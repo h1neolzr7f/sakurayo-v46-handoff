@@ -1,0 +1,376 @@
+{
+  "job": "atlas_skills_b",
+  "source": "C:\\Users\\tzzcomputer\\Desktop\\樱夜尸潮_V3.5_Codex续作\\assets\\image2\\source\\atlas_skills_b.png",
+  "atlas_size": [
+    1774,
+    887
+  ],
+  "cell_size": [
+    221,
+    295
+  ],
+  "detected_tiles": true,
+  "outputs": [
+    {
+      "id": "star",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\star.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        12,
+        66,
+        224,
+        301
+      ]
+    },
+    {
+      "id": "ribbon",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\ribbon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        232,
+        66,
+        443,
+        301
+      ]
+    },
+    {
+      "id": "transform",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\transform.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        451,
+        66,
+        662,
+        301
+      ]
+    },
+    {
+      "id": "sword",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\sword.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        669,
+        66,
+        881,
+        301
+      ]
+    },
+    {
+      "id": "qi",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\qi.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        889,
+        66,
+        1101,
+        301
+      ]
+    },
+    {
+      "id": "thunder",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\thunder.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1107,
+        66,
+        1319,
+        301
+      ]
+    },
+    {
+      "id": "fireball",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\fireball.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1327,
+        66,
+        1538,
+        301
+      ]
+    },
+    {
+      "id": "frost",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\frost.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1547,
+        66,
+        1760,
+        301
+      ]
+    },
+    {
+      "id": "chain",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\chain.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        12,
+        318,
+        224,
+        550
+      ]
+    },
+    {
+      "id": "talisman",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\talisman.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        232,
+        318,
+        443,
+        550
+      ]
+    },
+    {
+      "id": "barrier",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\barrier.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        451,
+        318,
+        662,
+        550
+      ]
+    },
+    {
+      "id": "spirit",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\spirit.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        669,
+        318,
+        881,
+        550
+      ]
+    },
+    {
+      "id": "familiar",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\familiar.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        889,
+        318,
+        1101,
+        550
+      ]
+    },
+    {
+      "id": "contract",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\contract.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1107,
+        318,
+        1319,
+        550
+      ]
+    },
+    {
+      "id": "sacrifice",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\sacrifice.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1327,
+        318,
+        1538,
+        550
+      ]
+    },
+    {
+      "id": "kunai",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\kunai.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1547,
+        318,
+        1760,
+        550
+      ]
+    },
+    {
+      "id": "shadowstep",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\shadowstep.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        12,
+        567,
+        224,
+        803
+      ]
+    },
+    {
+      "id": "mark",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\mark.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        232,
+        567,
+        443,
+        803
+      ]
+    },
+    {
+      "id": "beat",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\beat.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        451,
+        567,
+        662,
+        803
+      ]
+    },
+    {
+      "id": "encore",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\encore.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        669,
+        567,
+        881,
+        803
+      ]
+    },
+    {
+      "id": "spotlight",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\spotlight.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        889,
+        567,
+        1101,
+        803
+      ]
+    },
+    {
+      "id": "soul",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\soul.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1107,
+        567,
+        1319,
+        803
+      ]
+    },
+    {
+      "id": "bone",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\bone.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1327,
+        567,
+        1538,
+        803
+      ]
+    },
+    {
+      "id": "raise",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\raise.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1547,
+        567,
+        1760,
+        803
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\atlas_skills_b.png"
+}

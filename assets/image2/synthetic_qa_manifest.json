@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "output_root": "assets/image2/test_output",
+  "jobs": [
+    {
+      "id": "synthetic_chroma_qa",
+      "transparent": true,
+      "source": "assets/image2/source/synthetic_chroma_qa.png",
+      "processed": "assets/image2/processed/synthetic_chroma_qa.png",
+      "grid": {
+        "columns": 2,
+        "rows": 2,
+        "cells": [
+          {
+            "index": 0,
+            "id": "qa_1",
+            "output": "qa_1.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 1,
+            "id": "qa_2",
+            "output": "qa_2.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 2,
+            "id": "qa_3",
+            "output": "qa_3.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 3,
+            "id": "qa_4",
+            "output": "qa_4.webp",
+            "size": [
+              256,
+              256
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

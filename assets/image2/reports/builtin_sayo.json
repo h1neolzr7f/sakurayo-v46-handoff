@@ -1,0 +1,78 @@
+{
+  "job": "builtin_sayo",
+  "source": "C:\\Users\\tzzcomputer\\Desktop\\樱夜尸潮_V3.5_Codex续作\\assets\\image2\\source\\builtin_sayo_sheet.png",
+  "atlas_size": [
+    1774,
+    887
+  ],
+  "cell_size": [
+    591,
+    887
+  ],
+  "outputs": [
+    {
+      "id": "sayo_portrait",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\sayo\\default\\portrait.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        98,
+        153,
+        540,
+        709
+      ],
+      "coverage": 0.49804,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "sayo_battle",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\sayo\\default\\battle.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        67,
+        46,
+        452,
+        804
+      ],
+      "coverage": 0.19153,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "sayo_dialogue",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\sayo\\default\\dialogue.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        0,
+        37,
+        556,
+        855
+      ],
+      "coverage": 0.39432,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\builtin_sayo.png"
+}

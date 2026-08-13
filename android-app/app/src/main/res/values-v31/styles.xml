@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Android 12+ always draws a platform splash before WebView creation. -->
+    <style name="Theme.Sakurayo" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">#080611</item>
+        <item name="android:statusBarColor">#080611</item>
+        <item name="android:colorAccent">#FF58A7</item>
+        <item name="android:windowBackground">#080611</item>
+        <item name="android:windowSplashScreenBackground">#080611</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">#241335</item>
+        <item name="android:windowSplashScreenAnimationDuration">240</item>
+    </style>
+</resources>

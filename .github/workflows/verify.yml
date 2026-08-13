@@ -1,0 +1,25 @@
+name: verify
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  static:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Static check and syntax
+        run: |
+          python tools/static_check.py src/index.html
+          node --check tests/artifacts/static/index.extracted.js
+          node --check src/runtime/sakurayo-cutscene.js
+          node --check src/runtime/sakurayo-economy.js
+          node --check src/runtime/sakurayo-lifecycle.js
+          node --check src/runtime/sakurayo-content-runtime.js

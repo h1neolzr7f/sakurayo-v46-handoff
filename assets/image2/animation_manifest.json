@@ -1,0 +1,59 @@
+{
+  "output_root": "android-app/app/src/main/assets",
+  "jobs": [
+    {
+      "id": "animation_sayo",
+      "transparent": true,
+      "min_component_ratio": 0.45,
+      "source": "assets/image2/source/chibi_animation_sayo.png",
+      "processed": "assets/image2/processed/chibi_animation_sayo.png",
+      "grid": {
+        "columns": 5,
+        "rows": 1,
+        "cells": [
+          {"index": 0, "id": "idle", "output": "game/art/characters/sayo/default/anim_idle.webp", "size": [512, 512]},
+          {"index": 1, "id": "move", "output": "game/art/characters/sayo/default/anim_move.webp", "size": [512, 512]},
+          {"index": 2, "id": "attack", "output": "game/art/characters/sayo/default/anim_attack.webp", "size": [512, 512]},
+          {"index": 3, "id": "hit", "output": "game/art/characters/sayo/default/anim_hit.webp", "size": [512, 512]},
+          {"index": 4, "id": "dash", "output": "game/art/characters/sayo/default/anim_dash.webp", "size": [512, 512]}
+        ]
+      }
+    },
+    {
+      "id": "animation_aya",
+      "transparent": true,
+      "min_component_ratio": 0.45,
+      "source": "assets/image2/source/chibi_animation_aya.png",
+      "processed": "assets/image2/processed/chibi_animation_aya.png",
+      "grid": {
+        "columns": 5,
+        "rows": 1,
+        "cells": [
+          {"index": 0, "id": "idle", "output": "game/art/characters/aya/default/anim_idle.webp", "size": [512, 512]},
+          {"index": 1, "id": "move", "output": "game/art/characters/aya/default/anim_move.webp", "size": [512, 512]},
+          {"index": 2, "id": "attack", "output": "game/art/characters/aya/default/anim_attack.webp", "size": [512, 512]},
+          {"index": 3, "id": "hit", "output": "game/art/characters/aya/default/anim_hit.webp", "size": [512, 512]},
+          {"index": 4, "id": "dash", "output": "game/art/characters/aya/default/anim_dash.webp", "size": [512, 512], "source_box": [1580, 0, 2172, 724]}
+        ]
+      }
+    },
+    {
+      "id": "animation_rion",
+      "transparent": true,
+      "min_component_ratio": 0.45,
+      "source": "assets/image2/source/chibi_animation_rion.png",
+      "processed": "assets/image2/processed/chibi_animation_rion.png",
+      "grid": {
+        "columns": 5,
+        "rows": 1,
+        "cells": [
+          {"index": 0, "id": "idle", "output": "game/art/characters/rion/default/anim_idle.webp", "size": [512, 512]},
+          {"index": 1, "id": "move", "output": "game/art/characters/rion/default/anim_move.webp", "size": [512, 512]},
+          {"index": 2, "id": "attack", "output": "game/art/characters/rion/default/anim_attack.webp", "size": [512, 512]},
+          {"index": 3, "id": "hit", "output": "game/art/characters/rion/default/anim_hit.webp", "size": [512, 512]},
+          {"index": 4, "id": "dash", "output": "game/art/characters/rion/default/anim_dash.webp", "size": [512, 512]}
+        ]
+      }
+    }
+  ]
+}

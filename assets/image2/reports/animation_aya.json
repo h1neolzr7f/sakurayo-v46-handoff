@@ -1,0 +1,121 @@
+{
+  "job": "animation_aya",
+  "source": "C:\\Users\\tzzcomputer\\Desktop\\樱夜尸潮_V3.5_Codex续作\\assets\\image2\\source\\chibi_animation_aya.png",
+  "atlas_size": [
+    2172,
+    724
+  ],
+  "cell_size": [
+    434,
+    724
+  ],
+  "detected_tiles": false,
+  "outputs": [
+    {
+      "id": "idle",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\aya\\default\\anim_idle.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        80,
+        104,
+        396,
+        586
+      ],
+      "coverage": 0.2659,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "move",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\aya\\default\\anim_move.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        39,
+        133,
+        395,
+        585
+      ],
+      "coverage": 0.26131,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "attack",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\aya\\default\\anim_attack.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        0,
+        125,
+        399,
+        583
+      ],
+      "coverage": 0.27721,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "hit",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\aya\\default\\anim_hit.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        27,
+        132,
+        362,
+        586
+      ],
+      "coverage": 0.26302,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "dash",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\aya\\default\\anim_dash.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        94,
+        216,
+        568,
+        586
+      ],
+      "coverage": 0.27773,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\animation_aya.png"
+}

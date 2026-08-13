@@ -1,0 +1,60 @@
+apply plugin: "com.android.application"
+
+def releaseKeystorePropertiesFile = rootProject.file("keystore.properties")
+def releaseKeystoreProperties = new Properties()
+if (releaseKeystorePropertiesFile.exists()) {
+    releaseKeystoreProperties.load(new FileInputStream(releaseKeystorePropertiesFile))
+}
+
+android {
+    namespace "com.sakurayo.zombietide"
+    compileSdk 36
+
+    defaultConfig {
+        applicationId "com.sakurayo.zombietide"
+        minSdk 23
+        targetSdk 36
+        versionCode 51
+        versionName "4.4.1"
+    }
+
+    signingConfigs {
+        release {
+            if (releaseKeystorePropertiesFile.exists()) {
+                storeFile rootProject.file(releaseKeystoreProperties["storeFile"])
+                storePassword releaseKeystoreProperties["storePassword"]
+                keyAlias releaseKeystoreProperties["keyAlias"]
+                keyPassword releaseKeystoreProperties["keyPassword"]
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            debuggable true
+        }
+        release {
+            minifyEnabled false
+            shrinkResources false
+            if (releaseKeystorePropertiesFile.exists()) {
+                signingConfig signingConfigs.release
+            }
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    packaging {
+        resources {
+            excludes += ["META-INF/DEPENDENCIES", "META-INF/LICENSE*", "META-INF/NOTICE*"]
+        }
+    }
+}

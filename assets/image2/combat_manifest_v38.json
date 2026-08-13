@@ -1,0 +1,147 @@
+{
+  "version": "3.8",
+  "enemies": [
+    {
+      "id": "normal",
+      "path": "android-app/app/src/main/assets/game/art/enemies/normal.webp",
+      "coverage": 0.3199
+    },
+    {
+      "id": "fast",
+      "path": "android-app/app/src/main/assets/game/art/enemies/fast.webp",
+      "coverage": 0.3665
+    },
+    {
+      "id": "tank",
+      "path": "android-app/app/src/main/assets/game/art/enemies/tank.webp",
+      "coverage": 0.5463
+    },
+    {
+      "id": "ranged",
+      "path": "android-app/app/src/main/assets/game/art/enemies/ranged.webp",
+      "coverage": 0.4061
+    },
+    {
+      "id": "bomb",
+      "path": "android-app/app/src/main/assets/game/art/enemies/bomb.webp",
+      "coverage": 0.4082
+    },
+    {
+      "id": "shield",
+      "path": "android-app/app/src/main/assets/game/art/enemies/shield.webp",
+      "coverage": 0.4637
+    },
+    {
+      "id": "disruptor",
+      "path": "android-app/app/src/main/assets/game/art/enemies/disruptor.webp",
+      "coverage": 0.3822
+    },
+    {
+      "id": "purifier",
+      "path": "android-app/app/src/main/assets/game/art/enemies/purifier.webp",
+      "coverage": 0.4552
+    },
+    {
+      "id": "specter",
+      "path": "android-app/app/src/main/assets/game/art/enemies/specter.webp",
+      "coverage": 0.3788
+    },
+    {
+      "id": "decay",
+      "path": "android-app/app/src/main/assets/game/art/enemies/decay.webp",
+      "coverage": 0.3999
+    },
+    {
+      "id": "seal",
+      "path": "android-app/app/src/main/assets/game/art/enemies/seal.webp",
+      "coverage": 0.3738
+    },
+    {
+      "id": "elite",
+      "path": "android-app/app/src/main/assets/game/art/enemies/elite.webp",
+      "coverage": 0.478
+    }
+  ],
+  "bosses": [
+    {
+      "id": "stage1_phase1",
+      "path": "android-app/app/src/main/assets/game/art/bosses/stage1_phase1.webp",
+      "coverage": 0.4268
+    },
+    {
+      "id": "stage1_phase2",
+      "path": "android-app/app/src/main/assets/game/art/bosses/stage1_phase2.webp",
+      "coverage": 0.381
+    },
+    {
+      "id": "stage1_phase3",
+      "path": "android-app/app/src/main/assets/game/art/bosses/stage1_phase3.webp",
+      "coverage": 0.4181
+    },
+    {
+      "id": "stage1_phase4",
+      "path": "android-app/app/src/main/assets/game/art/bosses/stage1_phase4.webp",
+      "coverage": 0.6384
+    },
+    {
+      "id": "stage2_phase1",
+      "path": "android-app/app/src/main/assets/game/art/bosses/stage2_phase1.webp",
+      "coverage": 0.3334
+    },
+    {
+      "id": "stage2_phase2",
+      "path": "android-app/app/src/main/assets/game/art/bosses/stage2_phase2.webp",
+      "coverage": 0.305
+    },
+    {
+      "id": "stage2_phase3",
+      "path": "android-app/app/src/main/assets/game/art/bosses/stage2_phase3.webp",
+      "coverage": 0.2961
+    },
+    {
+      "id": "stage2_phase4",
+      "path": "android-app/app/src/main/assets/game/art/bosses/stage2_phase4.webp",
+      "coverage": 0.3631
+    },
+    {
+      "id": "stage3_phase1",
+      "path": "android-app/app/src/main/assets/game/art/bosses/stage3_phase1.webp",
+      "coverage": 0.2682
+    },
+    {
+      "id": "stage3_phase2",
+      "path": "android-app/app/src/main/assets/game/art/bosses/stage3_phase2.webp",
+      "coverage": 0.3362
+    },
+    {
+      "id": "stage3_phase3",
+      "path": "android-app/app/src/main/assets/game/art/bosses/stage3_phase3.webp",
+      "coverage": 0.4152
+    },
+    {
+      "id": "stage3_phase4",
+      "path": "android-app/app/src/main/assets/game/art/bosses/stage3_phase4.webp",
+      "coverage": 0.4457
+    },
+    {
+      "id": "stage4_phase1",
+      "path": "android-app/app/src/main/assets/game/art/bosses/stage4_phase1.webp",
+      "coverage": 0.2893
+    },
+    {
+      "id": "stage4_phase2",
+      "path": "android-app/app/src/main/assets/game/art/bosses/stage4_phase2.webp",
+      "coverage": 0.3228
+    },
+    {
+      "id": "stage4_phase3",
+      "path": "android-app/app/src/main/assets/game/art/bosses/stage4_phase3.webp",
+      "coverage": 0.4244
+    },
+    {
+      "id": "stage4_phase4",
+      "path": "android-app/app/src/main/assets/game/art/bosses/stage4_phase4.webp",
+      "coverage": 0.6771
+    }
+  ]
+}

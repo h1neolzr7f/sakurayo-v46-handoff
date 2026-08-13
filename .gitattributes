@@ -1,0 +1,15 @@
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.png binary
+*.webp binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.wav binary
+*.mp3 binary
+*.ogg binary
+*.jks binary
+*.keystore binary
+android-app/app/src/main/assets/index.html linguist-generated=true

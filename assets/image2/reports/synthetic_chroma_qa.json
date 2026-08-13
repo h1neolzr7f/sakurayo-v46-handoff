@@ -1,0 +1,99 @@
+{
+  "job": "synthetic_chroma_qa",
+  "source": "C:\\Users\\tzzcomputer\\Desktop\\樱夜尸潮_V3.5_Codex续作\\assets\\image2\\source\\synthetic_chroma_qa.png",
+  "atlas_size": [
+    1024,
+    1024
+  ],
+  "cell_size": [
+    512,
+    512
+  ],
+  "outputs": [
+    {
+      "id": "qa_1",
+      "path": "assets\\image2\\test_output\\qa_1.webp",
+      "size": [
+        256,
+        256
+      ],
+      "source_bbox": [
+        130,
+        54,
+        383,
+        431
+      ],
+      "coverage": 0.43034,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "qa_2",
+      "path": "assets\\image2\\test_output\\qa_2.webp",
+      "size": [
+        256,
+        256
+      ],
+      "source_bbox": [
+        130,
+        62,
+        383,
+        425
+      ],
+      "coverage": 0.44189,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "qa_3",
+      "path": "assets\\image2\\test_output\\qa_3.webp",
+      "size": [
+        256,
+        256
+      ],
+      "source_bbox": [
+        130,
+        70,
+        383,
+        419
+      ],
+      "coverage": 0.4528,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "qa_4",
+      "path": "assets\\image2\\test_output\\qa_4.webp",
+      "size": [
+        256,
+        256
+      ],
+      "source_bbox": [
+        130,
+        78,
+        383,
+        413
+      ],
+      "coverage": 0.46443,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\synthetic_chroma_qa.png"
+}

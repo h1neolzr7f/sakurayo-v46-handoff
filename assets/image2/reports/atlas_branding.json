@@ -1,0 +1,76 @@
+{
+  "job": "atlas_branding",
+  "source": "C:\\Users\\tzzcomputer\\Desktop\\樱夜尸潮_V3.5_Codex续作\\assets\\image2\\source\\atlas_branding.png",
+  "atlas_size": [
+    1254,
+    1254
+  ],
+  "cell_size": [
+    627,
+    627
+  ],
+  "detected_tiles": false,
+  "outputs": [
+    {
+      "id": "app_icon",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\ui\\app_icon.webp",
+      "size": [
+        512,
+        512
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        0,
+        0,
+        627,
+        627
+      ]
+    },
+    {
+      "id": "menu_emblem",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\ui\\menu_emblem.webp",
+      "size": [
+        512,
+        512
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        627,
+        0,
+        1254,
+        627
+      ]
+    },
+    {
+      "id": "loading_art",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\ui\\loading_art.webp",
+      "size": [
+        512,
+        512
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        0,
+        627,
+        627,
+        1254
+      ]
+    },
+    {
+      "id": "achievement_master",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\ui\\achievement_master.webp",
+      "size": [
+        512,
+        512
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        627,
+        627,
+        1254,
+        1254
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\atlas_branding.png"
+}

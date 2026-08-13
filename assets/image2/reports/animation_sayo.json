@@ -1,0 +1,121 @@
+{
+  "job": "animation_sayo",
+  "source": "C:\\Users\\tzzcomputer\\Desktop\\樱夜尸潮_V3.5_Codex续作\\assets\\image2\\source\\chibi_animation_sayo.png",
+  "atlas_size": [
+    2172,
+    724
+  ],
+  "cell_size": [
+    434,
+    724
+  ],
+  "detected_tiles": false,
+  "outputs": [
+    {
+      "id": "idle",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\sayo\\default\\anim_idle.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        71,
+        115,
+        375,
+        556
+      ],
+      "coverage": 0.28156,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "move",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\sayo\\default\\anim_move.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        31,
+        135,
+        388,
+        554
+      ],
+      "coverage": 0.29874,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "attack",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\sayo\\default\\anim_attack.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        0,
+        130,
+        434,
+        556
+      ],
+      "coverage": 0.33383,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "hit",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\sayo\\default\\anim_hit.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        14,
+        144,
+        325,
+        554
+      ],
+      "coverage": 0.28235,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "dash",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\sayo\\default\\anim_dash.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        0,
+        238,
+        378,
+        547
+      ],
+      "coverage": 0.30263,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\animation_sayo.png"
+}

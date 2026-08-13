@@ -1,0 +1,13 @@
+{
+  "version": "3.7.0",
+  "purpose": "Three-character shop costume portrait, dialogue and five-state chibi animation sets",
+  "assetRoot": "art/characters",
+  "characters": ["sayo", "aya", "rion"],
+  "skins": ["techcoat", "biodress", "psirobe", "haori", "idol", "apron", "summon", "festival"],
+  "files": ["portrait.webp", "dialogue.webp", "anim_idle.webp", "anim_move.webp", "anim_attack.webp", "anim_hit.webp", "anim_dash.webp"],
+  "expectedSets": 24,
+  "expectedFiles": 168,
+  "sourcePattern": "assets/image2/source/costume_<skin>_atlas.png",
+  "outputPattern": "android-app/app/src/main/assets/game/art/characters/<character>/<skin>/<file>",
+  "previewPattern": "assets/image2/previews/costumes/<character>_<skin>.png"
+}

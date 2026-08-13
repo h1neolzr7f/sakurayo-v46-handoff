@@ -1,0 +1,496 @@
+{
+  "job": "atlas_progression_b",
+  "source": "C:\\Users\\tzzcomputer\\Desktop\\樱夜尸潮_V3.5_Codex续作\\assets\\image2\\source\\atlas_progression_b.png",
+  "atlas_size": [
+    1536,
+    1024
+  ],
+  "cell_size": [
+    192,
+    256
+  ],
+  "detected_tiles": true,
+  "outputs": [
+    {
+      "id": "exorcist",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\exorcist\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        11,
+        32,
+        202,
+        266
+      ]
+    },
+    {
+      "id": "guardian",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\guardian\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        208,
+        32,
+        398,
+        266
+      ]
+    },
+    {
+      "id": "beast",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\beast\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        405,
+        32,
+        589,
+        266
+      ]
+    },
+    {
+      "id": "heroic",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\heroic\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        595,
+        32,
+        774,
+        266
+      ]
+    },
+    {
+      "id": "shadow",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\shadow\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        780,
+        32,
+        956,
+        266
+      ]
+    },
+    {
+      "id": "bombNinja",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\bombNinja\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        963,
+        32,
+        1140,
+        266
+      ]
+    },
+    {
+      "id": "warSinger",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\warSinger\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1147,
+        32,
+        1330,
+        266
+      ]
+    },
+    {
+      "id": "healingIdol",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\healingIdol\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1336,
+        32,
+        1523,
+        266
+      ]
+    },
+    {
+      "id": "boneKing",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\boneKing\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        11,
+        275,
+        202,
+        505
+      ]
+    },
+    {
+      "id": "soulHerd",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\soulHerd\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        208,
+        275,
+        398,
+        505
+      ]
+    },
+    {
+      "id": "magitech",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\fusions\\magitech\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        405,
+        275,
+        589,
+        505
+      ]
+    },
+    {
+      "id": "bloodsword",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\fusions\\bloodsword\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        595,
+        275,
+        774,
+        505
+      ]
+    },
+    {
+      "id": "plagueforge",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\fusions\\plagueforge\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        780,
+        275,
+        956,
+        505
+      ]
+    },
+    {
+      "id": "gunshrine",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\fusions\\gunshrine\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        963,
+        275,
+        1140,
+        505
+      ]
+    },
+    {
+      "id": "chimera",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\fusions\\chimera\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1147,
+        275,
+        1330,
+        505
+      ]
+    },
+    {
+      "id": "railsword",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\fusions\\railsword\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1336,
+        275,
+        1523,
+        505
+      ]
+    },
+    {
+      "id": "bloodstar",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\fusions\\bloodstar\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        11,
+        515,
+        202,
+        737
+      ]
+    },
+    {
+      "id": "biogun",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\fusions\\biogun\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        208,
+        515,
+        398,
+        737
+      ]
+    },
+    {
+      "id": "thunderpriest",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\fusions\\thunderpriest\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        405,
+        515,
+        589,
+        737
+      ]
+    },
+    {
+      "id": "corpseimmortal",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\fusions\\corpseimmortal\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        595,
+        515,
+        774,
+        737
+      ]
+    },
+    {
+      "id": "bloodmech",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\fusions\\bloodmech\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        780,
+        515,
+        956,
+        737
+      ]
+    },
+    {
+      "id": "flowerplague",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\fusions\\flowerplague\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        963,
+        515,
+        1140,
+        737
+      ]
+    },
+    {
+      "id": "shikigami",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\fusions\\shikigami\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1147,
+        515,
+        1330,
+        737
+      ]
+    },
+    {
+      "id": "shadowmage",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\fusions\\shadowmage\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1336,
+        515,
+        1523,
+        737
+      ]
+    },
+    {
+      "id": "idolgun",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\fusions\\idolgun\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        11,
+        747,
+        202,
+        980
+      ]
+    },
+    {
+      "id": "necrospore",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\fusions\\necrospore\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        208,
+        747,
+        398,
+        980
+      ]
+    },
+    {
+      "id": "bloodbeast",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\fusions\\bloodbeast\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        405,
+        747,
+        589,
+        980
+      ]
+    },
+    {
+      "id": "shadowblade",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\fusions\\shadowblade\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        595,
+        747,
+        774,
+        980
+      ]
+    },
+    {
+      "id": "tech",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\ascensions\\tech\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        780,
+        747,
+        956,
+        980
+      ]
+    },
+    {
+      "id": "bio",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\ascensions\\bio\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        963,
+        747,
+        1140,
+        980
+      ]
+    },
+    {
+      "id": "psi",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\ascensions\\psi\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1147,
+        747,
+        1330,
+        980
+      ]
+    },
+    {
+      "id": "locked",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\ui\\locked.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1336,
+        747,
+        1523,
+        980
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\atlas_progression_b.png"
+}

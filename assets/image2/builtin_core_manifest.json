@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "model": "builtin-imagegen",
+  "output_root": "android-app/app/src/main/assets",
+  "jobs": [
+    {
+      "id": "builtin_sayo",
+      "source": "assets/image2/source/builtin_sayo_sheet.png",
+      "processed": "assets/image2/processed/builtin_sayo_sheet.png",
+      "transparent": true,
+      "grid": {
+        "columns": 3,
+        "rows": 1,
+        "cells": [
+          {"index": 0, "id": "sayo_portrait", "output": "game/art/characters/sayo/default/portrait.webp", "size": [512, 512], "min_component_ratio": 0.50},
+          {"index": 1, "id": "sayo_battle", "output": "game/art/characters/sayo/default/battle.webp", "size": [512, 512], "min_component_ratio": 0.50},
+          {"index": 2, "id": "sayo_dialogue", "output": "game/art/characters/sayo/default/dialogue.webp", "size": [512, 512], "min_component_ratio": 0.50}
+        ]
+      }
+    },
+    {
+      "id": "builtin_aya",
+      "source": "assets/image2/source/builtin_aya_sheet.png",
+      "processed": "assets/image2/processed/builtin_aya_sheet.png",
+      "transparent": true,
+      "grid": {
+        "columns": 3,
+        "rows": 1,
+        "cells": [
+          {"index": 0, "id": "aya_portrait", "output": "game/art/characters/aya/default/portrait.webp", "size": [512, 512]},
+          {"index": 1, "id": "aya_battle", "output": "game/art/characters/aya/default/battle.webp", "size": [512, 512]},
+          {"index": 2, "id": "aya_dialogue", "output": "game/art/characters/aya/default/dialogue.webp", "size": [512, 512]}
+        ]
+      }
+    },
+    {
+      "id": "builtin_rion",
+      "source": "assets/image2/source/builtin_rion_sheet.png",
+      "processed": "assets/image2/processed/builtin_rion_sheet.png",
+      "transparent": true,
+      "grid": {
+        "columns": 3,
+        "rows": 1,
+        "cells": [
+          {"index": 0, "id": "rion_portrait", "output": "game/art/characters/rion/default/portrait.webp", "size": [512, 512]},
+          {"index": 1, "id": "rion_battle", "output": "game/art/characters/rion/default/battle.webp", "size": [512, 512]},
+          {"index": 2, "id": "rion_dialogue", "output": "game/art/characters/rion/default/dialogue.webp", "size": [512, 512]}
+        ]
+      }
+    },
+    {
+      "id": "builtin_nav_icons",
+      "source": "assets/image2/source/builtin_nav_icons.png",
+      "processed": "assets/image2/processed/builtin_nav_icons.png",
+      "transparent": false,
+      "grid": {
+        "columns": 3,
+        "rows": 2,
+        "cells": [
+          {"index": 0, "id": "nav_stage", "output": "game/art/ui/nav/stage.webp", "size": [256, 256]},
+          {"index": 1, "id": "nav_talent", "output": "game/art/ui/nav/talent.webp", "size": [256, 256]},
+          {"index": 2, "id": "nav_story", "output": "game/art/ui/nav/story.webp", "size": [256, 256]},
+          {"index": 3, "id": "nav_ascension", "output": "game/art/ui/nav/ascension.webp", "size": [256, 256]},
+          {"index": 4, "id": "nav_achievement", "output": "game/art/ui/nav/achievement.webp", "size": [256, 256]},
+          {"index": 5, "id": "nav_shop", "output": "game/art/ui/nav/shop.webp", "size": [256, 256]}
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "project": "樱夜·尸潮",
+  "version": "3.6.0",
+  "subtitle": "轮回主神篇 · 自由武器方向与专属兑换",
+  "entry": "src/index.html",
+  "release": "release/樱夜尸潮_V3.6_轮回主神篇.apk",
+  "source_sha256": "C6BF24D36525C0EB9866FE16CE81CB04F5A742D6F0D1E5EBB18BEA34C5AE5CB1",
+  "release_sha256": "34541561E89E7D72FD81674854DE7EBE40B6EE4695FBEE75720F5F287444C8AA",
+  "save_key": "sakurayoV3",
+  "runtime": "offline HTML5 Canvas / localStorage",
+  "target": [
+    "Android Chrome",
+    "Android WebView",
+    "desktop browser for testing"
+  ],
+  "characters": 3,
+  "image2_core_assets": 16,
+  "base_careers": 14,
+  "career_branches": 28,
+  "fusions": 18,
+  "ascensions": 3,
+  "validation": {
+    "static_check": "passed",
+    "node_syntax": "passed",
+    "browser_smoke": 26,
+    "viewports": [
+      "430x932",
+      "360x800",
+      "932x430"
+    ],
+    "external_requests": 0,
+    "tested_at": "2026-07-11",
+    "android_avd": "TFModLab_API35",
+    "apk_install": "passed",
+    "apk_cold_start": "passed",
+    "android_battle_visual": "passed",
+    "main_god_mode": "passed",
+    "weapon_alignment": "passed",
+    "directional_slash": "passed",
+    "new_cover": "passed"
+  }
+}

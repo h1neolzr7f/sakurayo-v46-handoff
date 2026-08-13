@@ -1,0 +1,2647 @@
+{
+  "version": 1,
+  "model": "gpt-image-2",
+  "reference_images": [
+    "assets/image2/reference/style_character.jpg",
+    "assets/image2/reference/style_game_ui.png"
+  ],
+  "output_root": "android-app/app/src/main/assets",
+  "note": "Complete raster asset plan: default and 8 alternate character outfits, enemies, bosses, pets, drops, hazards, 4 stages, 14 classes, 28 careers, 18 fusions, 3 ascensions, 48 skills and 4 branding assets. CSS text, UI frames, particles, bullets and damage numbers remain deterministic code-native assets.",
+  "jobs": [
+    {
+      "id": "atlas_characters",
+      "phase": "essential",
+      "kind": "atlas",
+      "size": "2304x2304",
+      "quality": "high",
+      "transparent": true,
+      "chroma_key": "#00ff00",
+      "source": "assets/image2/source/atlas_characters.png",
+      "processed": "assets/image2/processed/atlas_characters.png",
+      "grid": {
+        "columns": 3,
+        "rows": 3,
+        "cells": [
+          {
+            "index": 0,
+            "id": "sayo_portrait",
+            "name": "月城小夜 portrait",
+            "output": "game/art/characters/sayo/default/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 1,
+            "id": "aya_portrait",
+            "name": "神代绫 portrait",
+            "output": "game/art/characters/aya/default/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 2,
+            "id": "rion_portrait",
+            "name": "黑羽凛音 portrait",
+            "output": "game/art/characters/rion/default/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 3,
+            "id": "sayo_battle",
+            "name": "月城小夜 battle",
+            "output": "game/art/characters/sayo/default/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 4,
+            "id": "aya_battle",
+            "name": "神代绫 battle",
+            "output": "game/art/characters/aya/default/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 5,
+            "id": "rion_battle",
+            "name": "黑羽凛音 battle",
+            "output": "game/art/characters/rion/default/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 6,
+            "id": "sayo_dialogue",
+            "name": "月城小夜 dialogue",
+            "output": "game/art/characters/sayo/default/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 7,
+            "id": "aya_dialogue",
+            "name": "神代绫 dialogue",
+            "output": "game/art/characters/aya/default/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 8,
+            "id": "rion_dialogue",
+            "name": "黑羽凛音 dialogue",
+            "output": "game/art/characters/rion/default/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          }
+        ]
+      },
+      "prompt": "Image 1 is the PRIMARY visual-style reference only: clean Japanese anime cel illustration, delicate dark outlines, warm soft skin colors, smooth two-step shading, cute readable silhouettes, polished but uncluttered details. Image 2 is composition/game-scale reference only. Create original Sakurayo Zombie Tide assets; do not copy the reference character, clothing, logos, or text. No text, letters, numbers, labels, signatures, UI captions, or watermark. Strict 3 by 3 equal grid, row-major in the exact listed order. One centered isolated asset per cell, uniform scale and anchor, 8 percent safe margin, nothing crosses cell boundaries, no grid lines. Rows are: circular clean avatar busts; compact full-body top-down battle sprites facing front; expressive waist-up dialogue portraits. Columns are Sayo, Aya, Rion. Preserve each character identity across rows. Perfectly flat solid #00ff00 chroma-key background. No shadows, gradients, texture, reflection, floor plane, fog, glow outside the silhouette, or lighting variation on the background. Never use #00ff00 in subjects."
+    },
+    {
+      "id": "atlas_skin_techcoat",
+      "phase": "skins",
+      "kind": "atlas",
+      "size": "2304x2304",
+      "quality": "high",
+      "transparent": true,
+      "chroma_key": "#00ff00",
+      "source": "assets/image2/source/atlas_skin_techcoat.png",
+      "processed": "assets/image2/processed/atlas_skin_techcoat.png",
+      "grid": {
+        "columns": 3,
+        "rows": 3,
+        "cells": [
+          {
+            "index": 0,
+            "id": "sayo_portrait",
+            "name": "月城小夜 portrait",
+            "output": "game/art/characters/sayo/techcoat/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 1,
+            "id": "aya_portrait",
+            "name": "神代绫 portrait",
+            "output": "game/art/characters/aya/techcoat/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 2,
+            "id": "rion_portrait",
+            "name": "黑羽凛音 portrait",
+            "output": "game/art/characters/rion/techcoat/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 3,
+            "id": "sayo_battle",
+            "name": "月城小夜 battle",
+            "output": "game/art/characters/sayo/techcoat/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 4,
+            "id": "aya_battle",
+            "name": "神代绫 battle",
+            "output": "game/art/characters/aya/techcoat/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 5,
+            "id": "rion_battle",
+            "name": "黑羽凛音 battle",
+            "output": "game/art/characters/rion/techcoat/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 6,
+            "id": "sayo_dialogue",
+            "name": "月城小夜 dialogue",
+            "output": "game/art/characters/sayo/techcoat/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 7,
+            "id": "aya_dialogue",
+            "name": "神代绫 dialogue",
+            "output": "game/art/characters/aya/techcoat/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 8,
+            "id": "rion_dialogue",
+            "name": "黑羽凛音 dialogue",
+            "output": "game/art/characters/rion/techcoat/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          }
+        ]
+      },
+      "prompt": "Image 1 is the PRIMARY visual-style reference only: clean Japanese anime cel illustration, delicate dark outlines, warm soft skin colors, smooth two-step shading, cute readable silhouettes, polished but uncluttered details. Image 2 is composition/game-scale reference only. Create original Sakurayo Zombie Tide assets; do not copy the reference character, clothing, logos, or text. No text, letters, numbers, labels, signatures, UI captions, or watermark. Strict 3 by 3 equal grid, row-major in the exact listed order. One centered isolated asset per cell, uniform scale and anchor, 8 percent safe margin, nothing crosses cell boundaries, no grid lines. Same exact row and column roles as the default character sheet. Character identities: 月城小夜: purple-haired shrine-gunner girl with a compact cherry-blossom assault rifle, pink and violet combat shrine outfit; 神代绫: silver-haired agile tracker girl carrying a compact pistol and a moonlight katana, blue-white tactical school outfit; 黑羽凛音: long black-haired pure katana swordswoman, dark red and black modern sword-school outfit, calm fierce expression. Dress all three in the shared 霓虹战术风衣 theme: cyan and navy neon tactical trench coat with compact armored panels. Weapons and faces remain character-specific; the outfit must be visibly different from the default and consistent across portrait, battle and dialogue rows. Perfectly flat solid #00ff00 chroma-key background. No shadows, gradients, texture, reflection, floor plane, fog, glow outside the silhouette, or lighting variation on the background. Never use #00ff00 in subjects."
+    },
+    {
+      "id": "atlas_skin_biodress",
+      "phase": "skins",
+      "kind": "atlas",
+      "size": "2304x2304",
+      "quality": "high",
+      "transparent": true,
+      "chroma_key": "#00ff00",
+      "source": "assets/image2/source/atlas_skin_biodress.png",
+      "processed": "assets/image2/processed/atlas_skin_biodress.png",
+      "grid": {
+        "columns": 3,
+        "rows": 3,
+        "cells": [
+          {
+            "index": 0,
+            "id": "sayo_portrait",
+            "name": "月城小夜 portrait",
+            "output": "game/art/characters/sayo/biodress/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 1,
+            "id": "aya_portrait",
+            "name": "神代绫 portrait",
+            "output": "game/art/characters/aya/biodress/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 2,
+            "id": "rion_portrait",
+            "name": "黑羽凛音 portrait",
+            "output": "game/art/characters/rion/biodress/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 3,
+            "id": "sayo_battle",
+            "name": "月城小夜 battle",
+            "output": "game/art/characters/sayo/biodress/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 4,
+            "id": "aya_battle",
+            "name": "神代绫 battle",
+            "output": "game/art/characters/aya/biodress/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 5,
+            "id": "rion_battle",
+            "name": "黑羽凛音 battle",
+            "output": "game/art/characters/rion/biodress/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 6,
+            "id": "sayo_dialogue",
+            "name": "月城小夜 dialogue",
+            "output": "game/art/characters/sayo/biodress/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 7,
+            "id": "aya_dialogue",
+            "name": "神代绫 dialogue",
+            "output": "game/art/characters/aya/biodress/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 8,
+            "id": "rion_dialogue",
+            "name": "黑羽凛音 dialogue",
+            "output": "game/art/characters/rion/biodress/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          }
+        ]
+      },
+      "prompt": "Image 1 is the PRIMARY visual-style reference only: clean Japanese anime cel illustration, delicate dark outlines, warm soft skin colors, smooth two-step shading, cute readable silhouettes, polished but uncluttered details. Image 2 is composition/game-scale reference only. Create original Sakurayo Zombie Tide assets; do not copy the reference character, clothing, logos, or text. No text, letters, numbers, labels, signatures, UI captions, or watermark. Strict 3 by 3 equal grid, row-major in the exact listed order. One centered isolated asset per cell, uniform scale and anchor, 8 percent safe margin, nothing crosses cell boundaries, no grid lines. Same exact row and column roles as the default character sheet. Character identities: 月城小夜: purple-haired shrine-gunner girl with a compact cherry-blossom assault rifle, pink and violet combat shrine outfit; 神代绫: silver-haired agile tracker girl carrying a compact pistol and a moonlight katana, blue-white tactical school outfit; 黑羽凛音: long black-haired pure katana swordswoman, dark red and black modern sword-school outfit, calm fierce expression. Dress all three in the shared 绯血生体礼服 theme: crimson organic evening combat dress with subtle biotech vein motifs. Weapons and faces remain character-specific; the outfit must be visibly different from the default and consistent across portrait, battle and dialogue rows. Perfectly flat solid #00ff00 chroma-key background. No shadows, gradients, texture, reflection, floor plane, fog, glow outside the silhouette, or lighting variation on the background. Never use #00ff00 in subjects."
+    },
+    {
+      "id": "atlas_skin_psirobe",
+      "phase": "skins",
+      "kind": "atlas",
+      "size": "2304x2304",
+      "quality": "high",
+      "transparent": true,
+      "chroma_key": "#00ff00",
+      "source": "assets/image2/source/atlas_skin_psirobe.png",
+      "processed": "assets/image2/processed/atlas_skin_psirobe.png",
+      "grid": {
+        "columns": 3,
+        "rows": 3,
+        "cells": [
+          {
+            "index": 0,
+            "id": "sayo_portrait",
+            "name": "月城小夜 portrait",
+            "output": "game/art/characters/sayo/psirobe/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 1,
+            "id": "aya_portrait",
+            "name": "神代绫 portrait",
+            "output": "game/art/characters/aya/psirobe/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 2,
+            "id": "rion_portrait",
+            "name": "黑羽凛音 portrait",
+            "output": "game/art/characters/rion/psirobe/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 3,
+            "id": "sayo_battle",
+            "name": "月城小夜 battle",
+            "output": "game/art/characters/sayo/psirobe/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 4,
+            "id": "aya_battle",
+            "name": "神代绫 battle",
+            "output": "game/art/characters/aya/psirobe/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 5,
+            "id": "rion_battle",
+            "name": "黑羽凛音 battle",
+            "output": "game/art/characters/rion/psirobe/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 6,
+            "id": "sayo_dialogue",
+            "name": "月城小夜 dialogue",
+            "output": "game/art/characters/sayo/psirobe/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 7,
+            "id": "aya_dialogue",
+            "name": "神代绫 dialogue",
+            "output": "game/art/characters/aya/psirobe/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 8,
+            "id": "rion_dialogue",
+            "name": "黑羽凛音 dialogue",
+            "output": "game/art/characters/rion/psirobe/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          }
+        ]
+      },
+      "prompt": "Image 1 is the PRIMARY visual-style reference only: clean Japanese anime cel illustration, delicate dark outlines, warm soft skin colors, smooth two-step shading, cute readable silhouettes, polished but uncluttered details. Image 2 is composition/game-scale reference only. Create original Sakurayo Zombie Tide assets; do not copy the reference character, clothing, logos, or text. No text, letters, numbers, labels, signatures, UI captions, or watermark. Strict 3 by 3 equal grid, row-major in the exact listed order. One centered isolated asset per cell, uniform scale and anchor, 8 percent safe margin, nothing crosses cell boundaries, no grid lines. Same exact row and column roles as the default character sheet. Character identities: 月城小夜: purple-haired shrine-gunner girl with a compact cherry-blossom assault rifle, pink and violet combat shrine outfit; 神代绫: silver-haired agile tracker girl carrying a compact pistol and a moonlight katana, blue-white tactical school outfit; 黑羽凛音: long black-haired pure katana swordswoman, dark red and black modern sword-school outfit, calm fierce expression. Dress all three in the shared 星辉灵能裙装 theme: violet star-glow psychic layered skirt outfit with crystal ornaments. Weapons and faces remain character-specific; the outfit must be visibly different from the default and consistent across portrait, battle and dialogue rows. Perfectly flat solid #00ff00 chroma-key background. No shadows, gradients, texture, reflection, floor plane, fog, glow outside the silhouette, or lighting variation on the background. Never use #00ff00 in subjects."
+    },
+    {
+      "id": "atlas_skin_haori",
+      "phase": "skins",
+      "kind": "atlas",
+      "size": "2304x2304",
+      "quality": "high",
+      "transparent": true,
+      "chroma_key": "#00ff00",
+      "source": "assets/image2/source/atlas_skin_haori.png",
+      "processed": "assets/image2/processed/atlas_skin_haori.png",
+      "grid": {
+        "columns": 3,
+        "rows": 3,
+        "cells": [
+          {
+            "index": 0,
+            "id": "sayo_portrait",
+            "name": "月城小夜 portrait",
+            "output": "game/art/characters/sayo/haori/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 1,
+            "id": "aya_portrait",
+            "name": "神代绫 portrait",
+            "output": "game/art/characters/aya/haori/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 2,
+            "id": "rion_portrait",
+            "name": "黑羽凛音 portrait",
+            "output": "game/art/characters/rion/haori/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 3,
+            "id": "sayo_battle",
+            "name": "月城小夜 battle",
+            "output": "game/art/characters/sayo/haori/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 4,
+            "id": "aya_battle",
+            "name": "神代绫 battle",
+            "output": "game/art/characters/aya/haori/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 5,
+            "id": "rion_battle",
+            "name": "黑羽凛音 battle",
+            "output": "game/art/characters/rion/haori/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 6,
+            "id": "sayo_dialogue",
+            "name": "月城小夜 dialogue",
+            "output": "game/art/characters/sayo/haori/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 7,
+            "id": "aya_dialogue",
+            "name": "神代绫 dialogue",
+            "output": "game/art/characters/aya/haori/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 8,
+            "id": "rion_dialogue",
+            "name": "黑羽凛音 dialogue",
+            "output": "game/art/characters/rion/haori/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          }
+        ]
+      },
+      "prompt": "Image 1 is the PRIMARY visual-style reference only: clean Japanese anime cel illustration, delicate dark outlines, warm soft skin colors, smooth two-step shading, cute readable silhouettes, polished but uncluttered details. Image 2 is composition/game-scale reference only. Create original Sakurayo Zombie Tide assets; do not copy the reference character, clothing, logos, or text. No text, letters, numbers, labels, signatures, UI captions, or watermark. Strict 3 by 3 equal grid, row-major in the exact listed order. One centered isolated asset per cell, uniform scale and anchor, 8 percent safe margin, nothing crosses cell boundaries, no grid lines. Same exact row and column roles as the default character sheet. Character identities: 月城小夜: purple-haired shrine-gunner girl with a compact cherry-blossom assault rifle, pink and violet combat shrine outfit; 神代绫: silver-haired agile tracker girl carrying a compact pistol and a moonlight katana, blue-white tactical school outfit; 黑羽凛音: long black-haired pure katana swordswoman, dark red and black modern sword-school outfit, calm fierce expression. Dress all three in the shared 剑道部夜羽织 theme: midnight blue modern kendo haori with pale moon feather trim. Weapons and faces remain character-specific; the outfit must be visibly different from the default and consistent across portrait, battle and dialogue rows. Perfectly flat solid #00ff00 chroma-key background. No shadows, gradients, texture, reflection, floor plane, fog, glow outside the silhouette, or lighting variation on the background. Never use #00ff00 in subjects."
+    },
+    {
+      "id": "atlas_skin_idol",
+      "phase": "skins",
+      "kind": "atlas",
+      "size": "2304x2304",
+      "quality": "high",
+      "transparent": true,
+      "chroma_key": "#00ff00",
+      "source": "assets/image2/source/atlas_skin_idol.png",
+      "processed": "assets/image2/processed/atlas_skin_idol.png",
+      "grid": {
+        "columns": 3,
+        "rows": 3,
+        "cells": [
+          {
+            "index": 0,
+            "id": "sayo_portrait",
+            "name": "月城小夜 portrait",
+            "output": "game/art/characters/sayo/idol/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 1,
+            "id": "aya_portrait",
+            "name": "神代绫 portrait",
+            "output": "game/art/characters/aya/idol/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 2,
+            "id": "rion_portrait",
+            "name": "黑羽凛音 portrait",
+            "output": "game/art/characters/rion/idol/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 3,
+            "id": "sayo_battle",
+            "name": "月城小夜 battle",
+            "output": "game/art/characters/sayo/idol/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 4,
+            "id": "aya_battle",
+            "name": "神代绫 battle",
+            "output": "game/art/characters/aya/idol/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 5,
+            "id": "rion_battle",
+            "name": "黑羽凛音 battle",
+            "output": "game/art/characters/rion/idol/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 6,
+            "id": "sayo_dialogue",
+            "name": "月城小夜 dialogue",
+            "output": "game/art/characters/sayo/idol/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 7,
+            "id": "aya_dialogue",
+            "name": "神代绫 dialogue",
+            "output": "game/art/characters/aya/idol/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 8,
+            "id": "rion_dialogue",
+            "name": "黑羽凛音 dialogue",
+            "output": "game/art/characters/rion/idol/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          }
+        ]
+      },
+      "prompt": "Image 1 is the PRIMARY visual-style reference only: clean Japanese anime cel illustration, delicate dark outlines, warm soft skin colors, smooth two-step shading, cute readable silhouettes, polished but uncluttered details. Image 2 is composition/game-scale reference only. Create original Sakurayo Zombie Tide assets; do not copy the reference character, clothing, logos, or text. No text, letters, numbers, labels, signatures, UI captions, or watermark. Strict 3 by 3 equal grid, row-major in the exact listed order. One centered isolated asset per cell, uniform scale and anchor, 8 percent safe margin, nothing crosses cell boundaries, no grid lines. Same exact row and column roles as the default character sheet. Character identities: 月城小夜: purple-haired shrine-gunner girl with a compact cherry-blossom assault rifle, pink and violet combat shrine outfit; 神代绫: silver-haired agile tracker girl carrying a compact pistol and a moonlight katana, blue-white tactical school outfit; 黑羽凛音: long black-haired pure katana swordswoman, dark red and black modern sword-school outfit, calm fierce expression. Dress all three in the shared 末日舞台演出服 theme: pink black post-apocalypse idol stage costume with practical boots. Weapons and faces remain character-specific; the outfit must be visibly different from the default and consistent across portrait, battle and dialogue rows. Perfectly flat solid #00ff00 chroma-key background. No shadows, gradients, texture, reflection, floor plane, fog, glow outside the silhouette, or lighting variation on the background. Never use #00ff00 in subjects."
+    },
+    {
+      "id": "atlas_skin_apron",
+      "phase": "skins",
+      "kind": "atlas",
+      "size": "2304x2304",
+      "quality": "high",
+      "transparent": true,
+      "chroma_key": "#00ff00",
+      "source": "assets/image2/source/atlas_skin_apron.png",
+      "processed": "assets/image2/processed/atlas_skin_apron.png",
+      "grid": {
+        "columns": 3,
+        "rows": 3,
+        "cells": [
+          {
+            "index": 0,
+            "id": "sayo_portrait",
+            "name": "月城小夜 portrait",
+            "output": "game/art/characters/sayo/apron/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 1,
+            "id": "aya_portrait",
+            "name": "神代绫 portrait",
+            "output": "game/art/characters/aya/apron/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 2,
+            "id": "rion_portrait",
+            "name": "黑羽凛音 portrait",
+            "output": "game/art/characters/rion/apron/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 3,
+            "id": "sayo_battle",
+            "name": "月城小夜 battle",
+            "output": "game/art/characters/sayo/apron/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 4,
+            "id": "aya_battle",
+            "name": "神代绫 battle",
+            "output": "game/art/characters/aya/apron/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 5,
+            "id": "rion_battle",
+            "name": "黑羽凛音 battle",
+            "output": "game/art/characters/rion/apron/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 6,
+            "id": "sayo_dialogue",
+            "name": "月城小夜 dialogue",
+            "output": "game/art/characters/sayo/apron/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 7,
+            "id": "aya_dialogue",
+            "name": "神代绫 dialogue",
+            "output": "game/art/characters/aya/apron/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 8,
+            "id": "rion_dialogue",
+            "name": "黑羽凛音 dialogue",
+            "output": "game/art/characters/rion/apron/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          }
+        ]
+      },
+      "prompt": "Image 1 is the PRIMARY visual-style reference only: clean Japanese anime cel illustration, delicate dark outlines, warm soft skin colors, smooth two-step shading, cute readable silhouettes, polished but uncluttered details. Image 2 is composition/game-scale reference only. Create original Sakurayo Zombie Tide assets; do not copy the reference character, clothing, logos, or text. No text, letters, numbers, labels, signatures, UI captions, or watermark. Strict 3 by 3 equal grid, row-major in the exact listed order. One centered isolated asset per cell, uniform scale and anchor, 8 percent safe margin, nothing crosses cell boundaries, no grid lines. Same exact row and column roles as the default character sheet. Character identities: 月城小夜: purple-haired shrine-gunner girl with a compact cherry-blossom assault rifle, pink and violet combat shrine outfit; 神代绫: silver-haired agile tracker girl carrying a compact pistol and a moonlight katana, blue-white tactical school outfit; 黑羽凛音: long black-haired pure katana swordswoman, dark red and black modern sword-school outfit, calm fierce expression. Dress all three in the shared 炼金防污围裙 theme: lime cream alchemist work apron with potion belt and protective gloves. Weapons and faces remain character-specific; the outfit must be visibly different from the default and consistent across portrait, battle and dialogue rows. Perfectly flat solid #00ff00 chroma-key background. No shadows, gradients, texture, reflection, floor plane, fog, glow outside the silhouette, or lighting variation on the background. Never use #00ff00 in subjects."
+    },
+    {
+      "id": "atlas_skin_summon",
+      "phase": "skins",
+      "kind": "atlas",
+      "size": "2304x2304",
+      "quality": "high",
+      "transparent": true,
+      "chroma_key": "#00ff00",
+      "source": "assets/image2/source/atlas_skin_summon.png",
+      "processed": "assets/image2/processed/atlas_skin_summon.png",
+      "grid": {
+        "columns": 3,
+        "rows": 3,
+        "cells": [
+          {
+            "index": 0,
+            "id": "sayo_portrait",
+            "name": "月城小夜 portrait",
+            "output": "game/art/characters/sayo/summon/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 1,
+            "id": "aya_portrait",
+            "name": "神代绫 portrait",
+            "output": "game/art/characters/aya/summon/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 2,
+            "id": "rion_portrait",
+            "name": "黑羽凛音 portrait",
+            "output": "game/art/characters/rion/summon/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 3,
+            "id": "sayo_battle",
+            "name": "月城小夜 battle",
+            "output": "game/art/characters/sayo/summon/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 4,
+            "id": "aya_battle",
+            "name": "神代绫 battle",
+            "output": "game/art/characters/aya/summon/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 5,
+            "id": "rion_battle",
+            "name": "黑羽凛音 battle",
+            "output": "game/art/characters/rion/summon/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 6,
+            "id": "sayo_dialogue",
+            "name": "月城小夜 dialogue",
+            "output": "game/art/characters/sayo/summon/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 7,
+            "id": "aya_dialogue",
+            "name": "神代绫 dialogue",
+            "output": "game/art/characters/aya/summon/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 8,
+            "id": "rion_dialogue",
+            "name": "黑羽凛音 dialogue",
+            "output": "game/art/characters/rion/summon/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          }
+        ]
+      },
+      "prompt": "Image 1 is the PRIMARY visual-style reference only: clean Japanese anime cel illustration, delicate dark outlines, warm soft skin colors, smooth two-step shading, cute readable silhouettes, polished but uncluttered details. Image 2 is composition/game-scale reference only. Create original Sakurayo Zombie Tide assets; do not copy the reference character, clothing, logos, or text. No text, letters, numbers, labels, signatures, UI captions, or watermark. Strict 3 by 3 equal grid, row-major in the exact listed order. One centered isolated asset per cell, uniform scale and anchor, 8 percent safe margin, nothing crosses cell boundaries, no grid lines. Same exact row and column roles as the default character sheet. Character identities: 月城小夜: purple-haired shrine-gunner girl with a compact cherry-blossom assault rifle, pink and violet combat shrine outfit; 神代绫: silver-haired agile tracker girl carrying a compact pistol and a moonlight katana, blue-white tactical school outfit; 黑羽凛音: long black-haired pure katana swordswoman, dark red and black modern sword-school outfit, calm fierce expression. Dress all three in the shared 百鬼召唤睡衣 theme: teal spirit-summoner pajama outfit with cute ghost talismans. Weapons and faces remain character-specific; the outfit must be visibly different from the default and consistent across portrait, battle and dialogue rows. Perfectly flat solid #00ff00 chroma-key background. No shadows, gradients, texture, reflection, floor plane, fog, glow outside the silhouette, or lighting variation on the background. Never use #00ff00 in subjects."
+    },
+    {
+      "id": "atlas_skin_festival",
+      "phase": "skins",
+      "kind": "atlas",
+      "size": "2304x2304",
+      "quality": "high",
+      "transparent": true,
+      "chroma_key": "#00ff00",
+      "source": "assets/image2/source/atlas_skin_festival.png",
+      "processed": "assets/image2/processed/atlas_skin_festival.png",
+      "grid": {
+        "columns": 3,
+        "rows": 3,
+        "cells": [
+          {
+            "index": 0,
+            "id": "sayo_portrait",
+            "name": "月城小夜 portrait",
+            "output": "game/art/characters/sayo/festival/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 1,
+            "id": "aya_portrait",
+            "name": "神代绫 portrait",
+            "output": "game/art/characters/aya/festival/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 2,
+            "id": "rion_portrait",
+            "name": "黑羽凛音 portrait",
+            "output": "game/art/characters/rion/festival/portrait.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 3,
+            "id": "sayo_battle",
+            "name": "月城小夜 battle",
+            "output": "game/art/characters/sayo/festival/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 4,
+            "id": "aya_battle",
+            "name": "神代绫 battle",
+            "output": "game/art/characters/aya/festival/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 5,
+            "id": "rion_battle",
+            "name": "黑羽凛音 battle",
+            "output": "game/art/characters/rion/festival/battle.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 6,
+            "id": "sayo_dialogue",
+            "name": "月城小夜 dialogue",
+            "output": "game/art/characters/sayo/festival/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 7,
+            "id": "aya_dialogue",
+            "name": "神代绫 dialogue",
+            "output": "game/art/characters/aya/festival/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 8,
+            "id": "rion_dialogue",
+            "name": "黑羽凛音 dialogue",
+            "output": "game/art/characters/rion/festival/dialogue.webp",
+            "size": [
+              512,
+              512
+            ]
+          }
+        ]
+      },
+      "prompt": "Image 1 is the PRIMARY visual-style reference only: clean Japanese anime cel illustration, delicate dark outlines, warm soft skin colors, smooth two-step shading, cute readable silhouettes, polished but uncluttered details. Image 2 is composition/game-scale reference only. Create original Sakurayo Zombie Tide assets; do not copy the reference character, clothing, logos, or text. No text, letters, numbers, labels, signatures, UI captions, or watermark. Strict 3 by 3 equal grid, row-major in the exact listed order. One centered isolated asset per cell, uniform scale and anchor, 8 percent safe margin, nothing crosses cell boundaries, no grid lines. Same exact row and column roles as the default character sheet. Character identities: 月城小夜: purple-haired shrine-gunner girl with a compact cherry-blossom assault rifle, pink and violet combat shrine outfit; 神代绫: silver-haired agile tracker girl carrying a compact pistol and a moonlight katana, blue-white tactical school outfit; 黑羽凛音: long black-haired pure katana swordswoman, dark red and black modern sword-school outfit, calm fierce expression. Dress all three in the shared 镜夜祭典巫女服 theme: magenta white mirror-night festival shrine maiden outfit. Weapons and faces remain character-specific; the outfit must be visibly different from the default and consistent across portrait, battle and dialogue rows. Perfectly flat solid #00ff00 chroma-key background. No shadows, gradients, texture, reflection, floor plane, fog, glow outside the silhouette, or lighting variation on the background. Never use #00ff00 in subjects."
+    },
+    {
+      "id": "atlas_enemies",
+      "phase": "essential",
+      "kind": "atlas",
+      "size": "2048x2048",
+      "quality": "high",
+      "transparent": true,
+      "chroma_key": "#ff7a00",
+      "source": "assets/image2/source/atlas_enemies.png",
+      "processed": "assets/image2/processed/atlas_enemies.png",
+      "grid": {
+        "columns": 4,
+        "rows": 4,
+        "cells": [
+          {
+            "index": 0,
+            "id": "normal",
+            "name": "普通僵尸",
+            "output": "game/art/enemies/normal.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 1,
+            "id": "fast",
+            "name": "迅捷僵尸",
+            "output": "game/art/enemies/fast.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 2,
+            "id": "tank",
+            "name": "重甲僵尸",
+            "output": "game/art/enemies/tank.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 3,
+            "id": "ranged",
+            "name": "远程僵尸",
+            "output": "game/art/enemies/ranged.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 4,
+            "id": "bomb",
+            "name": "自爆僵尸",
+            "output": "game/art/enemies/bomb.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 5,
+            "id": "shield",
+            "name": "结界尸",
+            "output": "game/art/enemies/shield.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 6,
+            "id": "disruptor",
+            "name": "干扰尸",
+            "output": "game/art/enemies/disruptor.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 7,
+            "id": "purifier",
+            "name": "净化尸",
+            "output": "game/art/enemies/purifier.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 8,
+            "id": "specter",
+            "name": "幽魂尸",
+            "output": "game/art/enemies/specter.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 9,
+            "id": "decay",
+            "name": "腐败祭司",
+            "output": "game/art/enemies/decay.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 10,
+            "id": "seal",
+            "name": "封灵尸",
+            "output": "game/art/enemies/seal.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 11,
+            "id": "pet_hunter",
+            "name": "猎宠尸",
+            "output": "game/art/enemies/pet_hunter.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 12,
+            "id": "noise_zombie",
+            "name": "噪声尸",
+            "output": "game/art/enemies/noise_zombie.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 13,
+            "id": "soul_eater",
+            "name": "噬魂尸",
+            "output": "game/art/enemies/soul_eater.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 14,
+            "id": "anti_shadow_ninja",
+            "name": "反影忍者",
+            "output": "game/art/enemies/anti_shadow_ninja.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 15,
+            "id": "reserved",
+            "name": "空白占位",
+            "output": "game/art/enemies/reserved.webp",
+            "size": [
+              256,
+              256
+            ]
+          }
+        ]
+      },
+      "prompt": "Image 1 is the PRIMARY visual-style reference only: clean Japanese anime cel illustration, delicate dark outlines, warm soft skin colors, smooth two-step shading, cute readable silhouettes, polished but uncluttered details. Image 2 is composition/game-scale reference only. Create original Sakurayo Zombie Tide assets; do not copy the reference character, clothing, logos, or text. No text, letters, numbers, labels, signatures, UI captions, or watermark. Strict 4 by 4 equal grid, row-major in the exact listed order. One centered isolated asset per cell, uniform scale and anchor, 8 percent safe margin, nothing crosses cell boundaries, no grid lines. Cute-horror chibi zombie combat sprites in strict order: 普通僵尸; 迅捷僵尸; 重甲僵尸; 远程僵尸; 自爆僵尸; 结界尸; 干扰尸; 净化尸; 幽魂尸; 腐败祭司; 封灵尸; 猎宠尸; 噪声尸; 噬魂尸; 反影忍者; 空白占位. Distinct silhouettes and readable gameplay roles; use gray, olive, black-yellow or deep red accents, but no orange or brown dominant colors. Perfectly flat solid #ff7a00 chroma-key background. No shadows, gradients, texture, reflection, floor plane, fog, glow outside the silhouette, or lighting variation on the background. Never use #ff7a00 in subjects."
+    },
+    {
+      "id": "atlas_boss_utility",
+      "phase": "essential",
+      "kind": "atlas",
+      "size": "2048x2048",
+      "quality": "high",
+      "transparent": true,
+      "chroma_key": "#ff7a00",
+      "source": "assets/image2/source/atlas_boss_utility.png",
+      "processed": "assets/image2/processed/atlas_boss_utility.png",
+      "grid": {
+        "columns": 4,
+        "rows": 4,
+        "cells": [
+          {
+            "index": 0,
+            "id": "boss_stage_1",
+            "name": "百目尸将",
+            "output": "game/art/bosses/boss_stage_1.webp",
+            "size": [
+              384,
+              384
+            ]
+          },
+          {
+            "index": 1,
+            "id": "boss_stage_2",
+            "name": "雨魇行者",
+            "output": "game/art/bosses/boss_stage_2.webp",
+            "size": [
+              384,
+              384
+            ]
+          },
+          {
+            "index": 2,
+            "id": "boss_stage_3",
+            "name": "黄泉御前",
+            "output": "game/art/bosses/boss_stage_3.webp",
+            "size": [
+              384,
+              384
+            ]
+          },
+          {
+            "index": 3,
+            "id": "boss_stage_4",
+            "name": "八重镜姬",
+            "output": "game/art/bosses/boss_stage_4.webp",
+            "size": [
+              384,
+              384
+            ]
+          },
+          {
+            "index": 4,
+            "id": "pet_drone",
+            "name": "夜樱无人机",
+            "output": "game/art/pets/drone.webp",
+            "size": [
+              384,
+              384
+            ]
+          },
+          {
+            "index": 5,
+            "id": "pet_bat",
+            "name": "夜蝠",
+            "output": "game/art/pets/bat.webp",
+            "size": [
+              384,
+              384
+            ]
+          },
+          {
+            "index": 6,
+            "id": "pet_familiar",
+            "name": "灵兽使魔",
+            "output": "game/art/pets/familiar.webp",
+            "size": [
+              384,
+              384
+            ]
+          },
+          {
+            "index": 7,
+            "id": "pet_wisp",
+            "name": "魂灯",
+            "output": "game/art/pets/wisp.webp",
+            "size": [
+              384,
+              384
+            ]
+          },
+          {
+            "index": 8,
+            "id": "drop_xp",
+            "name": "灵核经验晶体",
+            "output": "game/art/items/xp.webp",
+            "size": [
+              384,
+              384
+            ]
+          },
+          {
+            "index": 9,
+            "id": "drop_coin",
+            "name": "樱花币",
+            "output": "game/art/items/coin.webp",
+            "size": [
+              384,
+              384
+            ]
+          },
+          {
+            "index": 10,
+            "id": "drop_health",
+            "name": "生命补给",
+            "output": "game/art/items/health.webp",
+            "size": [
+              384,
+              384
+            ]
+          },
+          {
+            "index": 11,
+            "id": "drop_core",
+            "name": "三相灵核",
+            "output": "game/art/items/core.webp",
+            "size": [
+              384,
+              384
+            ]
+          },
+          {
+            "index": 12,
+            "id": "hazard_eye",
+            "name": "百目预警",
+            "output": "game/art/hazards/eye.webp",
+            "size": [
+              384,
+              384
+            ]
+          },
+          {
+            "index": 13,
+            "id": "hazard_emp",
+            "name": "EMP预警",
+            "output": "game/art/hazards/emp.webp",
+            "size": [
+              384,
+              384
+            ]
+          },
+          {
+            "index": 14,
+            "id": "hazard_sword",
+            "name": "剑阵预警",
+            "output": "game/art/hazards/sword.webp",
+            "size": [
+              384,
+              384
+            ]
+          },
+          {
+            "index": 15,
+            "id": "hazard_mirror",
+            "name": "镜界预警",
+            "output": "game/art/hazards/mirror.webp",
+            "size": [
+              384,
+              384
+            ]
+          }
+        ]
+      },
+      "prompt": "Image 1 is the PRIMARY visual-style reference only: clean Japanese anime cel illustration, delicate dark outlines, warm soft skin colors, smooth two-step shading, cute readable silhouettes, polished but uncluttered details. Image 2 is composition/game-scale reference only. Create original Sakurayo Zombie Tide assets; do not copy the reference character, clothing, logos, or text. No text, letters, numbers, labels, signatures, UI captions, or watermark. Strict 4 by 4 equal grid, row-major in the exact listed order. One centered isolated asset per cell, uniform scale and anchor, 8 percent safe margin, nothing crosses cell boundaries, no grid lines. Row 1 four imposing chibi bosses: 百目尸将, 雨魇行者, 黄泉御前, 八重镜姬. Row 2 four friendly summons. Row 3 four collectible items. Row 4 four clean hazard telegraph emblems. No loose particles outside silhouettes; avoid orange and brown dominant colors. Perfectly flat solid #ff7a00 chroma-key background. No shadows, gradients, texture, reflection, floor plane, fog, glow outside the silhouette, or lighting variation on the background. Never use #ff7a00 in subjects."
+    },
+    {
+      "id": "atlas_progression_a",
+      "phase": "progression",
+      "kind": "atlas",
+      "size": "3072x1536",
+      "quality": "high",
+      "transparent": false,
+      "chroma_key": null,
+      "source": "assets/image2/source/atlas_progression_a.png",
+      "processed": "assets/image2/processed/atlas_progression_a.png",
+      "grid": {
+        "columns": 8,
+        "rows": 4,
+        "cells": [
+          {
+            "index": 0,
+            "id": "mech",
+            "name": "机械师",
+            "output": "game/art/classes/mech/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 1,
+            "id": "gun",
+            "name": "枪斗术",
+            "output": "game/art/classes/gun/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 2,
+            "id": "alch",
+            "name": "炼金术",
+            "output": "game/art/classes/alch/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 3,
+            "id": "gene",
+            "name": "基因战士",
+            "output": "game/art/classes/gene/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 4,
+            "id": "vamp",
+            "name": "血族",
+            "output": "game/art/classes/vamp/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 5,
+            "id": "spore",
+            "name": "菌群术",
+            "output": "game/art/classes/spore/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 6,
+            "id": "magical",
+            "name": "魔法少女",
+            "output": "game/art/classes/magical/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 7,
+            "id": "cult",
+            "name": "修仙",
+            "output": "game/art/classes/cult/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 8,
+            "id": "mage",
+            "name": "魔法师",
+            "output": "game/art/classes/mage/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 9,
+            "id": "shrine",
+            "name": "巫女",
+            "output": "game/art/classes/shrine/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 10,
+            "id": "summon",
+            "name": "召唤师",
+            "output": "game/art/classes/summon/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 11,
+            "id": "ninja",
+            "name": "忍者",
+            "output": "game/art/classes/ninja/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 12,
+            "id": "idol",
+            "name": "战场歌姬",
+            "output": "game/art/classes/idol/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 13,
+            "id": "necro",
+            "name": "死灵术士",
+            "output": "game/art/classes/necro/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 14,
+            "id": "swarm",
+            "name": "蜂群统御",
+            "output": "game/art/careers/swarm/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 15,
+            "id": "railLord",
+            "name": "天穹磁轨",
+            "output": "game/art/careers/railLord/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 16,
+            "id": "barrage",
+            "name": "弹幕暴君",
+            "output": "game/art/careers/barrage/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 17,
+            "id": "sniper",
+            "name": "处刑狙击",
+            "output": "game/art/careers/sniper/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 18,
+            "id": "plagueDoctor",
+            "name": "瘟疫医师",
+            "output": "game/art/careers/plagueDoctor/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 19,
+            "id": "philosopher",
+            "name": "贤者之石",
+            "output": "game/art/careers/philosopher/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 20,
+            "id": "titan",
+            "name": "再生泰坦",
+            "output": "game/art/careers/titan/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 21,
+            "id": "berserk",
+            "name": "超载狂战",
+            "output": "game/art/careers/berserk/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 22,
+            "id": "bloodDuke",
+            "name": "鲜血公爵",
+            "output": "game/art/careers/bloodDuke/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 23,
+            "id": "batQueen",
+            "name": "夜蝠女王",
+            "output": "game/art/careers/batQueen/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 24,
+            "id": "hive",
+            "name": "万菌母巢",
+            "output": "game/art/careers/hive/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 25,
+            "id": "garden",
+            "name": "尸骸花园",
+            "output": "game/art/careers/garden/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 26,
+            "id": "starIdol",
+            "name": "星穹偶像",
+            "output": "game/art/careers/starIdol/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 27,
+            "id": "miracle",
+            "name": "奇迹魔女",
+            "output": "game/art/careers/miracle/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 28,
+            "id": "swordSaint",
+            "name": "万剑仙",
+            "output": "game/art/careers/swordSaint/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 29,
+            "id": "thunderLord",
+            "name": "雷劫道君",
+            "output": "game/art/careers/thunderLord/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 30,
+            "id": "element",
+            "name": "元素统御",
+            "output": "game/art/careers/element/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 31,
+            "id": "timeMage",
+            "name": "时序魔导师",
+            "output": "game/art/careers/timeMage/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          }
+        ]
+      },
+      "prompt": "Image 1 is the PRIMARY visual-style reference only: clean Japanese anime cel illustration, delicate dark outlines, warm soft skin colors, smooth two-step shading, cute readable silhouettes, polished but uncluttered details. Image 2 is composition/game-scale reference only. Create original Sakurayo Zombie Tide assets; do not copy the reference character, clothing, logos, or text. No text, letters, numbers, labels, signatures, UI captions, or watermark. Strict 8 by 4 equal grid, row-major in the exact listed order. One centered isolated asset per cell, uniform scale and anchor, 8 percent safe margin, nothing crosses cell boundaries, no grid lines. Thirty-two premium square RPG ability icons in exact order: 机械师; 枪斗术; 炼金术; 基因战士; 血族; 菌群术; 魔法少女; 修仙; 魔法师; 巫女; 召唤师; 忍者; 战场歌姬; 死灵术士; 蜂群统御; 天穹磁轨; 弹幕暴君; 处刑狙击; 瘟疫医师; 贤者之石; 再生泰坦; 超载狂战; 鲜血公爵; 夜蝠女王; 万菌母巢; 尸骸花园; 星穹偶像; 奇迹魔女; 万剑仙; 雷劫道君; 元素统御; 时序魔导师. Symbol-only, no characters unless needed as a simple silhouette. Opaque deep navy square tile backgrounds, consistent icon material and no transparency."
+    },
+    {
+      "id": "atlas_progression_b",
+      "phase": "progression",
+      "kind": "atlas",
+      "size": "3072x1536",
+      "quality": "high",
+      "transparent": false,
+      "chroma_key": null,
+      "source": "assets/image2/source/atlas_progression_b.png",
+      "processed": "assets/image2/processed/atlas_progression_b.png",
+      "grid": {
+        "columns": 8,
+        "rows": 4,
+        "cells": [
+          {
+            "index": 0,
+            "id": "exorcist",
+            "name": "祓魔执行官",
+            "output": "game/art/careers/exorcist/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 1,
+            "id": "guardian",
+            "name": "八咫守护者",
+            "output": "game/art/careers/guardian/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 2,
+            "id": "beast",
+            "name": "百兽统御",
+            "output": "game/art/careers/beast/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 3,
+            "id": "heroic",
+            "name": "英灵契约",
+            "output": "game/art/careers/heroic/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 4,
+            "id": "shadow",
+            "name": "无明影刃",
+            "output": "game/art/careers/shadow/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 5,
+            "id": "bombNinja",
+            "name": "爆符忍军",
+            "output": "game/art/careers/bombNinja/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 6,
+            "id": "warSinger",
+            "name": "尸潮歌姬",
+            "output": "game/art/careers/warSinger/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 7,
+            "id": "healingIdol",
+            "name": "治愈偶像",
+            "output": "game/art/careers/healingIdol/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 8,
+            "id": "boneKing",
+            "name": "白骨君王",
+            "output": "game/art/careers/boneKing/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 9,
+            "id": "soulHerd",
+            "name": "群魂牧者",
+            "output": "game/art/careers/soulHerd/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 10,
+            "id": "magitech",
+            "name": "星核机甲少女",
+            "output": "game/art/fusions/magitech/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 11,
+            "id": "bloodsword",
+            "name": "血炼剑仙",
+            "output": "game/art/fusions/bloodsword/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 12,
+            "id": "plagueforge",
+            "name": "瘟炼菌海",
+            "output": "game/art/fusions/plagueforge/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 13,
+            "id": "gunshrine",
+            "name": "祓魔枪巫女",
+            "output": "game/art/fusions/gunshrine/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 14,
+            "id": "chimera",
+            "name": "元素嵌合体",
+            "output": "game/art/fusions/chimera/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 15,
+            "id": "railsword",
+            "name": "磁轨剑阵",
+            "output": "game/art/fusions/railsword/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 16,
+            "id": "bloodstar",
+            "name": "血月魔法少女",
+            "output": "game/art/fusions/bloodstar/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 17,
+            "id": "biogun",
+            "name": "活体弹仓",
+            "output": "game/art/fusions/biogun/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 18,
+            "id": "thunderpriest",
+            "name": "雷火天师",
+            "output": "game/art/fusions/thunderpriest/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 19,
+            "id": "corpseimmortal",
+            "name": "尸解剑仙",
+            "output": "game/art/fusions/corpseimmortal/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 20,
+            "id": "bloodmech",
+            "name": "血械猎姬",
+            "output": "game/art/fusions/bloodmech/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 21,
+            "id": "flowerplague",
+            "name": "花疫魔女",
+            "output": "game/art/fusions/flowerplague/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 22,
+            "id": "shikigami",
+            "name": "百鬼阴阳师",
+            "output": "game/art/fusions/shikigami/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 23,
+            "id": "shadowmage",
+            "name": "影法魔女",
+            "output": "game/art/fusions/shadowmage/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 24,
+            "id": "idolgun",
+            "name": "枪火偶像",
+            "output": "game/art/fusions/idolgun/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 25,
+            "id": "necrospore",
+            "name": "菌尸冥主",
+            "output": "game/art/fusions/necrospore/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 26,
+            "id": "bloodbeast",
+            "name": "血契兽王",
+            "output": "game/art/fusions/bloodbeast/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 27,
+            "id": "shadowblade",
+            "name": "御剑影忍",
+            "output": "game/art/fusions/shadowblade/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 28,
+            "id": "tech",
+            "name": "科技飞升·机神巫女",
+            "output": "game/art/ascensions/tech/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 29,
+            "id": "bio",
+            "name": "生物飞升·绯血神躯",
+            "output": "game/art/ascensions/bio/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 30,
+            "id": "psi",
+            "name": "灵能飞升·万象灵体",
+            "output": "game/art/ascensions/psi/icon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 31,
+            "id": "locked",
+            "name": "锁定节点",
+            "output": "game/art/ui/locked.webp",
+            "size": [
+              256,
+              256
+            ]
+          }
+        ]
+      },
+      "prompt": "Image 1 is the PRIMARY visual-style reference only: clean Japanese anime cel illustration, delicate dark outlines, warm soft skin colors, smooth two-step shading, cute readable silhouettes, polished but uncluttered details. Image 2 is composition/game-scale reference only. Create original Sakurayo Zombie Tide assets; do not copy the reference character, clothing, logos, or text. No text, letters, numbers, labels, signatures, UI captions, or watermark. Strict 8 by 4 equal grid, row-major in the exact listed order. One centered isolated asset per cell, uniform scale and anchor, 8 percent safe margin, nothing crosses cell boundaries, no grid lines. Thirty-two premium square RPG ability icons in exact order: 祓魔执行官; 八咫守护者; 百兽统御; 英灵契约; 无明影刃; 爆符忍军; 尸潮歌姬; 治愈偶像; 白骨君王; 群魂牧者; 星核机甲少女; 血炼剑仙; 瘟炼菌海; 祓魔枪巫女; 元素嵌合体; 磁轨剑阵; 血月魔法少女; 活体弹仓; 雷火天师; 尸解剑仙; 血械猎姬; 花疫魔女; 百鬼阴阳师; 影法魔女; 枪火偶像; 菌尸冥主; 血契兽王; 御剑影忍; 科技飞升·机神巫女; 生物飞升·绯血神躯; 灵能飞升·万象灵体; 锁定节点. Fusion icons visibly combine two motifs; ascensions feel final-tier. Opaque deep navy square tile backgrounds, consistent icon material and no transparency."
+    },
+    {
+      "id": "atlas_skills_a",
+      "phase": "skills",
+      "kind": "atlas",
+      "size": "3072x1536",
+      "quality": "high",
+      "transparent": false,
+      "chroma_key": null,
+      "source": "assets/image2/source/atlas_skills_a.png",
+      "processed": "assets/image2/processed/atlas_skills_a.png",
+      "grid": {
+        "columns": 8,
+        "rows": 3,
+        "cells": [
+          {
+            "index": 0,
+            "id": "dmg",
+            "name": "绯樱弹芯",
+            "output": "game/art/skills/dmg.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 1,
+            "id": "rate",
+            "name": "疾风扳机",
+            "output": "game/art/skills/rate.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 2,
+            "id": "speed",
+            "name": "轻羽足袋",
+            "output": "game/art/skills/speed.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 3,
+            "id": "crit",
+            "name": "红瞳锁定",
+            "output": "game/art/skills/crit.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 4,
+            "id": "magnet",
+            "name": "灵核感应",
+            "output": "game/art/skills/magnet.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 5,
+            "id": "skill",
+            "name": "樱华爆发",
+            "output": "game/art/skills/skill.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 6,
+            "id": "drone",
+            "name": "夜樱无人机",
+            "output": "game/art/skills/drone.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 7,
+            "id": "nano",
+            "name": "纳米护甲",
+            "output": "game/art/skills/nano.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 8,
+            "id": "rail",
+            "name": "磁轨过载",
+            "output": "game/art/skills/rail.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 9,
+            "id": "multi",
+            "name": "双生弹幕",
+            "output": "game/art/skills/multi.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 10,
+            "id": "pierce",
+            "name": "破甲银针",
+            "output": "game/art/skills/pierce.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 11,
+            "id": "cyber",
+            "name": "机械义体",
+            "output": "game/art/skills/cyber.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 12,
+            "id": "acid",
+            "name": "腐蚀炼成",
+            "output": "game/art/skills/acid.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 13,
+            "id": "blast",
+            "name": "灵爆催化剂",
+            "output": "game/art/skills/blast.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 14,
+            "id": "transmute",
+            "name": "晶核转化",
+            "output": "game/art/skills/transmute.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 15,
+            "id": "regen",
+            "name": "超速再生",
+            "output": "game/art/skills/regen.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 16,
+            "id": "carapace",
+            "name": "角质装甲",
+            "output": "game/art/skills/carapace.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 17,
+            "id": "overdrive",
+            "name": "血肉超载",
+            "output": "game/art/skills/overdrive.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 18,
+            "id": "steal",
+            "name": "猩红血契",
+            "output": "game/art/skills/steal.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 19,
+            "id": "bloodnova",
+            "name": "血月爆裂",
+            "output": "game/art/skills/bloodnova.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 20,
+            "id": "bat",
+            "name": "夜蝠眷属",
+            "output": "game/art/skills/bat.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 21,
+            "id": "spore",
+            "name": "孢子感染",
+            "output": "game/art/skills/spore.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 22,
+            "id": "cloud",
+            "name": "菌云扩散",
+            "output": "game/art/skills/cloud.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 23,
+            "id": "harvest",
+            "name": "尸骸收割",
+            "output": "game/art/skills/harvest.webp",
+            "size": [
+              256,
+              256
+            ]
+          }
+        ]
+      },
+      "prompt": "Image 1 is the PRIMARY visual-style reference only: clean Japanese anime cel illustration, delicate dark outlines, warm soft skin colors, smooth two-step shading, cute readable silhouettes, polished but uncluttered details. Image 2 is composition/game-scale reference only. Create original Sakurayo Zombie Tide assets; do not copy the reference character, clothing, logos, or text. No text, letters, numbers, labels, signatures, UI captions, or watermark. Strict 8 by 3 equal grid, row-major in the exact listed order. One centered isolated asset per cell, uniform scale and anchor, 8 percent safe margin, nothing crosses cell boundaries, no grid lines. Twenty-four square combat skill icons in exact order: 绯樱弹芯; 疾风扳机; 轻羽足袋; 红瞳锁定; 灵核感应; 樱华爆发; 夜樱无人机; 纳米护甲; 磁轨过载; 双生弹幕; 破甲银针; 机械义体; 腐蚀炼成; 灵爆催化剂; 晶核转化; 超速再生; 角质装甲; 血肉超载; 猩红血契; 血月爆裂; 夜蝠眷属; 孢子感染; 菌云扩散; 尸骸收割. Symbol-only, bold readable silhouette, no characters and no text. Opaque deep navy square tile backgrounds, consistent icon material and no transparency."
+    },
+    {
+      "id": "atlas_skills_b",
+      "phase": "skills",
+      "kind": "atlas",
+      "size": "3072x1536",
+      "quality": "high",
+      "transparent": false,
+      "chroma_key": null,
+      "source": "assets/image2/source/atlas_skills_b.png",
+      "processed": "assets/image2/processed/atlas_skills_b.png",
+      "grid": {
+        "columns": 8,
+        "rows": 3,
+        "cells": [
+          {
+            "index": 0,
+            "id": "star",
+            "name": "星辉弹幕",
+            "output": "game/art/skills/star.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 1,
+            "id": "ribbon",
+            "name": "缎带守护",
+            "output": "game/art/skills/ribbon.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 2,
+            "id": "transform",
+            "name": "奇迹变身",
+            "output": "game/art/skills/transform.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 3,
+            "id": "sword",
+            "name": "御剑术",
+            "output": "game/art/skills/sword.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 4,
+            "id": "qi",
+            "name": "周天运气",
+            "output": "game/art/skills/qi.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 5,
+            "id": "thunder",
+            "name": "雷劫引法",
+            "output": "game/art/skills/thunder.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 6,
+            "id": "fireball",
+            "name": "炎爆术",
+            "output": "game/art/skills/fireball.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 7,
+            "id": "frost",
+            "name": "霜环术",
+            "output": "game/art/skills/frost.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 8,
+            "id": "chain",
+            "name": "连锁雷光",
+            "output": "game/art/skills/chain.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 9,
+            "id": "talisman",
+            "name": "灵符护身",
+            "output": "game/art/skills/talisman.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 10,
+            "id": "barrier",
+            "name": "八咫结界",
+            "output": "game/art/skills/barrier.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 11,
+            "id": "spirit",
+            "name": "灵体化",
+            "output": "game/art/skills/spirit.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 12,
+            "id": "familiar",
+            "name": "灵兽使魔",
+            "output": "game/art/skills/familiar.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 13,
+            "id": "contract",
+            "name": "强化契约",
+            "output": "game/art/skills/contract.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 14,
+            "id": "sacrifice",
+            "name": "代偿召唤",
+            "output": "game/art/skills/sacrifice.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 15,
+            "id": "kunai",
+            "name": "追魂苦无",
+            "output": "game/art/skills/kunai.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 16,
+            "id": "shadowstep",
+            "name": "影遁步",
+            "output": "game/art/skills/shadowstep.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 17,
+            "id": "mark",
+            "name": "死线标记",
+            "output": "game/art/skills/mark.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 18,
+            "id": "beat",
+            "name": "尸潮节拍",
+            "output": "game/art/skills/beat.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 19,
+            "id": "encore",
+            "name": "安可时间",
+            "output": "game/art/skills/encore.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 20,
+            "id": "spotlight",
+            "name": "聚光舞台",
+            "output": "game/art/skills/spotlight.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 21,
+            "id": "soul",
+            "name": "拘魂灯",
+            "output": "game/art/skills/soul.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 22,
+            "id": "bone",
+            "name": "白骨装甲",
+            "output": "game/art/skills/bone.webp",
+            "size": [
+              256,
+              256
+            ]
+          },
+          {
+            "index": 23,
+            "id": "raise",
+            "name": "亡魂役使",
+            "output": "game/art/skills/raise.webp",
+            "size": [
+              256,
+              256
+            ]
+          }
+        ]
+      },
+      "prompt": "Image 1 is the PRIMARY visual-style reference only: clean Japanese anime cel illustration, delicate dark outlines, warm soft skin colors, smooth two-step shading, cute readable silhouettes, polished but uncluttered details. Image 2 is composition/game-scale reference only. Create original Sakurayo Zombie Tide assets; do not copy the reference character, clothing, logos, or text. No text, letters, numbers, labels, signatures, UI captions, or watermark. Strict 8 by 3 equal grid, row-major in the exact listed order. One centered isolated asset per cell, uniform scale and anchor, 8 percent safe margin, nothing crosses cell boundaries, no grid lines. Twenty-four square combat skill icons in exact order: 星辉弹幕; 缎带守护; 奇迹变身; 御剑术; 周天运气; 雷劫引法; 炎爆术; 霜环术; 连锁雷光; 灵符护身; 八咫结界; 灵体化; 灵兽使魔; 强化契约; 代偿召唤; 追魂苦无; 影遁步; 死线标记; 尸潮节拍; 安可时间; 聚光舞台; 拘魂灯; 白骨装甲; 亡魂役使. Symbol-only, bold readable silhouette, no characters and no text. Opaque deep navy square tile backgrounds, consistent icon material and no transparency."
+    },
+    {
+      "id": "atlas_branding",
+      "phase": "essential",
+      "kind": "atlas",
+      "size": "2048x2048",
+      "quality": "high",
+      "transparent": false,
+      "chroma_key": null,
+      "source": "assets/image2/source/atlas_branding.png",
+      "processed": "assets/image2/processed/atlas_branding.png",
+      "grid": {
+        "columns": 2,
+        "rows": 2,
+        "cells": [
+          {
+            "index": 0,
+            "id": "app_icon",
+            "name": "应用图标",
+            "output": "game/art/ui/app_icon.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 1,
+            "id": "menu_emblem",
+            "name": "主菜单徽记",
+            "output": "game/art/ui/menu_emblem.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 2,
+            "id": "loading_art",
+            "name": "加载页主视觉",
+            "output": "game/art/ui/loading_art.webp",
+            "size": [
+              512,
+              512
+            ]
+          },
+          {
+            "index": 3,
+            "id": "achievement_master",
+            "name": "全成就徽章",
+            "output": "game/art/ui/achievement_master.webp",
+            "size": [
+              512,
+              512
+            ]
+          }
+        ]
+      },
+      "prompt": "Image 1 is the PRIMARY visual-style reference only: clean Japanese anime cel illustration, delicate dark outlines, warm soft skin colors, smooth two-step shading, cute readable silhouettes, polished but uncluttered details. Image 2 is composition/game-scale reference only. Create original Sakurayo Zombie Tide assets; do not copy the reference character, clothing, logos, or text. No text, letters, numbers, labels, signatures, UI captions, or watermark. Strict 2 by 2 equal grid, row-major in the exact listed order. One centered isolated asset per cell, uniform scale and anchor, 8 percent safe margin, nothing crosses cell boundaries, no grid lines. Four square branding assets: a premium app icon showing a cherry blossom crossed with a katana and spirit core; a simplified menu emblem; a dramatic three-hero loading illustration; and a gold-pink master achievement badge. No title lettering, no text, no border touching the cell edge. Opaque deep navy square tile backgrounds, consistent icon material and no transparency."
+    },
+    {
+      "id": "atlas_stage_backgrounds",
+      "phase": "essential",
+      "kind": "atlas",
+      "size": "2160x3840",
+      "quality": "high",
+      "transparent": false,
+      "source": "assets/image2/source/atlas_stage_backgrounds.png",
+      "processed": "assets/image2/processed/atlas_stage_backgrounds.png",
+      "grid": {
+        "columns": 2,
+        "rows": 2,
+        "cells": [
+          {
+            "index": 0,
+            "id": "stage_1",
+            "name": "神社外街",
+            "output": "game/art/stages/stage_1/battle_bg.webp",
+            "size": [
+              1080,
+              1920
+            ]
+          },
+          {
+            "index": 1,
+            "id": "stage_2",
+            "name": "雨夜商圈",
+            "output": "game/art/stages/stage_2/battle_bg.webp",
+            "size": [
+              1080,
+              1920
+            ]
+          },
+          {
+            "index": 2,
+            "id": "stage_3",
+            "name": "黄泉参道",
+            "output": "game/art/stages/stage_3/battle_bg.webp",
+            "size": [
+              1080,
+              1920
+            ]
+          },
+          {
+            "index": 3,
+            "id": "stage_4",
+            "name": "镜界核心",
+            "output": "game/art/stages/stage_4/battle_bg.webp",
+            "size": [
+              1080,
+              1920
+            ]
+          }
+        ]
+      },
+      "prompt": "Image 1 is the PRIMARY visual-style reference only: clean Japanese anime cel illustration, delicate dark outlines, warm soft skin colors, smooth two-step shading, cute readable silhouettes, polished but uncluttered details. Image 2 is composition/game-scale reference only. Create original Sakurayo Zombie Tide assets; do not copy the reference character, clothing, logos, or text. No text, letters, numbers, labels, signatures, UI captions, or watermark. Strict 2 by 2 equal grid, row-major in the exact listed order. One centered isolated asset per cell, uniform scale and anchor, 8 percent safe margin, nothing crosses cell boundaries, no grid lines. Four portrait orthographic top-down mobile action-game battle backgrounds, no characters or UI: 神社外街: night cyber shrine outer street, cherry blossoms, broken seals, readable top-down combat lanes; 雨夜商圈: rainy neon shopping district, wet asphalt, abandoned signs without text, readable top-down lanes; 黄泉参道: underworld shrine approach with spectral swords and stone lanterns, readable top-down lanes; 镜界核心: surreal mirror-core arena with cracked reflections and magenta cyan circuitry, readable top-down lanes. Opaque full-bleed portrait scenes, centered safe combat area, dark enough for bright projectiles, no text."
+    }
+  ]
+}

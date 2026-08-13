@@ -1,0 +1,376 @@
+{
+  "job": "atlas_skills_a",
+  "source": "C:\\Users\\tzzcomputer\\Desktop\\樱夜尸潮_V3.5_Codex续作\\assets\\image2\\source\\atlas_skills_a.png",
+  "atlas_size": [
+    1536,
+    1024
+  ],
+  "cell_size": [
+    192,
+    341
+  ],
+  "detected_tiles": true,
+  "outputs": [
+    {
+      "id": "dmg",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\dmg.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        9,
+        149,
+        192,
+        355
+      ]
+    },
+    {
+      "id": "rate",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\rate.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        200,
+        149,
+        383,
+        355
+      ]
+    },
+    {
+      "id": "speed",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\speed.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        390,
+        149,
+        573,
+        355
+      ]
+    },
+    {
+      "id": "crit",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\crit.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        580,
+        149,
+        764,
+        355
+      ]
+    },
+    {
+      "id": "magnet",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\magnet.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        771,
+        149,
+        954,
+        355
+      ]
+    },
+    {
+      "id": "skill",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\skill.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        962,
+        149,
+        1145,
+        355
+      ]
+    },
+    {
+      "id": "drone",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\drone.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1153,
+        149,
+        1336,
+        355
+      ]
+    },
+    {
+      "id": "nano",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\nano.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1344,
+        149,
+        1527,
+        355
+      ]
+    },
+    {
+      "id": "rail",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\rail.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        9,
+        411,
+        192,
+        617
+      ]
+    },
+    {
+      "id": "multi",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\multi.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        200,
+        411,
+        383,
+        617
+      ]
+    },
+    {
+      "id": "pierce",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\pierce.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        390,
+        411,
+        573,
+        617
+      ]
+    },
+    {
+      "id": "cyber",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\cyber.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        580,
+        411,
+        764,
+        617
+      ]
+    },
+    {
+      "id": "acid",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\acid.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        771,
+        411,
+        954,
+        617
+      ]
+    },
+    {
+      "id": "blast",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\blast.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        962,
+        411,
+        1145,
+        617
+      ]
+    },
+    {
+      "id": "transmute",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\transmute.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1153,
+        411,
+        1336,
+        617
+      ]
+    },
+    {
+      "id": "regen",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\regen.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1344,
+        411,
+        1527,
+        617
+      ]
+    },
+    {
+      "id": "carapace",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\carapace.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        9,
+        673,
+        192,
+        878
+      ]
+    },
+    {
+      "id": "overdrive",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\overdrive.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        200,
+        673,
+        383,
+        878
+      ]
+    },
+    {
+      "id": "steal",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\steal.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        390,
+        673,
+        573,
+        878
+      ]
+    },
+    {
+      "id": "bloodnova",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\bloodnova.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        580,
+        673,
+        764,
+        878
+      ]
+    },
+    {
+      "id": "bat",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\bat.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        771,
+        673,
+        954,
+        878
+      ]
+    },
+    {
+      "id": "spore",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\spore.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        962,
+        673,
+        1145,
+        878
+      ]
+    },
+    {
+      "id": "cloud",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\cloud.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1153,
+        673,
+        1336,
+        878
+      ]
+    },
+    {
+      "id": "harvest",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\skills\\harvest.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1344,
+        673,
+        1527,
+        878
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\atlas_skills_a.png"
+}

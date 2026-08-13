@@ -1,0 +1,69 @@
+{
+  "job": "builtin_nav_icons",
+  "source": "C:\\Users\\tzzcomputer\\Desktop\\樱夜尸潮_V3.5_Codex续作\\assets\\image2\\source\\builtin_nav_icons.png",
+  "atlas_size": [
+    1536,
+    1024
+  ],
+  "cell_size": [
+    512,
+    512
+  ],
+  "outputs": [
+    {
+      "id": "nav_stage",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\ui\\nav\\stage.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0
+    },
+    {
+      "id": "nav_talent",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\ui\\nav\\talent.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0
+    },
+    {
+      "id": "nav_story",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\ui\\nav\\story.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0
+    },
+    {
+      "id": "nav_ascension",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\ui\\nav\\ascension.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0
+    },
+    {
+      "id": "nav_achievement",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\ui\\nav\\achievement.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0
+    },
+    {
+      "id": "nav_shop",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\ui\\nav\\shop.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0
+    }
+  ],
+  "preview": "assets\\image2\\previews\\builtin_nav_icons.png"
+}

@@ -1,0 +1,496 @@
+{
+  "job": "atlas_progression_a",
+  "source": "C:\\Users\\tzzcomputer\\Desktop\\樱夜尸潮_V3.5_Codex续作\\assets\\image2\\source\\atlas_progression_a.png",
+  "atlas_size": [
+    1717,
+    916
+  ],
+  "cell_size": [
+    214,
+    229
+  ],
+  "detected_tiles": true,
+  "outputs": [
+    {
+      "id": "mech",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\classes\\mech\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        13,
+        18,
+        221,
+        231
+      ]
+    },
+    {
+      "id": "gun",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\classes\\gun\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        233,
+        18,
+        439,
+        231
+      ]
+    },
+    {
+      "id": "alch",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\classes\\alch\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        450,
+        18,
+        656,
+        231
+      ]
+    },
+    {
+      "id": "gene",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\classes\\gene\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        666,
+        18,
+        871,
+        231
+      ]
+    },
+    {
+      "id": "vamp",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\classes\\vamp\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        883,
+        18,
+        1080,
+        231
+      ]
+    },
+    {
+      "id": "spore",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\classes\\spore\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1091,
+        18,
+        1286,
+        231
+      ]
+    },
+    {
+      "id": "magical",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\classes\\magical\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1296,
+        18,
+        1493,
+        231
+      ]
+    },
+    {
+      "id": "cult",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\classes\\cult\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1503,
+        18,
+        1701,
+        231
+      ]
+    },
+    {
+      "id": "mage",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\classes\\mage\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        13,
+        244,
+        221,
+        450
+      ]
+    },
+    {
+      "id": "shrine",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\classes\\shrine\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        233,
+        244,
+        439,
+        450
+      ]
+    },
+    {
+      "id": "summon",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\classes\\summon\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        450,
+        244,
+        656,
+        450
+      ]
+    },
+    {
+      "id": "ninja",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\classes\\ninja\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        666,
+        244,
+        871,
+        450
+      ]
+    },
+    {
+      "id": "idol",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\classes\\idol\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        883,
+        244,
+        1080,
+        450
+      ]
+    },
+    {
+      "id": "necro",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\classes\\necro\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1091,
+        244,
+        1286,
+        450
+      ]
+    },
+    {
+      "id": "swarm",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\swarm\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1296,
+        244,
+        1493,
+        450
+      ]
+    },
+    {
+      "id": "railLord",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\railLord\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1503,
+        244,
+        1701,
+        450
+      ]
+    },
+    {
+      "id": "barrage",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\barrage\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        13,
+        464,
+        221,
+        665
+      ]
+    },
+    {
+      "id": "sniper",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\sniper\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        233,
+        464,
+        439,
+        665
+      ]
+    },
+    {
+      "id": "plagueDoctor",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\plagueDoctor\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        450,
+        464,
+        656,
+        665
+      ]
+    },
+    {
+      "id": "philosopher",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\philosopher\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        666,
+        464,
+        871,
+        665
+      ]
+    },
+    {
+      "id": "titan",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\titan\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        883,
+        464,
+        1080,
+        665
+      ]
+    },
+    {
+      "id": "berserk",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\berserk\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1091,
+        464,
+        1286,
+        665
+      ]
+    },
+    {
+      "id": "bloodDuke",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\bloodDuke\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1296,
+        464,
+        1493,
+        665
+      ]
+    },
+    {
+      "id": "batQueen",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\batQueen\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1503,
+        464,
+        1701,
+        665
+      ]
+    },
+    {
+      "id": "hive",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\hive\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        13,
+        678,
+        221,
+        889
+      ]
+    },
+    {
+      "id": "garden",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\garden\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        233,
+        678,
+        439,
+        889
+      ]
+    },
+    {
+      "id": "starIdol",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\starIdol\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        450,
+        678,
+        656,
+        889
+      ]
+    },
+    {
+      "id": "miracle",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\miracle\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        666,
+        678,
+        871,
+        889
+      ]
+    },
+    {
+      "id": "swordSaint",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\swordSaint\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        883,
+        678,
+        1080,
+        889
+      ]
+    },
+    {
+      "id": "thunderLord",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\thunderLord\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1091,
+        678,
+        1286,
+        889
+      ]
+    },
+    {
+      "id": "element",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\element\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1296,
+        678,
+        1493,
+        889
+      ]
+    },
+    {
+      "id": "timeMage",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\timeMage\\icon.webp",
+      "size": [
+        256,
+        256
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        1503,
+        678,
+        1701,
+        889
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\atlas_progression_a.png"
+}

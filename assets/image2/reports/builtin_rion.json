@@ -1,0 +1,78 @@
+{
+  "job": "builtin_rion",
+  "source": "C:\\Users\\tzzcomputer\\Desktop\\樱夜尸潮_V3.5_Codex续作\\assets\\image2\\source\\builtin_rion_sheet.png",
+  "atlas_size": [
+    1774,
+    887
+  ],
+  "cell_size": [
+    591,
+    887
+  ],
+  "outputs": [
+    {
+      "id": "rion_portrait",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\rion\\default\\portrait.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        71,
+        119,
+        591,
+        766
+      ],
+      "coverage": 0.49594,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "rion_battle",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\rion\\default\\battle.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        0,
+        60,
+        567,
+        818
+      ],
+      "coverage": 0.24321,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "rion_dialogue",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\rion\\default\\dialogue.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        4,
+        41,
+        591,
+        887
+      ],
+      "coverage": 0.4087,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\builtin_rion.png"
+}

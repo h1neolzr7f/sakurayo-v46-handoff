@@ -1,0 +1,121 @@
+{
+  "job": "animation_rion",
+  "source": "C:\\Users\\tzzcomputer\\Desktop\\樱夜尸潮_V3.5_Codex续作\\assets\\image2\\source\\chibi_animation_rion.png",
+  "atlas_size": [
+    2172,
+    724
+  ],
+  "cell_size": [
+    434,
+    724
+  ],
+  "detected_tiles": false,
+  "outputs": [
+    {
+      "id": "idle",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\rion\\default\\anim_idle.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        71,
+        160,
+        386,
+        569
+      ],
+      "coverage": 0.29343,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "move",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\rion\\default\\anim_move.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        7,
+        183,
+        364,
+        566
+      ],
+      "coverage": 0.28076,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "attack",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\rion\\default\\anim_attack.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        2,
+        190,
+        434,
+        569
+      ],
+      "coverage": 0.315,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "hit",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\rion\\default\\anim_hit.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        38,
+        206,
+        313,
+        568
+      ],
+      "coverage": 0.24986,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "dash",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\rion\\default\\anim_dash.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        0,
+        296,
+        370,
+        568
+      ],
+      "coverage": 0.25189,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\animation_rion.png"
+}

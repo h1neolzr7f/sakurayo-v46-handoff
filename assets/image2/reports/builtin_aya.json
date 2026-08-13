@@ -1,0 +1,78 @@
+{
+  "job": "builtin_aya",
+  "source": "C:\\Users\\tzzcomputer\\Desktop\\樱夜尸潮_V3.5_Codex续作\\assets\\image2\\source\\builtin_aya_sheet.png",
+  "atlas_size": [
+    1786,
+    880
+  ],
+  "cell_size": [
+    595,
+    880
+  ],
+  "outputs": [
+    {
+      "id": "aya_portrait",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\aya\\default\\portrait.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        51,
+        97,
+        518,
+        657
+      ],
+      "coverage": 0.48038,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "aya_battle",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\aya\\default\\battle.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        102,
+        57,
+        507,
+        828
+      ],
+      "coverage": 0.16982,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "id": "aya_dialogue",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\aya\\default\\dialogue.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        29,
+        70,
+        530,
+        696
+      ],
+      "coverage": 0.46914,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\builtin_aya.png"
+}
