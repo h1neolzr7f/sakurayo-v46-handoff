@@ -167,9 +167,9 @@ try {
     await page.locator("#moreButton39").click();
   }
   await page.locator("#modKitButton42").click();
-  assert.equal(await page.locator("#modKitDrawer42 .modKitPack42").count(), 4);
-  assert.equal(await page.locator("#modKitDrawer42 .modKitPack42.enabled").count(), 4);
-  assert.match(await page.locator("#modKitDrawer42 .modKitSummary42").textContent(), /4\/4 已启用/);
+  assert.equal(await page.locator("#modKitDrawer42 .modKitPack42").count(), 5);
+  assert.equal(await page.locator("#modKitDrawer42 .modKitPack42.enabled").count(), 5);
+  assert.match(await page.locator("#modKitDrawer42 .modKitSummary42").textContent(), /5\/5 已启用/);
   await shot(page, "01a-modkit-packs.png");
   await page.locator("#modKitDrawer42 .close").click();
   pass("Mod Kit 面板显示内容格式、依赖与扩展启用状态");
@@ -193,7 +193,7 @@ try {
   assert.equal(await page.locator("#achList .achievementMaster35").count(), 1);
   await page.locator("#achDrawer .close").click();
   await page.locator('[data-open="shop"]').click();
-  assert.equal(await page.locator("#shopList .skinCard").count(), 10);
+  assert.equal(await page.locator("#shopList .skinCard").count(), 11);
   assert.equal(await page.locator("#shopList .shopTabs40 button").count(), 5);
   assert.equal(await page.locator('#shopList [data-shop="starters"]').count(), 1);
   assert.equal(await page.locator("#shopList .shopItem40").count(), 24);
@@ -201,7 +201,7 @@ try {
   assert.match(await page.locator("#shopWallet44").textContent(), /初始|核心|🌸/);
   await page.waitForFunction(() => {
     const images = [...document.querySelectorAll("#shopList .skinPreview img")];
-    return images.length === 10 && images.every(image => image.complete && image.naturalWidth > 0);
+    return images.length === 11 && images.every(image => image.complete && image.naturalWidth > 0);
   }, null, { timeout: 15000 });
   await shot(page, "01e-costume-shop.png");
   await page.locator('#shopList [data-shop="starters"]').click();
@@ -223,7 +223,7 @@ try {
   assert.equal(baitPurchase.snapshot.shop40.items.bait, 1);
   assert.equal(baitPurchase.snapshot.shop40.baitEquipped, true);
   pass("正式模式隐藏内测后门，测试模式可直达场景并导出本地报告");
-  const costumeSkins = ["techcoat", "biodress", "psirobe", "haori", "idol", "apron", "summon", "festival", "framework_observer"];
+  const costumeSkins = ["techcoat", "biodress", "psirobe", "haori", "idol", "apron", "summon", "festival", "framework_observer", "phantom"];
   for (const character of ["sayo", "aya", "rion"]) {
     await api(page, "selectCharacter", character);
     for (const skin of costumeSkins) {
@@ -238,7 +238,7 @@ try {
   }
   await api(page, "selectCharacter", "sayo");
   await api(page, "selectSkin", "default");
-  pass("27 costume sets decode and switch in the offline shop, including the official extension");
+  pass("30 costume sets decode and switch in the offline shop, including the official extension");
   const canvasBox = await page.locator("#game").boundingBox();
   assert.ok(canvasBox && canvasBox.width > 0 && canvasBox.height > 0);
   const coldCombatArt = await api(page, "combatArtStatus");
@@ -246,10 +246,10 @@ try {
   await api(page, "preloadCombatArt412");
   await page.waitForFunction(() => window.__SAKURAYO_COMBAT_ART__?.status().every(item => item.ready), null, { timeout: 20000 });
   const combatArt = await api(page, "combatArtStatus");
-  assert.equal(combatArt.length, 28);
+  assert.equal(combatArt.length, 38);
   assert.equal(combatArt.every(item => item.width === 512 && item.height === 512), true);
   await shot(page, "01-menu-430x932.png");
-  pass("首屏仅解码 9 项必要美术，6 项角色动作与 28 项战斗美术按需加载且均可本地解码");
+  pass("首屏仅解码 9 项必要美术，6 项角色动作与 38 项战斗美术按需加载且均可本地解码");
   pass("430×932 新存档主菜单与三角色卡");
 
   assert.equal(await page.locator("#guideButton37").count(), 1);
@@ -274,7 +274,7 @@ try {
   assert.equal(await page.locator("#statsButton37").isVisible(), true);
   await page.locator("#statsButton37").click();
   assert.equal(await page.locator("#analyticsDrawer37").isVisible(), true);
-  assert.match(await page.locator("#analyticsText37").inputValue(), /"version": "4.4.1"/);
+  assert.match(await page.locator("#analyticsText37").inputValue(), /"version": "4.4.6"/);
   await page.locator("#analyticsDrawer37 .close").click();
   await page.locator("#settingsButton37").click();
   assert.equal(await page.locator("#settingsDrawer37").isVisible(), true);
@@ -291,7 +291,7 @@ try {
   await page.locator("#battleGlow421").click();
   await page.locator("#battleGlow421").click();
   assert.match(await page.locator("#battleGlow421").textContent(), /关闭/);
-  pass("V4.4.1 普通战斗无发光、静态清晰立绘与界面减法设置");
+  pass("V4.4.3 普通战斗无发光、静态清晰立绘与界面减法设置");
   await page.locator("#hudSize38").click();
   assert.equal(await page.locator("body").evaluate(node => node.classList.contains("compactHud38")), true);
   await page.locator("#hudSize38").click();
@@ -654,6 +654,10 @@ try {
 
   await api(page, "defeatBoss");
   assert.equal((await state(page)).mode, "dialogue");
+  assert.equal(await page.locator("#storyBeat44:not(.hidden)").count(), 1);
+  assert.match(await page.locator("#storyBeat44").innerText(), /倒下|碎裂|净化/);
+  assert.equal((await api(page, "cutscene44")).playing, true);
+  await shot(page, "05a-victory-cutscene.png");
   await api(page, "dismissDialogue");
   let resultState = await state(page);
   assert.equal(resultState.mode, "result");

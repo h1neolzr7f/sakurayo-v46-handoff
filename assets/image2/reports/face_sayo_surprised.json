@@ -1,0 +1,37 @@
+{
+  "job": "face_sayo_surprised",
+  "source": "C:\\Users\\tzzcomputer\\Documents\\Codex\\2026-07-10\\new-chat-6\\work\\v423-delivery\\source\\assets\\image2\\source\\expansion\\face_sayo_surprised.png",
+  "atlas_size": [
+    1024,
+    1024
+  ],
+  "cell_size": [
+    1024,
+    1024
+  ],
+  "detected_tiles": false,
+  "outputs": [
+    {
+      "id": "face_sayo_surprised",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\sayo\\default\\face_surprised.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        105,
+        17,
+        964,
+        1024
+      ],
+      "coverage": 0.55241,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\face_sayo_surprised.png"
+}

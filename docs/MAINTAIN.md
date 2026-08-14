@@ -49,7 +49,7 @@ git commit -m "Release V4.4.2: 一句话说明为什么升这一版。"
 git tag v4.4.2
 ```
 
-不要把密钥、`local.properties`、APK、`tests/artifacts/` 提交进去。`.gitignore` 已排除。
+不要把密钥、`local.properties`、APK、`tests/artifacts/` 提交进去。`.gitignore` 已排除。公开仓库的 APK 只挂在 GitHub Releases，不要推进 git。
 
 ## 分支建议
 

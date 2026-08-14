@@ -1,0 +1,37 @@
+{
+  "job": "face_rion_smile",
+  "source": "C:\\Users\\tzzcomputer\\Documents\\Codex\\2026-07-10\\new-chat-6\\work\\v423-delivery\\source\\assets\\image2\\source\\expansion\\face_rion_smile.png",
+  "atlas_size": [
+    1024,
+    1024
+  ],
+  "cell_size": [
+    1024,
+    1024
+  ],
+  "detected_tiles": false,
+  "outputs": [
+    {
+      "id": "face_rion_smile",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\rion\\default\\face_smile.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        63,
+        17,
+        987,
+        1024
+      ],
+      "coverage": 0.5591,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\face_rion_smile.png"
+}

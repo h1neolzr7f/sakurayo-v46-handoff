@@ -14,8 +14,8 @@ android {
         applicationId "com.sakurayo.zombietide"
         minSdk 23
         targetSdk 36
-        versionCode 51
-        versionName "4.4.1"
+        versionCode 56
+        versionName "4.4.6"
     }
 
     signingConfigs {
@@ -56,5 +56,9 @@ android {
         resources {
             excludes += ["META-INF/DEPENDENCIES", "META-INF/LICENSE*", "META-INF/NOTICE*"]
         }
+    }
+
+    lint {
+        disable "PropertyEscape"
     }
 }

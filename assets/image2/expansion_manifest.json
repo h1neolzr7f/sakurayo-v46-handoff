@@ -1,0 +1,2334 @@
+{
+ "version": "expansion-1",
+ "model": "generate-image",
+ "output_root": "android-app/app/src/main/assets",
+ "note": "expansion assets: counter enemies, expression faces, phantom costume, maingod-void pack, progression splashes, story CGs",
+ "jobs": [
+  {
+   "id": "enemy_pethunter",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/enemy_pethunter.png",
+   "processed": "assets/image2/processed/expansion/enemy_pethunter.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "enemy_pethunter",
+      "output": "game/art/enemies/pethunter.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "enemy_noisecaller",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/enemy_noisecaller.png",
+   "processed": "assets/image2/processed/expansion/enemy_noisecaller.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "enemy_noisecaller",
+      "output": "game/art/enemies/noisecaller.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "enemy_souleater",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/enemy_souleater.png",
+   "processed": "assets/image2/processed/expansion/enemy_souleater.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "enemy_souleater",
+      "output": "game/art/enemies/souleater.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "enemy_mirrorblade",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/enemy_mirrorblade.png",
+   "processed": "assets/image2/processed/expansion/enemy_mirrorblade.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "enemy_mirrorblade",
+      "output": "game/art/enemies/mirrorblade.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "face_sayo_smile",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/face_sayo_smile.png",
+   "processed": "assets/image2/processed/expansion/face_sayo_smile.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "face_sayo_smile",
+      "output": "game/art/characters/sayo/default/face_smile.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 20
+     }
+    ]
+   }
+  },
+  {
+   "id": "face_sayo_serious",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/face_sayo_serious.png",
+   "processed": "assets/image2/processed/expansion/face_sayo_serious.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "face_sayo_serious",
+      "output": "game/art/characters/sayo/default/face_serious.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 20
+     }
+    ]
+   }
+  },
+  {
+   "id": "face_sayo_surprised",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/face_sayo_surprised.png",
+   "processed": "assets/image2/processed/expansion/face_sayo_surprised.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "face_sayo_surprised",
+      "output": "game/art/characters/sayo/default/face_surprised.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 20
+     }
+    ]
+   }
+  },
+  {
+   "id": "face_sayo_sad",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/face_sayo_sad.png",
+   "processed": "assets/image2/processed/expansion/face_sayo_sad.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "face_sayo_sad",
+      "output": "game/art/characters/sayo/default/face_sad.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 20
+     }
+    ]
+   }
+  },
+  {
+   "id": "face_aya_smile",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/face_aya_smile.png",
+   "processed": "assets/image2/processed/expansion/face_aya_smile.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "face_aya_smile",
+      "output": "game/art/characters/aya/default/face_smile.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 20
+     }
+    ]
+   }
+  },
+  {
+   "id": "face_aya_serious",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/face_aya_serious.png",
+   "processed": "assets/image2/processed/expansion/face_aya_serious.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "face_aya_serious",
+      "output": "game/art/characters/aya/default/face_serious.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 20
+     }
+    ]
+   }
+  },
+  {
+   "id": "face_aya_surprised",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/face_aya_surprised.png",
+   "processed": "assets/image2/processed/expansion/face_aya_surprised.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "face_aya_surprised",
+      "output": "game/art/characters/aya/default/face_surprised.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 20
+     }
+    ]
+   }
+  },
+  {
+   "id": "face_aya_sad",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/face_aya_sad.png",
+   "processed": "assets/image2/processed/expansion/face_aya_sad.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "face_aya_sad",
+      "output": "game/art/characters/aya/default/face_sad.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 20
+     }
+    ]
+   }
+  },
+  {
+   "id": "face_rion_smile",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/face_rion_smile.png",
+   "processed": "assets/image2/processed/expansion/face_rion_smile.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "face_rion_smile",
+      "output": "game/art/characters/rion/default/face_smile.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 20
+     }
+    ]
+   }
+  },
+  {
+   "id": "face_rion_serious",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/face_rion_serious.png",
+   "processed": "assets/image2/processed/expansion/face_rion_serious.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "face_rion_serious",
+      "output": "game/art/characters/rion/default/face_serious.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 20
+     }
+    ]
+   }
+  },
+  {
+   "id": "face_rion_surprised",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/face_rion_surprised.png",
+   "processed": "assets/image2/processed/expansion/face_rion_surprised.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "face_rion_surprised",
+      "output": "game/art/characters/rion/default/face_surprised.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 20
+     }
+    ]
+   }
+  },
+  {
+   "id": "face_rion_sad",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/face_rion_sad.png",
+   "processed": "assets/image2/processed/expansion/face_rion_sad.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "face_rion_sad",
+      "output": "game/art/characters/rion/default/face_sad.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 20
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_sayo_portrait",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_sayo_portrait.png",
+   "processed": "assets/image2/processed/expansion/phantom_sayo_portrait.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_sayo_portrait",
+      "output": "game/art/characters/sayo/phantom/portrait.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_sayo_dialogue",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_sayo_dialogue.png",
+   "processed": "assets/image2/processed/expansion/phantom_sayo_dialogue.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_sayo_dialogue",
+      "output": "game/art/characters/sayo/phantom/dialogue.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_sayo_anim_idle",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_sayo_anim_idle.png",
+   "processed": "assets/image2/processed/expansion/phantom_sayo_anim_idle.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_sayo_anim_idle",
+      "output": "game/art/characters/sayo/phantom/anim_idle.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_sayo_anim_move",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_sayo_anim_move.png",
+   "processed": "assets/image2/processed/expansion/phantom_sayo_anim_move.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_sayo_anim_move",
+      "output": "game/art/characters/sayo/phantom/anim_move.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_sayo_anim_attack",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_sayo_anim_attack.png",
+   "processed": "assets/image2/processed/expansion/phantom_sayo_anim_attack.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_sayo_anim_attack",
+      "output": "game/art/characters/sayo/phantom/anim_attack.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_sayo_anim_hit",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_sayo_anim_hit.png",
+   "processed": "assets/image2/processed/expansion/phantom_sayo_anim_hit.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_sayo_anim_hit",
+      "output": "game/art/characters/sayo/phantom/anim_hit.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_sayo_anim_dash",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_sayo_anim_dash.png",
+   "processed": "assets/image2/processed/expansion/phantom_sayo_anim_dash.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_sayo_anim_dash",
+      "output": "game/art/characters/sayo/phantom/anim_dash.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_aya_portrait",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_aya_portrait.png",
+   "processed": "assets/image2/processed/expansion/phantom_aya_portrait.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_aya_portrait",
+      "output": "game/art/characters/aya/phantom/portrait.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_aya_dialogue",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_aya_dialogue.png",
+   "processed": "assets/image2/processed/expansion/phantom_aya_dialogue.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_aya_dialogue",
+      "output": "game/art/characters/aya/phantom/dialogue.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_aya_anim_idle",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_aya_anim_idle.png",
+   "processed": "assets/image2/processed/expansion/phantom_aya_anim_idle.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_aya_anim_idle",
+      "output": "game/art/characters/aya/phantom/anim_idle.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_aya_anim_move",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_aya_anim_move.png",
+   "processed": "assets/image2/processed/expansion/phantom_aya_anim_move.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_aya_anim_move",
+      "output": "game/art/characters/aya/phantom/anim_move.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_aya_anim_attack",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_aya_anim_attack.png",
+   "processed": "assets/image2/processed/expansion/phantom_aya_anim_attack.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_aya_anim_attack",
+      "output": "game/art/characters/aya/phantom/anim_attack.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_aya_anim_hit",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_aya_anim_hit.png",
+   "processed": "assets/image2/processed/expansion/phantom_aya_anim_hit.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_aya_anim_hit",
+      "output": "game/art/characters/aya/phantom/anim_hit.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_aya_anim_dash",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_aya_anim_dash.png",
+   "processed": "assets/image2/processed/expansion/phantom_aya_anim_dash.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_aya_anim_dash",
+      "output": "game/art/characters/aya/phantom/anim_dash.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_rion_portrait",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_rion_portrait.png",
+   "processed": "assets/image2/processed/expansion/phantom_rion_portrait.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_rion_portrait",
+      "output": "game/art/characters/rion/phantom/portrait.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_rion_dialogue",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_rion_dialogue.png",
+   "processed": "assets/image2/processed/expansion/phantom_rion_dialogue.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_rion_dialogue",
+      "output": "game/art/characters/rion/phantom/dialogue.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_rion_anim_idle",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_rion_anim_idle.png",
+   "processed": "assets/image2/processed/expansion/phantom_rion_anim_idle.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_rion_anim_idle",
+      "output": "game/art/characters/rion/phantom/anim_idle.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_rion_anim_move",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_rion_anim_move.png",
+   "processed": "assets/image2/processed/expansion/phantom_rion_anim_move.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_rion_anim_move",
+      "output": "game/art/characters/rion/phantom/anim_move.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_rion_anim_attack",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_rion_anim_attack.png",
+   "processed": "assets/image2/processed/expansion/phantom_rion_anim_attack.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_rion_anim_attack",
+      "output": "game/art/characters/rion/phantom/anim_attack.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_rion_anim_hit",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_rion_anim_hit.png",
+   "processed": "assets/image2/processed/expansion/phantom_rion_anim_hit.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_rion_anim_hit",
+      "output": "game/art/characters/rion/phantom/anim_hit.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "phantom_rion_anim_dash",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/phantom_rion_anim_dash.png",
+   "processed": "assets/image2/processed/expansion/phantom_rion_anim_dash.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "phantom_rion_anim_dash",
+      "output": "game/art/characters/rion/phantom/anim_dash.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "void_bg",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": false,
+   "source": "assets/image2/source/expansion/void_bg.png",
+   "processed": "assets/image2/processed/expansion/void_bg.png",
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "void_bg",
+      "output": "game/art/content-packs/maingod-void/maps/void_arena.webp",
+      "size": [
+       1024,
+       1536
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "void_map",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": false,
+   "source": "assets/image2/source/expansion/void_map.png",
+   "processed": "assets/image2/processed/expansion/void_map.png",
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "void_map",
+      "output": "game/art/content-packs/maingod-void/maps/chapter5.webp",
+      "size": [
+       1280,
+       853
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "void_boss_p1",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/void_boss_p1.png",
+   "processed": "assets/image2/processed/expansion/void_boss_p1.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "void_boss_p1",
+      "output": "game/art/content-packs/maingod-void/bosses/void_phase1.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "void_boss_p2",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/void_boss_p2.png",
+   "processed": "assets/image2/processed/expansion/void_boss_p2.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "void_boss_p2",
+      "output": "game/art/content-packs/maingod-void/bosses/void_phase2.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "void_boss_p3",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/void_boss_p3.png",
+   "processed": "assets/image2/processed/expansion/void_boss_p3.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "void_boss_p3",
+      "output": "game/art/content-packs/maingod-void/bosses/void_phase3.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "void_boss_p4",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/void_boss_p4.png",
+   "processed": "assets/image2/processed/expansion/void_boss_p4.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "void_boss_p4",
+      "output": "game/art/content-packs/maingod-void/bosses/void_phase4.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "enemy_voidling",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/enemy_voidling.png",
+   "processed": "assets/image2/processed/expansion/enemy_voidling.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "enemy_voidling",
+      "output": "game/art/content-packs/maingod-void/enemies/voidling.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "enemy_voidmaw",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/enemy_voidmaw.png",
+   "processed": "assets/image2/processed/expansion/enemy_voidmaw.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "enemy_voidmaw",
+      "output": "game/art/content-packs/maingod-void/enemies/voidmaw.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "splash_asc_bio",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": false,
+   "source": "assets/image2/source/expansion/splash_asc_bio.png",
+   "processed": "assets/image2/processed/expansion/splash_asc_bio.png",
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "splash_asc_bio",
+      "output": "game/art/ascensions/bio/splash.webp",
+      "size": [
+       1024,
+       576
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "splash_asc_psi",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": false,
+   "source": "assets/image2/source/expansion/splash_asc_psi.png",
+   "processed": "assets/image2/processed/expansion/splash_asc_psi.png",
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "splash_asc_psi",
+      "output": "game/art/ascensions/psi/splash.webp",
+      "size": [
+       1024,
+       576
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "splash_asc_tech",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": false,
+   "source": "assets/image2/source/expansion/splash_asc_tech.png",
+   "processed": "assets/image2/processed/expansion/splash_asc_tech.png",
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "splash_asc_tech",
+      "output": "game/art/ascensions/tech/splash.webp",
+      "size": [
+       1024,
+       576
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "splash_career_swordSaint",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": false,
+   "source": "assets/image2/source/expansion/splash_career_swordSaint.png",
+   "processed": "assets/image2/processed/expansion/splash_career_swordSaint.png",
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "splash_career_swordSaint",
+      "output": "game/art/careers/swordSaint/splash.webp",
+      "size": [
+       1024,
+       576
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "splash_career_railLord",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": false,
+   "source": "assets/image2/source/expansion/splash_career_railLord.png",
+   "processed": "assets/image2/processed/expansion/splash_career_railLord.png",
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "splash_career_railLord",
+      "output": "game/art/careers/railLord/splash.webp",
+      "size": [
+       1024,
+       576
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "splash_career_starIdol",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": false,
+   "source": "assets/image2/source/expansion/splash_career_starIdol.png",
+   "processed": "assets/image2/processed/expansion/splash_career_starIdol.png",
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "splash_career_starIdol",
+      "output": "game/art/careers/starIdol/splash.webp",
+      "size": [
+       1024,
+       576
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "cg_stage1",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": false,
+   "source": "assets/image2/source/expansion/cg_stage1.png",
+   "processed": "assets/image2/processed/expansion/cg_stage1.png",
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "cg_stage1",
+      "output": "game/art/stages/stage_1/cg.webp",
+      "size": [
+       1024,
+       1536
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "cg_stage2",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": false,
+   "source": "assets/image2/source/expansion/cg_stage2.png",
+   "processed": "assets/image2/processed/expansion/cg_stage2.png",
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "cg_stage2",
+      "output": "game/art/stages/stage_2/cg.webp",
+      "size": [
+       1024,
+       1536
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "cg_stage3",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": false,
+   "source": "assets/image2/source/expansion/cg_stage3.png",
+   "processed": "assets/image2/processed/expansion/cg_stage3.png",
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "cg_stage3",
+      "output": "game/art/stages/stage_3/cg.webp",
+      "size": [
+       1024,
+       1536
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "cg_stage4",
+   "phase": "expansion",
+   "kind": "single",
+   "transparent": false,
+   "source": "assets/image2/source/expansion/cg_stage4.png",
+   "processed": "assets/image2/processed/expansion/cg_stage4.png",
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "cg_stage4",
+      "output": "game/art/stages/stage_4/cg.webp",
+      "size": [
+       1024,
+       1536
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_swarm",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_swarm.png",
+   "processed": "assets/image2/processed/expansion/career_swarm.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_swarm",
+      "output": "game/art/careers/swarm/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_railLord",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_railLord.png",
+   "processed": "assets/image2/processed/expansion/career_railLord.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_railLord",
+      "output": "game/art/careers/railLord/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_barrage",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_barrage.png",
+   "processed": "assets/image2/processed/expansion/career_barrage.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_barrage",
+      "output": "game/art/careers/barrage/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_sniper",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_sniper.png",
+   "processed": "assets/image2/processed/expansion/career_sniper.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_sniper",
+      "output": "game/art/careers/sniper/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_plagueDoctor",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_plagueDoctor.png",
+   "processed": "assets/image2/processed/expansion/career_plagueDoctor.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_plagueDoctor",
+      "output": "game/art/careers/plagueDoctor/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_philosopher",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_philosopher.png",
+   "processed": "assets/image2/processed/expansion/career_philosopher.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_philosopher",
+      "output": "game/art/careers/philosopher/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_titan",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_titan.png",
+   "processed": "assets/image2/processed/expansion/career_titan.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_titan",
+      "output": "game/art/careers/titan/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_berserk",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_berserk.png",
+   "processed": "assets/image2/processed/expansion/career_berserk.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_berserk",
+      "output": "game/art/careers/berserk/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_bloodDuke",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_bloodDuke.png",
+   "processed": "assets/image2/processed/expansion/career_bloodDuke.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_bloodDuke",
+      "output": "game/art/careers/bloodDuke/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_batQueen",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_batQueen.png",
+   "processed": "assets/image2/processed/expansion/career_batQueen.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_batQueen",
+      "output": "game/art/careers/batQueen/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_hive",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_hive.png",
+   "processed": "assets/image2/processed/expansion/career_hive.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_hive",
+      "output": "game/art/careers/hive/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_garden",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_garden.png",
+   "processed": "assets/image2/processed/expansion/career_garden.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_garden",
+      "output": "game/art/careers/garden/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_starIdol",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_starIdol.png",
+   "processed": "assets/image2/processed/expansion/career_starIdol.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_starIdol",
+      "output": "game/art/careers/starIdol/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_miracle",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_miracle.png",
+   "processed": "assets/image2/processed/expansion/career_miracle.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_miracle",
+      "output": "game/art/careers/miracle/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_swordSaint",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_swordSaint.png",
+   "processed": "assets/image2/processed/expansion/career_swordSaint.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_swordSaint",
+      "output": "game/art/careers/swordSaint/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_thunderLord",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_thunderLord.png",
+   "processed": "assets/image2/processed/expansion/career_thunderLord.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_thunderLord",
+      "output": "game/art/careers/thunderLord/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_element",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_element.png",
+   "processed": "assets/image2/processed/expansion/career_element.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_element",
+      "output": "game/art/careers/element/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_timeMage",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_timeMage.png",
+   "processed": "assets/image2/processed/expansion/career_timeMage.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_timeMage",
+      "output": "game/art/careers/timeMage/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_exorcist",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_exorcist.png",
+   "processed": "assets/image2/processed/expansion/career_exorcist.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_exorcist",
+      "output": "game/art/careers/exorcist/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_guardian",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_guardian.png",
+   "processed": "assets/image2/processed/expansion/career_guardian.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_guardian",
+      "output": "game/art/careers/guardian/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_beast",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_beast.png",
+   "processed": "assets/image2/processed/expansion/career_beast.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_beast",
+      "output": "game/art/careers/beast/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_heroic",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_heroic.png",
+   "processed": "assets/image2/processed/expansion/career_heroic.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_heroic",
+      "output": "game/art/careers/heroic/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_shadow",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_shadow.png",
+   "processed": "assets/image2/processed/expansion/career_shadow.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_shadow",
+      "output": "game/art/careers/shadow/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_bombNinja",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_bombNinja.png",
+   "processed": "assets/image2/processed/expansion/career_bombNinja.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_bombNinja",
+      "output": "game/art/careers/bombNinja/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_warSinger",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_warSinger.png",
+   "processed": "assets/image2/processed/expansion/career_warSinger.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_warSinger",
+      "output": "game/art/careers/warSinger/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_healingIdol",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_healingIdol.png",
+   "processed": "assets/image2/processed/expansion/career_healingIdol.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_healingIdol",
+      "output": "game/art/careers/healingIdol/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_boneKing",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_boneKing.png",
+   "processed": "assets/image2/processed/expansion/career_boneKing.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_boneKing",
+      "output": "game/art/careers/boneKing/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "career_soulHerd",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/career_soulHerd.png",
+   "processed": "assets/image2/processed/expansion/career_soulHerd.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "career_soulHerd",
+      "output": "game/art/careers/soulHerd/full.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "npc_rin_portrait",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/npc_rin_portrait.png",
+   "processed": "assets/image2/processed/expansion/npc_rin_portrait.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "npc_rin_portrait",
+      "output": "game/art/npc/rin/portrait.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "npc_kagami_portrait",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/npc_kagami_portrait.png",
+   "processed": "assets/image2/processed/expansion/npc_kagami_portrait.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "npc_kagami_portrait",
+      "output": "game/art/npc/kagami/portrait.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "npc_swordmaster_portrait",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/npc_swordmaster_portrait.png",
+   "processed": "assets/image2/processed/expansion/npc_swordmaster_portrait.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "npc_swordmaster_portrait",
+      "output": "game/art/npc/swordmaster/portrait.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 12
+     }
+    ]
+   }
+  },
+  {
+   "id": "npc_rin_face_calm",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/npc_rin_face_calm.png",
+   "processed": "assets/image2/processed/expansion/npc_rin_face_calm.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "npc_rin_face_calm",
+      "output": "game/art/npc/rin/face_calm.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 20
+     }
+    ]
+   }
+  },
+  {
+   "id": "npc_rin_face_serious",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/npc_rin_face_serious.png",
+   "processed": "assets/image2/processed/expansion/npc_rin_face_serious.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "npc_rin_face_serious",
+      "output": "game/art/npc/rin/face_serious.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 20
+     }
+    ]
+   }
+  },
+  {
+   "id": "npc_rin_face_smile",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/npc_rin_face_smile.png",
+   "processed": "assets/image2/processed/expansion/npc_rin_face_smile.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "npc_rin_face_smile",
+      "output": "game/art/npc/rin/face_smile.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 20
+     }
+    ]
+   }
+  },
+  {
+   "id": "npc_rin_face_surprised",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/npc_rin_face_surprised.png",
+   "processed": "assets/image2/processed/expansion/npc_rin_face_surprised.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "npc_rin_face_surprised",
+      "output": "game/art/npc/rin/face_surprised.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 20
+     }
+    ]
+   }
+  },
+  {
+   "id": "npc_kagami_face_calm",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/npc_kagami_face_calm.png",
+   "processed": "assets/image2/processed/expansion/npc_kagami_face_calm.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "npc_kagami_face_calm",
+      "output": "game/art/npc/kagami/face_calm.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 20
+     }
+    ]
+   }
+  },
+  {
+   "id": "npc_kagami_face_serious",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/npc_kagami_face_serious.png",
+   "processed": "assets/image2/processed/expansion/npc_kagami_face_serious.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "npc_kagami_face_serious",
+      "output": "game/art/npc/kagami/face_serious.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 20
+     }
+    ]
+   }
+  },
+  {
+   "id": "npc_kagami_face_smile",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/npc_kagami_face_smile.png",
+   "processed": "assets/image2/processed/expansion/npc_kagami_face_smile.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "npc_kagami_face_smile",
+      "output": "game/art/npc/kagami/face_smile.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 20
+     }
+    ]
+   }
+  },
+  {
+   "id": "npc_kagami_face_surprised",
+   "phase": "expansion2",
+   "kind": "single",
+   "transparent": true,
+   "source": "assets/image2/source/expansion/npc_kagami_face_surprised.png",
+   "processed": "assets/image2/processed/expansion/npc_kagami_face_surprised.png",
+   "min_component_ratio": 0.02,
+   "grid": {
+    "columns": 1,
+    "rows": 1,
+    "cells": [
+     {
+      "index": 0,
+      "id": "npc_kagami_face_surprised",
+      "output": "game/art/npc/kagami/face_surprised.webp",
+      "size": [
+       512,
+       512
+      ],
+      "padding": 20
+     }
+    ]
+   }
+  }
+ ]
+}

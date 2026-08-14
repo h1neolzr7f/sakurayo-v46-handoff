@@ -116,7 +116,7 @@ public final class MainActivity extends Activity {
         settings.setTextZoom(100);
         settings.setDefaultTextEncodingName("utf-8");
         settings.setMediaPlaybackRequiresUserGesture(true);
-        settings.setUserAgentString(settings.getUserAgentString() + " SakurayoAndroid/4.4.1");
+        settings.setUserAgentString(settings.getUserAgentString() + " SakurayoAndroid/4.4.6");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             settings.setSafeBrowsingEnabled(true);
         }

@@ -2,7 +2,7 @@
   "use strict";
 
   var API_VERSION = 2;
-  var GAME_VERSION = String(global.SAKURAYO_GAME_VERSION || "4.4.1");
+  var GAME_VERSION = String(global.SAKURAYO_GAME_VERSION || "4.4.6");
   var packs = [];
   var orderedPacks = [];
   var packById = Object.create(null);
@@ -152,12 +152,13 @@
   function normalizeCostume(owner, value, index) {
     if (!isRecord(value)) fail(owner, "shop.costumes[" + index + "]", "must be an object");
     var path = "shop.costumes[" + index + "]";
-    return {
+    var costume = {
       id: id(owner, path + ".id", value.id, false), n: text(value.n || value.name || value.id), e: text(value.e || "🎀"),
       price: finite(owner, path + ".price", value.price || 0, { integer: true, min: 0 }), c1: text(value.c1 || "#8ce7ff"), c2: text(value.c2 || "#493b7a"),
-      bias: validateList(owner, path + ".bias", value.bias).map(function (entry) { return text(entry); }), d: text(value.d || value.description),
-      assetBase: assetPath(owner, path + ".assetBase", value.assetBase, true),
+      bias: validateList(owner, path + ".bias", value.bias).map(function (entry) { return text(entry); }), d: text(value.d || value.description)
     };
+    if (value.assetBase) costume.assetBase = assetPath(owner, path + ".assetBase", value.assetBase, true);
+    return costume;
   }
 
   function normalizeItem(owner, value, index) {
@@ -195,7 +196,7 @@
     if (!isRecord(value)) fail(owner, "explorations[" + index + "]", "must be an object");
     var path = "explorations[" + index + "]";
     var scene = {
-      id: id(owner, path + ".id", value.id, false), stageId: finite(owner, path + ".stageId", value.stageId, { integer: true, min: 1 }), title: text(value.title || value.id),
+      id: id(owner, path + ".id", value.id, false), stageId: value.stageId === "mainGod" ? "mainGod" : finite(owner, path + ".stageId", value.stageId, { integer: true, min: 1 }), title: text(value.title || value.id), entryLabel: value.entryLabel ? text(value.entryLabel) : "",
       background: assetPath(owner, path + ".background", value.background, false),
       spawn: validateList(owner, path + ".spawn", value.spawn).map(function (entry, pointIndex) { return coordinate(owner, path + ".spawn[" + pointIndex + "]", entry); }),
       walkable: validateList(owner, path + ".walkable", value.walkable).map(function (zone, zoneIndex) { return normalizeZone(owner, path + ".walkable[" + zoneIndex + "]", zone); }),

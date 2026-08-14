@@ -1,0 +1,31 @@
+{
+  "job": "void_map",
+  "source": "C:\\Users\\tzzcomputer\\Documents\\Codex\\2026-07-10\\new-chat-6\\work\\v423-delivery\\source\\assets\\image2\\source\\expansion\\void_map.png",
+  "atlas_size": [
+    1536,
+    1024
+  ],
+  "cell_size": [
+    1536,
+    1024
+  ],
+  "detected_tiles": false,
+  "outputs": [
+    {
+      "id": "void_map",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\content-packs\\maingod-void\\maps\\chapter5.webp",
+      "size": [
+        1280,
+        853
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        0,
+        0,
+        1536,
+        1024
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\void_map.png"
+}

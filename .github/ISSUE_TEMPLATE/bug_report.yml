@@ -1,0 +1,45 @@
+name: 缺陷
+description: 报告一个可以复现的问题
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        请不要粘贴签名密钥、完整存档 JSON 或本机绝对路径。
+        安全问题请走 [SECURITY.md](https://github.com/h1neolzr7f/sakurayo-zombietide/blob/main/SECURITY.md)。
+  - type: textarea
+    id: what
+    attributes:
+      label: 发生了什么
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: 版本
+      placeholder: "4.4.6"
+  - type: dropdown
+    id: side
+    attributes:
+      label: 哪一端
+      options:
+        - Android APK
+        - 浏览器打开 src/index.html
+        - 两边都有
+  - type: dropdown
+    id: character
+    attributes:
+      label: 角色
+      options:
+        - 月城小夜
+        - 神代绫
+        - 黑羽凛音
+        - 还没进战斗
+        - 不确定

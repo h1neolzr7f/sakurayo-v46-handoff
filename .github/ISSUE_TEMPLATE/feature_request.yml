@@ -1,0 +1,26 @@
+name: 建议
+description: 提出一个可落地的改进
+title: "[feat] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        商店不卖永久伤害。存档键保持 `sakurayoV3`。不要建议给 `update` 再包一层。
+  - type: textarea
+    id: why
+    attributes:
+      label: 为什么要做
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: 希望变成什么样
+    validations:
+      required: true
+  - type: textarea
+    id: cost
+    attributes:
+      label: 代价或风险
+      description: 新职业 / 融合请写清触发条件、强势期、弱势怪和明确代价。

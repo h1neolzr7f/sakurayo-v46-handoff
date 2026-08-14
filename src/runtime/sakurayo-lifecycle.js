@@ -1,7 +1,7 @@
 (function (global) {
   "use strict";
 
-  var VERSION = "4.4.1";
+  var VERSION = "4.4.6";
   var TAU = Math.PI * 2;
   var EARLY_WINDOW = 20;
   var EARLY_INTERVAL = 0.45;
@@ -183,6 +183,15 @@
     return 0;
   }
 
+  function drawCover(ctx, img, W, H) {
+    var iw = img.naturalWidth || 1,
+      ih = img.naturalHeight || 1,
+      scale = Math.max(W / iw, H / ih),
+      dw = iw * scale,
+      dh = ih * scale;
+    ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh);
+  }
+
   function drawGround(ctx, world) {
     if (!ctx || !world) return;
     var W = world.W,
@@ -195,7 +204,27 @@
       i,
       y,
       pathL,
-      pathR;
+      pathR,
+      photo = world.battleBg;
+    if (photo && photo.complete && photo.naturalWidth > 0) {
+      drawCover(ctx, photo, W, H);
+      ctx.fillStyle = "rgba(5,4,14,0.26)";
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = pal.accent + "14";
+      var n = q < 0.8 ? 2 : 4;
+      for (i = 0; i < n; i++) {
+        var px = ((i * 211 - t * 11) % (W + 180)) - 90,
+          py = 80 + ((i * 113) % Math.max(120, H - 100));
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.rotate(0.8);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 7, 3, 0, 0, TAU);
+        ctx.fill();
+        ctx.restore();
+      }
+      return;
+    }
     if (pal.mainGod) {
       var shift = pal.hue;
       ctx.fillStyle = "hsl(" + (268 + shift) + ",42%,10%)";

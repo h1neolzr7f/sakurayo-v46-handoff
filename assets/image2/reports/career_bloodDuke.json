@@ -1,0 +1,37 @@
+{
+  "job": "career_bloodDuke",
+  "source": "C:\\Users\\tzzcomputer\\Documents\\Codex\\2026-07-10\\new-chat-6\\work\\v423-delivery\\source\\assets\\image2\\source\\expansion\\career_bloodDuke.png",
+  "atlas_size": [
+    1024,
+    1024
+  ],
+  "cell_size": [
+    1024,
+    1024
+  ],
+  "detected_tiles": false,
+  "outputs": [
+    {
+      "id": "career_bloodDuke",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\bloodDuke\\full.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        145,
+        5,
+        892,
+        1015
+      ],
+      "coverage": 0.39373,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\career_bloodDuke.png"
+}

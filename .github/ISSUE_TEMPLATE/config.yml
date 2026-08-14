@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 安全问题
+    url: https://github.com/h1neolzr7f/sakurayo-zombietide/security/advisories/new
+    about: 不要在公开 Issue 里贴存档、密钥或本机路径
+  - name: 怎么玩
+    url: https://github.com/h1neolzr7f/sakurayo-zombietide/blob/main/docs/user-guide.md
+    about: 安装、存档和操作说明

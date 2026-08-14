@@ -49,7 +49,7 @@ try {
   pass("旧 sakurayoV3 存档保留并补齐扩展默认字段");
 
   const status = await api(oldPage, "extensionStatus41");
-  assert.deepEqual(status.packs.map(pack => pack.id), ["official.framework-example", "official.story-exploration", "official.feedback", "official.modkit-addon"]);
+  assert.deepEqual(status.packs.map(pack => pack.id), ["official.framework-example", "official.story-exploration", "official.feedback", "official.modkit-addon", "official.maingod-void"]);
   assert.equal(status.packs.every(pack => pack.enabled), true);
   assert.equal(status.packs.every(pack => pack.apiVersion === 2), true);
   assert.deepEqual(status.packs.find(pack => pack.id === "official.modkit-addon").dependencies, [{ id: "official.framework-example", minVersion: 1 }]);
@@ -199,7 +199,7 @@ try {
   await brokenPage.locator(".bootArt35").waitFor({ state: "detached", timeout: 8000 });
   assert.equal(await brokenPage.locator("#menu").isVisible(), true);
   const brokenStatus = await api(brokenPage, "extensionStatus41");
-  assert.deepEqual(brokenStatus.packs.map(pack => pack.id), ["official.framework-example", "official.story-exploration", "official.feedback", "official.modkit-addon"]);
+  assert.deepEqual(brokenStatus.packs.map(pack => pack.id), ["official.framework-example", "official.story-exploration", "official.feedback", "official.modkit-addon", "official.maingod-void"]);
   assert.ok(brokenStatus.errors.some(error => error.packId === "fixture.broken-content" && error.phase === "register"));
   assert.equal(pageErrors.length, 0);
   pass("非法扩展被隔离，本体和其他扩展继续启动");

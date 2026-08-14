@@ -25,6 +25,16 @@
           bias: ["shrine", "mage"],
           d: "官方扩展示例服饰。资源、商店数据和职业倾向均来自独立内容包。",
           assetBase: "content-packs/official-example/characters"
+        },
+        {
+          id: "phantom",
+          n: "月影怪盗礼服",
+          e: "🎭",
+          price: 320,
+          c1: "#c8b6ff",
+          c2: "#2a1848",
+          bias: ["ninja", "idol"],
+          d: "月影下的华丽怪盗。提高忍者与战场歌姬出现倾向；怪盗从不在监控里留下正脸。"
         }
       ],
       items: [

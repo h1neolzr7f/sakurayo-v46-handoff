@@ -1,0 +1,37 @@
+{
+  "job": "enemy_noisecaller",
+  "source": "C:\\Users\\tzzcomputer\\Documents\\Codex\\2026-07-10\\new-chat-6\\work\\v423-delivery\\source\\assets\\image2\\source\\expansion\\enemy_noisecaller.png",
+  "atlas_size": [
+    1024,
+    1024
+  ],
+  "cell_size": [
+    1024,
+    1024
+  ],
+  "detected_tiles": false,
+  "outputs": [
+    {
+      "id": "enemy_noisecaller",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\enemies\\noisecaller.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        114,
+        62,
+        880,
+        967
+      ],
+      "coverage": 0.35038,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\enemy_noisecaller.png"
+}

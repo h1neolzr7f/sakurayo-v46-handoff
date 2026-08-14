@@ -1,0 +1,37 @@
+{
+  "job": "phantom_aya_anim_hit",
+  "source": "C:\\Users\\tzzcomputer\\Documents\\Codex\\2026-07-10\\new-chat-6\\work\\v423-delivery\\source\\assets\\image2\\source\\expansion\\phantom_aya_anim_hit.png",
+  "atlas_size": [
+    1024,
+    1024
+  ],
+  "cell_size": [
+    1024,
+    1024
+  ],
+  "detected_tiles": false,
+  "outputs": [
+    {
+      "id": "phantom_aya_anim_hit",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\characters\\aya\\phantom\\anim_hit.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        207,
+        19,
+        823,
+        982
+      ],
+      "coverage": 0.28071,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\phantom_aya_anim_hit.png"
+}

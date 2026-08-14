@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" name="viewport"/>
 <meta content="#090714" name="theme-color"/>
-<title>樱夜·尸潮：Mod Kit V4.4.1</title>
+<title>樱夜·尸潮：Mod Kit V4.4.6</title>
 <style>
 :root{--p:#ff58a7;--p2:#ffb4d5;--c:#56ddff;--g:#ffd36b;--bg:#080713;--panel:rgba(18,14,39,.96);--line:rgba(170,220,255,.24);--mut:#cfc4df;--red:#ff4e72}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:#fff;font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;touch-action:none}button{border:0;color:inherit;font:inherit}button:active{transform:scale(.985)}canvas{position:fixed;inset:0;width:100%;height:100%}.hidden{display:none!important}.screen{position:fixed;inset:0;z-index:10}
@@ -99,7 +99,7 @@
 <div class="overlay hidden" id="result"><div class="modal"><div class="resultIcon" id="ricon">🌸</div><div class="rankBig" id="rankBig"></div><h2 id="rtitle"></h2><p class="sub" id="rsub"></p><div class="stats" id="rstats"></div><div class="endingTag" id="endingTag">结局演算中</div><div class="report" id="damageReport"></div><div class="routeNote" id="routeNote"></div><div class="actions"><button class="primary" id="again">再次迎击</button><button class="secondary" id="back">返回主界面</button></div></div></div>
 <div class="warn hidden" id="warning"></div><div id="toast"></div>
 <script>
-window.SAKURAYO_GAME_VERSION = "4.4.1";
+window.SAKURAYO_GAME_VERSION = "4.4.6";
 (() => {
   "use strict";
   const enabled = /(?:\?|&)(?:debug|test)=1(?:&|$)/.test(location.search || "");
@@ -148,7 +148,7 @@ window.SAKURAYO_GAME_VERSION = "4.4.1";
   "use strict";
 
   var API_VERSION = 2;
-  var GAME_VERSION = String(global.SAKURAYO_GAME_VERSION || "4.4.1");
+  var GAME_VERSION = String(global.SAKURAYO_GAME_VERSION || "4.4.6");
   var packs = [];
   var orderedPacks = [];
   var packById = Object.create(null);
@@ -298,12 +298,13 @@ window.SAKURAYO_GAME_VERSION = "4.4.1";
   function normalizeCostume(owner, value, index) {
     if (!isRecord(value)) fail(owner, "shop.costumes[" + index + "]", "must be an object");
     var path = "shop.costumes[" + index + "]";
-    return {
+    var costume = {
       id: id(owner, path + ".id", value.id, false), n: text(value.n || value.name || value.id), e: text(value.e || "🎀"),
       price: finite(owner, path + ".price", value.price || 0, { integer: true, min: 0 }), c1: text(value.c1 || "#8ce7ff"), c2: text(value.c2 || "#493b7a"),
-      bias: validateList(owner, path + ".bias", value.bias).map(function (entry) { return text(entry); }), d: text(value.d || value.description),
-      assetBase: assetPath(owner, path + ".assetBase", value.assetBase, true),
+      bias: validateList(owner, path + ".bias", value.bias).map(function (entry) { return text(entry); }), d: text(value.d || value.description)
     };
+    if (value.assetBase) costume.assetBase = assetPath(owner, path + ".assetBase", value.assetBase, true);
+    return costume;
   }
 
   function normalizeItem(owner, value, index) {
@@ -341,7 +342,7 @@ window.SAKURAYO_GAME_VERSION = "4.4.1";
     if (!isRecord(value)) fail(owner, "explorations[" + index + "]", "must be an object");
     var path = "explorations[" + index + "]";
     var scene = {
-      id: id(owner, path + ".id", value.id, false), stageId: finite(owner, path + ".stageId", value.stageId, { integer: true, min: 1 }), title: text(value.title || value.id),
+      id: id(owner, path + ".id", value.id, false), stageId: value.stageId === "mainGod" ? "mainGod" : finite(owner, path + ".stageId", value.stageId, { integer: true, min: 1 }), title: text(value.title || value.id), entryLabel: value.entryLabel ? text(value.entryLabel) : "",
       background: assetPath(owner, path + ".background", value.background, false),
       spawn: validateList(owner, path + ".spawn", value.spawn).map(function (entry, pointIndex) { return coordinate(owner, path + ".spawn[" + pointIndex + "]", entry); }),
       walkable: validateList(owner, path + ".walkable", value.walkable).map(function (zone, zoneIndex) { return normalizeZone(owner, path + ".walkable[" + zoneIndex + "]", zone); }),
@@ -617,7 +618,7 @@ window.SAKURAYO_GAME_VERSION = "4.4.1";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.4.1";
+  var VERSION = "4.4.6";
   var TAU = Math.PI * 2;
   var EARLY_WINDOW = 20;
   var EARLY_INTERVAL = 0.45;
@@ -799,6 +800,15 @@ window.SAKURAYO_GAME_VERSION = "4.4.1";
     return 0;
   }
 
+  function drawCover(ctx, img, W, H) {
+    var iw = img.naturalWidth || 1,
+      ih = img.naturalHeight || 1,
+      scale = Math.max(W / iw, H / ih),
+      dw = iw * scale,
+      dh = ih * scale;
+    ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh);
+  }
+
   function drawGround(ctx, world) {
     if (!ctx || !world) return;
     var W = world.W,
@@ -811,7 +821,27 @@ window.SAKURAYO_GAME_VERSION = "4.4.1";
       i,
       y,
       pathL,
-      pathR;
+      pathR,
+      photo = world.battleBg;
+    if (photo && photo.complete && photo.naturalWidth > 0) {
+      drawCover(ctx, photo, W, H);
+      ctx.fillStyle = "rgba(5,4,14,0.26)";
+      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = pal.accent + "14";
+      var n = q < 0.8 ? 2 : 4;
+      for (i = 0; i < n; i++) {
+        var px = ((i * 211 - t * 11) % (W + 180)) - 90,
+          py = 80 + ((i * 113) % Math.max(120, H - 100));
+        ctx.save();
+        ctx.translate(px, py);
+        ctx.rotate(0.8);
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 7, 3, 0, 0, TAU);
+        ctx.fill();
+        ctx.restore();
+      }
+      return;
+    }
     if (pal.mainGod) {
       var shift = pal.hue;
       ctx.fillStyle = "hsl(" + (268 + shift) + ",42%,10%)";
@@ -1269,10 +1299,11 @@ window.SAKURAYO_GAME_VERSION = "4.4.1";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.4.1";
+  var VERSION = "4.4.6";
   var typing = null;
   var flashTimer = 0;
   var styleInjected = false;
+  var victory = null;
 
   function $(id) {
     return global.document.getElementById(id);
@@ -1288,6 +1319,7 @@ window.SAKURAYO_GAME_VERSION = "4.4.1";
       "@keyframes sakurayoKenBurns{from{transform:scale(1)}to{transform:scale(1.08)}}" +
       "@keyframes sakurayoWarnPulse{0%,100%{opacity:1;transform:translateX(-50%) scale(1)}50%{opacity:.82;transform:translateX(-50%) scale(1.04)}}" +
       "@keyframes sakurayoPhaseFlash{0%{opacity:0}18%{opacity:.72}100%{opacity:0}}" +
+      "@keyframes sakurayoBeatFade{from{opacity:0}to{opacity:1}}" +
       "#dialogue .dialogueModal{overflow:hidden}" +
       "#dialogue:not(.hidden) .dialogueModal{animation:sakurayoCutIn .36s ease}" +
       "#dialogue .dialogueArt{transform-origin:center 30%;animation:sakurayoKenBurns 12s linear alternate infinite}" +
@@ -1302,8 +1334,23 @@ window.SAKURAYO_GAME_VERSION = "4.4.1";
       "#warning:not(.hidden){animation:sakurayoWarnPulse .55s ease 2}" +
       "#phaseFlash44{position:fixed;inset:0;z-index:34;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 40%,#ff4ea366,#05040ecc 62%)}" +
       "#phaseFlash44.on{animation:sakurayoPhaseFlash .48s ease}" +
+      "#storyBeat44{position:fixed;inset:0;z-index:38;overflow:hidden;background:#05040e;color:#fff}" +
+      "#storyBeat44.hidden{display:none!important}" +
+      "#storyBeat44 .storyBeatBg{position:absolute;inset:-10%;background:#120b22 center 38%/cover no-repeat;transform-origin:center 30%;animation:sakurayoKenBurns 14s linear alternate infinite;filter:saturate(1.08) brightness(.68)}" +
+      "#storyBeat44 .storyBeatShade{position:absolute;inset:0;background:linear-gradient(180deg,#05040e55 0%,#05040e22 38%,#05040ef0 78%);pointer-events:none}" +
+      "#storyBeat44 .storyBeatPortrait{position:absolute;right:-8%;bottom:-10%;width:min(92vw,520px);height:78%;background:transparent right bottom/contain no-repeat;pointer-events:none;animation:sakurayoCutIn .55s ease}" +
+      "#storyBeat44 .storyBeatPortrait.empty{display:none}" +
+      "#storyBeat44 .storyBeatCopy{position:absolute;left:0;right:0;bottom:0;padding:max(18px,env(safe-area-inset-bottom)) 22px 28px;text-align:left;animation:sakurayoBeatFade .35s ease}" +
+      "#storyBeat44 .storyBeatKicker{color:#9ee7ff;letter-spacing:.28em;font-size:10px;font-weight:800;margin-bottom:6px}" +
+      "#storyBeat44 .storyBeatTitle{margin:0 0 8px;font-size:clamp(22px,7vw,34px);font-weight:1000;line-height:1.15}" +
+      "#storyBeat44 .storyBeatLine{max-width:28em;font-size:14px;line-height:1.55;color:#ffeaf4;text-shadow:0 2px 10px #05040e}" +
+      "#storyBeat44 .storyBeatHint{margin-top:10px;font-size:10px;color:#bfb1d3}" +
+      "#storyBeat44[data-ground='torii'] .storyBeatKicker{color:#ff9ec8}" +
+      "#storyBeat44[data-ground='neon'] .storyBeatKicker{color:#8defff}" +
+      "#storyBeat44[data-ground='swords'] .storyBeatKicker{color:#ddd4ea}" +
+      "#storyBeat44[data-ground='mirror'] .storyBeatKicker{color:#e2c4ff}" +
       "@media (prefers-reduced-motion:reduce){" +
-      "#dialogue:not(.hidden) .dialogueModal,#event:not(.hidden) .modal,#result:not(.hidden) .modal,#level:not(.hidden) .modal,#paused:not(.hidden) .modal,#warning:not(.hidden),#dialogue .dialogueArt,#phaseFlash44.on{animation:none}" +
+      "#dialogue:not(.hidden) .dialogueModal,#event:not(.hidden) .modal,#result:not(.hidden) .modal,#level:not(.hidden) .modal,#paused:not(.hidden) .modal,#warning:not(.hidden),#dialogue .dialogueArt,#phaseFlash44.on,#storyBeat44 .storyBeatBg,#storyBeat44 .storyBeatPortrait,#storyBeat44 .storyBeatCopy{animation:none}" +
       "}";
     global.document.head.appendChild(style);
   }
@@ -1316,9 +1363,38 @@ window.SAKURAYO_GAME_VERSION = "4.4.1";
     return node;
   }
 
+  function ensureVictoryNode() {
+    if (!global.document) return null;
+    var node = $("storyBeat44");
+    if (node) return node;
+    node = global.document.createElement("div");
+    node.id = "storyBeat44";
+    node.className = "hidden";
+    node.innerHTML =
+      '<div class="storyBeatBg"></div><div class="storyBeatShade"></div><div class="storyBeatPortrait empty"></div><div class="storyBeatCopy"><div class="storyBeatKicker"></div><div class="storyBeatTitle"></div><div class="storyBeatLine"></div><div class="storyBeatHint">点击跳过</div></div>';
+    node.addEventListener("click", function (ev) {
+      ev.stopPropagation();
+      skipBeat();
+    });
+    global.document.body.appendChild(node);
+    return node;
+  }
+
   function stopType() {
     if (typing && typing.timer) global.clearTimeout(typing.timer);
     typing = null;
+  }
+
+  function clearVictoryTimer() {
+    if (victory && victory.timer) {
+      global.clearTimeout(victory.timer);
+      victory.timer = 0;
+    }
+  }
+
+  function hideVictory() {
+    var node = $("storyBeat44");
+    if (node) node.classList.add("hidden");
   }
 
   function present(opts) {
@@ -1397,8 +1473,113 @@ window.SAKURAYO_GAME_VERSION = "4.4.1";
     node.dataset.phase = String(phase || 0);
   }
 
+  function renderBeat(beat) {
+    var node = ensureVictoryNode();
+    if (!node || !beat) return;
+    node.dataset.ground = (victory && victory.ground) || "torii";
+    var bg = node.querySelector(".storyBeatBg");
+    var portrait = node.querySelector(".storyBeatPortrait");
+    var copy = node.querySelector(".storyBeatCopy");
+    if (bg) {
+      bg.style.backgroundImage = beat.bg
+        ? "linear-gradient(#05040e33,#05040e88),url('" + String(beat.bg).replace(/'/g, "%27") + "')"
+        : "";
+    }
+    if (portrait) {
+      if (beat.portrait) {
+        portrait.classList.remove("empty");
+        portrait.style.backgroundImage = "url('" + String(beat.portrait).replace(/'/g, "%27") + "')";
+        portrait.style.animation = "none";
+        void portrait.offsetWidth;
+        portrait.style.animation = "";
+      } else {
+        portrait.classList.add("empty");
+        portrait.style.backgroundImage = "";
+      }
+    }
+    if (copy) {
+      copy.style.animation = "none";
+      void copy.offsetWidth;
+      copy.style.animation = "";
+    }
+    var kicker = node.querySelector(".storyBeatKicker");
+    var title = node.querySelector(".storyBeatTitle");
+    var line = node.querySelector(".storyBeatLine");
+    var hint = node.querySelector(".storyBeatHint");
+    if (kicker) kicker.textContent = beat.kicker || "";
+    if (title) title.textContent = beat.title || "";
+    if (line) line.textContent = beat.line || "";
+    if (hint) hint.textContent = victory && victory.index >= victory.beats.length - 1 ? "点击进入对白" : "点击跳过";
+    node.classList.remove("hidden");
+  }
+
+  function armBeatTimer() {
+    if (!victory || victory.testMode) return;
+    var beat = victory.beats[victory.index];
+    var hold = beat && Number(beat.hold);
+    if (!Number.isFinite(hold) || hold <= 0) hold = 2200;
+    clearVictoryTimer();
+    victory.timer = global.setTimeout(function () {
+      skipBeat();
+    }, hold);
+  }
+
+  function finishVictory(runDone) {
+    if (!victory) {
+      hideVictory();
+      return;
+    }
+    clearVictoryTimer();
+    var cb = victory.onDone;
+    victory = null;
+    hideVictory();
+    if (runDone && cb) cb();
+  }
+
+  function skipBeat() {
+    if (!victory) return false;
+    victory.index += 1;
+    if (victory.index >= victory.beats.length) {
+      finishVictory(true);
+      return true;
+    }
+    renderBeat(victory.beats[victory.index]);
+    armBeatTimer();
+    return true;
+  }
+
+  function isPlaying() {
+    return !!(victory && victory.beats && victory.beats.length);
+  }
+
+  function playVictory(opts) {
+    injectStyle();
+    finishVictory(false);
+    var beats = (opts && opts.beats) || [];
+    var done = opts && opts.onDone;
+    if (!beats.length) {
+      if (done) done();
+      return;
+    }
+    victory = {
+      beats: beats,
+      index: 0,
+      onDone: done,
+      testMode: !!(opts && opts.testMode),
+      ground: (opts && opts.ground) || "torii",
+      timer: 0,
+    };
+    renderBeat(beats[0]);
+    armBeatTimer();
+  }
+
+  function stopVictory() {
+    finishVictory(false);
+  }
+
   function dismiss() {
     stopType();
+    stopVictory();
     var root = $("dialogue");
     if (root) {
       root.removeAttribute("data-kind");
@@ -1406,9 +1587,16 @@ window.SAKURAYO_GAME_VERSION = "4.4.1";
   }
 
   function snapshot() {
+    var node = $("storyBeat44");
     return {
       version: VERSION,
       typing: isTyping(),
+      playing: isPlaying(),
+      beat: victory ? victory.index + 1 : 0,
+      beats: victory ? victory.beats.length : 0,
+      title: node && !node.classList.contains("hidden")
+        ? ((node.querySelector(".storyBeatTitle") || {}).textContent || "")
+        : "",
       kind: $("dialogue") ? $("dialogue").dataset.kind || "" : "",
       ground: $("dialogue") ? $("dialogue").dataset.ground || "" : "",
       chapter: $("dialogueChapter") ? $("dialogueChapter").textContent || "" : "",
@@ -1423,6 +1611,10 @@ window.SAKURAYO_GAME_VERSION = "4.4.1";
     completeLine: completeLine,
     stopType: stopType,
     flashPhase: flashPhase,
+    playVictory: playVictory,
+    skipBeat: skipBeat,
+    isPlaying: isPlaying,
+    stopVictory: stopVictory,
     dismiss: dismiss,
     snapshot: snapshot,
   };
@@ -1433,7 +1625,7 @@ window.SAKURAYO_GAME_VERSION = "4.4.1";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.4.1";
+  var VERSION = "4.4.6";
   var TABS = ["skins", "starters", "items", "talismans", "extensions"];
   var FIRST_CLEAR = 40;
   var styleInjected = false;
@@ -1582,6 +1774,7 @@ window.__SAKURAYO_BUNDLED_PACKS__=true;
     { "path": "content/packs/official-exploration/pack.js" },
     { "path": "content/packs/official-feedback/pack.js" },
     { "path": "content/packs/official-modkit-addon/pack.js" },
+    { "path": "content/packs/maingod-void/pack.js" },
     { "path": "content/packs/broken-fixture/pack.js", "when": { "queryParam": "brokenExtension", "equals": "1" } }
   ];
   window.SAKURAYO_EXTENSION_MANIFEST = Object.freeze(manifest.map(function (entry) { return Object.freeze(Object.assign({}, entry)); }));
@@ -1590,7 +1783,7 @@ window.__SAKURAYO_BUNDLED_PACKS__=true;
 
 </script>
 <script data-sakurayo-pack="content/packs/official-example/pack.js">
-SakurayoContent.loadBundledPack("content/packs/official-example/pack.js","(function () {\n  \"use strict\";\n  SakurayoContent.register({\n    id: \"official.framework-example\",\n    version: 1,\n    apiVersion: 2,\n    game: { min: \"4.2.0\", maxExclusive: \"5.0.0\" },\n    dependencies: [],\n    conflicts: [],\n    title: \"官方示例包：薄樱观测记录\",\n    description: \"证明服饰、商店、成就、档案和扩展存档可由内容包追加。\",\n    saveDefaults: {\n      purchases: {},\n      flags: { manualRead: false }\n    },\n    shop: {\n      costumes: [\n        {\n          id: \"framework_observer\",\n          n: \"薄樱观测服\",\n          e: \"📘\",\n          price: 40,\n          c1: \"#8ce7ff\",\n          c2: \"#493b7a\",\n          bias: [\"shrine\", \"mage\"],\n          d: \"官方扩展示例服饰。资源、商店数据和职业倾向均来自独立内容包。\",\n          assetBase: \"content-packs/official-example/characters\"\n        }\n      ],\n      items: [\n        {\n          id: \"observer_manual\",\n          n: \"扩展观测手册\",\n          i: \"📗\",\n          price: 25,\n          max: 1,\n          d: \"收藏型示例道具。购买状态写入该内容包自己的存档区域，不改变战斗数值。\"\n        }\n      ]\n    },\n    achievements: [\n      {\n        id: \"observer_wardrobe\",\n        n: \"框架观测员\",\n        i: \"🧩\",\n        d: \"拥有官方示例服饰“薄樱观测服”\",\n        r: 35,\n        condition: { type: \"ownedSkin\", skinId: \"framework_observer\" }\n      }\n    ],\n    stories: [\n      {\n        id: \"observer_notes\",\n        n: \"扩展档案：不动核心的第四条路\",\n        i: \"📖\",\n        d: \"凛把新记录装进独立档案层。即使档案损坏，尸潮、绘制与存档主干仍会继续运行。\",\n        unlock: { type: \"ownedItem\", itemId: \"observer_manual\" }\n      }\n    ],\n    texts: {\n      installed: \"官方示例扩展已隔离加载\"\n    }\n  });\n})();\n");
+SakurayoContent.loadBundledPack("content/packs/official-example/pack.js","(function () {\n  \"use strict\";\n  SakurayoContent.register({\n    id: \"official.framework-example\",\n    version: 1,\n    apiVersion: 2,\n    game: { min: \"4.2.0\", maxExclusive: \"5.0.0\" },\n    dependencies: [],\n    conflicts: [],\n    title: \"官方示例包：薄樱观测记录\",\n    description: \"证明服饰、商店、成就、档案和扩展存档可由内容包追加。\",\n    saveDefaults: {\n      purchases: {},\n      flags: { manualRead: false }\n    },\n    shop: {\n      costumes: [\n        {\n          id: \"framework_observer\",\n          n: \"薄樱观测服\",\n          e: \"📘\",\n          price: 40,\n          c1: \"#8ce7ff\",\n          c2: \"#493b7a\",\n          bias: [\"shrine\", \"mage\"],\n          d: \"官方扩展示例服饰。资源、商店数据和职业倾向均来自独立内容包。\",\n          assetBase: \"content-packs/official-example/characters\"\n        },\n        {\n          id: \"phantom\",\n          n: \"月影怪盗礼服\",\n          e: \"🎭\",\n          price: 320,\n          c1: \"#c8b6ff\",\n          c2: \"#2a1848\",\n          bias: [\"ninja\", \"idol\"],\n          d: \"月影下的华丽怪盗。提高忍者与战场歌姬出现倾向；怪盗从不在监控里留下正脸。\"\n        }\n      ],\n      items: [\n        {\n          id: \"observer_manual\",\n          n: \"扩展观测手册\",\n          i: \"📗\",\n          price: 25,\n          max: 1,\n          d: \"收藏型示例道具。购买状态写入该内容包自己的存档区域，不改变战斗数值。\"\n        }\n      ]\n    },\n    achievements: [\n      {\n        id: \"observer_wardrobe\",\n        n: \"框架观测员\",\n        i: \"🧩\",\n        d: \"拥有官方示例服饰“薄樱观测服”\",\n        r: 35,\n        condition: { type: \"ownedSkin\", skinId: \"framework_observer\" }\n      }\n    ],\n    stories: [\n      {\n        id: \"observer_notes\",\n        n: \"扩展档案：不动核心的第四条路\",\n        i: \"📖\",\n        d: \"凛把新记录装进独立档案层。即使档案损坏，尸潮、绘制与存档主干仍会继续运行。\",\n        unlock: { type: \"ownedItem\", itemId: \"observer_manual\" }\n      }\n    ],\n    texts: {\n      installed: \"官方示例扩展已隔离加载\"\n    }\n  });\n})();\n");
 </script>
 <script data-sakurayo-pack="content/packs/official-exploration/pack.js">
 SakurayoContent.loadBundledPack("content/packs/official-exploration/pack.js","(function () {\n  \"use strict\";\n  SakurayoContent.register({\n    id: \"official.story-exploration\",\n    version: 2,\n    apiVersion: 2,\n    game: { min: \"4.2.0\", maxExclusive: \"5.0.0\" },\n    dependencies: [],\n    conflicts: [],\n    title: \"官方剧情探索地图\",\n    description: \"四章可行走场景、一次性奖励节点与探索记录。\",\n    saveDefaults: {\n      collected: {},\n      visits: {},\n      fragments: [],\n      choices: {}\n    },\n    migrations: [\n      { from: 1, to: 2, set: { choices: {} } }\n    ],\n    explorations: [\n      {\n        id: \"shrine-outskirts\",\n        stageId: 1,\n        title: \"神社外街 · 封印余响\",\n        background: \"content-packs/official-exploration/maps/chapter1.webp\",\n        spawn: [0.5, 0.78],\n        walkable: [\n          { type: \"circle\", x: 0.5, y: 0.56, r: 0.27 },\n          { type: \"polygon\", points: [[0.32,0.98],[0.68,0.98],[0.62,0.55],[0.38,0.55]] },\n          { type: \"polygon\", points: [[0.38,0.60],[0.62,0.60],[0.69,0.10],[0.45,0.10]] },\n          { type: \"polygon\", points: [[0.10,0.86],[0.31,0.89],[0.50,0.62],[0.40,0.44],[0.15,0.62]] },\n          { type: \"polygon\", points: [[0.90,0.84],[0.69,0.89],[0.50,0.62],[0.60,0.44],[0.85,0.61]] }\n        ],\n        nodes: [\n          { id: \"torii-cache\", x: 0.18, y: 0.72, icon: \"🌸\", label: \"鸟居后的补给\", reward: { type: \"coins\", amount: 12 } },\n          { id: \"seal-fragment\", x: 0.77, y: 0.63, icon: \"📜\", label: \"破损封印记录\", reward: { type: \"fragment\", value: \"神社封印残页\", coins: 8 } },\n          { id: \"moon-crystal\", x: 0.52, y: 0.32, icon: \"✦\", label: \"月下晶核\", reward: { type: \"coins\", amount: 18 } },\n          { id: \"hidden-offering\", x: 0.36, y: 0.48, icon: \"🌸\", label: \"显形的旧祭盒\", requiresEvent: \"echo-altar\", reward: { type: \"coins\", amount: 28 } }\n        ],\n        events: [{ id:\"echo-altar\", x:0.50, y:0.55, icon:\"印\", requiresNode:\"seal-fragment\", title:\"残响祭坛\", text:\"封印里夹着一段未登记的人格残响。留下它，还是拆解成补给？\", choices:[\n          { id:\"preserve\", label:\"保留残响\", description:\"获得证词碎片并显形隐藏祭盒。\", coins:10, fragment:\"被保留的神社残响\" },\n          { id:\"extract\", label:\"拆解封印\", description:\"立即获得更多樱花币，但记录会留下选择。\", coins:24, fragment:\"被拆解的封印编号\" }\n        ] }]\n      },\n      {\n        id: \"rain-market\",\n        stageId: 2,\n        title: \"雨夜商圈 · 企业盲区\",\n        background: \"content-packs/official-exploration/maps/chapter2.webp\",\n        spawn: [0.48, 0.82],\n        walkable: [\n          { type:\"rect\", x:0.50, y:0.56, w:0.72, h:0.48 },\n          { type:\"rect\", x:0.48, y:0.76, w:0.50, h:0.34 },\n          { type:\"circle\", x:0.18, y:0.64, r:0.17 },\n          { type:\"circle\", x:0.76, y:0.46, r:0.20 },\n          { type:\"polygon\", points:[[0.19,0.28],[0.78,0.28],[0.87,0.43],[0.13,0.48]] }\n        ],\n        nodes: [\n          { id: \"arcade-locker\", x: 0.15, y: 0.57, icon: \"🎁\", label: \"停机厅储物柜\", reward: { type: \"coins\", amount: 16 } },\n          { id: \"emp-log\", x: 0.77, y: 0.48, icon: \"💠\", label: \"EMP 维护日志\", reward: { type: \"fragment\", value: \"零号维护日志\", coins: 10 } },\n          { id: \"roof-drop\", x: 0.79, y: 0.76, icon: \"✦\", label: \"屋顶空投\", reward: { type: \"coins\", amount: 22 } },\n          { id:\"hidden-terminal\", x:0.47, y:0.39, icon:\"◇\", label:\"零号离线密钥\", requiresEvent:\"blind-terminal\", reward:{type:\"fragment\",value:\"未上传的企业密钥\",coins:20} }\n        ],\n        events: [{ id:\"blind-terminal\", x:0.55, y:0.53, icon:\"端\", requiresNode:\"emp-log\", title:\"盲区终端\", text:\"终端仍连接着人格回收服务器。可以公开日志，也可以反向烧毁追踪索引。\", choices:[\n          { id:\"publish\", label:\"公开维护日志\", description:\"留下公开证词并打开隐藏终端。\", coins:14, fragment:\"公开的零号维护日志\" },\n          { id:\"burn\", label:\"烧毁追踪索引\", description:\"切断追踪并回收残余晶核。\", coins:28, fragment:\"被烧毁的追踪索引\" }\n        ] }]\n      },\n      {\n        id: \"sword-mound\",\n        stageId: 3,\n        title: \"黄泉剑冢 · 无名同门\",\n        background: \"content-packs/official-exploration/maps/chapter3.webp\",\n        spawn: [0.48, 0.82],\n        walkable: [\n          { type:\"circle\", x:0.50, y:0.50, r:0.21 },\n          { type:\"polygon\", points:[[0.42,0.57],[0.58,0.57],[0.60,0.98],[0.38,0.98]] },\n          { type:\"polygon\", points:[[0.42,0.47],[0.14,0.12],[0.29,0.08],[0.55,0.39]] },\n          { type:\"polygon\", points:[[0.57,0.46],[0.71,0.12],[0.91,0.11],[0.65,0.56]] },\n          { type:\"polygon\", points:[[0.38,0.52],[0.08,0.69],[0.17,0.85],[0.48,0.63]] },\n          { type:\"polygon\", points:[[0.61,0.53],[0.91,0.65],[0.84,0.84],[0.52,0.63]] }\n        ],\n        nodes: [\n          { id: \"left-memorial\", x: 0.17, y: 0.63, icon: \"🗡️\", label: \"无名剑碑\", reward: { type: \"fragment\", value: \"无名同门名册\", coins: 12 } },\n          { id: \"dojo-scroll\", x: 0.72, y: 0.25, icon: \"📜\", label: \"残缺剑谱\", reward: { type: \"coins\", amount: 24 } },\n          { id: \"ritual-core\", x: 0.49, y: 0.52, icon: \"✦\", label: \"剑阵晶核\", reward: { type: \"coins\", amount: 18 } },\n          { id:\"hidden-sword\", x:0.78, y:0.70, icon:\"刃\", label:\"归还姓名的断剑\", requiresEvent:\"nameless-oath\", reward:{type:\"fragment\",value:\"断剑上的真名\",coins:24} }\n        ],\n        events: [{ id:\"nameless-oath\", x:0.50, y:0.48, icon:\"誓\", requiresNode:\"left-memorial\", title:\"无名者之誓\", text:\"剑碑要求继承者留下一个名字。写自己的名字，还是归还亡者的名字？\", choices:[\n          { id:\"return\", label:\"归还亡者姓名\", description:\"保留名册并唤醒隐藏断剑。\", coins:12, fragment:\"被归还的同门姓名\" },\n          { id:\"inherit\", label:\"写下继承者姓名\", description:\"承担剑阵残响并获得更多晶核。\", coins:30, fragment:\"继承者的新誓约\" }\n        ] }]\n      },\n      {\n        id: \"mirror-core\",\n        stageId: 4,\n        title: \"镜界核心 · 失败时间线\",\n        background: \"content-packs/official-exploration/maps/chapter4.webp\",\n        spawn: [0.5, 0.82],\n        walkable: [\n          { type:\"circle\", x:0.50, y:0.57, r:0.25 },\n          { type:\"rect\", x:0.50, y:0.55, w:0.18, h:0.82 },\n          { type:\"rect\", x:0.50, y:0.57, w:0.82, h:0.14 },\n          { type:\"circle\", x:0.12, y:0.57, r:0.11 },\n          { type:\"circle\", x:0.88, y:0.57, r:0.11 },\n          { type:\"circle\", x:0.50, y:0.14, r:0.13 }\n        ],\n        nodes: [\n          { id: \"left-timeline\", x: 0.2, y: 0.58, icon: \"🪞\", label: \"左侧时间线\", reward: { type: \"fragment\", value: \"第 109 次失败记录\", coins: 14 } },\n          { id: \"right-timeline\", x: 0.79, y: 0.58, icon: \"🪞\", label: \"右侧时间线\", reward: { type: \"fragment\", value: \"第 317 次失败记录\", coins: 14 } },\n          { id: \"core-gift\", x: 0.5, y: 0.23, icon: \"🌸\", label: \"镜核赠礼\", reward: { type: \"coins\", amount: 30 } },\n          { id:\"hidden-witness\", x:0.50, y:0.56, icon:\"证\", label:\"未被覆盖的原始证词\", requiresEvent:\"mirror-verdict\", reward:{type:\"fragment\",value:\"未覆盖的原始证词\",coins:32} }\n        ],\n        events: [{ id:\"mirror-verdict\", x:0.50, y:0.67, icon:\"判\", requiresNode:\"left-timeline\", title:\"镜面裁决\", text:\"镜界要求删除一条失败时间线来维持核心稳定。接受它的二选一，还是拒绝裁决？\", choices:[\n          { id:\"refuse\", label:\"拒绝删除任何人\", description:\"核心升压，但原始证词会显形。\", coins:18, fragment:\"拒绝裁决的共同证词\" },\n          { id:\"archive\", label:\"封存而不删除\", description:\"转移时间线并回收镜核资源。\", coins:36, fragment:\"离线封存的时间线\" }\n        ] }]\n      }\n    ]\n  });\n})();\n");
@@ -1600,6 +1793,9 @@ SakurayoContent.loadBundledPack("content/packs/official-feedback/pack.js","(func
 </script>
 <script data-sakurayo-pack="content/packs/official-modkit-addon/pack.js">
 SakurayoContent.loadBundledPack("content/packs/official-modkit-addon/pack.js","(function () {\n  \"use strict\";\n  SakurayoContent.register({\n    id: \"official.modkit-addon\",\n    version: 1,\n    apiVersion: 2,\n    game: { min: \"4.2.0\", maxExclusive: \"5.0.0\" },\n    dependencies: [{ id: \"official.framework-example\", minVersion: 1 }],\n    conflicts: [],\n    title: \"官方 Mod Kit 依赖示例\",\n    description: \"证明内容包可声明依赖，并在不修改核心的情况下追加商店条目、成就、档案和独立存档。\",\n    saveDefaults: { purchases: {}, flags: { inspected: false } },\n    shop: {\n      items: [{\n        id: \"modkit_seal\",\n        n: \"Mod Kit 校验符\",\n        i: \"🧰\",\n        price: 18,\n        max: 1,\n        d: \"依赖 official.framework-example 的官方示例道具；移除依赖包时本包会自动停用，本体仍能启动。\"\n      }]\n    },\n    achievements: [{\n      id: \"dependency_ready\",\n      n: \"依赖链就绪\",\n      i: \"🔗\",\n      d: \"取得 Mod Kit 校验符\",\n      r: 24,\n      condition: { type: \"ownedItem\", itemId: \"modkit_seal\" }\n    }],\n    stories: [{\n      id: \"dependency_notes\",\n      n: \"扩展档案：依赖不是加载顺序\",\n      i: \"🧰\",\n      d: \"清单只决定候选包。真正启用前，运行时会检查格式版本、游戏版本、依赖与冲突，再生成确定顺序。\",\n      unlock: { type: \"ownedItem\", itemId: \"modkit_seal\" }\n    }],\n    texts: { installed: \"Mod Kit 依赖示例已启用\" }\n  });\n})();\n");
+</script>
+<script data-sakurayo-pack="content/packs/maingod-void/pack.js">
+SakurayoContent.loadBundledPack("content/packs/maingod-void/pack.js","(function () {\n  \"use strict\";\n\n  window.SakurayoContent.register({\n    id: \"official.maingod-void\",\n    version: 1,\n    apiVersion: 2,\n    title: \"主神空间 · 虚空圣所\",\n    description:\n      \"通关终章后开放的可自由探索区域。在主神空间最深处的虚空圣所收集监察碎片与回声火花，并见证镜零的异常。\",\n    saveDefaults: {\n      collected: {},\n      visits: {},\n      choices: {},\n    },\n    explorations: [\n      {\n        id: \"void-sanctum\",\n        stageId: \"mainGod\",\n        title: \"虚空圣所\",\n        entryLabel: \"探索虚空圣所\",\n        background: \"content-packs/maingod-void/maps/chapter5.webp\",\n        spawn: [0.5, 0.76],\n        walkable: [\n          { type: \"rect\", x: 0.5, y: 0.76, w: 0.6, h: 0.32 },\n          { type: \"rect\", x: 0.3, y: 0.52, w: 0.48, h: 0.56 },\n          { type: \"rect\", x: 0.68, y: 0.46, w: 0.52, h: 0.6 },\n          { type: \"rect\", x: 0.5, y: 0.3, w: 0.6, h: 0.28 },\n        ],\n        nodes: [\n          {\n            id: \"shard-1\",\n            icon: \"◆\",\n            label: \"监察碎片：它记录着所有轮回者的构筑曲线\",\n            x: 0.26,\n            y: 0.4,\n            reward: { type: \"fragment\", value: \"监察碎片·一\", coins: 42 },\n          },\n          {\n            id: \"shard-2\",\n            icon: \"◆\",\n            label: \"监察碎片：包括你上一次轮回忘记选的技能\",\n            x: 0.72,\n            y: 0.34,\n            reward: { type: \"fragment\", value: \"监察碎片·二\", coins: 42 },\n          },\n          {\n            id: \"echo-1\",\n            icon: \"✦\",\n            label: \"回声火花：虚灵尸在重复别人的死亡姿势\",\n            x: 0.55,\n            y: 0.56,\n            reward: { type: \"fragment\", value: \"回声火花·安魂\", coins: 30 },\n          },\n          {\n            id: \"echo-2\",\n            icon: \"✦\",\n            label: \"回声火花：凛音认出那是黄泉流的安魂调\",\n            x: 0.4,\n            y: 0.26,\n            reward: { type: \"fragment\", value: \"回声火花·摇篮曲\", coins: 30 },\n          },\n          {\n            id: \"clue-1\",\n            icon: \"✧\",\n            label: \"裂口坐标：指向现实层的某个物流仓库\",\n            x: 0.62,\n            y: 0.2,\n            reward: { type: \"fragment\", value: \"裂口坐标\", coins: 55 },\n          },\n        ],\n        events: [\n          {\n            id: \"kagami-glitch\",\n            icon: \"👁\",\n            title: \"镜零的异常\",\n            text: \"镜零的镜像在裂口前闪烁了三次。『监察者读取你的构筑，复制你的短板。下次轮回，带上它没见过的东西。』\",\n            x: 0.5,\n            y: 0.46,\n            choices: [\n              {\n                id: \"listen\",\n                label: \"听完镜零的警告\",\n                description: \"了解主神投影的四阶段权能。\",\n                coins: 80,\n                fragment: \"四阶段权能记录\",\n              },\n              {\n                id: \"pry\",\n                label: \"追问裂口的去向\",\n                description: \"把坐标转交给雨宫凛。\",\n                coins: 60,\n                fragment: \"雨宫凛的回信\",\n              },\n            ],\n          },\n        ],\n      },\n    ],\n  });\n})();\n");
 </script>
 <script data-sakurayo-pack="content/packs/broken-fixture/pack.js">
 if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoContent.loadBundledPack("content/packs/broken-fixture/pack.js","(function () {\n  \"use strict\";\n  SakurayoContent.register({\n    id: \"fixture.broken-content\",\n    version: 1,\n    title: \"故意损坏的回归夹具\",\n    shop: { costumes: \"this-must-be-an-array\" }\n  });\n})();\n");}
@@ -1824,7 +2020,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
 
 
   const SOURCE_NAME = {shot:"普通枪弹",tech:"科技伤害",spell:"法术",blade:"飞剑",star:"星辉弹",skill:"主动技能",acid:"腐蚀炼成",spore:"孢子感染",bio:"生物突变",aoe:"范围伤害",summon:"召唤兽",kunai:"忍术苦无",music:"战场音律",soul:"死灵魂火"};
-  const ENEMY_NAME = {normal:"普通僵尸",fast:"迅捷僵尸",tank:"重甲僵尸",ranged:"远程僵尸",bomb:"自爆僵尸",shield:"结界尸",disruptor:"干扰尸",purifier:"净化尸",specter:"幽魂尸",decay:"腐败祭司",seal:"封灵尸",boss:"Boss"};
+  const ENEMY_NAME = {normal:"普通僵尸",fast:"迅捷僵尸",tank:"重甲僵尸",ranged:"远程僵尸",bomb:"自爆僵尸",shield:"结界尸",disruptor:"干扰尸",purifier:"净化尸",specter:"幽魂尸",decay:"腐败祭司",seal:"封灵尸",pethunter:"猎宠尸",noisecaller:"噪声尸",souleater:"噬魂尸",mirrorblade:"反影刃尸",voidling:"虚灵尸",voidmaw:"噬空尸",boss:"Boss"};
   /* ================= DATA: STAGES / STORY / CAREERS / UPGRADES ================= */
   const BANTER_UP = {
     acid:[["小夜","这瓶颜色像过期三年的抹茶。凛，配方真的没写错？"],["凛","配方没错。唯一的问题是它正在腐蚀你的袖子。"],["小夜","好，炼金术第一课：不要穿最贵的巫女服上班。"]],
@@ -1866,6 +2062,12 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     decay:["小夜","腐败祭司一靠近，我的回血条都开始嫌弃我。"],
     seal:["小夜","封技能、加冷却？这已经不是僵尸，是策划本人。"],
     bomb:["凛","自爆单位接近。","小夜","每个世界的怪物都迟早学会这一招，毫无创意。"],
+    pethunter:["小夜","那只僵尸牵着……丧尸猎犬？它在看我的使魔！","凛","猎宠尸。专门捕猎召唤单位，别让使魔落单。"],
+    noisecaller:["小夜","我的歌……被它的喇叭头盖过去了？！","镜零","噪声尸。声波压制音律构筑。建议：捂住耳朵，或者换条打法。"],
+    souleater:["小夜","它在吃魂灯！那是我攒的魂啊！","凛","噬魂尸以游离灵魂为食。死灵构筑请优先点杀。"],
+    mirrorblade:["小夜","那面镜子……照出的是我的刀光？","凛","反影刃尸。会反弹忍具的镜像忍者。用实弹，别用苦无。"],
+    voidling:["镜零","虚灵尸。主神空间的最低配原住民。","小夜","连尸体都签劳务派遣了？"],
+    voidmaw:["镜零","警告：噬空尸。它的胃是一个微型虚空。","小夜","所以被它吃掉算……出差？"],
   };
   const BANTER_FUSION = {
     magitech:["小夜","机甲魔法少女……所以变身口号是“驱动安装完成”？"],
@@ -2455,6 +2657,72 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       res: { spell: 0.52, skill: 0.58, blade: 0.62, star: 0.55 },
       weak: { shot: 1.25, acid: 1.2, tech: 1.18 },
     },
+    pethunter: {
+      r: 20,
+      hp: 95,
+      spd: 66,
+      dmg: 13,
+      xp: 8,
+      c: "#c25e4a",
+      family: "pethunter",
+      res: { summon: 0.42, aoe: 0.85 },
+      weak: { shot: 1.22, spell: 1.15, blade: 1.1 },
+    },
+    noisecaller: {
+      r: 21,
+      hp: 90,
+      spd: 45,
+      dmg: 12,
+      xp: 8,
+      c: "#c9b458",
+      family: "noisecaller",
+      res: { music: 0.42, star: 0.8 },
+      weak: { shot: 1.2, tech: 1.15, spell: 1.1 },
+    },
+    souleater: {
+      r: 20,
+      hp: 88,
+      spd: 62,
+      dmg: 13,
+      xp: 9,
+      c: "#4aa08e",
+      family: "souleater",
+      res: { soul: 0.4, spore: 0.8 },
+      weak: { shot: 1.18, spell: 1.25, star: 1.15 },
+    },
+    mirrorblade: {
+      r: 18,
+      hp: 80,
+      spd: 88,
+      dmg: 14,
+      xp: 9,
+      c: "#7fa8b8",
+      family: "mirrorblade",
+      res: { kunai: 0.42, blade: 0.7 },
+      weak: { shot: 1.25, tech: 1.2, aoe: 1.15 },
+    },
+    voidling: {
+      r: 17,
+      hp: 70,
+      spd: 60,
+      dmg: 12,
+      xp: 8,
+      c: "#8a6fc0",
+      family: "voidling",
+      res: { shot: 0.75, tech: 0.75 },
+      weak: { spell: 1.25, skill: 1.2 },
+    },
+    voidmaw: {
+      r: 26,
+      hp: 150,
+      spd: 36,
+      dmg: 18,
+      xp: 10,
+      c: "#6a4f9e",
+      family: "voidmaw",
+      res: { aoe: 0.7, shot: 0.85 },
+      weak: { spell: 1.3, blade: 1.2 },
+    },
   };
   const COUNTER_FOR = {
     base: ["shield", "tank"],
@@ -2468,10 +2736,10 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     cult: ["ranged", "seal"],
     mage: ["fast", "seal"],
     shrine: ["tank", "decay"],
-    summon: ["disruptor", "bomb"],
-    ninja: ["shield", "tank"],
-    idol: ["seal", "ranged"],
-    necro: ["purifier", "fast"],
+    summon: ["disruptor", "bomb", "pethunter"],
+    ninja: ["shield", "tank", "mirrorblade"],
+    idol: ["seal", "ranged", "noisecaller"],
+    necro: ["purifier", "fast", "souleater"],
   };
   const COUNTER_NAME = {
     shield: "结界尸",
@@ -2484,6 +2752,12 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     fast: "迅捷尸",
     ranged: "远程尸",
     swarm: "尸群",
+    pethunter: "猎宠尸",
+    noisecaller: "噪声尸",
+    souleater: "噬魂尸",
+    mirrorblade: "反影刃尸",
+    voidling: "虚灵尸",
+    voidmaw: "噬空尸",
     boss: "Boss",
   };
   const SOLVES = {
@@ -2731,7 +3005,13 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
           ? id >= 2 && w >= 3
           : type === "specter" || type === "seal"
             ? id >= 3 && w >= 2
-            : true;
+            : type === "pethunter" || type === "mirrorblade"
+              ? id >= 2 && w >= 3
+              : type === "noisecaller" || type === "souleater"
+                ? id >= 3 && w >= 2
+                : type === "voidling" || type === "voidmaw"
+                  ? false
+                  : true;
   }
   function counterType(w) {
     let a = P.plan || refreshPlan(),
@@ -3937,6 +4217,19 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
         const branches=CAREERS[id]?[CAREERS[id].a,CAREERS[id].b].map(x=>`${x.n}（${x.d}）`).join("<br>"):"暂无分支";
         d.innerHTML = `<div class="storyIcon" style="background:radial-gradient(circle,${SCHOOL[id]?.c || "#ff75b3"},#24183f 70%)"></div><div><h3 style="color:${SCHOOL[id]?.c || "#fff"}">${a.n}</h3><p>${phase}<br><b>天敌：${weak}</b><br>核心技能：${a.core.map((x) => U.find((u) => u.id === x)?.n || x).join("、")}<br><b>9级分支：</b><br>${branches}<br><small>12级升二阶，15级升三阶并强化所选机制。</small></p></div>`;
         loadArtInto(d.querySelector(".storyIcon"), `classes/${id}/icon.webp`, SCHOOL[id]?.n?.slice(0, 1) || "职");
+        if (CAREERS[id]) {
+          const row = document.createElement("div");
+          row.style.cssText = "display:flex;gap:8px;margin-top:8px";
+          [CAREERS[id].a, CAREERS[id].b].forEach((br) => {
+            const img = new Image();
+            img.alt = br.n;
+            img.style.cssText = "width:72px;height:72px;object-fit:contain;border-radius:10px;background:#120e27";
+            img.src = artUrl(`careers/${br.id}/full.webp`);
+            img.onerror = () => img.remove();
+            row.appendChild(img);
+          });
+          d.appendChild(row);
+        }
         box.appendChild(d);
       });
     let fh = document.createElement("div");
@@ -3965,6 +4258,9 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       d.style.borderColor = a.c + "88";
       d.innerHTML = `<div class="storyIcon" style="box-shadow:0 0 22px ${a.c}55"></div><div><h3 style="color:${a.c}">${a.n}</h3><p>${a.d}<br><b>条件：${a.reqText}</b><br><b>${a.cost}</b><br>${got ? "✓ 已在历史局内完成" : "需在单局中收集对应流派技能后解锁"}</p></div>`;
       loadArtInto(d.querySelector(".storyIcon"), `ascensions/${a.id}/icon.webp`, a.e);
+      const splash = new Image();
+      splash.onload = () => { d.style.backgroundImage = `linear-gradient(90deg,#0d0a20f2 34%,#0d0a2088 62%,#0d0a2033),url('${splash.src}')`; d.style.backgroundSize = "cover"; d.style.backgroundPosition = "right center"; };
+      splash.src = artUrl(`ascensions/${a.id}/splash.webp`);
       box.appendChild(d);
     });
   }
@@ -4011,7 +4307,14 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   }
   /* ================= GAME FLOW / RUN LIFECYCLE ================= */
   function startGame() {
+    window.SakurayoCutscene?.stopVictory?.();
+    window.SakurayoCutscene?.stopType?.();
     ensureAudio();
+    if (!(typeof isMainGodRun36 === "function" && isMainGodRun36())) {
+      artImage(`stages/stage_${Math.max(1, Math.min(4, (typeof stage === "function" && stage().id) || selected || 1))}/battle_bg.webp`);
+    }
+    ["muzzle","slash","hit","dash","skill","shatter","levelup","loot"].forEach(kind=>artImage(`fx/${kind}.webp`));
+    ["muzzle","slash","hit","skill","dash","loot","shatter","levelup"].forEach(kind=>artImage(`fx/${kind}_b.webp`));
     bullets = [];
     ebullets = [];
     arenaHazards = [];
@@ -4072,6 +4375,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   }
   function finish(win) {
     if (state === "result") return;
+    window.SakurayoCutscene?.stopVictory?.();
     runWin=win;hideTransient();state="result";$("#hud").classList.add("hidden");
     save.kills += P.kills; save.best = Math.max(save.best, runTime); save.runs++;
     const pay44 = window.SakurayoEconomy
@@ -4510,10 +4814,71 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       { sp: "旁白", tx: last },
     ];
   }
+  function victoryBeats44() {
+    const c = char35();
+    const s = stage();
+    const mg = typeof isMainGodRun36 === "function" && isMainGodRun36();
+    const chap = Math.max(1, Math.min(4, s.id || 1));
+    const map = artUrl(`content-packs/official-exploration/maps/chapter${chap}.webp`);
+    const winFace = artImage(`characters/${c.id}/default/face_win.webp`);
+    const portrait = artReady(winFace) ? winFace.src : artUrl(charArtPath35(c, "dialogue", skin35()));
+    const cover = mg ? artUrl("ui/cover_v36_main_god.webp") : map;
+    const voice = {
+      sayo: {
+        1: "鸟居还在。它们等我回来的那一页，我先撕掉。",
+        2: "雨还在下。登记表上的名字，我会一个个划掉。",
+        3: "黄泉的剑可以还，证词不能还。",
+        4: "镜核碎了。活下来的这个我，继续选。",
+      },
+      aya: {
+        1: "节点断开有记录。下一份文件，我会亲自签字。",
+        2: "商圈的监控还亮着。正好，让它把真相录完。",
+        3: "参道上的名字我会带回现实，一份都不许缺。",
+        4: "协议无法归类的东西，正好拿来当呈堂证供。",
+      },
+      rion: {
+        1: "神社外的夜结束了。剑还在，人还在。",
+        2: "雨夜不是葬身之处。黄泉流不在水里折剑。",
+        3: "御前已倒。同门的名字，我会一个个念回去。",
+        4: "镜碎之后，剑仍认得它的主人。",
+      },
+    };
+    const line = (voice[c.id] || voice.sayo)[chap];
+    if (mg) {
+      return [
+        { kicker: s.no, title: "监察投影碎裂", line: "白色回廊第一次安静下来。", bg: cover, portrait: "", hold: 2000 },
+        { kicker: c.short, title: s.short, line: "奖励点已入账。光球还会开门——那我就还会回来。", bg: cover, portrait, hold: 2400 },
+      ];
+    }
+    const last = chap === 4
+      ? { kicker: endingData().name, title: "镜界节点已净化", line: endingData().text, bg: map, portrait, hold: 2600 }
+      : { kicker: c.short, title: "镜界节点已净化", line, bg: map, portrait, hold: 2400 };
+    const cg = artUrl(`stages/stage_${chap}/cg.webp`);
+    return [
+      { kicker: `${s.no} · ${s.short}`, title: `${s.boss} 倒下`, line: "节点断开。战场还没来得及变成档案。", bg: map, portrait: "", hold: 1900 },
+      { kicker: "剧情 CG", title: s.name, line, bg: cg, portrait: "", hold: 2600 },
+      last,
+    ];
+  }
   function bossDefeated() {
     ebullets = [];
+    hideTransient();
+    $("#hud").classList.add("hidden");
     state = "dialogue";
-    showDialogue(endingDialogue(), () => finish(true), "ending");
+    const talk = () => showDialogue(endingDialogue(), () => finish(true), "ending");
+    const mg = typeof isMainGodRun36 === "function" && isMainGodRun36();
+    const profile = window.SakurayoLifecycle?.stageProfile?.(selected, { mainGod: mg });
+    window.SakurayoCutscene?.flashPhase?.(4);
+    if (!window.SakurayoCutscene?.playVictory) {
+      talk();
+      return;
+    }
+    window.SakurayoCutscene.playVictory({
+      testMode: TEST_MODE,
+      ground: profile?.ground || "torii",
+      beats: victoryBeats44(),
+      onDone: talk,
+    });
   }
   function showDialogue(lines, done, kind) {
     hideTransient();
@@ -4534,6 +4899,10 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     nextDialogue();
   }
   function nextDialogue() {
+    if (window.SakurayoCutscene?.isPlaying?.()) {
+      window.SakurayoCutscene.skipBeat();
+      return;
+    }
     if (window.SakurayoCutscene?.isTyping?.()) {
       window.SakurayoCutscene.completeLine();
       $("#dialogueHint").textContent = dialogueQueue.length ? "点击继续" : "点击进入战场";
@@ -4618,6 +4987,14 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     world.playerX = P && P.x;
     world.playerY = P && P.y;
     world.playerR = P && P.r;
+    if (world.mainGod) {
+      const voidBg = artImage("content-packs/maingod-void/maps/void_arena.webp");
+      world.battleBg = artReady(voidBg) ? voidBg : null;
+    } else {
+      const bgPath = `stages/stage_${Math.max(1, Math.min(4, s.id || 1))}/battle_bg.webp`;
+      const bg = artImage(bgPath);
+      world.battleBg = artReady(bg) ? bg : null;
+    }
     return world;
   }
   function spawnEnemy(forced = null, elite = false) {
@@ -4691,13 +5068,19 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
                 ? "ranged"
                 : r < 0.47
                   ? "bomb"
-                  : r > 0.92 && unlockEnemy("specter", w)
-                    ? "specter"
-                    : "normal";
+                  : isMainGodRun36() && r > 0.9
+                    ? r > 0.955
+                      ? "voidmaw"
+                      : "voidling"
+                    : r > 0.92 && unlockEnemy("specter", w)
+                      ? "specter"
+                      : "normal";
     }
     if (!EDEF[type]) type = "normal";
     if (
-      ["shield", "disruptor", "purifier", "specter", "decay", "seal"].includes(
+      ["shield", "disruptor", "purifier", "specter", "decay", "seal",
+        "pethunter", "noisecaller", "souleater", "mirrorblade",
+        "voidling", "voidmaw"].includes(
         type,
       )
     )
@@ -4941,6 +5324,10 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       (P.damageSources[opt.source || "shot"] || 0) + damage;
     e.hp -= damage;
     e.hit = 0.1;
+    if (quality >= 0.7 && (e.fxHit44 || 0) < runTime) {
+      e.fxHit44 = runTime + 0.09;
+      fxStamp("hit", e.x, e.y, { size: 16 + Math.min(20, damage * 0.08), life: 0.16 });
+    }
     if (e === boss) P.bossDamage += damage;
     if(P.flowerPlague && opt.source==="star") e.infected=Math.max(e.infected,2.2);
     if(opt.source==="kunai"&&P.markPower)e.mark=Math.max(e.mark||0,3.2);
@@ -5033,6 +5420,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     if (e.type === "boss") {
       if(e.phaseStarted||e.phaseStarted===0)P.phaseTimes.push(Math.max(0,runTime-e.phaseStarted));
       boss = null;
+      fxStamp("shatter", e.x, e.y, { size: 118, life: 0.55 });
+      draw();
       bossDefeated();
       return;
     }
@@ -5243,6 +5632,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     P.dash = P.dashCd;
     if(P.shadowstep||P.shadowBladeFusion){aoe(P.x,P.y,70+(P.shadowstep||0)*8,P.dmg*(.55+(P.shadowstep||0)*.16),"#a890ff",false,{source:"kunai",school:"ninja"});for(const e of grid.near(P.x,P.y,115))if(e.mark>0)damageEnemy(e,P.dmg*(P.shadowBladeFusion?1.4:.65),{source:"blade",school:"cult"});}
     if(P.shadowMage)aoe(P.x,P.y,82,P.dmg*.62*P.spellPow,"#8c80ff",false,{source:"spell",school:"mage"});
+    fxStamp("dash", P.x, P.y, { size: 54, life: 0.28, rot: Math.atan2(dy, dx) });
     particles(
       P.x,
       P.y,
@@ -5256,6 +5646,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     if (P.xp >= P.next) {
       P.xp -= P.next;
       P.level++;
+      fxStamp("levelup", P.x, P.y, { size: 78, life: 0.7 });
       P.next = Math.floor(P.next * 1.24 + 5);
       if (P.level >= 12) save.ach.lv12 = true;
       updateCareerFormation();
@@ -5339,7 +5730,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   }
   function progressionArtPath(u) {
     if (u.conflict40) return `skills/${({glassMagazine40:"dmg",leadBoots40:"carapace",psiShort40:"skill",dabbler40:"magnet"})[u.id]||"dmg"}.webp`;
-    if (u.career) return `careers/${u.id.split(":")[2]}/icon.webp`;
+    if (u.career) return `careers/${u.id.split(":")[2]}/full.webp`;
     if (u.fusion) return `fusions/${u.id}/icon.webp`;
     if (u.asc) return `ascensions/${u.id}/icon.webp`;
     return `skills/${u.id}.webp`;
@@ -5377,6 +5768,17 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
         choiceImage.src = fallbackIcon;
       };
       choiceImage.src = artUrl(progressionArtPath(u));
+      if (u.career) {
+        choiceImage.style.objectFit = "contain";
+        choiceImage.style.background = `radial-gradient(circle at 50% 78%,${SCHOOL[u.school]?.c || "#8ce7ff"}44,#0d0a2000 72%)`;
+        const splash = new Image();
+        splash.onload = () => {
+          b.style.backgroundImage = `linear-gradient(90deg,#0d0a20f2 38%,#0d0a2088 66%,#0d0a2033),url('${splash.src}')`;
+          b.style.backgroundSize = "cover";
+          b.style.backgroundPosition = "right center";
+        };
+        splash.src = artUrl(`careers/${u.id.split(":")[2]}/splash.webp`);
+      }
       b.onclick = () => chooseUpgrade(u);
       box.appendChild(b);
     });
@@ -6133,7 +6535,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       let a = Math.atan2(P.y - e.y, P.x - e.x),
         dist = Math.hypot(P.x - e.x, P.y - e.y),
         spd = e.spd * (e.frozen > 0 ? 0.42 : 1),
-        shooter = ["ranged", "decay", "seal", "disruptor"].includes(e.type);
+        shooter = ["ranged", "decay", "seal", "disruptor", "noisecaller"].includes(e.type);
       if (shooter && dist < 230) {
         e.x -= Math.cos(a) * spd * 0.42 * dt;
         e.y -= Math.sin(a) * spd * 0.42 * dt;
@@ -6243,6 +6645,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       }
       if (d < P.r + g.r + 5) {
         g.dead = true;
+        fxStamp("loot", g.x, g.y, { size: 22, life: 0.32 });
         gainXp(g.v);
         P.gemCount++;
         if (P.transmute && P.gemCount % 12 === 0) {
@@ -6362,6 +6765,22 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   }
   function partsPush(p) {
     if (parts.length < caps().p) parts.push(p);
+  }
+  function fxStamp(kind, x, y, opt = {}) {
+    if (quality < 0.62 && kind === "hit") return;
+    partsPush({
+      x,
+      y,
+      vx: 0,
+      vy: 0,
+      life: opt.life ?? 0.28,
+      total: opt.life ?? 0.28,
+      size: opt.size ?? 28,
+      c: opt.color || "#ffffff",
+      stamp: kind,
+      rot: opt.rot || 0,
+      comp: opt.comp || "screen",
+    });
   }
   function textsPush(x, y, s, crit) {
     if (texts.length < 35) texts.push({ x, y, s, crit, life: 0.55, vy: -38 });
@@ -6691,6 +7110,16 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     ctx.restore();
   }
   function petDraw(p){
+    const flip=(Math.floor((runTime||0)*6+(p.i||0))%2)===1;
+    let img=flip?artImage(`pets/${p.kind}_b.webp`):null;
+    if(!artReady(img)) img=artImage(`pets/${p.kind}.webp`);
+    if(artReady(img)){
+      ctx.save();ctx.translate(p.x,p.y);
+      const s=p.kind==="drone"?38:p.kind==="wisp"?34:36;
+      ctx.drawImage(img,-s/2,-s/2-4,s,s);
+      ctx.restore();
+      return;
+    }
     ctx.save();ctx.translate(p.x,p.y);let c=p.kind==="drone"?"#65eaff":p.kind==="bat"?"#ff6c91":p.kind==="familiar"?"#73e6c3":"#8ed0ff";
     ctx.shadowBlur=14*battleGlow421(false);ctx.shadowColor=c;ctx.fillStyle="#eefaff";
     if(p.kind==="drone"){ctx.beginPath();if(typeof ctx.roundRect==="function")ctx.roundRect(-10,-6,20,12,5);else ctx.rect(-10,-6,20,12);ctx.fill();ctx.fillStyle="#ff65b4";ctx.beginPath();ctx.arc(0,0,3,0,TAU);ctx.fill();}
@@ -6734,16 +7163,28 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       ctx.save();
       ctx.globalAlpha = Math.max(0, p.life / p.total);
       ctx.translate(p.x, p.y);
-      ctx.fillStyle = p.c;
-      if (p.petal) {
-        ctx.rotate(Math.atan2(p.vy, p.vx));
-        ctx.beginPath();
-        ctx.ellipse(0, 0, p.size * 1.5, p.size * 0.7, 0, 0, TAU);
-        ctx.fill();
+      if (p.stamp) {
+        const late = p.total > 0 && p.life / p.total < 0.48;
+        const canB = late && (p.stamp === "slash" || p.stamp === "muzzle" || p.stamp === "hit" || p.stamp === "skill" || p.stamp === "dash" || p.stamp === "loot" || p.stamp === "shatter" || p.stamp === "levelup");
+        let stamp = canB ? artImage(`fx/${p.stamp}_b.webp`) : null;
+        if (!artReady(stamp)) stamp = artImage(`fx/${p.stamp}.webp`);
+        if (artReady(stamp)) {
+          if (p.rot) ctx.rotate(p.rot);
+          ctx.globalCompositeOperation = p.comp || "screen";
+          ctx.drawImage(stamp, -p.size, -p.size, p.size * 2, p.size * 2);
+        }
       } else {
-        ctx.beginPath();
-        ctx.arc(0, 0, p.size, 0, TAU);
-        ctx.fill();
+        ctx.fillStyle = p.c;
+        if (p.petal) {
+          ctx.rotate(Math.atan2(p.vy, p.vx));
+          ctx.beginPath();
+          ctx.ellipse(0, 0, p.size * 1.5, p.size * 0.7, 0, 0, TAU);
+          ctx.fill();
+        } else {
+          ctx.beginPath();
+          ctx.arc(0, 0, p.size, 0, TAU);
+          ctx.fill();
+        }
       }
       ctx.restore();
     }
@@ -7041,7 +7482,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   const _upgradeWeight35=upgradeWeight;
   upgradeWeight=function(u){let w=_upgradeWeight35(u),s=skin35(),c=char35(),school=u.s||u.school;if(s.bias.includes(school))w*=1.3;if(c.bias.includes(school))w*=1.16;if(c.id==="rion"&&["gun","mech"].includes(school))w*=.58;if(c.id==="sayo"&&school==="cult")w*=.82;return Math.max(.05,w);};
   const _resetP35=resetP;
-  resetP=function(){_resetP35();let c=char35();P.character=c.id;P.skin=save.skin;P.meleeChain=0;P.charPassive=0;P.animAttack=0;P.animDash=0;P.animHit=0;P.animSkill=0;P.animMoving=false;if(c.id==="sayo"){P.range*=1.18;P.dmg*=1.08;P.crit+=.03;P.spd*=.96;}else if(c.id==="aya"){P.spd*=1.08;P.rate*=1.28;P.range*=.85;P.dmg*=.82;P.dashCd*=.88;P.skillCd*=.92;}else{P.maxHp*=1.2;P.hp=P.maxHp;P.spd*=1.12;P.damageReduce+=.10;P.range=178;P.dmg*=1.28;P.rate=.55;P.skillCd*=.9;}["idle","move","attack","hit","dash"].forEach(pose=>artImage(charAnimPath35(c,pose)));updateCharacterUI35();};
+  resetP=function(){_resetP35();let c=char35();P.character=c.id;P.skin=save.skin;P.meleeChain=0;P.charPassive=0;P.animAttack=0;P.animDash=0;P.animHit=0;P.animSkill=0;P.animMoving=false;if(c.id==="sayo"){P.range*=1.18;P.dmg*=1.08;P.crit+=.03;P.spd*=.96;}else if(c.id==="aya"){P.spd*=1.08;P.rate*=1.28;P.range*=.85;P.dmg*=.82;P.dashCd*=.88;P.skillCd*=.92;}else{P.maxHp*=1.2;P.hp=P.maxHp;P.spd*=1.12;P.damageReduce+=.10;P.range=178;P.dmg*=1.28;P.rate=.55;P.skillCd*=.9;}["idle","move","attack","hit","dash"].forEach(pose=>artImage(charAnimPath35(c,pose)));["idle_b","idle_c","move_b","attack_b","attack_c","skill","skill_b","dash_b","hit_b"].forEach(pose=>artImage(charAnimPath35(c,pose,{id:"default"})));["calm","mad","hurt","win","smile","serious","surprised","sad"].forEach(mood=>artImage(`characters/${c.id}/default/face_${mood}.webp`));for(const n of ["rin","kagami","swordmaster"]){["calm","serious","smile","surprised"].forEach(m=>artImage(`npc/${n}/face_${m}.webp`));artImage(`npc/${n}/portrait.webp`);}updateCharacterUI35();};
   const PLAYER_GEOMETRY35=Object.freeze({visualSize:96,footOffset:18,collisionRadius:16,edgeX:28,edgeTop:73,edgeBottom:22});
   function circlesOverlap35(ax,ay,ar,bx,by,br){return (ax-bx)**2+(ay-by)**2<(ar+br)**2;}
   function playerMuzzle35(angle){return {x:P.x+Math.cos(angle)*26,y:P.y-18+Math.sin(angle)*8};}
@@ -7072,26 +7513,61 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function drawChar35(x,y){let c=char35(),sk=skin35(),m=sk.id==="default"?c.main:sk.c1,h=c.hair,light=c.light,a=Math.atan2(P.fy,P.fx);ctx.save();ctx.translate(x,y);if(P.inv>0&&Math.floor(P.inv*15)%2===0)ctx.globalAlpha=.35;ctx.fillStyle="#0006";ctx.beginPath();ctx.ellipse(0,23,25,8,0,0,TAU);ctx.fill();if(P.form||P.fusion){ctx.strokeStyle=m;ctx.lineWidth=2;ctx.globalAlpha=.55;ctx.beginPath();ctx.arc(0,0,31+Math.sin(runTime*4)*3,0,TAU);ctx.stroke();ctx.globalAlpha=1;}ctx.fillStyle=h;ctx.beginPath();ctx.ellipse(0,-4,21,27,0,0,TAU);ctx.fill();if(c.id==="sayo"){for(const s of [-1,1]){ctx.beginPath();ctx.moveTo(s*15,-7);ctx.quadraticCurveTo(s*35,5,s*20,31);ctx.quadraticCurveTo(s*7,20,s*8,0);ctx.fill();}}else if(c.id==="aya"){ctx.beginPath();ctx.ellipse(-20,-2,10,30,-.35,0,TAU);ctx.fill();}else{ctx.beginPath();ctx.moveTo(-17,-4);ctx.quadraticCurveTo(-28,20,-13,35);ctx.lineTo(0,15);ctx.lineTo(14,35);ctx.quadraticCurveTo(29,18,17,-5);ctx.fill();}ctx.fillStyle=m;ctx.beginPath();ctx.moveTo(-14,9);ctx.lineTo(14,9);ctx.lineTo(18,29);ctx.lineTo(-18,29);ctx.fill();ctx.fillStyle=light;ctx.fillRect(-11,10,22,5);ctx.fillStyle="#ffe1d5";ctx.beginPath();ctx.arc(0,-8,14,0,TAU);ctx.fill();ctx.fillStyle=h;ctx.beginPath();ctx.arc(0,-12,14,Math.PI,TAU);ctx.fill();ctx.beginPath();ctx.moveTo(-13,-11);ctx.lineTo(-5,0);ctx.lineTo(0,-17);ctx.lineTo(5,-1);ctx.lineTo(13,-11);ctx.fill();ctx.fillStyle=c.id==="rion"?"#b92849":"#6c347c";ctx.beginPath();ctx.ellipse(-5,-7,2.1,3,0,0,TAU);ctx.ellipse(5,-7,2.1,3,0,0,TAU);ctx.fill();ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(-4.3,-8,.8,0,TAU);ctx.arc(5.7,-8,.8,0,TAU);ctx.fill();ctx.rotate(a);if(c.id==="sayo"){ctx.fillStyle="#e8f8ff";ctx.fillRect(10,-3,25,7);ctx.fillStyle="#5be1ff";ctx.fillRect(28,-2,13,5);}else if(c.id==="aya"){ctx.fillStyle="#eef8ff";ctx.fillRect(10,-3,18,6);ctx.strokeStyle="#a6c8ff";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-8,13);ctx.lineTo(33,-25);ctx.stroke();}else{ctx.strokeStyle="#fff5f6";ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(-8,14);ctx.lineTo(38,-27);ctx.stroke();ctx.strokeStyle="#ff526f";ctx.lineWidth=2;ctx.stroke();}ctx.restore();}
   hero=drawChar35;
   const _vectorDrawChar35=drawChar35;
-  function charPose35(){return P.animHit>0?"hit":P.animDash>0?"dash":(P.animSkill>0||P.animAttack>0)?"attack":P.animMoving?"move":"idle";}
+  function charPose35(){return P.animHit>0?"hit":P.animDash>0?"dash":P.animSkill>0?"skill":P.animAttack>0?"attack":P.animMoving?"move":"idle";}
+  function charDrawPose35(){
+    const pose=charPose35(),t=runTime||0,extraOk=(skin35().id||"default")==="default";
+    if(!extraOk)return pose;
+    if(pose==="idle"){const n=Math.floor(t/.32)%3;return n===1?"idle_b":n===2?"idle_c":"idle";}
+    if(pose==="move")return (Math.floor(t/.16)%2)?"move_b":"move";
+    if(pose==="attack"){const a=P.animAttack||0;return a>.1?"attack":a>.05?"attack_b":"attack_c";}
+    if(pose==="skill")return (P.animSkill||0)>.2?"skill":"skill_b";
+    if(pose==="dash")return (P.animDash||0)>.16?"dash":"dash_b";
+    if(pose==="hit")return (P.animHit||0)>.12?"hit":"hit_b";
+    return pose;
+  }
+  function charAnimImage35(c,pose,sk){
+    const extra={idle_b:1,idle_c:1,move_b:1,attack_b:1,attack_c:1,skill:1,skill_b:1,dash_b:1,hit_b:1};
+    const order=[];
+    const add=p=>{if(p&&!order.includes(p))order.push(p);};
+    add(pose);
+    if(pose==="idle_c")add("idle_b");
+    if(pose==="idle_b"||pose==="idle_c")add("idle");
+    if(pose==="move_b")add("move");
+    if(pose==="attack_c")add("attack_b");
+    if(pose==="attack_b"||pose==="attack_c")add("attack");
+    if(pose==="skill_b")add("skill");
+    if(pose==="skill"||pose==="skill_b")add("attack");
+    if(pose==="dash_b")add("dash");
+    if(pose==="hit_b")add("hit");
+    if(pose!=="idle"&&pose!=="idle_b"&&pose!=="idle_c")add("idle");
+    const def={id:"default"};
+    for(const p of order){
+      const skins=extra[p]?[def]:(sk&&sk.id!=="default"?[sk,def]:[sk||def]);
+      for(const skin of skins){const image=artImage(charAnimPath35(c,p,skin));if(artReady(image))return image;}
+    }
+    return null;
+  }
   drawChar35=function(x,y){
-    const c=char35(),sk=skin35(),image=artImage(charAnimPath35(c,"idle",sk));
+    const c=char35(),sk=skin35(),image=charAnimImage35(c,charDrawPose35(),sk);
     if(!artReady(image)){
       const inv=P.inv,form=P.form,fusion=P.fusion;
       P.inv=0;P.form=null;P.fusion=null;
       try{return _vectorDrawChar35(x,y);}finally{P.inv=inv;P.form=form;P.fusion=fusion;}
     }
-    ctx.save();ctx.translate(x,y);ctx.globalAlpha=1;
+    ctx.save();ctx.translate(x,y);
+    ctx.globalAlpha=(P.inv>0&&Math.floor(P.inv*15)%2===0)?.35:1;
     ctx.scale(P.fx<-.08?-1:1,1);
     ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";
     const vis=PLAYER_GEOMETRY35.visualSize*(window.SakurayoLifecycle?window.SakurayoLifecycle.heroVisualScale(W):1),ox=vis/2,oy=vis-PLAYER_GEOMETRY35.footOffset;
-    if(save.settings?.contrast){ctx.filter="brightness(0)";ctx.globalAlpha=.82;for(const [dx,dy] of [[-2,0],[2,0],[0,-2],[0,2]])ctx.drawImage(image,-ox+dx,-oy+dy,vis,vis);ctx.filter="none";ctx.globalAlpha=1;}
+    if((P.animDash||0)>0){const a=ctx.globalAlpha;ctx.globalAlpha=a*.32;ctx.drawImage(image,-ox-12,-oy,vis,vis);ctx.globalAlpha=a;}
+    if(save.settings?.contrast){ctx.filter="brightness(0)";const a=ctx.globalAlpha;ctx.globalAlpha=.82;for(const [dx,dy] of [[-2,0],[2,0],[0,-2],[0,2]])ctx.drawImage(image,-ox+dx,-oy+dy,vis,vis);ctx.filter="none";ctx.globalAlpha=a;}
     ctx.drawImage(image,-ox,-oy,vis,vis);
     ctx.restore();
   };
   const _shootAnim35=shoot;
   shoot=function(){const before=P.shotCount,result=_shootAnim35();if(P.shotCount!==before)P.animAttack=.16;return result;};
   const _skillAnim35=skill;
-  skill=function(){const before=P.skill,result=_skillAnim35();if(P.skill>before)P.animSkill=.42;return result;};
+  skill=function(){const before=P.skill,result=_skillAnim35();if(P.skill>before){P.animSkill=.42;fxStamp("skill",P.x,P.y,{size:86,life:.42});}return result;};
   const _dashAnim35=dash;
   dash=function(){const before=P.dash,result=_dashAnim35();if(P.dash>before)P.animDash=.32;return result;};
   const _damagePlayerAnim35=damagePlayer;
@@ -7108,8 +7584,40 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   openingDialogue=function(){return (OPENING35[save.character]&&OPENING35[save.character][selected])||_opening35();};
   const _bossDialogue35=bossDialogue;
   bossDialogue=function(){let c=char35(),base=_bossDialogue35();if(c.id==="aya")base[2]={sp:"绫",tx:`锁定完成。手枪负责开路，太刀负责让你闭嘴。`};if(c.id==="rion")base[2]={sp:"凛音",tx:`四个阶段？很好。一阶段一刀，剩下的算利息。`};return base;};
+  function faceMood46(kind){
+    const k=kind||"talk";
+    if(k==="ending"||k==="win")return "win";
+    if(k==="phase")return "surprised";
+    if(k==="boss")return "mad";
+    if(k==="opening")return "smile";
+    const hp=P.hp/Math.max(1,P.maxHp);
+    if(hp<.2)return "sad";
+    if(hp<.35)return "hurt";
+    return "calm";
+  }
+  function faceSrc46(c,sk,kind){
+    const want=faceMood46(kind);
+    const chain=want==="surprised"?["surprised","serious","calm"]:want==="smile"?["smile","calm"]:want==="sad"?["sad","hurt","calm"]:[want,"calm"];
+    for(const mood of chain){
+      const img=artImage(`characters/${c.id}/default/face_${mood}.webp`);
+      if(artReady(img))return img.src;
+    }
+    const candidate=artImage(charArtPath35(c,"dialogue",sk));
+    return artReady(candidate)?candidate.src:svg35(c,sk,512);
+  }
+  const NPC_ART47={"凛":"rin","雨宫凛":"rin","镜零":"kagami","无名剑主":"swordmaster"};
+  function npcFaceSrc47(sp,kind){
+    const npc=NPC_ART47[sp];if(!npc)return null;
+    const mood=({boss:"serious",phase:"surprised",ending:"smile",win:"smile"})[kind]||"calm";
+    for(const m of [mood,"calm"]){const im=artImage(`npc/${npc}/face_${m}.webp`);if(artReady(im))return im.src;}
+    const p=artImage(`npc/${npc}/portrait.webp`);
+    return artReady(p)?p.src:null;
+  }
   const _showDialogue35=showDialogue;
-  showDialogue=function(lines,done,kind){let c=char35(),sk=skin35(),candidate=artImage(charArtPath35(c,"dialogue",sk)),src=artReady(candidate)?candidate.src:svg35(c,sk,512);$(".dialogueArt").style.backgroundImage=`linear-gradient(transparent 30%,#0d0a20),url('${src}')`;return _showDialogue35(mapLines35(lines),done,kind);};
+  showDialogue=function(lines,done,kind){let c=char35(),sk=skin35();
+    const raw=Array.isArray(lines)?lines:[],first=raw.find(l=>l&&(Array.isArray(l)?l[0]:l.sp)),spk=first&&(Array.isArray(first)?first[0]:first.sp);
+    const art=npcFaceSrc47(spk,kind)||faceSrc46(c,sk,kind);
+    $(".dialogueArt").style.backgroundImage=`linear-gradient(transparent 30%,#0d0a20),url('${art}')`;return _showDialogue35(mapLines35(lines),done,kind);};
   const _showBanter35=showBanter;
   showBanter=function(lines,force=false){return _showBanter35(mapLines35(typeof lines==="string"?localize35(lines):lines),force);};
   const _ending35=endingData;
@@ -7157,10 +7665,10 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function facingName36(a=P.weaponAngle||0){const x=Math.cos(a),y=Math.sin(a);return Math.abs(x)>Math.abs(y)?(x>=0?"right":"left"):(y>=0?"down":"up");}
   function angleDelta36(a,b){return Math.atan2(Math.sin(a-b),Math.cos(a-b));}
   function directionalHit36(distance,enemyRadius,radius,angleOffset,halfArc){if(distance>=radius+enemyRadius)return false;const edge=distance>enemyRadius?Math.asin(clamp(enemyRadius/distance,0,1)):Math.PI;return Math.abs(angleDelta36(angleOffset,0))<=halfArc+edge;}
-  function directionalSlash36(radius,dmg,big=false,angle=P.weaponAngle||Math.atan2(P.fy,P.fx),halfArc=big?1.66:1.05){const color=char35().id==="rion"?"#ff526f":"#7db8ff";slashes.push({x:P.x,y:P.y,max:radius,life:.32,total:.32,color,dir:angle,arc:halfArc*2});for(const e of grid.near(P.x,P.y,radius+55)){if(e.dead)continue;const dx=e.x-P.x,dy=e.y-P.y,d=Math.hypot(dx,dy),off=angleDelta36(Math.atan2(dy,dx),angle);if(directionalHit36(d,e.r,radius,off,halfArc))damageEnemy(e,dmg*(P.bladePower||1),{source:"blade",school:char35().id==="aya"?"ninja":"cult"});}particles(P.x+Math.cos(angle)*radius*.55,P.y+Math.sin(angle)*radius*.55,18,color);P.inv=Math.max(P.inv,big?.16:.07);return true;}
+  function directionalSlash36(radius,dmg,big=false,angle=P.weaponAngle||Math.atan2(P.fy,P.fx),halfArc=big?1.66:1.05){fxStamp("slash",P.x,P.y,{size:Math.max(48,radius*.42),life:.28,rot:angle});const color=char35().id==="rion"?"#ff526f":"#7db8ff";slashes.push({x:P.x,y:P.y,max:radius,life:.32,total:.32,color,dir:angle,arc:halfArc*2});for(const e of grid.near(P.x,P.y,radius+55)){if(e.dead)continue;const dx=e.x-P.x,dy=e.y-P.y,d=Math.hypot(dx,dy),off=angleDelta36(Math.atan2(dy,dx),angle);if(directionalHit36(d,e.r,radius,off,halfArc))damageEnemy(e,dmg*(P.bladePower||1),{source:"blade",school:char35().id==="aya"?"ninja":"cult"});}particles(P.x+Math.cos(angle)*radius*.55,P.y+Math.sin(angle)*radius*.55,18,color);P.inv=Math.max(P.inv,big?.16:.07);return true;}
   slash35=function(radius,dmg,big=false){return directionalSlash36(radius,dmg,big);};
 
-  function gunShot36(angle,c){const origin=playerMuzzle35(angle);P.fx=P.aimX=Math.cos(angle);P.fy=P.aimY=Math.sin(angle);P.weaponAngle=angle;P.weaponLock=.22;P.shotCount++;const rail=P.rail&&P.shotCount%9===0,count=P.multi,spread=.115;for(let i=0;i<count;i++){const q=angle+(i-(count-1)/2)*spread;pushBullet({x:origin.x,y:origin.y,vx:Math.cos(q)*P.bSpeed,vy:Math.sin(q)*P.bSpeed,r:rail?7:4,life:P.range/P.bSpeed,dmg:P.dmg*(rail?2.6:1),pierce:P.pierce+(rail?6:0),rail,source:rail?"tech":"shot",school:rail?"mech":"gun",bioSplit:!!P.bioGun,hit:new Set(),acid:P.acid});}
+  function gunShot36(angle,c){const origin=playerMuzzle35(angle);fxStamp("muzzle",origin.x,origin.y,{size:c.id==="sayo"?34:28,life:.14,rot:angle});P.fx=P.aimX=Math.cos(angle);P.fy=P.aimY=Math.sin(angle);P.weaponAngle=angle;P.weaponLock=.22;P.shotCount++;const rail=P.rail&&P.shotCount%9===0,count=P.multi,spread=.115;for(let i=0;i<count;i++){const q=angle+(i-(count-1)/2)*spread;pushBullet({x:origin.x,y:origin.y,vx:Math.cos(q)*P.bSpeed,vy:Math.sin(q)*P.bSpeed,r:rail?7:4,life:P.range/P.bSpeed,dmg:P.dmg*(rail?2.6:1),pierce:P.pierce+(rail?6:0),rail,source:rail?"tech":"shot",school:rail?"mech":"gun",bioSplit:!!P.bioGun,hit:new Set(),acid:P.acid});}
     if(P.gunWard&&P.shotCount%10===0)pushBullet({x:origin.x,y:origin.y,vx:Math.cos(angle)*P.bSpeed*.88,vy:Math.sin(angle)*P.bSpeed*.88,r:10,life:1.35,dmg:P.dmg*1.45*P.skillPow,pierce:8,home:.025,source:"skill",school:"shrine",wardShot:1,hit:new Set()});
     if(P.star&&P.shotCount%Math.max(3,7-P.star)===0)for(let i=0;i<P.star;i++){const q=angle+rnd(-.45,.45);pushBullet({x:origin.x,y:origin.y,vx:Math.cos(q)*P.bSpeed*.72,vy:Math.sin(q)*P.bSpeed*.72,r:5,life:1.45,dmg:P.dmg*.72*P.spellPow,pierce:1,home:.09,star:1,source:"star",school:"magical",hit:new Set()});}
     if(P.idolGun&&P.combo>0&&P.shotCount%6===0)for(let i=0;i<3;i++){const q=angle+(i-1)*.18;pushBullet({x:origin.x,y:origin.y,vx:Math.cos(q)*P.bSpeed,vy:Math.sin(q)*P.bSpeed,r:4,life:P.range/P.bSpeed,dmg:P.dmg*.46,pierce:1,source:"music",school:"idol",hit:new Set()});}
@@ -7171,7 +7679,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   shoot=function(){const c=char35(),target=P.manualAim?null:nearest(P.x,P.y,P.range);let angle=P.manualAim?(P.weaponAngle||0):(target?Math.atan2(target.y-P.y,target.x-P.x):null);if(c.id!=="rion"){if(angle==null)return;return gunShot36(angle,c);}if(angle==null){const e=nearest(P.x,P.y,176+55);if(!e)return;angle=Math.atan2(e.y-P.y,e.x-P.x);}P.fx=P.aimX=Math.cos(angle);P.fy=P.aimY=Math.sin(angle);P.weaponAngle=angle;P.weaponLock=.28;const next=(P.meleeChain+1)%3,third=next===0,radius=third?176:128,dmg=P.dmg*(third?2.35:1.48)*(1+(P.multi-1)*.12+P.pierce*.05);P.meleeChain=next;directionalSlash36(radius,dmg,third,angle,third?1.66:1.05);if(third){P.hp=Math.min(P.maxHp,P.hp+1.2*healingMul());toast("剑势·三段");}P.fire=P.rate;P.animAttack=.2;sound("slash");};
 
   function drawWeapon36(x,y){const c=char35(),a=P.weaponAngle??Math.atan2(P.fy,P.fx);ctx.save();ctx.translate(x,y-18);ctx.rotate(a);ctx.lineCap="round";if(c.id==="sayo"||c.id==="aya"){const long=c.id==="sayo",len=long?42:29;ctx.fillStyle="#1a2540";ctx.strokeStyle=long?"#65e7ff":"#83b7ff";ctx.lineWidth=1.5;ctx.beginPath();if(typeof ctx.roundRect==="function")ctx.roundRect(5,-5,len,10,3);else ctx.rect(5,-5,len,10);ctx.fill();ctx.stroke();ctx.fillStyle=long?"#dff8ff":"#edf4ff";ctx.fillRect(10,-3,long?23:14,6);ctx.fillStyle=long?"#55e7ff":"#78adff";ctx.fillRect(long?33:24,-2,long?16:10,4);ctx.fillStyle="#10172b";ctx.fillRect(12,5,7,7);if(P.animAttack>0){ctx.fillStyle="#fff5b7";ctx.beginPath();ctx.arc(long?52:37,0,4+P.animAttack*12,0,TAU);ctx.fill();}if(c.id==="aya"){ctx.strokeStyle="#eaf5ff";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-12,14);ctx.lineTo(32,-24);ctx.stroke();ctx.strokeStyle="#6f9fff";ctx.lineWidth=1.4;ctx.stroke();}}else{ctx.strokeStyle="#fff5f6";ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(-10,10);ctx.lineTo(46,-10);ctx.stroke();ctx.strokeStyle="#ff526f";ctx.lineWidth=2;ctx.stroke();}ctx.restore();}
-  const _drawChar36=drawChar35;drawChar35=function(x,y){_drawChar36(x,y);drawWeapon36(x,y);};hero=drawChar35;
+  const _drawChar36=drawChar35;drawChar35=function(x,y){_drawChar36(x,y);if(!artReady(charAnimImage35(char35(),charDrawPose35(),skin35())))drawWeapon36(x,y);};hero=drawChar35;
   /* V4.1.1 角色识别层：只增强视觉锚点，不扩大 16px 碰撞半径。 */
   function drawPlayerLocator411(x,y){
     const c=char35(),color=c.main||"#ff67ad";
@@ -7333,13 +7841,15 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function drawBossPointer38(){bossPointerVisible38=false;if(!boss||boss.dead||state!=="play")return;const pad=54,inside=boss.x>=pad&&boss.x<=W-pad&&boss.y>=92&&boss.y<=H-pad;if(inside)return;bossPointerVisible38=true;const dx=boss.x-P.x,dy=boss.y-P.y,a=Math.atan2(dy,dx),cx=clamp(P.x+Math.cos(a)*Math.min(W,H)*.38,pad,W-pad),cy=clamp(P.y+Math.sin(a)*Math.min(W,H)*.38,105,H-pad);ctx.save();ctx.translate(cx,cy);ctx.rotate(a);ctx.shadowBlur=14;ctx.shadowColor="#ff4fa5";ctx.fillStyle="#ff69b7";ctx.beginPath();ctx.moveTo(18,0);ctx.lineTo(-10,-10);ctx.lineTo(-5,0);ctx.lineTo(-10,10);ctx.closePath();ctx.fill();ctx.shadowBlur=0;ctx.rotate(-a);ctx.font="900 11px system-ui";ctx.textAlign="center";ctx.fillStyle="#fff";ctx.strokeStyle="#160a22";ctx.lineWidth=4;const label=`BOSS ${Math.round(Math.hypot(dx,dy))}m`;ctx.strokeText(label,0,25);ctx.fillText(label,0,25);ctx.restore();}
   CONTENT41.hook("combat:after-draw",drawBossPointer38,"core.boss-pointer38",20);
 
-  const ENEMY_ART38=["normal","fast","tank","ranged","bomb","shield","disruptor","purifier","specter","decay","seal","elite"],
+  const ENEMY_ART38=["normal","fast","tank","ranged","bomb","shield","disruptor","purifier","specter","decay","seal","elite","pethunter","noisecaller","souleater","mirrorblade"],
+    ENEMY_EXTRA38={normal:1,fast:1,tank:1,ranged:1,bomb:1,shield:1,disruptor:1,purifier:1,specter:1,decay:1,seal:1,elite:1,pethunter:1,noisecaller:1,souleater:1,mirrorblade:1},
+    VOID_ART45=["voidling","voidmaw"],
     BOSS_ART38=Array.from({length:16},(_,i)=>`stage${Math.floor(i/4)+1}_phase${i%4+1}`),
-    COMBAT_ART38=[...ENEMY_ART38.map(id=>`enemies/${id}.webp`),...BOSS_ART38.map(id=>`bosses/${id}.webp`)];
-  function combatArtPath38(e){if(e.type==="boss"){if(isMainGodRun36())return null;return `bosses/stage${clamp(stage().id,1,4)}_phase${clamp(e.phase||1,1,4)}.webp`;}return `enemies/${e.elite?"elite":ENEMY_ART38.includes(e.type)?e.type:"normal"}.webp`;}
+    COMBAT_ART38=[...ENEMY_ART38.map(id=>`enemies/${id}.webp`),...BOSS_ART38.map(id=>`bosses/${id}.webp`),...VOID_ART45.map(id=>`content-packs/maingod-void/enemies/${id}.webp`),...[1,2,3,4].map(p=>`content-packs/maingod-void/bosses/void_phase${p}.webp`)];
+  function combatArtPath38(e){if(e.type==="boss"){if(isMainGodRun36())return `content-packs/maingod-void/bosses/void_phase${clamp(e.phase||1,1,4)}.webp`;return `bosses/stage${clamp(stage().id,1,4)}_phase${clamp(e.phase||1,1,4)}.webp`;}if(VOID_ART45.includes(e.type))return `content-packs/maingod-void/enemies/${e.type}.webp`;return `enemies/${e.elite?"elite":ENEMY_ART38.includes(e.type)?e.type:"normal"}.webp`;}
   function drawEnemyOverlay38(e){if(e.elite){ctx.strokeStyle="#ffd36b";ctx.lineWidth=3;ctx.shadowBlur=10*battleGlow421(false);ctx.shadowColor="#ffb24e";ctx.beginPath();ctx.arc(0,0,e.r+7,0,TAU);ctx.stroke();ctx.shadowBlur=0;}if(e.infected>0){ctx.strokeStyle="#8dff72";ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,e.r+4,0,TAU);ctx.stroke();}const marks={shield:"盾",disruptor:"扰",purifier:"净",specter:"灵",decay:"腐",seal:"封"};if(marks[e.type]){ctx.font=`900 ${Math.max(10,e.r*.55)}px system-ui`;ctx.textAlign="center";ctx.strokeStyle="#130a22";ctx.lineWidth=4;ctx.fillStyle="#fff";ctx.strokeText(marks[e.type],0,-e.r-15);ctx.fillText(marks[e.type],0,-e.r-15);}if(e.hp<e.max||e.type==="boss"){const width=e.r*2.25,ratio=clamp(e.hp/Math.max(1,e.max),0,1);ctx.fillStyle="#07050bcc";ctx.fillRect(-width/2,-e.r-10,width,5);ctx.fillStyle=e.type==="boss"?"#ff57ad":e.elite?"#ffd36b":"#69e89a";ctx.fillRect(-width/2,-e.r-10,width*ratio,5);}}
   const _enemyFallback38=enemyDraw;
-  enemyDraw=function(e){const crowd=enemies.length,screenScale=clamp(Math.sqrt(Math.max(1,W*H)/(430*932)),.82,1),crowdScale=e.type==="boss"?1:crowd>74?.66:crowd>56?.78:1,margin=e.type==="boss"?150:85;if(e.x<-margin||e.x>W+margin||e.y<-margin||e.y>H+margin)return;const path=combatArtPath38(e),image=path?artImage(path):null;if(!artReady(image)){_enemyFallback38(e);return;}ctx.save();ctx.translate(e.x,e.y);if(e.hit)ctx.globalAlpha=.62;ctx.fillStyle="#0007";ctx.beginPath();ctx.ellipse(0,e.r*.78,e.r*1.12,e.r*.35,0,0,TAU);ctx.fill();const size=(e.type==="boss"?e.r*3.35:e.r*(e.type==="tank"?3.7:3.45))*screenScale*crowdScale,bob=e.type==="fast"?Math.sin(runTime*12)*2:Math.sin(runTime*4+e.x*.01)*1.2;drawEnemySilhouette412(e,size);drawBossSprite412(e,image,size,bob);drawEnemyOverlay38(e);ctx.restore();};
+  enemyDraw=function(e){const crowd=enemies.length,screenScale=clamp(Math.sqrt(Math.max(1,W*H)/(430*932)),.82,1),crowdScale=e.type==="boss"?1:crowd>74?.66:crowd>56?.78:1,margin=e.type==="boss"?150:85;if(e.x<-margin||e.x>W+margin||e.y<-margin||e.y>H+margin)return;const path=combatArtPath38(e);let image=path?artImage(path):null;if(e.type!=="boss"){const id=e.elite?"elite":ENEMY_ART38.includes(e.type)?e.type:"normal";if(ENEMY_EXTRA38[id]){const extra=artImage(`enemies/${id}_b.webp`);if(artReady(extra)&&(Math.floor((runTime||0)*5+(e.x||0)*.02)%2))image=extra;}}if(!artReady(image)){_enemyFallback38(e);return;}ctx.save();ctx.translate(e.x,e.y);if(e.hit)ctx.globalAlpha=.62;ctx.fillStyle="#0007";ctx.beginPath();ctx.ellipse(0,e.r*.78,e.r*1.12,e.r*.35,0,0,TAU);ctx.fill();const size=(e.type==="boss"?e.r*3.35:e.r*(e.type==="tank"?3.7:3.45))*screenScale*crowdScale,bob=e.type==="fast"?Math.sin(runTime*12)*2:Math.sin(runTime*4+e.x*.01)*1.2;drawEnemySilhouette412(e,size);drawBossSprite412(e,image,size,bob);drawEnemyOverlay38(e);ctx.restore();};
   window.__SAKURAYO_COMBAT_ART__=Object.freeze({paths:()=>[...COMBAT_ART38],status:()=>COMBAT_ART38.map(path=>{const image=ART_CACHE.get(path);return {path,loaded:!!image,ready:artReady(image),width:image?.naturalWidth||0,height:image?.naturalHeight||0};})});
 
   function upgradeDelta38(id){const l=lv(id),map={damage:["伤害",`${Math.round(P.dmg)}`,`${Math.round(P.dmg*1.12)}`],rate:["射速",`${(1/P.rate).toFixed(1)}/秒`,`${(1/(P.rate*.9)).toFixed(1)}/秒`],hp:["生命",`${Math.round(P.maxHp)}`,`${Math.round(P.maxHp+18)}`],speed:["移速",`${Math.round(P.spd)}`,`${Math.round(P.spd*1.08)}`],crit:["暴击",`${Math.round(P.crit*100)}%`,`${Math.round((P.crit+.06)*100)}%`],pierce:["穿透",`${P.pierce}`,`${P.pierce+1}`],multishot:["弹丸",`${P.multi}`,`${P.multi+1}`]};const key=Object.keys(map).find(k=>id.toLowerCase().includes(k));return key?map[key]:["技能等级",`Lv.${l}`,`Lv.${l+1}`];}
@@ -7440,7 +7950,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   const _menuUpdate39=menuUpdate;
   menuUpdate=function(){const result=_menuUpdate39();installCalmMenu39();return result;};
   const _runAnalytics39=runAnalytics37;
-  runAnalytics37=function(){return {..._runAnalytics39(),version:"4.4.1"};};
+  runAnalytics37=function(){return {..._runAnalytics39(),version:"4.4.6"};};
 
   function drawMechanics39(){
     if(state!=="play")return;
@@ -7599,7 +8109,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   renderChoices=function(){const result=_renderChoices40();document.querySelectorAll("#choices .choice").forEach(card=>{const u=U.find(x=>x.id===card.dataset.upgradeId);if(!u?.conflict40)return;card.classList.add("conflictChoice40");const p=card.querySelector("p");if(p)p.insertAdjacentHTML("beforeend",'<strong class="conflictWarn40">高风险冲突：收益与削弱同时生效，可能让构筑失控。</strong>');});return result;};
 
   style37.textContent+=`.shopTabs40{margin:0 0 10px}.shopGroup40{display:grid;gap:9px}.shopItem40{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:11px;border-radius:14px;background:#100c20e8;border:1px solid #ffffff18;margin-bottom:9px}.shopItem40 h3{margin:0 0 4px;font-size:14px}.shopItem40 p{margin:0;color:#c7bfd2;font-size:11px;line-height:1.45}.shopItem40 button,.shopUpgrade40,.challengeToggle40,.betaActions40 button,.betaDrawer40>[class] button[data-beta="refresh"],.betaDrawer40 .dbody>button[data-beta="refresh"]{padding:9px;border-radius:10px;border:1px solid #8463aa;background:#261b3d;color:#fff}.shopIcon40{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:#27183d;font-size:24px}.shopUpgrade40{grid-column:3;margin-top:-6px}.challengeToggle40{width:100%;margin-bottom:10px;border-color:#ffd36b;color:#ffe69b;background:#35251d}.conflictChoice40{border-color:#ff6f7e!important;background:linear-gradient(145deg,#2a101be8,#160d22e8)!important}.conflictWarn40{display:block;margin-top:6px;color:#ff8793}.betaGrid40{display:grid;grid-template-columns:1fr 1fr;gap:8px}.betaGrid40 label{display:grid;gap:5px;font-size:11px}.betaGrid40 select{padding:9px;border-radius:9px;background:#141025;color:#fff;border:1px solid #70558c}.betaActions40{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}.betaDrawer40 textarea{width:100%;height:230px;background:#080713;color:#bdf4de;border:1px solid #6b548b;border-radius:10px;padding:9px;font:10px/1.4 ui-monospace,monospace}.betaDrawer40 .dbody>button[data-beta="refresh"]{width:100%;margin-top:8px}.hiddenStory40{border-color:#ffe6a455!important}.utilityButtons37.open39>#betaButton40{display:block!important}`;
-  document.title="樱夜·尸潮：Mod Kit V4.4.1";
+  document.title="樱夜·尸潮：Mod Kit V4.4.6";
 
   /* ================= V4.0 融合扩展：24种跨职业机制 ================= */
   const FUSION_ICON_ALIAS41={elementalbeast:"chimera",plagueidol:"plagueforge",soulgun:"gunshrine",nanoninja:"shadowmage",fleshshrine:"corpseimmortal",bloodmage:"bloodstar"};
@@ -7753,7 +8263,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   addEventListener("keydown",e=>{if(exploration41){exploreKeys41[e.key.toLowerCase()]=1;e.preventDefault();}});
   addEventListener("keyup",e=>{exploreKeys41[e.key.toLowerCase()]=0;});
   const _renderStagesExtension41=renderStages;
-  renderStages=function(){const result=_renderStagesExtension41();for(const scene of CONTENT41?.content("explorations")||[]){const card=document.querySelector(`.stageCard[data-stage-id="${Number(scene.stageId)}"]`);if(!card||Number(scene.stageId)>save.unlock)continue;const area=card.querySelector(".i"),button=document.createElement("button");button.className="exploreEntry41";button.textContent="探索地图";button.onclick=e=>{e.stopPropagation();openExploration41(scene);};area?.appendChild(button);}return result;};
+  renderStages=function(){const result=_renderStagesExtension41();for(const scene of CONTENT41?.content("explorations")||[]){const isMG=scene.stageId==="mainGod";const card=document.querySelector(`.stageCard[data-stage-id="${isMG?"mainGod":Number(scene.stageId)}"]`);if(!card)continue;if(isMG){if(!save.done.includes(4))continue;}else if(Number(scene.stageId)>save.unlock)continue;const area=card.querySelector(".i"),button=document.createElement("button");button.className="exploreEntry41";button.textContent=scene.entryLabel||"探索地图";button.onclick=e=>{e.stopPropagation();openExploration41(scene);};area?.appendChild(button);}return result;};
 
   /* ================= V4.1.2 EXPLORATION / LAZY ART / COMBAT READABILITY ================= */
   function explorationData412(){return exploration41?extensionState41(exploration41.scene.__packId):null;}
@@ -7826,7 +8336,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function drawBossSprite412(e,image,size,bob){
     if(e.type!=="boss"){ctx.drawImage(image,-size/2,-size*.64+bob,size,size);return;}const fx=e.transformFx412||0,q=clamp(fx/1.35,0,1),pulse=q?1+Math.sin((1-q)*Math.PI*5)*.08:1;if(q&&e.prevPhase412){const previous=artImage(`bosses/stage${clamp(stage().id,1,4)}_phase${e.prevPhase412}.webp`);if(artReady(previous)){ctx.save();ctx.globalAlpha=.48*q;ctx.rotate((1-q)*-.28);ctx.drawImage(previous,-size*.54,-size*.68,size*1.08,size*1.08);ctx.restore();}}ctx.save();ctx.scale(pulse,pulse);ctx.drawImage(image,-size/2,-size*.64+bob,size,size);ctx.restore();if(q){ctx.save();ctx.globalCompositeOperation="screen";ctx.strokeStyle=stage().id===2?"#66edff":stage().id===3?"#eee4ff":"#ff8bd1";ctx.lineWidth=4*q;for(let i=0;i<3;i++){ctx.globalAlpha=q*(.75-i*.18);ctx.beginPath();ctx.arc(0,0,e.r+(1-q)*90+i*14,0,TAU);ctx.stroke();}ctx.restore();}}
   function preloadCombatPaths412(paths){for(const path of paths)artImage(path);}
-  const _spawnEnemy412=spawnEnemy;spawnEnemy=function(type,elite){preloadCombatPaths412([`enemies/${elite?"elite":ENEMY_ART38.includes(type)?type:"normal"}.webp`]);return _spawnEnemy412(type,elite);};
+  const _spawnEnemy412=spawnEnemy;spawnEnemy=function(type,elite){const id=elite?"elite":ENEMY_ART38.includes(type)?type:"normal";preloadCombatPaths412([`enemies/${id}.webp`].concat(ENEMY_EXTRA38[id]?[`enemies/${id}_b.webp`]:[]));return _spawnEnemy412(type,elite);};
   CONTENT41.hook("boss:before-spawn",()=>{if(!isMainGodRun36())preloadCombatPaths412([`bosses/stage${clamp(stage().id,1,4)}_phase1.webp`]);},"core.boss-art412",10);
   CONTENT41.hook("boss:after-spawn",()=>{if(boss){boss.prevPhase412=0;boss.transformFx412=1.1;}},"core.boss-art412",10);
   CONTENT41.hook("boss:before-phase",payload=>{const e=payload?.boss,p=payload?.nextPhase;if(e&&p>e.phase){e.prevPhase412=e.phase;e.transformFx412=1.35;if(!isMainGodRun36())preloadCombatPaths412([`bosses/stage${clamp(stage().id,1,4)}_phase${p}.webp`]);}},"core.boss-art412",10);
@@ -7870,7 +8380,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       counts:{enemies:enemies.filter(e=>!e.dead).length,bullets:bullets.length,enemyBullets:ebullets.length,gems:gems.length,pets:pets.length},
       boss:boss?{phase:boss.phase,hp:finite(boss.hp),maxHp:finite(boss.max),ratio:boss.max?finite(boss.hp/boss.max):0,guard:finite(boss.guard),dead:!!boss.dead,pointerVisible:bossPointerVisible38,rule:boss.rule39||"",adaptSource:boss.adaptSource39||null,x:finite(boss.x),y:finite(boss.y)}:null,
       build:{upgrades:{...(P.up||{})},fusion:P.fusion||null,form:P.form||null,upgradeOrder:[...(P.upgradeOrder||[])],fusionMechanics:{elementalBeast:!!P.elementalBeast41,plagueIdol:!!P.plagueIdol41,soulGun:!!P.soulGun41,nanoNinja:!!P.nanoNinja41,fleshShrine:!!P.fleshShrine41,bloodMage:!!P.bloodMage41},damageSources:{...damageSources},attackTotal:Object.values(damageSources).reduce((sum,value)=>sum+finite(value),0)},
-      overlays:{menu:visible("#menu"),hud:visible("#hud"),level:visible("#level"),dialogue:visible("#dialogue"),event:visible("#event"),paused:visible("#paused"),result:visible("#result")},
+      overlays:{menu:visible("#menu"),hud:visible("#hud"),level:visible("#level"),dialogue:visible("#dialogue"),event:visible("#event"),paused:visible("#paused"),result:visible("#result"),storyBeat:visible("#storyBeat44")},
       mainGod:{tier:selectedMainGodTier36,...save.mainGod},shop40:JSON.parse(JSON.stringify(save.shop40||{})),extensions:{packs:CONTENT41?.packs()||[],errors:CONTENT41?.errors()||[],state:JSON.parse(JSON.stringify(save.extensions||{})),exploration:explorationSnapshot41()},balanceSamples:save.balance40?.samples?.length||0,result:{win:!!runWin,title:$("#rtitle")?.textContent||""},devErrors:window.__SAKURAYO_DEV__?.errors.length||0,
     };
   }
@@ -8008,6 +8518,89 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   document.addEventListener("visibilitychange", () => {
     if (document.hidden && state === "play") pauseGame();
   });
+
+  let heroLiveKey46 = "";
+  function installHomeDock46() {
+    const menu = $("#menu");
+    if (!menu) return;
+    menu.classList.add("homeDock46");
+    const wrap = document.querySelector(".utilityButtons37");
+    const top = $("#menu .top");
+    if (wrap && top && wrap.parentElement !== top) top.appendChild(wrap);
+    if ($("#moreButton39")) $("#moreButton39").textContent = "更多";
+  }
+  function installHeroLive46() {
+    if ($("#heroLive46") || !$("#menu") || !$("#menu .menu")) return;
+    const stage = document.createElement("div");
+    stage.id = "heroLive46";
+    stage.className = "heroLive46";
+    stage.innerHTML = '<div class="heroLiveSway46"><div class="heroLiveBreath46"><img class="heroLiveBase46" alt=""><img class="heroLiveBlink46 off" alt=""><img class="heroLiveHair46 off" alt=""></div></div><div class="heroLiveName46"><b></b><small></small></div>';
+    $("#menu").insertBefore(stage, $("#menu .menu"));
+  }
+  function setLiveLayer46(img, path, done) {
+    if (!img) return;
+    img.classList.add("off");
+    img.onload = () => {
+      img.classList.remove("off");
+      done && done(true);
+    };
+    img.onerror = () => {
+      img.removeAttribute("src");
+      img.classList.add("off");
+      done && done(false);
+    };
+    img.src = artUrl(path);
+  }
+  function updateHeroLive46() {
+    const root = $("#heroLive46");
+    if (!root) return;
+    const c = char35(),
+      sk = skin35(),
+      skinId = sk.id || "default";
+    const name = root.querySelector(".heroLiveName46 b");
+    const weapon = root.querySelector(".heroLiveName46 small");
+    if (name) name.textContent = c.name;
+    if (weapon) weapon.textContent = c.weapon;
+    const livePath = skinId === "default" ? `characters/${c.id}/default/live_idle.webp` : "";
+    const key = `${c.id}|${skinId}|${livePath || charArtPath35(c, "dialogue", sk)}`;
+    if (key === heroLiveKey46) return;
+    heroLiveKey46 = key;
+    const base = root.querySelector(".heroLiveBase46");
+    if (livePath) {
+      setLiveLayer46(base, livePath, ok => {
+        if (!ok) setCharacterImage35(base, c, "dialogue", sk);
+      });
+    } else {
+      setCharacterImage35(base, c, "dialogue", sk);
+    }
+    const blink = root.querySelector(".heroLiveBlink46");
+    const hair = root.querySelector(".heroLiveHair46");
+    if (hair) {
+      hair.removeAttribute("src");
+      hair.classList.add("off");
+      root.classList.remove("hasHair");
+    }
+    if (blink) {
+      blink.removeAttribute("src");
+      blink.classList.add("off");
+      root.classList.remove("hasBlink");
+    }
+  }
+  const _updateCharacterUI46 = updateCharacterUI35;
+  updateCharacterUI35 = function () {
+    _updateCharacterUI46();
+    updateHeroLive46();
+  };
+  const _menuUpdate46 = menuUpdate;
+  menuUpdate = function () {
+    const result = _menuUpdate46();
+    installHomeDock46();
+    installHeroLive46();
+    updateHeroLive46();
+    return result;
+  };
+  style37.textContent += `#menu.homeDock46{overflow-x:hidden}#menu.homeDock46 .bg{filter:brightness(.7) saturate(.9)}#menu.homeDock46 .bg:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#05051266 0%,#05051200 22%,#08071300 54%,#080713f0 86%);pointer-events:none}#coverTitle36{z-index:4}#menu.homeDock46 #coverTitle36{top:max(8px,env(safe-area-inset-top));left:50%;width:auto;max-width:86%;transform:translateX(-50%);pointer-events:auto}#menu.homeDock46 .coverTitle36 b{font-size:clamp(15px,4.2vw,22px);letter-spacing:.2em}#menu.homeDock46 .coverTitle36 span{margin-top:3px;padding:2px 8px;font-size:8px;letter-spacing:.22em;opacity:.88}.heroLive46{position:absolute;z-index:1;left:-18%;right:-18%;top:-4%;bottom:19%;pointer-events:none;overflow:hidden;-webkit-mask-image:linear-gradient(to top,transparent 0%,#000 24%,#000 100%);mask-image:linear-gradient(to top,transparent 0%,#000 24%,#000 100%);-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}.heroLiveSway46{height:100%;width:100%;display:grid;place-items:end center;transform-origin:50% 100%;animation:heroSway46 5.4s ease-in-out infinite}.heroLiveBreath46{position:relative;height:138%;width:min(165vw,860px);transform-origin:50% 100%;animation:heroBreath46 3.8s ease-in-out infinite}.heroLiveBreath46 img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center bottom;background:transparent!important;pointer-events:none;filter:drop-shadow(0 16px 32px #05020d99)}.heroLiveBlink46,.heroLiveHair46,.heroLiveBlink46.off,.heroLiveHair46.off{opacity:0}.heroLiveName46{position:absolute;z-index:2;left:14px;right:auto;top:18%;bottom:auto;text-align:left;text-shadow:0 2px 16px #05020d;max-width:48%}.heroLiveName46 b{display:block;font-size:22px;letter-spacing:.22em}.heroLiveName46 small{display:block;margin-top:4px;color:#ffe7a3;font-size:10px;letter-spacing:.28em}#menu.homeDock46 .menu{transform:none;z-index:3;justify-content:flex-end}#menu.homeDock46 .top{z-index:5;gap:8px;align-items:center}#menu.homeDock46 .profile{display:none}#menu.homeDock46 .coins{margin-right:auto;padding:4px 10px;border-radius:99px;background:#0b0818cc;border:1px solid #ff9bcc44}#menu.homeDock46 .menuBrand35{width:30px;height:30px;border-radius:10px}#menu.homeDock46 .utilityButtons37{position:static;margin:0;max-width:148px;gap:6px}#menu.homeDock46 .calmUtility39.open39{position:absolute;top:0;right:0;width:min(74vw,280px);max-width:none;padding:8px;border-radius:14px;background:#0b0818f2;border:1px solid #ff9bcc55;z-index:8}#menu.homeDock46 .charSelectPanel{position:absolute;left:8px;bottom:30%;width:auto;margin:0;padding:0;border:0;background:none;box-shadow:none;z-index:6;pointer-events:auto}#menu.homeDock46 .sectionTitle{display:none}#menu.homeDock46 .characterList{display:flex;flex-direction:column;justify-content:flex-end;gap:9px}#menu.homeDock46 .charCard{width:52px;height:52px;min-width:52px;padding:3px;border-radius:50%;background:#0b0818d8}#menu.homeDock46 .charCard.selected{box-shadow:0 0 0 2px #fff7d8,0 0 16px #ff4fa8aa}#menu.homeDock46 .charCard img{width:44px;height:44px}#menu.homeDock46 .charCard b,#menu.homeDock46 .charCard em,#menu.homeDock46 .charCard p,#menu.homeDock46 .charCard .selectedMark{display:none}#menu.homeDock46 .stageMini{width:min(100%,560px);grid-template-columns:48px 1fr auto;padding:6px 10px;margin:0 auto 8px;border-radius:16px;background:#0b0818e8;backdrop-filter:blur(8px)}#menu.homeDock46 .stageMini img{width:48px;height:32px}#menu.homeDock46 .stageMini h3{font-size:13px}#menu.homeDock46 .stageMini p{display:none}#menu.homeDock46 .stageMini strong{font-size:16px}#menu.homeDock46 .start{margin:0 auto 8px;padding:14px;font-size:17px;letter-spacing:.14em;width:min(100%,560px);border-radius:16px;box-shadow:0 8px 28px #ff4ea355}#menu.homeDock46 .nav{width:min(100%,560px);margin:0 auto;padding:6px 4px calc(8px + env(safe-area-inset-bottom));border-radius:18px 18px 0 0;background:#0b0818f0;border:1px solid #ff9bcc33}@keyframes heroSway46{0%,100%{transform:rotate(-0.55deg) translate3d(-0.5%,0,0)}50%{transform:rotate(0.65deg) translate3d(0.5%,0,0)}}@keyframes heroBreath46{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-1%) scale(1.01)}}@keyframes heroHair46{0%,100%{transform:rotate(-1.8deg)}50%{transform:rotate(2deg)}}@keyframes heroBlink46{0%,94%,100%{opacity:0}95.2%,96.4%{opacity:1}}@keyframes heroBaseBlink46{0%,94%,100%{opacity:1}95.2%,96.4%{opacity:0}}@media(prefers-reduced-motion:reduce){.heroLiveSway46,.heroLiveBreath46,.heroLive46.hasBlink .heroLiveBase46,.heroLive46.hasBlink .heroLiveBlink46,.heroLive46.hasHair .heroLiveHair46{animation:none}}@media(max-height:760px){#menu.homeDock46 .heroLive46{bottom:28%}#menu.homeDock46 .charSelectPanel{bottom:32%}#menu.homeDock46 .charCard{width:44px;height:44px;min-width:44px}#menu.homeDock46 .charCard img{width:36px;height:36px}#menu.homeDock46 .heroLiveName46{top:14%;font-size:16px}}@media(min-width:700px) and (orientation:landscape){#menu.homeDock46 .heroLive46{top:0;bottom:0;left:0;right:auto;width:56%;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 8%,#000 78%,transparent 100%);mask-image:linear-gradient(to right,transparent 0%,#000 8%,#000 78%,transparent 100%);-webkit-mask-size:100% 100%;mask-size:100% 100%}#menu.homeDock46 .menu{width:42%;max-width:420px;margin-left:auto;padding-left:0;transform:none;box-sizing:border-box}#menu.homeDock46 #coverTitle36{left:auto;right:3%;width:auto;transform:none;text-align:right}#menu.homeDock46 .charSelectPanel{left:auto;right:calc(42% + 10px);bottom:16%}#menu.homeDock46 .charSelectPanel,#menu.homeDock46 .stageMini,#menu.homeDock46 .start,#menu.homeDock46 .nav{margin-left:auto}}`;
+
   checkAch();
   menuUpdate();
   installModKitButton42();

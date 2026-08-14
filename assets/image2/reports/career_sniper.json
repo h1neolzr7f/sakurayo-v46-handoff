@@ -1,0 +1,37 @@
+{
+  "job": "career_sniper",
+  "source": "C:\\Users\\tzzcomputer\\Documents\\Codex\\2026-07-10\\new-chat-6\\work\\v423-delivery\\source\\assets\\image2\\source\\expansion\\career_sniper.png",
+  "atlas_size": [
+    1024,
+    1024
+  ],
+  "cell_size": [
+    1024,
+    1024
+  ],
+  "detected_tiles": false,
+  "outputs": [
+    {
+      "id": "career_sniper",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\careers\\sniper\\full.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        14,
+        57,
+        1024,
+        981
+      ],
+      "coverage": 0.35564,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\career_sniper.png"
+}

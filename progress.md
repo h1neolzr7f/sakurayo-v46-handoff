@@ -15,6 +15,28 @@ Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先
 
 # Progress
 
+## 2026-08-14 V4.4.6 扩展美术接入与克制怪分图
+
+- 另一套 AI 素材已接入：NPC、职业全身图、章节 CG、飞升闪图、虚空圣所。离线包补齐此前缺失的 61+ 项。
+- 发现并修复四只新怪 WebP 与被覆盖旧怪哈希相同；已恢复 elite/fast/disruptor/specter，并用独立源图重导出 pethunter/noisecaller/souleater/mirrorblade。
+- 按恢复后的原图重做旧四怪 `_b`；新四怪补 `_b`；剑主四表情已抠图入库。职业卡闪图与图鉴缩略图已接线。
+- 版本 4.4.6 / versionCode 56。static_check 通过；框架 8/8；浏览器 44/44。离线/Android 包 SHA-256 `0F17E128372E6197F45DC2A46ED5EC1214A4CC1EFCDADCEF6382A18687E4CD9D`。
+- Release APK：`release/樱夜尸潮_V4.4.6_Android.apk`，46.2 MB，SHA-256 `D3CCD15CF38955951A5917217C22EAB8B136B45CFA82A04D75030D9F5C6B33EB`。v1/v2 签名通过，证书 SHA-256 `03a493a3447a507abf407e1b66c1462ad8fa046028e73ba4f3e408a95b91a30b`，可覆盖安装旧正式包。包内 `assets/index.html` 与同步包哈希一致。未提交密钥。
+- 后续可做：其余 25 个职业闪图、虚空怪 `_b`、真机 APK。不要再把新怪图写进旧怪路径。
+
+## 2026-08-14 V4.4.5 尸潮加帧、受击与召唤物
+
+- 12 类杂兵各有 `_b` 切帧；`COMBAT_ART38` 仍 28。默认皮肤受击 `hit_b`；碎裂/升级特效后半段切 `_b`。
+- 无人机、夜蝠、使魔、魂灯改为贴图并切 `_b`，缺图回退矢量。没有再包 `update`。
+- 版本 4.4.5 / versionCode 55。static_check 通过；框架 8/8；浏览器 44/44。离线/Android 包 SHA-256 `0D747E5DC7199606C55A4A8D672DEBF1FB85C0757C809C577B1C394B0314E151`。未打 APK。
+
+## 2026-08-14 V4.4.4 主页动图与战斗加帧
+
+- 默认皮肤主页 `live_idle.webp` 三帧眨眼循环（dialogue + blink），失败回退 dialogue；不进 CORE_ART，不走 `artImage()`。
+- 默认皮肤战斗加 idle_c / move_b / attack_c / skill_b / dash_b，按时间切帧；幻影等衣装只用基础 pose，避免缺图 404 和串皮。
+- 斩击/枪口/受击/技能/冲刺/掉落特效后半段切 `_b`；冲刺画一层残影。没有再包 `update`，animation_manifest 仍是 15。
+- 版本 4.4.4 / versionCode 54。static_check 通过；框架 8/8；浏览器 44/44。离线/Android 包 SHA-256 `52CDE02153DA4CF7E1ABAAB7672DC9085389CF68C2E3717A97FF1702DA2E5325`。未打 APK。
+
 ## 2026-07-12 V3.8 镜界证词
 - 三角色四章开场完成重写：小夜聚焦复制人格的生存自主权，绫聚焦签名责任与妹妹拒绝救援的权利，凛音聚焦记忆继承与传统可否被改写。
 - 剧情抉择新增 `save.storyChoices38` 跨章节持久层，下一章开场、Boss 阶段对白和终章结局会读取此前选择；继续沿用 `sakurayoV3` 存档键。
@@ -284,6 +306,18 @@ Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先
 - 开场对白、章节抉择、电台和教程贴合地面；电台按角色分流，机械提示只弹一次。
 - 战斗循环模块 `sakurayo-lifecycle.js` 负责地面与障碍，没有再包一层 `update`。
 - 框架 8/8、完整浏览器流程 44/44 通过；离线单文件与 Android assets 已同步为 4.4.0 / versionCode 50。
+
+## 2026-08-13 V4.4.3 二游主页与扩展补齐
+
+- 主页角色占满、底边 mask 渐隐、去掉 mix-blend 洗白；左侧圆头像；开始键和 6 nav 贴底。闭眼硬切关掉，只留呼吸轻晃。
+- 表情接入 opening/phase/boss/低血；P4 新怪覆盖 disruptor/specter/elite/fast。幻影衣装进 official-example，商店 11 张 / 30 套。
+- 版本 4.4.3 / versionCode 53。static_check 通过；框架 8/8；浏览器 44/44。离线/Android 包 SHA-256 `D0C95B36EFB528C2AF746E1DFE4AE0ACDCE8A4A846205D44A98803B7E58D92AC`。未打 APK。
+
+## 2026-08-13 V4.4.2 击破 Boss 后剧情过场
+
+- 胜利后先播全屏剧情过场，再进结束对白和结算。测试模式可点跳过，不卡 `dismissDialogue`。
+- 验证：static_check 通过；框架 8/8；浏览器 44/44（含 `#storyBeat44` 过场断言）。
+- 版本 4.4.2 / versionCode 52。离线/Android 包 SHA-256 `0CEDD4FDA9DF5FAFE04EA41A46C3B7A0D8FD30B82C13078C82E633560540B306`。未打 APK。
 
 ## 2026-08-13 V4.4.1 过场、商店与 Git
 

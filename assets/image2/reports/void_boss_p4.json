@@ -1,0 +1,37 @@
+{
+  "job": "void_boss_p4",
+  "source": "C:\\Users\\tzzcomputer\\Documents\\Codex\\2026-07-10\\new-chat-6\\work\\v423-delivery\\source\\assets\\image2\\source\\expansion\\void_boss_p4.png",
+  "atlas_size": [
+    1024,
+    1024
+  ],
+  "cell_size": [
+    1024,
+    1024
+  ],
+  "detected_tiles": false,
+  "outputs": [
+    {
+      "id": "void_boss_p4",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\content-packs\\maingod-void\\bosses\\void_phase4.webp",
+      "size": [
+        512,
+        512
+      ],
+      "source_bbox": [
+        6,
+        0,
+        1016,
+        1003
+      ],
+      "coverage": 0.57263,
+      "corners": [
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\void_boss_p4.png"
+}

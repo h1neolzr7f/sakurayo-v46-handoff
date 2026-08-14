@@ -1,0 +1,31 @@
+{
+  "job": "cg_stage4",
+  "source": "C:\\Users\\tzzcomputer\\Documents\\Codex\\2026-07-10\\new-chat-6\\work\\v423-delivery\\source\\assets\\image2\\source\\expansion\\cg_stage4.png",
+  "atlas_size": [
+    1024,
+    1536
+  ],
+  "cell_size": [
+    1024,
+    1536
+  ],
+  "detected_tiles": false,
+  "outputs": [
+    {
+      "id": "cg_stage4",
+      "path": "android-app\\app\\src\\main\\assets\\game\\art\\stages\\stage_4\\cg.webp",
+      "size": [
+        1024,
+        1536
+      ],
+      "coverage": 1.0,
+      "source_box": [
+        0,
+        0,
+        1024,
+        1536
+      ]
+    }
+  ],
+  "preview": "assets\\image2\\previews\\cg_stage4.png"
+}

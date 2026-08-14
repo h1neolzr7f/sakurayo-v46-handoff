@@ -22,6 +22,10 @@ tests/artifacts/
 *.apk
 *.ap_
 *.aab
+release/
+
+# One-off local art scripts
+tools/image2/_extend_manifest.py
 
 # Android
 android-app/.gradle/
@@ -33,6 +37,13 @@ android-app/signing/
 *.jks
 *.keystore
 *.keystore.old
+
+# Image2 generation intermediates (the game loads WebP from android-app assets)
+assets/image2/source/
+assets/image2/processed/
+assets/image2/previews/
+assets/image2/test_output/
+assets/image2/reference/expansion_refs/
 
 # Local secrets and caches
 .env
