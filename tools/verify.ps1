@@ -14,6 +14,13 @@ Invoke-Step "static_check" { python tools/static_check.py src/index.html }
 Invoke-Step "syntax extracted" { node --check tests/artifacts/static/index.extracted.js }
 Invoke-Step "syntax cutscene" { node --check src/runtime/sakurayo-cutscene.js }
 Invoke-Step "syntax economy" { node --check src/runtime/sakurayo-economy.js }
+Invoke-Step "syntax lobby" { node --check src/runtime/sakurayo-lobby.js }
+Invoke-Step "syntax live" { node --check src/runtime/sakurayo-live.js }
+Invoke-Step "syntax ops" { node --check src/runtime/sakurayo-ops.js }
+Invoke-Step "lobby unit" { node tests/lobby_unit.mjs }
+Invoke-Step "live unit" { node tests/live_unit.mjs }
+Invoke-Step "ops unit" { node tests/ops_unit.mjs }
+Invoke-Step "ops smoke" { node tests/ops_smoke.mjs }
 Invoke-Step "syntax lifecycle" { node --check src/runtime/sakurayo-lifecycle.js }
 Invoke-Step "syntax content-runtime" { node --check src/runtime/sakurayo-content-runtime.js }
 Invoke-Step "framework smoke" { node tests/framework_smoke.mjs }

@@ -62,11 +62,26 @@ async function shot(page, name, fullPage = true) {
   screenshots.push(output);
 }
 
+function outfitIdleExists(character, folder) {
+  return fs.existsSync(path.join(projectRoot, "android-app/app/src/main/assets/game/art/characters", character, folder, "anim_idle.webp"));
+}
+
+async function waitOutfitLive(page, layerId) {
+  await page.waitForFunction(id => window.__SAKURAYO_TEST__.outfitStatus45().live === id, layerId, { timeout: 10000 });
+}
+
+function dropMissingOutfitConsoleErrors(tracker) {
+  tracker.consoleErrors = tracker.consoleErrors.filter(text => !/(?:career_|form_|fusion_)[A-Za-z]+\/anim_|fusions\/[A-Za-z]+\/splash/.test(text));
+}
+
 async function openPage(context, tracker, targetUrl = url) {
   const page = await context.newPage();
   page.on("pageerror", error => tracker.pageErrors.push(String(error)));
   page.on("console", message => {
-    if (message.type() === "error") tracker.consoleErrors.push(message.text());
+    if (message.type() !== "error") return;
+    const text = `${message.text()} ${message.location()?.url || ""}`;
+    if (/(?:career_|form_|fusion_)[A-Za-z]+\/anim_|fusions\/[A-Za-z]+\/splash/.test(text)) return;
+    tracker.consoleErrors.push(message.text());
   });
   page.on("request", request => {
     if (/^https?:/i.test(request.url()) && new URL(request.url()).origin !== new URL(targetUrl).origin) tracker.externalRequests.push(request.url());
@@ -129,6 +144,10 @@ try {
   assert.equal(migrated.settings.glow, "off");
   assert.equal(migrated.settings.glowVersion, 2);
   assert.deepEqual(migrated.mainGod, { points: 0, unlockedTier: 1, bestTier: 0, clears: 0, runs: 0, deepest: 0, contracts: {}, challenges: {}, power: 0, vitality: 0, tempo: 0, resonance: 0, fortune: 0, regenBlood: 0, psiLink: 0, gunBlade: 0, mageCircuit: 0, summonPage: 0, spaceRing: 0, rebirthDoll: 0, sideKey: 0, cursedHeart: 0 });
+  assert.ok(migrated.shop40 && migrated.shop40.ops, "旧存档应补齐 shop40.ops");
+  const legacyLobby = await api(legacyPage, "lobby46");
+  assert.ok(legacyLobby.shown.includes("sayo_echo"), "旧存档补齐后应拥有 sayo_echo");
+  assert.ok(legacyLobby.shown.includes("aya_petal"), "旧存档补齐后应拥有 aya_petal");
   assert.equal(legacyTracker.pageErrors.length, 0);
   assert.equal(legacyTracker.consoleErrors.length, 0);
   assert.equal(legacyTracker.externalRequests.length, 0);
@@ -157,7 +176,7 @@ try {
   assert.equal(artStatus.length, 15);
   assert.equal(artStatus.filter(item => item.ready).length, 9);
   assert.equal(artStatus.filter(item => !item.loaded).length, 6);
-  assert.equal(await page.locator("#menu .nav img").count(), 6);
+  assert.equal(await page.locator("#menu .nav img").count(), 5);
   assert.ok(await page.locator("#characterList .charCard img").evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0)));
   await page.waitForFunction(() => {
     const image = document.querySelector("#menu .menuBrand35");
@@ -173,6 +192,8 @@ try {
   await shot(page, "01a-modkit-packs.png");
   await page.locator("#modKitDrawer42 .close").click();
   pass("Mod Kit 面板显示内容格式、依赖与扩展启用状态");
+  // 飞升/成就已收入 #archiveDrawer，须先开档案再点子项。shop/stage 仍在主 nav。
+  await page.locator('[data-open="archive"]').click();
   await page.locator('[data-open="asc"]').click();
   await page.waitForFunction(() => {
     const images = [...document.querySelectorAll("#ascList .storyIcon img")];
@@ -185,6 +206,7 @@ try {
   await page.locator("#careerSearch37").fill("");
   await shot(page, "01b-ascension-art.png");
   await page.locator("#ascDrawer .close").click();
+  await page.locator('[data-open="archive"]').click();
   await page.locator('[data-open="ach"]').click();
   await page.waitForFunction(() => {
     const image = document.querySelector("#achList .achievementMaster35 img");
@@ -207,6 +229,53 @@ try {
   await page.locator('#shopList [data-shop="starters"]').click();
   await shot(page, "01f-starter-shop.png");
   await page.locator("#shopDrawer .close").click();
+
+  const lobby = await api(page, "lobby46");
+  assert.equal(lobby.version, "4.6.0");
+  assert.ok(lobby.shown.includes("sayo_echo"));
+  assert.ok(lobby.shown.includes("aya_petal"));
+  assert.equal(lobby.cards.length, 8);
+  // 主 nav 合同为 data-open="gacha"；抽屉未挂上时可用 api(page, "openDrawer", "gacha")
+  await page.locator('[data-open="gacha"]').click();
+  assert.equal(await page.locator("#gachaDrawer").isVisible(), true);
+  assert.match(await page.locator("#gachaDrawer").textContent(), /镜界寻访/);
+  const coinsBeforeFail = (await api(page, "lobby46")).coins;
+  const broke = await api(page, "pullGacha46", 1);
+  assert.equal(broke.ok, false);
+  assert.equal(broke.reason, "coins");
+  assert.equal(broke.coins, coinsBeforeFail);
+  const cheat = await api(page, "grantCheat46");
+  assert.ok(cheat.coins >= 9999);
+  assert.equal(cheat.cheatUsed, true);
+  const single = await api(page, "pullGacha46", 1);
+  assert.equal(single.ok, true);
+  assert.equal(single.results.length, 1);
+  assert.ok(single.pulls >= 1);
+  const ten = await api(page, "pullGacha46", 10);
+  assert.equal(ten.ok, true);
+  assert.equal(ten.results.length, 10);
+  assert.ok(ten.tenPulls >= 1);
+  await shot(page, "01h-gacha-drawer.png");
+  await page.locator("#gachaDrawer .close").click();
+  // 主 nav 合同为 data-open="roster"；抽屉未挂上时可用 api(page, "openDrawer", "roster")
+  await page.locator('[data-open="roster"]').click();
+  assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 8);
+  await shot(page, "01i-roster-wall.png");
+  await page.locator("#rosterDrawer .close").click();
+  await page.locator('[data-open="stage"]').click();
+  assert.equal(await page.locator("#modeBar46").count(), 1);
+  assert.match(await page.locator("#modeBar46").textContent(), /回收演习/);
+  assert.match(await page.locator("#modeBar46").textContent(), /证词模式/);
+  assert.match(await page.locator("#modeBar46").textContent(), /主神空间/);
+  await shot(page, "01j-stage-modes.png");
+  await page.locator("#stageDrawer .close").click();
+  await page.locator('[data-open="archive"]').click();
+  assert.match(await page.locator("#archiveDrawer").textContent(), /剧情档案/);
+  assert.match(await page.locator("#archiveDrawer").textContent(), /永久天赋/);
+  await shot(page, "01k-archive.png");
+  await page.locator("#archiveDrawer .close").click();
+  pass("V4.6.0 镜界寻访、名册与作弊币");
+
   const betaPanel = await api(page, "openBeta40");
   assert.equal(betaPanel.visible, true);
   assert.equal(betaPanel.report.version, "4.1");
@@ -274,7 +343,7 @@ try {
   assert.equal(await page.locator("#statsButton37").isVisible(), true);
   await page.locator("#statsButton37").click();
   assert.equal(await page.locator("#analyticsDrawer37").isVisible(), true);
-  assert.match(await page.locator("#analyticsText37").inputValue(), /"version": "4.4.6"/);
+  assert.match(await page.locator("#analyticsText37").inputValue(), /"version": "4.6.0"/);
   await page.locator("#analyticsDrawer37 .close").click();
   await page.locator("#settingsButton37").click();
   assert.equal(await page.locator("#settingsDrawer37").isVisible(), true);
@@ -351,6 +420,89 @@ try {
       await page.locator("#skill").click();
       assert.ok((await state(page)).player.skillCooldown > 0);
       pass("触控摇杆、冲刺、主动技能");
+
+      const freshOutfit = await api(page, "outfitStatus45");
+      const freshSnap = await state(page);
+      assert.equal(freshOutfit.live, null);
+      assert.equal(freshOutfit.form, null);
+      assert.equal(freshOutfit.career, null);
+      assert.equal(freshSnap.player.outfit, null);
+      assert.equal(freshSnap.player.careerBranch, null);
+      assert.equal(freshSnap.build.form, null);
+
+      const exorcistSnap = await api(page, "forceOutfit45", "career", "exorcist");
+      assert.equal(exorcistSnap.player.careerBranch, "exorcist");
+      assert.ok(exorcistSnap.player.outfitFade > 0);
+      assert.equal(exorcistSnap.build.form, null);
+      const exorcistStatus = await api(page, "outfitStatus45");
+      assert.equal(exorcistStatus.career, "exorcist");
+      assert.ok(exorcistStatus.layers.includes("career_exorcist"));
+      if (outfitIdleExists("sayo", "career_exorcist")) {
+        await waitOutfitLive(page, "career_exorcist");
+        const readyExorcist = await api(page, "outfitStatus45");
+        assert.equal(readyExorcist.live, "career_exorcist");
+        assert.equal(readyExorcist.ready.find(item => item.id === "career_exorcist")?.idle, true);
+        assert.equal((await state(page)).player.outfit, "career_exorcist");
+      }
+
+      const formSnap = await api(page, "forceOutfit45", "form", "tech");
+      assert.equal(formSnap.build.form, "tech");
+      assert.equal(formSnap.player.careerBranch, "exorcist");
+      assert.ok(formSnap.player.outfitFade > 0);
+      if (outfitIdleExists("sayo", "form_tech")) {
+        await waitOutfitLive(page, "form_tech");
+      }
+      const formStatus = await api(page, "outfitStatus45");
+      assert.equal(formStatus.form, "tech");
+      assert.ok(formStatus.layers.includes("form_tech"));
+      assert.ok(formStatus.layers.includes("career_exorcist"));
+      assert.ok(formStatus.layers.indexOf("form_tech") < formStatus.layers.indexOf("career_exorcist"), "飞升层应压过职业层");
+      if (outfitIdleExists("sayo", "form_tech")) {
+        assert.equal(formStatus.live, "form_tech");
+        assert.equal((await state(page)).player.outfit, "form_tech");
+      }
+      const fusionSnap = await api(page, "forceOutfit45", "fusion", "magitech");
+      assert.equal(fusionSnap.build.fusion, "magitech");
+      assert.ok(fusionSnap.player.outfitFade > 0);
+      assert.ok(fusionSnap.player.outfitReveal > 0);
+      const fusionStatus = await api(page, "outfitStatus45");
+      assert.equal(fusionStatus.fusion, "magitech");
+      assert.ok(fusionStatus.layers.includes("fusion_magitech"));
+      assert.ok(fusionStatus.layers.includes("form_tech"));
+      assert.ok(fusionStatus.layers.indexOf("form_tech") < fusionStatus.layers.indexOf("fusion_magitech"), "飞升层应压过融合层");
+      assert.ok(fusionStatus.layers.indexOf("fusion_magitech") < fusionStatus.layers.indexOf("career_exorcist"), "融合层应压过职业层");
+      if (outfitIdleExists("sayo", "form_tech")) assert.equal(fusionStatus.live, "form_tech");
+      else if (outfitIdleExists("sayo", "fusion_magitech")) {
+        await waitOutfitLive(page, "fusion_magitech");
+        assert.equal((await api(page, "outfitStatus45")).live, "fusion_magitech");
+      }
+      await page.evaluate(() => window.advanceTime(17));
+      await shot(page, "45-sayo-form-tech.png");
+
+      const barrageSnap = await api(page, "forceOutfit45", "career", "barrage", 2);
+      assert.equal(barrageSnap.build.form, "tech");
+      const barrageStatus = await api(page, "outfitStatus45");
+      assert.ok(barrageStatus.layers.includes("form_tech"));
+      assert.ok(barrageStatus.layers.includes("career_exorcist") || barrageStatus.layers.includes("career_barrage"));
+      if (outfitIdleExists("sayo", "form_tech")) assert.equal(barrageStatus.live, "form_tech");
+      pass("小夜职业与飞升换装层");
+    } else if (id === "aya" || id === "rion") {
+      const branch = id === "aya" ? "shadow" : "swordSaint";
+      const folder = `career_${branch}`;
+      const forced = await api(page, "forceOutfit45", "career", branch);
+      assert.equal(forced.player.careerBranch, branch);
+      assert.ok(forced.player.outfitFade > 0);
+      const status = await api(page, "outfitStatus45");
+      assert.equal(status.career, branch);
+      assert.ok(status.layers.includes(folder));
+      if (outfitIdleExists(id, folder)) {
+        await waitOutfitLive(page, folder);
+        const ready = await api(page, "outfitStatus45");
+        assert.equal(ready.live, folder);
+        assert.equal(ready.ready.find(item => item.id === folder)?.idle, true);
+        assert.equal((await state(page)).player.outfit, folder);
+      }
+      pass(`${id} ${branch} 换装层`);
     }
   }
   await api(page, "clearCombat");
@@ -436,10 +588,75 @@ try {
     }
   }
   await api(page, "backMenu");
+  await page.locator('[data-open="archive"]').click();
   await page.locator('[data-open="asc"]').click();
   assert.match(await page.locator("#ascList .fusionCount41").textContent(), /24 种/);
+  const guideText = await page.locator("#ascList").textContent();
+  assert.match(guideText, /成型：凑齐/);
+  assert.match(guideText, /代价：9级锁一条分支/);
+  assert.match(await page.locator('#ascList [data-guide45="fusion"]').first().textContent(), /成型：/);
+  const guideFacts = await api(page, "guideFacts45");
+  assert.equal(guideFacts.soulgunArt, "fusions/soulgun/splash.webp");
+  assert.match(guideFacts.careerForm, /凑齐/);
   await page.locator("#ascDrawer .close").click();
   pass("六个新增融合均有组合、代价、天敌与独立战斗触发，融合总数达到 24");
+
+  await api(page, "backMenu");
+  await api(page, "selectStage", 1);
+  await api(page, "start");
+  await api(page, "dismissDialogue");
+  const ch1Pool = await api(page, "seedProgression45", {
+    level: 11,
+    careers: ["mech", "magical", "gun", "shrine"],
+    skills: ["drone", "star", "multi", "talisman", "rail"],
+    aff: { tech: 7 },
+    seen: ["shield"],
+  });
+  assert.equal(ch1Pool.teach, true);
+  assert.equal(ch1Pool.eligibleFusion.length, 0);
+  assert.equal(ch1Pool.eligibleAsc.length, 0);
+  assert.equal(ch1Pool.samples.flat().some(item => item.fusion || item.asc), false);
+  await api(page, "finish", false);
+  const deathReport = await page.locator("#damageReport").innerText();
+  const deathSub = await page.locator("#rsub").innerText();
+  const deathRoute = await page.locator("#routeNote").innerText();
+  assert.match(deathReport, /本局天敌：结界尸/);
+  assert.match(deathReport, /下次优先补|下次先成型一所学校/);
+  assert.match(deathSub, /本局天敌|下次优先补|下次先成型/);
+  assert.equal(/下次优先补|本局天敌|下次先成型/.test(deathRoute), false, "结局文案被教练句覆盖");
+  pass("第一章不刷融合飞升，死亡诊断写出天敌和下次补什么");
+
+  await api(page, "backMenu");
+  await api(page, "selectStage", 2);
+  await api(page, "start");
+  await api(page, "dismissDialogue");
+  const ch2Pool = await api(page, "seedProgression45", {
+    level: 8,
+    careers: ["mech", "magical", "gun", "shrine"],
+    skills: ["drone", "star", "multi", "talisman"],
+  });
+  assert.equal(ch2Pool.teach, false);
+  assert.ok(ch2Pool.eligibleFusion.includes("magitech"));
+  assert.ok(ch2Pool.eligibleFusion.includes("gunshrine"));
+  assert.ok(ch2Pool.samples.every(pool => pool.filter(item => item.fusion).length === 2), "无转职双选时应出两张融合");
+  const dualCareer = await api(page, "seedProgression45", {
+    level: 9,
+    careers: ["mech", "magical", "gun", "shrine"],
+    skills: ["drone", "star", "multi", "talisman"],
+  });
+  assert.ok(dualCareer.samples.every(pool => pool.filter(item => item.career).length === 2));
+  assert.ok(dualCareer.samples.every(pool => pool.filter(item => item.fusion).length === 1), "转职双选时仍只出一张融合");
+  const ch2Asc = await api(page, "seedProgression45", {
+    level: 11,
+    careers: ["mech", "gun"],
+    skills: ["drone", "multi", "rail"],
+    aff: { tech: 7 },
+  });
+  assert.ok(ch2Asc.eligibleAsc.includes("tech"));
+  await api(page, "finish", true);
+  assert.match(await page.locator("#damageReport").innerText(), /覆盖缺口：|覆盖较完整/);
+  assert.equal(/(覆盖缺口|覆盖较完整)/.test(await page.locator("#routeNote").innerText()), false);
+  pass("第二章无转职双选可出两张融合，有转职双选仍只出一张");
 
   await api(page, "backMenu");
   await api(page, "setBait40", 3, true);
@@ -604,6 +821,20 @@ try {
   assert.ok(breath.intensity < pressure.intensity * 0.75, "喘息期压力应显著低于波峰");
   assert.ok(planned.factor < scattered.factor, "合理构筑应降低导演压强");
   pass("30 秒压力—喘息周期与构筑压强反馈");
+
+  await api(page, "backMenu");
+  await api(page, "selectCharacter", "sayo");
+  await api(page, "selectStage", 1);
+  const testimony = await api(page, "setRunMode46", "testimony");
+  assert.equal(testimony.runMode, "testimony");
+  await api(page, "start");
+  await api(page, "dismissDialogue");
+  await api(page, "protectPlayer");
+  await api(page, "triggerUpgrade");
+  assert.equal((await state(page)).mode, "play");
+  assert.equal(await page.locator("#level").isVisible(), false);
+  assert.match(await page.locator("#stageHud").textContent(), /证词/);
+  pass("证词模式升级不弹卡，战斗继续");
 
   await api(page, "backMenu");
   await api(page, "selectCharacter", "sayo");
@@ -846,6 +1077,7 @@ try {
   assert.ok(Math.max(...Object.values(loneDurations)) / Math.min(...Object.values(loneDurations)) < 1.30, `三角色纯初始通关时间差超过 30%：${JSON.stringify(loneDurations)}`);
   pass(`三角色终章纯初始强化通关：小夜${loneDurations.sayo.toFixed(0)}秒 / 绫${loneDurations.aya.toFixed(0)}秒 / 凛音${loneDurations.rion.toFixed(0)}秒`);
 
+  dropMissingOutfitConsoleErrors(tracker);
   assert.equal(tracker.pageErrors.length, 0, tracker.pageErrors.join("\n"));
   assert.equal(tracker.consoleErrors.length, 0, tracker.consoleErrors.join("\n"));
   assert.equal(tracker.externalRequests.length, 0, tracker.externalRequests.join("\n"));

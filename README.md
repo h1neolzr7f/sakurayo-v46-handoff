@@ -1,194 +1,132 @@
-# 🌸 樱夜·尸潮
+# 樱夜·尸潮 — 接手说明
 
-### v4.4.6 · 原创离线二次元肉鸽射击
+这是 **v4.6.0 私有开发快照**，给下一位 AI / 维护者继续做横屏二游大厅和局内干员。公开玩家仓是另一个地址：
 
-**选角 · 四章剧情 · 职业转职 · 跨职融合 · 三相飞升 · 主神空间**
+https://github.com/h1neolzr7f/sakurayo-zombietide
 
-![Release](https://img.shields.io/github/v/release/h1neolzr7f/sakurayo-zombietide?label=Release&color=C026D3)
-![Version](https://img.shields.io/badge/Version-4.4.6-db2777)
-![Android](https://img.shields.io/badge/Android-6.0%2B-3DDC84?logo=android&logoColor=white)
-![HTML5](https://img.shields.io/badge/HTML5-Canvas-E34F26?logo=html5&logoColor=white)
-![License](https://img.shields.io/github/license/h1neolzr7f/sakurayo-zombietide)
-![CI](https://img.shields.io/github/actions/workflow/status/h1neolzr7f/sakurayo-zombietide/verify.yml?label=verify)
-![Local First](https://img.shields.io/badge/Privacy-Local--first-7A5AF8)
+已发布 APK 仍是 **v4.4.6**。本仓源码已到 4.6.0，**未发版、不要擅自升到 4.6.1**。
 
-[v4.4.6 Android 包](https://github.com/h1neolzr7f/sakurayo-zombietide/releases/tag/v4.4.6) ·
-[怎么玩](docs/user-guide.md) ·
-[更新记录](CHANGELOG.md) ·
-[路线图](ROADMAP.md) ·
-[参与贡献](CONTRIBUTING.md) ·
-[负责任使用](RESPONSIBLE_USE.md)
+完整需求、分期、选择器和陷阱见 **[docs/HANDOFF.md](docs/HANDOFF.md)**。硬约束见 **[AGENTS.md](AGENTS.md)**。一页清单见 **[README_FIRST.md](README_FIRST.md)**。
 
-> [!IMPORTANT]
-> **原创游戏。** 三角色、四章剧情、职业树和本仓库自制美术都属于本项目，不是任何现有商业游戏的同人、移植或资源提取。少量 UI 反馈音效使用 [Kenney](https://kenney.nl/) 的 CC0 素材，见 [第三方素材说明](docs/THIRD_PARTY_ASSETS.md)。维护者不为把本游戏冒充上架商店、传播签名密钥或清空他人存档提供支持。详见 [免责声明](DISCLAIMER.md)。
+## 3 分钟上手
 
-> [!NOTE]
-> **玩家请下 Releases，不要直接翻源码。** 从 [v4.4.6](https://github.com/h1neolzr7f/sakurayo-zombietide/releases/tag/v4.4.6) 下载 `Sakurayo-ZombieTide-v4.4.6-android.apk`，用发布说明里的 SHA-256 核对后再安装。电脑试玩：克隆仓库后用浏览器打开 `src/index.html`。存档只在本机，键名 `sakurayoV3`。
-
-## 它是做什么的
-
-樱夜市被零号企业改写成尸潮试验场。你从三名幸存者里选一个，用触控摇杆、冲刺和主动技能在四章地图里活下去，边打边选职业、转职、融合，最后面对四阶段 Boss。
-
-整局离线。没有账号、没有广告、没有 CDN。通关或阵亡后，进度写回本机存档，下次接着开。
-
-```mermaid
-flowchart LR
-    A[选角色] --> B[四章 / 主神空间]
-    B --> C[升级三选一]
-    C --> D[职业 / 转职 / 融合]
-    D --> E[科技 / 生物 / 灵能]
-    E --> F[Boss 四阶段]
-    F --> G[结算与本地存档]
-```
-
-## 小白三步
-
-1. 打开 [Releases](https://github.com/h1neolzr7f/sakurayo-zombietide/releases/tag/v4.4.6)，下载 `Sakurayo-ZombieTide-v4.4.6-android.apk`。
-2. 用发布说明中的 SHA-256 核对文件，再侧载安装。覆盖安装旧正式包会保留存档。
-3. 选月城小夜 / 神代绫 / 黑羽凛音，左手摇杆移动，右侧冲刺和技能。
-
-电脑没有手机时：
+1. 读 `docs/HANDOFF.md`、`AGENTS.md`、`docs/PLAN_V46_ERYOU.md`。
+2. 用浏览器打开 `src/index.html`（美术在 `android-app/app/src/main/assets/game/art`）。
+3. 先跑短测，不要一上来就跑完整 `browser_smoke`：
 
 ```powershell
-git clone https://github.com/h1neolzr7f/sakurayo-zombietide.git
-cd sakurayo-zombietide
-start src/index.html
+node --check src/runtime/sakurayo-lobby.js
+node --check src/runtime/sakurayo-live.js
+node --check src/runtime/sakurayo-ops.js
+node tests/lobby_unit.mjs
+node tests/live_unit.mjs
+node tests/ops_unit.mjs
+node tests/ops_smoke.mjs
 ```
 
-美术从 `android-app/app/src/main/assets/game/art` 读取。不要改存档键，也不要清 `localStorage`。
+全量验证：`powershell -File tools/verify.ps1`（含较长的 `browser_smoke`，主视口仍是 **430×932**）。
 
-## 三角色
+存档键必须是 **`sakurayoV3`**。不要清 `localStorage`。
 
-| 角色 | 武器 | 定位 |
-|---|---|---|
-| **月城小夜** | 夜樱突击步枪 | 远程压制。射程稳，每第七发贯穿。 |
-| **神代绫** | 手枪＋月切太刀 | 远近切换。每第四枪近身居合。 |
-| **黑羽凛音** | 黑羽太刀 | 纯近战。第三刀扩大剑势，没有远程普攻。 |
+## 产品是什么
 
-<p align="center">
-  <img src="android-app/app/src/main/assets/game/art/characters/sayo/default/face_smile.webp" alt="月城小夜" width="160">
-  <img src="android-app/app/src/main/assets/game/art/characters/aya/default/face_smile.webp" alt="神代绫" width="160">
-  <img src="android-app/app/src/main/assets/game/art/characters/rion/default/face_smile.webp" alt="黑羽凛音" width="160">
-</p>
+离线二次元肉鸽射击。局外做成能横着玩的二游大厅，局内仍是摇杆射击。不换引擎，不引 Vue/Phaser，最终仍出单文件 HTML。
 
-## 核心能力
-
-| 能力 | 说明 |
+| 角色 | 武器 |
 |---|---|
-| **完全离线** | 不登录、不联网、不拉外部字体或图片。Android WebView / 本地 Chrome 可直接开。 |
-| **本地存档** | 键名固定 `sakurayoV3`。旧档缺字段会自动补齐，不会为了升级清空进度。 |
-| **14 职业 · 28 转职** | 升级三选一里成型，9 级选分支，12 / 15 级升阶。 |
-| **18 种跨职融合** | 改变攻击循环和代价，不是只加百分比。一局一次正式融合。 |
-| **三相飞升** | 科技 / 生物 / 灵能改写终局规则，可与融合叠加。 |
-| **四章＋主神空间** | 四章有各自地面和剧情抉择；主神空间是独立高难轮回，强化跨局保留。 |
-| **Boss 四阶段** | 75% / 50% / 25% 转阶段。阶段内不无限召唤普通怪。 |
-| **商店只改外观** | 衣装影响外观和职业出现倾向，不出售永久伤害。 |
-| **手机操作** | 左摇杆、冲刺、主动技能。剧情 / 升级 / 暂停会暂停并收起其他文字。 |
+| 月城小夜 `sayo` | 步枪远程 |
+| 神代绫 `aya` | 手枪＋太刀 |
+| 黑羽凛音 `rion` | 纯太刀 |
 
-## 界面预览
+必须保住：14 基础职业、28 转职、融合、科技/生物/灵能三相飞升、四章、Boss 四阶段、主神空间、触控摇杆/冲刺/技能。
 
-四章各有自己的地面和过场。职业卡有闪图时会铺在升级选项上。
+## 已完成（A / B / C，版本仍 4.6.0）
 
-<p align="center">
-  <img src="android-app/app/src/main/assets/game/art/stages/stage_1/cg.webp" alt="第一章过场" width="210">
-  <img src="android-app/app/src/main/assets/game/art/stages/stage_2/cg.webp" alt="第二章过场" width="210">
-  <img src="android-app/app/src/main/assets/game/art/careers/swordSaint/splash.webp" alt="剑圣闪图" width="210">
-</p>
+- **横屏主体验**：Android 锁 `landscape`。`preferLandscape46()` 默认加 `html.landscape46`。窗口宽 `< 640` 才竖屏回退。大厅左约 64% 全身站桩（头要完整），右约 34%、最宽 360 的操作台；三角色圆钮必须在操作台里，不能压在人身上。
+- **五房**：寻访 / 名册 / 商店 / 关卡 / 档案。出击是大厅主按钮，不进五格。
+- **镜界寻访只收藏**：pity 80 SSR / 10 SR，价格 160 / 1440，N70 / R22 / SR7 / SSR1。字段只写 `shop40.ops`。
+- **证词模式**：`runMode36="testimony"`，升级不弹卡。测试 API `selectStage` 仍强制 `story`。
+- **干员**：最多 2 人，DP 开局 10 / 上限 20 / 花费 8 / 撤回 +4，约 0.4/s。不进 `pets`。挂 `combat:after-update` / `after-draw`。
+- **仿 Live2D**：`src/runtime/sakurayo-live.js`。眨眼 Mean 2.5±2s，注视阻尼，点头/点身。不要再改成 5.4s CSS 死循环。
 
-## 硬规则
+## 下一步（不要当成已完成）
 
-- 存档键必须是 `sakurayoV3`。缺字段补齐，禁止清档
-- 不依赖网络、CDN、外部字体或外部图片
-- 商店皮肤只改外观和职业倾向，不卖永久数值
-- 不恢复「每颗子弹遍历全部敌人」的无界碰撞
-- 敌人、子弹、召唤物、伤害字和粒子都有上限
-- 不要给 `update` 再加包装层，也不要改名 `startGame` / `update` / `draw` / `spawnEnemy` / `showDialogue`
+1. I2V 绿幕重出三角色站桩（需 infsh login）。
+2. 有独特动作的融合再补 `skill` / `dash`。
+3. 寻访卡扩到 16 以内；大厅宽背景去黑边。
+4. 全量 `tools/verify.ps1`。
+5. 同步 Android 资源后发版。模拟器上的正式包可能仍是签名对不上的 4.2.3；debug 不能覆盖，**不要擅自卸包清档**。
 
-## 仓库结构
+## 明确不做
+
+清档、改存档键、再包 `update`、抽卡/商店加永久伤害、每日任务/邮件/通行证/广告、联网账号、换引擎、把主神空间删掉或并进寻访。
+
+## 改哪里
 
 ```text
 src/index.html                         唯一代码基线
-src/runtime/                           过场、经济、生命周期、内容包
-src/content/packs/                     官方内容包（含主神虚空）
-android-app/                           WebView 壳与运行时美术
-android-app/app/src/main/assets/       同步后的 HTML + game/art
-docs/                                  玩法、架构、变更、素材许可
-tools/                                 静态检查、构建、美术后处理
-tests/                                 框架与浏览器冒烟
+src/runtime/sakurayo-lobby.js          大厅 / 寻访 / 名册 / 模式条
+src/runtime/sakurayo-live.js           仿 Live2D
+src/runtime/sakurayo-ops.js            局内干员 DP
+android-app/.../game/art               运行时美术（游戏读这里）
+docs/HANDOFF.md                        完整交接规格
+docs/PLAN_V46_ERYOU.md                 二游分期原文
+docs/MAINTAIN.md                       升版本 / 发版
 ```
 
-发版仍是单文件 HTML，再同步进 Android 资源。维护步骤见 [docs/MAINTAIN.md](docs/MAINTAIN.md)。开发约束见 [AGENTS.md](AGENTS.md)。
+脚本顺序必须是：content-runtime → lifecycle → cutscene → economy → **lobby → live → ops**。
 
-## 从源码运行
+## 必须保住的选择器
 
-需要能打开本地 HTML 的浏览器。美术路径已经写好，直接打开 `src/index.html` 即可。
+`#gachaPull1` `#gachaPull10` `#gachaDrawer` `#rosterWall46` `.rosterSlot46.lock` `#shopDrawer` `.shopTabs40` `#shopWallet44` `#opsDock46` `#heroTap46` `#heroHead46` `#modeBar46` `#rotateHint46`，以及 `[data-open="gacha|roster|shop|stage|archive|story"]`。档案按钮文案仍须含 **剧情档案**。大厅主按钮是 **出击**。
 
-验证：
+## 测试 API
 
-```powershell
-powershell -File tools/verify.ps1
-```
+写在 `src/index.html` 的 `__SAKURAYO_TEST__` **字面量内部**（`Object.freeze`）。新 API 不要挂在 freeze 之后。
 
-等价于：
+| API | 用途 |
+|---|---|
+| `setRunMode46(mode)` | 同时写 `runMode36` 和 `pendingMode46` |
+| `selectStage(id)` | 永远把 `runMode36` 写成 `story` |
+| `opsSnapshot46` / `deployOp46` / `retreatOp46` / `grantDp46` | 干员 |
+| `liveSnapshot46` / `liveTrigger46` / `liveLook46` | 立绘 |
+| `lobby46` / `pullGacha46` / `grantCheat46` / `tapPortrait46` | 大厅 / 寻访 |
 
-```powershell
-python tools/static_check.py src/index.html
-node --check tests/artifacts/static/index.extracted.js
-node tests/framework_smoke.mjs
-node tests/browser_smoke.mjs
-```
+`verify.ps1` 目前**没有**跑 `tests/testimony_smoke.mjs` 和 `tests/gacha_visual.mjs`，改证词或寻访视觉时要单独跑。
 
-打 Android 包（需要 JDK 17、Android SDK，以及你自己的 `android-app/keystore.properties`）：
+## 已知陷阱
 
-```powershell
-python tools/build_game.py --source src/index.html --output ../offline/index.html --asset-root ../offline/game/art
-powershell -File android-app/sync-game.ps1
-cd android-app
-.\gradlew.bat assembleRelease
-```
+- 不要再给 `update` 加包装层。局内扩展挂 `CONTENT41.hook("combat:after-update")` / `combat:after-draw`。
+- 不要改名 `startGame` / `update` / `draw` / `spawnEnemy` / `showDialogue` 却不改调用点。
+- `#hud` 是 `pointer-events:none`。干员坞自己开 `pointer-events:auto`。
+- `startGame` 在 `!save.tutorialDone && state==="menu"` 时会打开教程并 **return**。隔离冒烟先点 `#tutorialSkip37`。
+- `ART_ROOT`：`/android_asset/` → `game/art`；路径以 `/src/index.html` 结尾 → `../android-app/app/src/main/assets/game/art`；否则 `game/art`。
+- 大厅 `live_idle.webp` / `live_blink.webp` 必须是**无损静帧 WebP**，用 CSS/JS 动。不要把动画 WebP 压成 lossy / yuva420p。
+- 干员单位放独立 `units`，禁止推进 `pets`（`syncPets` 会清空）。
+- `progress.md` 顶部 Original prompt 不得删。
+- 仓库不含签名密钥。不要提交 `keystore.properties`、`local.properties`、`*.jks`、`*.apk`、`release/`、`assets/image2/source/`。
 
-仓库**不含**签名密钥、`local.properties` 和 APK。模板见 `android-app/keystore.properties.example`。
+## 模拟器
 
-## 隐私与安全
-
-- 进度默认只在本机：浏览器 `localStorage`，或 Android WebView 同源存储
-- 不申请账号，不上传存档，不读通讯录或已装应用列表
-- 发行包和 git 都不包含你的存档
-- 签名密钥、`keystore.properties`、`local.properties` 已被 `.gitignore` 排除
-
-安全问题请不要在公开 Issue 里粘贴完整存档、密钥或本机绝对路径，参见 [SECURITY.md](SECURITY.md)。
-
-## 测试
-
-```powershell
-powershell -File tools/verify.ps1
-```
-
-浏览器冒烟会开三个角色、打升级、走 Boss 转阶段并检查结算。不要把私人存档 JSON 放进 `tests/`。
-
-## 贡献
-
-欢迎提交：平衡、无障碍操作、缺图回退、文档和小白说明。开始前请阅读 [CONTRIBUTING.md](CONTRIBUTING.md)。
-
-不要提交签名密钥、别人的存档、或给 `update` 再包一层。不接受把商店改成永久伤害、或把存档键改掉导致旧档丢失的改动。
-
-## 路线图
-
-当前维护线是 **v4.4.6**。已完成项与下一步见 [ROADMAP.md](ROADMAP.md)，版本记录见 [CHANGELOG.md](CHANGELOG.md)。
-
-## 许可
-
-代码与本仓库原创内容为 [MIT License](LICENSE)。Kenney 反馈素材为 CC0，见 [docs/THIRD_PARTY_ASSETS.md](docs/THIRD_PARTY_ASSETS.md)。
-
-MIT 不表示你可以冒充官方上架应用商店，也不授予把签名密钥或他人存档一并分发的权利。本项目按现状提供。完整边界见 [DISCLAIMER.md](DISCLAIMER.md) 与 [RESPONSIBLE_USE.md](RESPONSIBLE_USE.md)。
+已装正式包若是旧签名 4.2.3 / versionCode 47，debug APK 会 `INSTALL_FAILED_UPDATE_INCOMPATIBLE`。用本机 HTTP 打开 `src/index.html` 验收横屏，不要卸包除非用户接受清档。
 
 ---
 
-**樱夜·尸潮 v4.4.6** · APK 与源码请从 [本仓库 Releases](https://github.com/h1neolzr7f/sakurayo-zombietide/releases/tag/v4.4.6) 下载，并用 SHA-256 核对：
+## 玩家说明（公开仓）
+
+玩家请下公开仓 Releases，不要直接翻这份私有源码。
+
+- 公开仓：https://github.com/h1neolzr7f/sakurayo-zombietide
+- 已发布包：[v4.4.6 APK](https://github.com/h1neolzr7f/sakurayo-zombietide/releases/tag/v4.4.6)
+- 怎么玩：[docs/user-guide.md](docs/user-guide.md)
+- 更新记录：[CHANGELOG.md](CHANGELOG.md)
+- 路线图：[ROADMAP.md](ROADMAP.md)
 
 ```
 Sakurayo-ZombieTide-v4.4.6-android.apk
 SHA-256 D3CCD15CF38955951A5917217C22EAB8B136B45CFA82A04D75030D9F5C6B33EB
 ```
 
-Sakurayo: Zombie Tide is an original offline anime-style roguelite shooter. Three characters, four story chapters plus a high-difficulty loop, local saves only. No account, no CDN.
+樱夜市被零号企业改写成尸潮试验场。选月城小夜 / 神代绫 / 黑羽凛音，用触控摇杆、冲刺和主动技能在四章里活下去。整局离线，没有账号、没有广告、没有 CDN。存档只在本机，键名 `sakurayoV3`。
+
+代码与本仓库原创内容为 [MIT License](LICENSE)。Kenney 反馈音效为 CC0，见 [docs/THIRD_PARTY_ASSETS.md](docs/THIRD_PARTY_ASSETS.md)。不要提交签名密钥或他人存档。

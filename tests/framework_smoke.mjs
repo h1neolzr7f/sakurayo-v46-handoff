@@ -46,6 +46,11 @@ try {
   assert.equal(oldSave.extensions["official.story-exploration"].__version, 2);
   assert.deepEqual(oldSave.extensions["official.story-exploration"].data.choices, {});
   assert.equal(oldSave.extensions["official.story-exploration"].data.collected.legacy, true);
+  assert.ok(oldSave.shop40 && oldSave.shop40.ops, "旧存档应补齐 shop40.ops");
+  const oldLobby = await api(oldPage, "lobby46");
+  assert.ok(oldLobby.shown.includes("sayo_echo"));
+  assert.ok(oldLobby.shown.includes("aya_petal"));
+  assert.equal(oldLobby.coins, 90, "旧存档樱花币不应被寻访字段清空");
   pass("旧 sakurayoV3 存档保留并补齐扩展默认字段");
 
   const status = await api(oldPage, "extensionStatus41");
@@ -60,7 +65,7 @@ try {
   assert.match(feedbackAssets.audio.reward, /reward\.ogg$/);
   assert.match(feedbackAssets.vfx.muzzle, /muzzle\.png$/);
   const lifecycleHooks = await oldPage.evaluate(() => window.SakurayoContent.hookStatus());
-  assert.deepEqual(lifecycleHooks["combat:after-draw"].map(entry => entry.owner), ["core.boss-pointer38", "core.mechanics39", "core.boss-stage412"]);
+  assert.deepEqual(lifecycleHooks["combat:after-draw"].map(entry => entry.owner), ["core.boss-pointer38", "core.outfit-reveal45", "core.mechanics39", "core.boss-stage412"]);
   assert.equal(lifecycleHooks["combat:after-update"].some(entry => entry.owner === "core.boss-art412"), true);
   pass("官方扩展通过注册表提供服饰、商店、成就和档案数据");
 
@@ -91,6 +96,8 @@ try {
   assert.equal(afterItem.extensions["official.modkit-addon"].data.purchases.modkit_seal, 1);
   assert.equal(afterItem.ach["official.modkit-addon:dependency_ready"], true);
   await oldPage.locator("#shopDrawer .close").click();
+  // story 已收入档案抽屉；shop 仍在主 nav。抽屉未挂上时可用 api(oldPage, "openDrawer", "story")
+  await oldPage.locator('[data-open="archive"]').click();
   await oldPage.locator('[data-open="story"]').click();
   assert.equal(await oldPage.locator(".extensionStory41", { hasText: "不动核心的第四条路" }).count(), 1);
   assert.equal(await oldPage.locator(".extensionStory41", { hasText: "依赖不是加载顺序" }).count(), 1);

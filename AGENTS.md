@@ -1,5 +1,7 @@
 # AGENTS.md — Codex 开发约束
 
+接手请先读根目录 [README.md](README.md) 和 [docs/HANDOFF.md](docs/HANDOFF.md)，再改代码。一页清单见 [README_FIRST.md](README_FIRST.md)。
+
 ## 项目目标
 
 继续开发手机端离线二次元肉鸽射击游戏《樱夜·尸潮》。以 `src/index.html` 为唯一代码基线，最终发布仍需生成单文件 HTML。

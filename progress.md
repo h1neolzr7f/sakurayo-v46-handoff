@@ -15,6 +15,111 @@ Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先
 
 # Progress
 
+## 2026-08-14 V4.6 全身站桩
+
+- 大厅/寻访立绘改用 `battle.webp` 全身图，不再用腰斩对话图。去掉右侧硬切遮罩，保底轨收进玻璃条。
+- 管线优先 battle → 抠黑边 → 去白边晕 → 无损 WebP。凛音黑发仍走边缘连通，不整图泛洪。
+
+## 2026-08-14 V4.6 局外精装修收口
+
+- 立绘管线改为：对话静帧抠像 → 遮罩抹圆 + 连通域去渣 → 细软边 → 无损 WebP。大厅/寻访用 CSS 溶边，不再用会压坏透明通道的动画 WebP。
+- 商店横屏只留 `#shopWallet44` 一栏；`.shopNotice` 仍在 DOM。衣装卡墙、道具卡同一套金粉玻璃。
+- 档案内页（剧情/飞升/成就）收成玻璃卡 + 筛选条。名册锁卡脚注改「待寻访」，墙上仍写「未回收」。
+- `gacha_visual` 增补 story/asc/ach 截图。未包 `update`，版本仍 4.6.0，未发版。
+
+## 2026-08-14 V4.6.0 镜界寻访视觉层
+
+- 重做寻访/名册视觉：全屏 banner + 抠图立绘、玻璃标题、金保底轨、粉单抽/金十连、3D 翻牌揭示。逻辑、爆率、保底、存档键未改。
+- 新美术入库 `game/art/gacha/`：banner_bg、card_back、8 张卡面、hero_sayo/aya/rion；`ui/nav/gacha.webp` `ui/nav/roster.webp`。源 PNG 在 Cursor assets 与 `assets/image2/source/gacha/`。
+- `#gachaPull1` / `#gachaPull10` / `#gachaDrawer` / `#rosterWall46` / `.rosterSlot46.lock` / `#heroTap46` 仍在。`injectStyle` 会替换 `#sakurayo-lobby-css`。
+- 揭示层挂在 `#gachaDrawer` 而不是 `#gachaBody46`，刷新不抹掉翻牌。`TEST_MODE` / `?test=1` 立即翻开。
+- 主页 nav 改 5 等分；NAV_ART35 的 gacha/roster 指向新图标。未包 `update`，未提交。
+- 死亡教练在学校已齐时写「下次先成型一所学校」，browser_smoke 已同时接受这句。
+
+## 2026-08-14 V4.6 A 期去毛坯
+
+- 完整二游计划：`docs/PLAN_V46_ERYOU.md`。局外做成横屏二游大厅，局内仍是离线肉鸽射击。
+- 寻访：去掉说明书玻璃盒，大标题 + 双保底轨 + 按钮价格 + CSS 落花 + 立绘底边溶进底栏。
+- 名册：未回收只用卡背，点开详情；揭示加稀有角标 / NEW / 跳过 / 再寻一次。
+- 大厅主按钮固定「出击」。爆率、存档键、`update` 未动。
+
+## 2026-08-14 V4.6 B 期房间 + 证词 + 仿 Live2D
+
+- 关卡页 `#modeBar46`：回收演习 / 证词模式 / 主神空间。证词 `runMode36="testimony"` 升级只回血，不打开 `#level`。`selectStage` 仍写 `story`。测试 API：`setRunMode46`。
+- 大厅用 `ui/lobby_wide.webp`，默认皮肤接 `live_idle.webp` 三帧 + `live_blink.webp` 眨眼层。商店/档案同一套玻璃房。
+- 动图管线 `tools/image2/live_pipeline.py`：现有黑底抠边，或 `--video clip.mp4 --cid sayo` 抽帧扣绿幕。未包 `update`，版本仍 4.6.0。
+- 验证：`lobby_unit`、`gacha_visual`、`testimony_smoke`、`static_check` 通过。全量 `browser_smoke` 未在本批跑完。
+
+## 2026-08-14 V4.6 精装修续作
+
+- 立绘软边 + 描边藏锯齿；寻访站桩改从 dialogue 抠图。
+- 商店服饰改卡片墙；档案四格铺导航图；关卡卡底渐变；天赋/剧情/飞升/成就同一套玻璃条。
+- 大厅副标改回「四章 · 证词尚未结束」。未包 `update`。
+
+## 2026-08-14 V4.6 C 期玩法骨架
+
+- 局内 DP + 最多 2 名干员钉地。`src/runtime/sakurayo-ops.js`，挂 `combat:after-update` / `after-draw`，没有再包 `update`。
+- 可部署另外两名角色，开局 10 DP / 上限 20 / 花费 8 / 撤回 +4。证词模式隐藏 `#opsDock46`。
+- 开火复用 `pushBullet`/`aoe`，`source:"summon"`，不进 `pets`（`syncPets` 会清空宠物数组）。
+- 测试：`tests/ops_unit.mjs`、`tests/ops_smoke.mjs`。版本仍 4.6.0，未发版。
+
+## 2026-08-14 横屏主体验
+
+- 用户确认：对标二游，横版 UI + 横版战场是主路径；竖屏只保留基础操作。
+- Android `sensorLandscape`。大厅/房间横屏样式去掉 `min-width:700` 门槛。`visualViewport` 铺满画布。竖屏顶栏 `#rotateHint46`。
+
+## 2026-08-14 仿 Live2D + 卡顿
+
+- 对照 Cubism 官方眨眼/注视/点触教程：`src/runtime/sakurayo-live.js`。眨眼 Mean 2.5±2s，注视阻尼，点头/点身淡入淡出。不再用 5.4s CSS steps 循环。
+- 去掉立绘多层 drop-shadow/blur、抽屉整屏 backdrop-filter、横屏菜单 14px 毛玻璃。抽屉关闭时停落花动画。
+- 横屏用 `html.landscape46`（宽>高）强制铺满，不单靠 orientation。竖屏仍只是回退。
+- 未包 `update`，版本仍 4.6.0。
+
+## 2026-08-14 横屏强制
+
+- 用户仍看到竖屏：模拟器装的是旧包 4.2.3 / versionCode 47，且 Chrome 窗口是 1080×2400。
+- 网页现在一打开就带 `html.landscape46`，大厅/寻访不再等横过来才切左右分栏。Android 锁 `landscape`。
+- 旧正式包签名对不上，不能覆盖安装。
+
+## 2026-08-14 横屏大厅改合理
+
+- 立绘不再 138% 裁头；三角色圆钮收回右侧操作台横排，不再压在人身上。
+- 操作台最宽 360；标题左上，名字左下。宽于 640 走左右分栏，更窄才竖屏回退。
+
+## TODO next
+- I2V 绿幕重出三角色站桩（需 infsh login）
+- 有独特动作的融合再补 skill/dash
+- 寻访卡扩到 16 以内；大厅宽背景去黑边
+- 发布同步 release/ 与 APK
+- 全量 verify.ps1（browser_smoke 较长）
+
+## 2026-08-14 V4.6 交接包
+
+- 需求和升级计划收进 `docs/HANDOFF.md`。根目录 README / README_FIRST 改成给下一位 AI 的入口。
+- 公开仓仍是 `h1neolzr7f/sakurayo-zombietide`。本快照走私有仓，不改 origin。
+- 未包 `update`，版本仍 4.6.0，未发版。
+
+## 2026-08-14 V4.5.2 闪图结算、图鉴三行、融合色特效
+
+- 新 6 融合不再借旧闪图。结算/暂停铺当前闪图，暂停加待机立绘。
+- 图鉴职业/融合/飞升前三行固定为成型、天敌、代价。
+- 六套新融合本色特效挂在现有射击/冲刺/技能/周期脉冲上，没有再包 `update`。
+- 紧凑 HUD 藏衣装芯片。存档键仍是 `sakurayoV3`。版本 4.5.2 / versionCode 59。
+
+## 2026-08-14 V4.5.1 融合换装与揭示卡
+
+- 解析顺序改为飞升 > 融合 > 转职 > 商店衣。揭示卡、职业/融合光环、HUD/暂停衣装名。吐槽在揭示期间让路。
+- 首批融合服（magitech / gunshrine / bloodsword / shadowblade / shikigami / idolgun 等）由并行子智能体出图。缺图回退。
+- 没有再包 `update`。存档键仍是 `sakurayoV3`。版本 4.5.1 / versionCode 58。
+
+## 2026-08-14 V4.5.0 转职飞升真换装
+
+- 本批补齐 6 职战斗换装 54 帧：plagueDoctor / philosopher / bloodDuke / batQueen / hive / garden × sayo/aya/rion × idle/move/attack。源 PNG 在 Cursor assets；WebP 已写入 android / offline / assets/image2/source/outfits。未改 index.html，未覆盖 default，未提交。
+- 战斗换装解析：飞升形态 > 转职衣装 > 商店皮肤 > 默认。
+- 28 条转职 × 三角色 × idle/move/attack，加上三相飞升，共 93 套；签名 12 套另有 skill/dash。28 张职业闪图齐了。
+- 换装淡入淡出与飞升光环；职业 skill 帧会用上；虚空尸有 `_b`。缺图回退。存档键仍是 `sakurayoV3`。没有再包 `update`。
+- 版本 4.5.0 / versionCode 57。
+
 ## 2026-08-14 V4.4.6 扩展美术接入与克制怪分图
 
 - 另一套 AI 素材已接入：NPC、职业全身图、章节 CG、飞升闪图、虚空圣所。离线包补齐此前缺失的 61+ 项。
@@ -326,3 +431,9 @@ Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先
 - `source/` 收成 Git 仓库，忽略构建产物和密钥。维护说明见 `docs/MAINTAIN.md`。
 - 验证：static_check 通过；框架 8/8；浏览器 44/44（含 `#shopWallet44`、`#dialogueChapter`、analytics `4.4.1`）。
 - 源码 SHA-256 `33EC9A28C49B839C5141D28E81E25C6C9615E27659757E8AE40B586296BEC48F`；离线/Android 包 SHA-256 `86AEF79AA2D84CACB9D13C056FF1A17ED648F698F1145975E0EDF097455A2019`。未打 APK。
+
+## TODOs / next agent
+
+- Confirm `game/art/gacha/*.webp` and `ui/nav/gacha.webp` / `ui/nav/roster.webp` are on disk under ART_ROOT; missing files hide via onerror and keep the gradient fallback.
+- Run `node tests/browser_smoke.mjs` for the 镜界寻访 / 名册 screenshots after art lands.
+- Do not wrap `update`. Do not sell damage through gacha.

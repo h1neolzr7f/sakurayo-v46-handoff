@@ -2,6 +2,7 @@ package com.sakurayo.zombietide;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -53,6 +54,7 @@ public final class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         configureWindow();
         webView = createWebView();
 
@@ -116,7 +118,7 @@ public final class MainActivity extends Activity {
         settings.setTextZoom(100);
         settings.setDefaultTextEncodingName("utf-8");
         settings.setMediaPlaybackRequiresUserGesture(true);
-        settings.setUserAgentString(settings.getUserAgentString() + " SakurayoAndroid/4.4.6");
+        settings.setUserAgentString(settings.getUserAgentString() + " SakurayoAndroid/4.6.0");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             settings.setSafeBrowsingEnabled(true);
         }
