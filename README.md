@@ -23,7 +23,7 @@
 > **原创游戏。** 三角色、四章剧情、职业树和本仓库自制美术都属于本项目，不是任何现有商业游戏的同人、移植或资源提取。少量 UI 反馈音效使用 [Kenney](https://kenney.nl/) 的 CC0 素材，见 [第三方素材说明](docs/THIRD_PARTY_ASSETS.md)。维护者不为把本游戏冒充上架商店、传播签名密钥或清空他人存档提供支持。详见 [免责声明](DISCLAIMER.md)。
 
 > [!NOTE]
-> **玩家请下 Releases，不要直接翻源码。** 从 [v4.4.6](https://github.com/h1neolzr7f/sakurayo-zombietide/releases/tag/v4.4.6) 下载 `樱夜尸潮_V4.4.6_Android.apk`，用发布说明里的 SHA-256 核对后再安装。电脑试玩：克隆仓库后用浏览器打开 `src/index.html`。存档只在本机，键名 `sakurayoV3`。
+> **玩家请下 Releases，不要直接翻源码。** 从 [v4.4.6](https://github.com/h1neolzr7f/sakurayo-zombietide/releases/tag/v4.4.6) 下载 `Sakurayo-ZombieTide-v4.4.6-android.apk`，用发布说明里的 SHA-256 核对后再安装。电脑试玩：克隆仓库后用浏览器打开 `src/index.html`。存档只在本机，键名 `sakurayoV3`。
 
 ## 它是做什么的
 
@@ -43,7 +43,7 @@ flowchart LR
 
 ## 小白三步
 
-1. 打开 [Releases](https://github.com/h1neolzr7f/sakurayo-zombietide/releases/tag/v4.4.6)，下载 `樱夜尸潮_V4.4.6_Android.apk`。
+1. 打开 [Releases](https://github.com/h1neolzr7f/sakurayo-zombietide/releases/tag/v4.4.6)，下载 `Sakurayo-ZombieTide-v4.4.6-android.apk`。
 2. 用发布说明中的 SHA-256 核对文件，再侧载安装。覆盖安装旧正式包会保留存档。
 3. 选月城小夜 / 神代绫 / 黑羽凛音，左手摇杆移动，右侧冲刺和技能。
 
@@ -187,7 +187,7 @@ MIT 不表示你可以冒充官方上架应用商店，也不授予把签名密�
 **樱夜·尸潮 v4.4.6** · APK 与源码请从 [本仓库 Releases](https://github.com/h1neolzr7f/sakurayo-zombietide/releases/tag/v4.4.6) 下载，并用 SHA-256 核对：
 
 ```
-樱夜尸潮_V4.4.6_Android.apk
+Sakurayo-ZombieTide-v4.4.6-android.apk
 SHA-256 D3CCD15CF38955951A5917217C22EAB8B136B45CFA82A04D75030D9F5C6B33EB
 ```
 

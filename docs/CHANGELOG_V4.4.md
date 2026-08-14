@@ -5,7 +5,7 @@
 - 旧四怪 `_b` 按恢复后的原图重做；新四怪补 `_b` 切帧。无名剑主补齐 calm/serious/smile/surprised。
 - 职业升级卡有闪图时作背景；职业图鉴显示两分支全身缩略图。没有再包 `update`。
 - 版本 4.4.6 / versionCode 56 / UA `SakurayoAndroid/4.4.6`。存档键仍是 `sakurayoV3`。离线/Android 包 SHA-256 `0F17E128372E6197F45DC2A46ED5EC1214A4CC1EFCDADCEF6382A18687E4CD9D`。
-- Release APK：`release/樱夜尸潮_V4.4.6_Android.apk`，SHA-256 `D3CCD15CF38955951A5917217C22EAB8B136B45CFA82A04D75030D9F5C6B33EB`。沿用 V3.7 正式证书，v1/v2 通过。
+- Release APK：GitHub Releases 的 `Sakurayo-ZombieTide-v4.4.6-android.apk`，SHA-256 `D3CCD15CF38955951A5917217C22EAB8B136B45CFA82A04D75030D9F5C6B33EB`。沿用 V3.7 正式证书，v1/v2 通过。
 
 # V4.4.5 尸潮加帧、受击与召唤物
 

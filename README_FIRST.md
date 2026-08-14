@@ -9,7 +9,7 @@
 ## 立即运行
 
 - 开发打开：`src/index.html`（美术在 `android-app/app/src/main/assets/game/art`）
-- 手机发布版：GitHub Releases 里的 `樱夜尸潮_V4.4.6_Android.apk`
+- 手机发布版：GitHub Releases 里的 `Sakurayo-ZombieTide-v4.4.6-android.apk`
 - 验证：`powershell -File tools/verify.ps1`
 
 ## 当前版本
