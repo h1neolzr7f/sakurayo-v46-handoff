@@ -12,8 +12,15 @@ vm.runInNewContext(code, sandbox);
 const L = sandbox.window.SakurayoLobby;
 
 assert.equal(L.version, "4.6.0");
-assert.equal(L.CARDS.length, 8);
+assert.equal(L.CARDS.length, 16);
 assert.deepEqual([...L.DEFAULT_SHOWN], ["sayo_echo", "aya_petal"]);
+for (const card of L.CARDS) {
+  assert.equal(
+    fs.existsSync(path.join(root, "android-app/app/src/main/assets/game/art/gacha", `${card.id}.webp`)),
+    true,
+    `缺少寻访卡面 ${card.id}.webp`,
+  );
+}
 assert.equal(L.RATES.single, 160);
 assert.equal(L.RATES.ten, 1440);
 assert.equal(L.RATES.SSR, 0.01);
@@ -25,7 +32,23 @@ old.shop40 = shop;
 assert.equal(shop.ops.owned.sayo_echo, 1);
 assert.equal(shop.ops.owned.aya_petal, 1);
 assert.equal(shop.ops.owned.last_witness, 0);
+assert.equal(shop.ops.owned.mirror_twins, 0);
 assert.equal(L.snapshot(old).shown.includes("sayo_echo"), true);
+
+const legacyEight = L.normalizeOps({
+  ops: {
+    pity: 27,
+    pitySR: 4,
+    pulls: 31,
+    owned: { sayo_echo: 3, aya_petal: 2, last_witness: 1 },
+  },
+});
+assert.equal(legacyEight.ops.owned.sayo_echo, 3);
+assert.equal(legacyEight.ops.owned.last_witness, 1);
+assert.equal(legacyEight.ops.owned.sayo_318, 0);
+assert.equal(legacyEight.ops.owned.mirror_twins, 0);
+assert.equal(legacyEight.ops.pity, 27);
+assert.equal(legacyEight.ops.pulls, 31);
 
 const poor = { coins: 10, shop40: L.normalizeOps({}) };
 const denied = L.pull(poor, 1, () => 0);
@@ -50,7 +73,7 @@ const pitySave = { coins: 20000, shop40: L.normalizeOps({}) };
 pitySave.shop40.ops.pity = 79;
 const forced = L.pull(pitySave, 1, () => 0.999);
 assert.equal(forced.results[0].r, "SSR");
-assert.equal(forced.results[0].id, "last_witness");
+assert.ok(["last_witness", "mirror_twins"].includes(forced.results[0].id));
 assert.equal(pitySave.shop40.ops.pity, 0);
 
 const cheat = L.grantCheat({ coins: 3, shop40: L.normalizeOps({}) });
@@ -194,7 +217,7 @@ const rosterHost = fakeEl("div", { id: "rosterBody46" });
 body.appendChild(rosterDrawer);
 rosterDrawer.appendChild(rosterHost);
 V.renderRoster(rosterHost, save, { art: (p) => "game/art/" + p });
-assert.equal((rosterHost.innerHTML.match(/class="rosterSlot46/g) || []).length, 8);
+assert.equal((rosterHost.innerHTML.match(/class="rosterSlot46/g) || []).length, 16);
 assert.match(rosterHost.innerHTML, /id="rosterWall46"/);
 assert.match(rosterHost.innerHTML, /未回收/);
 assert.match(rosterHost.innerHTML, /rosterSlot46 r-SSR lock" data-card="last_witness"/);
