@@ -7344,6 +7344,37 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if(P.elementalBeast41)return ["#ff8a55","#78ddff","#c18cff"][P.fusionPulse41||0];
     return fusionData()?.c||"";
   }
+  const SIGNATURE_FUSIONS46=new Set(["magitech","gunshrine","bloodsword","shadowblade","shikigami","idolgun"]);
+  function drawFusionAction46(){
+    const id=P.fusion||"";
+    const skill=P.animSkill||0,dash=P.animDash||0;
+    if(state!=="play"||quality<.62||!SIGNATURE_FUSIONS46.has(id)||(skill<=0&&dash<=0))return;
+    const active=Math.max(skill/.42,dash/.32),q=clamp(active,0,1),t=runTime||0,color=fusionFxColor45()||"#ffd36b";
+    ctx.save();
+    ctx.translate(P.x,P.y);
+    ctx.globalAlpha=.16+q*.2;
+    ctx.strokeStyle=color;
+    ctx.fillStyle=color;
+    ctx.lineWidth=1+q*1.2;
+    if(id==="magitech"){
+      for(let i=0;i<3;i++){const a=t*1.8+i*TAU/3,r=34+i*8;ctx.save();ctx.rotate(a);ctx.strokeRect(-r,-r,r*2,r*2);ctx.restore();}
+    }else if(id==="gunshrine"){
+      for(let i=0;i<6;i++){const a=i*TAU/6+t*.4,r=30+q*22;ctx.beginPath();ctx.ellipse(Math.cos(a)*r,Math.sin(a)*r,8,3,a,0,TAU);ctx.fill();}
+      ctx.beginPath();ctx.arc(0,0,28+q*25,0,TAU);ctx.stroke();
+    }else if(id==="bloodsword"){
+      ctx.lineWidth=3+q*3;
+      for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(0,0,38+i*13,-1.1+i*.16,.8+i*.14);ctx.stroke();}
+    }else if(id==="shadowblade"){
+      for(let i=0;i<4;i++){const a=t*2+i*TAU/4,r=28+i*7,x=Math.cos(a)*r,y=Math.sin(a)*r;ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.strokeRect(-8,-8,16,16);ctx.restore();}
+    }else if(id==="shikigami"){
+      for(let i=0;i<5;i++){const a=-t*1.5+i*TAU/5,r=34+q*18;ctx.save();ctx.translate(Math.cos(a)*r,Math.sin(a)*r);ctx.rotate(a+Math.PI/2);ctx.strokeRect(-4,-10,8,20);ctx.restore();}
+    }else if(id==="idolgun"){
+      for(let i=0;i<3;i++){ctx.globalAlpha=(.18+q*.25)*(1-i*.18);ctx.beginPath();ctx.arc(0,0,30+i*14+q*12,0,TAU);ctx.stroke();}
+      ctx.globalAlpha=.24+q*.32;ctx.beginPath();ctx.moveTo(-55,34);ctx.lineTo(0,-42-q*18);ctx.lineTo(55,34);ctx.closePath();ctx.stroke();
+    }
+    ctx.restore();
+  }
+  CONTENT41.hook("combat:after-draw",drawFusionAction46,"core.fusion-action46",27);
   const _finish45=finish;
   finish=function(win){const result=_finish45(win);paintOutfitModal45("#result");return result;};
   const _finishMainGod45=finishMainGod36;
@@ -7383,6 +7414,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const result=L.pull(save,count);
     if(!result.ok){
       toast(result.reason==="coins"?"樱花币不足":"寻访失败");
+      playFeedback411("error",.24);
       refreshLobby46();
       return result;
     }
@@ -7390,6 +7422,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     toast(count===10?`十连完成：${names}…`:`寻访：${result.results[0].n}`);
     checkAch();
     persist();
+    playFeedback411("reward",result.results.some(item=>item.r==="SSR")?.48:.3);
     refreshLobby46();
     if(L.showReveal)L.showReveal(result.results,{art:artUrl,again:()=>doPull46(count)});
     return result;
@@ -7399,6 +7432,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if(!L)return {coins:save.coins,cheatUsed:0};
     const result=L.grantCheat(save);
     toast(L.cheatToast);
+    playFeedback411("reward",.35);
     persist();
     refreshLobby46();
     return { coins: result.coins, cheatUsed: true };
@@ -7521,12 +7555,12 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const name=O.NAMES[id]||id;
     if(O.snapshot().units.some(u=>u.id===id)){
       const r=O.retreat(id);
-      if(r.ok)toast(`${name} 已撤回`);
+      if(r.ok){toast(`${name} 已撤回`);playFeedback411("close",.24);}
       opsPaint46();
       return r;
     }
     const r=O.deploy(id,save.character||P.character,P.x,P.y,W,H);
-    if(r.ok)toast(`${name} 已部署`);
+    if(r.ok){toast(`${name} 已部署`);playFeedback411("open",.28);}
     else if(r.reason==="dp")toast("部署点不足");
     else if(r.reason==="full")toast("最多两名干员");
     else if(r.reason==="self")toast("不能部署当前角色");
@@ -7570,6 +7604,16 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         ctx.beginPath();
         ctx.arc(0,2,20,0,Math.PI*2);
         ctx.stroke();
+        if(u.pulse>0){
+          const q=clamp(u.pulse/.72,0,1);
+          ctx.globalCompositeOperation="screen";
+          ctx.globalAlpha=q*.8;
+          ctx.strokeStyle=u.id==="sayo"?"#ff77bd":u.id==="aya"?"#70c8ff":"#ff6c82";
+          ctx.lineWidth=2+q*2;
+          ctx.beginPath();
+          ctx.arc(0,2,22+(1-q)*34,0,Math.PI*2);
+          ctx.stroke();
+        }
         ctx.restore();
       }
     },"core.ops46",15);
