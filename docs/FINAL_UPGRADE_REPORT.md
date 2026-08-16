@@ -116,7 +116,7 @@
 ### 离线单入口
 
 Framework 8/8、Landscape 5/5 与 Browser 52/52 再次通过；第二轮战斗视觉回归通过。
-合并构建的最终 SHA-256 待完整回归后更新。
+最终 SHA-256：`A948D837EB44CBFEAA01EF479857C66F746520B49EC5FE83C884F68774EDB598`
 
 ## 8. Android 状态
 
@@ -132,7 +132,7 @@ Framework 8/8、Landscape 5/5 与 Browser 52/52 再次通过；第二轮战斗�
 - APK 内 `assets/index.html` 与同步包哈希完全一致
 - APK WebP：1190
 - Debug APK v1/v2 签名：通过
-- 合并构建的 Debug APK SHA-256 待完整回归后更新。
+- Debug APK SHA-256：`CE760C4A3BF890445768812E3D9452233625EE2BC05EA7914C9522C03E3C8291`
 
 当前 VM 没有 Android AVD 或实体设备，也没有项目正式签名密钥。因此本轮没有声称真机安装或正式 Release 签名通过；提供的是已构建、可安装的 Debug 候选包。
 
