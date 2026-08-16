@@ -66,6 +66,18 @@ function outfitIdleExists(character, folder) {
   return fs.existsSync(path.join(projectRoot, "android-app/app/src/main/assets/game/art/characters", character, folder, "anim_idle.webp"));
 }
 
+function signatureFusionActionExists(character, fusion, pose) {
+  return fs.existsSync(
+    path.join(
+      projectRoot,
+      "android-app/app/src/main/assets/game/art/characters",
+      character,
+      `fusion_${fusion}`,
+      `anim_${pose}.webp`,
+    ),
+  );
+}
+
 async function waitOutfitLive(page, layerId) {
   await page.waitForFunction(id => window.__SAKURAYO_TEST__.outfitStatus45().live === id, layerId, { timeout: 10000 });
 }
@@ -308,6 +320,14 @@ try {
   await api(page, "selectCharacter", "sayo");
   await api(page, "selectSkin", "default");
   pass("30 costume sets decode and switch in the offline shop, including the official extension");
+  const signatureFusions = ["magitech", "gunshrine", "bloodsword", "shadowblade", "shikigami", "idolgun"];
+  for (const character of ["sayo", "aya", "rion"]) {
+    for (const fusion of signatureFusions) {
+      assert.equal(signatureFusionActionExists(character, fusion, "skill"), true, `${character}/${fusion} 缺少 skill 动作`);
+      assert.equal(signatureFusionActionExists(character, fusion, "dash"), true, `${character}/${fusion} 缺少 dash 动作`);
+    }
+  }
+  pass("六套签名融合为三角色提供独立 skill / dash 动作资源");
   const canvasBox = await page.locator("#game").boundingBox();
   assert.ok(canvasBox && canvasBox.width > 0 && canvasBox.height > 0);
   const coldCombatArt = await api(page, "combatArtStatus");

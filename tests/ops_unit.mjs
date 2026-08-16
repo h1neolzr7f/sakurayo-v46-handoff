@@ -38,6 +38,7 @@ assert.equal(first.ok, true);
 assert.equal(first.snapshot.dp, 2);
 assert.equal(first.snapshot.units.length, 1);
 assert.equal(first.snapshot.units[0].id, "aya");
+assert.ok(first.snapshot.units[0].pulse > 0);
 assert.ok(Math.abs(first.snapshot.units[0].x - 200) > 40);
 
 assert.equal(O.deploy("rion", "sayo", 200, 400, 430, 932).reason, "dp");
@@ -66,6 +67,7 @@ const ready = O.tick(1.2, {
   nearest: () => target,
 });
 assert.equal(ready.shots.length, 1);
+assert.equal(ready.snapshot.units[0].pulse, 0);
 assert.equal(ready.shots[0].id, "aya");
 assert.equal(ready.shots[0].weapon, "pistol");
 

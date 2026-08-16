@@ -58,7 +58,7 @@
       cost: COST,
       max: MAX,
       units: state.units.map(function (u) {
-        return { id: u.id, x: u.x, y: u.y, n: NAMES[u.id] || u.id };
+        return { id: u.id, x: u.x, y: u.y, n: NAMES[u.id] || u.id, pulse: u.pulse || 0 };
       }),
     };
   }
@@ -106,6 +106,7 @@
       x: pin.x,
       y: pin.y,
       clock: 0.2,
+      pulse: 0.72,
       weapon: WEAPON[id] || "rifle",
     });
     return { ok: true, reason: "", snapshot: snapshot() };
@@ -143,6 +144,7 @@
     var dmg = Math.max(1, (Number(world.dmg) || 8) * DMG * (Number(world.petPow) || 1));
     for (var i = 0; i < state.units.length; i++) {
       var u = state.units[i];
+      u.pulse = Math.max(0, (u.pulse || 0) - dt);
       u.clock -= dt;
       if (u.clock > 0) continue;
       u.clock = RATE;
