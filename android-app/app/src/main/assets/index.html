@@ -7298,6 +7298,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       crit ? 6 : 3,
       crit ? "#ffd36b" : match >= 1.28 ? "#78f6ff" : "#ff76ad",
     );
+    if (crit && !(opt.depth > 0)) combatImpact47(e.type === "boss" ? "bossCrit" : "crit", e);
     if (P.thunder && opt.source === "blade" && chance(P.thunder)) {
       let n = nearest(e.x, e.y, 170, e);
       if (n) {
@@ -7348,7 +7349,10 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     P.killsByType[e.type]=(P.killsByType[e.type]||0)+1;
     P.combo++;
     P.comboClock = 2.5;
-    if (e.elite && e.type !== "boss") P.eliteKills++;
+    if (e.elite && e.type !== "boss") {
+      P.eliteKills++;
+      combatImpact47("elite", e);
+    }
     if (e.guardFor && boss) {
       boss.guard = Math.max(0, (boss.guard || 0) - 1);
       toast(
@@ -7357,6 +7361,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     }
     if (e.type === "boss") {
       if(e.phaseStarted||e.phaseStarted===0)P.phaseTimes.push(Math.max(0,runTime-e.phaseStarted));
+      combatImpact47("bossKill", e);
       boss = null;
       fxStamp("shatter", e.x, e.y, { size: 118, life: 0.55 });
       draw();
@@ -9110,6 +9115,13 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function draw() {
     ctx.save();
     if (shake) ctx.translate(rnd(-shake / 2, shake / 2), rnd(-shake / 2, shake / 2));
+    if ((P.impactPunch47 || 0) > 0 && quality >= 0.62) {
+      const punch = clamp((P.impactPunch47 || 0) / 0.28, 0, 1);
+      const zoom = 1 + punch * (save.settings?.fx === 0 ? 0.008 : 0.016);
+      ctx.translate(W / 2, H / 2);
+      ctx.scale(zoom, zoom);
+      ctx.translate(-W / 2, -H / 2);
+    }
     background();
     drawArenaHazards();
     gems.forEach(gemDraw);
@@ -9680,13 +9692,13 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   const _shootAnim35=shoot;
   shoot=function(){const before=P.shotCount,result=_shootAnim35();if(P.shotCount!==before)P.animAttack=.16;return result;};
   const _skillAnim35=skill;
-  skill=function(){const before=P.skill,result=_skillAnim35();if(P.skill>before){P.animSkill=.42;fxStamp("skill",P.x,P.y,{size:86,life:.42});}return result;};
+  skill=function(){const before=P.skill,result=_skillAnim35();if(P.skill>before){P.animSkill=.42;fxStamp("skill",P.x,P.y,{size:86,life:.42});combatImpact47("skill",P);}return result;};
   const _dashAnim35=dash;
   dash=function(){const before=P.dash,result=_dashAnim35();if(P.dash>before)P.animDash=.32;return result;};
   const _damagePlayerAnim35=damagePlayer;
   damagePlayer=function(amount){const before=P.hp,result=_damagePlayerAnim35(amount);if(P.hp<before)P.animHit=.24;return result;};
   const _updateAnim35=update;
-  update=function(dt){const beforeX=P.x,beforeY=P.y,result=_updateAnim35(dt);P.animAttack=Math.max(0,(P.animAttack||0)-dt);P.animDash=Math.max(0,(P.animDash||0)-dt);P.animHit=Math.max(0,(P.animHit||0)-dt);P.animSkill=Math.max(0,(P.animSkill||0)-dt);P.outfitFade=Math.max(0,(P.outfitFade||0)-dt);P.outfitReveal=Math.max(0,(P.outfitReveal||0)-dt);P.animMoving=Math.hypot(P.x-beforeX,P.y-beforeY)>.08;return result;};
+  update=function(dt){const beforeX=P.x,beforeY=P.y,result=_updateAnim35(dt);P.animAttack=Math.max(0,(P.animAttack||0)-dt);P.animDash=Math.max(0,(P.animDash||0)-dt);P.animHit=Math.max(0,(P.animHit||0)-dt);P.animSkill=Math.max(0,(P.animSkill||0)-dt);P.outfitFade=Math.max(0,(P.outfitFade||0)-dt);P.outfitReveal=Math.max(0,(P.outfitReveal||0)-dt);P.impactPunch47=Math.max(0,(P.impactPunch47||0)-dt);P.animMoving=Math.hypot(P.x-beforeX,P.y-beforeY)>.08;return result;};
   hero=drawChar35;
   const OPENING35={
     sayo:null,
@@ -9886,7 +9898,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   const _startSensory37=startGame;startGame=function(){quality=save.settings?.fx===0?.62:1;const result=_startSensory37();if(save.tutorialDone)ensureMusic37();return result;};
   const _backMenuSensory37=backMenu;backMenu=function(){setMusic37(false);return _backMenuSensory37();};
   const _finishSensory37=finish;finish=function(win){setMusic37(false);return _finishSensory37(win);};
-  const _advanceBossPhase37=advanceBossPhase;advanceBossPhase=function(e,p){sound("phase");haptic37([45,30,70]);setMusic37(true,p);return _advanceBossPhase37(e,p);};
+  const _advanceBossPhase37=advanceBossPhase;advanceBossPhase=function(e,p){sound("phase");haptic37([45,30,70]);setMusic37(true,p);combatImpact47("phase",e||P);return _advanceBossPhase37(e,p);};
   const _damagePlayerSensory37=damagePlayer;damagePlayer=function(amount){const before=P.hp,result=_damagePlayerSensory37(amount);if(P.hp<before)haptic37(20);return result;};
   const _dashSensory37=dash;dash=function(){const before=P.dash,result=_dashSensory37();if(P.dash>before)haptic37(10);return result;};
   const _skillSensory37=skill;skill=function(){const before=P.skill,result=_skillSensory37();if(P.skill>before)haptic37([12,18,24]);return result;};
@@ -9999,7 +10011,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   MAIN_GOD_ITEMS36.cursedHeart={n:"诅咒遗物·猩红心核",i:"🫀",d:"全伤害 +25%，最大生命 -18%；高风险永久兑换，可在重置时返还",max:1,base:24,step:0,group:"特殊效果道具"};
 
   const _resetP39=resetP;
-  resetP=function(){const result=_resetP39();window.SakurayoLifecycle?.updatePresentation?.(99);P.perfectDodges=0;P.dodgeFlash=0;P.bossRule39="";P.signalLane39=null;if(isMainGodRun36()&&save.mainGod.cursedHeart){P.dmg*=1.25;P.skillPow*=1.25;P.spellPow*=1.25;P.bladePower*=1.25;P.maxHp*=.82;P.hp=Math.min(P.hp,P.maxHp);}return result;};
+  resetP=function(){const result=_resetP39();window.SakurayoLifecycle?.updatePresentation?.(99);P.perfectDodges=0;P.dodgeFlash=0;P.bossRule39="";P.signalLane39=null;P.impactPunch47=0;P.impactKind47="";P.impactNext47=0;if(isMainGodRun36()&&save.mainGod.cursedHeart){P.dmg*=1.25;P.skillPow*=1.25;P.spellPow*=1.25;P.bladePower*=1.25;P.maxHp*=.82;P.hp=Math.min(P.hp,P.maxHp);}return result;};
 
   function immediateThreat39(){
     for(const b of ebullets)if(Math.hypot(b.x-P.x,b.y-P.y)<78+(b.r||4))return true;
@@ -10514,6 +10526,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       mode:state,runMode:runMode36,stageKey:isMainGodRun36()?stage().key:`story-${selected}`,stageDuration:finite(stage().dur),stage44:window.SakurayoLifecycle?window.SakurayoLifecycle.snapshot(lifecycleWorld44()):null,viewport:{width:W,height:H,coordinates:"origin top-left; +x right; +y down"},stage:selected,runTime:finite(runTime),
       player:{character:P.character||save.character||"sayo",skin:save.skin||"default",outfit:liveOutfitLayer35()?.id||null,careerBranch:careerBranchId35(),outfitFade:finite(P.outfitFade),outfitReveal:finite(P.outfitReveal),outfitTitle:P.outfitRevealTitle||"",animation:state==="play"?charPose35():"idle",portraitMode:"static",direction:facingName36(),aim:{x:finite(P.aimX,P.fx),y:finite(P.aimY,P.fy),angle:finite(P.weaponAngle)},manualAim:!!P.manualAim,x:finite(P.x),y:finite(P.y),radius:finite(P.r),visualSize:PLAYER_GEOMETRY35.visualSize,footOffset:PLAYER_GEOMETRY35.footOffset,hp:finite(P.hp),maxHp:finite(P.maxHp),shield:finite(P.sh),maxShield:finite(P.maxSh),level:finite(P.level),xp:finite(P.xp),nextXp:finite(P.next),attackDamage:finite(P.dmg),attackInterval:finite(P.rate),attackRange:finite(P.range),multishot:finite(P.multi),pierce:finite(P.pierce),skillCooldown:finite(P.skill),dashCooldown:finite(P.dash),shotCount:finite(P.shotCount),meleeChain:finite(P.meleeChain),perfectDodges:finite(P.perfectDodges),initialCore:P.initialCore40||null,initialCoreLevel:finite(P.initialCoreLevel40),noUpgradeChallenge:!!P.noUpgradeChallenge40,upgradeChoices:finite(P.upgradeChoices40),baitLevel:finite(P.baitLevel40),baitSpawns:finite(P.baitSpawns40)},
       counts:{enemies:enemies.filter(e=>!e.dead).length,bullets:bullets.length,enemyBullets:ebullets.length,gems:gems.length,pets:pets.length,      ops:window.SakurayoOps?window.SakurayoOps.snapshot().units.length:0},
+      feedback:{kind:P.impactKind47||"",punch:finite(P.impactPunch47),shake:finite(shake),ascension:ascensionVisual47()},
       live:window.SakurayoLive?window.SakurayoLive.snapshot():null,
       ops:window.SakurayoOps?window.SakurayoOps.snapshot():null,
       boss:boss?{phase:boss.phase,hp:finite(boss.hp),maxHp:finite(boss.max),ratio:boss.max?finite(boss.hp/boss.max):0,guard:finite(boss.guard),dead:!!boss.dead,pointerVisible:bossPointerVisible38,rule:boss.rule39||"",adaptSource:boss.adaptSource39||null,x:finite(boss.x),y:finite(boss.y)}:null,
@@ -10544,6 +10557,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
           ready:outfitLayers35().filter(layer=>outfitSpecial35(layer.id)).map(layer=>({id:layer.id,idle:outfitLayerReady35(c,layer)})),
         };
       },
+      combatFeedback47(){return snapshot35().feedback;},
+      ascensionVisual47,
       forceOutfit45(kind,id,rank=1){
         if(kind==="form"){
           if(!["tech","bio","psi"].includes(id))throw new Error(`Unknown form: ${id}`);
@@ -10942,6 +10957,57 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     ctx.restore();
   }
   CONTENT41.hook("combat:after-draw",drawFusionAction46,"core.fusion-action46",27);
+  const IMPACT_PROFILE47=Object.freeze({
+    crit:Object.freeze({punch:.09,shake:2.2,stamp:null,size:24,haptic:0}),
+    bossCrit:Object.freeze({punch:.12,shake:3.8,stamp:null,size:34,haptic:0}),
+    skill:Object.freeze({punch:.18,shake:6,stamp:null,size:94,haptic:0}),
+    elite:Object.freeze({punch:.2,shake:7,stamp:"shatter",size:62,haptic:22}),
+    phase:Object.freeze({punch:.28,shake:10,stamp:"shatter",size:112,haptic:0}),
+    bossKill:Object.freeze({punch:.34,shake:13,stamp:null,size:138,haptic:36}),
+  });
+  function combatImpact47(kind,target){
+    if(state!=="play"&&kind!=="phase"&&kind!=="bossKill")return false;
+    const profile=IMPACT_PROFILE47[kind];
+    if(!profile)return false;
+    const now=runTime||0;
+    if((kind==="crit"||kind==="bossCrit")&&now<(P.impactNext47||0))return false;
+    if(kind==="crit"||kind==="bossCrit")P.impactNext47=now+.085;
+    const reduced=save.settings?.fx===0||quality<.7;
+    P.impactKind47=kind;
+    P.impactPunch47=Math.max(P.impactPunch47||0,profile.punch*(reduced?.62:1));
+    shake=Math.max(shake,profile.shake*(reduced?.62:1));
+    if(profile.stamp&&quality>=.62){
+      const x=Number.isFinite(target?.x)?target.x:P.x,y=Number.isFinite(target?.y)?target.y:P.y;
+      fxStamp(profile.stamp,x,y,{size:profile.size*(reduced?.78:1),life:Math.max(.16,profile.punch*1.9)});
+    }
+    if(profile.haptic)haptic37(profile.haptic);
+    return true;
+  }
+  const ASCENSION_SIGNATURE47=Object.freeze({tech:"多重演算环",bio:"血肉花冠",psi:"灵能星轨"});
+  function ascensionVisual47(){
+    const form=P.form||null;
+    const active=form&&state==="play"&&quality>=.7&&Math.max((P.animSkill||0)/.42,(P.outfitReveal||0)/2.4)>0;
+    return {form,active:!!active,signature:form?ASCENSION_SIGNATURE47[form]||"":""};
+  }
+  function drawAscensionAction47(){
+    const visual=ascensionVisual47();
+    if(!visual.active)return;
+    const q=clamp(Math.max((P.animSkill||0)/.42,(P.outfitReveal||0)/2.4),0,1),t=runTime||0;
+    const color=visual.form==="tech"?"#65eaff":visual.form==="bio"?"#ff6f94":"#c98aff";
+    ctx.save();ctx.translate(P.x,P.y);ctx.globalAlpha=.1+q*.17;ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=.9+q*1.05;
+    if(visual.form==="tech"){
+      for(let ring=0;ring<3;ring++){const sides=6,r=32+ring*15+q*7;ctx.save();ctx.rotate((ring%2?1:-1)*t*(.5+ring*.18));ctx.beginPath();for(let i=0;i<=sides;i++){const a=i*TAU/sides-Math.PI/2,x=Math.cos(a)*r,y=Math.sin(a)*r;i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();ctx.restore();}
+      for(let i=0;i<6;i++){const a=i*TAU/6+t*.25;ctx.beginPath();ctx.moveTo(Math.cos(a)*28,Math.sin(a)*28);ctx.lineTo(Math.cos(a)*(62+q*12),Math.sin(a)*(62+q*12));ctx.stroke();}
+    }else if(visual.form==="bio"){
+      for(let i=0;i<8;i++){const a=i*TAU/8-t*.28,r=35+q*20;ctx.save();ctx.translate(Math.cos(a)*r,Math.sin(a)*r);ctx.rotate(a);ctx.beginPath();ctx.ellipse(0,0,11+q*5,4+q*2,0,0,TAU);ctx.fill();ctx.restore();}
+      ctx.beginPath();ctx.arc(0,0,28+q*22,-.15,Math.PI+.15);ctx.stroke();ctx.beginPath();ctx.arc(0,0,28+q*22,Math.PI-.15,TAU+.15);ctx.stroke();
+    }else{
+      for(let i=0;i<3;i++){const r=30+i*16+q*8;ctx.save();ctx.rotate((i%2?1:-1)*t*(.55+i*.14));ctx.beginPath();ctx.ellipse(0,0,r,r*.46,i*.45,0,TAU);ctx.stroke();ctx.restore();}
+      for(let i=0;i<5;i++){const a=t*.7+i*TAU/5,r=38+(i%2)*19;ctx.save();ctx.translate(Math.cos(a)*r,Math.sin(a)*r);ctx.rotate(a);ctx.fillRect(-3-q*2,-3-q*2,6+q*4,6+q*4);ctx.restore();}
+    }
+    ctx.restore();
+  }
+  CONTENT41.hook("combat:after-draw",drawAscensionAction47,"core.ascension-action47",28);
   const _finish45=finish;
   finish=function(win){const result=_finish45(win);paintOutfitModal45("#result");return result;};
   const _finishMainGod45=finishMainGod36;

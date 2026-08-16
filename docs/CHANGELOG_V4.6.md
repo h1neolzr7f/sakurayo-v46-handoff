@@ -61,3 +61,13 @@
 - 开发入口及最终单入口通过 3 组 unit、8 项 framework、5 项 landscape、52 项 browser、证词、干员与两组 visual 回归。
 - 最终单入口 SHA-256：`A948D837EB44CBFEAA01EF479857C66F746520B49EC5FE83C884F68774EDB598`。
 - Android Debug `assembleDebug` / `lintDebug` 成功，1190 个 WebP、无 INTERNET、v1/v2 签名通过；最终 APK SHA-256：`CE760C4A3BF890445768812E3D9452233625EE2BC05EA7914C9522C03E3C8291`。
+
+## 战斗峰值反馈精修（2026-08-16）
+
+- 暴击、Boss 暴击、主动技能、精英击破、Boss 转阶段与 Boss 击破按强度分层驱动短时镜头冲击、屏幕震动和可关闭震动，不增加常驻实体。
+- 暴击反馈设置 85ms 门禁，避免高攻速、多段和连锁伤害产生持续抖屏；精简特效模式同步降低镜头位移与震幅。
+- 科技、生物、灵能飞升分别获得「多重演算环」「血肉花冠」「灵能星轨」签名短时演出，只在换装揭示和主动技能窗口绘制。
+- 新演出复用 Canvas 与已有 `combat:after-draw` 生命周期，没有新增外部资源、网络依赖或主循环包装层。
+- Browser smoke 新增主动技能冲击、三相飞升签名和 Boss 阶段反馈断言；完整 `npm test`、寻访视觉回归与二次 Browser smoke 均通过。
+- 与第二轮角色技能、Boss 阶段字幕、分段血条和 Q 版干员演出完成无损合并；寻访与战斗视觉门禁同时通过。
+- 最终单入口 SHA-256：`6360528F85C687491947255C4711A192037746928CB3433530CB0D2FB1EB8E6B`；Debug APK SHA-256：`48FEA71AD7E422DBF67993BFFED1C2EA0D8BA2A2748FD219EBB8190EAA45FD9E`。

@@ -5,10 +5,10 @@
   "entry": "src/index.html",
   "release_html": "release/樱夜尸潮_V4.6.0_单文件.html",
   "android_debug_apk": "release/樱夜尸潮_V4.6.0_Android_Debug.apk",
-  "source_sha256": "9E3AB80CDF6433964CA8988F7AA138CE1915788CD29898BC702DAB35756AEEC7",
-  "release_html_sha256": "A948D837EB44CBFEAA01EF479857C66F746520B49EC5FE83C884F68774EDB598",
-  "android_bundle_sha256": "A948D837EB44CBFEAA01EF479857C66F746520B49EC5FE83C884F68774EDB598",
-  "android_debug_apk_sha256": "CE760C4A3BF890445768812E3D9452233625EE2BC05EA7914C9522C03E3C8291",
+  "source_sha256": "88154B09429FDE5C0597BD08A08FE4D3DD2FFB20486DBC8C80D044138E01B43A",
+  "release_html_sha256": "6360528F85C687491947255C4711A192037746928CB3433530CB0D2FB1EB8E6B",
+  "android_bundle_sha256": "6360528F85C687491947255C4711A192037746928CB3433530CB0D2FB1EB8E6B",
+  "android_debug_apk_sha256": "48FEA71AD7E422DBF67993BFFED1C2EA0D8BA2A2748FD219EBB8190EAA45FD9E",
   "save_key": "sakurayoV3",
   "runtime": "offline HTML5 Canvas / localStorage",
   "target": [
@@ -53,6 +53,8 @@
     "weapon_alignment": "passed",
     "directional_slash": "passed",
     "old_save_migration": "passed",
-    "sixteen_card_roster": "passed"
+    "sixteen_card_roster": "passed",
+    "layered_combat_feedback": "passed",
+    "ascension_signatures": 3
   }
 }
