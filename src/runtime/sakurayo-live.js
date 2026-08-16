@@ -16,6 +16,11 @@
   // CubismLookController damping ~0.15s, then return to center when idle.
   var LOOK = Object.freeze({ damp: 0.16, maxX: 7.2, maxY: 4.8, maxTX: 1.35, maxTY: 0.7, idle: 1.35 });
   var IDLE = Object.freeze({ swayA: 4.7, swayB: 7.3, drift: 5.6, breath: 3.15, hair: 0.22 });
+  var PROFILES = Object.freeze({
+    sayo: Object.freeze({ sway: 0.92, breath: 1, look: 0.92, motion: 0.94 }),
+    aya: Object.freeze({ sway: 0.72, breath: 0.86, look: 1.12, motion: 1.08 }),
+    rion: Object.freeze({ sway: 0.56, breath: 0.74, look: 0.82, motion: 0.78 }),
+  });
   var MOTIONS = Object.freeze({
     tapHead: Object.freeze({ dur: 0.92, fadeIn: 0.1, fadeOut: 0.26, lean: -2.6, lift: 0.7, lookY: -0.38 }),
     tapBody: Object.freeze({ dur: 1.12, fadeIn: 0.12, fadeOut: 0.34, lean: 3.1, lift: -0.45, lookY: 0.18 }),
@@ -109,6 +114,7 @@
       motionT: 0,
       lastKind: "",
       test: !!opts.test,
+      profileId: PROFILES[opts.character] ? opts.character : "sayo",
     };
   }
 
@@ -141,6 +147,7 @@
 
   function stepState(state, dt, rand) {
     dt = clamp(Number(dt) || 0, 0, 0.05);
+    var profile = PROFILES[state.profileId] || PROFILES.sayo;
     state.t += dt;
     state.idleLook += dt;
     if (state.idleLook > LOOK.idle) {
@@ -193,13 +200,13 @@
       }
     }
 
-    var lean = idle.sway + (motion ? motion.lean * weight : 0);
-    var lift = idle.breath * 0.85 + (motion ? motion.lift * weight : 0);
-    var lookY = state.lookY + (motion ? motion.lookY * weight : 0);
+    var lean = idle.sway * profile.sway + (motion ? motion.lean * weight * profile.motion : 0);
+    var lift = idle.breath * 0.85 * profile.breath + (motion ? motion.lift * weight * profile.motion : 0);
+    var lookY = (state.lookY + (motion ? motion.lookY * weight : 0)) * profile.look;
     return {
       sway: lean,
-      x: idle.x + state.lookX * 0.35,
-      breath: idle.breath,
+      x: idle.x * profile.sway + state.lookX * 0.35 * profile.look,
+      breath: idle.breath * profile.breath,
       lift: lift,
       hair: state.hair,
       lookX: state.lookX,
@@ -302,6 +309,7 @@
     if (puppet && puppet.root === root) {
       puppet.opts = opts;
       puppet.state.test = !!opts.test;
+      puppet.state.profileId = PROFILES[opts.character] ? opts.character : "sayo";
       root.classList.add("livePuppet46");
       return snapshot();
     }
@@ -311,7 +319,7 @@
     puppet = {
       root: root,
       nodes: nodes,
-      state: createState({ test: !!opts.test }),
+      state: createState({ test: !!opts.test, character: opts.character }),
       opts: opts,
       last: 0,
       raf: 0,
@@ -380,6 +388,7 @@
       lastKind: puppet.state.lastKind,
       lookX: puppet.state.lookX,
       lookY: puppet.state.lookY,
+      profile: puppet.state.profileId,
       t: puppet.state.t,
     };
   }
@@ -388,6 +397,7 @@
     version: VERSION,
     BLINK: BLINK,
     LOOK: LOOK,
+    PROFILES: PROFILES,
     MOTIONS: MOTIONS,
     nextBlinkWait: nextBlinkWait,
     blinkEnvelope: blinkEnvelope,

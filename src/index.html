@@ -7264,6 +7264,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (L) L.bindHeroTap(root, () => grantCheat46(), kind => Live && Live.trigger(kind));
     if (Live) Live.attach(root, {
       test: TEST_MODE,
+      character: save.character || "sayo",
       hidden() {
         const menu = $("#menu");
         if (!menu || menu.classList.contains("hidden") || document.hidden) return true;
