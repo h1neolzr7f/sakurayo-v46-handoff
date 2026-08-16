@@ -54,3 +54,10 @@
 - 开发入口、离线单入口均通过静态、3 组 unit、8 项 framework、证词、干员、52 项 browser smoke 与两组 visual。
 - 单入口 SHA-256：`415844A549AD6C842F8CAEF3D3014506F2D47D59DAEAB6263073445571612C4C`。
 - Android Debug `assembleDebug` / `lintDebug` 成功，1190 个 WebP、无 INTERNET、v1/v2 签名通过；APK SHA-256：`F0F44F12FE8D7FD24F41C46DC06B107EE6A9E39A360B7F17133B233430B86A0D`。
+
+## 合并验收（2026-08-16）
+
+- 横屏战斗导演与第二轮成熟化已合并到指定续作分支；两套断言同时纳入 `npm test`，寻访与战斗视觉同时纳入 `npm run test:visual`。
+- 开发入口及最终单入口通过 3 组 unit、8 项 framework、5 项 landscape、52 项 browser、证词、干员与两组 visual 回归。
+- 最终单入口 SHA-256：`A948D837EB44CBFEAA01EF479857C66F746520B49EC5FE83C884F68774EDB598`。
+- Android Debug `assembleDebug` / `lintDebug` 成功，1190 个 WebP、无 INTERNET、v1/v2 签名通过；最终 APK SHA-256：`CE760C4A3BF890445768812E3D9452233625EE2BC05EA7914C9522C03E3C8291`。

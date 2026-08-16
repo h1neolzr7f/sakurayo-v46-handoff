@@ -1,5 +1,12 @@
 Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先阅读根目录的 AGENTS.md、README_FIRST.md 和 CODEX_TASK.md，基于 src/index.html 继续开发，不要使用旧版本文件。
 
+## 2026-08-16 V4.6 双线成熟化合并验收
+
+- 将横屏战斗导演与从 `613c85c` 开始的第二轮成熟化完整合并到指定续作分支，保留双方的演出、信息优先级和自动回归。
+- `npm test`、`npm run test:visual` 通过；最终单入口再次通过 8 项 framework、5 项 landscape 和 52 项完整流程。
+- Android `assembleDebug` / `lintDebug` 通过；无 INTERNET 权限，1190 WebP，v1/v2 Debug 签名通过。
+- 最终单入口 SHA-256 `A948D837EB44CBFEAA01EF479857C66F746520B49EC5FE83C884F68774EDB598`；Debug APK SHA-256 `CE760C4A3BF890445768812E3D9452233625EE2BC05EA7914C9522C03E3C8291`。
+
 ## 2026-08-16 V4.6 横屏战斗导演精修
 
 - 补上 Android 横屏主路径此前缺少的完整视觉验收：新增 `tests/landscape_smoke.mjs`，在 932×430 固定回归作战简报、战场、Boss 阶段机制条、战术结算、操作可见性与离线门禁。
