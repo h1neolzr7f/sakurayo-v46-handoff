@@ -57,6 +57,7 @@ async function api(page, method, ...args) {
 }
 
 async function shot(page, name, fullPage = true) {
+  await page.waitForTimeout(380);
   const output = path.join(artifactDir, name);
   await page.screenshot({ path: output, fullPage });
   screenshots.push(output);
@@ -894,8 +895,11 @@ try {
     assert.equal(phaseState.boss.phase, phase);
     assert.equal(phaseState.mode, "dialogue");
     const phaseVisual = await api(page, "bossVisualState412");
+    const phaseDirection = await api(page, "cutscene44");
     assert.equal(phaseVisual.previous, phase - 1);
     assert.ok(phaseVisual.transform > 1);
+    assert.equal(phaseDirection.phase, `PHASE 0${phase}`);
+    assert.ok(phaseDirection.phaseCue.length >= 8, `阶段 ${phase} 缺少机制应对提示`);
     await api(page, "dismissDialogue");
     assert.equal((await state(page)).mode, "play");
     if (phase === 2) await shot(page, "04a-boss-transform.png");

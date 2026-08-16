@@ -60,6 +60,7 @@
 | 仿 Live2D | 真实随机眨眼 / 注视 / 点触，去掉卡顿滤镜 | 已落地 |
 | D | 16 卡寻访；真实闭眼帧；商店/档案换皮；六套签名融合动作 | **已落地** |
 | E | 全量回归、单入口、Android Debug、CHANGELOG、最终报告 | **已落地；正式签名待原证书** |
+| F | 横屏作战简报、四阶段机制条、左右对白、双栏战术结算 | **已落地** |
 
 ### 下一步（按优先级）
 
@@ -67,7 +68,8 @@
 2. 使用原正式证书构建 Release，并在至少一台横屏 Android 实体设备验证覆盖安装、触控、刘海安全区、发热和长期帧率。
 3. 若继续升级站桩，只做像素稳定的分层/I2V 路线；不得退回待机与眨眼同图，也不要用高开销滤镜伪装动画。
 4. 六套签名融合已有三角色 `anim_skill.webp` / `anim_dash.webp`。新增动作仍须缺图回退，禁止借错融合。
-5. 日常验证优先 `npm test && npm run test:visual`；Windows 仍可运行 `powershell -File tools/verify.ps1`。
+5. 横屏主路径已有 `tests/landscape_smoke.mjs`，不得只跑 430×932 就声称 Android 横屏可用。
+6. 日常验证优先 `npm test && npm run test:visual`；Windows 仍可运行 `powershell -File tools/verify.ps1`。
 
 ### 明确不做
 
@@ -279,14 +281,9 @@ node tests/ops_smoke.mjs
 powershell -File tools/verify.ps1
 ```
 
-`verify.ps1` 目前包含：`static_check`、各 runtime 语法、`lobby_unit`、`live_unit`、`ops_unit`、`ops_smoke`、`framework_smoke`、`browser_smoke`。
+`verify.ps1` 目前包含：`static_check`、内容包、各 runtime 语法、3 个 unit、ops / testimony / landscape / framework / browser smoke 与 gacha visual。
 
-**没有**自动跑：
-
-- `tests/testimony_smoke.mjs`
-- `tests/gacha_visual.mjs`（会出 932×430 截图到 `tests/artifacts/gacha/`，该目录 gitignore）
-
-改证词或寻访视觉时请单独跑这两项。`browser_smoke.mjs` 断言版本 `"4.6.0"`，主视口 430×932；竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。
+`landscape_smoke.mjs` 固定验证 932×430 作战简报、战场、Boss 阶段机制条和战术结算；`browser_smoke.mjs` 仍以 430×932 做大部分兼容回归并断言版本 `"4.6.0"`。竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。
 
 发版（用户明确要求再做）：
 
