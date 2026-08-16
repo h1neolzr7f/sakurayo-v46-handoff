@@ -443,7 +443,11 @@ try {
       assert.ok(skillState.player.skillCooldown > 0);
       assert.equal(skillState.stage44.presentation.skill, "sayo");
       assert.ok(skillState.stage44.presentation.skillTime > 0);
-      pass("触控摇杆、冲刺、主动技能与角色技能演出");
+      const skillFeedback = await api(page, "combatFeedback47");
+      assert.equal(skillFeedback.kind, "skill");
+      assert.ok(skillFeedback.punch > 0);
+      assert.ok(skillFeedback.shake >= 5);
+      pass("触控摇杆、冲刺、主动技能、角色演出与镜头冲击");
 
       const freshOutfit = await api(page, "outfitStatus45");
       const freshSnap = await state(page);
@@ -485,6 +489,14 @@ try {
         assert.equal(formStatus.live, "form_tech");
         assert.equal((await state(page)).player.outfit, "form_tech");
       }
+      for (const [form, signature] of [["tech", "多重演算环"], ["bio", "血肉花冠"], ["psi", "灵能星轨"]]) {
+        await api(page, "forceOutfit45", "form", form);
+        const visual = await api(page, "ascensionVisual47");
+        assert.equal(visual.form, form);
+        assert.equal(visual.signature, signature);
+        assert.equal(visual.active, true);
+      }
+      await api(page, "forceOutfit45", "form", "tech");
       const fusionSnap = await api(page, "forceOutfit45", "fusion", "magitech");
       assert.equal(fusionSnap.build.fusion, "magitech");
       assert.ok(fusionSnap.player.outfitFade > 0);
@@ -910,6 +922,10 @@ try {
     assert.ok(phaseDirection.phaseCue.length >= 8, `阶段 ${phase} 缺少机制应对提示`);
     assert.equal(phaseState.stage44.presentation.kind, "phase");
     assert.equal(phaseState.stage44.presentation.phase, phase);
+    const phaseFeedback = await api(page, "combatFeedback47");
+    assert.equal(phaseFeedback.kind, "phase");
+    assert.ok(phaseFeedback.punch > 0);
+    assert.ok(phaseFeedback.shake >= 8);
     await api(page, "dismissDialogue");
     await page.evaluate(() => window.advanceTime(180));
     assert.equal((await state(page)).mode, "play");

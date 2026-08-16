@@ -1,5 +1,14 @@
 Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先阅读根目录的 AGENTS.md、README_FIRST.md 和 CODEX_TASK.md，基于 src/index.html 继续开发，不要使用旧版本文件。
 
+## 2026-08-16 V4.6 战斗峰值反馈精修
+
+- 暴击、主动技能、精英击破、Boss 阶段与 Boss 击破增加分级镜头冲击、震动与可关闭触觉反馈；高攻速暴击使用 85ms 门禁，精简特效模式自动降档。
+- 科技 / 生物 / 灵能三相飞升分别增加多重演算环、血肉花冠、灵能星轨短时签名演出，仅在换装揭示和技能窗口绘制，不增加战斗实体。
+- 新绘制通过 `core.ascension-action47` 生命周期 Hook 接入，没有新增主循环包装或存档字段。
+- Framework smoke 固定新 Hook 顺序；Browser smoke 固定验证技能反馈、三相签名与阶段冲击。`npm test`、`npm run test:visual` 和二次 Browser smoke 全部通过。
+- 单入口 / Android bundle SHA-256：`6360528F85C687491947255C4711A192037746928CB3433530CB0D2FB1EB8E6B`。
+- Debug APK SHA-256：`48FEA71AD7E422DBF67993BFFED1C2EA0D8BA2A2748FD219EBB8190EAA45FD9E`。
+
 ## 2026-08-16 V4.6 双线成熟化合并验收
 
 - 将横屏战斗导演与从 `613c85c` 开始的第二轮成熟化完整合并到指定续作分支，保留双方的演出、信息优先级和自动回归。
@@ -15,8 +24,8 @@ Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先
 - 932×430 对白改为左角色、右情报构图；结算改为双栏战术报告，构筑、伤害、阶段耗时、诊断、结局和两个操作按钮无需滚动即可同时看到。
 - 横屏吐槽电台下移，避开战场中心、双干员坞和技能按钮。Browser smoke 截图统一等待淡入稳定，视觉产物不再捕获 0% 透明帧。
 - 源码、离线单入口与 Android 包内入口通过完整回归；Android `assembleDebug` / `lintDebug` 成功，无 INTERNET 权限，v1/v2 Debug 签名通过，包内 1190 个 WebP。
-- 单入口 / Android bundle SHA-256：`FEE632E564D26DFC55AE62B06BB9A0E6FCD6A37EE02063634F2AC6BEA6676150`。
-- Debug APK SHA-256：`A2AD177FEBBE7F4477AE23B037BDECD0318E052BB553451100C2801416EA9380`。
+- 单入口 / Android bundle SHA-256：`725295F88C332247C12F0BEDE46D5F5755009FA1B6FB22EEBC412649C016EDF1`。
+- Debug APK SHA-256：`CEC30991DFE4A987AE2429EE939C0FE940309B5996163E596C488EFCF229B80C`。
 
 ## 2026-08-16 V4.6 第二轮成熟化完成
 

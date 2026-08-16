@@ -65,7 +65,7 @@ try {
   assert.match(feedbackAssets.audio.reward, /reward\.ogg$/);
   assert.match(feedbackAssets.vfx.muzzle, /muzzle\.png$/);
   const lifecycleHooks = await oldPage.evaluate(() => window.SakurayoContent.hookStatus());
-  assert.deepEqual(lifecycleHooks["combat:after-draw"].map(entry => entry.owner), ["core.ops46", "core.boss-pointer38", "core.outfit-reveal45", "core.fusion-action46", "core.mechanics39", "core.boss-stage412", "core.combat-presentation46"]);
+  assert.deepEqual(lifecycleHooks["combat:after-draw"].map(entry => entry.owner), ["core.ops46", "core.boss-pointer38", "core.outfit-reveal45", "core.fusion-action46", "core.ascension-action47", "core.mechanics39", "core.boss-stage412", "core.combat-presentation46"]);
   assert.equal(lifecycleHooks["combat:after-update"].some(entry => entry.owner === "core.boss-art412"), true);
   assert.equal(lifecycleHooks["boss:after-phase"].some(entry => entry.owner === "core.combat-presentation46"), true);
   pass("官方扩展通过注册表提供服饰、商店、成就和档案数据");
