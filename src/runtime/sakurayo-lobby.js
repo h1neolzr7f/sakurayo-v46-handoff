@@ -169,7 +169,7 @@
     "}" +
     "html.landscape46 #menu.homeDock46 .heroLive46{pointer-events:none;left:0;width:64%;top:0;bottom:0}" +
     "html.landscape46 #menu.homeDock46 .menu{width:min(34vw,360px);max-width:360px;margin-left:auto}" +
-    "html.landscape46 .wishHero46{left:-2%;width:46%;height:124%;bottom:-8%}" +
+    "html.landscape46 .wishHero46{left:-4%;width:52%;height:142%;bottom:-13%}" +
     "html.landscape46 .wishTitle46{right:4%;max-width:46%}" +
     "html.landscape46 .wishDock46,html.landscape46 .wishPity46{left:46%}" +
     "html.landscape46 #rosterWall46{grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}" +

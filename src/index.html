@@ -6728,6 +6728,15 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       const track=pool.find(item=>item.paused||item.ended)||pool[0],gain=clamp((save.settings?.master??.8)*(save.settings?.sfx??.8)*volume,0,1);track.pause();track.currentTime=0;track.volume=gain;track.play().catch(()=>{});return true;
     }catch(error){CONTENT41?.guard("official.feedback","audio:"+key,()=>{throw error;});return false;}
   }
+  let navFeedbackAt411=0;
+  document.addEventListener("click",event=>{
+    const now=performance.now();
+    if(now-navFeedbackAt411<70)return;
+    const target=event.target?.closest?.(".drawer .close,[data-open],[data-character]");
+    if(!target)return;
+    navFeedbackAt411=now;
+    playFeedback411(target.matches(".drawer .close")?"close":target.matches("[data-open]")?"open":"click",.2);
+  },{passive:true});
   const _soundFeedback411=sound;
   sound=function(key){const result=_soundFeedback411(key),sample={level:"reward",ach:"reward",win:"reward",over:"error",phase:"phase",boss:"boss"}[key];if(sample)playFeedback411(sample,key==="boss"?.44:.3);return result;};
   addEventListener("pointerdown",event=>{const button=event.target.closest?.("button");if(!button||button.disabled||button.closest("#hud"))return;playFeedback411(button.classList.contains("close")||button.id==="exploreClose41"?"close":button.dataset.open?"open":"click",.2);},{capture:true,passive:true});
@@ -7225,7 +7234,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const name = root.querySelector(".heroLiveName46 b");
     const weapon = root.querySelector(".heroLiveName46 small");
     if (name) name.textContent = c.name;
-    if (weapon) weapon.textContent = c.weapon;
+    if (weapon) weapon.textContent = `${c.role} · ${c.weapon}`;
     const livePath = skinId === "default" ? `characters/${c.id}/default/live_idle.webp` : "";
     const key = `${c.id}|${skinId}|${livePath || charArtPath35(c, "dialogue", sk)}`;
     if (key === heroLiveKey46) return;
