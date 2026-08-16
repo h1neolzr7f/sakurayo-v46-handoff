@@ -89,7 +89,7 @@ assert.equal(state.mode, "dialogue");
 assert.equal(state.stage44.presentation.kind, "phase");
 assert.equal(state.stage44.presentation.phase, 2);
 await api("dismissDialogue");
-await page.evaluate(() => window.advanceTime(17));
+await page.evaluate(() => window.advanceTime(180));
 assert.equal(await page.locator("#bossPhaseGates46 i").count(), 3);
 await page.screenshot({
   path: path.join(artifactDir, "boss-phase-2-932x430.png"),
