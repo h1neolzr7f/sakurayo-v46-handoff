@@ -2720,6 +2720,26 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     );
   }
   /* ================= GAME FLOW / RUN LIFECYCLE ================= */
+  function operationBriefing44() {
+    const c = char35();
+    const s = stage();
+    const mg = typeof isMainGodRun36 === "function" && isMainGodRun36();
+    const chap = Math.max(1, Math.min(4, s.id || selected || 1));
+    const bg = mg
+      ? artUrl("ui/cover_v36_main_god.webp")
+      : artUrl(`stages/stage_${chap}/battle_bg.webp`);
+    const portrait = artUrl(charArtPath35(c, "battle", skin35()));
+    return [{
+      kicker: `${mg ? "REINCARNATION ORDER" : "OPERATION ORDER"} · ${s.no}`,
+      title: s.short || s.name,
+      line: mg
+        ? `${c.short}进入监管回廊。奖励点只在击破监察投影后结算。`
+        : `${c.short}执行节点回收。目标：${s.boss}。四阶段机制已写入战术终端。`,
+      bg,
+      portrait,
+      hold: 1800,
+    }];
+  }
   function startGame() {
     window.SakurayoCutscene?.stopVictory?.();
     window.SakurayoCutscene?.stopType?.();
@@ -2760,18 +2780,30 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     $("#warning").classList.add("hidden");
     $("#hud").classList.remove("hidden");
     $("#stageHud").textContent = stage().short;
-    showDialogue(openingDialogue(), () => {
-      state = "play";
-      const radio44 = window.SakurayoLifecycle?.radio?.(lifecycleWorld44(), save.character);
-      const hint44 = window.SakurayoLifecycle?.hint?.(lifecycleWorld44());
-      showBanter(["雨宫凛", radio44 || "电台接通。你负责走位，构筑去暂停页看。"], true);
-      if (hint44 && !P.banterSeen.has("ground44")) {
-        P.banterSeen.add("ground44");
-        toast(hint44);
-      }
-      last = performance.now();
-      scheduleLoop();
-    }, "opening");
+    const enterOperation = () => showDialogue(openingDialogue(), () => {
+        state = "play";
+        const radio44 = window.SakurayoLifecycle?.radio?.(lifecycleWorld44(), save.character);
+        const hint44 = window.SakurayoLifecycle?.hint?.(lifecycleWorld44());
+        showBanter(["雨宫凛", radio44 || "电台接通。你负责走位，构筑去暂停页看。"], true);
+        if (hint44 && !P.banterSeen.has("ground44")) {
+          P.banterSeen.add("ground44");
+          toast(hint44);
+        }
+        last = performance.now();
+        scheduleLoop();
+      }, "opening");
+    const mg = typeof isMainGodRun36 === "function" && isMainGodRun36();
+    const profile = window.SakurayoLifecycle?.stageProfile?.(selected, { mainGod: mg });
+    if (window.SakurayoCutscene?.playBriefing) {
+      window.SakurayoCutscene.playBriefing({
+        testMode: TEST_MODE,
+        ground: profile?.ground || "torii",
+        beats: operationBriefing44(),
+        onDone: enterOperation,
+      });
+    } else {
+      enterOperation();
+    }
   }
   function backMenu() {
     window.SakurayoCutscene?.stopType?.();
@@ -3072,6 +3104,25 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       ]
     );
   }
+  function bossPhaseCue(p) {
+    const sid = stage().id;
+    const phase = clamp(Math.floor(Number(p) || 1), 1, 4);
+    if (typeof isMainGodRun36 === "function" && isMainGodRun36()) {
+      return [
+        "权限锁定 · 观察回廊弹道",
+        "监管增压 · 保留冲刺窗口",
+        "轮回收束 · 优先清理召唤",
+        "最终审查 · 打破投影核心",
+      ][phase - 1];
+    }
+    const cues = {
+      1: ["百目锁定 · 远离目印", "镜卫护盾 · 优先击破镜卫", "恐惧扩散 · 观察弹幕缺口", "百目狂视 · 持续移动"],
+      2: ["雨幕定位 · 避开重叠射线", "干扰尸群 · 保留主动技能", "暴雨协议 · 治疗与瞄准受阻", "删除程序 · 弹幕全面加速"],
+      3: ["剑冢开阵 · 不要停在剑域", "亡剑追猎 · 近身后立刻撤离", "封灵剑卫 · 先破护阵", "万剑归坟 · 借冲刺穿过缺口"],
+      4: ["镜核读取 · 暴露主构筑", "反构筑镜像 · 切换伤害来源", "镜卫封锁 · 先解除防护", "三相归零 · 抢在适应前决胜"],
+    };
+    return cues[sid]?.[phase - 1] || `阶段 ${phase} · 观察地面危险`;
+  }
   function advanceBossPhase(e, p) {
     if (!e || e.dead || p <= e.phase) return false;
     if(e.phaseStarted||e.phaseStarted===0){P.phaseTimes.push(Math.max(0,runTime-e.phaseStarted));}
@@ -3308,6 +3359,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       stageNo: stage()?.no,
       stageName: stage()?.short || stage()?.name,
       ground: profile?.ground || "torii",
+      phase: kind === "phase" ? boss?.phase || 1 : kind === "boss" ? 1 : 0,
+      phaseCue: kind === "phase" || kind === "boss" ? bossPhaseCue(kind === "phase" ? boss?.phase || 1 : 1) : "",
     });
     $("#dialogue").classList.remove("hidden");
     nextDialogue();

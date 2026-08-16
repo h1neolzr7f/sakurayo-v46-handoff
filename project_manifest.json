@@ -1,14 +1,14 @@
 {
   "project": "樱夜·尸潮",
   "version": "4.6.0",
-  "subtitle": "横屏镜界 · 十六证词与双干员协同",
+  "subtitle": "横屏镜界 · 作战简报与四阶段战斗导演",
   "entry": "src/index.html",
   "release_html": "release/樱夜尸潮_V4.6.0_单文件.html",
   "android_debug_apk": "release/樱夜尸潮_V4.6.0_Android_Debug.apk",
-  "source_sha256": "2929817B30B5DF0435FF6590F74E7A53F87EBD47EBE4FB07C4F6561BD17E130B",
-  "release_html_sha256": "4B0F2E76E1BC860453F42E96FE2738E36295D6F0E0E6ACDC7906603BA1295C14",
-  "android_bundle_sha256": "4B0F2E76E1BC860453F42E96FE2738E36295D6F0E0E6ACDC7906603BA1295C14",
-  "android_debug_apk_sha256": "1F3AABB2619247BCDDB6932A9114A5A9FE476AB6074062F698B5C1152BE9C334",
+  "source_sha256": "22C4A66A47604BB33319920A81B6EB10FDCD70CCC7CDE96354C2D2334E10465C",
+  "release_html_sha256": "FEE632E564D26DFC55AE62B06BB9A0E6FCD6A37EE02063634F2AC6BEA6676150",
+  "android_bundle_sha256": "FEE632E564D26DFC55AE62B06BB9A0E6FCD6A37EE02063634F2AC6BEA6676150",
+  "android_debug_apk_sha256": "A2AD177FEBBE7F4477AE23B037BDECD0318E052BB553451100C2801416EA9380",
   "save_key": "sakurayoV3",
   "runtime": "offline HTML5 Canvas / localStorage",
   "target": [
@@ -31,6 +31,7 @@
     "unit_suites": 3,
     "framework_smoke": 8,
     "browser_smoke": 52,
+    "landscape_smoke": 5,
     "gacha_visual": "passed",
     "viewports": [
       "430x932",
