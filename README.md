@@ -1,18 +1,143 @@
-# 樱夜·尸潮 — 接手说明
+# 樱夜·尸潮 V4.6 — Cursor / GPT-5.6 Sol 总接手指令
 
-这是 **v4.6.0 私有开发快照**，给下一位 AI / 维护者继续做横屏二游大厅和局内干员。公开玩家仓是另一个地址：
+> **这是本仓最高优先级的开发入口。** 交给 Cursor / GPT-5.6 Sol 后，目标不是继续写方案，而是把游戏实际做到当前能力范围内尽可能好的二次元游戏成品。用户希望采用“甩手掌柜”模式：除真正无法绕过的外部阻塞外，不要频繁询问，自己审计、决策、实现、测试、返工、继续优化。
 
-https://github.com/h1neolzr7f/sakurayo-zombietide
+当前开发仓：`h1neolzr7f/sakurayo-v46-handoff`  
+公开玩家仓：`h1neolzr7f/sakurayo-zombietide`  
+当前源码版本：**4.6.0，未发版，不要开工就随意改版本号。**
 
-已发布 APK 仍是 **v4.4.6**。本仓源码已到 4.6.0，**未发版、不要擅自升到 4.6.1**。
+## 1. 唯一总目标：效果优先
 
-完整需求、分期、选择器和陷阱见 **[docs/HANDOFF.md](docs/HANDOFF.md)**。硬约束见 **[AGENTS.md](AGENTS.md)**。一页清单见 **[README_FIRST.md](README_FIRST.md)**。
+《樱夜·尸潮》是横屏、手机端、二次元、离线肉鸽射击游戏。现有核心包括三角色（月城小夜 / 神代绫 / 黑羽凛音）、14 基础职业、28 转职、融合、科技/生物/灵能三相飞升、四章、Boss 多阶段、主神空间、触控摇杆/冲刺/主动技能、局外大厅、寻访、名册、商店、关卡、档案、证词模式和局内 DP 干员。
 
-## 3 分钟上手
+**最终体验优先于“少改代码”“维持原架构”“工作量小”。**
 
-1. 读 `docs/HANDOFF.md`、`AGENTS.md`、`docs/PLAN_V46_ERYOU.md`。
-2. 用浏览器打开 `src/index.html`（美术在 `android-app/app/src/main/assets/game/art`）。
-3. 先跑短测，不要一上来就跑完整 `browser_smoke`：
+如果保留当前 HTML/Canvas/WebView 架构可以达到最佳结果，就继续沿用；如果经过实际评估后，迁移到更适合的引擎能显著提高最终画面、动画、特效、UI、资源管理、性能、可测试性或长期维护性，则**允许换引擎、允许大规模重构、允许重做表现层**。工作量大本身不是否决理由。
+
+可评估 Unity、Godot、其他合适方案，也可以保留现架构。不要因为“以前文档写了不换引擎”就机械禁止迁移；README 当前规则覆盖旧文档中的这一条。迁移必须有明确收益，并保证现有核心玩法、存档迁移方案和可玩闭环，不允许为了技术炫技把项目重写成半成品。
+
+## 2. 开工方式：先审计，再直接做
+
+先完整阅读：
+
+- `docs/HANDOFF.md`
+- `AGENTS.md`
+- `README_FIRST.md`
+- `docs/PLAN_V46_ERYOU.md`
+- `docs/MAINTAIN.md`
+- `ARCHITECTURE_MAP.md`
+- `progress.md`
+- 当前代码、资源、测试和 Android 工程
+
+这些文件提供现状、选择器、历史坑和兼容约束；**若它们与本 README 的“效果优先 / 可评估换引擎 / 高自主开发”冲突，以本 README 为准。**
+
+先给当前版本做一次真实评分：玩法、稳定性、架构、UI、UX、角色表现、场景美术、动画、VFX、剧情演出、音频、移动端性能、完成度。使用木桶原则，优先修最低分项。
+
+然后直接开始实现，不要只产出计划和 TODO。
+
+## 3. 多智能体并行工作
+
+允许并鼓励使用多个 Agent。建议至少覆盖：
+
+- **Producer / Director**：统一方向、决定优先级、合并各 Agent 结果。
+- **Engine / Architecture**：评估是否值得迁移引擎；若迁移，负责可运行的增量路线而不是“大爆炸重写”。
+- **Gameplay**：保住并打磨肉鸽、职业、融合、飞升、Boss、DP 干员和手感。
+- **UI/UX**：大厅、寻访、名册、商店、关卡、档案、结算、设置。
+- **Anime Art Director**：统一角色、背景、卡面、UI 装饰和整体二游视觉。
+- **Image Production**：主动使用最先进的图片生成/编辑能力生产缺失素材。
+- **Combat Polish / VFX**：打击感、技能、Boss 转阶段、部署、反馈和可读性。
+- **QA / Visual QA / Performance**：自动测试、完整游玩、截图验收、移动端性能。
+
+各 Agent 不能各做一套风格。必须共享同一套 Art Bible、角色设定和产品方向。
+
+## 4. Image 是正式美术生产线，不是补丁
+
+这是二次元游戏，**不要吝惜使用 Image 生图和图片编辑功能。** 素材不足时不要停下来等用户提供，优先自己生成、修改、接入、截图检查、再返工。
+
+优先检查并提升：
+
+- 月城小夜 / 神代绫 / 黑羽凛音的大厅全身立绘、头像、卡面、干员头像、表情与必要动作素材；
+- 大厅横屏宽背景，解决黑边、构图和 UI 冲突；
+- 镜界寻访背景、卡背、卡面、稀有度视觉、揭示演出；
+- 名册收藏视觉；
+- 商店、档案、章节、Boss、剧情 CG；
+- 技能、融合、飞升、部署、Boss 阶段所需的视觉素材和特效贴图。
+
+先建立 `docs/ART_BIBLE.md`，固定三名角色的发色、发型、瞳色、服装、武器、轮廓、配色、气质和世界观视觉语言。后续生成必须尽量保持角色一致，不允许大厅、卡面、头像像三个不同的人。
+
+世界观视觉核心：**末世都市 × 夜樱 × 二次元作战 × 企业实验区**。避免随机赛博朋克、纯粉萌系、中世纪、高魔或照抄其他商业二游。
+
+正式文字一律由游戏 UI 渲染，不让生图承担中文/英文 UI 文本，避免 AI 乱码。
+
+每个关键图片必须走：**生成/编辑 → 检查手脸武器/透视/文字/边缘 → 接入游戏 → 实际截图 → 检查裁切/对比度/UI 遮挡 → 再修改**。第一张图不是默认最终稿。
+
+## 5. 可以重构，但必须保住“樱夜·尸潮”
+
+不管是否换引擎，以下产品资产不能轻易丢：
+
+- 三名主角及各自战斗定位；
+- 14 基础职业、28 转职、融合和三相飞升；
+- 四章与 Boss 阶段；
+- 主神空间、回收演习、证词模式；
+- 触控摇杆、冲刺、主动技能；
+- 寻访只作为收藏/证词系统，不出售永久攻击、生命、暴击；
+- 离线优先，不引入账号、广告、通行证、每日任务、排行榜等无关商业化系统。
+
+当前存档键是 `sakurayoV3`。如果保留原架构，必须继续兼容；如果换引擎，必须设计**旧存档导入/迁移方案**，不能简单清档。
+
+## 6. 当前 V4.6 已有成果不要重复造轮子
+
+A/B/C 阶段已基本落地：横屏大厅、五房入口、镜界寻访、名册、商店、三种出击模式、局内 DP 干员、仿 Live2D。先验证它们，再决定保留、重做表现层还是迁移。
+
+当前仍明显值得继续做的方向包括：
+
+- 三角色站桩和角色表现进一步提升；
+- 大厅宽背景和整体主界面完成度；
+- 寻访卡扩充到合理规模（建议不超过 16，质量优先）；
+- 商店/档案视觉统一；
+- 独特融合的 skill/dash 表现；
+- Boss、技能、飞升、干员部署的动画/VFX/音效反馈；
+- 完整从大厅到战斗、Boss、结算再回大厅的二游化体验；
+- 移动端性能、稳定性和发版质量。
+
+## 7. 如果保留现架构，必须继续遵守的硬约束
+
+当前代码基线是 `src/index.html` + `src/runtime/*.js`，运行时美术主要在 `android-app/app/src/main/assets/game/art`。
+
+保留现架构时：
+
+- 不要再给 `update` 套包装层；局内扩展继续优先走现有 hook；
+- 不要随意改名 `startGame` / `update` / `draw` / `spawnEnemy` / `showDialogue` 而漏掉调用点；
+- 干员单位不要塞进 `pets`；
+- 不要恢复“每颗子弹遍历所有敌人”的无界碰撞；
+- 敌人、子弹、Boss 弹、召唤物、伤害字、粒子保持合理上限；
+- 不清 `localStorage`；
+- 不提交密钥、JKS、APK、release 输出和 `assets/image2/source/`；
+- `live_idle.webp` / `live_blink.webp` 继续注意透明边缘和静帧质量。
+
+重要旧选择器和测试 API 见 `docs/HANDOFF.md`，若没有架构迁移，不要破坏现有自动测试依赖。
+
+## 8. 引擎迁移的决策门槛
+
+不要凭喜好换，也不要因为怕工作量而不换。先做小型技术验证，比较至少：
+
+1. 角色动画 / Live2D 类表现能提升多少；
+2. UI 和过场能提升多少；
+3. 战斗 VFX 和镜头能提升多少；
+4. Android 中端机性能；
+5. 现有大量玩法逻辑迁移成本与风险；
+6. 旧存档迁移；
+7. 自动测试和后续 AI 继续维护的难度；
+8. 最终 APK/包体/启动速度；
+9. 实际可达到的成品观感。
+
+如果新引擎的**实际效果收益明显高于迁移风险**，就迁移；如果当前 Canvas/WebView 经过重构和美术升级已经足够接近目标，就不要为了换而换。
+
+一旦决定迁移，采用可验证的阶段性迁移：先做一个完整可玩的纵切片（大厅 → 出击 → 一段战斗 → Boss/结算 → 回大厅），证明新引擎路线确实更好，再逐步迁移剩余系统。不要先删掉旧项目再开始重写。
+
+## 9. 测试和自主迭代
+
+每完成一批功能就测试。当前架构可先跑：
 
 ```powershell
 node --check src/runtime/sakurayo-lobby.js
@@ -24,109 +149,65 @@ node tests/ops_unit.mjs
 node tests/ops_smoke.mjs
 ```
 
-全量验证：`powershell -File tools/verify.ps1`（含较长的 `browser_smoke`，主视口仍是 **430×932**）。
+改证词或寻访时额外跑对应 smoke / visual 测试，最终跑：
 
-存档键必须是 **`sakurayoV3`**。不要清 `localStorage`。
-
-## 产品是什么
-
-离线二次元肉鸽射击。局外做成能横着玩的二游大厅，局内仍是摇杆射击。不换引擎，不引 Vue/Phaser，最终仍出单文件 HTML。
-
-| 角色 | 武器 |
-|---|---|
-| 月城小夜 `sayo` | 步枪远程 |
-| 神代绫 `aya` | 手枪＋太刀 |
-| 黑羽凛音 `rion` | 纯太刀 |
-
-必须保住：14 基础职业、28 转职、融合、科技/生物/灵能三相飞升、四章、Boss 四阶段、主神空间、触控摇杆/冲刺/技能。
-
-## 已完成（A / B / C，版本仍 4.6.0）
-
-- **横屏主体验**：Android 锁 `landscape`。`preferLandscape46()` 默认加 `html.landscape46`。窗口宽 `< 640` 才竖屏回退。大厅左约 64% 全身站桩（头要完整），右约 34%、最宽 360 的操作台；三角色圆钮必须在操作台里，不能压在人身上。
-- **五房**：寻访 / 名册 / 商店 / 关卡 / 档案。出击是大厅主按钮，不进五格。
-- **镜界寻访只收藏**：pity 80 SSR / 10 SR，价格 160 / 1440，N70 / R22 / SR7 / SSR1。字段只写 `shop40.ops`。
-- **证词模式**：`runMode36="testimony"`，升级不弹卡。测试 API `selectStage` 仍强制 `story`。
-- **干员**：最多 2 人，DP 开局 10 / 上限 20 / 花费 8 / 撤回 +4，约 0.4/s。不进 `pets`。挂 `combat:after-update` / `after-draw`。
-- **仿 Live2D**：`src/runtime/sakurayo-live.js`。眨眼 Mean 2.5±2s，注视阻尼，点头/点身。不要再改成 5.4s CSS 死循环。
-
-## 下一步（不要当成已完成）
-
-1. I2V 绿幕重出三角色站桩（需 infsh login）。
-2. 有独特动作的融合再补 `skill` / `dash`。
-3. 寻访卡扩到 16 以内；大厅宽背景去黑边。
-4. 全量 `tools/verify.ps1`。
-5. 同步 Android 资源后发版。模拟器上的正式包可能仍是签名对不上的 4.2.3；debug 不能覆盖，**不要擅自卸包清档**。
-
-## 明确不做
-
-清档、改存档键、再包 `update`、抽卡/商店加永久伤害、每日任务/邮件/通行证/广告、联网账号、换引擎、把主神空间删掉或并进寻访。
-
-## 改哪里
-
-```text
-src/index.html                         唯一代码基线
-src/runtime/sakurayo-lobby.js          大厅 / 寻访 / 名册 / 模式条
-src/runtime/sakurayo-live.js           仿 Live2D
-src/runtime/sakurayo-ops.js            局内干员 DP
-android-app/.../game/art               运行时美术（游戏读这里）
-docs/HANDOFF.md                        完整交接规格
-docs/PLAN_V46_ERYOU.md                 二游分期原文
-docs/MAINTAIN.md                       升版本 / 发版
+```powershell
+powershell -File tools/verify.ps1
 ```
 
-脚本顺序必须是：content-runtime → lifecycle → cutscene → economy → **lobby → live → ops**。
+如果迁移引擎，则建立等价甚至更完善的自动测试、场景测试和 Android 构建验证。
 
-## 必须保住的选择器
+至少进行多轮：**审计 → 实现 → 自动测试 → 实际运行 → 截图/录像视觉 QA → 修复 → 回归 → 再优化**。不要只优化首页，也不要“能启动”就宣布完成。
 
-`#gachaPull1` `#gachaPull10` `#gachaDrawer` `#rosterWall46` `.rosterSlot46.lock` `#shopDrawer` `.shopTabs40` `#shopWallet44` `#opsDock46` `#heroTap46` `#heroHead46` `#modeBar46` `#rotateHint46`，以及 `[data-open="gacha|roster|shop|stage|archive|story"]`。档案按钮文案仍须含 **剧情档案**。大厅主按钮是 **出击**。
+完整玩家闭环必须反复实测：
 
-## 测试 API
+**大厅 → 寻访/名册/商店/档案 → 选模式 → 出击 → 升级/构筑 → 干员/技能 → Boss → 结算 → 回大厅 → 再开一局。**
 
-写在 `src/index.html` 的 `__SAKURAYO_TEST__` **字面量内部**（`Object.freeze`）。新 API 不要挂在 freeze 之后。
+## 10. 视觉验收标准
 
-| API | 用途 |
-|---|---|
-| `setRunMode46(mode)` | 同时写 `runMode36` 和 `pendingMode46` |
-| `selectStage(id)` | 永远把 `runMode36` 写成 `story` |
-| `opsSnapshot46` / `deployOp46` / `retreatOp46` / `grantDp46` | 干员 |
-| `liveSnapshot46` / `liveTrigger46` / `liveLook46` | 立绘 |
-| `lobby46` / `pullGacha46` / `grantCheat46` / `tapPortrait46` | 大厅 / 寻访 |
+每次重大迭代都问：
 
-`verify.ps1` 目前**没有**跑 `tests/testimony_smoke.mjs` 和 `tests/gacha_visual.mjs`，改证词或寻访视觉时要单独跑。
+> 如果把实际游戏截图直接发给二次元游戏玩家，他们第一眼会不会仍觉得这是网页 Demo、程序员 UI 或 AI 素材拼盘？
 
-## 已知陷阱
+如果会，就继续优化。
 
-- 不要再给 `update` 加包装层。局内扩展挂 `CONTENT41.hook("combat:after-update")` / `combat:after-draw`。
-- 不要改名 `startGame` / `update` / `draw` / `spawnEnemy` / `showDialogue` 却不改调用点。
-- `#hud` 是 `pointer-events:none`。干员坞自己开 `pointer-events:auto`。
-- `startGame` 在 `!save.tutorialDone && state==="menu"` 时会打开教程并 **return**。隔离冒烟先点 `#tutorialSkip37`。
-- `ART_ROOT`：`/android_asset/` → `game/art`；路径以 `/src/index.html` 结尾 → `../android-app/app/src/main/assets/game/art`；否则 `game/art`。
-- 大厅 `live_idle.webp` / `live_blink.webp` 必须是**无损静帧 WebP**，用 CSS/JS 动。不要把动画 WebP 压成 lossy / yuva420p。
-- 干员单位放独立 `units`，禁止推进 `pets`（`syncPets` 会清空）。
-- `progress.md` 顶部 Original prompt 不得删。
-- 仓库不含签名密钥。不要提交 `keystore.properties`、`local.properties`、`*.jks`、`*.apk`、`release/`、`assets/image2/source/`。
+最终重点不是“改了多少文件”，而是：
 
-## 模拟器
+- 角色一致且有吸引力；
+- 大厅真正像成熟二游首页；
+- 寻访、名册、商店、档案属于同一个视觉系统；
+- 战斗清晰、有打击感、有角色区别；
+- Boss、技能、融合、飞升有演出；
+- 剧情和章节不再像纯文本功能；
+- Android 上稳定、流畅、可触控；
+- 原有深度玩法没有被视觉重做牺牲。
 
-已装正式包若是旧签名 4.2.3 / versionCode 47，debug APK 会 `INSTALL_FAILED_UPDATE_INCOMPATIBLE`。用本机 HTTP 打开 `src/index.html` 验收横屏，不要卸包除非用户接受清档。
+## 11. “甩手掌柜”执行原则
 
----
+**默认自主决策。** 对可逆、合理、能提高成品质量的修改直接做，不要把每个细节都抛回用户确认。
 
-## 玩家说明（公开仓）
+不要因为工作量大而停止；不要把缺美术、缺 UI、缺测试写成“后续人工处理”；能用代码、Image、多 Agent、自动测试解决的就自己解决。
 
-玩家请下公开仓 Releases，不要直接翻这份私有源码。
+只有真正的硬阻塞才需要用户，例如：必须由用户提供的账号/授权、签名密钥、无法访问的外部资产、不可逆且高风险的产品方向选择。
 
-- 公开仓：https://github.com/h1neolzr7f/sakurayo-zombietide
-- 已发布包：[v4.4.6 APK](https://github.com/h1neolzr7f/sakurayo-zombietide/releases/tag/v4.4.6)
-- 怎么玩：[docs/user-guide.md](docs/user-guide.md)
-- 更新记录：[CHANGELOG.md](CHANGELOG.md)
-- 路线图：[ROADMAP.md](ROADMAP.md)
+除此之外，持续：
 
-```
-Sakurayo-ZombieTide-v4.4.6-android.apk
-SHA-256 D3CCD15CF38955951A5917217C22EAB8B136B45CFA82A04D75030D9F5C6B33EB
-```
+**发现问题 → 修复 → 运行 → 测试 → 看实际效果 → 再修。**
 
-樱夜市被零号企业改写成尸潮试验场。选月城小夜 / 神代绫 / 黑羽凛音，用触控摇杆、冲刺和主动技能在四章里活下去。整局离线，没有账号、没有广告、没有 CDN。存档只在本机，键名 `sakurayoV3`。
+不要把“计划完成”当成“游戏完成”。
 
-代码与本仓库原创内容为 [MIT License](LICENSE)。Kenney 反馈音效为 CC0，见 [docs/THIRD_PARTY_ASSETS.md](docs/THIRD_PARTY_ASSETS.md)。不要提交签名密钥或他人存档。
+## 12. 最终交付
+
+完成后生成 `docs/FINAL_UPGRADE_REPORT.md`，简洁记录：
+
+- 最终采用/未采用引擎迁移及理由；
+- 主要代码和架构变化；
+- Image 生成/编辑了哪些关键美术；
+- UI/UX、角色、战斗、剧情、Boss、音效和性能变化；
+- 自动测试与实际游玩结果；
+- Android 构建状态；
+- Before / After 评分；
+- 尚存的真实限制；
+- 当前 Release Readiness。
+
+**终点是一个实际可玩的、高完成度的《樱夜·尸潮》，而不是一份更漂亮的开发文档。现在开始读取仓库并直接执行。**
