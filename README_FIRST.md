@@ -27,9 +27,9 @@ node tests/ops_unit.mjs
 
 横屏大厅、五房、镜界寻访（只收藏）、证词模式、局内 2 干员 DP、仿 Live2D。版本号仍是 4.6.0。
 
-## 你接下来做
+## 当前交付状态
 
-I2V 绿幕站桩、融合 skill/dash、寻访卡扩到 16、全量 verify、再发版。细节在 `docs/HANDOFF.md`。
+16 卡寻访、真实随机眨眼、六套融合 skill/dash、全量回归、单入口和 Android Debug 已完成。先读 `docs/FINAL_UPGRADE_REPORT.md`；下一步是使用原正式证书做 Release，并在实体横屏 Android 设备完成覆盖安装与长时性能验收。
 
 ## 不要做
 

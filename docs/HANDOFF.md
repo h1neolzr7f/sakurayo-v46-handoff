@@ -57,17 +57,17 @@
 | 局外精装修 | 五房同一套玻璃、立绘软边无损、商店一栏钱包 | 已落地 |
 | C | 局内 DP + 最多 2 干员钉地 | 已落地 |
 | 横屏主体验 | `html.landscape46` 默认就在；Android 锁 `landscape` | 已落地 |
-| 仿 Live2D | 随机眨眼 / 注视 / 点触，去掉卡顿滤镜 | 已落地 |
-| D | 寻访卡扩到 16 以内；站桩与大厅背景重出；商店/档案换皮 | **未做** |
-| E | 全量 `verify.ps1`、`release/`、APK、CHANGELOG | **未做** |
+| 仿 Live2D | 真实随机眨眼 / 注视 / 点触，去掉卡顿滤镜 | 已落地 |
+| D | 16 卡寻访；真实闭眼帧；商店/档案换皮；六套签名融合动作 | **已落地** |
+| E | 全量回归、单入口、Android Debug、CHANGELOG、最终报告 | **已落地；正式签名待原证书** |
 
 ### 下一步（按优先级）
 
-1. I2V 绿幕重出三角色站桩（需 infsh login）。现用 `battle.webp` / `live_idle` 静帧 + JS 动。
-2. 有独特动作的融合再补 `anim_skill.webp` / `anim_dash.webp`。缺图回退，不要借错融合的图。
-3. 寻访卡扩到 16 以内；`ui/lobby_wide.webp` 去左右黑边。
-4. 全量 `powershell -File tools/verify.ps1`（`browser_smoke` 主视口仍是 430×932）。
-5. `android-app/sync-game.ps1` 后发版。模拟器上的正式包可能仍是签名对不上的 **4.2.3 / versionCode 47**；debug 不能覆盖（`INSTALL_FAILED_UPDATE_INCOMPATIBLE`）。不要擅自卸包清档。用本机 HTTP 打开 `src/index.html` 验收。
+1. 先读 `docs/FINAL_UPGRADE_REPORT.md` 和 `docs/ART_BIBLE.md`；不要重复生成已完成的 16 卡与闭眼帧。
+2. 使用原正式证书构建 Release，并在至少一台横屏 Android 实体设备验证覆盖安装、触控、刘海安全区、发热和长期帧率。
+3. 若继续升级站桩，只做像素稳定的分层/I2V 路线；不得退回待机与眨眼同图，也不要用高开销滤镜伪装动画。
+4. 六套签名融合已有三角色 `anim_skill.webp` / `anim_dash.webp`。新增动作仍须缺图回退，禁止借错融合。
+5. 日常验证优先 `npm test && npm run test:visual`；Windows 仍可运行 `powershell -File tools/verify.ps1`。
 
 ### 明确不做
 
@@ -137,7 +137,7 @@ pity, pitySR, pulls, tenPulls, owned, last, cheatUsed
 
 禁止新 top-level save key。证词进度若以后要记，加 `shop40.ops.story` 或沿用现有剧情字段。
 
-名册 8 格。未回收只用卡背，禁止灰图剧透。点开详情。重复只加计数，不进战斗。锁卡脚注「待寻访」，墙上仍可写「未回收」。
+名册 16 格。未回收只用卡背，禁止灰图剧透。点开详情。重复只加计数，不进战斗。锁卡脚注「待寻访」，墙上仍可写「未回收」。
 
 揭示层挂在 `#gachaDrawer`，不要挂在 `#gachaBody46`（刷新会抹掉翻牌）。`TEST_MODE` / `?test=1` 立即翻开。
 
@@ -255,7 +255,7 @@ ART_ROOT =
 - 新图同时考虑进 `game/art`；源 PNG 在 `assets/image2/source/`（本仓未收录）。
 - 规格见 [IMAGE2_ASSET_SPEC.md](IMAGE2_ASSET_SPEC.md)。
 - 已入库但未发版的包括：职业/融合闪图、三角色 career/form/fusion 战斗帧、`gacha/`、`ui/lobby_wide.webp`、寻访/名册/档案导航图。
-- 还缺：I2V 绿幕全身站桩、无缝大厅宽背景、部分融合的 skill/dash。
+- 当前限制：站桩仍是轻量 2D puppet 而非网格 Live2D；Android 正式签名与实体设备长测待原证书/设备。大厅宽背景、16 卡和六套签名融合动作已完成。
 
 ## 14. 怎么跑
 

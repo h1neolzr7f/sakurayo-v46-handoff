@@ -1,5 +1,17 @@
 Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先阅读根目录的 AGENTS.md、README_FIRST.md 和 CODEX_TASK.md，基于 src/index.html 继续开发，不要使用旧版本文件。
 
+## 2026-08-16 V4.6 综合制作升级完成
+
+- 以制作人、系统策划、UI/UX、美术指导和 QA 的统一标准完成 V4.6 收口；评估后保留 Canvas/WebView，避免用高风险引擎迁移重做已成熟的 24 融合与完整闭环。
+- 新增 `docs/ART_BIBLE.md`，固定三角色、世界观、场景、UI、卡面和战斗表现规则。
+- 修复三角色假眨眼：原 `live_idle` / `live_blink` 哈希相同，现改为只动眼部的无跳帧闭眼图；小夜/绫/凛音拥有不同呼吸、注视和点触权重。
+- 镜界证词由 8 张扩到 16 张；新增 8 张四章叙事卡，重制终章证人，旧 8 卡计数/保底无损迁移。横屏名册为 8×2，锁卡不剧透。
+- 六套签名融合验证三角色独立 skill/dash 帧，并接入短时本色 VFX；干员部署新增身份色脉冲。房间、角色、寻访、部署/撤回使用离线反馈音效。
+- 修复 430×932 竖屏回退中角色列遮挡寻访按钮。大厅身份文案和寻访角色构图继续精修。
+- 新增 `package.json`、Playwright lockfile 与 CI；开发入口和离线单入口均通过 3 组 unit、8 项 framework、证词/干员 smoke、52 项完整 browser smoke、寻访视觉和无外部请求检查。
+- Android assets 与离线单入口 SHA-256 均为 `4B0F2E76E1BC860453F42E96FE2738E36295D6F0E0E6ACDC7906603BA1295C14`。
+- Android `assembleDebug` / `lintDebug` 成功；APK 4.6.0 / versionCode 61、无 INTERNET、v1/v2 Debug 签名通过，SHA-256 `1F3AABB2619247BCDDB6932A9114A5A9FE476AB6074062F698B5C1152BE9C334`。
+
 ## 2026-07-11 自由方向与主神空间
 
 - 用户要求：枪械可自由随方向转动，刀剑只在挥砍扇形内造成伤害；三角色各有独立吐槽彩蛋；新增高难爽发育“主神空间”，奖励点强化仅在该副本跨局保留。
