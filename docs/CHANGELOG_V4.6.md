@@ -32,3 +32,14 @@
 - 修复竖屏回退中角色选择列遮住寻访按钮的问题；932×430、430×932、360×800 均可操作。
 - 增加可复现 npm 测试入口与 CI：静态、内容包、3 个 unit、8 项 framework、证词、干员、52 项完整流程和寻访视觉。
 - 单入口 HTML、Android assets 与 Debug APK 已重新构建。Android 4.6.0 / versionCode 61，APK 无 INTERNET 权限，v1/v2 Debug 签名验证通过。
+
+## 第二轮成熟化（2026-08-16，基线 `613c85c`）
+
+- Boss 登场与 P2/P3/P4 转阶段加入章节化 Canvas 字幕、短暗场和四段血条门槛；四章与主神空间使用各自色板和机制文案。
+- 三角色主动技能增加身份化短时演出：小夜樱花环、绫六向枪线、凛音双重剑弧；不增加粒子、子弹或召唤物上限。
+- 干员改用 Q 版待机/攻击帧，增加朝向、武器类型和开火/斩击反馈；DP、人数、伤害、证词关闭规则不变。
+- 修正信息优先级：剧情/升级/暂停/结算模态出现时收起 Boss 警告，阶段演出结束后吐槽队列再继续。
+- 新增 `tests/combat_visual.mjs`，以 932×430 验收技能＋双干员与 Boss 阶段字幕；`npm test` 继续 52 项完整流程通过。
+- 开发入口、离线单入口均通过静态、3 组 unit、8 项 framework、证词、干员、52 项 browser smoke 与两组 visual。
+- 单入口 SHA-256：`415844A549AD6C842F8CAEF3D3014506F2D47D59DAEAB6263073445571612C4C`。
+- Android Debug `assembleDebug` / `lintDebug` 成功，1190 个 WebP、无 INTERNET、v1/v2 签名通过；APK SHA-256：`F0F44F12FE8D7FD24F41C46DC06B107EE6A9E39A360B7F17133B233430B86A0D`。
