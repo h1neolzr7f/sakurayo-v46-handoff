@@ -1,5 +1,10 @@
 Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先阅读根目录的 AGENTS.md、README_FIRST.md 和 CODEX_TASK.md，基于 src/index.html 继续开发，不要使用旧版本文件。
 
+## 2026-08-16 README 说清 GitHub 与发版状态
+
+- 根目录 `README.md` / `README_FIRST.md` 开头改为先写当前状态：开发仓已上传、草稿 PR #1、最新提交 `fabbdfa`、未合并 `main`、公开仓仍是 v4.4.6、正式签名未做。
+- `docs/HANDOFF.md` 同步写明战斗峰值反馈已落地，并指向同一 PR。
+
 ## 2026-08-16 V4.6 战斗峰值反馈精修
 
 - 暴击、主动技能、精英击破、Boss 阶段与 Boss 击破增加分级镜头冲击、震动与可关闭触觉反馈；高攻速暴击使用 85ms 门禁，精简特效模式自动降档。

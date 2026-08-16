@@ -62,15 +62,19 @@
 | E | 全量回归、单入口、Android Debug、CHANGELOG、最终报告 | **已落地；正式签名待原证书** |
 | F | 横屏作战简报、四阶段机制条、左右对白、双栏战术结算 | **已落地** |
 | 第二轮成熟化 | Boss 阶段字幕/血条门槛、三角色技能演出、干员攻击帧、横屏战斗视觉门禁 | **已落地** |
+| 战斗峰值反馈 | 分层镜头冲击、三相飞升签名、与成熟化演出无损合并 | **已落地并推到开发仓草稿 PR** |
+
+GitHub：开发仓 `h1neolzr7f/sakurayo-v46-handoff` 分支 `cursor/bc-a381488d-90d5-4ff1-914f-6cabd630c2b2-074d`，最新提交 `fabbdfa`，草稿 [PR #1](https://github.com/h1neolzr7f/sakurayo-v46-handoff/pull/1)。**未合并 `main`，未对公开仓发 4.6.0。**
 
 ### 下一步（按优先级）
 
-1. 先读 `docs/FINAL_UPGRADE_REPORT.md` 和 `docs/ART_BIBLE.md`；报告已包含从 `613c85c` 开始的第二轮成熟化结果，不要重复实现 Boss 字幕、技能演出和干员攻击帧。
+1. 先读根目录 `README.md` 的「当前状态」和 `docs/FINAL_UPGRADE_REPORT.md`；不要重复实现 16 卡、闭眼帧、作战简报、Boss 字幕、技能演出、干员攻击帧、分层冲击或三相飞升签名。
 2. 使用原正式证书构建 Release，并在至少一台横屏 Android 实体设备验证覆盖安装、触控、刘海安全区、发热和长期帧率。
-3. 若继续升级站桩，只做像素稳定的分层/I2V 路线；不得退回待机与眨眼同图，也不要用高开销滤镜伪装动画。
-4. 六套签名融合已有三角色 `anim_skill.webp` / `anim_dash.webp`。新增动作仍须缺图回退，禁止借错融合。
-5. 横屏主路径已有 `tests/landscape_smoke.mjs`，不得只跑 430×932 就声称 Android 横屏可用。
-6. 日常验证优先 `npm test && npm run test:visual`；visual 现同时覆盖寻访/名册和 932×430 战斗。Windows 仍可运行 `powershell -File tools/verify.ps1`。
+3. 明确要求后再把草稿 PR 合进 `main`，以及是否同步公开玩家仓。
+4. 若继续升级站桩，只做像素稳定的分层/I2V 路线；不得退回待机与眨眼同图，也不要用高开销滤镜伪装动画。
+5. 六套签名融合已有三角色 `anim_skill.webp` / `anim_dash.webp`。新增动作仍须缺图回退，禁止借错融合。
+6. 横屏主路径已有 `tests/landscape_smoke.mjs`，不得只跑 430×932 就声称 Android 横屏可用。
+7. 日常验证优先 `npm test && npm run test:visual`；visual 现同时覆盖寻访/名册和 932×430 战斗。Windows 仍可运行 `powershell -File tools/verify.ps1`。
 
 ### 明确不做
 
