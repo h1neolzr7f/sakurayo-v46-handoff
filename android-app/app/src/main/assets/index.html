@@ -1802,6 +1802,14 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     { id: "void_ticket", n: "主神回收券影", r: "SR", tag: "主神残券", d: "虚空圣所的作废回收券。不能兑换属性。" },
     { id: "cherry_crown", n: "樱冠残片", r: "SR", tag: "樱冠残片", d: "镜界冠冕裂开后的一片。好看，不卖伤害。" },
     { id: "last_witness", n: "终章证人立绘", r: "SSR", tag: "终章证人", d: "碎镜后面那个人终于肯露面。这是收藏，不是数值。" },
+    { id: "sayo_318", n: "小夜·第318号", r: "N", tag: "镜像编号", d: "镜界给她排了编号，她用每一次选择把编号改回名字。" },
+    { id: "aya_channel", n: "绫·未送达频道", r: "N", tag: "雨夜频道", d: "那句没有送达的拒绝终于穿过雨夜。救援必须允许被拒绝。" },
+    { id: "rion_names", n: "凛音·同门名册", r: "R", tag: "黄泉名册", d: "她没有继承无名的数据，只把每位同门的名字送回剑冢。" },
+    { id: "rin_signal", n: "雨宫凛·安全频道", r: "R", tag: "电台证词", d: "尸潮覆盖城市后仍未中断的人工频道。有人一直在另一端值守。" },
+    { id: "corp_contract", n: "零号企业·回收合同", r: "R", tag: "事故原件", d: "把人格写成资产的原始合同。封条完整，良心栏从未存在。" },
+    { id: "sister_reply", n: "妹妹频道·拒绝救援", r: "SR", tag: "自主权证词", d: "她没有请求被复活，只请求姐姐把选择权还给自己。" },
+    { id: "swordmaster_oath", n: "无名剑主·最后一式", r: "SR", tag: "黄泉残响", d: "最后一式没有被上传。剑主把空白留给仍然活着的继承人。" },
+    { id: "mirror_twins", n: "镜后双生证词", r: "SSR", tag: "双生证人", d: "原本与备份都不必争夺唯一名额。镜后第一次站着两个完整的名字。" },
   ]);
 
   var CARD_MAP = Object.create(null);
@@ -1922,7 +1930,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     "#menu.homeDock46 .nav{width:100%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;padding:8px;border-radius:18px}" +
     "#menu.homeDock46 .homeNav46 button{min-height:58px}" +
     "#menu.homeDock46 .stageMini{width:100%}" +
-    "#menu.homeDock46 .charSelectPanel{right:calc(min(42vw,400px) + 12px);left:auto;bottom:14%}" +
+    "#menu.homeDock46 .charSelectPanel{position:relative;left:auto;right:auto;bottom:auto;width:100%}" +
     ".wishHero46{left:-2%;width:46%;height:124%;bottom:-8%}" +
     ".wishTitle46{right:4%;max-width:46%}" +
     ".wishDock46,.wishPity46{left:46%}" +
@@ -1930,18 +1938,23 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     ".rosterArt46{height:168px}" +
     ".heroTap46{left:10%;width:28%;top:16%;bottom:18%}" +
     "}" +
-    "html.landscape46 #menu.homeDock46 .heroLive46{pointer-events:none;left:0;width:58%;top:0;bottom:0}" +
-    "html.landscape46 #menu.homeDock46 .menu{width:min(42vw,420px);max-width:420px;margin-left:auto}" +
-    "html.landscape46 .wishHero46{left:-2%;width:46%;height:124%;bottom:-8%}" +
+    "html.landscape46 #menu.homeDock46 .heroLive46{pointer-events:none;left:0;width:64%;top:0;bottom:0}" +
+    "html.landscape46 #menu.homeDock46 .menu{width:min(34vw,360px);max-width:360px;margin-left:auto}" +
+    "html.landscape46 .wishHero46{left:-4%;width:52%;height:142%;bottom:-13%}" +
     "html.landscape46 .wishTitle46{right:4%;max-width:46%}" +
     "html.landscape46 .wishDock46,html.landscape46 .wishPity46{left:46%}" +
-    "html.landscape46 #rosterWall46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
+    "html.landscape46 #rosterWall46{grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}" +
+    "html.landscape46 .rosterSlot46{min-height:150px;border-radius:13px}" +
+    "html.landscape46 .rosterArt46{height:108px}" +
+    "html.landscape46 .rosterSlot46 b{padding-top:6px;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
+    "html.landscape46 .rosterSlot46 small{margin:3px 0 6px;font-size:8px}" +
     "html.landscape46 #archiveDrawer .archiveDock46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
     "html.landscape46 #stageList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}" +
     "#rotateHint46{display:none;position:fixed;z-index:80;left:50%;top:max(8px,env(safe-area-inset-top));transform:translateX(-50%);padding:6px 12px;border-radius:999px;background:#0b0818cc;border:1px solid #ffe6a355;color:#ffe7a3;font:800 11px/1 system-ui;letter-spacing:.12em;pointer-events:none;white-space:nowrap}" +
     "@media(orientation:portrait){" +
     "#rotateHint46{display:block}" +
     "}" +
+    "html.tallWindow46 #rotateHint46{display:block}" +
     "@media(prefers-reduced-motion:reduce){.wishStage46:before,.wishPetals46 i,.revealInner46,.revealFace46.front:after,.revealCard46.r-SSR.flipped .revealFace46.front{animation:none;transition:none}}";
 
   var ROOM_CSS =
@@ -1969,8 +1982,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     "#archiveDrawer .archiveDock46 button b{font:800 16px/1.2 system-ui;letter-spacing:.12em}" +
     "#archiveDrawer .archiveDock46 button small{color:#ffe7a3;font:700 11px/1.2 system-ui;letter-spacing:.08em}" +
     "#menu.homeDock46.lobbyWide46 .bg{filter:brightness(.78) saturate(1.05)}" +
-    "#menu.homeDock46 .heroLive46{-webkit-mask-image:linear-gradient(to top,transparent 0%,#000 16%,#000 100%);mask-image:linear-gradient(to top,transparent 0%,#000 16%,#000 100%)}" +
-    "#menu.homeDock46 .heroLiveBreath46{width:min(150vw,720px)}" +
+    "#menu.homeDock46 .heroLive46{-webkit-mask-image:linear-gradient(to right,#000 0%,#000 78%,transparent 100%);mask-image:linear-gradient(to right,#000 0%,#000 78%,transparent 100%)}" +
+    "#menu.homeDock46 .heroLiveBreath46{width:min(62vw,680px);height:100%}" +
     "#menu.homeDock46 .heroLiveBreath46:before{content:\"\";position:absolute;inset:18% 18% 0 18%;background:radial-gradient(ellipse at 50% 78%,#1a103066 0%,#12081c00 70%);pointer-events:none}" +
     "#menu.homeDock46 .heroLiveBreath46 img,.wishHero46{background:transparent!important;image-rendering:auto;filter:none}" +
     ".heroLive46.hasBlink:not(.livePuppet46) .heroLiveBlink46{animation:heroBlink46 5.4s steps(1) infinite}" +
@@ -2002,9 +2015,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     ".rosterSlot46.lock b{letter-spacing:.16em;color:#bfb1d3}" +
     ".rosterArt46:after{content:\"\";position:absolute;inset:auto 0 0;height:42%;background:linear-gradient(180deg,#100c1c00,#100c1cee)}" +
     "@media(orientation:landscape){" +
-    "#menu.homeDock46 .heroLive46{width:62%;left:0}" +
-    "#menu.homeDock46 .heroLiveBreath46{width:min(92vw,560px)}" +
-    "#menu.homeDock46 .menu{background:linear-gradient(180deg,#0b0818e6,#0b0818f6);border:1px solid #ffe6a333;border-radius:22px 0 0 0;box-shadow:-12px 0 40px #05020d66}" +
+    "#menu.homeDock46 .heroLive46{width:64%;left:0;bottom:0!important}" +
+    "#menu.homeDock46 .heroLiveBreath46{width:min(58vw,680px);height:100%}" +
+    "#menu.homeDock46 .menu{background:linear-gradient(180deg,#0b0818cc,#0b0818f2);border:1px solid #ffe6a328;border-radius:20px 0 0 0;box-shadow:-12px 0 40px #05020d66}" +
     "#shopDrawer>.dhead p,#shopDrawer .shopNotice{display:none}" +
     "#shopWallet44{display:flex;align-items:center;gap:14px;flex-wrap:wrap}" +
     "#shopWallet44 p,#shopWallet44 em{margin:0;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;flex:1}" +
@@ -2017,6 +2030,22 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     "#storyList,#achList{grid-template-columns:repeat(2,minmax(0,1fr))}" +
     "#talentList{grid-template-columns:1fr}" +
     "}" +
+    "html.landscape46 #menu.homeDock46 .heroLive46{top:0;bottom:0!important;left:0;width:64%;-webkit-mask-image:linear-gradient(to right,#000 0%,#000 78%,transparent 100%);mask-image:linear-gradient(to right,#000 0%,#000 78%,transparent 100%)}" +
+    "html.landscape46 #menu.homeDock46 .heroLiveBreath46{height:100%;width:min(58vw,680px)}" +
+    "html.landscape46 #menu.homeDock46 .heroLiveBreath46 img{object-fit:contain;object-position:center 10%}" +
+    "html.landscape46 #menu.homeDock46 .heroLiveName46{top:auto;bottom:16%;left:max(16px,env(safe-area-inset-left));max-width:36%}" +
+    "html.landscape46 #menu.homeDock46 #coverTitle36{left:max(16px,env(safe-area-inset-left));right:auto;top:max(10px,env(safe-area-inset-top));transform:none;text-align:left;max-width:40%}" +
+    "html.landscape46 #menu.homeDock46 .menu{width:min(34vw,360px);max-width:360px;margin-left:auto;padding:10px 12px calc(10px + env(safe-area-inset-bottom));box-sizing:border-box}" +
+    "html.landscape46 #menu.homeDock46 .charSelectPanel{position:relative!important;left:auto!important;right:auto!important;bottom:auto!important;width:100%;margin:0 0 8px}" +
+    "html.landscape46 #menu.homeDock46 .characterList{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;flex-direction:unset}" +
+    "html.landscape46 #menu.homeDock46 .charCard{width:auto;height:auto;min-width:0;max-width:56px;margin:0 auto;aspect-ratio:1}" +
+    "html.landscape46 #menu.homeDock46 .charCard img{width:100%;height:100%}" +
+    "html.landscape46 #menu.homeDock46 .stageMini,html.landscape46 #menu.homeDock46 .start,html.landscape46 #menu.homeDock46 .nav{width:100%;margin-left:0;margin-right:0}" +
+    "html.portraitFallback46 #menu.homeDock46 .heroLive46{width:100%;left:0;right:0;top:0;bottom:34%}" +
+    "html.portraitFallback46 #menu.homeDock46 .menu{width:100%;max-width:none;margin:0;border-radius:18px 18px 0 0}" +
+    "html.portraitFallback46 #menu.homeDock46 .charSelectPanel{position:absolute!important;left:8px!important;right:auto!important;bottom:36%!important;width:auto}" +
+    "html.portraitFallback46 #menu.homeDock46 .characterList{display:flex!important;flex-direction:column}" +
+    "html.portraitFallback46 #menu.homeDock46 #coverTitle36{left:50%;right:auto;transform:translateX(-50%);text-align:center}" +
     "@media(prefers-reduced-motion:reduce){.heroLive46.hasBlink .heroLiveBlink46,.heroLive46.hasBlink .heroLiveBase46{animation:none}}";
 
   function injectStyle() {
@@ -2341,7 +2370,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     host.innerHTML =
       '<div class="rosterStage46"><div class="rosterHead46"><h3>证词名册</h3><span>已点亮 ' +
       got +
-      " / 8</span></div><div id=\"rosterWall46\">" +
+      " / " +
+      CARDS.length +
+      "</span></div><div id=\"rosterWall46\">" +
       CARDS.map(function (card) {
         var count = info.owned[card.id] || 0;
         var locked = count < 1 && DEFAULT_SHOWN.indexOf(card.id) < 0;
@@ -2589,6 +2620,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   // CubismLookController damping ~0.15s, then return to center when idle.
   var LOOK = Object.freeze({ damp: 0.16, maxX: 7.2, maxY: 4.8, maxTX: 1.35, maxTY: 0.7, idle: 1.35 });
   var IDLE = Object.freeze({ swayA: 4.7, swayB: 7.3, drift: 5.6, breath: 3.15, hair: 0.22 });
+  var PROFILES = Object.freeze({
+    sayo: Object.freeze({ sway: 0.92, breath: 1, look: 0.92, motion: 0.94 }),
+    aya: Object.freeze({ sway: 0.72, breath: 0.86, look: 1.12, motion: 1.08 }),
+    rion: Object.freeze({ sway: 0.56, breath: 0.74, look: 0.82, motion: 0.78 }),
+  });
   var MOTIONS = Object.freeze({
     tapHead: Object.freeze({ dur: 0.92, fadeIn: 0.1, fadeOut: 0.26, lean: -2.6, lift: 0.7, lookY: -0.38 }),
     tapBody: Object.freeze({ dur: 1.12, fadeIn: 0.12, fadeOut: 0.34, lean: 3.1, lift: -0.45, lookY: 0.18 }),
@@ -2607,14 +2643,13 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     "#menu.homeDock46 .heroLiveBreath46 img,.wishHero46{filter:none!important}" +
     "#menu.homeDock46 .heroLiveBreath46:before{filter:none!important;background:radial-gradient(ellipse at 50% 78%,#1a103066 0%,#12081c00 70%)}" +
     ".drawer.hidden .wishPetals46 i,.drawer.hidden .wishStage46:before{animation:none!important}" +
-    "html.landscape46 #menu.homeDock46 .heroLive46{top:0;bottom:0;left:0;right:auto;width:58%;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 8%,#000 82%,transparent 100%);mask-image:linear-gradient(to right,transparent 0%,#000 8%,#000 82%,transparent 100%)}" +
-    "html.landscape46 #menu.homeDock46 .menu{width:min(42vw,420px);max-width:420px;margin-left:auto}" +
-    "html.landscape46 #menu.homeDock46 #coverTitle36{left:auto;right:3%;transform:none;text-align:right}" +
-    "html.landscape46 #menu.homeDock46 .charSelectPanel{left:auto;right:calc(min(42vw,420px) + 10px);bottom:16%}" +
+    "html.landscape46 #menu.homeDock46 .heroLive46{top:0;bottom:0;left:0;right:auto;width:64%}" +
+    "html.landscape46 #menu.homeDock46 .menu{width:min(34vw,360px);max-width:360px;margin-left:auto}" +
+    "html.landscape46 #menu.homeDock46 #coverTitle36{left:max(16px,env(safe-area-inset-left));right:auto;transform:none;text-align:left}" +
     "html.landscape46 .nav,html.landscape46 .homeNav46{grid-template-columns:repeat(5,minmax(0,1fr))!important}" +
-    "html.landscape46 .heroHead46{left:18%;width:16%;top:10%;height:28%}" +
-    "html.landscape46 .heroLive46 .heroTap46{left:14%;width:22%;top:36%;bottom:12%}" +
-    "html.portraitFallback46 #rotateHint46{display:block}" +
+    "html.landscape46 .heroHead46{left:22%;width:18%;top:8%;height:26%}" +
+    "html.landscape46 .heroLive46 .heroTap46{left:18%;width:28%;top:34%;bottom:14%}" +
+    "html.portraitFallback46 #rotateHint46,html.tallWindow46 #rotateHint46{display:block}" +
     "@media(orientation:landscape){.heroHead46{left:18%;width:16%;top:10%;height:28%}.heroLive46 .heroTap46{left:14%;width:22%;top:36%;bottom:12%}}" +
     "@media(prefers-reduced-motion:reduce){.heroLive46.livePuppet46 .heroLiveSway46,.heroLive46.livePuppet46 .heroLivePhys46,.heroLive46.livePuppet46 .heroLiveBreath46,.heroLive46.livePuppet46 .heroLiveLook46{transform:none!important}}";
 
@@ -2683,6 +2718,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       motionT: 0,
       lastKind: "",
       test: !!opts.test,
+      profileId: PROFILES[opts.character] ? opts.character : "sayo",
     };
   }
 
@@ -2715,6 +2751,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 
   function stepState(state, dt, rand) {
     dt = clamp(Number(dt) || 0, 0, 0.05);
+    var profile = PROFILES[state.profileId] || PROFILES.sayo;
     state.t += dt;
     state.idleLook += dt;
     if (state.idleLook > LOOK.idle) {
@@ -2767,13 +2804,13 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       }
     }
 
-    var lean = idle.sway + (motion ? motion.lean * weight : 0);
-    var lift = idle.breath * 0.85 + (motion ? motion.lift * weight : 0);
-    var lookY = state.lookY + (motion ? motion.lookY * weight : 0);
+    var lean = idle.sway * profile.sway + (motion ? motion.lean * weight * profile.motion : 0);
+    var lift = idle.breath * 0.85 * profile.breath + (motion ? motion.lift * weight * profile.motion : 0);
+    var lookY = (state.lookY + (motion ? motion.lookY * weight : 0)) * profile.look;
     return {
       sway: lean,
-      x: idle.x + state.lookX * 0.35,
-      breath: idle.breath,
+      x: idle.x * profile.sway + state.lookX * 0.35 * profile.look,
+      breath: idle.breath * profile.breath,
       lift: lift,
       hair: state.hair,
       lookX: state.lookX,
@@ -2876,6 +2913,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (puppet && puppet.root === root) {
       puppet.opts = opts;
       puppet.state.test = !!opts.test;
+      puppet.state.profileId = PROFILES[opts.character] ? opts.character : "sayo";
       root.classList.add("livePuppet46");
       return snapshot();
     }
@@ -2885,7 +2923,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     puppet = {
       root: root,
       nodes: nodes,
-      state: createState({ test: !!opts.test }),
+      state: createState({ test: !!opts.test, character: opts.character }),
       opts: opts,
       last: 0,
       raf: 0,
@@ -2954,6 +2992,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       lastKind: puppet.state.lastKind,
       lookX: puppet.state.lookX,
       lookY: puppet.state.lookY,
+      profile: puppet.state.profileId,
       t: puppet.state.t,
     };
   }
@@ -2962,6 +3001,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     version: VERSION,
     BLINK: BLINK,
     LOOK: LOOK,
+    PROFILES: PROFILES,
     MOTIONS: MOTIONS,
     nextBlinkWait: nextBlinkWait,
     blinkEnvelope: blinkEnvelope,
@@ -3042,7 +3082,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       cost: COST,
       max: MAX,
       units: state.units.map(function (u) {
-        return { id: u.id, x: u.x, y: u.y, n: NAMES[u.id] || u.id };
+        return { id: u.id, x: u.x, y: u.y, n: NAMES[u.id] || u.id, pulse: u.pulse || 0 };
       }),
     };
   }
@@ -3090,6 +3130,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       x: pin.x,
       y: pin.y,
       clock: 0.2,
+      pulse: 0.72,
       weapon: WEAPON[id] || "rifle",
     });
     return { ok: true, reason: "", snapshot: snapshot() };
@@ -3127,6 +3168,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     var dmg = Math.max(1, (Number(world.dmg) || 8) * DMG * (Number(world.petPow) || 1));
     for (var i = 0; i < state.units.length; i++) {
       var u = state.units[i];
+      u.pulse = Math.max(0, (u.pulse || 0) - dt);
       u.clock -= dt;
       if (u.clock > 0) continue;
       u.clock = RATE;
@@ -3918,6 +3960,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     tenvisit: { n:"十连证词", i:"🎴", d:"完成一次十连寻访", r:80, c:()=>!!(save.shop40&&save.shop40.ops&&save.shop40.ops.tenPulls) },
     ssrwitness: { n:"终章证人", i:"👑", d:"抽到终章证人立绘", r:200, c:()=>((save.shop40&&save.shop40.ops&&save.shop40.ops.owned&&save.shop40.ops.owned.last_witness)||0)>0 },
     rosterfull: { n:"八页名册", i:"📚", d:"集齐 8 张证词卡", r:360, c:()=>["sayo_echo","aya_petal","rion_edge","night_radio","shrine_seal","void_ticket","cherry_crown","last_witness"].every(id=>((save.shop40&&save.shop40.ops&&save.shop40.ops.owned&&save.shop40.ops.owned[id])||0)>0) },
+    rostercomplete: { n:"镜界全证词", i:"🪞", d:"集齐全部 16 张证词卡", r:680, c:()=>["sayo_echo","aya_petal","rion_edge","night_radio","shrine_seal","void_ticket","cherry_crown","last_witness","sayo_318","aya_channel","rion_names","rin_signal","corp_contract","sister_reply","swordmaster_oath","mirror_twins"].every(id=>((save.shop40&&save.shop40.ops&&save.shop40.ops.owned&&save.shop40.ops.owned[id])||0)>0) },
   };
 
   const P = {};
@@ -5415,12 +5458,13 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     const view = viewportSize46();
     const portrait = view.h > view.w;
     document.documentElement.classList.add("landscape46");
-    document.documentElement.classList.toggle("portraitFallback46", portrait);
+    document.documentElement.classList.toggle("portraitFallback46", view.w < 640);
+    document.documentElement.classList.toggle("tallWindow46", portrait && view.w >= 640);
     let hint = $("#rotateHint46");
     if (!hint) {
       hint = document.createElement("div");
       hint.id = "rotateHint46";
-      hint.textContent = "请横持设备 · 竖屏只保留射击操作";
+      hint.textContent = "请横持设备";
       document.body.appendChild(hint);
     }
     try {
@@ -9844,6 +9888,15 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       const track=pool.find(item=>item.paused||item.ended)||pool[0],gain=clamp((save.settings?.master??.8)*(save.settings?.sfx??.8)*volume,0,1);track.pause();track.currentTime=0;track.volume=gain;track.play().catch(()=>{});return true;
     }catch(error){CONTENT41?.guard("official.feedback","audio:"+key,()=>{throw error;});return false;}
   }
+  let navFeedbackAt411=0;
+  document.addEventListener("click",event=>{
+    const now=performance.now();
+    if(now-navFeedbackAt411<70)return;
+    const target=event.target?.closest?.(".drawer .close,[data-open],[data-character]");
+    if(!target)return;
+    navFeedbackAt411=now;
+    playFeedback411(target.matches(".drawer .close")?"close":target.matches("[data-open]")?"open":"click",.2);
+  },{passive:true});
   const _soundFeedback411=sound;
   sound=function(key){const result=_soundFeedback411(key),sample={level:"reward",ach:"reward",win:"reward",over:"error",phase:"phase",boss:"boss"}[key];if(sample)playFeedback411(sample,key==="boss"?.44:.3);return result;};
   addEventListener("pointerdown",event=>{const button=event.target.closest?.("button");if(!button||button.disabled||button.closest("#hud"))return;playFeedback411(button.classList.contains("close")||button.id==="exploreClose41"?"close":button.dataset.open?"open":"click",.2);},{capture:true,passive:true});
@@ -10341,7 +10394,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     const name = root.querySelector(".heroLiveName46 b");
     const weapon = root.querySelector(".heroLiveName46 small");
     if (name) name.textContent = c.name;
-    if (weapon) weapon.textContent = c.weapon;
+    if (weapon) weapon.textContent = `${c.role} · ${c.weapon}`;
     const livePath = skinId === "default" ? `characters/${c.id}/default/live_idle.webp` : "";
     const key = `${c.id}|${skinId}|${livePath || charArtPath35(c, "dialogue", sk)}`;
     if (key === heroLiveKey46) return;
@@ -10381,6 +10434,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     if (L) L.bindHeroTap(root, () => grantCheat46(), kind => Live && Live.trigger(kind));
     if (Live) Live.attach(root, {
       test: TEST_MODE,
+      character: save.character || "sayo",
       hidden() {
         const menu = $("#menu");
         if (!menu || menu.classList.contains("hidden") || document.hidden) return true;
@@ -10403,7 +10457,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     wireLivePuppet46();
     return result;
   };
-  style37.textContent += `#menu.homeDock46{overflow-x:hidden}#menu.homeDock46 .bg{filter:brightness(.7) saturate(.9)}#menu.homeDock46 .bg:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#05051266 0%,#05051200 22%,#08071300 54%,#080713f0 86%);pointer-events:none}#coverTitle36{z-index:4}#menu.homeDock46 #coverTitle36{top:max(8px,env(safe-area-inset-top));left:50%;width:auto;max-width:86%;transform:translateX(-50%);pointer-events:auto}#menu.homeDock46 .coverTitle36 b{font-size:clamp(15px,4.2vw,22px);letter-spacing:.2em}#menu.homeDock46 .coverTitle36 span{margin-top:3px;padding:2px 8px;font-size:8px;letter-spacing:.22em;opacity:.88}.heroLive46{position:absolute;z-index:1;left:-18%;right:-18%;top:-4%;bottom:19%;pointer-events:none;overflow:hidden;-webkit-mask-image:linear-gradient(to top,transparent 0%,#000 24%,#000 100%);mask-image:linear-gradient(to top,transparent 0%,#000 24%,#000 100%);-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}.heroLiveSway46{height:100%;width:100%;display:grid;place-items:end center;transform-origin:50% 100%;animation:heroSway46 5.4s ease-in-out infinite}.heroLiveBreath46{position:relative;height:138%;width:min(165vw,860px);transform-origin:50% 100%;animation:heroBreath46 3.8s ease-in-out infinite}.heroLiveBreath46 img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center bottom;background:transparent!important;pointer-events:none;filter:none}.heroLiveBlink46,.heroLiveHair46,.heroLiveBlink46.off,.heroLiveHair46.off{opacity:0}.heroLiveName46{position:absolute;z-index:2;left:14px;right:auto;top:18%;bottom:auto;text-align:left;text-shadow:0 2px 16px #05020d;max-width:48%}.heroLiveName46 b{display:block;font-size:22px;letter-spacing:.22em}.heroLiveName46 small{display:block;margin-top:4px;color:#ffe7a3;font-size:10px;letter-spacing:.28em}#menu.homeDock46 .menu{transform:none;z-index:3;justify-content:flex-end}#menu.homeDock46 .top{z-index:5;gap:8px;align-items:center}#menu.homeDock46 .profile{display:none}#menu.homeDock46 .coins{margin-right:auto;padding:4px 10px;border-radius:99px;background:#0b0818cc;border:1px solid #ff9bcc44}#menu.homeDock46 .menuBrand35{width:30px;height:30px;border-radius:10px}#menu.homeDock46 .utilityButtons37{position:static;margin:0;max-width:148px;gap:6px}#menu.homeDock46 .calmUtility39.open39{position:absolute;top:0;right:0;width:min(74vw,280px);max-width:none;padding:8px;border-radius:14px;background:#0b0818f2;border:1px solid #ff9bcc55;z-index:8}#menu.homeDock46 .charSelectPanel{position:absolute;left:8px;bottom:30%;width:auto;margin:0;padding:0;border:0;background:none;box-shadow:none;z-index:6;pointer-events:auto}#menu.homeDock46 .sectionTitle{display:none}#menu.homeDock46 .characterList{display:flex;flex-direction:column;justify-content:flex-end;gap:9px}#menu.homeDock46 .charCard{width:52px;height:52px;min-width:52px;padding:3px;border-radius:50%;background:#0b0818d8}#menu.homeDock46 .charCard.selected{box-shadow:0 0 0 2px #fff7d8,0 0 16px #ff4fa8aa}#menu.homeDock46 .charCard img{width:44px;height:44px}#menu.homeDock46 .charCard b,#menu.homeDock46 .charCard em,#menu.homeDock46 .charCard p,#menu.homeDock46 .charCard .selectedMark{display:none}#menu.homeDock46 .stageMini{width:min(100%,560px);grid-template-columns:48px 1fr auto;padding:6px 10px;margin:0 auto 8px;border-radius:16px;background:#0b0818e8;backdrop-filter:blur(8px)}#menu.homeDock46 .stageMini img{width:48px;height:32px}#menu.homeDock46 .stageMini h3{font-size:13px}#menu.homeDock46 .stageMini p{display:none}#menu.homeDock46 .stageMini strong{font-size:16px}#menu.homeDock46 .start{margin:0 auto 8px;padding:14px;font-size:17px;letter-spacing:.14em;width:min(100%,560px);border-radius:16px;box-shadow:0 8px 28px #ff4ea355}#menu.homeDock46 .nav{width:min(100%,560px);margin:0 auto;padding:6px 4px calc(8px + env(safe-area-inset-bottom));border-radius:18px 18px 0 0;background:#0b0818f0;border:1px solid #ff9bcc33}@keyframes heroSway46{0%,100%{transform:rotate(-0.55deg) translate3d(-0.5%,0,0)}50%{transform:rotate(0.65deg) translate3d(0.5%,0,0)}}@keyframes heroBreath46{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-1%) scale(1.01)}}@keyframes heroHair46{0%,100%{transform:rotate(-1.8deg)}50%{transform:rotate(2deg)}}@keyframes heroBlink46{0%,94%,100%{opacity:0}95.2%,96.4%{opacity:1}}@keyframes heroBaseBlink46{0%,94%,100%{opacity:1}95.2%,96.4%{opacity:0}}@media(prefers-reduced-motion:reduce){.heroLiveSway46,.heroLiveBreath46,.heroLive46.hasBlink .heroLiveBase46,.heroLive46.hasBlink .heroLiveBlink46,.heroLive46.hasHair .heroLiveHair46{animation:none}}@media(max-height:760px){#menu.homeDock46 .heroLive46{bottom:28%}#menu.homeDock46 .charSelectPanel{bottom:32%}#menu.homeDock46 .charCard{width:44px;height:44px;min-width:44px}#menu.homeDock46 .charCard img{width:36px;height:36px}#menu.homeDock46 .heroLiveName46{top:14%;font-size:16px}}@media(orientation:landscape){#menu.homeDock46 .heroLive46{top:0;bottom:0;left:0;right:auto;width:58%;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 8%,#000 82%,transparent 100%);mask-image:linear-gradient(to right,transparent 0%,#000 8%,#000 82%,transparent 100%);-webkit-mask-size:100% 100%;mask-size:100% 100%}#menu.homeDock46 .menu{width:min(42vw,420px);max-width:420px;margin-left:auto;padding-left:0;transform:none;box-sizing:border-box}#menu.homeDock46 #coverTitle36{left:auto;right:3%;width:auto;transform:none;text-align:right}#menu.homeDock46 .charSelectPanel{left:auto;right:calc(min(42vw,420px) + 10px);bottom:16%}#menu.homeDock46 .charSelectPanel,#menu.homeDock46 .stageMini,#menu.homeDock46 .start,#menu.homeDock46 .nav{margin-left:auto;width:100%}#joy{left:max(18px,env(safe-area-inset-left));bottom:max(16px,env(safe-area-inset-bottom))}#hud .acts{right:max(18px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom))}}`;
+  style37.textContent += `#menu.homeDock46{overflow-x:hidden}#menu.homeDock46 .bg{filter:brightness(.7) saturate(.9)}#menu.homeDock46 .bg:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#05051266 0%,#05051200 22%,#08071300 54%,#080713f0 86%);pointer-events:none}#coverTitle36{z-index:4}#menu.homeDock46 #coverTitle36{top:max(8px,env(safe-area-inset-top));left:50%;width:auto;max-width:86%;transform:translateX(-50%);pointer-events:auto}#menu.homeDock46 .coverTitle36 b{font-size:clamp(15px,4.2vw,22px);letter-spacing:.2em}#menu.homeDock46 .coverTitle36 span{margin-top:3px;padding:2px 8px;font-size:8px;letter-spacing:.22em;opacity:.88}.heroLive46{position:absolute;z-index:1;left:-18%;right:-18%;top:-4%;bottom:19%;pointer-events:none;overflow:hidden;-webkit-mask-image:linear-gradient(to top,transparent 0%,#000 24%,#000 100%);mask-image:linear-gradient(to top,transparent 0%,#000 24%,#000 100%);-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}.heroLiveSway46{height:100%;width:100%;display:grid;place-items:end center;transform-origin:50% 100%;animation:heroSway46 5.4s ease-in-out infinite}.heroLiveBreath46{position:relative;height:100%;width:min(72vw,680px);transform-origin:50% 100%;animation:heroBreath46 3.8s ease-in-out infinite}.heroLiveBreath46 img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center 8%;background:transparent!important;pointer-events:none;filter:none}.heroLiveBlink46,.heroLiveHair46,.heroLiveBlink46.off,.heroLiveHair46.off{opacity:0}.heroLiveName46{position:absolute;z-index:2;left:14px;right:auto;top:18%;bottom:auto;text-align:left;text-shadow:0 2px 16px #05020d;max-width:48%}.heroLiveName46 b{display:block;font-size:22px;letter-spacing:.22em}.heroLiveName46 small{display:block;margin-top:4px;color:#ffe7a3;font-size:10px;letter-spacing:.28em}#menu.homeDock46 .menu{transform:none;z-index:3;justify-content:flex-end}#menu.homeDock46 .top{z-index:5;gap:8px;align-items:center}#menu.homeDock46 .profile{display:none}#menu.homeDock46 .coins{margin-right:auto;padding:4px 10px;border-radius:99px;background:#0b0818cc;border:1px solid #ff9bcc44}#menu.homeDock46 .menuBrand35{width:30px;height:30px;border-radius:10px}#menu.homeDock46 .utilityButtons37{position:static;margin:0;max-width:148px;gap:6px}#menu.homeDock46 .calmUtility39.open39{position:absolute;top:0;right:0;width:min(74vw,280px);max-width:none;padding:8px;border-radius:14px;background:#0b0818f2;border:1px solid #ff9bcc55;z-index:8}#menu.homeDock46 .charSelectPanel{position:absolute;left:8px;bottom:30%;width:auto;margin:0;padding:0;border:0;background:none;box-shadow:none;z-index:6;pointer-events:auto}#menu.homeDock46 .sectionTitle{display:none}#menu.homeDock46 .characterList{display:flex;flex-direction:column;justify-content:flex-end;gap:9px}#menu.homeDock46 .charCard{width:52px;height:52px;min-width:52px;padding:3px;border-radius:50%;background:#0b0818d8}#menu.homeDock46 .charCard.selected{box-shadow:0 0 0 2px #fff7d8,0 0 16px #ff4fa8aa}#menu.homeDock46 .charCard img{width:44px;height:44px}#menu.homeDock46 .charCard b,#menu.homeDock46 .charCard em,#menu.homeDock46 .charCard p,#menu.homeDock46 .charCard .selectedMark{display:none}#menu.homeDock46 .stageMini{width:min(100%,560px);grid-template-columns:48px 1fr auto;padding:6px 10px;margin:0 auto 8px;border-radius:16px;background:#0b0818e8;backdrop-filter:blur(8px)}#menu.homeDock46 .stageMini img{width:48px;height:32px}#menu.homeDock46 .stageMini h3{font-size:13px}#menu.homeDock46 .stageMini p{display:none}#menu.homeDock46 .stageMini strong{font-size:16px}#menu.homeDock46 .start{margin:0 auto 8px;padding:14px;font-size:17px;letter-spacing:.14em;width:min(100%,560px);border-radius:16px;box-shadow:0 8px 28px #ff4ea355}#menu.homeDock46 .nav{width:min(100%,560px);margin:0 auto;padding:6px 4px calc(8px + env(safe-area-inset-bottom));border-radius:18px 18px 0 0;background:#0b0818f0;border:1px solid #ff9bcc33}@keyframes heroSway46{0%,100%{transform:rotate(-0.55deg) translate3d(-0.5%,0,0)}50%{transform:rotate(0.65deg) translate3d(0.5%,0,0)}}@keyframes heroBreath46{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-1%) scale(1.01)}}@keyframes heroHair46{0%,100%{transform:rotate(-1.8deg)}50%{transform:rotate(2deg)}}@keyframes heroBlink46{0%,94%,100%{opacity:0}95.2%,96.4%{opacity:1}}@keyframes heroBaseBlink46{0%,94%,100%{opacity:1}95.2%,96.4%{opacity:0}}@media(prefers-reduced-motion:reduce){.heroLiveSway46,.heroLiveBreath46,.heroLive46.hasBlink .heroLiveBase46,.heroLive46.hasBlink .heroLiveBlink46,.heroLive46.hasHair .heroLiveHair46{animation:none}}@media(max-height:760px){#menu.homeDock46 .heroLive46{bottom:28%}#menu.homeDock46 .charSelectPanel{bottom:32%}#menu.homeDock46 .charCard{width:44px;height:44px;min-width:44px}#menu.homeDock46 .charCard img{width:36px;height:36px}#menu.homeDock46 .heroLiveName46{top:14%;font-size:16px}}@media(orientation:landscape){#menu.homeDock46 .heroLive46{top:0;bottom:0;left:0;right:auto;width:58%;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 8%,#000 82%,transparent 100%);mask-image:linear-gradient(to right,transparent 0%,#000 8%,#000 82%,transparent 100%);-webkit-mask-size:100% 100%;mask-size:100% 100%}#menu.homeDock46 .menu{width:min(34vw,360px);max-width:360px;margin-left:auto;padding-left:0;transform:none;box-sizing:border-box}#menu.homeDock46 #coverTitle36{left:max(16px,env(safe-area-inset-left));right:auto;width:auto;transform:none;text-align:left}#menu.homeDock46 .charSelectPanel{position:relative;left:auto;right:auto;bottom:auto;width:100%}#menu.homeDock46 .charSelectPanel,#menu.homeDock46 .stageMini,#menu.homeDock46 .start,#menu.homeDock46 .nav{margin-left:auto;width:100%}#joy{left:max(18px,env(safe-area-inset-left));bottom:max(16px,env(safe-area-inset-bottom))}#hud .acts{right:max(18px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom))}}`;
 
   /* ================= V4.5.2 闪图结算、图鉴三行、融合色特效 ================= */
   function liveSplashPath45(){
@@ -10459,6 +10513,37 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     if(P.elementalBeast41)return ["#ff8a55","#78ddff","#c18cff"][P.fusionPulse41||0];
     return fusionData()?.c||"";
   }
+  const SIGNATURE_FUSIONS46=new Set(["magitech","gunshrine","bloodsword","shadowblade","shikigami","idolgun"]);
+  function drawFusionAction46(){
+    const id=P.fusion||"";
+    const skill=P.animSkill||0,dash=P.animDash||0;
+    if(state!=="play"||quality<.62||!SIGNATURE_FUSIONS46.has(id)||(skill<=0&&dash<=0))return;
+    const active=Math.max(skill/.42,dash/.32),q=clamp(active,0,1),t=runTime||0,color=fusionFxColor45()||"#ffd36b";
+    ctx.save();
+    ctx.translate(P.x,P.y);
+    ctx.globalAlpha=.16+q*.2;
+    ctx.strokeStyle=color;
+    ctx.fillStyle=color;
+    ctx.lineWidth=1+q*1.2;
+    if(id==="magitech"){
+      for(let i=0;i<3;i++){const a=t*1.8+i*TAU/3,r=34+i*8;ctx.save();ctx.rotate(a);ctx.strokeRect(-r,-r,r*2,r*2);ctx.restore();}
+    }else if(id==="gunshrine"){
+      for(let i=0;i<6;i++){const a=i*TAU/6+t*.4,r=30+q*22;ctx.beginPath();ctx.ellipse(Math.cos(a)*r,Math.sin(a)*r,8,3,a,0,TAU);ctx.fill();}
+      ctx.beginPath();ctx.arc(0,0,28+q*25,0,TAU);ctx.stroke();
+    }else if(id==="bloodsword"){
+      ctx.lineWidth=3+q*3;
+      for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(0,0,38+i*13,-1.1+i*.16,.8+i*.14);ctx.stroke();}
+    }else if(id==="shadowblade"){
+      for(let i=0;i<4;i++){const a=t*2+i*TAU/4,r=28+i*7,x=Math.cos(a)*r,y=Math.sin(a)*r;ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.strokeRect(-8,-8,16,16);ctx.restore();}
+    }else if(id==="shikigami"){
+      for(let i=0;i<5;i++){const a=-t*1.5+i*TAU/5,r=34+q*18;ctx.save();ctx.translate(Math.cos(a)*r,Math.sin(a)*r);ctx.rotate(a+Math.PI/2);ctx.strokeRect(-4,-10,8,20);ctx.restore();}
+    }else if(id==="idolgun"){
+      for(let i=0;i<3;i++){ctx.globalAlpha=(.18+q*.25)*(1-i*.18);ctx.beginPath();ctx.arc(0,0,30+i*14+q*12,0,TAU);ctx.stroke();}
+      ctx.globalAlpha=.24+q*.32;ctx.beginPath();ctx.moveTo(-55,34);ctx.lineTo(0,-42-q*18);ctx.lineTo(55,34);ctx.closePath();ctx.stroke();
+    }
+    ctx.restore();
+  }
+  CONTENT41.hook("combat:after-draw",drawFusionAction46,"core.fusion-action46",27);
   const _finish45=finish;
   finish=function(win){const result=_finish45(win);paintOutfitModal45("#result");return result;};
   const _finishMainGod45=finishMainGod36;
@@ -10498,6 +10583,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     const result=L.pull(save,count);
     if(!result.ok){
       toast(result.reason==="coins"?"樱花币不足":"寻访失败");
+      playFeedback411("error",.24);
       refreshLobby46();
       return result;
     }
@@ -10505,6 +10591,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     toast(count===10?`十连完成：${names}…`:`寻访：${result.results[0].n}`);
     checkAch();
     persist();
+    playFeedback411("reward",result.results.some(item=>item.r==="SSR")?.48:.3);
     refreshLobby46();
     if(L.showReveal)L.showReveal(result.results,{art:artUrl,again:()=>doPull46(count)});
     return result;
@@ -10514,6 +10601,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     if(!L)return {coins:save.coins,cheatUsed:0};
     const result=L.grantCheat(save);
     toast(L.cheatToast);
+    playFeedback411("reward",.35);
     persist();
     refreshLobby46();
     return { coins: result.coins, cheatUsed: true };
@@ -10636,12 +10724,12 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     const name=O.NAMES[id]||id;
     if(O.snapshot().units.some(u=>u.id===id)){
       const r=O.retreat(id);
-      if(r.ok)toast(`${name} 已撤回`);
+      if(r.ok){toast(`${name} 已撤回`);playFeedback411("close",.24);}
       opsPaint46();
       return r;
     }
     const r=O.deploy(id,save.character||P.character,P.x,P.y,W,H);
-    if(r.ok)toast(`${name} 已部署`);
+    if(r.ok){toast(`${name} 已部署`);playFeedback411("open",.28);}
     else if(r.reason==="dp")toast("部署点不足");
     else if(r.reason==="full")toast("最多两名干员");
     else if(r.reason==="self")toast("不能部署当前角色");
@@ -10685,6 +10773,16 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
         ctx.beginPath();
         ctx.arc(0,2,20,0,Math.PI*2);
         ctx.stroke();
+        if(u.pulse>0){
+          const q=clamp(u.pulse/.72,0,1);
+          ctx.globalCompositeOperation="screen";
+          ctx.globalAlpha=q*.8;
+          ctx.strokeStyle=u.id==="sayo"?"#ff77bd":u.id==="aya"?"#70c8ff":"#ff6c82";
+          ctx.lineWidth=2+q*2;
+          ctx.beginPath();
+          ctx.arc(0,2,22+(1-q)*34,0,Math.PI*2);
+          ctx.stroke();
+        }
         ctx.restore();
       }
     },"core.ops46",15);
