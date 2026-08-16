@@ -50,6 +50,14 @@ const api = (method, ...args) =>
   );
 const snap = () => page.evaluate(() => JSON.parse(window.render_game_to_text()));
 
+await page.locator("#start").click();
+if (await page.locator("#tutorialDrawer37").isVisible()) {
+  for (let i = 0; i < 4; i++) await page.locator("#tutorialNext37").click();
+}
+if ((await snap()).mode !== "menu") {
+  await api("dismissDialogue");
+  await api("backMenu");
+}
 await api("selectCharacter", "sayo");
 await api("selectStage", 1);
 await api("start");
