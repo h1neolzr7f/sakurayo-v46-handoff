@@ -58,7 +58,16 @@
       cost: COST,
       max: MAX,
       units: state.units.map(function (u) {
-        return { id: u.id, x: u.x, y: u.y, n: NAMES[u.id] || u.id, pulse: u.pulse || 0 };
+        return {
+          id: u.id,
+          x: u.x,
+          y: u.y,
+          n: NAMES[u.id] || u.id,
+          pulse: u.pulse || 0,
+          aim: Number(u.aim) || 0,
+          fire: u.fire || 0,
+          weapon: u.weapon || WEAPON[u.id] || "rifle",
+        };
       }),
     };
   }
@@ -107,6 +116,8 @@
       y: pin.y,
       clock: 0.2,
       pulse: 0.72,
+      aim: 0,
+      fire: 0,
       weapon: WEAPON[id] || "rifle",
     });
     return { ok: true, reason: "", snapshot: snapshot() };
@@ -145,11 +156,14 @@
     for (var i = 0; i < state.units.length; i++) {
       var u = state.units[i];
       u.pulse = Math.max(0, (u.pulse || 0) - dt);
+      u.fire = Math.max(0, (u.fire || 0) - dt);
       u.clock -= dt;
       if (u.clock > 0) continue;
       u.clock = RATE;
       var target = typeof world.nearest === "function" ? world.nearest(u.x, u.y, u.weapon === "blade" ? BLADE_RANGE : RANGE) : null;
       if (!target) continue;
+      u.aim = Math.atan2(target.y - u.y, target.x - u.x);
+      u.fire = u.weapon === "blade" ? 0.24 : 0.16;
       shots.push({
         id: u.id,
         weapon: u.weapon,

@@ -11,6 +11,16 @@ Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先
 - 单入口 / Android bundle SHA-256：`FEE632E564D26DFC55AE62B06BB9A0E6FCD6A37EE02063634F2AC6BEA6676150`。
 - Debug APK SHA-256：`A2AD177FEBBE7F4477AE23B037BDECD0318E052BB553451100C2801416EA9380`。
 
+## 2026-08-16 V4.6 第二轮成熟化完成
+
+- 从 `613c85c` 继续，保留 Canvas/WebView、4.6.0、`sakurayoV3` 和现有玩法闭环；未迁移引擎、未扩卡池、未出售永久数值。
+- Boss 登场/转阶段新增章节字幕、短暗场和四段血条门槛；小夜/绫/凛音主动技能获得樱花环、六向枪线、双剑弧身份演出。
+- 干员改用 Q 版待机/攻击帧并记录朝向、武器和短时攻击反馈；不进 `pets`，DP、伤害、人数和实体预算不变。
+- 修正模态优先级：剧情等模态出现时收起 Boss 警告，阶段演出完成后吐槽队列继续。
+- 新增 932×430 `combat_visual`；开发入口与离线单入口均通过静态、3 unit、8 framework、证词/干员、52 browser smoke 与 gacha/combat visual。
+- Android `assembleDebug` / `lintDebug` 成功；无 INTERNET，1190 WebP，v1/v2 Debug 签名通过。
+- 单入口 SHA-256 `415844A549AD6C842F8CAEF3D3014506F2D47D59DAEAB6263073445571612C4C`；Debug APK SHA-256 `F0F44F12FE8D7FD24F41C46DC06B107EE6A9E39A360B7F17133B233430B86A0D`。
+
 ## 2026-08-16 V4.6 综合制作升级完成
 
 - 以制作人、系统策划、UI/UX、美术指导和 QA 的统一标准完成 V4.6 收口；评估后保留 Canvas/WebView，避免用高风险引擎迁移重做已成熟的 24 融合与完整闭环。

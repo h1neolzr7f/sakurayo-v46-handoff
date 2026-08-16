@@ -11,7 +11,7 @@
     "check": "python3 tools/static_check.py src/index.html && node --check tests/artifacts/static/index.extracted.js && python3 tools/check_content_packs.py && node --check src/runtime/sakurayo-content-runtime.js && node --check src/runtime/sakurayo-lifecycle.js && node --check src/runtime/sakurayo-cutscene.js && node --check src/runtime/sakurayo-economy.js && node --check src/runtime/sakurayo-lobby.js && node --check src/runtime/sakurayo-live.js && node --check src/runtime/sakurayo-ops.js",
     "test:unit": "node tests/lobby_unit.mjs && node tests/live_unit.mjs && node tests/ops_unit.mjs",
     "test:smoke": "node tests/ops_smoke.mjs && node tests/framework_smoke.mjs && node tests/testimony_smoke.mjs && node tests/landscape_smoke.mjs && node tests/browser_smoke.mjs",
-    "test:visual": "node tests/gacha_visual.mjs",
+    "test:visual": "node tests/gacha_visual.mjs && node tests/combat_visual.mjs",
     "test": "npm run check && npm run test:unit && npm run test:smoke"
   },
   "repository": {

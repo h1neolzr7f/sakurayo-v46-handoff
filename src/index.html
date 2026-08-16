@@ -520,10 +520,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     warSinger:["小夜","尸潮歌姬成型。副歌一响，僵尸负责倒下。"],healingIdol:["凛","治愈偶像进阶。","小夜","终于有观众看完演出后生命值会上升。"],
     boneKing:["小夜","白骨君王成型。王座先免了，我不想知道材料来源。"],soulHerd:["小夜","群魂牧者进阶。请亡魂排队，不要挤占弹幕通道。"],
   };
-  function transientBlocked(){return ["dialogue","event","level","pause","result","menu"].includes(state) || !$("#warning").classList.contains("hidden") || (P.outfitReveal||0)>0.18;}
+  function transientBlocked(){return ["dialogue","event","level","pause","result","menu"].includes(state) || !$("#warning").classList.contains("hidden") || (P.outfitReveal||0)>0.18 || !!window.SakurayoLifecycle?.presentationActive?.();}
   function hideTransient(){
     $("#banter").classList.add("hidden");
     $("#toast").classList.remove("show");
+    $("#warning").classList.add("hidden");
     banterBusy=false;toastBusy=false;
     clearTimeout(playBanter.t);clearTimeout(playToast.t);
   }
@@ -3615,9 +3616,6 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       dead: false,
     };
     enemies.push(boss);
-    $("#warning").textContent = `BOSS ${s.boss} 降临 · 四阶段战斗`;
-    $("#warning").classList.remove("hidden");
-    setTimeout(() => $("#warning").classList.add("hidden"), 2300);
     sound("boss");
     showDialogue(bossDialogue(), () => {
       state = "play";
@@ -4086,6 +4084,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
             school: "magical",
           });
       }, 160);
+    window.SakurayoLifecycle?.triggerSkill?.(save.character || "sayo", fusionData()?.c || "#ff77bd");
     sound("skill");
   }
   function dash() {
@@ -5179,6 +5178,26 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     updateHud();
   }
 
+  let bossGateKey46="";
+  function updateBossGates46(){
+    const rail=$("#waveF")?.parentElement;
+    if(!rail)return;
+    let gates=$("#bossPhaseGates46");
+    if(!gates){
+      gates=document.createElement("div");
+      gates.id="bossPhaseGates46";
+      gates.setAttribute("aria-hidden","true");
+      gates.innerHTML='<i data-phase="2"></i><i data-phase="3"></i><i data-phase="4"></i>';
+      rail.appendChild(gates);
+    }
+    gates.hidden=!(boss&&!boss.dead);
+    if(gates.hidden){bossGateKey46="";return;}
+    const key=`${stage().id}:${boss.phase}`;
+    if(key===bossGateKey46)return;
+    bossGateKey46=key;
+    gates.dataset.phase=String(boss.phase||1);
+    gates.querySelectorAll("i").forEach(mark=>mark.classList.toggle("passed",Number(mark.dataset.phase)<=Number(boss.phase||1)));
+  }
   function rankValue(r){return ({D:0,C:1,B:2,A:3,S:4})[r]??2;}
   function updateHud() {
     let s = stage(),
@@ -5208,6 +5227,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     $("#kill").textContent = `击破 ${P.kills}`;
     let prog = bossBorn ? (boss ? 1 - boss.hp / boss.max : 1) : runTime / s.dur;
     $("#waveF").style.width = `${clamp(prog * 100, 0, 100)}%`;
+    updateBossGates46();
     $("#waveT").textContent = bossBorn
       ? boss
         ? `${s.boss} · 阶段 ${boss.phase}${boss.guard ? ` · 镜卫 ${boss.guard}` : ""}`
@@ -6108,7 +6128,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     P.fire=P.rate;sound("skill");
   };
   const _skill35=skill;
-  skill=function(){let c=char35();if(c.id==="sayo")return _skill35();if(state!=="play"||P.skill>0)return;P.skill=P.skillCd;if(c.id==="aya"){slash35(150,P.skillD*P.skillPow*1.15,true);setTimeout(()=>{if(state==="play")slash35(190,P.skillD*P.skillPow*.82,true)},120);for(let i=0;i<6;i++){let a=i*TAU/6;pushBullet({x:P.x,y:P.y,vx:Math.cos(a)*P.bSpeed,vy:Math.sin(a)*P.bSpeed,r:4,life:1,dmg:P.dmg*.65,pierce:2,source:"shot",school:"gun",hit:new Set()});}}else{P.inv=Math.max(P.inv,.45);slash35(230,P.skillD*P.skillPow*1.85,true);for(const e of grid.near(P.x,P.y,260))e.frozen=Math.max(e.frozen,.55);}sound("skill");};
+  skill=function(){let c=char35();if(c.id==="sayo")return _skill35();if(state!=="play"||P.skill>0)return;P.skill=P.skillCd;if(c.id==="aya"){slash35(150,P.skillD*P.skillPow*1.15,true);setTimeout(()=>{if(state==="play")slash35(190,P.skillD*P.skillPow*.82,true)},120);for(let i=0;i<6;i++){let a=i*TAU/6;pushBullet({x:P.x,y:P.y,vx:Math.cos(a)*P.bSpeed,vy:Math.sin(a)*P.bSpeed,r:4,life:1,dmg:P.dmg*.65,pierce:2,source:"shot",school:"gun",hit:new Set()});}}else{P.inv=Math.max(P.inv,.45);slash35(230,P.skillD*P.skillPow*1.85,true);for(const e of grid.near(P.x,P.y,260))e.frozen=Math.max(e.frozen,.55);}window.SakurayoLifecycle?.triggerSkill?.(c.id,fusionData()?.c||c.main);sound("skill");};
   function drawChar35(x,y){let c=char35(),sk=skin35(),m=sk.id==="default"?c.main:sk.c1,h=c.hair,light=c.light,a=Math.atan2(P.fy,P.fx);ctx.save();ctx.translate(x,y);if(P.inv>0&&Math.floor(P.inv*15)%2===0)ctx.globalAlpha=.35;ctx.fillStyle="#0006";ctx.beginPath();ctx.ellipse(0,23,25,8,0,0,TAU);ctx.fill();if(P.form||P.fusion){ctx.strokeStyle=m;ctx.lineWidth=2;ctx.globalAlpha=.55;ctx.beginPath();ctx.arc(0,0,31+Math.sin(runTime*4)*3,0,TAU);ctx.stroke();ctx.globalAlpha=1;}ctx.fillStyle=h;ctx.beginPath();ctx.ellipse(0,-4,21,27,0,0,TAU);ctx.fill();if(c.id==="sayo"){for(const s of [-1,1]){ctx.beginPath();ctx.moveTo(s*15,-7);ctx.quadraticCurveTo(s*35,5,s*20,31);ctx.quadraticCurveTo(s*7,20,s*8,0);ctx.fill();}}else if(c.id==="aya"){ctx.beginPath();ctx.ellipse(-20,-2,10,30,-.35,0,TAU);ctx.fill();}else{ctx.beginPath();ctx.moveTo(-17,-4);ctx.quadraticCurveTo(-28,20,-13,35);ctx.lineTo(0,15);ctx.lineTo(14,35);ctx.quadraticCurveTo(29,18,17,-5);ctx.fill();}ctx.fillStyle=m;ctx.beginPath();ctx.moveTo(-14,9);ctx.lineTo(14,9);ctx.lineTo(18,29);ctx.lineTo(-18,29);ctx.fill();ctx.fillStyle=light;ctx.fillRect(-11,10,22,5);ctx.fillStyle="#ffe1d5";ctx.beginPath();ctx.arc(0,-8,14,0,TAU);ctx.fill();ctx.fillStyle=h;ctx.beginPath();ctx.arc(0,-12,14,Math.PI,TAU);ctx.fill();ctx.beginPath();ctx.moveTo(-13,-11);ctx.lineTo(-5,0);ctx.lineTo(0,-17);ctx.lineTo(5,-1);ctx.lineTo(13,-11);ctx.fill();ctx.fillStyle=c.id==="rion"?"#b92849":"#6c347c";ctx.beginPath();ctx.ellipse(-5,-7,2.1,3,0,0,TAU);ctx.ellipse(5,-7,2.1,3,0,0,TAU);ctx.fill();ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(-4.3,-8,.8,0,TAU);ctx.arc(5.7,-8,.8,0,TAU);ctx.fill();ctx.rotate(a);if(c.id==="sayo"){ctx.fillStyle="#e8f8ff";ctx.fillRect(10,-3,25,7);ctx.fillStyle="#5be1ff";ctx.fillRect(28,-2,13,5);}else if(c.id==="aya"){ctx.fillStyle="#eef8ff";ctx.fillRect(10,-3,18,6);ctx.strokeStyle="#a6c8ff";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-8,13);ctx.lineTo(33,-25);ctx.stroke();}else{ctx.strokeStyle="#fff5f6";ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(-8,14);ctx.lineTo(38,-27);ctx.stroke();ctx.strokeStyle="#ff526f";ctx.lineWidth=2;ctx.stroke();}ctx.restore();}
   hero=drawChar35;
   const _vectorDrawChar35=drawChar35;
@@ -6506,7 +6526,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   MAIN_GOD_ITEMS36.cursedHeart={n:"诅咒遗物·猩红心核",i:"🫀",d:"全伤害 +25%，最大生命 -18%；高风险永久兑换，可在重置时返还",max:1,base:24,step:0,group:"特殊效果道具"};
 
   const _resetP39=resetP;
-  resetP=function(){const result=_resetP39();P.perfectDodges=0;P.dodgeFlash=0;P.bossRule39="";P.signalLane39=null;if(isMainGodRun36()&&save.mainGod.cursedHeart){P.dmg*=1.25;P.skillPow*=1.25;P.spellPow*=1.25;P.bladePower*=1.25;P.maxHp*=.82;P.hp=Math.min(P.hp,P.maxHp);}return result;};
+  resetP=function(){const result=_resetP39();window.SakurayoLifecycle?.updatePresentation?.(99);P.perfectDodges=0;P.dodgeFlash=0;P.bossRule39="";P.signalLane39=null;if(isMainGodRun36()&&save.mainGod.cursedHeart){P.dmg*=1.25;P.skillPow*=1.25;P.spellPow*=1.25;P.bladePower*=1.25;P.maxHp*=.82;P.hp=Math.min(P.hp,P.maxHp);}return result;};
 
   function immediateThreat39(){
     for(const b of ebullets)if(Math.hypot(b.x-P.x,b.y-P.y)<78+(b.r||4))return true;
@@ -6974,6 +6994,18 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   CONTENT41.hook("combat:after-update",payload=>{if(boss?.transformFx412>0)boss.transformFx412=Math.max(0,boss.transformFx412-payload.dt);},"core.boss-art412",10);
   function drawBossStage412(){if(!boss||boss.dead||state!=="play"||quality<.7)return;const p=boss.phase||1,t=runTime,sid=stage().id;ctx.save();ctx.globalCompositeOperation="screen";ctx.globalAlpha=.05+p*.018;ctx.strokeStyle=sid===2?"#5ceaff":sid===3?"#e4d7ff":"#ff6dbb";ctx.lineWidth=2;if(sid===1){for(let i=0;i<4+p;i++){const x=(i+.5)*W/(4+p);ctx.beginPath();ctx.ellipse(x,88+Math.sin(t+i)*18,18,6,0,0,TAU);ctx.stroke();}}else if(sid===2){for(let y=80;y<H;y+=34+p*2){ctx.beginPath();ctx.moveTo(0,y+Math.sin(t*7+y)*4);ctx.lineTo(W,y);ctx.stroke();}}else if(sid===3){for(let i=0;i<5+p;i++){const x=(i+.5)*W/(5+p),y=74+(i%2)*28;ctx.beginPath();ctx.moveTo(x-9,y-18);ctx.lineTo(x+9,y+18);ctx.stroke();}}else{for(let i=0;i<4+p;i++){const a=t*.08+i*TAU/(4+p),x=W/2+Math.cos(a)*W*.43,y=H/2+Math.sin(a)*H*.42;ctx.strokeRect(x-10,y-16,20,32);}}ctx.restore();}
   CONTENT41.hook("combat:after-draw",drawBossStage412,"core.boss-stage412",40);
+  CONTENT41.hook("boss:after-spawn",()=>{
+    if(boss)window.SakurayoLifecycle?.triggerBoss?.(stage().id,stage().boss,isMainGodRun36());
+  },"core.combat-presentation46",45);
+  CONTENT41.hook("boss:after-phase",payload=>{
+    window.SakurayoLifecycle?.triggerPhase?.(stage().id,payload?.bossPhase||boss?.phase||1,isMainGodRun36());
+  },"core.combat-presentation46",45);
+  CONTENT41.hook("combat:after-update",payload=>{
+    if(state==="play")window.SakurayoLifecycle?.updatePresentation?.(payload?.dt||0);
+  },"core.combat-presentation46",60);
+  CONTENT41.hook("combat:after-draw",()=>{
+    if(state==="play")window.SakurayoLifecycle?.drawPresentation?.(ctx,lifecycleWorld44());
+  },"core.combat-presentation46",60);
 
   /* ================= V4.2 MOD KIT LIFECYCLE SEAM ================= */
   const CORE_LIFECYCLE42=Object.freeze({spawnBoss,advanceBossPhase,update,draw,world:lifecycleWorld44,lifecycle:()=>window.SakurayoLifecycle});
@@ -6995,7 +7027,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
   function installModKitButton42(){installUtilityButtons37();const wrap=document.querySelector(".utilityButtons37");if(!wrap||$("#modKitButton42"))return;const button=document.createElement("button");button.id="modKitButton42";button.textContent=`扩展包 ${CONTENT41.packs().filter(pack=>pack.enabled).length}`;button.onclick=openModKit42;wrap.appendChild(button);}
   style37.textContent+=`.modKitSummary42{padding:10px 12px;margin-bottom:10px;border:1px solid #70e4ff55;border-radius:12px;background:#0b1724;color:#9cecff;font-weight:800}.modKitPack42{margin:8px 0;padding:11px 12px;border:1px solid #ffffff20;border-radius:13px;background:#100d24}.modKitPack42.enabled{border-color:#63e6b455}.modKitPack42.disabled{border-color:#ff6c8c66;background:#26101c}.modKitPack42 h3{margin:0 0 5px;font-size:14px}.modKitPack42.enabled h3{color:#8ff2ca}.modKitPack42.disabled h3{color:#ff9eb4}.modKitPack42 code{color:#aeb6d9;font-size:10px;word-break:break-all}.modKitPack42 p{margin:7px 0 0;color:#d5cee4;font-size:11px}.modKitErrorTitle42{margin:16px 0 6px;color:#ff98b0}.modKitError42{padding:9px;border-radius:9px;background:#2b111c;color:#ffd4df;white-space:pre-wrap;font-size:10px}`;
-  style37.textContent+=`#skill{filter:brightness(.72) saturate(.8);box-shadow:0 0 0 3px #fff1,0 8px 18px #0009}#dash{filter:brightness(.84) saturate(.85)}#skill:active,#dash:active,#skill.ready44,#dash.ready44{filter:brightness(1.08) saturate(1.12)}#skill.ready44{box-shadow:0 0 0 3px #ffe6a866,0 0 18px #ff8ad888}#dash.ready44{box-shadow:0 0 0 3px #9befff88,0 0 16px #72e9ff66}.careerTree44{margin:0 0 12px;padding:10px 12px;border:1px solid #ffb2d444;border-radius:14px;background:#140f24;text-align:left}.careerTree44 em{display:block;margin:0 0 6px;color:#ffd3ea;letter-spacing:.22em;font-size:10px;font-style:normal}.careerTree44 div{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid #ffffff0f;color:#f4eaf4;font-size:12px}.careerTree44 div:last-of-type{border-bottom:0}.careerTree44 small{display:block;margin-top:6px;color:#9ee7ff;line-height:1.45}.careerTree44 b{color:#ffd3ea}.ground44-1:after{background:linear-gradient(90deg,#140a14fa,#3a18288a 72%,transparent)!important}.ground44-2:after{background:linear-gradient(90deg,#071018fa,#1230448a 72%,transparent)!important}.ground44-3:after{background:linear-gradient(90deg,#100e16fa,#2a24388a 72%,transparent)!important}.ground44-4:after{background:linear-gradient(90deg,#120e22fa,#2c1a448a 72%,transparent)!important}.choice{border-left-width:5px}.wave .fill{transition:width .2s linear}#paused .modal{border-color:#ffb2d455}#paused .sub{max-width:28em;margin-left:auto;margin-right:auto;line-height:1.55}.coverTitle36 span{letter-spacing:.22em}.mission{color:#f3e7f4}.mission b{color:#ffe6a3}#toast{max-width:86vw;white-space:normal;line-height:1.45;text-align:center}.dialogueHint{letter-spacing:.18em;color:#ffb7d8}.charSelectPanel .sectionTitle small{color:#c9b8d8}@media(min-width:720px){#menu .menu{transform:scale(1.04);transform-origin:top center}.coverTitle36 b{font-size:clamp(40px,8vw,72px)}}`;
+  style37.textContent+=`#skill{filter:brightness(.72) saturate(.8);box-shadow:0 0 0 3px #fff1,0 8px 18px #0009}#dash{filter:brightness(.84) saturate(.85)}#skill:active,#dash:active,#skill.ready44,#dash.ready44{filter:brightness(1.08) saturate(1.12)}#skill.ready44{box-shadow:0 0 0 3px #ffe6a866,0 0 18px #ff8ad888}#dash.ready44{box-shadow:0 0 0 3px #9befff88,0 0 16px #72e9ff66}.careerTree44{margin:0 0 12px;padding:10px 12px;border:1px solid #ffb2d444;border-radius:14px;background:#140f24;text-align:left}.careerTree44 em{display:block;margin:0 0 6px;color:#ffd3ea;letter-spacing:.22em;font-size:10px;font-style:normal}.careerTree44 div{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid #ffffff0f;color:#f4eaf4;font-size:12px}.careerTree44 div:last-of-type{border-bottom:0}.careerTree44 small{display:block;margin-top:6px;color:#9ee7ff;line-height:1.45}.careerTree44 b{color:#ffd3ea}.ground44-1:after{background:linear-gradient(90deg,#140a14fa,#3a18288a 72%,transparent)!important}.ground44-2:after{background:linear-gradient(90deg,#071018fa,#1230448a 72%,transparent)!important}.ground44-3:after{background:linear-gradient(90deg,#100e16fa,#2a24388a 72%,transparent)!important}.ground44-4:after{background:linear-gradient(90deg,#120e22fa,#2c1a448a 72%,transparent)!important}.choice{border-left-width:5px}.wave .fill{transition:width .2s linear}#bossPhaseGates46{position:absolute;inset:0;z-index:2;pointer-events:none}#bossPhaseGates46[hidden]{display:none}#bossPhaseGates46 i{position:absolute;top:0;bottom:0;width:2px;background:#fff8;box-shadow:0 0 4px #000;transform:translateX(-1px)}#bossPhaseGates46 i:nth-child(1){left:25%}#bossPhaseGates46 i:nth-child(2){left:50%}#bossPhaseGates46 i:nth-child(3){left:75%}#bossPhaseGates46 i:after{content:"";position:absolute;left:50%;top:50%;width:6px;height:6px;border:1px solid #fff;background:#24152f;transform:translate(-50%,-50%) rotate(45deg)}#bossPhaseGates46 i.passed{background:#ffe6a3}#bossPhaseGates46 i.passed:after{background:#f35aa6;border-color:#ffe6a3}#paused .modal{border-color:#ffb2d455}#paused .sub{max-width:28em;margin-left:auto;margin-right:auto;line-height:1.55}.coverTitle36 span{letter-spacing:.22em}.mission{color:#f3e7f4}.mission b{color:#ffe6a3}#toast{max-width:86vw;white-space:normal;line-height:1.45;text-align:center}.dialogueHint{letter-spacing:.18em;color:#ffb7d8}.charSelectPanel .sectionTitle small{color:#c9b8d8}@media(min-width:720px){#menu .menu{transform:scale(1.04);transform-origin:top center}.coverTitle36 b{font-size:clamp(40px,8vw,72px)}}`;
   style37.textContent+=`.exploreEvent412{position:absolute;z-index:7;inset:0;display:grid;place-items:center;padding:22px;background:#05030bbd;backdrop-filter:blur(4px)}.exploreEvent412.hidden{display:none}.exploreEvent412>div{width:min(430px,92vw);padding:18px;border:1px solid #8deaff88;border-radius:20px;background:linear-gradient(145deg,#17102cf2,#080713f5);box-shadow:0 22px 70px #000b}.exploreEvent412 small{color:#7ee9ff;letter-spacing:.18em}.exploreEvent412 h3{margin:8px 0;color:#fff;font-size:22px}.exploreEvent412 p{color:#d9d0e5;line-height:1.65}.exploreEvent412 #exploreEventChoices412{display:grid;gap:9px;margin:14px 0}.exploreEvent412 #exploreEventChoices412 button{padding:12px;text-align:left;border:1px solid #ffffff22;border-radius:14px;background:#ffffff0b}.exploreEvent412 #exploreEventChoices412 b,.exploreEvent412 #exploreEventChoices412 span{display:block}.exploreEvent412 #exploreEventChoices412 b{color:#fff}.exploreEvent412 #exploreEventChoices412 span{margin-top:4px;color:#bfb2d2;font-size:10px}.exploreEvent412 #exploreEventLeave412{width:100%;padding:10px;border-radius:12px;background:#332748;color:#cabed8}`;
   CONTENT41?.emit("core:contentApplied",{packs:CONTENT41.packs(),costumes:CONTENT41.content("costumes").length,achievements:CONTENT41.content("achievements").length});
   style37.textContent+=`.extensionStory41{border-color:#72dcff55!important}.shopTabs40 button[data-shop="extensions"]{color:#91efff}.exploreEntry41{margin-left:7px;background:linear-gradient(135deg,#36b9d9,#7659ee)!important}.exploration41{position:fixed;inset:0;z-index:90;background:#080713;overflow:hidden;touch-action:none}.exploration41 canvas{position:absolute;inset:0}.exploreTop41{position:absolute;z-index:2;left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));top:max(12px,env(safe-area-inset-top));display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:1px solid #ffffff2b;border-radius:15px;background:#0b0923d9;backdrop-filter:blur(6px)}.exploreTop41 b,.exploreTop41 small{display:block}.exploreTop41 small{margin-top:3px;color:#8fe8ff}.exploreTop41 button{width:40px;height:40px;border-radius:50%;background:#ffffff17;font-size:24px}.explorePad41{position:absolute;z-index:3;left:max(22px,env(safe-area-inset-left));bottom:max(52px,env(safe-area-inset-bottom));width:116px;height:116px;border-radius:50%;border:2px solid #ffffff55;background:#0c0a24a8}.explorePad41 i{position:absolute;left:31px;top:31px;width:50px;height:50px;border-radius:50%;background:linear-gradient(145deg,#ff69b7,#7468ff);box-shadow:0 0 20px #ff70c477}.exploreHint41{position:absolute;z-index:2;right:16px;bottom:max(20px,env(safe-area-inset-bottom));padding:7px 10px;border-radius:10px;background:#090719b8;color:#ddd0ed;font-size:10px}.exploreToast41,#exploreToast41{position:absolute;z-index:4;left:50%;top:19%;transform:translate(-50%,-12px);opacity:0;padding:9px 13px;border-radius:12px;background:#1a1234e8;border:1px solid #ffd36b99;color:#fff1b0;transition:.2s;white-space:nowrap}.exploreToast41.show,#exploreToast41.show{opacity:1;transform:translate(-50%,0)}`;
@@ -7653,8 +7685,14 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         ctx.beginPath();
         ctx.ellipse(0,16,13,5,0,0,Math.PI*2);
         ctx.fill();
-        const img=artImage(`characters/${u.id}/default/portrait.webp`);
-        if(artReady(img))ctx.drawImage(img,-16,-30,32,36);
+        const firing=(u.fire||0)>0;
+        const img=artImage(`characters/${u.id}/default/anim_${firing?"attack":"idle"}.webp`);
+        if(artReady(img)){
+          ctx.save();
+          if(Math.cos(u.aim||0)<0)ctx.scale(-1,1);
+          ctx.drawImage(img,-24,-34,48,48);
+          ctx.restore();
+        }
         else{
           ctx.fillStyle="#ffe6a3";
           ctx.beginPath();
@@ -7666,6 +7704,23 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         ctx.beginPath();
         ctx.arc(0,2,20,0,Math.PI*2);
         ctx.stroke();
+        if(firing){
+          const q=clamp((u.fire||0)/(u.weapon==="blade"?.24:.16),0,1),a=u.aim||0;
+          ctx.globalCompositeOperation="screen";
+          ctx.globalAlpha=.32+q*.62;
+          ctx.strokeStyle=u.id==="sayo"?"#ff77bd":u.id==="aya"?"#70c8ff":"#ff6c82";
+          ctx.lineWidth=2+q*2;
+          if(u.weapon==="blade"){
+            ctx.beginPath();
+            ctx.arc(0,-4,26+(1-q)*18,a-.8,a+.8);
+            ctx.stroke();
+          }else{
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(a)*15,-4+Math.sin(a)*15);
+            ctx.lineTo(Math.cos(a)*(34+(1-q)*18),-4+Math.sin(a)*(34+(1-q)*18));
+            ctx.stroke();
+          }
+        }
         if(u.pulse>0){
           const q=clamp(u.pulse/.72,0,1);
           ctx.globalCompositeOperation="screen";
