@@ -58,7 +58,8 @@ O.deploy("aya", "sayo", 120, 300, 430, 932);
 const idle = O.tick(0.2, { play: true, mode: "story", dmg: 10, petPow: 1, nearest: () => null });
 assert.equal(idle.shots.length, 0);
 
-const target = { x: 160, y: 300 };
+const deployedUnit = O.snapshot().units[0];
+const target = { x: deployedUnit.x + 40, y: deployedUnit.y };
 const ready = O.tick(1.2, {
   play: true,
   mode: "story",
