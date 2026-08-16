@@ -11,6 +11,21 @@
   var fillAcc = 0;
   var echo = [0, 0, 0, 0, 0, 0];
   var echoAt = 0;
+  var presentation = {
+    kind: "",
+    phase: 0,
+    time: 0,
+    total: 0,
+    stageId: 1,
+    mainGod: false,
+    title: "",
+    subtitle: "",
+    color: "#ff6fb0",
+    skill: "",
+    skillTime: 0,
+    skillTotal: 0,
+    skillColor: "#ff6fb0",
+  };
 
   function clamp(v, a, b) {
     return v < a ? a : v > b ? b : v;
@@ -640,6 +655,189 @@
     return stageProfile(world.stageId, world).accent;
   }
 
+  function phaseCue(stageId, phase, mainGod, bossName) {
+    var sid = clamp(stageId | 0, 1, 4);
+    var p = clamp(phase | 0, 1, 4);
+    if (mainGod) {
+      return {
+        title: p === 1 ? (bossName || "轮回监察者") : "权限 P" + p + " 解锁",
+        subtitle: ["轮回校验启动", "短板复制", "失败记录训练", "撤退权限删除"][p - 1],
+        color: "#e5c4ff",
+      };
+    }
+    var cues = {
+      1: [
+        ["百目尸将", "群眼协议启动"],
+        ["镜卫结界", "先破坏护卫"],
+        ["群眼共振", "凝视区连续展开"],
+        ["百目全开", "最终阶段"],
+      ],
+      2: [
+        ["雨魇行者", "回收协议启动"],
+        ["干扰追缉", "寻找安全信道"],
+        ["暴雨封锁", "EMP 与腐蚀叠加"],
+        ["人格删除", "最终阶段"],
+      ],
+      3: [
+        ["黄泉御前", "剑冢协议启动"],
+        ["亡剑列阵", "横向脱离预警"],
+        ["封灵剑阵", "优先斩断镜卫"],
+        ["万剑归坟", "最终阶段"],
+      ],
+      4: [
+        ["八重镜姬", "构筑读取启动"],
+        ["反构筑镜像", "伤害来源开始适应"],
+        ["镜卫校验", "切换攻击来源"],
+        ["三相归零", "最终阶段"],
+      ],
+    };
+    var colors = ["#ff6fb0", "#69ddf2", "#d8cae8", "#d7a8ff"];
+    var cue = cues[sid][p - 1];
+    return { title: cue[0], subtitle: cue[1], color: colors[sid - 1] };
+  }
+
+  function triggerPresentation(kind, stageId, phase, mainGod, bossName) {
+    var cue = phaseCue(stageId, phase, mainGod, bossName);
+    presentation.kind = kind || "phase";
+    presentation.phase = clamp(phase | 0, 1, 4);
+    presentation.stageId = clamp(stageId | 0, 1, 4);
+    presentation.mainGod = !!mainGod;
+    presentation.title = cue.title;
+    presentation.subtitle = cue.subtitle;
+    presentation.color = cue.color;
+    presentation.total = kind === "boss" ? 1.5 : 1.22;
+    presentation.time = presentation.total;
+    return presentationSnapshot();
+  }
+
+  function triggerBoss(stageId, bossName, mainGod) {
+    return triggerPresentation("boss", stageId, 1, mainGod, bossName);
+  }
+
+  function triggerPhase(stageId, phase, mainGod) {
+    return triggerPresentation("phase", stageId, phase, mainGod, "");
+  }
+
+  function triggerSkill(character, color) {
+    presentation.skill = character === "aya" || character === "rion" ? character : "sayo";
+    presentation.skillTotal = 0.42;
+    presentation.skillTime = presentation.skillTotal;
+    presentation.skillColor = color || (presentation.skill === "aya" ? "#70c8ff" : presentation.skill === "rion" ? "#ff6c82" : "#ff77bd");
+    return presentationSnapshot();
+  }
+
+  function updatePresentation(dt) {
+    dt = Math.max(0, Number(dt) || 0);
+    presentation.time = Math.max(0, presentation.time - dt);
+    presentation.skillTime = Math.max(0, presentation.skillTime - dt);
+    if (!presentation.time) presentation.kind = "";
+    if (!presentation.skillTime) presentation.skill = "";
+    return presentationSnapshot();
+  }
+
+  function presentationActive() {
+    return presentation.time > 0;
+  }
+
+  function presentationSnapshot() {
+    return {
+      kind: presentation.kind,
+      phase: presentation.phase,
+      time: presentation.time,
+      title: presentation.title,
+      subtitle: presentation.subtitle,
+      color: presentation.color,
+      skill: presentation.skill,
+      skillTime: presentation.skillTime,
+    };
+  }
+
+  function drawPresentation(ctx, world) {
+    if (!ctx || !world) return;
+    var W = world.W || 430;
+    var H = world.H || 932;
+    if (presentation.skillTime > 0 && world.playerX != null) {
+      var sq = clamp(presentation.skillTime / presentation.skillTotal, 0, 1);
+      var sa = (1 - sq) * Math.PI * 1.5;
+      ctx.save();
+      ctx.translate(world.playerX, world.playerY);
+      ctx.globalAlpha = sq * 0.72;
+      ctx.strokeStyle = presentation.skillColor;
+      ctx.fillStyle = presentation.skillColor;
+      ctx.lineWidth = 2 + sq * 3;
+      if (presentation.skill === "rion") {
+        ctx.beginPath();
+        ctx.arc(0, 0, 42 + (1 - sq) * 80, -1.25 + sa * 0.18, 1.1 + sa * 0.18);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(0, 0, 30 + (1 - sq) * 58, 1.8 + sa * 0.12, 4.8 + sa * 0.12);
+        ctx.stroke();
+      } else if (presentation.skill === "aya") {
+        for (var ai = 0; ai < 6; ai++) {
+          var aa = ai * TAU / 6 + sa * 0.14;
+          ctx.beginPath();
+          ctx.moveTo(Math.cos(aa) * 24, Math.sin(aa) * 24);
+          ctx.lineTo(Math.cos(aa) * (60 + (1 - sq) * 45), Math.sin(aa) * (60 + (1 - sq) * 45));
+          ctx.stroke();
+        }
+      } else {
+        for (var si = 0; si < 5; si++) {
+          var a = si * TAU / 5 - sa * 0.1;
+          var r = 35 + (1 - sq) * 58;
+          ctx.save();
+          ctx.translate(Math.cos(a) * r, Math.sin(a) * r);
+          ctx.rotate(a);
+          ctx.beginPath();
+          ctx.ellipse(0, 0, 10, 4, 0, 0, TAU);
+          ctx.fill();
+          ctx.restore();
+        }
+        ctx.beginPath();
+        ctx.arc(0, 0, 32 + (1 - sq) * 64, 0, TAU);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+    if (presentation.time <= 0) return;
+    var elapsed = presentation.total - presentation.time;
+    var enter = clamp(elapsed / 0.16, 0, 1);
+    var leave = clamp(presentation.time / 0.28, 0, 1);
+    var alpha = Math.min(enter, leave);
+    var centerY = H * 0.38;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    var shade = ctx.createLinearGradient(0, centerY - 64, 0, centerY + 64);
+    shade.addColorStop(0, "rgba(5,4,14,0)");
+    shade.addColorStop(0.22, "rgba(5,4,14,0.82)");
+    shade.addColorStop(0.78, "rgba(5,4,14,0.82)");
+    shade.addColorStop(1, "rgba(5,4,14,0)");
+    ctx.fillStyle = shade;
+    ctx.fillRect(0, centerY - 64, W, 128);
+    ctx.strokeStyle = presentation.color;
+    ctx.lineWidth = 1.5;
+    ctx.globalAlpha = alpha * 0.78;
+    ctx.beginPath();
+    ctx.moveTo(W * 0.12, centerY - 42);
+    ctx.lineTo(W * 0.88, centerY - 42);
+    ctx.moveTo(W * 0.2, centerY + 42);
+    ctx.lineTo(W * 0.8, centerY + 42);
+    ctx.stroke();
+    ctx.globalAlpha = alpha;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "#fff7fb";
+    ctx.strokeStyle = "#080713";
+    ctx.lineWidth = 5;
+    ctx.font = "900 " + Math.max(20, Math.min(34, W * 0.058)) + "px system-ui";
+    ctx.strokeText(presentation.title, W / 2, centerY - 5);
+    ctx.fillText(presentation.title, W / 2, centerY - 5);
+    ctx.fillStyle = presentation.color;
+    ctx.font = "800 " + Math.max(10, Math.min(14, W * 0.024)) + "px system-ui";
+    var label = (presentation.kind === "boss" ? "BOSS · P1" : "PHASE · P" + presentation.phase) + "  " + presentation.subtitle;
+    ctx.fillText(label, W / 2, centerY + 25);
+    ctx.restore();
+  }
+
   function snapshot(world) {
     world = world || {};
     var pal = stageProfile(world.stageId, world);
@@ -653,6 +851,7 @@
       earlyFloor: EARLY_FLOOR,
       earlyInterval: EARLY_INTERVAL,
       heroScale: heroVisualScale(world.W),
+      presentation: presentationSnapshot(),
     };
   }
 
@@ -672,6 +871,14 @@
     hint: hint,
     radio: radio,
     waveTint: waveTint,
+    phaseCue: phaseCue,
+    triggerBoss: triggerBoss,
+    triggerPhase: triggerPhase,
+    triggerSkill: triggerSkill,
+    updatePresentation: updatePresentation,
+    drawPresentation: drawPresentation,
+    presentationActive: presentationActive,
+    presentationSnapshot: presentationSnapshot,
     snapshot: snapshot,
     obstacles: obstacles,
   };

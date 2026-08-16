@@ -70,6 +70,7 @@ const mid = await snap();
 assert.equal(mid.counts.ops, 1);
 assert.equal(mid.ops.units[0].id, "aya");
 assert.ok(Math.abs(mid.ops.units[0].x - mid.player.x) > 30);
+assert.equal(mid.ops.units[0].weapon, "pistol");
 
 const denied = await api("deployOp46", "rion");
 assert.equal(denied.ok, false);
@@ -87,6 +88,7 @@ const afterFire = await snap();
 assert.equal(afterFire.counts.ops, 2);
 assert.equal(afterFire.counts.pets, petsBefore);
 assert.ok(afterFire.counts.bullets >= 0);
+assert.deepEqual(afterFire.ops.units.map(unit => unit.weapon).sort(), ["blade", "pistol"]);
 
 const retreated = await api("retreatOp46", "aya");
 assert.equal(retreated.ok, true);
