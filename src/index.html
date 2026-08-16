@@ -800,6 +800,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     tenvisit: { n:"十连证词", i:"🎴", d:"完成一次十连寻访", r:80, c:()=>!!(save.shop40&&save.shop40.ops&&save.shop40.ops.tenPulls) },
     ssrwitness: { n:"终章证人", i:"👑", d:"抽到终章证人立绘", r:200, c:()=>((save.shop40&&save.shop40.ops&&save.shop40.ops.owned&&save.shop40.ops.owned.last_witness)||0)>0 },
     rosterfull: { n:"八页名册", i:"📚", d:"集齐 8 张证词卡", r:360, c:()=>["sayo_echo","aya_petal","rion_edge","night_radio","shrine_seal","void_ticket","cherry_crown","last_witness"].every(id=>((save.shop40&&save.shop40.ops&&save.shop40.ops.owned&&save.shop40.ops.owned[id])||0)>0) },
+    rostercomplete: { n:"镜界全证词", i:"🪞", d:"集齐全部 16 张证词卡", r:680, c:()=>["sayo_echo","aya_petal","rion_edge","night_radio","shrine_seal","void_ticket","cherry_crown","last_witness","sayo_318","aya_channel","rion_names","rin_signal","corp_contract","sister_reply","swordmaster_oath","mirror_twins"].every(id=>((save.shop40&&save.shop40.ops&&save.shop40.ops.owned&&save.shop40.ops.owned[id])||0)>0) },
   };
 
   const P = {};

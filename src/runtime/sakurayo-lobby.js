@@ -31,6 +31,14 @@
     { id: "void_ticket", n: "主神回收券影", r: "SR", tag: "主神残券", d: "虚空圣所的作废回收券。不能兑换属性。" },
     { id: "cherry_crown", n: "樱冠残片", r: "SR", tag: "樱冠残片", d: "镜界冠冕裂开后的一片。好看，不卖伤害。" },
     { id: "last_witness", n: "终章证人立绘", r: "SSR", tag: "终章证人", d: "碎镜后面那个人终于肯露面。这是收藏，不是数值。" },
+    { id: "sayo_318", n: "小夜·第318号", r: "N", tag: "镜像编号", d: "镜界给她排了编号，她用每一次选择把编号改回名字。" },
+    { id: "aya_channel", n: "绫·未送达频道", r: "N", tag: "雨夜频道", d: "那句没有送达的拒绝终于穿过雨夜。救援必须允许被拒绝。" },
+    { id: "rion_names", n: "凛音·同门名册", r: "R", tag: "黄泉名册", d: "她没有继承无名的数据，只把每位同门的名字送回剑冢。" },
+    { id: "rin_signal", n: "雨宫凛·安全频道", r: "R", tag: "电台证词", d: "尸潮覆盖城市后仍未中断的人工频道。有人一直在另一端值守。" },
+    { id: "corp_contract", n: "零号企业·回收合同", r: "R", tag: "事故原件", d: "把人格写成资产的原始合同。封条完整，良心栏从未存在。" },
+    { id: "sister_reply", n: "妹妹频道·拒绝救援", r: "SR", tag: "自主权证词", d: "她没有请求被复活，只请求姐姐把选择权还给自己。" },
+    { id: "swordmaster_oath", n: "无名剑主·最后一式", r: "SR", tag: "黄泉残响", d: "最后一式没有被上传。剑主把空白留给仍然活着的继承人。" },
+    { id: "mirror_twins", n: "镜后双生证词", r: "SSR", tag: "双生证人", d: "原本与备份都不必争夺唯一名额。镜后第一次站着两个完整的名字。" },
   ]);
 
   var CARD_MAP = Object.create(null);
@@ -164,7 +172,11 @@
     "html.landscape46 .wishHero46{left:-2%;width:46%;height:124%;bottom:-8%}" +
     "html.landscape46 .wishTitle46{right:4%;max-width:46%}" +
     "html.landscape46 .wishDock46,html.landscape46 .wishPity46{left:46%}" +
-    "html.landscape46 #rosterWall46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
+    "html.landscape46 #rosterWall46{grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}" +
+    "html.landscape46 .rosterSlot46{min-height:150px;border-radius:13px}" +
+    "html.landscape46 .rosterArt46{height:108px}" +
+    "html.landscape46 .rosterSlot46 b{padding-top:6px;font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
+    "html.landscape46 .rosterSlot46 small{margin:3px 0 6px;font-size:8px}" +
     "html.landscape46 #archiveDrawer .archiveDock46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
     "html.landscape46 #stageList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}" +
     "#rotateHint46{display:none;position:fixed;z-index:80;left:50%;top:max(8px,env(safe-area-inset-top));transform:translateX(-50%);padding:6px 12px;border-radius:999px;background:#0b0818cc;border:1px solid #ffe6a355;color:#ffe7a3;font:800 11px/1 system-ui;letter-spacing:.12em;pointer-events:none;white-space:nowrap}" +
@@ -587,7 +599,9 @@
     host.innerHTML =
       '<div class="rosterStage46"><div class="rosterHead46"><h3>证词名册</h3><span>已点亮 ' +
       got +
-      " / 8</span></div><div id=\"rosterWall46\">" +
+      " / " +
+      CARDS.length +
+      "</span></div><div id=\"rosterWall46\">" +
       CARDS.map(function (card) {
         var count = info.owned[card.id] || 0;
         var locked = count < 1 && DEFAULT_SHOWN.indexOf(card.id) < 0;

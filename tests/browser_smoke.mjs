@@ -234,7 +234,7 @@ try {
   assert.equal(lobby.version, "4.6.0");
   assert.ok(lobby.shown.includes("sayo_echo"));
   assert.ok(lobby.shown.includes("aya_petal"));
-  assert.equal(lobby.cards.length, 8);
+  assert.equal(lobby.cards.length, 16);
   // 主 nav 合同为 data-open="gacha"；抽屉未挂上时可用 api(page, "openDrawer", "gacha")
   await page.locator('[data-open="gacha"]').click();
   assert.equal(await page.locator("#gachaDrawer").isVisible(), true);
@@ -259,7 +259,7 @@ try {
   await page.locator("#gachaDrawer .close").click();
   // 主 nav 合同为 data-open="roster"；抽屉未挂上时可用 api(page, "openDrawer", "roster")
   await page.locator('[data-open="roster"]').click();
-  assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 8);
+  assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 16);
   await shot(page, "01i-roster-wall.png");
   await page.locator("#rosterDrawer .close").click();
   await page.locator('[data-open="stage"]').click();
