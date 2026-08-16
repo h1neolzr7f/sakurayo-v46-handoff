@@ -260,7 +260,7 @@
     "html.landscape46 #menu.homeDock46 .stageMini,html.landscape46 #menu.homeDock46 .start,html.landscape46 #menu.homeDock46 .nav{width:100%;margin-left:0;margin-right:0}" +
     "html.portraitFallback46 #menu.homeDock46 .heroLive46{width:100%;left:0;right:0;top:0;bottom:34%}" +
     "html.portraitFallback46 #menu.homeDock46 .menu{width:100%;max-width:none;margin:0;border-radius:18px 18px 0 0}" +
-    "html.portraitFallback46 #menu.homeDock46 .charSelectPanel{position:absolute!important;left:8px;right:auto;bottom:36%;width:auto}" +
+    "html.portraitFallback46 #menu.homeDock46 .charSelectPanel{position:absolute!important;left:8px!important;right:auto!important;bottom:36%!important;width:auto}" +
     "html.portraitFallback46 #menu.homeDock46 .characterList{display:flex!important;flex-direction:column}" +
     "html.portraitFallback46 #menu.homeDock46 #coverTitle36{left:50%;right:auto;transform:translateX(-50%);text-align:center}" +
     "@media(prefers-reduced-motion:reduce){.heroLive46.hasBlink .heroLiveBlink46,.heroLive46.hasBlink .heroLiveBase46{animation:none}}";

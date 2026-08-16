@@ -1,19 +1,22 @@
-# 浏览器冒烟测试
+# 自动回归测试
 
-```powershell
-python tools\static_check.py src\index.html
-node --check tests\artifacts\static\index.extracted.js
-python tools\check_content_packs.py
-node tests\framework_smoke.mjs src\index.html
-node tests\browser_smoke.mjs src\index.html
-```
+首次克隆后安装开发依赖与匹配浏览器：
 
-Runner 优先使用项目本地 `playwright`；若未安装，会使用 Codex `develop-web-game` 技能自带版本。独立环境可执行：
-
-```powershell
-npm install --save-dev playwright
+```bash
+npm ci
 npx playwright install chromium
 ```
+
+日常完整验证：
+
+```bash
+npm test
+npm run test:visual
+```
+
+`npm test` 依次执行静态/语法、内容包、lobby/live/ops 单元测试，以及 ops、框架、证词和完整玩家流程冒烟。`test:visual` 额外输出 932×430 大厅、寻访、名册、商店、关卡和档案截图。
+
+Runner 优先使用项目本地 `playwright`；历史 Codex fallback 仅用于旧环境，不属于项目依赖。
 
 测试输出位于 `tests/artifacts/smoke/`，包括 JSON 报告、主菜单、三角色、升级、Boss、胜负结算和错误面板全页面截图。
 

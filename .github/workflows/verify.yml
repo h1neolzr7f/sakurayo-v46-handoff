@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  static:
+  verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -16,11 +16,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: Static check and syntax
+          cache: npm
+      - name: Install test runtime
         run: |
-          python tools/static_check.py src/index.html
-          node --check tests/artifacts/static/index.extracted.js
-          node --check src/runtime/sakurayo-cutscene.js
-          node --check src/runtime/sakurayo-economy.js
-          node --check src/runtime/sakurayo-lifecycle.js
-          node --check src/runtime/sakurayo-content-runtime.js
+          npm ci
+          npx playwright install --with-deps chromium
+      - name: Static, unit, and browser regression
+        run: npm test
+      - name: Landscape visual regression
+        run: npm run test:visual

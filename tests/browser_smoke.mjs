@@ -167,15 +167,15 @@ try {
   assert.equal(await page.locator("#characterList .charCard").count(), 3);
   assert.equal(await page.locator("#start").isVisible(), true);
   assert.equal(await page.locator("#coverTitle36").isVisible(), true);
-  assert.match(await page.locator("#menu .bg").evaluate(node => node.style.backgroundImage), /cover_v36_main_god\.webp/);
+  assert.match(await page.locator("#menu .bg").evaluate(node => node.style.backgroundImage), /lobby_wide\.webp/);
   await page.waitForFunction(() => {
     const boot = new Set(window.__SAKURAYO_ART__?.boot() || []);
     return window.__SAKURAYO_ART__?.status().filter(item => boot.has(item.path)).every(item => item.ready);
   }, null, { timeout: 10000 });
   const artStatus = await page.evaluate(() => window.__SAKURAYO_ART__.status());
-  assert.equal(artStatus.length, 15);
-  assert.equal(artStatus.filter(item => item.ready).length, 9);
-  assert.equal(artStatus.filter(item => !item.loaded).length, 6);
+  assert.equal(artStatus.length, 20);
+  assert.equal(artStatus.filter(item => item.ready).length, 12);
+  assert.equal(artStatus.filter(item => !item.loaded).length, 8);
   assert.equal(await page.locator("#menu .nav img").count(), 5);
   assert.ok(await page.locator("#characterList .charCard img").evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0)));
   await page.waitForFunction(() => {
