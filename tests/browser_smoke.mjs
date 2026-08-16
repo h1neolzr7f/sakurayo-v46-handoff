@@ -907,7 +907,7 @@ try {
     assert.equal(phaseState.stage44.presentation.kind, "phase");
     assert.equal(phaseState.stage44.presentation.phase, phase);
     await api(page, "dismissDialogue");
-    await page.evaluate(() => window.advanceTime(17));
+    await page.evaluate(() => window.advanceTime(180));
     assert.equal((await state(page)).mode, "play");
     assert.equal(await page.locator(`#bossPhaseGates46 i[data-phase="${phase}"]`).evaluate(node => node.classList.contains("passed")), true);
     if (phase === 2) await shot(page, "04a-boss-transform.png");
