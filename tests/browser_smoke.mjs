@@ -438,8 +438,11 @@ try {
       assert.ok(dashState.player.dashCooldown > 0);
       assert.equal(dashState.player.animation, "dash");
       await page.locator("#skill").click();
-      assert.ok((await state(page)).player.skillCooldown > 0);
-      pass("触控摇杆、冲刺、主动技能");
+      const skillState = await state(page);
+      assert.ok(skillState.player.skillCooldown > 0);
+      assert.equal(skillState.stage44.presentation.skill, "sayo");
+      assert.ok(skillState.stage44.presentation.skillTime > 0);
+      pass("触控摇杆、冲刺、主动技能与角色技能演出");
 
       const freshOutfit = await api(page, "outfitStatus45");
       const freshSnap = await state(page);
@@ -881,8 +884,13 @@ try {
 
   await api(page, "spawnBossNow");
   assert.equal((await state(page)).mode, "dialogue");
+  assert.equal((await state(page)).stage44.presentation.kind, "boss");
+  assert.equal(await page.locator("#warning").isVisible(), false, "剧情模态出现时应收起 Boss 警告");
   await api(page, "dismissDialogue");
   assert.equal((await state(page)).boss.phase, 1);
+  await page.evaluate(() => window.advanceTime(17));
+  assert.equal((await state(page)).stage44.presentation.title, "百目尸将");
+  assert.equal(await page.locator("#bossPhaseGates46 i").count(), 3);
   await api(page, "setBossPosition", -180, 220);
   assert.equal((await state(page)).boss.pointerVisible, true, "离屏 Boss 应显示方向指针");
   await shot(page, "03b-offscreen-boss-pointer.png");
@@ -896,12 +904,16 @@ try {
     const phaseVisual = await api(page, "bossVisualState412");
     assert.equal(phaseVisual.previous, phase - 1);
     assert.ok(phaseVisual.transform > 1);
+    assert.equal(phaseState.stage44.presentation.kind, "phase");
+    assert.equal(phaseState.stage44.presentation.phase, phase);
     await api(page, "dismissDialogue");
+    await page.evaluate(() => window.advanceTime(17));
     assert.equal((await state(page)).mode, "play");
+    assert.equal(await page.locator(`#bossPhaseGates46 i[data-phase="${phase}"]`).evaluate(node => node.classList.contains("passed")), true);
     if (phase === 2) await shot(page, "04a-boss-transform.png");
   }
   await shot(page, "04-boss-phase-4.png");
-  pass("Boss 75%/50%/25% 三次转阶段并播放阶段图交叉变身与场地演出");
+  pass("Boss 75%/50%/25% 三次转阶段、分段血条、阶段字幕与场地演出");
 
   await api(page, "defeatBoss");
   assert.equal((await state(page)).mode, "dialogue");
