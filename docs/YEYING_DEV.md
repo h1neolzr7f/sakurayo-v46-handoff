@@ -45,4 +45,6 @@ cd android-app
 
 本包在 Android 壳注入 `__SAKURAYO_ANDROID_LANDSCAPE__`，由 `sakurayo-layout52.js` 强制横屏大厅、打开按钮 `pointer-events`，并把 `html,body` 的 `touch-action` 从 `none` 改成 `manipulation`（画布和摇杆仍是 `none`）。
 
-覆盖安装 `versionCode 6102` 即可，不会动正式《樱夜·尸潮》。
+覆盖安装 `versionCode 6103` 即可，不会动正式《樱夜·尸潮》。
+
+大厅点按若仍落到画布上，`sakurayo-touch54.js` 会拦住 UI 层、用触摸位置补一次 click，覆盖出击、换角、寻访、商店、关卡、暂停、升级和结算。

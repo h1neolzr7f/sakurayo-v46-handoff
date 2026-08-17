@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowInsets;
@@ -36,6 +37,7 @@ import java.util.Locale;
 public final class MainActivity extends Activity {
     private static final String TAG = "SakurayoWebView";
     private static final String GAME_URL = "file:///android_asset/index.html";
+    private static final String TOUCH54_ASSET = "runtime/sakurayo-touch54.js";
     private static final String LAYOUT52_ASSET = "runtime/sakurayo-layout52.js";
     private static final String FEEL53_ASSET = "runtime/sakurayo-feel53.js";
     private static final long EXIT_CONFIRM_WINDOW_MS = 1800L;
@@ -109,6 +111,16 @@ public final class MainActivity extends Activity {
         view.setBackgroundColor(Color.rgb(8, 6, 17));
         view.setFocusable(true);
         view.setFocusableInTouchMode(true);
+        view.setClickable(true);
+        view.setLongClickable(false);
+        view.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        view.setOnLongClickListener(v -> true);
+        view.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                v.requestFocus();
+            }
+            return false;
+        });
         view.requestFocus(View.FOCUS_DOWN);
 
         WebSettings settings = view.getSettings();
@@ -199,6 +211,7 @@ public final class MainActivity extends Activity {
     private void injectRuntime(WebView view) {
         if (view == null) return;
         view.evaluateJavascript(ANDROID_LANDSCAPE_SCRIPT, null);
+        injectAssetScript(view, TOUCH54_ASSET);
         injectAssetScript(view, LAYOUT52_ASSET);
         injectAssetScript(view, FEEL53_ASSET);
     }

@@ -31,6 +31,7 @@ jobs:
       - name: Sync runtime overlays and rebuild the single HTML entry
         run: |
           mkdir -p android-app/app/src/main/assets/runtime
+          cp src/runtime/sakurayo-touch54.js android-app/app/src/main/assets/runtime/sakurayo-touch54.js
           cp src/runtime/sakurayo-layout52.js android-app/app/src/main/assets/runtime/sakurayo-layout52.js
           cp src/runtime/sakurayo-feel53.js android-app/app/src/main/assets/runtime/sakurayo-feel53.js
           python3 tools/build_game.py \
@@ -67,8 +68,8 @@ jobs:
 
             - 桌面名：开发版 夜樱
             - 包名：`com.sakurayo.yeying.dev`
-            - versionName：`4.6.0-yeying` / versionCode 6102
-            - 本包修了大厅按键无响应和横屏 UI 重叠。覆盖安装旧开发版即可，不会动正式《樱夜·尸潮》。
+            - versionName：`4.6.0-yeying` / versionCode 6103
+            - 本包修了真机 WebView 点穿到画布、大厅/抽屉/战斗按钮全无响应。覆盖安装即可，不会动正式《樱夜·尸潮》。
             - 不会覆盖正式《樱夜·尸潮》（`com.sakurayo.zombietide`）
             - Debug 证书签名，只适合自己装
 
