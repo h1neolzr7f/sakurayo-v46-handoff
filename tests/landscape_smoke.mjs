@@ -90,10 +90,52 @@ try {
   assert.equal(combat.mode, "play");
   assert.ok(combat.counts.enemies > 0);
   assert.ok(combat.build.attackTotal > 0);
+  const atmo = await api("atmosphereSnapshot48");
+  assert.equal(atmo.on, true, "横屏战斗应开启氛围层");
+  assert.ok(atmo.clouds >= 2 && atmo.particles >= 6, "云影与章节粒子应就位");
+  assert.equal(atmo.vignette, true, "战场暗角应就位");
   assert.ok(canvas && canvas.width >= 931 && canvas.height >= 429, "横屏画布没有铺满 932×430");
   assert.equal(await page.locator("#hud").isVisible(), true);
   assert.equal(await page.locator("#skill").isVisible(), true);
   assert.equal(await page.locator("#dash").isVisible(), true);
+  const hudBoxes = await page.evaluate(() => {
+    const box = (el) => {
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      const style = getComputedStyle(el);
+      if (style.display === "none" || style.visibility === "hidden") return null;
+      return { x: r.x, y: r.y, w: r.width, h: r.height };
+    };
+    const hit = (a, b) => {
+      if (!a || !b) return 0;
+      const x = Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x));
+      const y = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+      return x * y;
+    };
+    const hero = box(document.querySelector("#hud .hero"));
+    const ops = box(document.getElementById("opsDock46"));
+    const wave = box(document.querySelector("#hud .wave"));
+    const mission = box(document.getElementById("mission"));
+    const pause = box(document.getElementById("pause"));
+    return { opsWave: hit(ops, wave), opsMission: hit(ops, mission), heroOps: hit(hero, ops), pauseWave: hit(pause, wave) };
+  });
+  assert.equal(hudBoxes.opsWave, 0, "干员坝不得盖住波次条");
+  assert.equal(hudBoxes.opsMission, 0, "干员坝不得盖住任务条");
+  assert.equal(hudBoxes.heroOps, 0, "血条不得盖住干员坝");
+  assert.equal(hudBoxes.pauseWave, 0, "暂停不得盖住波次条");
+  const director = await api("hudDirectorSnapshot51");
+  assert.equal(director.cid, "sayo", "横屏战斗 HUD 应带当前角色身份");
+  assert.match(director.accent, /#f35aa0|#f35aa6/i, "小夜 HUD 应使用角色主色");
+  await api("grantCombo51", 20);
+  const combo = await api("hudDirectorSnapshot51");
+  assert.equal(combo.combo.rank, "mirror", "20 连应升到镜闪");
+  assert.match(combo.combo.text, /镜闪/);
+  assert.equal(await page.locator("#combo.on51").isVisible(), true, "连击段位芯片应可见");
+  await api("setPlayerHpRatio", 0.15);
+  await api("grantCombo51", 12);
+  assert.equal((await api("hudDirectorSnapshot51")).lowHp, true, "残血时应点亮危急描边");
+  await api("setPlayerHpRatio", 1);
+  await api("grantCombo51", 0);
   await shot("01-landscape-combat.png");
 
   await api("spawnBossNow");
@@ -123,7 +165,43 @@ try {
   assert.equal(await page.locator("#again").isVisible(), true);
   assert.equal(await page.locator("#back").isVisible(), true);
   assert.match(await page.locator("#damageReport").innerText(), /伤害构成|战斗诊断/);
+  assert.equal(await page.locator("#result .resultHero47").isVisible(), true, "横屏结算应露出角色立绘");
+  const resultHits = await page.evaluate(() => {
+    const box = (el) => {
+      if (!el) return null;
+      const r = el.getBoundingClientRect();
+      return { x: r.x, y: r.y, w: r.width, h: r.height };
+    };
+    const hit = (a, b) => {
+      if (!a || !b) return 0;
+      const x = Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x));
+      const y = Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+      return x * y;
+    };
+    const hero = box(document.querySelector("#result .resultHero47"));
+    const rank = box(document.getElementById("rankBig"));
+    const actions = box(document.querySelector("#result .actions"));
+    return { heroRank: hit(hero, rank), heroActions: hit(hero, actions) };
+  });
+  assert.equal(resultHits.heroRank, 0, "结算立绘不得盖住评级");
+  assert.equal(resultHits.heroActions, 0, "结算立绘不得盖住底栏按钮");
   await shot("03-landscape-result.png");
+
+  await api("backMenu");
+  await api("selectStage", 1);
+  await api("start");
+  await api("dismissDialogue");
+  await api("protectPlayer");
+  await api("triggerUpgrade");
+  assert.equal((await snapshot()).mode, "level");
+  assert.equal(await page.locator("#level .levelRail47").isVisible(), true, "横屏升级模态应有角色仪式轨");
+  const levelBox = await page.locator("#level .modal").boundingBox();
+  const rerollBox = await page.locator("#reroll").boundingBox();
+  assert.ok(levelBox && levelBox.height <= 430 && levelBox.width <= 932, "升级模态不得超出横屏视口");
+  assert.ok(rerollBox && rerollBox.y >= 0 && rerollBox.y + rerollBox.height <= 430, "重抽按钮不得被裁切");
+  await shot("04-landscape-levelup.png");
+  await api("chooseUpgrade", 0);
+  assert.equal((await snapshot()).mode, "play");
 
   assert.deepEqual(pageErrors, []);
   assert.deepEqual(consoleErrors, []);
@@ -136,8 +214,11 @@ try {
         passed: [
           "出击先播放横屏作战简报再进入对白",
           "横屏战场铺满且触控按钮可见",
+          "战斗 HUD 带角色身份色与连击段位",
+          "战场氛围层（云影/章节粒子/暗角）就位",
           "Boss 阶段机制条显示阶段、进度与应对提示",
           "横屏战术结算无需滚动即可看到报告与操作",
+          "横屏升级模态有角色仪式轨且重抽不被裁切",
           "无控制台错误和外部请求",
         ],
         screenshots,
