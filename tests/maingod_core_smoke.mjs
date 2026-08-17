@@ -40,6 +40,13 @@ assert.equal(migrated.mainGod.core.crimson, 0);
 assert.equal(migrated.mainGod.geneLock, 0);
 
 await api(page, "unlockMainGod");
+const shop = await api(page, "openMainGodShop36");
+assert.equal(shop.hall, true, "兑换大厅应有精装修外壳");
+assert.equal(shop.hero, true, "兑换大厅应有账户条");
+assert.equal(shop.cards, 28, "旧货架 + 8 件外设应为 28 张 exchangeCard36");
+assert.equal(shop.core, 8);
+assert.ok(shop.tabs.includes("模板") && shop.tabs.includes("特效"));
+assert.equal(await api(page, "pickMainGodBossType46", 0, 1, 1), "mirror");
 await api(page, "grantMainGodPoints", 80);
 const bought = await api(page, "buyMainGodTemplate46", "crimson");
 assert.equal(bought.bought, true);
@@ -50,6 +57,10 @@ await api(page, "grantMainGodShards46", 8);
 const lock = await api(page, "buyMainGodLock46", "lockSpecial");
 assert.equal(lock.bought, true);
 assert.equal(lock.snapshot.mainGod.core.lockSpecial, 1);
+await api(page, "grantMainGodPoints", 20);
+const boots = await api(page, "buyMainGodItem", "echoBoots");
+assert.equal(boots.bought, true);
+assert.equal(boots.snapshot.mainGod.echoBoots, 1);
 
 await api(page, "selectCharacter", "sayo");
 await api(page, "selectMainGodTier", 1);
@@ -61,6 +72,7 @@ assert.ok(snap.player.steal > 0, "猩红主模板应开局吸血");
 assert.ok(snap.player.orbit >= 1, "气机副模板应开局飞剑");
 assert.ok(snap.player.mgCrimson > 0);
 assert.ok(snap.player.mgBurst > 0, "猩红＋气机＋潜能特化应解锁心核激荡");
+assert.ok(snap.player.mgEcho > 0, "折跃残影靴应只在主神开局生效");
 
 await api(page, "backMenu");
 await api(page, "selectStage", 1);
@@ -71,6 +83,7 @@ assert.equal(snap.runMode, "story");
 assert.equal(snap.player.steal, 0, "模板不得带进普通四章");
 assert.equal(snap.player.mgBurst, 0);
 assert.equal(snap.player.orbit, 0);
+assert.equal(snap.player.mgEcho, 0, "外设不得带进普通四章");
 
 for (const id of ["sayo", "aya", "rion"]) {
   await api(page, "backMenu");
@@ -88,6 +101,11 @@ for (const id of ["sayo", "aya", "rion"]) {
   assert.ok(snap.player.steal > 0, `${id} 应带上猩红吸血`);
 }
 
+await api(page, "spawnBossNow");
+const bossFx = await api(page, "mainGodBoss46");
+assert.equal(bossFx.type, "mirror", "clears0+T1+depth1 应为镜像投影");
+assert.ok(bossFx.fx.some(x => x.kind === "mirror"), "镜像投影应有可打碎的镜核");
+assert.match(bossFx.rule || "", /镜核|适应/);
 const beforeFinish = await api(page, "saveSnapshot");
 await api(page, "finish", true);
 const after = await api(page, "saveSnapshot");
