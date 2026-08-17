@@ -12,11 +12,20 @@
 
 ## 安装
 
-1. 从本仓 GitHub Releases 下载 `YeYing-Dev-v4.6.0-android.apk`
-2. 侧载安装。Android 6.0+
-3. 手机上会同时看到两个图标：原来的「樱夜·尸潮」和新的「开发版 夜樱」
+1. 从本仓 GitHub Releases 的 `yeying-dev-v4.6.0` 预发布下载 `YeYing-Dev-v4.6.0-android.apk`
+2. 若 Release 还没出来，到本分支 Actions 工作流 `yeying-dev-apk` 的 Artifacts 里下同名文件
+3. 侧载安装。Android 6.0+
+4. 手机上会同时看到两个图标：原来的「樱夜·尸潮」和新的「开发版 夜樱」
 
 不要用 `adb install -r` 把这个包装到正式版包名上。它们本来就不是同一个 applicationId。
+
+本机已验证的一份 SHA-256：
+
+```
+2FBFAEA4DAF36D972F6DE4F63033D68760303E4BA43B5DB2AB6D4EB87BBBA815
+```
+
+Actions 重新打包后校验和会变，以 Release / Artifact 页面为准。
 
 ## 构建
 
