@@ -30,7 +30,7 @@
     ".opsSlots46 button.poor{opacity:.42}" +
     ".opsSlots46 button small{display:block;margin-top:2px;color:#ffe7a3;font:700 9px/1 system-ui}" +
     "@media(orientation:landscape){#opsDock46{left:max(12px,env(safe-area-inset-left));bottom:max(18px,env(safe-area-inset-bottom));width:196px}}" +
-    "html.landscape46:not(.portraitFallback46) #opsDock46{left:max(248px,calc(env(safe-area-inset-left) + 232px));top:max(8px,env(safe-area-inset-top));bottom:auto;width:auto;padding:4px 8px;display:flex;align-items:center;gap:8px;border-radius:999px;background:#120e27d8;border:1px solid #f2c75d44}" +
+    "html.landscape46:not(.portraitFallback46) #opsDock46{left:max(236px,calc(env(safe-area-inset-left) + 220px));top:max(8px,env(safe-area-inset-top));bottom:auto;width:auto;padding:4px 8px;display:flex;align-items:center;gap:8px;border-radius:999px;background:#120e27d8;border:1px solid #f2c75d44}" +
     "html.landscape46:not(.portraitFallback46) .opsDp46{margin:0;min-width:52px}" +
     "html.landscape46:not(.portraitFallback46) .opsSlots46{display:flex;gap:6px}" +
     "html.landscape46:not(.portraitFallback46) .opsSlots46 button{width:44px;min-height:44px;padding:2px;border-radius:50%}" +
