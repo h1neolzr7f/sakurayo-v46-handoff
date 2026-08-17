@@ -32,6 +32,14 @@ await page.evaluate(() => window.__SAKURAYO_TEST__.pullGacha46(1));
 await page.waitForSelector("#gachaReveal46", { timeout: 8000 });
 await page.waitForTimeout(300);
 await page.screenshot({ path: path.join(out, "reveal.png"), fullPage: true });
+await page.evaluate(() => {
+  const el = document.getElementById("gachaReveal46");
+  if (el && el.parentNode) el.parentNode.removeChild(el);
+});
+await page.evaluate(() => window.__SAKURAYO_TEST__.pullGacha46(10));
+await page.waitForSelector("#gachaReveal46", { timeout: 8000 });
+await page.waitForTimeout(300);
+await page.screenshot({ path: path.join(out, "reveal-ten.png"), fullPage: true });
 await page.evaluate(() => window.__SAKURAYO_TEST__.openDrawer("roster"));
 await page.waitForSelector("#rosterWall46", { timeout: 8000 });
 await page.waitForTimeout(400);
