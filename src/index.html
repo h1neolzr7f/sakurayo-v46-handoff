@@ -312,7 +312,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     character: "sayo",
     skin: "default",
     ownedSkins: ["default"],
-    mainGod: { points: 0, unlockedTier: 1, bestTier: 0, clears: 0, runs: 0, deepest: 0, contracts: {}, challenges: {}, power: 0, vitality: 0, tempo: 0, resonance: 0, fortune: 0, regenBlood: 0, psiLink: 0, gunBlade: 0, mageCircuit: 0, summonPage: 0, spaceRing: 0, rebirthDoll: 0, sideKey: 0, cursedHeart: 0 },
+    mainGod: { points: 0, unlockedTier: 1, bestTier: 0, clears: 0, runs: 0, deepest: 0, contracts: {}, challenges: {}, power: 0, vitality: 0, tempo: 0, resonance: 0, fortune: 0, regenBlood: 0, psiLink: 0, gunBlade: 0, mageCircuit: 0, summonPage: 0, spaceRing: 0, rebirthDoll: 0, sideKey: 0, cursedHeart: 0, geneLock: 0, bioSerum: 0, deathSense: 0, captainMark: 0, wardWeave: 0, judgmentPin: 0 },
   };
   const FORBIDDEN_SAVE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
   const ALLOWED_SAVE_KEYS = ["coins","unlock","done","kills","bosses","best","runs","tal","ach","claim","story","forms","fusions","endings","runHistory","banter","tutorialDone","settings","character","skin","ownedSkins","mainGod","storyChoices38","storySeen38","shop40","balance40","hiddenStory40","pendingLoneStory40","extensions"];
@@ -2278,7 +2278,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     {tier:3,name:"轮回试炼",dur:145,scale:2.34,points:32,xp:3.6},
     {tier:4,name:"无限回廊",dur:165,scale:2.65,points:42,xp:4.0,endless:true},
   ];
-  const MAIN_GOD_DEF36={points:0,unlockedTier:1,bestTier:0,clears:0,runs:0,deepest:0,contracts:{},challenges:{},power:0,vitality:0,tempo:0,resonance:0,fortune:0,regenBlood:0,psiLink:0,gunBlade:0,mageCircuit:0,summonPage:0,spaceRing:0,rebirthDoll:0,sideKey:0};
+  const MAIN_GOD_DEF36={points:0,unlockedTier:1,bestTier:0,clears:0,runs:0,deepest:0,contracts:{},challenges:{},power:0,vitality:0,tempo:0,resonance:0,fortune:0,regenBlood:0,psiLink:0,gunBlade:0,mageCircuit:0,summonPage:0,spaceRing:0,rebirthDoll:0,sideKey:0,cursedHeart:0,geneLock:0,bioSerum:0,deathSense:0,captainMark:0,wardWeave:0,judgmentPin:0};
   save.mainGod={...MAIN_GOD_DEF36,...(save.mainGod||{})};
   let runMode36="story",selectedMainGodTier36=1,pendingMode46="story";
   const isMainGodRun36=()=>runMode36==="mainGod";
@@ -3718,6 +3718,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (["summon","soul"].includes(opt.source)) amt *= P.petPow || 1;
     if (P.rhythm) amt *= 1 + Math.min(P.rhythm, P.rhythm * (P.combo||0) / 45);
     if (P.berserk) amt *= 1 + P.berserk * (1 - P.hp / P.maxHp);
+    if (P.mgGeneLock && P.hp / Math.max(1, P.maxHp) < 0.4) amt *= 1 + P.mgGeneLock * 0.1;
     if (e.mark > 0) amt *= 1 + (P.markPower || .12);
     if (P.exorcist && ["specter","seal","boss"].includes(e.type)) amt *= 1 + P.exorcist;
     if (P.execute && e.elite) amt *= 1 + P.execute;
@@ -6207,12 +6208,18 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   const MAIN_GOD_ITEMS36={
     regenBlood:{n:"超凡血统·再生序列",i:"🧬",d:"每级生命 +6%，自然恢复 +0.35",max:3,base:10,step:8,group:"血统与灵能"},
     psiLink:{n:"心灵链接芯片",i:"🔮",d:"每级护盾 +22，主动技能威力 +8%",max:3,base:10,step:8,group:"血统与灵能"},
+    geneLock:{n:"本能解锁序列",i:"🔓",d:"生命低于 40% 时每级全伤害 +10%；常驻移速 +3%/级",max:3,base:12,step:9,group:"血统与灵能"},
+    bioSerum:{n:"镜核原液变异",i:"🧪",d:"每级生命 +5%、腐蚀 +1；受到伤害 +6%",max:3,base:12,step:9,group:"血统与灵能"},
+    deathSense:{n:"零时差感应环",i:"⏳",d:"每级冲刺冷却 -8%；完美闪避判定范围扩大",max:3,base:12,step:9,group:"血统与灵能"},
     gunBlade:{n:"枪剑同调印记",i:"⚔️",d:"每级枪弹、刀剑与弹速 +5%",max:3,base:12,step:9,group:"职业与技法"},
     mageCircuit:{n:"多重魔法回路",i:"✨",d:"每级法术与主动技能威力 +10%",max:3,base:12,step:9,group:"职业与技法"},
     summonPage:{n:"英灵召唤契约页",i:"👻",d:"开局获得使魔；每级召唤伤害 +15%",max:3,base:12,step:9,group:"职业与技法"},
+    captainMark:{n:"轮回队长印",i:"🎖️",d:"每级挑战奖励点 +2，经验 +8%，召唤伤害 +8%",max:3,base:12,step:9,group:"职业与技法"},
     spaceRing:{n:"折叠军械空间戒",i:"💍",d:"永久解锁：主神空间开局额外弹幕、穿透和磁吸",max:1,base:22,step:0,group:"特殊效果道具"},
     rebirthDoll:{n:"因果替身人偶",i:"🪆",d:"永久解锁：每轮第一次致死时重构身体",max:1,base:28,step:0,group:"特殊效果道具"},
     sideKey:{n:"支线剧情权限钥匙",i:"🗝️",d:"每级通关额外奖励点 +2，并解锁隐藏日志",max:3,base:14,step:10,group:"特殊效果道具"},
+    wardWeave:{n:"监管防弹织层",i:"🦺",d:"每级受到伤害 -7%",max:3,base:10,step:8,group:"特殊效果道具"},
+    judgmentPin:{n:"裁决投针",i:"🔱",d:"每级对 Boss 伤害 +12%",max:3,base:14,step:10,group:"特殊效果道具"},
   };
   function mainGodUpgradeCost36(id){return 3+(save.mainGod[id]||0)*4;}
   function buyMainGodUpgrade36(id){const u=MAIN_GOD_UPGRADES36[id];if(!u)throw new Error(`Unknown main-god upgrade: ${id}`);const lv=save.mainGod[id]||0,cost=mainGodUpgradeCost36(id);if(lv>=u.max||save.mainGod.points<cost)return false;save.mainGod.points-=cost;save.mainGod[id]=lv+1;persist();toast(`${u.n} 已提升`);return true;}
@@ -6267,7 +6274,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   };
   function triggerEgg36(key,force=true){const seen=`egg36:${save.character}:${key}`;if(P.banterSeen.has(seen))return;const lines=CHARACTER_EGGS36[save.character]?.[key];if(!lines)return;P.banterSeen.add(seen);showBanter(lines,force);}
 
-  const _resetP36=resetP;resetP=function(){_resetP36();P.aimX=P.fx;P.aimY=P.fy;P.weaponAngle=Math.atan2(P.fy,P.fx);P.manualAim=false;P.weaponLock=0;P.moveX=P.moveY=0;P.banterSeen.add("lowhp");P.banterSeen.add("combo80");P.banterSeen.add("rankD");P.eggPrevKills=0;P.eggPrevBossPhase=0;P.eggFusion=null;P.eggForm=null;if(isMainGodRun36()){const m=save.mainGod,t=mainGodTier36();P.lordMode=1;P.dmg*=1.15*(1+m.power*.06)*(1+m.gunBlade*.05);P.maxHp*=1+m.vitality*.08+m.regenBlood*.06;P.hp=P.maxHp;P.regen+=m.regenBlood*.35;P.maxSh+=28+m.psiLink*22;P.sh=P.maxSh;P.skillPow*=1+m.psiLink*.08+m.mageCircuit*.1;P.spellPow*=1+m.mageCircuit*.1;P.rate/=(1.12+m.tempo*.04);P.skillCd*=.88*(1-m.tempo*.04);P.dashCd*=.9*(1-m.tempo*.04);P.bSpeed*=1+m.gunBlade*.05;P.bladePower*=1+m.gunBlade*.05;P.multi=Math.max(P.multi,2)+(m.spaceRing?1:0);P.pierce+=1+(m.spaceRing?1:0);P.next=Math.max(5,Math.floor(P.next*.68));P.lordXp=t.xp*(1+m.resonance*.12);P.mag*=m.spaceRing?2.1:1.55;P.revive=Math.max(P.revive,m.rebirthDoll?1:0);if(m.summonPage){P.familiar+=1;P.petPow*=1+m.summonPage*.15;syncPets();}levelRerolls+=2+m.fortune;}};
+  const _resetP36=resetP;resetP=function(){_resetP36();P.aimX=P.fx;P.aimY=P.fy;P.weaponAngle=Math.atan2(P.fy,P.fx);P.manualAim=false;P.weaponLock=0;P.moveX=P.moveY=0;P.banterSeen.add("lowhp");P.banterSeen.add("combo80");P.banterSeen.add("rankD");P.eggPrevKills=0;P.eggPrevBossPhase=0;P.eggFusion=null;P.eggForm=null;P.mgGeneLock=0;P.mgDeathSense=0;if(isMainGodRun36()){const m=save.mainGod,t=mainGodTier36();P.lordMode=1;P.dmg*=1.15*(1+m.power*.06)*(1+m.gunBlade*.05);P.maxHp*=1+m.vitality*.08+m.regenBlood*.06+(m.bioSerum||0)*.05;P.hp=P.maxHp;P.regen+=m.regenBlood*.35;P.maxSh+=28+m.psiLink*22;P.sh=P.maxSh;P.skillPow*=1+m.psiLink*.08+m.mageCircuit*.1;P.spellPow*=1+m.mageCircuit*.1;P.rate/=(1.12+m.tempo*.04);P.skillCd*=.88*(1-m.tempo*.04);P.dashCd*=.9*(1-m.tempo*.04)*(1-(m.deathSense||0)*.08);P.bSpeed*=1+m.gunBlade*.05;P.bladePower*=1+m.gunBlade*.05;P.multi=Math.max(P.multi,2)+(m.spaceRing?1:0);P.pierce+=1+(m.spaceRing?1:0);P.next=Math.max(5,Math.floor(P.next*.68));P.lordXp=t.xp*(1+m.resonance*.12+(m.captainMark||0)*.08);P.mag*=m.spaceRing?2.1:1.55;P.revive=Math.max(P.revive,m.rebirthDoll?1:0);P.mgGeneLock=m.geneLock||0;P.mgDeathSense=m.deathSense||0;if(m.geneLock)P.spd*=1+m.geneLock*.03;if(m.bioSerum){P.acid+=m.bioSerum;P.lordRisk=(P.lordRisk||1)*(1+m.bioSerum*.06);}if(m.captainMark)P.petPow*=1+m.captainMark*.08;if(m.wardWeave)P.lordRisk=(P.lordRisk||1)*(1-m.wardWeave*.07);if(m.judgmentPin)P.bossPierce=(P.bossPierce||0)+m.judgmentPin*.12;if(m.summonPage){P.familiar+=1;P.petPow*=1+m.summonPage*.15;syncPets();}levelRerolls+=2+m.fortune;}};
   const _gainXp36=gainXp;gainXp=function(v){const before=P.level,result=_gainXp36(v*(isMainGodRun36()?(P.lordXp||mainGodTier36().xp):1));if(isMainGodRun36()&&P.level>before){P.dmg*=1.025;P.hp=Math.min(P.maxHp,P.hp+P.maxHp*.08);if(P.level%3===0)P.pierce=Math.min(12,P.pierce+1);if(P.level%5===0)P.multi=Math.min(7,P.multi+1);toast(`主神灌注 · Lv.${P.level}`);}return result;};
   const _update36=update;update=function(dt){const result=_update36(dt);if(state==="play"){if(!P.manualAim){const target=nearest(P.x,P.y,P.range);if(target)setAimVector36(target.x-P.x,target.y-P.y,false);else if(P.moveX||P.moveY)setAimVector36(P.moveX,P.moveY,false);}if(isMainGodRun36()){if($("#mission"))$("#mission").textContent=`轮回 T${selectedMainGodTier36} · ${mainGodTier36().xp.toFixed(1)}×`;if(runTime>.3)triggerEgg36("entry");}if(P.kills>0)triggerEgg36("firstKill",false);if(P.hp/P.maxHp<.23)triggerEgg36("lowhp");if(P.combo>=80)triggerEgg36("combo",false);if(P.plan?.rank==="D")triggerEgg36("rankD");if(boss?.phase===4)triggerEgg36("boss4");if(P.fusion&&P.fusion!==P.eggFusion){P.eggFusion=P.fusion;triggerEgg36("fusion");}if(P.form&&P.form!==P.eggForm){P.eggForm=P.form;triggerEgg36("asc");}}return result;};
 
@@ -6310,7 +6317,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   const _renderMainGodShop37=renderMainGodShop36;renderMainGodShop36=function(){_renderMainGodShop37();const balance=$("#mainGodBalance36");if(balance&&!$("#mgReset37")){const meta=document.createElement("div");meta.className="mgMeta37";meta.innerHTML=`<span>完成 ${save.mainGod.clears} 次</span><span>无限回廊 ${save.mainGod.deepest||0} 层</span><button id="mgReset37">重置兑换 · 返还 ◈ ${totalMainGodInvestment37()}</button>`;balance.appendChild(meta);meta.querySelector("button").onclick=resetMainGodBuild37;}};
   const _resetP37=resetP;resetP=function(){_resetP37();if(isMainGodRun36()){P.mgDepth=selectedMainGodTier36===4?Math.max(1,(save.mainGod.deepest||0)+1):0;P.mgContractPrompted=0;P.mgContract=null;P.mgChallenge=randomOffers37(MAIN_GOD_CHALLENGES37,1)[0];P.mgChallengeDone=false;P.mgChallengeBonus=0;P.mgPressure=0;}};
   const _update37=update;update=function(dt){const result=_update37(dt);if(state==="play"&&isMainGodRun36()){if(!P.mgContractPrompted&&runTime>.18){showMainGodContract37();return result;}if(P.mgPressure)P.pressure=(P.pressure||1)*(1+P.mgPressure*dt/Math.max(1,stage().dur));if($("#mission")&&P.mgContract)$("#mission").textContent=`${stage().short} · ${P.mgContract.n} · 挑战：${P.mgChallenge.n}`;}return result;};
-  const _finish37=finish;finish=function(win){if(isMainGodRun36()){P.mgChallengeDone=!!win&&!!P.mgChallenge?.ok();P.mgChallengeBonus=P.mgChallengeDone?(P.mgChallenge.bonus||0):0;if(P.mgChallengeDone)save.mainGod.challenges[P.mgChallenge.id]=(save.mainGod.challenges[P.mgChallenge.id]||0)+1;}return _finish37(win);};
+  const _finish37=finish;finish=function(win){if(isMainGodRun36()){P.mgChallengeDone=!!win&&!!P.mgChallenge?.ok();P.mgChallengeBonus=P.mgChallengeDone?(P.mgChallenge.bonus||0)+(save.mainGod.captainMark||0)*2:0;if(P.mgChallengeDone)save.mainGod.challenges[P.mgChallenge.id]=(save.mainGod.challenges[P.mgChallenge.id]||0)+1;}return _finish37(win);};
   const style37=document.createElement("style");style37.textContent=`.tierPick37{display:flex;align-items:center;gap:8px;margin:7px 0}.tierPick37 span{min-width:72px;text-align:center;color:#ffe9a9;font-weight:800}.tierPick37 button{min-width:40px;padding:7px}.mgMeta37{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:8px}.mgMeta37 span{padding:5px 8px;border-radius:10px;background:#ffffff12}.mgMeta37 button{margin-left:auto;background:#33264d;color:#ffe5a4;border:1px solid #a887df;border-radius:10px;padding:7px 10px}`;document.head.appendChild(style37);
 
   const TUTORIAL37=[
@@ -6449,15 +6456,22 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   if(previousGlowVersion422<2){save.settings.glow="off";save.settings.glowVersion=2;persist();}
   if(!["off","soft","vivid"].includes(save.settings.glow))save.settings.glow="off";
   save.mainGod.cursedHeart=Number(save.mainGod.cursedHeart)||0;
+  save.mainGod.geneLock=Number(save.mainGod.geneLock)||0;
+  save.mainGod.bioSerum=Number(save.mainGod.bioSerum)||0;
+  save.mainGod.deathSense=Number(save.mainGod.deathSense)||0;
+  save.mainGod.captainMark=Number(save.mainGod.captainMark)||0;
+  save.mainGod.wardWeave=Number(save.mainGod.wardWeave)||0;
+  save.mainGod.judgmentPin=Number(save.mainGod.judgmentPin)||0;
   MAIN_GOD_ITEMS36.cursedHeart={n:"诅咒遗物·猩红心核",i:"🫀",d:"全伤害 +25%，最大生命 -18%；高风险永久兑换，可在重置时返还",max:1,base:24,step:0,group:"特殊效果道具"};
 
   const _resetP39=resetP;
   resetP=function(){const result=_resetP39();P.perfectDodges=0;P.dodgeFlash=0;P.bossRule39="";P.signalLane39=null;if(isMainGodRun36()&&save.mainGod.cursedHeart){P.dmg*=1.25;P.skillPow*=1.25;P.spellPow*=1.25;P.bladePower*=1.25;P.maxHp*=.82;P.hp=Math.min(P.hp,P.maxHp);}return result;};
 
   function immediateThreat39(){
-    for(const b of ebullets)if(Math.hypot(b.x-P.x,b.y-P.y)<78+(b.r||4))return true;
-    for(const e of enemies)if(!e.dead&&e!==boss&&Math.hypot(e.x-P.x,e.y-P.y)<P.r+e.r+54)return true;
-    return !!(boss&&!boss.dead&&Math.hypot(boss.x-P.x,boss.y-P.y)<P.r+boss.r+72);
+    const sense=(P.mgDeathSense||0)*18;
+    for(const b of ebullets)if(Math.hypot(b.x-P.x,b.y-P.y)<78+sense+(b.r||4))return true;
+    for(const e of enemies)if(!e.dead&&e!==boss&&Math.hypot(e.x-P.x,e.y-P.y)<P.r+e.r+54+sense)return true;
+    return !!(boss&&!boss.dead&&Math.hypot(boss.x-P.x,boss.y-P.y)<P.r+boss.r+72+sense);
   }
   const _dash39=dash;
   dash=function(){const ready=state==="play"&&P.dash<=0,perfect=ready&&immediateThreat39(),result=_dash39();if(ready&&perfect){P.perfectDodges++;P.dodgeFlash=.42;P.dash=Math.max(0,P.dash-.7);P.sh=Math.min(P.maxSh,P.sh+8);const c=char35();if(c.id==="rion"){directionalSlash36(132,P.dmg*1.45,true,P.weaponAngle||0,1.5);toast("黄泉返：完美格挡反击");}else if(c.id==="aya"){directionalSlash36(105,P.dmg*.88,false,P.weaponAngle||0,1.18);toast("月切：完美闪避追斩");}else{aoe(P.x,P.y,92,P.dmg*.72,"#77efff",true,{source:"skill",school:"shrine"});toast("完美闪避：护盾回充");}haptic37([12,18,26]);}return result;};
