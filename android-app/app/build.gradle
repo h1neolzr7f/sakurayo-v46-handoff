@@ -11,11 +11,11 @@ android {
     compileSdk 36
 
     defaultConfig {
-        applicationId "com.sakurayo.zombietide"
+        applicationId "com.sakurayo.yeying.dev"
         minSdk 23
         targetSdk 36
-        versionCode 61
-        versionName "4.6.0"
+        versionCode 6101
+        versionName "4.6.0-yeying"
     }
 
     signingConfigs {
