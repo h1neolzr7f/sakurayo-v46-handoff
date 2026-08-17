@@ -246,6 +246,24 @@
     return snapshot();
   }
 
+  function bootLayout52() {
+    if (!global.document) return;
+    if (global.SakurayoLayout52 && typeof global.SakurayoLayout52.install === "function") {
+      global.SakurayoLayout52.install();
+      return;
+    }
+    if (global.document.getElementById("sakurayo-layout52-js")) return;
+    var script = global.document.createElement("script");
+    script.id = "sakurayo-layout52-js";
+    script.src = "runtime/sakurayo-layout52.js";
+    script.onload = function () {
+      if (global.SakurayoLayout52 && typeof global.SakurayoLayout52.install === "function") {
+        global.SakurayoLayout52.install();
+      }
+    };
+    (global.document.head || global.document.documentElement).appendChild(script);
+  }
+
   function injectStyle() {
     if (!global.document) return;
     var style = global.document.getElementById("sakurayo-ops-css");
@@ -254,6 +272,7 @@
     style.id = "sakurayo-ops-css";
     style.textContent = CSS;
     (global.document.head || global.document.documentElement).appendChild(style);
+    bootLayout52();
   }
 
   global.SakurayoOps = {
