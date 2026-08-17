@@ -36,8 +36,14 @@ import java.util.Locale;
 public final class MainActivity extends Activity {
     private static final String TAG = "SakurayoWebView";
     private static final String GAME_URL = "file:///android_asset/index.html";
+    private static final String LAYOUT52_ASSET = "runtime/sakurayo-layout52.js";
     private static final String FEEL53_ASSET = "runtime/sakurayo-feel53.js";
     private static final long EXIT_CONFIRM_WINDOW_MS = 1800L;
+    private static final String ANDROID_LANDSCAPE_SCRIPT =
+            "window.__SAKURAYO_ANDROID_LANDSCAPE__=true;" +
+            "(function(){var h=document.documentElement;if(!h||!h.classList)return;" +
+            "h.classList.add('androidLandscape46','landscape46');" +
+            "h.classList.remove('portraitFallback46');})()";
 
     private static final String ANDROID_BACK_SCRIPT =
             "(function(){" +
@@ -186,16 +192,22 @@ public final class MainActivity extends Activity {
             super.onPageFinished(view, url);
             applyImmersiveMode();
             view.requestFocus(View.FOCUS_DOWN);
-            injectFeel53(view);
+            injectRuntime(view);
         }
     }
 
-    private void injectFeel53(WebView view) {
+    private void injectRuntime(WebView view) {
         if (view == null) return;
+        view.evaluateJavascript(ANDROID_LANDSCAPE_SCRIPT, null);
+        injectAssetScript(view, LAYOUT52_ASSET);
+        injectAssetScript(view, FEEL53_ASSET);
+    }
+
+    private void injectAssetScript(WebView view, String assetPath) {
         try {
-            view.evaluateJavascript(readAssetUtf8(FEEL53_ASSET), null);
+            view.evaluateJavascript(readAssetUtf8(assetPath), null);
         } catch (IOException error) {
-            Log.w(TAG, "Unable to boot feel53 from " + FEEL53_ASSET, error);
+            Log.w(TAG, "Unable to boot runtime from " + assetPath, error);
         }
     }
 
