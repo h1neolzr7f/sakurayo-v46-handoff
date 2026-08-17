@@ -27,11 +27,16 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 public final class MainActivity extends Activity {
     private static final String TAG = "SakurayoWebView";
     private static final String GAME_URL = "file:///android_asset/index.html";
+    private static final String FEEL53_ASSET = "runtime/sakurayo-feel53.js";
     private static final long EXIT_CONFIRM_WINDOW_MS = 1800L;
 
     private static final String ANDROID_BACK_SCRIPT =
@@ -118,7 +123,7 @@ public final class MainActivity extends Activity {
         settings.setTextZoom(100);
         settings.setDefaultTextEncodingName("utf-8");
         settings.setMediaPlaybackRequiresUserGesture(true);
-        settings.setUserAgentString(settings.getUserAgentString() + " SakurayoAndroid/4.6.0");
+        settings.setUserAgentString(settings.getUserAgentString() + " SakurayoAndroid/4.6.0-yeying");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             settings.setSafeBrowsingEnabled(true);
         }
@@ -181,6 +186,28 @@ public final class MainActivity extends Activity {
             super.onPageFinished(view, url);
             applyImmersiveMode();
             view.requestFocus(View.FOCUS_DOWN);
+            injectFeel53(view);
+        }
+    }
+
+    private void injectFeel53(WebView view) {
+        if (view == null) return;
+        try {
+            view.evaluateJavascript(readAssetUtf8(FEEL53_ASSET), null);
+        } catch (IOException error) {
+            Log.w(TAG, "Unable to boot feel53 from " + FEEL53_ASSET, error);
+        }
+    }
+
+    private String readAssetUtf8(String path) throws IOException {
+        try (InputStream input = getAssets().open(path);
+             ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[4096];
+            int read;
+            while ((read = input.read(buffer)) != -1) {
+                output.write(buffer, 0, read);
+            }
+            return output.toString(StandardCharsets.UTF_8.name());
         }
     }
 

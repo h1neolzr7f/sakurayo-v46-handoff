@@ -30,7 +30,18 @@
     ".opsSlots46 button.poor{opacity:.42}" +
     ".opsSlots46 button small{display:block;margin-top:2px;color:#ffe7a3;font:700 9px/1 system-ui}" +
     "@media(orientation:landscape){#opsDock46{left:max(12px,env(safe-area-inset-left));bottom:max(18px,env(safe-area-inset-bottom));width:196px}}" +
-    "html.landscape46 #opsDock46{left:max(12px,env(safe-area-inset-left));bottom:max(18px,env(safe-area-inset-bottom));width:196px}";
+    "html.landscape46:not(.portraitFallback46) #opsDock46{left:max(236px,calc(env(safe-area-inset-left) + 220px));top:max(8px,env(safe-area-inset-top));bottom:auto;width:auto;padding:4px 8px;display:flex;align-items:center;gap:8px;border-radius:999px;background:#120e27d8;border:1px solid #f2c75d44}" +
+    "html.landscape46:not(.portraitFallback46) .opsDp46{margin:0;min-width:52px}" +
+    "html.landscape46:not(.portraitFallback46) .opsSlots46{display:flex;gap:6px}" +
+    "html.landscape46:not(.portraitFallback46) .opsSlots46 button{width:44px;min-height:44px;padding:2px;border-radius:50%}" +
+    "html.landscape46:not(.portraitFallback46) .opsSlots46 button img{width:22px;height:22px;margin:0 auto}" +
+    "html.landscape46:not(.portraitFallback46) .opsSlots46 button small{display:none}" +
+    "html.shortWindow46 #opsDock46{left:max(252px,calc(env(safe-area-inset-left) + 236px));top:max(6px,env(safe-area-inset-top));bottom:auto;width:auto;padding:4px 8px;display:flex;align-items:center;gap:8px;border-radius:999px;background:#120e27d8;border:1px solid #f2c75d44}" +
+    "html.shortWindow46 .opsDp46{margin:0;min-width:48px}" +
+    "html.shortWindow46 .opsSlots46{display:flex;gap:6px}" +
+    "html.shortWindow46 .opsSlots46 button{width:44px;min-height:44px;padding:2px;border-radius:50%}" +
+    "html.shortWindow46 .opsSlots46 button img{width:22px;height:22px;margin:0 auto}" +
+    "html.shortWindow46 .opsSlots46 button small{display:none}";
 
   var state = emptyState();
 
@@ -58,7 +69,16 @@
       cost: COST,
       max: MAX,
       units: state.units.map(function (u) {
-        return { id: u.id, x: u.x, y: u.y, n: NAMES[u.id] || u.id };
+        return {
+          id: u.id,
+          x: u.x,
+          y: u.y,
+          n: NAMES[u.id] || u.id,
+          pulse: u.pulse || 0,
+          aim: Number(u.aim) || 0,
+          fire: u.fire || 0,
+          weapon: u.weapon || WEAPON[u.id] || "rifle",
+        };
       }),
     };
   }
@@ -106,6 +126,9 @@
       x: pin.x,
       y: pin.y,
       clock: 0.2,
+      pulse: 0.72,
+      aim: 0,
+      fire: 0,
       weapon: WEAPON[id] || "rifle",
     });
     return { ok: true, reason: "", snapshot: snapshot() };
@@ -143,11 +166,15 @@
     var dmg = Math.max(1, (Number(world.dmg) || 8) * DMG * (Number(world.petPow) || 1));
     for (var i = 0; i < state.units.length; i++) {
       var u = state.units[i];
+      u.pulse = Math.max(0, (u.pulse || 0) - dt);
+      u.fire = Math.max(0, (u.fire || 0) - dt);
       u.clock -= dt;
       if (u.clock > 0) continue;
       u.clock = RATE;
       var target = typeof world.nearest === "function" ? world.nearest(u.x, u.y, u.weapon === "blade" ? BLADE_RANGE : RANGE) : null;
       if (!target) continue;
+      u.aim = Math.atan2(target.y - u.y, target.x - u.x);
+      u.fire = u.weapon === "blade" ? 0.24 : 0.16;
       shots.push({
         id: u.id,
         weapon: u.weapon,
@@ -219,6 +246,32 @@
     return snapshot();
   }
 
+  function bootScript(id, src, ready) {
+    if (!global.document) return;
+    if (ready()) return;
+    if (global.document.getElementById(id)) return;
+    var script = global.document.createElement("script");
+    script.id = id;
+    script.src = src;
+    script.onload = ready;
+    (global.document.head || global.document.documentElement).appendChild(script);
+  }
+
+  function bootLayout52() {
+    bootScript("sakurayo-layout52-js", "runtime/sakurayo-layout52.js", function () {
+      if (global.SakurayoLayout52 && typeof global.SakurayoLayout52.install === "function") {
+        global.SakurayoLayout52.install();
+      }
+      return !!(global.SakurayoLayout52 && global.SakurayoLayout52.install);
+    });
+    bootScript("sakurayo-feel53-js", "runtime/sakurayo-feel53.js", function () {
+      if (global.SakurayoFeel53 && typeof global.SakurayoFeel53.install === "function") {
+        global.SakurayoFeel53.install();
+      }
+      return !!(global.SakurayoFeel53 && global.SakurayoFeel53.install);
+    });
+  }
+
   function injectStyle() {
     if (!global.document) return;
     var style = global.document.getElementById("sakurayo-ops-css");
@@ -227,6 +280,7 @@
     style.id = "sakurayo-ops-css";
     style.textContent = CSS;
     (global.document.head || global.document.documentElement).appendChild(style);
+    bootLayout52();
   }
 
   global.SakurayoOps = {
