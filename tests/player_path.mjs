@@ -82,6 +82,8 @@ const lobby = await boxesOf(page, {
   settings: '#homeRail46 [data-home="settings"]',
   banner: "#homeBanner46",
   cal: "#homeQuick46 .homeIco46.cal",
+  profile: "#menu.homeDock46 .profile",
+  chars: "#menu.homeDock46 .charSelectPanel",
 });
 assert.ok(lobby.notice && lobby.notice.h >= 42, "notice touch target");
 assert.ok(lobby.settings && lobby.settings.h >= 42, "settings touch target");
@@ -89,6 +91,13 @@ assert.equal(overlap(lobby.rail, lobby.banner), 0, "rail must not cover banner")
 assert.equal(overlap(lobby.notice, lobby.banner), 0, "notice must not sit under banner");
 assert.equal(overlap(lobby.settings, lobby.banner), 0, "settings must not sit under banner");
 assert.equal(overlap(lobby.start, lobby.nav), 0);
+assert.equal(overlap(lobby.profile, lobby.chars), 0, "名牌不得盖住换角圆钮");
+if (lobby.banner && lobby.nav) {
+  assert.ok(lobby.banner.y + lobby.banner.h <= lobby.nav.y + 2, "寻访条须在底栏之上");
+}
+if (lobby.rail && lobby.banner) {
+  assert.ok(lobby.rail.y + lobby.rail.h <= lobby.banner.y + 2, "左栏须停在寻访条上方");
+}
 await page.screenshot({ path: path.join(out, "01-lobby.png") });
 
 await api(page, "openDrawer", "calendar");
