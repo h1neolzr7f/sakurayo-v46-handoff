@@ -246,22 +246,30 @@
     return snapshot();
   }
 
-  function bootLayout52() {
+  function bootScript(id, src, ready) {
     if (!global.document) return;
-    if (global.SakurayoLayout52 && typeof global.SakurayoLayout52.install === "function") {
-      global.SakurayoLayout52.install();
-      return;
-    }
-    if (global.document.getElementById("sakurayo-layout52-js")) return;
+    if (ready()) return;
+    if (global.document.getElementById(id)) return;
     var script = global.document.createElement("script");
-    script.id = "sakurayo-layout52-js";
-    script.src = "runtime/sakurayo-layout52.js";
-    script.onload = function () {
+    script.id = id;
+    script.src = src;
+    script.onload = ready;
+    (global.document.head || global.document.documentElement).appendChild(script);
+  }
+
+  function bootLayout52() {
+    bootScript("sakurayo-layout52-js", "runtime/sakurayo-layout52.js", function () {
       if (global.SakurayoLayout52 && typeof global.SakurayoLayout52.install === "function") {
         global.SakurayoLayout52.install();
       }
-    };
-    (global.document.head || global.document.documentElement).appendChild(script);
+      return !!(global.SakurayoLayout52 && global.SakurayoLayout52.install);
+    });
+    bootScript("sakurayo-feel53-js", "runtime/sakurayo-feel53.js", function () {
+      if (global.SakurayoFeel53 && typeof global.SakurayoFeel53.install === "function") {
+        global.SakurayoFeel53.install();
+      }
+      return !!(global.SakurayoFeel53 && global.SakurayoFeel53.install);
+    });
   }
 
   function injectStyle() {
