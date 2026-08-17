@@ -38,3 +38,11 @@ cd android-app
 输出：`android-app/app/build/outputs/apk/debug/app-debug.apk`
 
 当前用 Android debug 证书签名，只适合自己试，不能当正式商店包。
+
+## 4.6.0 开发版触控修复
+
+手机锁横屏后，WebView 有时仍上报竖屏宽度（`view.w < 640`）。页面会同时套 `landscape46` 和 `portraitFallback46`：立绘/指挥台视觉叠在一起，出击等按钮的命中盒却还在另一处，表现为「按了没反应」。
+
+本包在 Android 壳注入 `__SAKURAYO_ANDROID_LANDSCAPE__`，由 `sakurayo-layout52.js` 强制横屏大厅、打开按钮 `pointer-events`，并把 `html,body` 的 `touch-action` 从 `none` 改成 `manipulation`（画布和摇杆仍是 `none`）。
+
+覆盖安装 `versionCode 6102` 即可，不会动正式《樱夜·尸潮》。
