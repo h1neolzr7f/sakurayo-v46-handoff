@@ -15,6 +15,10 @@
     rion: { id: "rion", name: "凛音", color: "#c9a6ff", password: "黄泉", pluck: 329.63 },
   };
   var CSS =
+    "html,body{touch-action:manipulation!important}" +
+    "canvas,#hud,#level,#joy{touch-action:none}" +
+    "#menu.homeDock46 button,#menu.homeDock46 .charCard,#menu.homeDock46 .homeDeck46,#menu.homeDock46 .homeNav46,#menu.homeDock46 .homeRail46,#menu.homeDock46 .homeBanner46,#menu.homeDock46 .charSelectPanel,#menu.homeDock46 .start,.drawer button,.choice,#pause,#dash,#skill,#resume,#back{pointer-events:auto!important;touch-action:manipulation!important}" +
+    "#" + BADGE_ID + "{pointer-events:none!important}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46.speak53{width:min(168px,22vw)!important;min-height:48px!important;padding:4px 8px 4px 4px!important;grid-template-columns:42px 1fr!important;justify-items:start;gap:6px;align-items:center}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46.speak53 b,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46.speak53 small{display:block!important;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46.speak53 b{font-size:12px;letter-spacing:.08em}" +
