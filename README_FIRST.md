@@ -60,6 +60,7 @@ Windows 也可：`powershell -File tools/verify.ps1`
 
 - `src/` 唯一代码基线
 - `src/runtime/sakurayo-lobby.js` 大厅/寻访
+- `src/runtime/sakurayo-shell.js` 缺系统的预览壳
 - `src/runtime/sakurayo-live.js` 立绘
 - `src/runtime/sakurayo-ops.js` 干员
 - `android-app/app/src/main/assets/game/art` 运行时美术
