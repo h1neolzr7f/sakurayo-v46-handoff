@@ -5,7 +5,7 @@
   var HIT_CSS =
     "html,body{touch-action:manipulation!important}" +
     "canvas,#hud,#level,#joy{touch-action:none}" +
-    "#menu.homeDock46 .menu{pointer-events:none}" +
+    "#menu,#menu.homeDock46,#menu.homeDock46 .menu{pointer-events:auto!important}" +
     "#menu.homeDock46 button,#menu.homeDock46 .charCard,#menu.homeDock46 .homeDeck46,#menu.homeDock46 .homeNav46,#menu.homeDock46 .homeRail46,#menu.homeDock46 .homeBanner46,#menu.homeDock46 .charSelectPanel,#menu.homeDock46 .start,#menu.homeDock46 .homeModes46,#menu.homeDock46 .stageMini,#menu.homeDock46 .profile,#menu.homeDock46 .coins,#menu.homeDock46 .homeCoinPlus46,#menu.homeDock46 .heroTap46,.drawer button,.drawer .close,.choice,#pause,#dash,#skill,#resume,#back,#opsDock46,#opsDock46 button{pointer-events:auto!important;touch-action:manipulation!important}" +
     "#menu.homeDock46 .heroLive46,#menu.homeDock46 .heroLiveBreath46,#menu.homeDock46 .bg,#yeyingDevBadge53{pointer-events:none!important}" +
     "html.landscape46 #menu.homeDock46 .top,html.androidLandscape46 #menu.homeDock46 .top{height:52px!important;max-height:52px!important;overflow:visible!important;z-index:10!important;pointer-events:none!important}" +
