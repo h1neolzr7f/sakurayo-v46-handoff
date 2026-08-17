@@ -41,6 +41,58 @@
     );
   }
 
+  function shortField(world) {
+    var w = world && world.W ? world.W : 0;
+    var h = world && world.H ? world.H : 0;
+    return w >= 640 && h > 0 && h < 360;
+  }
+
+  function earlyCrowd(world) {
+    if (shortField(world)) {
+      return { interval: 0.88, floor: 4, fill: 0.48 };
+    }
+    return { interval: EARLY_INTERVAL, floor: EARLY_FLOOR, fill: 0.22 };
+  }
+
+  function spawnLaneY(world) {
+    var h = world && world.H ? world.H : 0;
+    var py = world && typeof world.playerY === "number" ? world.playerY : h * 0.5;
+    var band = Math.max(24, h * 0.26);
+    if (h <= 0) return 0;
+    if (py < h * 0.5) return h - band + Math.random() * Math.max(8, band - 8);
+    return Math.random() * Math.max(8, band);
+  }
+
+  function spawnSide(world) {
+    if (shortField(world)) {
+      return Math.random() < 0.5 ? 1 : 3;
+    }
+    return Math.floor(Math.random() * 4);
+  }
+
+  function spawnEdge(world) {
+    var w = world && world.W ? world.W : 430;
+    var h = world && world.H ? world.H : 932;
+    var pad = shortField(world) ? 110 : 65;
+    var side = spawnSide(world);
+    var x;
+    var y;
+    if (side === 0) {
+      x = Math.random() * w;
+      y = -pad;
+    } else if (side === 1) {
+      x = w + pad;
+      y = shortField(world) ? spawnLaneY(world) : Math.random() * h;
+    } else if (side === 2) {
+      x = Math.random() * w;
+      y = h + pad;
+    } else {
+      x = -pad;
+      y = shortField(world) ? spawnLaneY(world) : Math.random() * h;
+    }
+    return { side: side, pad: pad, x: x, y: y };
+  }
+
   function groundId(world) {
     if (world && world.mainGod) return "maingod";
     var id = world ? world.stageId | 0 : 1;
@@ -129,7 +181,7 @@
   }
 
   function spawnInterval(baseInterval, world) {
-    if (earlyCh1(world)) return EARLY_INTERVAL;
+    if (earlyCh1(world)) return earlyCrowd(world).interval;
     return baseInterval;
   }
 
@@ -138,12 +190,13 @@
       fillAcc = 0;
       return 0;
     }
-    if ((world.enemyCount || 0) >= EARLY_FLOOR || (world.enemyCount || 0) >= (world.capE || EARLY_FLOOR)) {
+    var crowd = earlyCrowd(world);
+    if ((world.enemyCount || 0) >= crowd.floor || (world.enemyCount || 0) >= (world.capE || crowd.floor)) {
       fillAcc = 0;
       return 0;
     }
     fillAcc += dt || 0;
-    if (fillAcc >= 0.22) {
+    if (fillAcc >= crowd.fill) {
       fillAcc = 0;
       return 1;
     }
@@ -553,7 +606,8 @@
     ctx.restore();
   }
 
-  function heroVisualScale(width) {
+  function heroVisualScale(width, height) {
+    if ((width || 0) >= 640 && (height || 0) > 0 && height < 360) return 0.94;
     return (width || 0) >= 560 ? 1.12 : 1;
   }
 
@@ -848,9 +902,10 @@
       hint: hint(world),
       obstacleCount: obstacles(world).length,
       earlyWindow: earlyCh1(world),
-      earlyFloor: EARLY_FLOOR,
-      earlyInterval: EARLY_INTERVAL,
-      heroScale: heroVisualScale(world.W),
+      earlyFloor: earlyCrowd(world).floor,
+      earlyInterval: earlyCrowd(world).interval,
+      shortField: shortField(world),
+      heroScale: heroVisualScale(world.W, world.H),
       presentation: presentationSnapshot(),
     };
   }
@@ -859,6 +914,9 @@
     version: VERSION,
     stageProfile: stageProfile,
     spawnInterval: spawnInterval,
+    spawnSide: spawnSide,
+    spawnEdge: spawnEdge,
+    shortField: shortField,
     ensureMinCrowd: ensureMinCrowd,
     drawGround: drawGround,
     drawObstacles: drawObstacles,

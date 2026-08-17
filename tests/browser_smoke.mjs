@@ -253,6 +253,10 @@ try {
   assert.equal(await page.locator("#gachaDrawer").isVisible(), true);
   assert.match(await page.locator("#gachaDrawer").textContent(), /镜界寻访/);
   const coinsBeforeFail = (await api(page, "lobby46")).coins;
+  const welcome = await api(page, "pullGacha46", 1);
+  assert.equal(welcome.ok, true);
+  assert.equal(welcome.paid, "ticket");
+  assert.equal(welcome.coins, coinsBeforeFail);
   const broke = await api(page, "pullGacha46", 1);
   assert.equal(broke.ok, false);
   assert.equal(broke.reason, "coins");

@@ -64,6 +64,18 @@
       "#storyBeat44[data-ground='neon'] .storyBeatKicker{color:#8defff}" +
       "#storyBeat44[data-ground='swords'] .storyBeatKicker{color:#ddd4ea}" +
       "#storyBeat44[data-ground='mirror'] .storyBeatKicker{color:#e2c4ff}" +
+      "html.shortWindow46 #storyBeat44[data-sequence='briefing'] .storyBeatCopy{left:3%;right:34%;bottom:8%;padding:10px 14px;border-left:3px solid #f35aa6;background:linear-gradient(90deg,#080615d8,transparent)}" +
+      "html.shortWindow46 #storyBeat44[data-sequence='briefing'] .storyBeatTitle{font-size:clamp(18px,4.8vw,28px);letter-spacing:.14em}" +
+      "html.shortWindow46 #storyBeat44[data-sequence='briefing'] .storyBeatLine{font-size:12px;line-height:1.45}" +
+      "html.shortWindow46 #dialogue .dialogueModal{height:min(86vh,230px);max-height:230px;border:1px solid #f2c75d55}" +
+      "html.shortWindow46 #result .modal{height:min(92vh,252px);max-height:min(92vh,252px);padding:10px 12px;grid-template-columns:56px minmax(150px,.9fr) minmax(210px,1.2fr);column-gap:10px;row-gap:4px;border:1px solid #f2c75d66}" +
+      "html.shortWindow46 #result .resultIcon{font-size:18px;margin-top:0}" +
+      "html.shortWindow46 #result .rankBig{font-size:36px}" +
+      "html.shortWindow46 #result #rtitle{font-size:16px;letter-spacing:.08em}" +
+      "html.shortWindow46 #result #endingTag{top:auto;bottom:46px;left:10px}" +
+      "html.shortWindow46 #result #rstats,html.shortWindow46 #result #damageReport{padding:6px 8px;font-size:9px}" +
+      "html.shortWindow46 #result .actions button{min-height:40px;padding:6px 10px}" +
+      "html.shortWindow46 #paused .modal,html.shortWindow46 #level .modal,html.shortWindow46 #event .modal{max-height:94vh;overflow:auto}" +
       "@media (orientation:landscape) and (max-height:600px){" +
       ".overlay{padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}" +
       "#dialogue .dialogueModal{display:grid;grid-template-columns:minmax(220px,38%) minmax(0,1fr);width:min(94vw,900px);height:min(78vh,336px);max-height:336px;padding:0;text-align:left}" +

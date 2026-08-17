@@ -39,13 +39,15 @@
     "#menu.homeDock46 .heroLiveBreath46 img,.wishHero46{filter:none!important}" +
     "#menu.homeDock46 .heroLiveBreath46:before{filter:none!important;background:radial-gradient(ellipse at 50% 78%,#1a103066 0%,#12081c00 70%)}" +
     ".drawer.hidden .wishPetals46 i,.drawer.hidden .wishStage46:before{animation:none!important}" +
-    "html.landscape46 #menu.homeDock46 .heroLive46{top:0;bottom:0;left:0;right:auto;width:64%}" +
-    "html.landscape46 #menu.homeDock46 .menu{width:min(34vw,360px);max-width:360px;margin-left:auto}" +
-    "html.landscape46 #menu.homeDock46 #coverTitle36{left:max(16px,env(safe-area-inset-left));right:auto;transform:none;text-align:left}" +
+    "html.landscape46 #menu.homeDock46 .heroLive46{top:0;bottom:0;left:0;right:auto;width:58%}" +
+    "html.landscape46 #menu.homeDock46 .menu{width:100%;max-width:none;margin:0}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 #coverTitle36{display:none}" +
     "html.landscape46 .nav,html.landscape46 .homeNav46{grid-template-columns:repeat(5,minmax(0,1fr))!important}" +
     "html.landscape46 .heroHead46{left:22%;width:18%;top:8%;height:26%}" +
     "html.landscape46 .heroLive46 .heroTap46{left:18%;width:28%;top:34%;bottom:14%}" +
     "html.portraitFallback46 #rotateHint46,html.tallWindow46 #rotateHint46{display:block}" +
+    "html.shortWindow46 .heroHead46{left:22%;width:18%;top:6%;height:26%}" +
+    "html.shortWindow46 .heroLive46 .heroTap46{left:18%;width:28%;top:32%;bottom:14%}" +
     "@media(orientation:landscape){.heroHead46{left:18%;width:16%;top:10%;height:28%}.heroLive46 .heroTap46{left:14%;width:22%;top:36%;bottom:12%}}" +
     "@media(prefers-reduced-motion:reduce){.heroLive46.livePuppet46 .heroLiveSway46,.heroLive46.livePuppet46 .heroLivePhys46,.heroLive46.livePuppet46 .heroLiveBreath46,.heroLive46.livePuppet46 .heroLiveLook46{transform:none!important}}";
 
