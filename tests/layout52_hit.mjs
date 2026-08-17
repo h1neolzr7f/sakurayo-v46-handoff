@@ -66,7 +66,7 @@ assert.equal(state.start.pointer, "auto");
 assert.equal(state.shop.pointer, "auto");
 assert.equal(state.char.pointer, "auto");
 assert.equal(state.hero.pointer, "none");
-assert.equal(state.menu.pointer, "none");
+assert.equal(state.menu.pointer, "auto");
 assert.equal(state.deck.pointer, "auto");
 assert.ok(state.start.w > 40 && state.start.h > 30, "出击按钮应有可点面积");
 assert.ok(overlapArea(state.start, state.hero) < state.start.w * state.start.h * 0.35, "出击不应被立绘大面积盖住");
