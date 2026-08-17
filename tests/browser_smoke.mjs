@@ -143,7 +143,7 @@ try {
   assert.ok(migrated.ownedSkins.includes("default"));
   assert.equal(migrated.settings.glow, "off");
   assert.equal(migrated.settings.glowVersion, 2);
-  assert.deepEqual(migrated.mainGod, { points: 0, unlockedTier: 1, bestTier: 0, clears: 0, runs: 0, deepest: 0, contracts: {}, challenges: {}, power: 0, vitality: 0, tempo: 0, resonance: 0, fortune: 0, regenBlood: 0, psiLink: 0, gunBlade: 0, mageCircuit: 0, summonPage: 0, spaceRing: 0, rebirthDoll: 0, sideKey: 0, cursedHeart: 0, geneLock: 0, bioSerum: 0, deathSense: 0, captainMark: 0, wardWeave: 0, judgmentPin: 0, core: { shards: 0, eqMain: "", eqSub: "", mecha: 0, crimson: 0, qi: 0, star: 0, titan: 0, lockSurvive: 0, lockControl: 0, lockSpecial: 0 } });
+  assert.deepEqual(migrated.mainGod, { points: 0, unlockedTier: 1, bestTier: 0, clears: 0, runs: 0, deepest: 0, contracts: {}, challenges: {}, power: 0, vitality: 0, tempo: 0, resonance: 0, fortune: 0, regenBlood: 0, psiLink: 0, gunBlade: 0, mageCircuit: 0, summonPage: 0, spaceRing: 0, rebirthDoll: 0, sideKey: 0, cursedHeart: 0, geneLock: 0, bioSerum: 0, deathSense: 0, captainMark: 0, wardWeave: 0, judgmentPin: 0, echoBoots: 0, railLens: 0, bloodVial: 0, swordMark: 0, starClip: 0, voidCharm: 0, blindKey: 0, silentPendulum: 0, core: { shards: 0, eqMain: "", eqSub: "", mecha: 0, crimson: 0, qi: 0, star: 0, titan: 0, lockSurvive: 0, lockControl: 0, lockSpecial: 0 } });
   assert.ok(migrated.shop40 && migrated.shop40.ops, "旧存档应补齐 shop40.ops");
   const legacyLobby = await api(legacyPage, "lobby46");
   assert.ok(legacyLobby.shown.includes("sayo_echo"), "旧存档补齐后应拥有 sayo_echo");
@@ -940,8 +940,10 @@ try {
   await page.locator('[data-open="stage"]').click();
   await page.locator(".mainGodCard36 .exchange36").click();
   assert.equal(await page.locator("#mainGodDrawer36").isVisible(), true);
-  assert.equal(await page.locator("#mainGodShopList36 .exchangeCard36").count(), 20);
+  assert.equal(await page.locator("#mainGodShopList36 .exchangeCard36").count(), 28);
   assert.equal(await page.locator("#mainGodShopList36 .coreCard46").count(), 8);
+  assert.equal(await page.locator("#mgHero46").count(), 1);
+  assert.ok(await page.locator("#mainGodDrawer36").evaluate(el => el.classList.contains("mgHall46")));
   assert.equal(await page.locator("#mgReset37").count(), 1);
   await shot(page, "08-main-god-shop.png");
   await page.locator("#mainGodDrawer36 .close").click();

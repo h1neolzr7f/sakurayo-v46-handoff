@@ -312,7 +312,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     character: "sayo",
     skin: "default",
     ownedSkins: ["default"],
-    mainGod: { points: 0, unlockedTier: 1, bestTier: 0, clears: 0, runs: 0, deepest: 0, contracts: {}, challenges: {}, power: 0, vitality: 0, tempo: 0, resonance: 0, fortune: 0, regenBlood: 0, psiLink: 0, gunBlade: 0, mageCircuit: 0, summonPage: 0, spaceRing: 0, rebirthDoll: 0, sideKey: 0, cursedHeart: 0, geneLock: 0, bioSerum: 0, deathSense: 0, captainMark: 0, wardWeave: 0, judgmentPin: 0, core: { shards: 0, eqMain: "", eqSub: "", mecha: 0, crimson: 0, qi: 0, star: 0, titan: 0, lockSurvive: 0, lockControl: 0, lockSpecial: 0 } },
+    mainGod: { points: 0, unlockedTier: 1, bestTier: 0, clears: 0, runs: 0, deepest: 0, contracts: {}, challenges: {}, power: 0, vitality: 0, tempo: 0, resonance: 0, fortune: 0, regenBlood: 0, psiLink: 0, gunBlade: 0, mageCircuit: 0, summonPage: 0, spaceRing: 0, rebirthDoll: 0, sideKey: 0, cursedHeart: 0, geneLock: 0, bioSerum: 0, deathSense: 0, captainMark: 0, wardWeave: 0, judgmentPin: 0, echoBoots: 0, railLens: 0, bloodVial: 0, swordMark: 0, starClip: 0, voidCharm: 0, blindKey: 0, silentPendulum: 0, core: { shards: 0, eqMain: "", eqSub: "", mecha: 0, crimson: 0, qi: 0, star: 0, titan: 0, lockSurvive: 0, lockControl: 0, lockSpecial: 0 } },
   };
   const FORBIDDEN_SAVE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
   const ALLOWED_SAVE_KEYS = ["coins","unlock","done","kills","bosses","best","runs","tal","ach","claim","story","forms","fusions","endings","runHistory","banter","tutorialDone","settings","character","skin","ownedSkins","mainGod","storyChoices38","storySeen38","shop40","balance40","hiddenStory40","pendingLoneStory40","extensions"];
@@ -2278,7 +2278,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     {tier:3,name:"轮回试炼",dur:145,scale:2.34,points:32,xp:3.6},
     {tier:4,name:"无限回廊",dur:165,scale:2.65,points:42,xp:4.0,endless:true},
   ];
-  const MAIN_GOD_DEF36={points:0,unlockedTier:1,bestTier:0,clears:0,runs:0,deepest:0,contracts:{},challenges:{},power:0,vitality:0,tempo:0,resonance:0,fortune:0,regenBlood:0,psiLink:0,gunBlade:0,mageCircuit:0,summonPage:0,spaceRing:0,rebirthDoll:0,sideKey:0,cursedHeart:0,geneLock:0,bioSerum:0,deathSense:0,captainMark:0,wardWeave:0,judgmentPin:0,core:{shards:0,eqMain:"",eqSub:"",mecha:0,crimson:0,qi:0,star:0,titan:0,lockSurvive:0,lockControl:0,lockSpecial:0}};
+  const MAIN_GOD_DEF36={points:0,unlockedTier:1,bestTier:0,clears:0,runs:0,deepest:0,contracts:{},challenges:{},power:0,vitality:0,tempo:0,resonance:0,fortune:0,regenBlood:0,psiLink:0,gunBlade:0,mageCircuit:0,summonPage:0,spaceRing:0,rebirthDoll:0,sideKey:0,cursedHeart:0,geneLock:0,bioSerum:0,deathSense:0,captainMark:0,wardWeave:0,judgmentPin:0,echoBoots:0,railLens:0,bloodVial:0,swordMark:0,starClip:0,voidCharm:0,blindKey:0,silentPendulum:0,core:{shards:0,eqMain:"",eqSub:"",mecha:0,crimson:0,qi:0,star:0,titan:0,lockSurvive:0,lockControl:0,lockSpecial:0}};
   save.mainGod={...MAIN_GOD_DEF36,...(save.mainGod||{})};
   save.mainGod.core={...MAIN_GOD_DEF36.core,...(save.mainGod.core&&typeof save.mainGod.core==="object"?save.mainGod.core:{})};
   let runMode36="story",selectedMainGodTier36=1,pendingMode46="story";
@@ -7081,6 +7081,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       buyMainGodLock46(id){return {bought:buyMainGodLock46(id),snapshot:snapshot35()};},
       grantMainGodShards46(n=1){const c=ensureMainGodCore46();c.shards+=Math.max(0,Math.floor(Number(n)||0));persist();return snapshot35();},
       mainGodCore46(){return JSON.parse(JSON.stringify(ensureMainGodCore46()));},
+      openMainGodShop36(){openMainGodShop36();return {visible:!$("#mainGodDrawer36").classList.contains("hidden"),hall:$("#mainGodDrawer36").classList.contains("mgHall46"),hero:!!$("#mgHero46"),cards:document.querySelectorAll("#mainGodShopList36 .exchangeCard36").length,core:document.querySelectorAll("#mainGodShopList36 .coreCard46").length,tabs:[...document.querySelectorAll("#mainGodTabs38 button")].map(b=>b.textContent)};},
+      mainGodBoss46(){return mainGodBossSnap46();},
+      pickMainGodBossType46(clears=0,tier=1,depth=1){return pickMainGodBossType46(clears,tier,depth);},
       characterEggCatalog(id=save.character){return JSON.parse(JSON.stringify(CHARACTER_EGGS36[id]||{}));},
       setAim(x,y){setAimVector36(Number(x),Number(y),true);return snapshot35();},
       directionalHit(distance,enemyRadius,radius,angleOffset,halfArc){return directionalHit36(Number(distance),Number(enemyRadius),Number(radius),Number(angleOffset),Number(halfArc));},
@@ -7924,6 +7927,332 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   styleCore46.textContent=`.coreHint46{margin:0 0 6px;color:#cfc4df;font-size:10px;line-height:1.45}.coreCard46{display:grid;grid-template-columns:44px 1fr auto;gap:9px;align-items:center;padding:10px;border:1px solid #ffe29133;border-radius:14px;background:#ffffff08}.coreCard46 .ei{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:radial-gradient(circle,#ffd76f,#3c285f);font-size:22px}.coreCard46 h4{margin:0;font-size:12px}.coreCard46 p{margin:3px 0;color:#cfc4df;font-size:9px;line-height:1.4}.coreCard46 button{padding:8px;border-radius:10px;background:linear-gradient(135deg,#ffd05c,#9d58e8);font-size:9px;font-weight:900}.coreBtns46{display:grid;gap:5px}.coreBtns46 button{padding:7px 8px}.soulHud46{position:absolute;left:10px;top:78px;z-index:5;display:flex;align-items:center;gap:6px;min-width:148px;padding:4px 8px;border-radius:999px;background:#0b0818d8;border:1px solid #85c8ff66;color:#d9f3ff;font:800 10px/1 system-ui;pointer-events:none}.soulHud46 i{flex:1;height:8px;border-radius:99px;background:#0008;overflow:hidden}.soulHud46 b{display:block;height:100%;width:0;background:linear-gradient(90deg,#5aa7ff,#d7f1ff)}.soulHud46.hidden{display:none}@media(max-height:720px){.soulHud46{top:70px}}`;
   document.head.appendChild(styleCore46);
   ensureMainGodCore46();
+
+  /* ================= V4.6 主神精装修：货架 / 大厅 / Boss 类型与交互 ================= */
+  const MAIN_GOD_EXTRA_IDS46=["echoBoots","railLens","bloodVial","swordMark","starClip","voidCharm","blindKey","silentPendulum"];
+  MAIN_GOD_ITEMS36.echoBoots={n:"折跃残影靴",i:"🥾",d:"冲刺距离略增并延长无敌。只在主神空间生效。",max:1,base:16,step:0,group:"特殊效果道具"};
+  MAIN_GOD_ITEMS36.railLens={n:"磁轨校准镜",i:"🔭",d:"每隔数发补一发磁轨，穿透 +1。机甲手感的轻量外设。",max:2,base:14,step:10,group:"职业与技法"};
+  MAIN_GOD_ITEMS36.bloodVial={n:"血露回廊瓶",i:"🧴",d:"每级微量吸血与回复。不替代猩红模板，只做续航垫层。",max:2,base:12,step:9,group:"血统与灵能"};
+  MAIN_GOD_ITEMS36.swordMark={n:"飞剑胎记",i:"🗡️",d:"开局保底一柄飞剑。已有气机模板时不重复叠剑。",max:1,base:14,step:0,group:"职业与技法"};
+  MAIN_GOD_ITEMS36.starClip={n:"星屑弹夹",i:"🌟",d:"开局追加星辉弹。已有星辉模板时只补微量法术倍率。",max:1,base:14,step:0,group:"职业与技法"};
+  MAIN_GOD_ITEMS36.voidCharm={n:"虚空避弹符",i:"🧿",d:"释放主动技能时获得短暂无敌。",max:1,base:18,step:0,group:"特殊效果道具"};
+  MAIN_GOD_ITEMS36.blindKey={n:"监察盲区钥",i:"👁️",d:"经验晶核磁吸范围扩大，方便单手拾取。",max:2,base:10,step:8,group:"特殊效果道具"};
+  MAIN_GOD_ITEMS36.silentPendulum={n:"静默钟摆",i:"🕰️",d:"冲刺冻结附近普通怪（最多 8 个）。沿用局内冻结，不另开无界扫描。",max:1,base:16,step:0,group:"血统与灵能"};
+  for(const id of MAIN_GOD_EXTRA_IDS46)save.mainGod[id]=Number(save.mainGod[id])||0;
+
+  const MAIN_GOD_BOSS_TYPES46={
+    auditor:{n:"监察投影·校验者",color:"#d7c2ff",rule:"打碎两侧校验柱，解除抗性加码",hint:"柱在则监察加抗。子弹打柱，不是再刷一波普通怪。"},
+    reaper:{n:"收割投影·断线者",color:"#ffd36b",rule:"冲刺穿过金色裂口，解除技能封锁",hint:"它会周期性锁技能。裂口是交互物，不是召唤物。"},
+    mirror:{n:"镜像投影·抄袭者",color:"#9ee7ff",rule:"打碎镜核，重置伤害适应",hint:"它抄你最高伤来源。打碎镜核才能改题。"},
+    warden:{n:"深廊投影·压境者",color:"#7ad7ff",rule:"站进压境纹内减伤，纹外承伤加重",hint:"安全纹像第二章信道，但是圆形交互区。"}
+  };
+  function pickMainGodBossType46(clears,tier,depth){
+    const n=Math.abs((Number(clears)||0)+(Number(tier)||1)+(Number(depth)||1));
+    return ["auditor","reaper","mirror","warden"][n%4];
+  }
+  function mainGodBossSnap46(){
+    const fx=(P.mgBoss?.fx||[]).slice(0,8).map(x=>({kind:x.kind,hp:Number(x.hp)||0,max:Number(x.max)||0,x:Number(x.x)||0,y:Number(x.y)||0}));
+    return {type:P.mgBoss?.type||boss?.mgType||null,name:P.mgBoss?.name||"",rule:boss?.rule39||P.bossRule39||"",fx,adaptReset:P.mgBoss?.adaptReset||0,riftClear:P.mgBoss?.riftClear||0,insideWard:!!P.mgBoss?.insideWard,pillarAlive:P.mgBoss?.pillarAlive||0};
+  }
+  function refreshMainGodBossFx46(){
+    if(!P.mgBoss||!boss)return;
+    const type=P.mgBoss.type,hp=Math.max(72,(boss.max||800)*0.045),fx=[];
+    if(type==="auditor"){
+      fx.push({kind:"pillar",x:W*0.22,y:H*0.34,r:18,hp,max:hp});
+      fx.push({kind:"pillar",x:W*0.78,y:H*0.34,r:18,hp,max:hp});
+    }else if(type==="reaper"){
+      fx.push({kind:"rift",x:W*0.5,y:H*0.64,r:30,hp:1,max:1});
+    }else if(type==="mirror"){
+      fx.push({kind:"mirror",x:boss.x||W*0.5,y:Math.min(H*0.42,(boss.y||120)+74),r:20,hp:hp*1.1,max:hp*1.1});
+    }else{
+      fx.push({kind:"ward",x:W*0.5,y:H*0.56,r:80,hp:1,max:1});
+    }
+    P.mgBoss.fx=fx.slice(0,8);
+    P.mgBoss.pillarAlive=fx.filter(x=>x.kind==="pillar"&&x.hp>0).length;
+  }
+  function initMainGodBoss46(){
+    if(!isMainGodRun36()||!boss)return;
+    const type=pickMainGodBossType46(save.mainGod.clears,selectedMainGodTier36,stage().depth||1);
+    const meta=MAIN_GOD_BOSS_TYPES46[type];
+    P.mgBoss={type,name:meta.n,fx:[],adaptReset:0,riftClear:0,skillLock:3.2,pillarAlive:0,insideWard:false};
+    boss.mgType=type;boss.color=meta.color;boss.rule39=meta.rule;P.bossRule39=meta.rule;
+    refreshMainGodBossFx46();
+    const warn=$("#warning");if(warn){warn.textContent=`BOSS ${meta.n} 降临 · ${meta.rule}`;warn.classList.remove("hidden");setTimeout(()=>warn.classList.add("hidden"),2300);}
+    const node=$("#bossRule39");if(node)node.textContent=meta.rule;
+  }
+  function tickMainGodBoss46(dt){
+    if(!isMainGodRun36()||state!=="play"||!boss||boss.dead||!P.mgBoss)return;
+    const fx=P.mgBoss.fx;if(fx.length>8)fx.length=8;
+    if(P.mgBoss.type==="reaper"){
+      P.mgBoss.skillLock=(P.mgBoss.skillLock||0)+dt;
+      const rift=fx.find(x=>x.kind==="rift");
+      if(rift){rift.x=W*0.5+Math.sin(runTime*0.7)*W*0.2;rift.y=H*0.62+Math.cos(runTime*0.45)*28;}
+      if(P.mgBoss.skillLock>6.2){P.skill=Math.max(P.skill,2.2);P.mgBoss.skillLock=0;toast("断线封锁：冲进裂口解除");}
+    }
+    if(P.mgBoss.type==="mirror"){
+      const mirror=fx.find(x=>x.kind==="mirror"&&x.hp>0);
+      if(mirror){mirror.x=boss.x;mirror.y=clamp(boss.y+72,90,H-40);}
+    }
+    if(P.mgBoss.type==="warden"){
+      const ward=fx.find(x=>x.kind==="ward");
+      P.mgBoss.insideWard=!!(ward&&Math.hypot(P.x-ward.x,P.y-ward.y)<ward.r);
+    }
+    const targets=fx.filter(x=>x.hp>0&&(x.kind==="pillar"||x.kind==="mirror"));
+    if(targets.length){
+      for(const b of bullets){
+        if(!b||b.life<=0)continue;
+        for(const t of targets){
+          if(t.hp<=0)continue;
+          if(Math.hypot((b.x||0)-t.x,(b.y||0)-t.y)<(b.r||4)+t.r){
+            t.hp-=b.dmg||P.dmg||8;b.life=0;
+            if(t.hp<=0){
+              t.hp=0;P.mgBoss.adaptReset=(P.mgBoss.adaptReset||0)+1;
+              fxStamp("shatter",t.x,t.y,{size:42,life:.22});
+              if(t.kind==="pillar")toast("校验柱破碎");
+              if(t.kind==="mirror"){boss.adaptSource39=null;boss.bossRes={};toast("镜核破碎：适应重置");}
+            }
+            break;
+          }
+        }
+      }
+    }
+    P.mgBoss.pillarAlive=fx.filter(x=>x.kind==="pillar"&&x.hp>0).length;
+  }
+  function drawMainGodBossFx46(){
+    if(state!=="play"||!isMainGodRun36()||!P.mgBoss)return;
+    ctx.save();
+    for(const t of P.mgBoss.fx.slice(0,8)){
+      ctx.globalAlpha=t.hp>0?.9:.28;
+      if(t.kind==="pillar"){
+        ctx.fillStyle="#d7c2ff55";ctx.strokeStyle="#f2deff";ctx.lineWidth=2;
+        ctx.beginPath();ctx.roundRect?ctx.roundRect(t.x-10,t.y-28,20,40,6):ctx.rect(t.x-10,t.y-28,20,40);ctx.fill();ctx.stroke();
+        ctx.fillStyle="#fff";ctx.font="900 11px system-ui";ctx.textAlign="center";ctx.fillText("柱",t.x,t.y-34);
+      }else if(t.kind==="rift"){
+        ctx.strokeStyle="#ffd36b";ctx.lineWidth=3;ctx.setLineDash([8,6]);
+        ctx.beginPath();ctx.ellipse(t.x,t.y,t.r,t.r*.42,runTime,0,TAU);ctx.stroke();ctx.setLineDash([]);
+        ctx.fillStyle="#ffe08a";ctx.font="900 11px system-ui";ctx.textAlign="center";ctx.fillText("裂口",t.x,t.y+4);
+      }else if(t.kind==="mirror"){
+        ctx.strokeStyle="#9ee7ff";ctx.fillStyle="#9ee7ff22";ctx.lineWidth=2;
+        ctx.beginPath();ctx.arc(t.x,t.y,t.r,0,TAU);ctx.fill();ctx.stroke();
+        ctx.fillStyle="#e8fbff";ctx.font="900 11px system-ui";ctx.textAlign="center";ctx.fillText("镜",t.x,t.y+4);
+      }else if(t.kind==="ward"){
+        ctx.strokeStyle=P.mgBoss.insideWard?"#7ad7ff":"#7ad7ff66";ctx.fillStyle=P.mgBoss.insideWard?"#7ad7ff18":"#7ad7ff0c";
+        ctx.setLineDash([10,8]);ctx.beginPath();ctx.arc(t.x,t.y,t.r,0,TAU);ctx.fill();ctx.stroke();ctx.setLineDash([]);
+        ctx.fillStyle="#d9f6ff";ctx.font="900 11px system-ui";ctx.textAlign="center";ctx.fillText("压境纹",t.x,t.y+4);
+      }
+    }
+    ctx.restore();
+  }
+  function drawMainGodExtraFx46(){
+    if(state!=="play"||!Number.isFinite(P.x))return;
+    ctx.save();
+    if(P.mgCrimson){ctx.strokeStyle="#ff4d6d66";ctx.lineWidth=2;ctx.beginPath();ctx.arc(P.x,P.y,P.r+11+Math.sin(runTime*6)*2,0,TAU);ctx.stroke();}
+    if(P.mgStar||P.star){ctx.fillStyle="#ffe08a88";for(let i=0;i<3;i++){const a=runTime*2+i*2.1;ctx.beginPath();ctx.arc(P.x+Math.cos(a)*22,P.y+Math.sin(a)*16,2,0,TAU);ctx.fill();}}
+    if(P.mgTitan){ctx.strokeStyle="#8dff7288";ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(P.x,P.y+6,P.r+18,P.r+10,0,0,TAU);ctx.stroke();}
+    if(P.mgDashGhost>0){ctx.globalAlpha=Math.min(.45,P.mgDashGhost*1.4);ctx.strokeStyle="#b7f3ff";ctx.beginPath();ctx.arc(P.x,P.y,P.r+24,0,TAU);ctx.stroke();P.mgDashGhost=Math.max(0,P.mgDashGhost-0.016);}
+    if(P.mgVoidFlash>0){ctx.globalAlpha=Math.min(.5,P.mgVoidFlash*1.6);ctx.strokeStyle="#c792ff";ctx.lineWidth=3;ctx.beginPath();ctx.arc(P.x,P.y,P.r+20,0,TAU);ctx.stroke();P.mgVoidFlash=Math.max(0,P.mgVoidFlash-0.016);}
+    ctx.restore();
+  }
+  function applyMainGodExtras46(){
+    P.mgEcho=0;P.mgRail=0;P.mgVial=0;P.mgVoid=0;P.mgPendulum=0;P.mgDashGhost=0;P.mgVoidFlash=0;
+    if(!isMainGodRun36())return;
+    const m=save.mainGod||{};
+    if(m.echoBoots){P.mgEcho=1;P.spd*=1.04;}
+    if(m.railLens){P.mgRail=m.railLens;P.pierce=Math.min(12,P.pierce+1);}
+    if(m.bloodVial){P.mgVial=m.bloodVial;P.steal=Math.min(.22,(P.steal||0)+.04*m.bloodVial);P.regen+=.18*m.bloodVial;}
+    if(m.swordMark)P.orbit=Math.max(P.orbit||0,1);
+    if(m.starClip){if(P.star)P.spellPow*=1.04;else P.star=1;}
+    if(m.voidCharm)P.mgVoid=1;
+    if(m.blindKey)P.mag=(P.mag||95)+36*m.blindKey;
+    if(m.silentPendulum)P.mgPendulum=1;
+  }
+  function dressMainGodHall46(){
+    const drawer=ensureMainGodShop36();
+    drawer.classList.add("mgHall46");
+    const head=drawer.querySelector(".dhead h2");
+    if(head)head.innerHTML="◈ 主神兑换大厅<span class=\"mgHeadSub46\">模板 · 基因锁 · 权能 · 特效</span>";
+    let hero=$("#mgHero46");
+    if(!hero){hero=document.createElement("div");hero.id="mgHero46";hero.className="mgHero46";$("#mainGodBalance36")?.insertAdjacentElement("beforebegin",hero);}
+    const c=ensureMainGodCore46();
+    const main=c.eqMain&&MAIN_GOD_TEMPLATES46[c.eqMain]?MAIN_GOD_TEMPLATES46[c.eqMain].n:"空";
+    const sub=c.eqSub&&MAIN_GOD_TEMPLATES46[c.eqSub]?MAIN_GOD_TEMPLATES46[c.eqSub].n:"空";
+    hero.innerHTML=`<div class="mgHeroArt46"><i>◈</i><div><b>轮回账户</b><span>${templateLabel46()}</span></div></div><ul><li><em>奖励点</em><b>◈ ${save.mainGod.points}</b></li><li><em>基因锁碎片</em><b>${c.shards}</b></li><li><em>通关</em><b>${save.mainGod.clears}</b></li><li><em>主 / 副模板</em><b>${main} / ${sub}</b></li></ul>`;
+  }
+  function bindMainGodTabs46(){
+    const list=$("#mainGodShopList36"),tabs=$("#mainGodTabs38");
+    if(!list||!tabs)return;
+    tabs.classList.add("mgTabs46");
+    const groups=[["全部","全部"],["轮回模板","模板"],["基因锁碎片","基因锁"],["基础权能强化","权能"],["血统与灵能","血统"],["职业与技法","技法"],["特殊效果道具","特效"]];
+    tabs.innerHTML=groups.map(([g,label],i)=>`<button class="${i===0?"on":""}" data-group="${g}">${label}</button>`).join("");
+    tabs.querySelectorAll("button").forEach(button=>button.onclick=()=>{
+      tabs.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b===button));
+      list.querySelectorAll(".exchangeSection36").forEach(section=>{
+        const title=section.querySelector("h3")?.textContent||"";
+        section.style.display=button.dataset.group==="全部"||title===button.dataset.group?"":"none";
+      });
+    });
+  }
+  function polishMainGodCards46(){
+    document.querySelectorAll("#mainGodShopList36 .exchangeCard36").forEach(card=>{
+      const title=card.querySelector("h4")?.textContent||"";
+      const cursed=/猩红心核/.test(title),unique=/MAX|Lv\.1\/1|Lv\.0\/1/.test(title)&&/空间戒|人偶|残影靴|胎记|弹夹|避弹符|钟摆|心核/.test(title);
+      card.classList.add("mgCard46",cursed?"mgRareCursed":unique?"mgRareGold":"mgRarePurple");
+      if(/Lv\.[1-9]/.test(title))card.classList.add("mgOwned46");
+      if(!card.querySelector(".mgTag46")){
+        const section=card.closest(".exchangeSection36");
+        const tag=document.createElement("em");tag.className="mgTag46";tag.textContent=section?.querySelector("h3")?.textContent||"兑换";
+        card.querySelector("div")?.prepend(tag);
+      }
+    });
+    document.querySelectorAll("#mainGodShopList36 .coreCard46").forEach(card=>{
+      card.classList.add("mgCard46","mgRareGold");
+      if(/ · 主| · 副/.test(card.querySelector("h4")?.textContent||""))card.classList.add("mgEquipped46");
+    });
+  }
+  const _ensureShopHall46=ensureMainGodShop36;
+  ensureMainGodShop36=function(){const d=_ensureShopHall46();d.classList.add("mgHall46");return d;};
+  const _cardHall46=exchangeCard36;
+  exchangeCard36=function(id,u,buyer,cost){
+    const d=_cardHall46(id,u,buyer,cost);
+    d.dataset.id=id;d.dataset.group=u.group||"";
+    d.classList.add("mgCard46",id==="cursedHeart"?"mgRareCursed":u.max===1?"mgRareGold":(u.base||0)>=14?"mgRarePurple":"mgRareBlue");
+    if((save.mainGod[id]||0)>0)d.classList.add("mgOwned46");
+    if(!d.querySelector(".mgTag46")){const tag=document.createElement("em");tag.className="mgTag46";tag.textContent=u.group||"兑换";d.querySelector("div")?.prepend(tag);}
+    return d;
+  };
+  const _coreCardHall46=coreCard46;
+  coreCard46=function(kind,id){
+    const d=_coreCardHall46(kind,id);
+    d.classList.add("mgCard46",kind==="template"?"mgRareGold":"mgRareBlue");
+    const c=ensureMainGodCore46();
+    if(kind==="template"&&(c.eqMain===id||c.eqSub===id))d.classList.add("mgEquipped46");
+    return d;
+  };
+  const _renderHall46=renderMainGodShop36;
+  renderMainGodShop36=function(){
+    _renderHall46();
+    dressMainGodHall46();
+    bindMainGodTabs46();
+    polishMainGodCards46();
+  };
+  const _resetExtras46=resetP;
+  resetP=function(){const result=_resetExtras46();applyMainGodExtras46();if(!isMainGodRun36())P.mgBoss=null;return result;};
+  const _gunExtras46=gunShot36;
+  gunShot36=function(angle,c){
+    const result=_gunExtras46(angle,c);
+    if(P.mgRail&&P.shotCount%Math.max(6,9-Math.round(P.mgRail))===0){
+      const origin=playerMuzzle35(angle);
+      pushBullet({x:origin.x,y:origin.y,vx:Math.cos(angle)*P.bSpeed*1.05,vy:Math.sin(angle)*P.bSpeed*1.05,r:6,life:P.range/P.bSpeed,dmg:P.dmg*(1.15+P.mgRail*.12),pierce:P.pierce+2,rail:1,source:"tech",school:"mech",hit:new Set()});
+    }
+    return result;
+  };
+  const _dashExtras46=dash;
+  dash=function(){
+    const ready=state==="play"&&P.dash<=0,result=_dashExtras46();
+    if(!isMainGodRun36()||!ready||P.dash<=0)return result;
+    if(P.mgEcho){
+      const dx=joy.dx||P.fx,dy=joy.dy||P.fy,l=Math.hypot(dx,dy)||1;
+      P.x=clamp(P.x+(dx/l)*22,18,W-18);P.y=clamp(P.y+(dy/l)*22,65,H-18);
+      P.inv=Math.max(P.inv||0,.55);P.mgDashGhost=.32;
+    }
+    if(P.mgPendulum){
+      let n=0;for(const e of grid.near(P.x,P.y,96)){if(!e||e.dead||e.type==="boss")continue;e.frozen=Math.max(e.frozen||0,.7);if(++n>=8)break;}
+    }
+    const rift=(P.mgBoss?.fx||[]).find(x=>x.kind==="rift");
+    if(rift&&Math.hypot(P.x-rift.x,P.y-rift.y)<rift.r+P.r+16){
+      P.mgBoss.riftClear=(P.mgBoss.riftClear||0)+1;P.mgBoss.skillLock=0;P.jam=0;P.skill=Math.min(P.skill,.15);
+      toast("断线裂口：技能封锁解除");fxStamp("dash",P.x,P.y,{size:48,life:.2});
+    }
+    return result;
+  };
+  const _skillExtras46=skill;
+  skill=function(){
+    const before=P.skill,result=_skillExtras46();
+    if(isMainGodRun36()&&P.mgVoid&&before<=0&&P.skill>0){P.inv=Math.max(P.inv||0,.26);P.mgVoidFlash=.28;}
+    return result;
+  };
+  const _addsMain46=spawnBossAdds;
+  spawnBossAdds=function(type,count,guard){if(isMainGodRun36())return 0;return _addsMain46(type,count,guard);};
+  const _spawnBossType46=spawnBoss;
+  spawnBoss=function(){const result=_spawnBossType46();initMainGodBoss46();return result;};
+  const _phaseBoss46=advanceBossPhase;
+  advanceBossPhase=function(e,p){
+    const result=_phaseBoss46(e,p);
+    if(isMainGodRun36()&&P.mgBoss){
+      refreshMainGodBossFx46();
+      const meta=MAIN_GOD_BOSS_TYPES46[P.mgBoss.type];
+      if(meta&&e){e.rule39=`阶段 ${p} · ${meta.rule}`;P.bossRule39=e.rule39;const node=$("#bossRule39");if(node)node.textContent=e.rule39;}
+    }
+    return result;
+  };
+  const _ruleBoss46=bossRule39;
+  bossRule39=function(e,p){
+    _ruleBoss46(e,p);
+    if(isMainGodRun36()&&P.mgBoss){
+      const meta=MAIN_GOD_BOSS_TYPES46[P.mgBoss.type];
+      if(meta&&e){e.rule39=meta.rule;P.bossRule39=meta.rule;const node=$("#bossRule39");if(node)node.textContent=meta.rule;}
+    }
+  };
+  const _dmgEnemyBoss46=damageEnemy;
+  damageEnemy=function(e,amt,opt){
+    if(e===boss&&isMainGodRun36()&&P.mgBoss?.type==="auditor"&&(P.mgBoss.pillarAlive||0)>0)amt*=.72;
+    return _dmgEnemyBoss46(e,amt,opt);
+  };
+  const _dmgPlayerBoss46=damagePlayer;
+  damagePlayer=function(amount){
+    if(isMainGodRun36()&&P.mgBoss?.type==="warden")amount*=P.mgBoss.insideWard?.72:1.16;
+    return _dmgPlayerBoss46(amount);
+  };
+  const _drawPolish46=draw;
+  draw=function(){
+    const result=_drawPolish46();
+    drawMainGodExtraFx46();
+    return result;
+  };
+  const _finishPolish46=finishMainGod36;
+  finishMainGod36=function(win){
+    const result=_finishPolish46(win);
+    const stats=$("#rstats");
+    if(stats&&P.mgBoss){
+      const bits=[`监察类型：<b>${P.mgBoss.name}</b>`];
+      if(P.mgBoss.adaptReset)bits.push(`交互解除 <b>${P.mgBoss.adaptReset}</b>`);
+      if(P.mgBoss.riftClear)bits.push(`裂口穿越 <b>${P.mgBoss.riftClear}</b>`);
+      const extras=MAIN_GOD_EXTRA_IDS46.filter(id=>save.mainGod[id]).map(id=>MAIN_GOD_ITEMS36[id].n);
+      if(extras.length)bits.push(`本局外设：<b>${extras.join(" · ")}</b>`);
+      stats.innerHTML+=`<br>${bits.join("<br>")}`;
+    }
+    return result;
+  };
+  const _reportPolish46=renderRunReport;
+  renderRunReport=function(){
+    _reportPolish46();
+    const note=$(".routeNote");
+    if(!note||!isMainGodRun36())return;
+    if(P.mgBoss)note.innerHTML+=`<br>监察类型：${P.mgBoss.name}`;
+  };
+  const _snapPolish46=snapshot35;
+  snapshot35=function(){
+    const s=_snapPolish46();
+    if(s.player){
+      s.player.mgEcho=Number.isFinite(P.mgEcho)?P.mgEcho:0;
+      s.player.mgRail=Number.isFinite(P.mgRail)?P.mgRail:0;
+      s.player.mgVial=Number.isFinite(P.mgVial)?P.mgVial:0;
+      s.player.mgVoid=Number.isFinite(P.mgVoid)?P.mgVoid:0;
+    }
+    if(s.boss){
+      s.boss.mgType=boss?.mgType||P.mgBoss?.type||null;
+      s.boss.mgName=P.mgBoss?.name||"";
+      s.boss.mgFx=(P.mgBoss?.fx||[]).slice(0,8).map(x=>({kind:x.kind,hp:Number(x.hp)||0}));
+    }
+    s.overlays=s.overlays||{};
+    s.overlays.mgHall=!!($("#mainGodDrawer36")&&$("#mainGodDrawer36").classList.contains("mgHall46")&&!$("#mainGodDrawer36").classList.contains("hidden"));
+    return s;
+  };
+  CONTENT41.hook("combat:after-update",payload=>tickMainGodBoss46(payload?.dt||0),"core.mgBoss46",60);
+  CONTENT41.hook("combat:after-draw",drawMainGodBossFx46,"core.mgBoss46",45);
+  const styleHall46=document.createElement("style");
+  styleHall46.textContent=`.mgHall46{background:radial-gradient(circle at 12% 0,#ffe6a31c,transparent 36%),radial-gradient(circle at 88% 8%,#9d58e828,transparent 32%),linear-gradient(180deg,#140c24f2,#0b0818f6);border:1px solid #ffe29144}.mgHall46 .dhead{background:linear-gradient(90deg,#20143acc,#3a1d58aa);border-bottom:1px solid #ffe29133}.mgHeadSub46{display:block;margin-top:3px;color:#cfc4df;font-size:10px;font-weight:700;letter-spacing:.08em}.mgHero46{display:grid;gap:8px;margin:0 0 10px;padding:12px;border-radius:16px;border:1px solid #ffe6a355;background:linear-gradient(135deg,#ffd76f22,#7a4bff22),repeating-linear-gradient(45deg,#0000 0 10px,#ffe6a30a 10px 12px)}.mgHero46 ul{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0;padding:0;list-style:none}.mgHero46 li{padding:7px 8px;border-radius:10px;background:#0b0818cc;border:1px solid #ffffff14}.mgHero46 em{display:block;color:#cfc4df;font-size:9px;font-style:normal}.mgHero46 b{color:#ffe6a3;font-size:13px}.mgHeroArt46{display:flex;align-items:center;gap:8px}.mgHeroArt46 i{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:radial-gradient(circle,#ffe08a,#6a3ad8);font-style:normal;font-size:22px}.mgHeroArt46 span{display:block;color:#d7cce4;font-size:10px}.mgCard46{position:relative;box-shadow:0 0 0 1px #ffffff10,0 8px 18px #0005}.mgRareGold{border-color:#ffe29188!important;background:linear-gradient(135deg,#ffe29114,#ffffff08)!important}.mgRarePurple{border-color:#c792ff77!important}.mgRareBlue{border-color:#7ad7ff55!important}.mgRareCursed{border-color:#ff4d6d88!important;background:linear-gradient(135deg,#ff4d6d14,#ffffff08)!important}.mgOwned46:after{content:"已持有";position:absolute;right:8px;top:6px;font-size:8px;color:#9ee7ff}.mgEquipped46{box-shadow:0 0 0 1px #ffe291aa,0 0 16px #ffd76f33}.mgTag46{display:inline-block;margin:0 0 3px;padding:1px 6px;border-radius:99px;background:#ffe29122;color:#ffe291;font-size:8px;font-style:normal}.mgTabs46{background:#0b0818ee!important;border:1px solid #ffe29133;border-radius:14px;padding:6px!important}.mgHall46 .exchangeSection36 h3{display:flex;align-items:center;gap:6px}.mgHall46 .exchangeSection36 h3:before{content:"";width:6px;height:6px;border-radius:50%;background:#ffe291}.coreCard46.mgEquipped46 .ei{box-shadow:0 0 12px #ffe29166}`;
+  document.head.appendChild(styleHall46);
 
   installLobby46();
   installOps46();

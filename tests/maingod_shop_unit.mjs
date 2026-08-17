@@ -34,4 +34,21 @@ assert.ok(catalog, "MAIN_GOD_ITEMS36 应可解析");
 assert.equal([...catalog[1].matchAll(/^\s+\w+:\{n:/gm)].length, 14);
 assert.match(html, /MAIN_GOD_ITEMS36\.cursedHeart=/);
 
+const EXTRA_ITEMS = [
+  ["echoBoots", "折跃残影靴", "特殊效果道具"],
+  ["railLens", "磁轨校准镜", "职业与技法"],
+  ["bloodVial", "血露回廊瓶", "血统与灵能"],
+  ["swordMark", "飞剑胎记", "职业与技法"],
+  ["starClip", "星屑弹夹", "职业与技法"],
+  ["voidCharm", "虚空避弹符", "特殊效果道具"],
+  ["blindKey", "监察盲区钥", "特殊效果道具"],
+  ["silentPendulum", "静默钟摆", "血统与灵能"],
+];
+for (const [id, name, group] of EXTRA_ITEMS) {
+  assert.match(html, new RegExp(`MAIN_GOD_ITEMS36\\.${id}=\\{n:"${name}"`));
+  assert.match(html, new RegExp(`MAIN_GOD_ITEMS36\\.${id}=\\{n:"${name}"[^\\n]+group:"${group}"`));
+  assert.match(html, new RegExp(`${id}: 0`));
+  assert.match(html, new RegExp(`${id}:0`));
+}
+
 console.log("maingod_shop_unit: ok");

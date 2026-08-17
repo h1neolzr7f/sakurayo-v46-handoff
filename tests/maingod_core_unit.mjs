@@ -42,6 +42,14 @@ assert.match(html, /grantMainGodShards46/);
 assert.doesNotMatch(html, /n:"爆炸"/);
 assert.doesNotMatch(html, /T病毒|血族子爵|亡灵圣经|太阳真经|审判之矛|重生十字章|纳戒/);
 assert.match(html, /货架不出现「爆炸」|不单独出售「爆炸」/);
+assert.match(html, /function pickMainGodBossType46/);
+assert.match(html, /监察投影·校验者/);
+assert.match(html, /收割投影·断线者/);
+assert.match(html, /镜像投影·抄袭者/);
+assert.match(html, /深廊投影·压境者/);
+assert.match(html, /mgHall46/);
+assert.match(html, /mgHero46/);
+assert.match(html, /spawnBossAdds=function\(type,count,guard\)\{if\(isMainGodRun36\(\)\)return 0/);
 
 const catalog = html.match(/const MAIN_GOD_ITEMS36=\{([\s\S]*?)\n  \};/);
 assert.ok(catalog, "MAIN_GOD_ITEMS36 应可解析");
