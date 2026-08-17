@@ -119,9 +119,9 @@ try {
     const pause = box(document.getElementById("pause"));
     return { opsWave: hit(ops, wave), opsMission: hit(ops, mission), heroOps: hit(hero, ops), pauseWave: hit(pause, wave) };
   });
-  assert.equal(hudBoxes.opsWave, 0, "干员坝不得盖住波次条");
-  assert.equal(hudBoxes.opsMission, 0, "干员坝不得盖住任务条");
-  assert.equal(hudBoxes.heroOps, 0, "血条不得盖住干员坝");
+  assert.equal(hudBoxes.opsWave, 0, "干员坞不得盖住波次条");
+  assert.equal(hudBoxes.opsMission, 0, "干员坞不得盖住任务条");
+  assert.equal(hudBoxes.heroOps, 0, "血条不得盖住干员坞");
   assert.equal(hudBoxes.pauseWave, 0, "暂停不得盖住波次条");
   const director = await api("hudDirectorSnapshot51");
   assert.equal(director.cid, "sayo", "横屏战斗 HUD 应带当前角色身份");
