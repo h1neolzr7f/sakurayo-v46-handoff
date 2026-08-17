@@ -19,14 +19,21 @@ const assetFeel = fs.readFileSync(
 );
 
 assert.match(ops, /sakurayo-feel53\.js/);
+assert.match(activity, /runtime\/sakurayo-layout52\.js/);
 assert.match(activity, /runtime\/sakurayo-feel53\.js/);
-assert.match(activity, /injectFeel53/);
+assert.match(activity, /injectRuntime/);
+assert.match(activity, /__SAKURAYO_ANDROID_LANDSCAPE__/);
+assert.match(activity, /androidLandscape46/);
+assert.doesNotMatch(activity, /injectFeel53/);
 assert.equal(assetFeel, code);
+assert.match(code, /touch-action:manipulation/);
+assert.match(code, /pointer-events:auto!important/);
 assert.doesNotMatch(code, /update\s*=\s*function/);
 assert.doesNotMatch(code, /sakurayoV3/);
 assert.match(gradle, /applicationId "com\.sakurayo\.yeying\.dev"/);
 assert.doesNotMatch(gradle, /applicationId "com\.sakurayo\.zombietide"/);
 assert.match(gradle, /versionName "4\.6\.0-yeying"/);
+assert.match(gradle, /versionCode 6102/);
 assert.match(strings, /开发版 夜樱/);
 
 class FakeClassList {
