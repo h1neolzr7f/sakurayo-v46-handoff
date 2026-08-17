@@ -7628,15 +7628,15 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     lockSpecial:{n:"潜能特化",i:"🔓",max:3,cost:[3,4,5],d:"放大已装备模板。主+副同时为猩红与气机时，解锁心核激荡（主动技附加血气爆，低血自动爆发一次）。货架不出现「爆炸」。"}
   };
   function ensureMainGodCore46(){
-    const incoming=save.mainGod.core&&typeof save.mainGod.core==="object"&&!Array.isArray(save.mainGod.core)?save.mainGod.core:{};
-    const c={...MAIN_GOD_CORE_DEF46,...incoming};
+    if(!save.mainGod.core||typeof save.mainGod.core!=="object"||Array.isArray(save.mainGod.core))save.mainGod.core={};
+    const c=save.mainGod.core;
+    for(const [key,value] of Object.entries(MAIN_GOD_CORE_DEF46))if(!Object.prototype.hasOwnProperty.call(c,key))c[key]=value;
     const num=(v,max)=>clamp(Math.floor(Number(v)||0),0,max);
     c.shards=num(c.shards,9999);
     for(const id of Object.keys(MAIN_GOD_TEMPLATES46))c[id]=num(c[id],MAIN_GOD_TEMPLATES46[id].max);
     for(const id of Object.keys(MAIN_GOD_LOCKS46))c[id]=num(c[id],MAIN_GOD_LOCKS46[id].max);
     if(!MAIN_GOD_TEMPLATES46[c.eqMain]||!c[c.eqMain])c.eqMain="";
     if(!MAIN_GOD_TEMPLATES46[c.eqSub]||!c[c.eqSub]||c.eqSub===c.eqMain)c.eqSub="";
-    save.mainGod.core=c;
     return c;
   }
   function templateRank46(id){
