@@ -40,6 +40,7 @@
     radioTimer: 0,
     swapTimer: 0,
     observers: [],
+    bound: false,
   };
 
   function doc() {
@@ -296,10 +297,15 @@
   }
 
   function install() {
+    if (state.bound) {
+      ensureBadge();
+      return { ok: true, id: STYLE_ID, channel: CHANNEL, label: LABEL, reused: true };
+    }
     var css = installCss();
     ensureBadge();
     bind();
-    return { ok: css.ok, id: STYLE_ID, channel: CHANNEL, label: LABEL };
+    state.bound = true;
+    return { ok: css.ok, id: STYLE_ID, channel: CHANNEL, label: LABEL, reused: false };
   }
 
   global.SakurayoFeel53 = {
