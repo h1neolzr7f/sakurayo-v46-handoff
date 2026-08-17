@@ -258,6 +258,12 @@
   }
 
   function bootLayout52() {
+    bootScript("sakurayo-touch54-js", "runtime/sakurayo-touch54.js", function () {
+      if (global.SakurayoTouch54 && typeof global.SakurayoTouch54.install === "function") {
+        global.SakurayoTouch54.install();
+      }
+      return !!(global.SakurayoTouch54 && global.SakurayoTouch54.install);
+    });
     bootScript("sakurayo-layout52-js", "runtime/sakurayo-layout52.js", function () {
       if (global.SakurayoLayout52 && typeof global.SakurayoLayout52.install === "function") {
         global.SakurayoLayout52.install();
