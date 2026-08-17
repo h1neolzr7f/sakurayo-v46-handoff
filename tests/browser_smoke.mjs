@@ -143,7 +143,7 @@ try {
   assert.ok(migrated.ownedSkins.includes("default"));
   assert.equal(migrated.settings.glow, "off");
   assert.equal(migrated.settings.glowVersion, 2);
-  assert.deepEqual(migrated.mainGod, { points: 0, unlockedTier: 1, bestTier: 0, clears: 0, runs: 0, deepest: 0, contracts: {}, challenges: {}, power: 0, vitality: 0, tempo: 0, resonance: 0, fortune: 0, regenBlood: 0, psiLink: 0, gunBlade: 0, mageCircuit: 0, summonPage: 0, spaceRing: 0, rebirthDoll: 0, sideKey: 0, cursedHeart: 0, geneLock: 0, bioSerum: 0, deathSense: 0, captainMark: 0, wardWeave: 0, judgmentPin: 0 });
+  assert.deepEqual(migrated.mainGod, { points: 0, unlockedTier: 1, bestTier: 0, clears: 0, runs: 0, deepest: 0, contracts: {}, challenges: {}, power: 0, vitality: 0, tempo: 0, resonance: 0, fortune: 0, regenBlood: 0, psiLink: 0, gunBlade: 0, mageCircuit: 0, summonPage: 0, spaceRing: 0, rebirthDoll: 0, sideKey: 0, cursedHeart: 0, geneLock: 0, bioSerum: 0, deathSense: 0, captainMark: 0, wardWeave: 0, judgmentPin: 0, core: { shards: 0, eqMain: "", eqSub: "", mecha: 0, crimson: 0, qi: 0, star: 0, titan: 0, lockSurvive: 0, lockControl: 0, lockSpecial: 0 } });
   assert.ok(migrated.shop40 && migrated.shop40.ops, "旧存档应补齐 shop40.ops");
   const legacyLobby = await api(legacyPage, "lobby46");
   assert.ok(legacyLobby.shown.includes("sayo_echo"), "旧存档补齐后应拥有 sayo_echo");
@@ -941,6 +941,7 @@ try {
   await page.locator(".mainGodCard36 .exchange36").click();
   assert.equal(await page.locator("#mainGodDrawer36").isVisible(), true);
   assert.equal(await page.locator("#mainGodShopList36 .exchangeCard36").count(), 20);
+  assert.equal(await page.locator("#mainGodShopList36 .coreCard46").count(), 8);
   assert.equal(await page.locator("#mgReset37").count(), 1);
   await shot(page, "08-main-god-shop.png");
   await page.locator("#mainGodDrawer36 .close").click();
@@ -962,6 +963,16 @@ try {
   assert.equal(genePurchase.bought, true);
   assert.equal(genePurchase.snapshot.mainGod.geneLock, 1);
   assert.equal(genePurchase.snapshot.mainGod.points, beforeMainGod.mainGod.points + 19);
+  await api(page, "grantMainGodPoints", 20);
+  const templatePurchase = await api(page, "buyMainGodTemplate46", "crimson");
+  assert.equal(templatePurchase.bought, true);
+  assert.equal(templatePurchase.snapshot.mainGod.core.crimson, 1);
+  assert.equal(templatePurchase.snapshot.mainGod.core.eqMain, "crimson");
+  await api(page, "grantMainGodShards46", 5);
+  const lockPurchase = await api(page, "buyMainGodLock46", "lockSurvive");
+  assert.equal(lockPurchase.bought, true);
+  assert.equal(lockPurchase.snapshot.mainGod.core.lockSurvive, 1);
+  assert.equal(lockPurchase.snapshot.mainGod.core.shards, 3);
   await api(page, "selectCharacter", "sayo");
   await api(page, "selectMainGodTier", 1);
   await api(page, "start");
@@ -972,6 +983,8 @@ try {
   assert.equal(mainGodState.stageKey, "mainGod-1");
   assert.ok(mainGodState.player.attackDamage > baseCombat.sayo.attackDamage);
   assert.ok(mainGodState.player.maxHp < baseCombat.sayo.maxHp * 1.25, "诅咒遗物应以生命上限换取伤害");
+  assert.ok(mainGodState.player.steal > 0, "猩红模板应开局给吸血");
+  assert.ok(mainGodState.player.mgCrimson > 0, "主神开局应写入已装备模板");
   await page.evaluate(() => window.advanceTime(250));
   assert.equal((await state(page)).mode, "event");
   assert.match(await page.locator("#eventTitle").textContent(), /主神随机契约/);
@@ -1016,6 +1029,7 @@ try {
   assert.equal(mainGodState.mode, "result");
   assert.equal(mainGodState.result.win, true);
   assert.ok(afterMainGod.mainGod.points >= pointsBeforeClear + 12);
+  assert.ok(afterMainGod.mainGod.core.shards >= 4, "T1 通关应再给 1 枚基因锁碎片");
   assert.ok(afterMainGod.mainGod.unlockedTier >= 2);
   assert.equal(afterMainGod.coins, beforeMainGod.coins, "主神空间不应发放普通樱花币");
   assert.deepEqual(afterMainGod.story, beforeMainGod.story, "主神空间不应污染四章剧情存档");
