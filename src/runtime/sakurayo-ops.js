@@ -276,6 +276,12 @@
       }
       return !!(global.SakurayoFeel53 && global.SakurayoFeel53.install);
     });
+    bootScript("sakurayo-boutique-js", "runtime/sakurayo-boutique.js", function () {
+      if (global.SakurayoBoutique && typeof global.SakurayoBoutique.install === "function") {
+        global.SakurayoBoutique.install();
+      }
+      return !!(global.SakurayoBoutique && global.SakurayoBoutique.install);
+    });
   }
 
   function injectStyle() {
