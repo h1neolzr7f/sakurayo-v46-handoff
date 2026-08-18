@@ -64,6 +64,8 @@ const info = await page.evaluate(() => {
     featuredGoods: document.querySelectorAll("#shopFeatured46 .shopGood46").length,
     hiddenGroups: !!document.querySelector("#shopDrawer.isFeatured46"),
     boutique: document.getElementById("shopDrawer")?.classList.contains("isBoutique46"),
+    railIcons: document.querySelectorAll(".shopRailIco46 svg").length,
+    mark: !!document.querySelector("#shopDrawer .shopMark46 svg"),
   };
 });
 
@@ -81,6 +83,8 @@ assert.equal(info.heroKicker, "本期主推");
 assert.equal(info.featuredGoods, 0);
 assert.equal(info.hiddenGroups, false);
 assert.equal(info.boutique, true);
+assert.equal(info.railIcons, 3);
+assert.equal(info.mark, true);
 
 await page.locator("[data-shop-group=skins] .skinCard").first().scrollIntoViewIfNeeded();
 const inView = await page.evaluate(() => {
@@ -101,6 +105,7 @@ await page.screenshot({ path: path.join(out, "02-boutique-scroll.png") });
 await page.locator('[data-shop-rail="supplies"]').click();
 await page.waitForTimeout(200);
 assert.equal(await page.locator("#shopCounter46 .shopGood46").count(), 3);
+assert.equal(await page.locator("#shopCounter46 .shopGoodIco46 svg").count(), 3);
 const coinsOf = () =>
   page.locator("#coins").evaluate((el) => {
     const node = [...el.childNodes].find((n) => n.nodeType === 3);

@@ -96,6 +96,9 @@ const boutique = fs.readFileSync(path.join(root, "src/runtime/sakurayo-boutique.
 assert.match(boutique, /时装商店/);
 assert.match(boutique, /本期主推/);
 assert.match(boutique, /isBoutique46/);
+assert.match(boutique, /shopRailIco46/);
+assert.match(boutique, /shopMark46/);
+assert.match(boutique, /dressIcons/);
 assert.match(code, /shopPrism46/);
 assert.match(code, /data-shop-buy/);
 assert.match(code, /不出售永久伤害/);
