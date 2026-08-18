@@ -20,6 +20,10 @@ Invoke-Step "syntax ops" { node --check src/runtime/sakurayo-ops.js }
 Invoke-Step "lobby unit" { node tests/lobby_unit.mjs }
 Invoke-Step "live unit" { node tests/live_unit.mjs }
 Invoke-Step "ops unit" { node tests/ops_unit.mjs }
+Invoke-Step "maingod shop unit" { node tests/maingod_shop_unit.mjs }
+Invoke-Step "maingod core unit" { node tests/maingod_core_unit.mjs }
+Invoke-Step "maingod polish unit" { node tests/maingod_polish_unit.mjs }
+Invoke-Step "maingod core smoke" { node tests/maingod_core_smoke.mjs }
 Invoke-Step "ops smoke" { node tests/ops_smoke.mjs }
 Invoke-Step "syntax lifecycle" { node --check src/runtime/sakurayo-lifecycle.js }
 Invoke-Step "syntax content-runtime" { node --check src/runtime/sakurayo-content-runtime.js }
