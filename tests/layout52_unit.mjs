@@ -30,8 +30,9 @@ assert.match(code, /width:42%/);
 assert.match(activity, /LAYOUT52_ASSET/);
 assert.match(activity, /ANDROID_LANDSCAPE_SCRIPT/);
 assert.match(activity, /injectRuntime/);
-assert.match(gradle, /versionCode 6106/);
+assert.match(gradle, /versionCode 6108/);
 assert.match(workflow, /sakurayo-layout52\.js/);
+assert.match(workflow, /sakurayo-chrome\.js/);
 assert.match(workflow, /cursor\/yeying-touch-fix-eaa0/);
 assert.match(feel, /touch-action:manipulation!important/);
 
