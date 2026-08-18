@@ -7109,6 +7109,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       lobby46(){return window.SakurayoLobby?window.SakurayoLobby.snapshot(save):null;},
       setPool46(id){const L=window.SakurayoLobby;if(!L)return null;L.setPool(save,id);persist();refreshLobby46();return L.snapshot(save);},
       setRosterTab46(id){const L=window.SakurayoLobby;if(!L)return null;L.setRosterTab(save,id);persist();refreshLobby46();return L.snapshot(save);},
+      spark46(id){const L=window.SakurayoLobby;if(!L)return {ok:false};const r=L.spark(save,save.shop40.ops.pool,id);persist();refreshLobby46();return r;},
+      equip46(tab,id){const L=window.SakurayoLobby;if(!L)return {ok:false};const r=L.equip(save,tab,id);persist();refreshLobby46();return r;},
       pullGacha46(count=1){return doPull46(count);},
       grantCheat46(){return grantCheat46();},
       liveSnapshot46(){return window.SakurayoLive?window.SakurayoLive.snapshot():null;},
@@ -7373,6 +7375,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       character:save.character,
       setPool(id){const L=window.SakurayoLobby;if(!L)return;L.setPool(save,id);persist();refreshLobby46();},
       setRosterTab(id){const L=window.SakurayoLobby;if(!L)return;L.setRosterTab(save,id);persist();refreshLobby46();},
+      spark(id){const L=window.SakurayoLobby;if(!L)return;const r=L.spark(save,save.shop40.ops.pool,id);toast(r.ok?("Spark："+r.n):r.reason==="shards"?"碎镜片不足":r.reason==="owned"?"已经拥有":r.reason==="scrap"?"残件不能 Spark":"无法 Spark");persist();refreshLobby46();if(r.ok&&L.showReveal)L.showReveal([{id:r.id,n:r.n,r:r.r,legend:r.legend}],{art:artUrl});},
+      equip(tab,id){const L=window.SakurayoLobby;if(!L)return;const r=L.equip(save,tab,id);toast(r.ok?"已装备":"不能装备");persist();refreshLobby46();},
     };
   }
   function refreshLobby46(){
