@@ -32,5 +32,7 @@
 | 结算诊断看不清 | `#rstats`/`#damageReport` 实心底 `#161028`；矮横屏结算不铺闪图、去掉 overlay 模糊 | 再给结算盖闪图，或把诊断做成 `#ffffff08` |
 | 寻访斜切热区 | 430px 高 `#gachaPull1`/`#gachaPull10` `clip-path:none` | 再给单抽/十连切掉四角却让底板接点击 |
 | 寻访「跳过」点不到 | 揭示钮 `min-width:72px`，430px 高仍保底 72×42 | 再只缩 padding 让「跳过」收到 62px |
+| 升级「重抽」落到屏外 | 430px 高压缩标题/说明/读出，描述最多 3 行，重抽固定在卡底 | 再让升级卡按 175px 最小高度把重抽顶出 412px |
+| 启动层盖住大厅/升级 | `?test=1` 立刻摘掉 `#bootArt35`；`.gone` 直接 `display:none`，900ms 不再等 window.load | 再让启动层 opacity 过渡盖住升级卡中间 |
 
 选择器与测试 API 仍以 [HANDOFF.md](HANDOFF.md) 为准。`selectStage` 永远把 `runMode36` 写成 `"story"`。

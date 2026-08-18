@@ -58,12 +58,16 @@ assert.match(feel, /@media\(max-height:430px\)\{#start \.pass53\{display:none!im
 assert.match(index, /P\.damageSources\|\|\{\}/);
 assert.match(index, /P\.damageSources = P\.damageSources \|\| \{\}/);
 assert.match(index, /skipped: "short-pause"/);
+assert.match(index, /\.bootArt35\.gone\{opacity:0;visibility:hidden;display:none\}/);
+assert.match(index, /if \(TEST_MODE\) dismissBoot\(\)/);
 assert.match(index, /skipped: "short-result"/);
 assert.match(feel, /#back,#reroll,\.revealSkip46.*background:#2a1848!important/);
 assert.match(feel, /#reroll,\.revealSkip46/);
 assert.match(layout, /#result #rstats,#result #damageReport,#result #routeNote\{background:#161028!important/);
 assert.match(layout, /backdrop-filter:none!important/);
 assert.match(layout, /max-height:430px.*homeBanner46/);
+assert.match(layout, /#level \.choiceReadout38 em\{display:none!important\}/);
+assert.match(read("src/runtime/sakurayo-cutscene.js"), /#level \.choice p\{color:#e8dcc8;display:-webkit-box/);
 assert.match(read("src/runtime/sakurayo-cutscene.js"), /background:#161028ee/);
 assert.doesNotMatch(layout, /max-height:409px/);
 assert.match(layout, /touch-action:manipulation!important/);
