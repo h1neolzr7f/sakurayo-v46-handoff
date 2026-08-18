@@ -15,7 +15,10 @@
     "html.androidLandscape46 #menu.homeDock46 .nav.homeNav46,html.landscape46.portraitFallback46 #menu.homeDock46 .nav.homeNav46{position:absolute!important;left:50%!important;bottom:max(8px,env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;z-index:13!important;pointer-events:auto!important}" +
     "html.androidLandscape46 #menu.homeDock46 .homeRail46,html.landscape46.portraitFallback46 #menu.homeDock46 .homeRail46{position:absolute!important;z-index:12!important;pointer-events:auto!important}" +
     "html.androidLandscape46 #menu.homeDock46 .homeBanner46,html.landscape46.portraitFallback46 #menu.homeDock46 .homeBanner46{z-index:12!important;pointer-events:auto!important}" +
-    "html.androidLandscape46 #menu.homeDock46 .charSelectPanel,html.landscape46.portraitFallback46 #menu.homeDock46 .charSelectPanel{z-index:14!important;pointer-events:auto!important;bottom:auto!important}";
+    "html.androidLandscape46 #menu.homeDock46 .charSelectPanel,html.landscape46.portraitFallback46 #menu.homeDock46 .charSelectPanel{z-index:14!important;pointer-events:auto!important;bottom:auto!important}" +
+    "html.landscape46:not(.portraitFallback46) .utilityButtons37{display:none!important}" +
+    "html.landscape46:not(.portraitFallback46) #dash,html.landscape46:not(.portraitFallback46) #skill{min-width:52px;min-height:52px}" +
+    "html.landscape46:not(.portraitFallback46) #pause{min-width:40px;min-height:40px}";
 
   var CSS =
     HIT_CSS +

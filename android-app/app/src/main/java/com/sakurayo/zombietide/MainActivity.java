@@ -37,6 +37,7 @@ import java.util.Locale;
 public final class MainActivity extends Activity {
     private static final String TAG = "SakurayoWebView";
     private static final String GAME_URL = "file:///android_asset/index.html";
+    private static final String DEBUG_GAME_URL = "file:///android_asset/index.html?beta=1";
     private static final String TOUCH54_ASSET = "runtime/sakurayo-touch54.js";
     private static final String LAYOUT52_ASSET = "runtime/sakurayo-layout52.js";
     private static final String FEEL53_ASSET = "runtime/sakurayo-feel53.js";
@@ -82,7 +83,7 @@ public final class MainActivity extends Activity {
 
         boolean restored = savedInstanceState != null && webView.restoreState(savedInstanceState) != null;
         if (!restored) {
-            webView.loadUrl(GAME_URL);
+            webView.loadUrl(BuildConfig.DEBUG ? DEBUG_GAME_URL : GAME_URL);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {

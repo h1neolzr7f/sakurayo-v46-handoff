@@ -32,9 +32,25 @@ assert.equal(await page.evaluate(() => window.__SAKURAYO_TEST__.liveTrigger46("t
 const api = (method, ...args) => page.evaluate(({ method, args }) => window.__SAKURAYO_TEST__[method](...args), { method, args });
 const snap = () => page.evaluate(() => JSON.parse(window.render_game_to_text()));
 
-await page.locator("#start").click();
-if (await page.locator("#tutorialDrawer37").isVisible()) {
-  for (let i = 0; i < 4; i++) await page.locator("#tutorialNext37").click();
+await page.locator("#start").click({ timeout: 15000 });
+const tutorial = page.locator("#tutorialDrawer37");
+if (await tutorial.isVisible().catch(() => false)) {
+  const skip = page.locator("#tutorialSkip37");
+  if (await skip.count()) {
+    await skip.click({ force: true, timeout: 8000 });
+  } else {
+    for (let i = 0; i < 4; i++) {
+      await page.locator("#tutorialNext37").click({ force: true, timeout: 8000 });
+    }
+  }
+  await page.waitForFunction(
+    () => {
+      const drawer = document.getElementById("tutorialDrawer37");
+      return !drawer || drawer.classList.contains("hidden");
+    },
+    null,
+    { timeout: 8000 },
+  );
 }
 if ((await snap()).mode !== "menu") {
   await api("dismissDialogue");

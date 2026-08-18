@@ -38,6 +38,7 @@ assert.doesNotMatch(ops, /pets\.push/);
 assert.doesNotMatch(ops, /update\s*=\s*function/);
 
 assert.match(layout, /hangChars\.busy/);
+assert.match(layout, /utilityButtons37\{display:none!important\}/);
 assert.match(layout, /position:static!important/);
 assert.match(layout, /homeChip46\.prism/);
 assert.match(layout, /touch-action:manipulation!important/);
@@ -64,6 +65,9 @@ assert.doesNotMatch(boutique, /update\s*=\s*function/);
 
 assert.match(chrome, /chrome6109/);
 assert.match(chrome, /version:"4\.7\.0"/);
+assert.match(chrome, /dress\.busy/);
+assert.match(chrome, /if\(style&&style\.textContent\)return/);
+assert.doesNotMatch(chrome, /n>40&&global\.clearInterval/);
 assert.doesNotMatch(chrome, /update\s*=\s*function/);
 
 assert.match(gradle, /applicationId "com\.sakurayo\.yeying\.dev"/);
