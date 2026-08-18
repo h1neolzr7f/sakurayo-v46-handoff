@@ -206,21 +206,29 @@
 
   function markLive(box, on) {
     if (!box) return { ok: false };
-    if (on) box.classList.add("live53");
-    else box.classList.remove("live53");
+    if (on) {
+      if (!box.classList.contains("live53")) box.classList.add("live53");
+    } else if (box.classList.contains("live53")) {
+      box.classList.remove("live53");
+    }
     return { ok: true, live: !!on };
   }
 
   function startRadio(box) {
-    if (!box) return { ok: false };
-    markLive(box, true);
-    if (state.radioTimer && global.clearTimeout) global.clearTimeout(state.radioTimer);
-    if (global.setTimeout) {
-      state.radioTimer = global.setTimeout(function () {
-        markLive(box, false);
-      }, RADIO_MS);
+    if (!box || startRadio.busy) return { ok: false, busy: !!startRadio.busy };
+    startRadio.busy = true;
+    try {
+      markLive(box, true);
+      if (state.radioTimer && global.clearTimeout) global.clearTimeout(state.radioTimer);
+      if (global.setTimeout) {
+        state.radioTimer = global.setTimeout(function () {
+          markLive(box, false);
+        }, RADIO_MS);
+      }
+      return { ok: true, ms: RADIO_MS };
+    } finally {
+      startRadio.busy = false;
     }
-    return { ok: true, ms: RADIO_MS };
   }
 
   function paintResultHook(win, diagnosis, host) {
@@ -304,8 +312,12 @@
 
     var banter = $("banter");
     if (banter) {
+      var banterHidden = banter.classList.contains("hidden");
       observe(banter, { attributes: true, attributeFilter: ["class"] }, function () {
-        if (!banter.classList.contains("hidden")) startRadio(banter);
+        var nowHidden = banter.classList.contains("hidden");
+        if (banterHidden && !nowHidden) startRadio(banter);
+        else if (nowHidden) markLive(banter, false);
+        banterHidden = nowHidden;
       });
     }
 

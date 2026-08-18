@@ -39,6 +39,8 @@ assert.doesNotMatch(gradle, /applicationId "com\.sakurayo\.zombietide"/);
 assert.match(gradle, /versionName "4\.7\.0-yeying"/);
 assert.match(gradle, /versionCode 6110/);
 assert.match(code, /chip\.textContent !== next/);
+assert.match(code, /startRadio\.busy/);
+assert.match(code, /banterHidden && !nowHidden/);
 assert.match(code, /observe\(start, \{ childList: true \}/);
 assert.doesNotMatch(code, /characterData: true/);
 assert.match(strings, /开发版 夜樱/);

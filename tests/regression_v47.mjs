@@ -60,6 +60,8 @@ assert.match(lobby, /homeChip46\.prism/);
 
 assert.match(feel, /applyPassword\.busy/);
 assert.match(feel, /applyPassword\.pulse47/);
+assert.match(feel, /startRadio\.busy/);
+assert.match(feel, /banterHidden && !nowHidden/);
 assert.match(feel, /observe\(start, \{ childList: true \}/);
 assert.doesNotMatch(feel, /characterData: true/);
 assert.doesNotMatch(feel, /update\s*=\s*function/);
