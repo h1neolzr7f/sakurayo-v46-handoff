@@ -149,5 +149,91 @@ const gacha = await page.evaluate(() => document.querySelectorAll(".wishPills46 
 await page.screenshot({ path: path.join(out, "10-gacha.png") });
 assert.ok(gacha >= 2, "gacha wallet pills must drop circle/rect drafts");
 
+await page.evaluate(() => document.querySelector("#gachaDrawer .close")?.click());
+await api("openDrawer", "ach");
+await page.waitForTimeout(300);
+await page.evaluate(() => window.SakurayoChrome?.dress?.(document));
+const ach = await page.evaluate(() => {
+  const badges = [...document.querySelectorAll("#achDrawer .badge")];
+  const leftover = badges.filter((el) => !el.querySelector("svg") && !el.querySelector("img") && /[\u{1F300}-\u{1FAFF}\u2600-\u27BF]/u.test((el.textContent || "").trim()));
+  return {
+    svg: badges.filter((el) => el.querySelector("svg")).length,
+    leftover: leftover.map((el) => (el.textContent || "").trim()),
+    total: badges.length,
+  };
+});
+await page.screenshot({ path: path.join(out, "11-achievements.png") });
+assert.ok(ach.total >= 8, "achievement list must render badges");
+assert.ok(ach.svg >= 6, "achievement badges must drop emoji drafts");
+assert.equal(ach.leftover.length, 0, "no raw emoji badges left");
+
+await page.evaluate(() => document.querySelector("#achDrawer .close")?.click());
+await page.evaluate(() => document.querySelector("#guideButton37")?.click());
+await page.waitForSelector("#tutorialDrawer37:not(.hidden) .tutorialIcon37", { timeout: 8000 });
+await page.evaluate(() => window.SakurayoChrome?.dress?.(document));
+const tutorial = await page.evaluate(() => {
+  const icon = document.querySelector(".tutorialIcon37");
+  return {
+    svg: !!icon?.querySelector("svg"),
+    text: (icon?.textContent || "").trim(),
+    kind: icon?.getAttribute("data-chrome") || "",
+  };
+});
+await page.screenshot({ path: path.join(out, "12-tutorial.png") });
+assert.equal(tutorial.svg, true, "tutorial hero icon must drop joystick/emoji draft");
+assert.ok(!tutorial.text, "tutorial icon must not keep the emoji glyph");
+
+await page.evaluate(() => document.querySelector("#tutorialDrawer37 .close")?.click());
+await api("openDrawer", "talent");
+await page.waitForTimeout(200);
+await page.evaluate(() => window.SakurayoChrome?.dress?.(document));
+const talentDrawer = await page.evaluate(() => document.querySelectorAll("#talentList .ticon svg").length);
+await page.screenshot({ path: path.join(out, "13-talent-drawer.png") });
+assert.ok(talentDrawer >= 4, "permanent talent icons must drop emoji drafts");
+
+await page.evaluate(() => document.querySelector("#talentDrawer .close")?.click());
+await api("openDrawer", "asc");
+await page.waitForTimeout(200);
+await page.evaluate(() => window.SakurayoChrome?.dress?.(document));
+const asc = await page.evaluate(() => {
+  const icons = [...document.querySelectorAll("#ascDrawer .storyIcon")];
+  const leftover = icons.filter((el) => !el.querySelector("svg") && !el.querySelector("img") && /[\u{1F300}-\u{1FAFF}\u2600-\u27BF\u2139]/u.test((el.textContent || "").trim()));
+  return { svg: icons.filter((el) => el.querySelector("svg")).length, leftover: leftover.map((el) => (el.textContent || "").trim()) };
+});
+await page.screenshot({ path: path.join(out, "14-ascension.png") });
+assert.ok(asc.svg >= 1, "ascension guide must mint the info/story icons");
+assert.equal(asc.leftover.length, 0, "ascension story icons must not stay as emoji");
+
+const extras = await page.evaluate(() => {
+  const event = document.querySelector("#eventIcon");
+  const result = document.querySelector("#ricon");
+  event.textContent = "📡";
+  result.textContent = "☠️";
+  const box = document.querySelector("#choices");
+  box.innerHTML = '<button class="choice"><img src="data:image/svg+xml;charset=utf-8,' +
+    encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128"><text x="64" y="79" font-size="52" text-anchor="middle">⚡</text></svg>') +
+    '"><div><b>疾风扳机</b></div></button>';
+  const skin = document.createElement("div");
+  skin.className = "skinPreview";
+  skin.innerHTML = "<span>🎤</span>";
+  document.body.appendChild(skin);
+  window.SakurayoChrome.dress(document);
+  return {
+    event: { svg: !!event.querySelector("svg"), kind: event.getAttribute("data-chrome"), text: (event.textContent || "").trim() },
+    result: { svg: !!result.querySelector("svg"), kind: result.getAttribute("data-chrome"), text: (result.textContent || "").trim() },
+    choice: document.querySelector(".choice > img")?.getAttribute("data-chrome") || "",
+    skin: { svg: !!skin.querySelector("svg"), kind: skin.querySelector("span")?.getAttribute("data-chrome") || "" },
+    kinds: ["🕹️", "⚠️", "⚡", "👻", "🎤", "ℹ️", "📡", "☠️"].map((mark) => window.SakurayoChrome.kind(mark)),
+  };
+});
+assert.equal(extras.event.svg, true);
+assert.equal(extras.event.kind, "notice");
+assert.equal(extras.result.svg, true);
+assert.equal(extras.result.kind, "skull");
+assert.equal(extras.choice, "bolt");
+assert.equal(extras.skin.svg, true);
+assert.equal(extras.skin.kind, "mic");
+assert.deepEqual(extras.kinds, ["stick", "warn", "bolt", "ghost", "mic", "info", "notice", "skull"]);
+
 await browser.close();
-console.log("PASS chrome icons", JSON.stringify({ lobby, shop, supplies, exchange, mission, profile, talent, gacha }), out);
+console.log("PASS chrome icons", JSON.stringify({ lobby, shop, supplies, exchange, mission, profile, talent, gacha, ach, tutorial, talentDrawer, asc, extras }), out);
