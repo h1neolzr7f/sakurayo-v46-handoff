@@ -12,12 +12,25 @@ vm.runInNewContext(code, sandbox);
 const L = sandbox.window.SakurayoLobby;
 
 assert.equal(L.version, "4.6.0");
-assert.equal(L.CARDS.length, 8);
+assert.equal(L.CARDS.length, 16);
 assert.deepEqual([...L.DEFAULT_SHOWN], ["sayo_echo", "aya_petal"]);
+for (const card of L.CARDS) {
+  assert.equal(
+    fs.existsSync(path.join(root, "android-app/app/src/main/assets/game/art/gacha", `${card.id}.webp`)),
+    true,
+    `缺少寻访卡面 ${card.id}.webp`,
+  );
+}
 assert.equal(L.RATES.single, 160);
 assert.equal(L.RATES.ten, 1440);
 assert.equal(L.RATES.SSR, 0.01);
 assert.equal(L.RATES.pitySSR, 80);
+assert.ok(L.upIds("moon").includes("sayo_echo"));
+assert.ok(L.upIds("fate").includes("aya_petal"));
+assert.equal(L.upIds("normal").length, 0);
+const moonN = L.weightPool("N", "moon").filter((c) => c.id === "sayo_echo").length;
+const moonAya = L.weightPool("N", "moon").filter((c) => c.id === "aya_petal").length;
+assert.ok(moonN > moonAya);
 
 const old = { coins: 90, shop40: {} };
 const shop = L.normalizeOps(old.shop40);
@@ -25,13 +38,42 @@ old.shop40 = shop;
 assert.equal(shop.ops.owned.sayo_echo, 1);
 assert.equal(shop.ops.owned.aya_petal, 1);
 assert.equal(shop.ops.owned.last_witness, 0);
+assert.equal(shop.ops.owned.mirror_twins, 0);
 assert.equal(L.snapshot(old).shown.includes("sayo_echo"), true);
+
+const legacyEight = L.normalizeOps({
+  ops: {
+    pity: 27,
+    pitySR: 4,
+    pulls: 31,
+    owned: { sayo_echo: 3, aya_petal: 2, last_witness: 1 },
+  },
+});
+assert.equal(legacyEight.ops.owned.sayo_echo, 3);
+assert.equal(legacyEight.ops.owned.last_witness, 1);
+assert.equal(legacyEight.ops.owned.sayo_318, 0);
+assert.equal(legacyEight.ops.owned.mirror_twins, 0);
+assert.equal(legacyEight.ops.pity, 27);
+assert.equal(legacyEight.ops.pulls, 31);
 
 const poor = { coins: 10, shop40: L.normalizeOps({}) };
 const denied = L.pull(poor, 1, () => 0);
 assert.equal(denied.ok, false);
 assert.equal(denied.reason, "coins");
 assert.equal(poor.coins, 10);
+const ticketPay = { coins: 10, shop40: L.normalizeOps({}), shell46: { ticket: 1, energy: 0 } };
+const ticketPull = L.pull(ticketPay, 1, () => 0.999, "moon");
+assert.equal(ticketPull.ok, true);
+assert.equal(ticketPull.paid, "ticket");
+assert.equal(ticketPay.coins, 10);
+assert.equal(ticketPay.shell46.ticket, 0);
+assert.equal(ticketPay.shell46.energy, 1);
+const energyPay = { coins: 20000, shop40: L.normalizeOps({}), shell46: { ticket: 0, energy: 49 } };
+const energyPull = L.pull(energyPay, 1, () => 0.999, "normal");
+assert.equal(energyPull.ok, true);
+assert.equal(energyPull.energyGrant, 1);
+assert.equal(energyPay.shell46.energy, 0);
+assert.equal(energyPay.shell46.ticket, 1);
 
 const rich = { coins: 20000, shop40: L.normalizeOps({}) };
 const one = L.pull(rich, 1, () => 0.999);
@@ -50,7 +92,7 @@ const pitySave = { coins: 20000, shop40: L.normalizeOps({}) };
 pitySave.shop40.ops.pity = 79;
 const forced = L.pull(pitySave, 1, () => 0.999);
 assert.equal(forced.results[0].r, "SSR");
-assert.equal(forced.results[0].id, "last_witness");
+assert.ok(["last_witness", "mirror_twins"].includes(forced.results[0].id));
 assert.equal(pitySave.shop40.ops.pity, 0);
 
 const cheat = L.grantCheat({ coins: 3, shop40: L.normalizeOps({}) });
@@ -59,7 +101,11 @@ assert.equal(cheat.cheatUsed, 1);
 assert.deepEqual(Object.keys(L.snapshot(old).cards[0]).sort(), ["count", "id", "n", "r"]);
 assert.equal(typeof L.showReveal, "function");
 assert.equal(typeof L.injectStyle, "function");
-assert.match(fs.readFileSync(path.join(root, "src/runtime/sakurayo-lobby.js"), "utf8"), /@media\(orientation:landscape\)\{/);
+const lobbySrc = fs.readFileSync(path.join(root, "src/runtime/sakurayo-lobby.js"), "utf8");
+assert.match(lobbySrc, /@media\(orientation:landscape\)\{/);
+assert.match(lobbySrc, /homeBanner46\{display:grid;.*left:max\(80px/);
+assert.match(lobbySrc, /shortWindow46 \.revealGrid46\.ten \.revealCard46\{height:68px\}/);
+assert.doesNotMatch(lobbySrc, /12天22时/);
 assert.doesNotMatch(fs.readFileSync(path.join(root, "src/runtime/sakurayo-lobby.js"), "utf8"), /orientation:landscape\) and \(min-width:700px\)/);
 assert.match(fs.readFileSync(path.join(root, "src/index.html"), "utf8"), /class="landscape46"/);
 assert.match(fs.readFileSync(path.join(root, "src/index.html"), "utf8"), /classList\.add\("landscape46"\)/);
@@ -187,6 +233,8 @@ assert.match(gachaHost.innerHTML, /1440/);
 assert.match(gachaHost.innerHTML, /距证人保底还有/);
 assert.ok(gachaHost.querySelector("#gachaPull1"));
 assert.ok(gachaHost.querySelector("#gachaPull10"));
+V.renderGacha(gachaHost, save, { pull() {}, art: (p) => "game/art/" + p, character: "sayo", tickets: 3 });
+assert.match(gachaHost.innerHTML, /寻访券 3/);
 
 const rosterDrawer = fakeEl("section", { id: "rosterDrawer" });
 rosterDrawer.className = "drawer wishDrawer46";
@@ -194,7 +242,7 @@ const rosterHost = fakeEl("div", { id: "rosterBody46" });
 body.appendChild(rosterDrawer);
 rosterDrawer.appendChild(rosterHost);
 V.renderRoster(rosterHost, save, { art: (p) => "game/art/" + p });
-assert.equal((rosterHost.innerHTML.match(/class="rosterSlot46/g) || []).length, 8);
+assert.equal((rosterHost.innerHTML.match(/class="rosterSlot46/g) || []).length, 16);
 assert.match(rosterHost.innerHTML, /id="rosterWall46"/);
 assert.match(rosterHost.innerHTML, /未回收/);
 assert.match(rosterHost.innerHTML, /rosterSlot46 r-SSR lock" data-card="last_witness"/);
@@ -212,6 +260,23 @@ assert.ok(reveal);
 assert.match(reveal.innerHTML, /收下证词/);
 assert.match(reveal.innerHTML, /revealCard46/);
 assert.match(reveal.innerHTML, /revealGem46/);
+assert.match(reveal.innerHTML, /镜界开印/);
+assert.match(reveal.innerHTML, /revealSum46/);
+assert.match(reveal.innerHTML, /单次寻访/);
+V.showReveal(
+  [
+    { id: "last_witness", n: "终章证人立绘", r: "SSR" },
+    { id: "sayo_echo", n: "小夜残响", r: "N" },
+    { id: "mirror_twins", n: "镜中双生", r: "SSR" },
+  ],
+  { art: (p) => "game/art/" + p },
+);
+const tenReveal = document.getElementById("gachaReveal46");
+assert.match(tenReveal.innerHTML, /十连证词/);
+const tenCards = tenReveal.querySelectorAll(".revealCard46");
+assert.equal(tenCards[0].getAttribute("data-card"), "sayo_echo");
+assert.equal(tenCards[1].getAttribute("data-card"), "last_witness");
+assert.equal(tenCards[2].getAttribute("data-card"), "mirror_twins");
 
 const locked = collect(rosterHost).find((n) => (` ${n.className} `).includes(" lock "));
 assert.ok(locked);
