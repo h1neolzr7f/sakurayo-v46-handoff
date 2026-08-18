@@ -109,6 +109,8 @@ assert.match(bossFx.rule || "", /镜核|适应/);
 const shattered = await api(page, "hitMainGodFx46", "mirror");
 assert.ok(shattered.hit > 0, "太刀/命中路径应能打碎镜核");
 assert.ok(shattered.boss.fx.every(x => x.kind !== "mirror" || x.hp <= 0), "镜核被打碎后 hp 应为 0");
+const kept = await api(page, "refreshMainGodBossFx46");
+assert.ok(kept.fx.every(x => x.kind !== "mirror" || x.hp <= 0), "转阶段升级不得把已碎镜核刷回来");
 for (const type of ["auditor", "reaper", "mirror", "warden"]) {
   const forced = await api(page, "forceMainGodBossType46", type);
   assert.equal(forced.ok, true, `${type} 应可强制`);
