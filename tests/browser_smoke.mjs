@@ -236,7 +236,7 @@ try {
   assert.ok(lobby.shown.includes("aya_petal"));
   assert.equal(lobby.cards.length, 8);
   assert.deepEqual(lobby.pages, ["remnant", "fashion", "weapon"]);
-  assert.deepEqual(lobby.rosterTabs, ["scrap", "school"]);
+  assert.deepEqual(lobby.rosterTabs, ["scrap", "school", "fashion", "weapon"]);
   assert.equal(lobby.rates.single, 160);
   assert.equal(lobby.rates.ten, 1440);
   assert.equal(lobby.rates.softPity, 65);
@@ -251,12 +251,12 @@ try {
   assert.match(await page.locator("#gachaDrawer").textContent(), /时装/);
   const emptyFashion = await api(page, "pullGacha46", 1);
   assert.equal(emptyFashion.ok, false);
-  assert.equal(emptyFashion.reason, "empty");
+  assert.equal(emptyFashion.reason, "coins");
   await page.locator('#gachaTabs46 [data-pool="weapon"]').click();
   assert.match(await page.locator("#gachaDrawer").textContent(), /武器/);
   const emptyWeapon = await api(page, "pullGacha46", 1);
   assert.equal(emptyWeapon.ok, false);
-  assert.equal(emptyWeapon.reason, "empty");
+  assert.equal(emptyWeapon.reason, "coins");
   await page.locator('#gachaTabs46 [data-pool="remnant"]').click();
   assert.match(await page.locator("#gachaDrawer").textContent(), /残片进仓库/);
   const coinsBeforeFail = (await api(page, "lobby46")).coins;
@@ -286,6 +286,10 @@ try {
   await page.locator('#rosterTabs46 [data-roster="school"]').click();
   assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 14);
   assert.match(await page.locator("#rosterDrawer").textContent(), /待寻访/);
+  await page.locator('#rosterTabs46 [data-roster="fashion"]').click();
+  assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 12);
+  await page.locator('#rosterTabs46 [data-roster="weapon"]').click();
+  assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 12);
   await page.locator('#rosterTabs46 [data-roster="scrap"]').click();
   assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 8);
   await shot(page, "01i-roster-wall.png");

@@ -18,7 +18,11 @@ assert.equal([...L.SCHOOL_CARDS].filter((card) => card.r === "SR").map((card) =>
 assert.ok(L.SCHOOL_CARDS.every((card) => card.kind === "school" && Array.isArray(card.lore) && card.lore.length === 4));
 assert.deepEqual([...L.DEFAULT_SHOWN], ["sayo_echo", "aya_petal"]);
 assert.deepEqual([...L.POOL_IDS], ["remnant", "fashion", "weapon"]);
-assert.deepEqual([...L.ROSTER_TABS], ["scrap", "school"]);
+assert.deepEqual([...L.ROSTER_TABS], ["scrap", "school", "fashion", "weapon"]);
+assert.equal(L.FASHION_CARDS.length, 12);
+assert.equal(L.WEAPON_CARDS.length, 12);
+assert.ok(L.FASHION_CARDS.filter((card) => card.legend).map((card) => card.id).join(",").includes("fashion_sayo_crown"));
+assert.ok(L.WEAPON_CARDS.filter((card) => card.legend).map((card) => card.id).join(",").includes("weapon_sayo_final"));
 assert.equal(L.RATES.single, 160);
 assert.equal(L.RATES.ten, 1440);
 assert.equal(L.RATES.SSR, 0.01);
@@ -29,7 +33,7 @@ assert.ok(L.CARDS.every((card) => card.r === "R" && card.kind === "scrap"));
 assert.ok(L.CARDS.every((card) => Array.isArray(card.lore) && card.lore.length === 4));
 assert.equal(L.cardOf("last_witness").n, "碎镜后的人");
 assert.match(L.cardOf("last_witness").lore[0], /他不是小夜/);
-["school_shrine","school_idol","school_magical","school_mech","school_spore","school_gun","school_mage","school_alch","school_ninja","school_vamp","school_cult","school_necro","school_gene","school_summon"].forEach((id) => {
+["school_shrine","school_idol","school_magical","school_mech","school_spore","school_gun","school_mage","school_alch","school_ninja","school_vamp","school_cult","school_necro","school_gene","school_summon","fashion_sayo_crown","fashion_aya_funeral","fashion_rion_bride","fashion_sayo_plain","weapon_sayo_final","weapon_aya_mirror","weapon_rion_burial","weapon_sayo_spare"].forEach((id) => {
   const art = path.join(root, "android-app/app/src/main/assets/game/art/gacha", id + ".webp");
   assert.equal(fs.existsSync(art), true, "missing " + id);
   assert.ok(fs.statSync(art).size > 8000, id + " too small");
@@ -86,11 +90,25 @@ assert.ok(["school_shrine", "school_gun", "school_cult"].includes(forced.results
 assert.equal(forced.results[0].kind, "school");
 assert.notEqual(forced.results[0].kind, "scrap");
 
-const emptyPool = { coins: 20000, shop40: L.normalizeOps({}) };
-const fashionDenied = L.pull(emptyPool, 1, () => 0, "fashion");
-assert.equal(fashionDenied.ok, false);
-assert.equal(fashionDenied.reason, "empty");
-assert.equal(emptyPool.coins, 20000);
+const fashionSave = { coins: 20000, shop40: L.normalizeOps({}) };
+const fashionPull = L.pull(fashionSave, 1, () => 0.5, "fashion");
+assert.equal(fashionPull.ok, true);
+assert.equal(fashionPull.pool, "fashion");
+assert.equal(fashionSave.coins, 20000 - 160);
+assert.ok(fashionPull.results[0].id.startsWith("fashion_"));
+const scrapSpark = L.spark({ coins: 0, shop40: L.normalizeOps({}) }, "remnant", "sayo_echo");
+assert.equal(scrapSpark.ok, false);
+assert.equal(scrapSpark.reason, "scrap");
+fashionSave.shop40.ops.fashion.shards = 200;
+const sparked = L.spark(fashionSave, "fashion", "fashion_sayo_crown");
+assert.equal(sparked.ok, true);
+assert.equal(fashionSave.shop40.ops.fashion.owned.fashion_sayo_crown, 1);
+assert.equal(fashionSave.shop40.ops.fashion.shards, 0);
+const equipped = L.equip(fashionSave, "fashion", "fashion_sayo_crown");
+assert.equal(equipped.ok, true);
+const wearP = { dmg: 20, character: "sayo" };
+L.applyOwnedBonus(wearP, { character: "sayo", shop40: fashionSave.shop40 });
+assert.ok(Math.abs(wearP.dmg - 20 * 1.08) < 1e-6);
 
 const bonusP = { crit: 0.05, spd: 220, dmg: 18, bladePower: 1, skillCd: 7, damageReduce: 0, maxSh: 0, sh: 0, maxHp: 100, hp: 100, character: "sayo" };
 const bonusSave = { character: "sayo", shop40: L.normalizeOps({}) };
@@ -301,6 +319,11 @@ assert.match(rosterHost.innerHTML, /待寻访/);
 assert.match(rosterHost.innerHTML, /data-card="school_shrine"/);
 assert.equal(rosterHost.innerHTML.includes("school_shrine.webp"), false);
 assert.match(rosterHost.innerHTML, /card_back\.webp/);
+V.setRosterTab(save, "fashion");
+V.renderRoster(rosterHost, save, { art: (p) => "game/art/" + p });
+assert.equal((rosterHost.innerHTML.match(/class="rosterSlot46/g) || []).length, 12);
+assert.match(rosterHost.innerHTML, /data-roster="fashion"/);
+assert.match(rosterHost.innerHTML, /data-roster="weapon"/);
 V.setRosterTab(save, "scrap");
 
 const drawer = fakeEl("section", { id: "gachaDrawer" });

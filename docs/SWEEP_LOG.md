@@ -9,3 +9,4 @@ A/B 每轮追加一行，不准删旧记录。
 | 2026-08-18 | A | 检查点1 / 寻访三页壳 | 三页空壳、仓库改名、shop40.ops 补 shards/pool/fashion/weapon、旧8张全R残件、加成进 resetP。时装/武器空池 toast「本池尚未写入」。竖屏底栏左两格被角色卡挡住记 P1，测试走 openDrawer，不改大厅布局。 | static/lobby/live/ops/framework/browser 全绿 | 旧断言未跟三页合同；竖屏点击被挡 | 检查点2：并行出14张+残件8文 |
 | 2026-08-18 | B | 残件8文案 | 八张四段写入 docs/gacha/REMNANT_8.md，并接到仓库阅读。不覆盖旧 webp。last_witness 用「他」。 | 文案自检过；等认人 | 本轮才写 | 14张接线（认人/自检后） |
 | 2026-08-18 | B | 小夜基础5 / 绫基础5 / 凛音基础4 | 生成并落盘 14 张 768×1024 webp。见 docs/PHASE1_FACE_CHECK.md 与 docs/gacha/SCHOOL_14.md。未把职业 id 写进存档。 | 自检 14/14 能报出人；等人抽查，超 24h 按自检继续 | 基线无职业封面 | 检查点3接线 |
+| 2026-08-18 | A | 检查点3 / 14张接线 | 14 张进残片池与仓库基础页；四段阅读；倾向 ×1.3；套装 7/+2%、14/+3%；SSR 硬保降到 shrine/gun/cult，不打残件。 | static/lobby/live/ops/framework/browser 绿 | 认人未回，按自检继续 | 检查点4：时装武器+装备槽 |
