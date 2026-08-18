@@ -34,6 +34,7 @@ jobs:
           cp src/runtime/sakurayo-touch54.js android-app/app/src/main/assets/runtime/sakurayo-touch54.js
           cp src/runtime/sakurayo-layout52.js android-app/app/src/main/assets/runtime/sakurayo-layout52.js
           cp src/runtime/sakurayo-feel53.js android-app/app/src/main/assets/runtime/sakurayo-feel53.js
+          cp src/runtime/sakurayo-boutique.js android-app/app/src/main/assets/runtime/sakurayo-boutique.js
           python3 tools/build_game.py \
             --source src/index.html \
             --output android-app/app/src/main/assets/index.html \
