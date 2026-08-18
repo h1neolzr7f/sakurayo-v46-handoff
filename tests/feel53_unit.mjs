@@ -35,7 +35,10 @@ assert.doesNotMatch(code, /sakurayoV3/);
 assert.match(gradle, /applicationId "com\.sakurayo\.yeying\.dev"/);
 assert.doesNotMatch(gradle, /applicationId "com\.sakurayo\.zombietide"/);
 assert.match(gradle, /versionName "4\.6\.0-yeying"/);
-assert.match(gradle, /versionCode 6103/);
+assert.match(gradle, /versionCode 6105/);
+assert.match(code, /chip\.textContent !== next/);
+assert.match(code, /observe\(start, \{ childList: true \}/);
+assert.doesNotMatch(code, /characterData: true/);
 assert.match(strings, /开发版 夜樱/);
 
 class FakeClassList {
