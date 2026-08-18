@@ -132,17 +132,24 @@
   }
 
   function applyPassword(id) {
-    var start = $("start");
-    if (!start) return "";
-    var ident = identOf(id);
-    var chip = start.querySelector ? start.querySelector(".pass53") : null;
-    if (!chip && doc()) {
-      chip = doc().createElement("em");
-      chip.className = "pass53";
-      start.appendChild(chip);
+    if (applyPassword.busy) return identOf(id).password;
+    applyPassword.busy = true;
+    try {
+      var start = $("start");
+      if (!start) return "";
+      var ident = identOf(id);
+      var next = "口令 · " + ident.password;
+      var chip = start.querySelector ? start.querySelector(".pass53") : null;
+      if (!chip && doc()) {
+        chip = doc().createElement("em");
+        chip.className = "pass53";
+        start.appendChild(chip);
+      }
+      if (chip && chip.textContent !== next) chip.textContent = next;
+      return ident.password;
+    } finally {
+      applyPassword.busy = false;
     }
-    if (chip) chip.textContent = "口令 · " + ident.password;
-    return ident.password;
   }
 
   function pluckTone(id) {
@@ -280,7 +287,7 @@
 
     var start = $("start");
     if (start) {
-      observe(start, { childList: true, subtree: true, characterData: true }, function () {
+      observe(start, { childList: true }, function () {
         applyPassword(detectChar());
       });
     }
