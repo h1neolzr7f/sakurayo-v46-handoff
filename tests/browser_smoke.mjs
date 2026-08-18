@@ -241,7 +241,14 @@ try {
   assert.equal(lobby.rates.ten, 1440);
   assert.equal(lobby.rates.softPity, 65);
   assert.equal(lobby.rates.spark, 200);
-  // 竖屏角色卡会挡住底栏左两格；寻访/仓库走测试 API，不放宽抽屉合同
+  const dockHit = await page.evaluate(() => {
+    const btn = document.querySelector("#menu .homeNav46 [data-open=\"gacha\"]") || document.querySelector("#menu .nav [data-open=\"gacha\"]");
+    if (!btn) return false;
+    const box = btn.getBoundingClientRect();
+    const el = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+    return !!(el && (el === btn || btn.contains(el)));
+  });
+  assert.equal(dockHit, true, "竖屏底栏寻访键被角色卡挡住");
   const gachaOpen = await api(page, "openDrawer", "gacha");
   assert.equal(gachaOpen.visible, true);
   assert.equal(await page.locator("#gachaDrawer").isVisible(), true);
@@ -881,6 +888,8 @@ try {
   const beforeUpgrade = await state(page);
   await api(page, "triggerUpgrade");
   assert.equal((await state(page)).mode, "level");
+  assert.equal(await page.locator("#dialogue").evaluate(node => node.classList.contains("hidden")), true);
+  assert.equal(await page.locator("#banter").evaluate(node => node.classList.contains("hidden")), true);
   assert.ok(await page.locator("#choices .choice").count() >= 1);
   assert.equal(await page.locator("#choices .choiceReadout38").count(), await page.locator("#choices .choice").count());
   assert.match(await page.locator("#choices .choiceReadout38").first().innerText(), /→/);
