@@ -22,6 +22,7 @@ assert.match(ops, /sakurayo-feel53\.js/);
 assert.match(activity, /runtime\/sakurayo-touch54\.js/);
 assert.match(activity, /runtime\/sakurayo-layout52\.js/);
 assert.match(activity, /runtime\/sakurayo-feel53\.js/);
+assert.match(activity, /runtime\/sakurayo-boutique\.js/);
 assert.match(activity, /injectRuntime/);
 assert.match(activity, /setOnTouchListener/);
 assert.match(activity, /__SAKURAYO_ANDROID_LANDSCAPE__/);
