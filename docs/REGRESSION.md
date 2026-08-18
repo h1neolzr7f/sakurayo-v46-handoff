@@ -8,6 +8,7 @@
 | 量触控热区卡死 | `resize.busy`，画布尺寸没变不重设 `canvas.width`，resize 里不再改出击键 | `resize` 里写 `cv.width` 再触发 `visualViewport`/`getBoundingClientRect` 重入 |
 | 关对白卡死 | 吐槽/过场用 `requestAnimationFrame` 重启动画，禁止 `void offsetWidth` | `playBanter` / 过场里强制回流再叠 `resize` |
 | 口令观察者脉冲 | `#start` childList 同一帧最多 6 次 `applyPassword` | 无上限同步改 `#start` 文本 |
+| 进战斗电台卡死 | `#banter` 只在 hidden→显示时 `startRadio`；`live53` 已在则不加 | 观察 class 时反复 `add("live53")` 重入 |
 | Android 点出击没反应 | `layout52` 强制 `androidLandscape46`，按钮 `pointer-events:auto`，`html,body` 用 `touch-action:manipulation` | 再按 `view.w < 640` 套 `portraitFallback46` 却锁横屏 |
 | 点到画布上 | `touch54` 用 `elementFromPoint` 补 click | 大厅层 `pointer-events:none` 且不补点 |
 | 口令观察者卡死 WebView | `applyPassword.busy`，只观察 `childList` | `characterData: true` 或无门禁改 `#start` 文本 |
