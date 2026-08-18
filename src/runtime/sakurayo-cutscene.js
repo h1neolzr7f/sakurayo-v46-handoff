@@ -40,7 +40,7 @@
       "#dialogue[data-ground='mirror'] .dialogueModal{border-color:#c79bff88;box-shadow:0 0 40px #c79bff24}" +
       "#dialogue[data-kind='phase'] .dialogueModal{border-width:2px}" +
       "#dialogue[data-kind='ending'] .dialogueModal{border-color:#ffe6a488}" +
-      "#event:not(.hidden) .modal,#result:not(.hidden) .modal,#level:not(.hidden) .modal,#paused:not(.hidden) .modal{opacity:1;animation:sakurayoCutIn .3s ease}" +
+      "#event:not(.hidden) .modal,#result:not(.hidden) .modal,#level:not(.hidden) .modal,#paused:not(.hidden) .modal{opacity:1;transform:none;animation:none}" +
       "#warning:not(.hidden){animation:sakurayoWarnPulse .55s ease 2}" +
       "#phaseFlash44{position:fixed;inset:0;z-index:34;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 40%,#ff4ea366,#05040ecc 62%)}" +
       "#phaseFlash44.on{animation:sakurayoPhaseFlash .48s ease}" +
@@ -76,6 +76,7 @@
       "html.shortWindow46 #result #rstats,html.shortWindow46 #result #damageReport{padding:6px 8px;font-size:9px}" +
       "html.shortWindow46 #result .actions button{min-height:40px;padding:6px 10px}" +
       "html.shortWindow46 #paused .modal,html.shortWindow46 #level .modal,html.shortWindow46 #event .modal{max-height:94vh;overflow:auto}" +
+      "@media(max-height:430px){#level .modal{max-height:94vh;overflow:auto}#level .choice{padding:8px 6px}#reroll{min-height:40px;margin-top:6px}}" +
       "@media (orientation:landscape) and (max-height:600px){" +
       ".overlay{padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}" +
       "#dialogue .dialogueModal{display:grid;grid-template-columns:minmax(220px,38%) minmax(0,1fr);width:min(94vw,900px);height:min(78vh,336px);max-height:336px;padding:0;text-align:left}" +
