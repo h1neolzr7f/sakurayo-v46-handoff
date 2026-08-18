@@ -2514,7 +2514,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charCard.selected img{border-color:#f2c75d;box-shadow:0 0 0 2px #f2c75dcc,0 0 16px #f35aa688}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charCard b,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charCard p,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charCard em,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charCard .selectedMark{display:none!important}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46{display:flex;flex-direction:column;position:absolute;right:max(16px,env(safe-area-inset-right));top:max(64px,calc(env(safe-area-inset-top) + 52px));bottom:max(86px,calc(env(safe-area-inset-bottom) + 76px));width:min(34vw,320px);gap:8px;z-index:6;pointer-events:none}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46 .stageMini,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46 .homeModes46,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46 #start,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46 button{pointer-events:auto}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46 .homeModes46 button,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46 #start,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46 button{pointer-events:auto}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini{position:relative;width:100%;margin:0;flex:1 1 auto;min-height:96px;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto 1fr auto;gap:4px 8px;padding:12px 14px 10px;border-radius:16px;overflow:hidden;background:#120e27ee;border:1px solid #69ddf266;box-shadow:0 0 0 1px #05020d,0 12px 28px #05020d66,inset 0 0 0 1px #69ddf222;backdrop-filter:none}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.32;border-radius:0}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini>div,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini h3,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini p,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini strong,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeStageProg46{position:relative;z-index:1}" +
@@ -12036,7 +12036,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function installNavArt35(){
     $$("#menu .nav button").forEach(button=>{
       const span=button.querySelector("span"),key=button.dataset.open;
-      if(!span||!NAV_ART35[key]||span.querySelector("img"))return;
+      if(!span||!NAV_ART35[key]||span.querySelector("img")||span.querySelector("svg")||span.classList.contains("chromeOn46"))return;
       const fallback=span.textContent,img=document.createElement("img");
       img.alt="";img.src=artUrl(`ui/nav/${NAV_ART35[key]}.webp`);
       img.onerror=()=>{span.textContent=fallback;};
