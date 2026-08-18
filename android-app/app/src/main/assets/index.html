@@ -1682,7 +1682,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
       "html.shortWindow46 #result #rstats,html.shortWindow46 #result #damageReport{padding:6px 8px;font-size:9px}" +
       "html.shortWindow46 #result .actions button{min-height:40px;padding:6px 10px}" +
       "html.shortWindow46 #paused .modal,html.shortWindow46 #level .modal,html.shortWindow46 #event .modal{max-height:94vh;overflow:auto}" +
-      "@media(max-height:430px){#level .modal{max-height:94vh;overflow:auto}#level .choice{padding:8px 6px}#reroll{min-height:40px;margin-top:6px}}" +
+      "@media(max-height:430px){#level .modal{max-height:94vh;overflow:auto}#level .choice{padding:8px 6px;min-height:0}#level .choice img{width:36px;height:36px}#level .choice p{color:#e8dcc8}#reroll{min-height:40px;margin-top:6px;background:#2a1848;border:1px solid #f2c75d;color:#ffe7a3}#result #rstats,#result #damageReport,#result #routeNote{background:#161028;border:1px solid #f2c75d55;color:#fff4e4}#result #damageReport h3,#result #rstats b{color:#ffe7a3}.eventChoice{min-height:48px;background:#1a1230;border:1px solid #f2c75d55;color:#fff7fb}.eventChoice p{color:#e8dcc8}}" +
       "@media (orientation:landscape) and (max-height:600px){" +
       ".overlay{padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}" +
       "#dialogue .dialogueModal{display:grid;grid-template-columns:minmax(220px,38%) minmax(0,1fr);width:min(94vw,900px);height:min(78vh,336px);max-height:336px;padding:0;text-align:left}" +
@@ -1699,11 +1699,11 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
       "#result .rankBig{grid-area:rank;align-self:center;justify-self:center;font-size:68px;line-height:1;text-shadow:0 0 28px #ffd36b55}" +
       "#result #rtitle{grid-area:title;align-self:end;margin:0;font-size:24px;line-height:1.05;text-align:left}" +
       "#result #rsub{grid-area:summary;align-self:start;margin:0;font-size:10px;line-height:1.5;text-align:left}" +
-      "#result #rstats{grid-area:stats;min-height:0;align-self:stretch;padding:10px 12px;overflow:auto;border:1px solid #ffffff12;border-radius:13px;background:#ffffff08;font-size:10px;line-height:1.55;text-align:left}" +
+      "#result #rstats{grid-area:stats;min-height:0;align-self:stretch;padding:10px 12px;overflow:auto;border:1px solid #f2c75d44;border-radius:13px;background:#161028ee;color:#fff4e4;font-size:10px;line-height:1.55;text-align:left}" +
       "#result #endingTag{position:absolute;left:18px;top:176px;margin:0;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}" +
-      "#result #damageReport{grid-area:report;min-height:0;margin:0;padding:9px 11px;overflow:auto;border:1px solid #ffffff12;border-radius:13px;background:#09071696}" +
-      "#result #damageReport h3{margin:0 0 5px}" +
-      "#result #damageReport .routeNote{padding:7px;font-size:9px;line-height:1.45}" +
+      "#result #damageReport{grid-area:report;min-height:0;margin:0;padding:9px 11px;overflow:auto;border:1px solid #f2c75d44;border-radius:13px;background:#161028f2;color:#fff4e4}" +
+      "#result #damageReport h3{margin:0 0 5px;color:#ffe7a3}" +
+      "#result #damageReport .routeNote{padding:7px;font-size:9px;line-height:1.45;color:#fff4e4}" +
       "#result #routeNote{grid-area:route;min-height:0;max-height:78px;padding:8px 10px;overflow:auto;font-size:9px;line-height:1.45}" +
       "#result .actions{grid-area:actions;display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:0}" +
       "#result .actions button{min-height:38px;padding:8px 12px}" +
@@ -2318,6 +2318,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     "html.landscape46.shortWindow46 .revealSum46{margin:4px 0 0;font-size:10px}" +
     "html.landscape46.shortWindow46 .revealActs46{margin-top:6px}" +
     "html.landscape46.shortWindow46 .revealTake46,html.landscape46.shortWindow46 .revealSkip46,html.landscape46.shortWindow46 .revealAgain46{min-height:42px;padding:0 14px}" +
+    "@media(max-height:430px){html.landscape46 .revealGrid46.ten .revealCard46{height:68px}html.landscape46 .revealGrid46.one .revealCard46{width:132px;height:168px}html.landscape46 .revealHead46 b{font-size:15px}html.landscape46 .revealActs46{margin-top:6px}html.landscape46 .revealTake46,html.landscape46 .revealSkip46,html.landscape46 .revealAgain46{min-height:42px;padding:0 14px}}" +
     ".revealCard46{position:relative;width:104px;height:146px;perspective:900px}" +
     ".revealGrid46.one .revealCard46{width:196px;height:276px}" +
     ".revealInner46{position:relative;width:100%;height:100%;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transition:transform .7s cubic-bezier(.2,.8,.2,1)}" +
@@ -3389,6 +3390,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     "html.landscape46:not(.portraitFallback46) .gachaFeature46 i{display:block;margin-top:8px;color:#cfc4df;font:700 11px/1 system-ui;font-style:normal}" +
     "html.landscape46:not(.portraitFallback46) .gachaEnergy46{display:block;position:absolute;z-index:6;right:max(16px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));color:#ffe7a3;font:800 11px/1 system-ui;letter-spacing:.08em}" +
     "html.landscape46:not(.portraitFallback46) #gachaPull1,html.landscape46:not(.portraitFallback46) #gachaPull10{clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);border-radius:0}" +
+    "@media(max-height:430px){html.landscape46:not(.portraitFallback46) #gachaPull1,html.landscape46:not(.portraitFallback46) #gachaPull10{clip-path:none;border-radius:12px}html.landscape46:not(.portraitFallback46) #stageDrawer.stageShell46 .stageCard button{clip-path:none;border-radius:10px}}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer,html.landscape46:not(.portraitFallback46) #storyDrawer,html.landscape46:not(.portraitFallback46) #profileDrawer{background:#080713}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer>.dhead,html.landscape46:not(.portraitFallback46) #storyDrawer>.dhead,html.landscape46:not(.portraitFallback46) #profileDrawer>.dhead{background:#0b0818}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer>.dhead p{display:none}" +
@@ -3498,7 +3500,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     "#homeGreet46{display:none}" +
     "html.landscape46:not(.portraitFallback46) #homeGreet46{display:block;margin-top:4px;max-width:220px;color:#ffe7a3;font:700 10px/1.35 system-ui;letter-spacing:.04em;text-shadow:0 2px 8px #05020d;pointer-events:none}" +
     "html.landscape46.shortWindow46 #homeGreet46,html.landscape46.shortWindow46 #homePetals46{display:none!important}" +
-    "@media(max-height:430px){html.landscape46:not(.portraitFallback46) #homeGreet46{display:none!important}}" +
+    "@media(max-height:430px){html.landscape46:not(.portraitFallback46) #homeGreet46,html.landscape46:not(.portraitFallback46) #homeBanner46,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46{display:none!important}}" +
     ".shellDrawer46:not(.hidden),.drawer.wishDrawer46:not(.hidden){animation:shellIn46 .28s ease}" +
     ".shellFloat46{position:fixed;left:50%;top:30%;z-index:90;color:#f2c75d;font:900 22px/1 system-ui;letter-spacing:.08em;pointer-events:none;text-shadow:0 0 16px #f2c75d88;animation:shellFloat46 .9s ease forwards}" +
     ".homeChip46.pop46 b,.homeChip46.pop46,#coins.pop46{animation:chipPop46 .28s ease}" +
@@ -13644,9 +13646,9 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     const modal=$(sel)?.querySelector(".modal");
     if(!modal)return {ok:false,path:""};
     const short = document.documentElement.classList.contains("shortWindow46") || innerHeight < 431;
-    if (sel === "#paused" && short) {
+    if ((sel === "#paused" || sel === "#result") && short) {
       clearOutfitModal45(sel);
-      return { ok: false, path: "", skipped: "short-pause" };
+      return { ok: false, path: "", skipped: sel === "#paused" ? "short-pause" : "short-result" };
     }
     const path=liveSplashPath45();
     modal.classList.toggle("outfitSplash45",!!path);

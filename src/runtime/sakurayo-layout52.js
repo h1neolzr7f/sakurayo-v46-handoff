@@ -48,7 +48,7 @@
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46 b,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46 small,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46 em,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBannerDots46{display:none}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .nav.homeNav46{width:min(480px,52vw);z-index:13}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46{z-index:12}" +
-    "@media(max-height:409px){html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46{display:none!important}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeRail46{bottom:max(78px,calc(env(safe-area-inset-bottom) + 68px))}}" +
+    "@media(max-height:430px){html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46.speak53{display:none!important}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeRail46{bottom:max(78px,calc(env(safe-area-inset-bottom) + 68px))}}" +
     "@media(max-height:370px){html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46{bottom:max(80px,calc(env(safe-area-inset-bottom) + 70px));gap:4px;overflow:hidden}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini{min-height:48px;padding:6px 10px}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini p,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeStageProg46{display:none!important}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeModes46 button{min-height:36px;padding:4px 8px}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeModes46 button small{display:none}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .start{min-height:40px;flex:0 0 40px}}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .heroLive46{width:40%;bottom:88px!important}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .top .charSelectPanel{position:static!important;left:auto!important;top:auto!important;margin:0 6px 0 auto}" +
@@ -69,9 +69,27 @@
     "html.landscape46:not(.portraitFallback46) #level .levelRailArt47{background-size:auto 100%;background-position:center 12%}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .start{clip-path:none}" +
     "#paused .modal,#result .modal{position:relative;background:#140e24f6;opacity:1!important}" +
-    "#paused .actions button.secondary,#result .actions button.secondary,#fxToggle,#banterToggle,#retryP,#quit,#back{background:#2a1848!important;border:1px solid #f2c75d!important;color:#ffe7a3!important;box-shadow:0 0 0 1px #f2c75d55!important}" +
-    "#paused .actions button.primary,#result .actions button.primary,#resume,#again{background:linear-gradient(135deg,#ff4ea3,#c13bff)!important;border:1px solid #ffe6a3!important;color:#fff!important;box-shadow:0 0 0 1px #ffe6a366,0 8px 18px #f35aa666!important}" +
-    "@media(max-height:430px){html.landscape46:not(.portraitFallback46) #paused .actions{grid-template-columns:1fr 1fr}html.landscape46:not(.portraitFallback46) #paused #resume{grid-column:1/-1}html.landscape46:not(.portraitFallback46) #paused .sub,html.landscape46:not(.portraitFallback46) #paused #build{max-height:72px;overflow:auto}html.landscape46:not(.portraitFallback46) #paused .modal{background:#140e24f8!important;background-image:none!important}}";
+    "#paused .actions button.secondary,#result .actions button.secondary,#fxToggle,#banterToggle,#retryP,#quit,#back,#reroll,.revealSkip46,.revealAgain46,.eventChoice{background:#2a1848!important;border:1px solid #f2c75d!important;color:#ffe7a3!important;box-shadow:0 0 0 1px #f2c75d55!important}" +
+    "#paused .actions button.primary,#result .actions button.primary,#resume,#again,.revealTake46{background:linear-gradient(135deg,#ff4ea3,#c13bff)!important;border:1px solid #ffe6a3!important;color:#fff!important;box-shadow:0 0 0 1px #ffe6a366,0 8px 18px #f35aa666!important}" +
+    "@media(max-height:430px){" +
+    "html.landscape46:not(.portraitFallback46) #paused .actions{grid-template-columns:1fr 1fr}" +
+    "html.landscape46:not(.portraitFallback46) #paused #resume{grid-column:1/-1}" +
+    "html.landscape46:not(.portraitFallback46) #paused .sub,html.landscape46:not(.portraitFallback46) #paused #build{max-height:72px;overflow:auto}" +
+    "html.landscape46:not(.portraitFallback46) #paused .modal,html.landscape46:not(.portraitFallback46) #result .modal{background:#140e24f8!important;background-image:none!important}" +
+    ".overlay{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:#05040ef5!important}" +
+    "#result #rstats,#result #damageReport,#result #routeNote{background:#161028!important;border:1px solid #f2c75d55!important;color:#fff4e4!important}" +
+    "#result #damageReport h3,#result #rstats b,#result #rsub{color:#ffe7a3!important}" +
+    "#level .choice{min-height:0!important;background:#1a1230!important;border:1px solid #f2c75d44!important}" +
+    "#level .choice p,.eventChoice p{color:#e8dcc8!important}" +
+    "#reroll{min-height:40px}" +
+    ".drawer .close{min-width:44px;min-height:44px}" +
+    "html.landscape46:not(.portraitFallback46) #gachaPull1,html.landscape46:not(.portraitFallback46) #gachaPull10{clip-path:none!important;border-radius:12px!important}" +
+    "html.landscape46:not(.portraitFallback46) #stageDrawer.stageShell46 .stageCard button{clip-path:none!important;border-radius:10px!important}" +
+    "html.landscape46:not(.portraitFallback46) #hud .perf{display:none!important}" +
+    "html.landscape46:not(.portraitFallback46) #combo:not(.on51){opacity:0;pointer-events:none}" +
+    "html.landscape46:not(.portraitFallback46) #hud .mission{max-height:22px;overflow:hidden}" +
+    "body:has(#level:not(.hidden)) #banter,body:has(#paused:not(.hidden)) #banter,body:has(#result:not(.hidden)) #banter,body:has(#event:not(.hidden)) #banter,body:has(#dialogue:not(.hidden)) #banter{opacity:0!important;pointer-events:none!important;visibility:hidden!important}" +
+    "}";
 
   function androidLocked() {
     var html = global.document && global.document.documentElement;

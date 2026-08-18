@@ -76,7 +76,7 @@
       "html.shortWindow46 #result #rstats,html.shortWindow46 #result #damageReport{padding:6px 8px;font-size:9px}" +
       "html.shortWindow46 #result .actions button{min-height:40px;padding:6px 10px}" +
       "html.shortWindow46 #paused .modal,html.shortWindow46 #level .modal,html.shortWindow46 #event .modal{max-height:94vh;overflow:auto}" +
-      "@media(max-height:430px){#level .modal{max-height:94vh;overflow:auto}#level .choice{padding:8px 6px}#reroll{min-height:40px;margin-top:6px}}" +
+      "@media(max-height:430px){#level .modal{max-height:94vh;overflow:auto}#level .choice{padding:8px 6px;min-height:0}#level .choice img{width:36px;height:36px}#level .choice p{color:#e8dcc8}#reroll{min-height:40px;margin-top:6px;background:#2a1848;border:1px solid #f2c75d;color:#ffe7a3}#result #rstats,#result #damageReport,#result #routeNote{background:#161028;border:1px solid #f2c75d55;color:#fff4e4}#result #damageReport h3,#result #rstats b{color:#ffe7a3}.eventChoice{min-height:48px;background:#1a1230;border:1px solid #f2c75d55;color:#fff7fb}.eventChoice p{color:#e8dcc8}}" +
       "@media (orientation:landscape) and (max-height:600px){" +
       ".overlay{padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}" +
       "#dialogue .dialogueModal{display:grid;grid-template-columns:minmax(220px,38%) minmax(0,1fr);width:min(94vw,900px);height:min(78vh,336px);max-height:336px;padding:0;text-align:left}" +
@@ -93,11 +93,11 @@
       "#result .rankBig{grid-area:rank;align-self:center;justify-self:center;font-size:68px;line-height:1;text-shadow:0 0 28px #ffd36b55}" +
       "#result #rtitle{grid-area:title;align-self:end;margin:0;font-size:24px;line-height:1.05;text-align:left}" +
       "#result #rsub{grid-area:summary;align-self:start;margin:0;font-size:10px;line-height:1.5;text-align:left}" +
-      "#result #rstats{grid-area:stats;min-height:0;align-self:stretch;padding:10px 12px;overflow:auto;border:1px solid #ffffff12;border-radius:13px;background:#ffffff08;font-size:10px;line-height:1.55;text-align:left}" +
+      "#result #rstats{grid-area:stats;min-height:0;align-self:stretch;padding:10px 12px;overflow:auto;border:1px solid #f2c75d44;border-radius:13px;background:#161028ee;color:#fff4e4;font-size:10px;line-height:1.55;text-align:left}" +
       "#result #endingTag{position:absolute;left:18px;top:176px;margin:0;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center}" +
-      "#result #damageReport{grid-area:report;min-height:0;margin:0;padding:9px 11px;overflow:auto;border:1px solid #ffffff12;border-radius:13px;background:#09071696}" +
-      "#result #damageReport h3{margin:0 0 5px}" +
-      "#result #damageReport .routeNote{padding:7px;font-size:9px;line-height:1.45}" +
+      "#result #damageReport{grid-area:report;min-height:0;margin:0;padding:9px 11px;overflow:auto;border:1px solid #f2c75d44;border-radius:13px;background:#161028f2;color:#fff4e4}" +
+      "#result #damageReport h3{margin:0 0 5px;color:#ffe7a3}" +
+      "#result #damageReport .routeNote{padding:7px;font-size:9px;line-height:1.45;color:#fff4e4}" +
       "#result #routeNote{grid-area:route;min-height:0;max-height:78px;padding:8px 10px;overflow:auto;font-size:9px;line-height:1.45}" +
       "#result .actions{grid-area:actions;display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:0}" +
       "#result .actions button{min-height:38px;padding:8px 12px}" +

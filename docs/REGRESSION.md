@@ -26,7 +26,10 @@
 | 覆盖正式包 | 开发版包名 `com.sakurayo.yeying.dev` | 改回正式 `applicationId` 再让人覆盖安装 |
 | 出击斜切热区被甲板截走 | `#start` 横屏 `clip-path:none`；`#homeDeck46` `pointer-events:none`，子按钮再打开 | 再给出击键切掉四角却让甲板接点击 |
 | 问候条像关不掉的签到层 | 412px 高藏 `#homeGreet46`，`pointer-events:none`；日历红点仍在 | 把长句问候绝对钉在左栏上抢点击 |
-| 结算/暂停次要钮看不清 | `#back`/`#quit` 实心底+金边；矮横屏暂停不铺闪图 | 再把 `.secondary` 做成 6% 白底，或给暂停盖全屏闪图 |
+| 结算/暂停次要钮看不清 | `#back`/`#quit`/`#reroll` 实心底+金边；矮横屏暂停不铺闪图 | 再把 `.secondary` 做成 6% 白底，或给暂停盖全屏闪图 |
 | 暂停只剩模糊光圈 | `sakurayoCutIn` 不再从 opacity 0 起；`#paused .modal{opacity:1}` | 再让过场 `from{opacity:0}` 或 `animation:none` 停在透明帧 |
+| 412px 寻访条抢左栏/底栏 | `@media(max-height:430px)` 藏 `#homeBanner46`，左栏落到底栏之上 | 再只在 409px 才藏条，让 412px 手机露出 50px 图标 |
+| 结算诊断看不清 | `#rstats`/`#damageReport` 实心底 `#161028`；矮横屏结算不铺闪图、去掉 overlay 模糊 | 再给结算盖闪图，或把诊断做成 `#ffffff08` |
+| 寻访斜切热区 | 430px 高 `#gachaPull1`/`#gachaPull10` `clip-path:none` | 再给单抽/十连切掉四角却让底板接点击 |
 
 选择器与测试 API 仍以 [HANDOFF.md](HANDOFF.md) 为准。`selectStage` 永远把 `runMode36` 写成 `"story"`。

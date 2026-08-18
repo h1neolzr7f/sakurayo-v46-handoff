@@ -7727,9 +7727,9 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     const modal=$(sel)?.querySelector(".modal");
     if(!modal)return {ok:false,path:""};
     const short = document.documentElement.classList.contains("shortWindow46") || innerHeight < 431;
-    if (sel === "#paused" && short) {
+    if ((sel === "#paused" || sel === "#result") && short) {
       clearOutfitModal45(sel);
-      return { ok: false, path: "", skipped: "short-pause" };
+      return { ok: false, path: "", skipped: sel === "#paused" ? "short-pause" : "short-result" };
     }
     const path=liveSplashPath45();
     modal.classList.toggle("outfitSplash45",!!path);

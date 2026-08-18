@@ -165,6 +165,7 @@
     "html.landscape46:not(.portraitFallback46) .gachaFeature46 i{display:block;margin-top:8px;color:#cfc4df;font:700 11px/1 system-ui;font-style:normal}" +
     "html.landscape46:not(.portraitFallback46) .gachaEnergy46{display:block;position:absolute;z-index:6;right:max(16px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));color:#ffe7a3;font:800 11px/1 system-ui;letter-spacing:.08em}" +
     "html.landscape46:not(.portraitFallback46) #gachaPull1,html.landscape46:not(.portraitFallback46) #gachaPull10{clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);border-radius:0}" +
+    "@media(max-height:430px){html.landscape46:not(.portraitFallback46) #gachaPull1,html.landscape46:not(.portraitFallback46) #gachaPull10{clip-path:none;border-radius:12px}html.landscape46:not(.portraitFallback46) #stageDrawer.stageShell46 .stageCard button{clip-path:none;border-radius:10px}}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer,html.landscape46:not(.portraitFallback46) #storyDrawer,html.landscape46:not(.portraitFallback46) #profileDrawer{background:#080713}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer>.dhead,html.landscape46:not(.portraitFallback46) #storyDrawer>.dhead,html.landscape46:not(.portraitFallback46) #profileDrawer>.dhead{background:#0b0818}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer>.dhead p{display:none}" +
@@ -274,7 +275,7 @@
     "#homeGreet46{display:none}" +
     "html.landscape46:not(.portraitFallback46) #homeGreet46{display:block;margin-top:4px;max-width:220px;color:#ffe7a3;font:700 10px/1.35 system-ui;letter-spacing:.04em;text-shadow:0 2px 8px #05020d;pointer-events:none}" +
     "html.landscape46.shortWindow46 #homeGreet46,html.landscape46.shortWindow46 #homePetals46{display:none!important}" +
-    "@media(max-height:430px){html.landscape46:not(.portraitFallback46) #homeGreet46{display:none!important}}" +
+    "@media(max-height:430px){html.landscape46:not(.portraitFallback46) #homeGreet46,html.landscape46:not(.portraitFallback46) #homeBanner46,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46{display:none!important}}" +
     ".shellDrawer46:not(.hidden),.drawer.wishDrawer46:not(.hidden){animation:shellIn46 .28s ease}" +
     ".shellFloat46{position:fixed;left:50%;top:30%;z-index:90;color:#f2c75d;font:900 22px/1 system-ui;letter-spacing:.08em;pointer-events:none;text-shadow:0 0 16px #f2c75d88;animation:shellFloat46 .9s ease forwards}" +
     ".homeChip46.pop46 b,.homeChip46.pop46,#coins.pop46{animation:chipPop46 .28s ease}" +
