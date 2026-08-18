@@ -1,6 +1,6 @@
 ---
 name: vibegame-playtest
-description: Run a VibeGame-style adversarial playtest on 樱夜·尸潮 in Cursor Cloud or local Agent. Use when the user mentions VibeGame, 对抗验收, playtest, 局内验收, auditor/player/reviewer, or wants a cloud agent to verify upgrade, Boss phases, dialogue overlap, and restart. Do not use this to install Phaser, clone tettethu/VibeGame, or rewrite the game.
+description: Verify-only adversarial playtest for 樱夜·尸潮. Use when the user wants 只验收、对抗验收、playtest, or VibeGame-style reviewer without changing product code. For 自主优化+验收 use sakurayo-autonomous instead. Do not install Phaser or clone tettethu/VibeGame.
 ---
 
 # VibeGame 式对抗验收（樱夜·尸潮）
@@ -10,6 +10,8 @@ description: Run a VibeGame-style adversarial playtest on 樱夜·尸潮 in Curs
 执行者是 **当前 Cursor Agent**，不是南京大学那套 Claude Code / Codex 八人小队，也不要去装 Phaser。
 
 需要原版 VibeGame 引擎时，先读 [references/limits.md](references/limits.md)。默认不要走那条路。
+
+用户要「自己改再自己验」时，改走 `/sakurayo-autonomous`。本 skill 只验收、不优化。
 
 ## 何时用
 
