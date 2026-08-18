@@ -38,10 +38,10 @@
     "#resultHook53:empty{display:none}" +
     "html.landscape46:not(.portraitFallback46) #resultHook53{grid-area:title;justify-self:end;align-self:start;margin:0;max-width:42%;z-index:3}" +
     "#" + BADGE_ID + "{position:fixed;z-index:40;left:max(8px,env(safe-area-inset-left));top:max(8px,env(safe-area-inset-top));padding:4px 10px;border-radius:999px;border:1px solid #f2c75d88;background:#120e27ee;color:#ffe7a3;font:800 10px/1 system-ui;letter-spacing:.14em;pointer-events:none}" +
-    "#paused .actions button.secondary,#result .actions button.secondary,#fxToggle,#banterToggle,#retryP,#quit,#back{background:#1c1634ee!important;border:1px solid #ffe7a366!important;color:#fff7fb!important}" +
-    "#paused .actions button.primary,#result .actions button.primary,#resume,#again{background:linear-gradient(135deg,#ff3d91,#a44ded)!important;border:1px solid #ffe6a355!important;color:#fff!important}" +
-    "#result .modal.outfitSplash45:before,#paused .modal.outfitSplash45:before{content:\"\";position:absolute;inset:0;z-index:0;pointer-events:none;border-radius:inherit;background:linear-gradient(180deg,#0d0a20f2 8%,#0d0a20d8 46%,#0d0a20f4)}" +
-    "#result .modal.outfitSplash45 > *,#paused .modal.outfitSplash45 > *{position:relative;z-index:1}";
+    "#paused .modal,#result .modal{position:relative;background:#140e24f6;opacity:1!important}" +
+    "#paused .actions button.secondary,#result .actions button.secondary,#fxToggle,#banterToggle,#retryP,#quit,#back{background:#2a1848!important;border:1px solid #f2c75d!important;color:#ffe7a3!important;box-shadow:0 0 0 1px #f2c75d55!important}" +
+    "#paused .actions button.primary,#result .actions button.primary,#resume,#again{background:linear-gradient(135deg,#ff4ea3,#c13bff)!important;border:1px solid #ffe6a3!important;color:#fff!important;box-shadow:0 0 0 1px #ffe6a366,0 8px 18px #f35aa666!important;font-weight:1000!important}" +
+    "@media(max-height:430px){#paused .modal{background:#140e24f8!important;background-image:none!important}}";
 
   var state = {
     lastChar: "",

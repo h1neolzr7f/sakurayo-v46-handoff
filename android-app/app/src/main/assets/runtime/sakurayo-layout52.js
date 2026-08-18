@@ -68,9 +68,10 @@
     "html.landscape46:not(.portraitFallback46) #result #endingTag{grid-area:hero;align-self:end;justify-self:stretch;position:relative;left:auto;top:auto;max-width:none;margin:0;text-align:center}" +
     "html.landscape46:not(.portraitFallback46) #level .levelRailArt47{background-size:auto 100%;background-position:center 12%}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .start{clip-path:none}" +
-    "#paused .actions button.secondary,#result .actions button.secondary,#fxToggle,#banterToggle,#retryP,#quit,#back{background:#1c1634ee!important;border:1px solid #ffe7a366!important;color:#fff7fb!important}" +
-    "#paused .actions button.primary,#result .actions button.primary,#resume,#again{background:linear-gradient(135deg,#ff3d91,#a44ded)!important;border:1px solid #ffe6a355!important;color:#fff!important}" +
-    "@media(max-height:430px){html.landscape46:not(.portraitFallback46) #paused .actions{grid-template-columns:1fr 1fr}html.landscape46:not(.portraitFallback46) #paused #resume{grid-column:1/-1}html.landscape46:not(.portraitFallback46) #paused .sub,html.landscape46:not(.portraitFallback46) #paused #build{max-height:72px;overflow:auto}}";
+    "#paused .modal,#result .modal{position:relative;background:#140e24f6;opacity:1!important}" +
+    "#paused .actions button.secondary,#result .actions button.secondary,#fxToggle,#banterToggle,#retryP,#quit,#back{background:#2a1848!important;border:1px solid #f2c75d!important;color:#ffe7a3!important;box-shadow:0 0 0 1px #f2c75d55!important}" +
+    "#paused .actions button.primary,#result .actions button.primary,#resume,#again{background:linear-gradient(135deg,#ff4ea3,#c13bff)!important;border:1px solid #ffe6a3!important;color:#fff!important;box-shadow:0 0 0 1px #ffe6a366,0 8px 18px #f35aa666!important}" +
+    "@media(max-height:430px){html.landscape46:not(.portraitFallback46) #paused .actions{grid-template-columns:1fr 1fr}html.landscape46:not(.portraitFallback46) #paused #resume{grid-column:1/-1}html.landscape46:not(.portraitFallback46) #paused .sub,html.landscape46:not(.portraitFallback46) #paused #build{max-height:72px;overflow:auto}html.landscape46:not(.portraitFallback46) #paused .modal{background:#140e24f8!important;background-image:none!important}}";
 
   function androidLocked() {
     var html = global.document && global.document.documentElement;

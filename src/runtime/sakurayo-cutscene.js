@@ -17,7 +17,7 @@
     var style = global.document.createElement("style");
     style.id = "sakurayo-cutscene-css";
     style.textContent =
-      "@keyframes sakurayoCutIn{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:none}}" +
+      "@keyframes sakurayoCutIn{from{transform:translateY(12px) scale(.98)}to{transform:none}}" +
       "@keyframes sakurayoKenBurns{from{transform:scale(1)}to{transform:scale(1.08)}}" +
       "@keyframes sakurayoWarnPulse{0%,100%{opacity:1;transform:translateX(-50%) scale(1)}50%{opacity:.82;transform:translateX(-50%) scale(1.04)}}" +
       "@keyframes sakurayoPhaseFlash{0%{opacity:0}18%{opacity:.72}100%{opacity:0}}" +
@@ -40,7 +40,7 @@
       "#dialogue[data-ground='mirror'] .dialogueModal{border-color:#c79bff88;box-shadow:0 0 40px #c79bff24}" +
       "#dialogue[data-kind='phase'] .dialogueModal{border-width:2px}" +
       "#dialogue[data-kind='ending'] .dialogueModal{border-color:#ffe6a488}" +
-      "#event:not(.hidden) .modal,#result:not(.hidden) .modal,#level:not(.hidden) .modal,#paused:not(.hidden) .modal{animation:sakurayoCutIn .3s ease}" +
+      "#event:not(.hidden) .modal,#result:not(.hidden) .modal,#level:not(.hidden) .modal,#paused:not(.hidden) .modal{opacity:1;animation:sakurayoCutIn .3s ease}" +
       "#warning:not(.hidden){animation:sakurayoWarnPulse .55s ease 2}" +
       "#phaseFlash44{position:fixed;inset:0;z-index:34;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 40%,#ff4ea366,#05040ecc 62%)}" +
       "#phaseFlash44.on{animation:sakurayoPhaseFlash .48s ease}" +
@@ -102,7 +102,7 @@
       "#result .actions button{min-height:38px;padding:8px 12px}" +
       "}" +
       "@media (prefers-reduced-motion:reduce){" +
-      "#dialogue:not(.hidden) .dialogueModal,#event:not(.hidden) .modal,#result:not(.hidden) .modal,#level:not(.hidden) .modal,#paused:not(.hidden) .modal,#warning:not(.hidden),#dialogue .dialogueArt,#dialoguePhase44,#phaseFlash44.on,#storyBeat44 .storyBeatBg,#storyBeat44 .storyBeatPortrait,#storyBeat44 .storyBeatCopy{animation:none}" +
+      "#dialogue:not(.hidden) .dialogueModal,#event:not(.hidden) .modal,#result:not(.hidden) .modal,#level:not(.hidden) .modal,#paused:not(.hidden) .modal,#warning:not(.hidden),#dialogue .dialogueArt,#dialoguePhase44,#phaseFlash44.on,#storyBeat44 .storyBeatBg,#storyBeat44 .storyBeatPortrait,#storyBeat44 .storyBeatCopy{animation:none;opacity:1!important}" +
       "}";
     global.document.head.appendChild(style);
   }
