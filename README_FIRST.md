@@ -16,6 +16,24 @@
 
 开发版和正式版可以同时装。**没有对玩家发正式 4.7.0。** 侧载包走本仓 Releases 预发布 `yeying-dev-v4.7.0` 的 `YeYing-Dev-v4.7.0-android.apk`。已修错误见 [docs/REGRESSION.md](docs/REGRESSION.md)。
 
+## 本机模拟器侧载（当前可下）
+
+最新开发包已挂在预发布，对应提交 `884d7c5`（含 412px 横屏热区/对比度修复）。**不要把 APK 提交进 git。**
+
+- 下载：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/yeying-dev-v4.7.0/YeYing-Dev-v4.7.0-android.apk
+- 发布页：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/yeying-dev-v4.7.0
+- SHA256：`f618362956dfd544764c1fb0866d4d28950e2460931d66cac4dcffab8da650b9`
+- 桌面名：开发版 夜樱 / 包名 `com.sakurayo.yeying.dev` / `4.7.0-yeying` / versionCode **6110**
+- Debug 签名，只给自己装。可与正式包 `com.sakurayo.zombietide` 并存，**不要卸正式包**（会清档）。
+
+```bash
+adb install -r YeYing-Dev-v4.7.0-android.apk
+adb shell settings put system user_rotation 1
+adb shell am start -n com.sakurayo.yeying.dev/com.sakurayo.zombietide.MainActivity
+```
+
+模拟器请锁横屏。存档键仍是 `sakurayoV3`。
+
 按这个顺序读：
 
 1. [README.md](README.md)
