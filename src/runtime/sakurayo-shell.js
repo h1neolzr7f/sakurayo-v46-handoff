@@ -275,7 +275,7 @@
     "#homeGreet46{display:none}" +
     "html.landscape46:not(.portraitFallback46) #homeGreet46{display:block;margin-top:4px;max-width:220px;color:#ffe7a3;font:700 10px/1.35 system-ui;letter-spacing:.04em;text-shadow:0 2px 8px #05020d;pointer-events:none}" +
     "html.landscape46.shortWindow46 #homeGreet46,html.landscape46.shortWindow46 #homePetals46{display:none!important}" +
-    "@media(max-height:430px){html.landscape46:not(.portraitFallback46) #homeGreet46,html.landscape46:not(.portraitFallback46) #homeBanner46,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46{display:none!important}}" +
+    "@media(max-height:430px){html.landscape46:not(.portraitFallback46) #homeGreet46{display:none!important}html.landscape46:not(.portraitFallback46) #homeBanner46,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46{display:none!important}}" +
     ".shellDrawer46:not(.hidden),.drawer.wishDrawer46:not(.hidden){animation:shellIn46 .28s ease}" +
     ".shellFloat46{position:fixed;left:50%;top:30%;z-index:90;color:#f2c75d;font:900 22px/1 system-ui;letter-spacing:.08em;pointer-events:none;text-shadow:0 0 16px #f2c75d88;animation:shellFloat46 .9s ease forwards}" +
     ".homeChip46.pop46 b,.homeChip46.pop46,#coins.pop46{animation:chipPop46 .28s ease}" +
