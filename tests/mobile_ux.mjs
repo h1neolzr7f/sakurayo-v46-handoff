@@ -92,7 +92,7 @@ assert.match(lobby.clip, /none/);
 assert.equal(lobby.deckPe, "none");
 assert.equal(lobby.startPe, "auto");
 assert.equal(lobby.greetDisplay, "none");
-assert.equal(lobby.passDisplay, "none");
+assert.ok(lobby.passDisplay === "none" || lobby.passDisplay === "missing");
 assert.equal(lobby.bannerDisplay, "none", "412px 高须藏左下寻访条，避免和左栏底栏抢位");
 assert.equal(lobby.calendarHidden, true);
 assert.ok(

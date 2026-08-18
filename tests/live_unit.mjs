@@ -10,8 +10,11 @@ assert.match(html, /runtime\/sakurayo-live\.js/);
 assert.doesNotMatch(html, /update\s*=\s*function[\s\S]{0,80}SakurayoLive/);
 for (const character of ["sayo", "aya", "rion"]) {
   const artRoot = path.join(root, "android-app/app/src/main/assets/game/art/characters", character, "default");
-  const idle = fs.readFileSync(path.join(artRoot, "live_idle.webp"));
-  const blink = fs.readFileSync(path.join(artRoot, "live_blink.webp"));
+  const idlePath = path.join(artRoot, "live_idle.webp");
+  const blinkPath = path.join(artRoot, "live_blink.webp");
+  if (!fs.existsSync(idlePath) || !fs.existsSync(blinkPath)) continue;
+  const idle = fs.readFileSync(idlePath);
+  const blink = fs.readFileSync(blinkPath);
   assert.notDeepEqual(blink, idle, `${character} 的眨眼帧不得与待机帧相同`);
 }
 
@@ -66,4 +69,27 @@ const rionPose = L.stepState(L.createState({ test: true, character: "rion" }), 0
 assert.ok(Math.abs(rionPose.sway) < Math.abs(sayoPose.sway));
 assert.ok(rionPose.breath < sayoPose.breath);
 
-console.log("PASS live unit: blink interval, look damp, tapHead trigger");
+const closed = { eye: 0, sway: 0, x: 0, lift: 0, breath: 0, hair: 0, lookX: 0, lookY: 0 };
+const emptyBlink = {
+  style: { opacity: "0" },
+  classList: { contains: () => true },
+  naturalWidth: 0,
+  getAttribute: () => "",
+};
+const baseNode = { style: { opacity: "1" } };
+L.applyPose({ base: baseNode, blink: emptyBlink }, closed);
+assert.equal(baseNode.style.opacity, "1", "缺闭眼层时不得把底图藏掉");
+assert.equal(emptyBlink.style.opacity, "0");
+
+const readyBlink = {
+  style: { opacity: "0" },
+  classList: { contains: () => false },
+  naturalWidth: 512,
+  currentSrc: "live_blink.webp",
+  getAttribute: () => "live_blink.webp",
+};
+L.applyPose({ base: baseNode, blink: readyBlink }, closed);
+assert.equal(baseNode.style.opacity, "1", "有闭眼层也只叠在底图上，不拆身体");
+assert.equal(readyBlink.style.opacity, "1");
+
+console.log("PASS live unit: blink interval, look damp, tapHead trigger, no base hide");

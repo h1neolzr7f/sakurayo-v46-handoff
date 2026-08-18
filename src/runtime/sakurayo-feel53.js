@@ -24,12 +24,11 @@
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46.speak53 b{font-size:12px;letter-spacing:.08em}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46.speak53 small{margin-top:2px;color:#ffe7a3;font:700 9px/1.2 system-ui}" +
     "@media(max-height:430px){html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46.speak53{display:none!important}}" +
-    "#menu.swap53 .heroLive46 img,#menu .heroLive46.swap53 img{animation:swapFade53 .62s ease}" +
+    "#menu.swap53 .heroLive46 img,#menu .heroLive46.swap53 img{animation:none}" +
     "#menu .profile.swap53{box-shadow:0 0 0 1px var(--swapAccent53,#f35aa0),0 0 18px var(--swapAccent53,#f35aa0)}" +
     "#start.swap53{box-shadow:0 0 0 1px var(--swapAccent53,#f2c75d),0 0 22px var(--swapAccent53,#f35aa0)}" +
-    "#start .pass53{display:inline;margin:0 0 0 8px;color:var(--swapAccent53,#ffe7a3);font:800 9px/1 system-ui;letter-spacing:.16em}" +
-    "@media(max-height:430px){#start .pass53{display:none!important}}" +
-    "@keyframes swapFade53{0%{opacity:.28;filter:saturate(.7)}40%{opacity:1}100%{opacity:1}}" +
+    "#start .pass53{display:none!important}" +
+    "@keyframes swapFade53{0%,100%{opacity:1}}" +
     "@media(prefers-reduced-motion:reduce){#menu.swap53 .heroLive46 img,#menu .heroLive46.swap53 img{animation:none}}" +
     "html.landscape46:not(.portraitFallback46) #banter:not(.live53){opacity:0!important;pointer-events:none!important;transform:translate(-50%,10px)!important}" +
     "html.landscape46:not(.portraitFallback46) #banter.live53{opacity:1;transform:translate(-50%,0)!important}" +
@@ -38,6 +37,7 @@
     "#resultHook53:empty{display:none}" +
     "html.landscape46:not(.portraitFallback46) #resultHook53{grid-area:title;justify-self:end;align-self:start;margin:0;max-width:42%;z-index:3}" +
     "#" + BADGE_ID + "{position:fixed;z-index:40;left:max(8px,env(safe-area-inset-left));top:max(8px,env(safe-area-inset-top));padding:4px 10px;border-radius:999px;border:1px solid #f2c75d88;background:#120e27ee;color:#ffe7a3;font:800 10px/1 system-ui;letter-spacing:.14em;pointer-events:none}" +
+    "html.shortWindow46 #" + BADGE_ID + ",body:has(#hud:not(.hidden)) #" + BADGE_ID + "{display:none!important}" +
     "#paused .modal,#result .modal{position:relative;background:#140e24f6;opacity:1!important}" +
     "#paused .actions button.secondary,#result .actions button.secondary,#fxToggle,#banterToggle,#retryP,#quit,#back,#reroll,.revealSkip46,.revealAgain46{background:#2a1848!important;border:1px solid #f2c75d!important;color:#ffe7a3!important;box-shadow:0 0 0 1px #f2c75d55!important}" +
     "#paused .actions button.primary,#result .actions button.primary,#resume,#again,.revealTake46{background:linear-gradient(135deg,#ff4ea3,#c13bff)!important;border:1px solid #ffe6a3!important;color:#fff!important;box-shadow:0 0 0 1px #ffe6a366,0 8px 18px #f35aa666!important;font-weight:1000!important}" +
@@ -137,24 +137,13 @@
   }
 
   function applyPassword(id) {
-    if (applyPassword.busy) return identOf(id).password;
-    applyPassword.busy = true;
-    try {
-      var start = $("start");
-      if (!start) return "";
-      var ident = identOf(id);
-      var next = "口令 · " + ident.password;
-      var chip = start.querySelector ? start.querySelector(".pass53") : null;
-      if (!chip && doc()) {
-        chip = doc().createElement("em");
-        chip.className = "pass53";
-        start.appendChild(chip);
-      }
-      if (chip && chip.textContent !== next) chip.textContent = next;
-      return ident.password;
-    } finally {
-      applyPassword.busy = false;
+    var ident = identOf(id);
+    var start = $("start");
+    if (start && start.querySelector) {
+      var chip = start.querySelector(".pass53");
+      if (chip && chip.parentNode) chip.parentNode.removeChild(chip);
     }
+    return ident.password;
   }
 
   function pluckTone(id) {
@@ -186,11 +175,9 @@
   function applySwap(id, opts) {
     var ident = identOf(id);
     var d = doc();
-    var menu = $("menu");
-    var live = $("heroLive46") || (d && d.querySelector ? d.querySelector(".heroLive46") : null);
     var profile = d && d.querySelector ? d.querySelector("#menu .profile") : null;
     var start = $("start");
-    var nodes = [menu, live, profile, start].filter(Boolean);
+    var nodes = [profile, start].filter(Boolean);
     nodes.forEach(function (node) {
       node.classList.add("swap53");
       if (node.style) node.style.setProperty("--swapAccent53", ident.color);
@@ -298,22 +285,7 @@
       });
     }
 
-    var start = $("start");
-    if (start) {
-      observe(start, { childList: true }, function () {
-        if (applyPassword.busy) return;
-        applyPassword.pulse47 = (applyPassword.pulse47 || 0) + 1;
-        if (applyPassword.pulse47 > 6) return;
-        applyPassword(detectChar());
-        if (global.requestAnimationFrame && !applyPassword.reset47) {
-          applyPassword.reset47 = true;
-          global.requestAnimationFrame(function () {
-            applyPassword.pulse47 = 0;
-            applyPassword.reset47 = false;
-          });
-        }
-      });
-    }
+    applyPassword(detectChar());
 
     var banter = $("banter");
     if (banter) {

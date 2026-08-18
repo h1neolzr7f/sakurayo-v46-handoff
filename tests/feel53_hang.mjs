@@ -20,7 +20,7 @@ const first = await page.evaluate(() => ({
   ticks: window.__feel53Probe.ticks,
 }));
 assert.equal(first.feel, true, "feel53 should install");
-assert.match(first.chip, /樱花/);
+assert.equal(first.chip, "");
 
 await page.evaluate(() => {
   for (let i = 0; i < 40; i++) window.SakurayoFeel53.applyPassword("sayo");
@@ -32,8 +32,8 @@ const after = await page.evaluate(() => ({
   chip: (document.querySelector("#start .pass53") || {}).textContent || "",
   responsive: document.title,
 }));
-assert.ok(after.ticks > 8, "main thread must keep ticking after password observer");
-assert.match(after.chip, /樱花/);
+assert.ok(after.ticks > 8, "main thread must keep ticking after password calls");
+assert.equal(after.chip, "");
 await page.screenshot({ path: path.join(out, "lobby.png") });
 await browser.close();
 console.log("feel53 hang probe ok", after);

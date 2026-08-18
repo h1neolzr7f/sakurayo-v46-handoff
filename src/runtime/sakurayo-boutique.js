@@ -101,10 +101,12 @@
     "html.landscape46:not(.portraitFallback46) #shopDrawer .shopItem40{overflow:hidden;border-radius:16px;border:1px solid #f35aa644;box-shadow:0 10px 22px #05020d55}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer .shopChip46 i{display:grid;place-items:center;width:16px;height:16px;font-size:0}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer .shopChip46 i svg{width:14px;height:14px}" +
-    "html.shortWindow46 #shopFeatured46 .shopSkin46{grid-template-columns:84px 1fr minmax(110px,24%);min-height:96px;max-height:104px}" +
-    "html.shortWindow46 #shopFeatured46 .shopSkinPrev46,html.shortWindow46 #shopDrawer .skinPreview{height:96px!important}" +
-    "html.shortWindow46 #shopFeatured46 .shellHint46,html.shortWindow46 .shopRunway46{display:none}" +
-    "html.shortWindow46 #shopList [data-shop-group=skins]{grid-template-columns:repeat(2,minmax(0,1fr))!important}";
+    "html.shortWindow46 #shopFeatured46 .shopSkin46{grid-template-columns:84px 1fr minmax(110px,24%);min-height:80px;max-height:88px;margin:0 0 8px}" +
+    "html.shortWindow46 #shopFeatured46 .shopSkinPrev46,html.shortWindow46 #shopDrawer .skinPreview{height:88px!important}" +
+    "html.shortWindow46 #shopFeatured46 .shellHint46,html.shortWindow46 .shopRunway46,html.shortWindow46 .shopSub46,html.shortWindow46 #shopFeatured46 .shopSkin46 p,html.shortWindow46 #shopFeatured46 .shopSkin46 .skinBias,html.shortWindow46 #shopFeatured46 .shopSkin46 .shopPitch46{display:none!important}" +
+    "html.landscape46.shortWindow46:not(.portraitFallback46) #shopDrawer.isBoutique46 #shopList [data-shop-group=skins]{display:none!important}" +
+    "html.shortWindow46 #shopList .shopTabs40{display:flex!important;flex-wrap:wrap;gap:6px;margin:0 0 8px}" +
+    "html.shortWindow46 #shopList .shopTabs40 button{min-height:36px;padding:6px 10px}";
 
   function $$(sel, root) {
     var doc = root || global.document;
@@ -276,7 +278,7 @@
       hint.className = "shellHint46";
       shelf.appendChild(hint);
     }
-    hint.textContent = "衣装只改外观 · 核心/道具写入存档 · 不出售永久伤害";
+    hint.textContent = "橱窗改外观倾向 · 补给柜加伤害 · 寻访叠层火力";
     var counter = list.querySelector("#shopCounter46");
     if (!counter) {
       counter = global.document.createElement("section");
@@ -320,7 +322,7 @@
     }
     next.innerHTML =
       '<button type="button" data-shop-rail="boutique"><i class="shopRailIco46">' + ICO.boutique + "</i><span>橱窗<small>全套上架</small></span></button>" +
-      '<button type="button" data-shop-rail="supplies"><i class="shopRailIco46">' + ICO.supplies + "</i><span>补给柜<small>核心道具</small></span></button>" +
+      '<button type="button" data-shop-rail="supplies"><i class="shopRailIco46">' + ICO.supplies + "</i><span>补给柜<small>核心加伤</small></span></button>" +
       '<button type="button" data-shop-rail="exchange"><i class="shopRailIco46">' + ICO.exchange + "</i><span>兑换<small>货币柜台</small></span></button>";
     next.onclick = function (ev) {
       var btn = ev.target.closest ? ev.target.closest("[data-shop-rail]") : null;

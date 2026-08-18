@@ -219,8 +219,7 @@ try {
   await page.locator("#careerSearch37").fill("");
   await shot(page, "01b-ascension-art.png");
   await page.locator("#ascDrawer .close").click();
-  await page.locator('[data-open="archive"]').click();
-  await page.locator('[data-open="ach"]').click();
+  await page.locator('[data-home="ach"]').click();
   await page.waitForFunction(() => {
     const image = document.querySelector("#achList .achievementMaster35 img");
     return image?.complete && image.naturalWidth > 0;
@@ -370,7 +369,7 @@ try {
   assert.equal(await page.locator("#analyticsDrawer37").isVisible(), true);
   assert.match(await page.locator("#analyticsText37").inputValue(), /"version": "4.7.0"/);
   await page.locator("#analyticsDrawer37 .close").click();
-  await page.locator("#settingsButton37").click();
+  await page.locator('[data-home="settings"]').click();
   assert.equal(await page.locator("#settingsDrawer37").isVisible(), true);
   assert.equal(await page.locator("#settingsBody37 input[type=range]").count(), 3);
   assert.equal(await page.locator("#settingsBody37 [data-toggle]").count(), 2);

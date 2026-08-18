@@ -8,9 +8,12 @@
     "#menu,#menu.homeDock46,#menu.homeDock46 .menu{pointer-events:auto!important}" +
     "#menu.homeDock46 button,#menu.homeDock46 .charCard,#menu.homeDock46 .homeNav46,#menu.homeDock46 .homeRail46,#menu.homeDock46 .homeBanner46,#menu.homeDock46 .charSelectPanel,#menu.homeDock46 .start,#menu.homeDock46 .homeModes46,#menu.homeDock46 .profile,#menu.homeDock46 .coins,#menu.homeDock46 .homeCoinPlus46,#menu.homeDock46 .heroTap46,.drawer button,.drawer .close,.choice,#pause,#dash,#skill,#resume,#back,#opsDock46,#opsDock46 button{pointer-events:auto!important;touch-action:manipulation!important}" +
     "#menu.homeDock46 .homeDeck46{pointer-events:none!important}" +
-    "#menu.homeDock46 .homeDeck46 .stageMini{pointer-events:none!important}" +
-    "#menu.homeDock46 .homeDeck46 .homeModes46 button,#menu.homeDock46 .homeDeck46 #start,#menu.homeDock46 .homeDeck46 button{pointer-events:auto!important}" +
-    "#menu.homeDock46 .calmUtility39,#menu.homeDock46 #moreButton39,#menu.homeDock46 #statsButton37,#menu.homeDock46 #settingsButton37,#menu.homeDock46 #guideButton37,#menu.homeDock46 #saveButton38{position:relative;z-index:16!important;pointer-events:auto!important}" +
+    "#menu.homeDock46 .homeDeck46 .stageMini,#menu.homeDock46 .homeDeck46 .homeModes46,#menu.homeDock46 .homeDeck46 .homeModes46 button,#menu.homeDock46 .homeDeck46 #start,#menu.homeDock46 .homeDeck46 button{pointer-events:auto!important;touch-action:manipulation!important}" +
+    "#menu.homeDock46 .homeDeck46 .stageMini{cursor:pointer}" +
+    "#menu.homeDock46 .calmUtility39:not(.open39),#menu.homeDock46 #moreButton39,#menu.homeDock46 #statsButton37,#menu.homeDock46 #settingsButton37,#menu.homeDock46 #guideButton37,#menu.homeDock46 #saveButton38{position:relative;z-index:16!important;pointer-events:auto!important}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .calmUtility39.open39{position:fixed!important;top:max(52px,calc(env(safe-area-inset-top) + 44px))!important;right:max(12px,env(safe-area-inset-right))!important;bottom:auto!important;left:auto!important;z-index:42!important;width:min(74vw,280px)!important;max-height:min(68vh,280px)!important;overflow:auto!important;padding:8px!important;border-radius:14px!important;background:#120e27f8!important;border:1px solid #f2c75d66!important;box-shadow:0 16px 36px #05020de8!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .calmUtility39.open39>#moreButton39{grid-column:1/-1!important;position:relative!important;z-index:43!important}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46:has(.calmUtility39.open39)::before{content:\"\";position:fixed;inset:0;z-index:34;background:#05020d99;pointer-events:none}" +
     "#menu.homeDock46 .heroLive46,#menu.homeDock46 .heroLiveBreath46,#menu.homeDock46 .bg,#yeyingDevBadge53{pointer-events:none!important}" +
     "html.landscape46 #menu.homeDock46 .top,html.androidLandscape46 #menu.homeDock46 .top{height:52px!important;max-height:52px!important;overflow:visible!important;z-index:10!important;pointer-events:none!important}" +
     "html.landscape46 #menu.homeDock46 .top .profile,html.landscape46 #menu.homeDock46 .top .coins,html.landscape46 #menu.homeDock46 .top button,html.landscape46 #menu.homeDock46 .top .charSelectPanel,html.landscape46 #menu.homeDock46 .top #homeWallet46,html.landscape46 #menu.homeDock46 .top #homeQuick46,html.androidLandscape46 #menu.homeDock46 .top .profile,html.androidLandscape46 #menu.homeDock46 .top .coins,html.androidLandscape46 #menu.homeDock46 .top button,html.androidLandscape46 #menu.homeDock46 .top .charSelectPanel,html.androidLandscape46 #menu.homeDock46 .top #homeWallet46,html.androidLandscape46 #menu.homeDock46 .top #homeQuick46{pointer-events:auto!important}" +
@@ -27,7 +30,7 @@
   var CSS =
     HIT_CSS +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .menuBrand35{display:none!important}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .heroLive46{width:42%;max-width:46%;top:0;bottom:108px!important;z-index:1;pointer-events:none!important;-webkit-mask-image:linear-gradient(to right,#000 0%,#000 70%,transparent 100%),linear-gradient(to top,transparent 0%,#000 10%,#000 100%);mask-image:linear-gradient(to right,#000 0%,#000 70%,transparent 100%),linear-gradient(to top,transparent 0%,#000 10%,#000 100%);-webkit-mask-composite:source-in;mask-composite:intersect}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .heroLive46{width:42%;max-width:46%;top:48px;bottom:108px!important;z-index:1;pointer-events:none!important;-webkit-mask-image:linear-gradient(to right,#000 0%,#000 78%,transparent 100%),linear-gradient(to top,transparent 0%,#000 8%,#000 100%);mask-image:linear-gradient(to right,#000 0%,#000 78%,transparent 100%),linear-gradient(to top,transparent 0%,#000 8%,#000 100%);-webkit-mask-composite:source-in;mask-composite:intersect}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .heroLiveBreath46{width:min(40vw,420px);height:100%}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .heroLiveBreath46 img{object-fit:contain;object-position:center 10%}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .top{align-items:center}" +
@@ -52,16 +55,35 @@
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46{z-index:12}" +
     "@media(max-height:430px){html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46.speak53{display:none!important}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeRail46{bottom:max(78px,calc(env(safe-area-inset-bottom) + 68px))}}" +
     "@media(max-height:370px){html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46{bottom:max(80px,calc(env(safe-area-inset-bottom) + 70px));gap:4px;overflow:hidden}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini{min-height:48px;padding:6px 10px}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini p,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeStageProg46{display:none!important}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeModes46 button{min-height:36px;padding:4px 8px}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeModes46 button small{display:none}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .start{min-height:40px;flex:0 0 40px}}" +
-    "html.landscape46.shortWindow46 #menu.homeDock46 .heroLive46{width:40%;bottom:88px!important}" +
+    "html.landscape46.shortWindow46 #menu.homeDock46 .heroLive46{width:44%;top:44px!important;bottom:80px!important}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .top .charSelectPanel{position:static!important;left:auto!important;top:auto!important;margin:0 6px 0 auto}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .homeDeck46{bottom:max(88px,calc(env(safe-area-inset-bottom) + 78px))}" +
-    "html.landscape46:not(.portraitFallback46) #hud .hero{max-width:220px}" +
-    "html.landscape46:not(.portraitFallback46) #hud .rinfo{display:none}" +
-    "html.landscape46:not(.portraitFallback46) #hud .wave{left:auto;right:max(168px,calc(env(safe-area-inset-right) + 156px));transform:none;width:min(200px,22vw)}" +
-    "html.landscape46:not(.portraitFallback46) #hud .mission{left:auto;right:max(168px,calc(env(safe-area-inset-right) + 156px));transform:none;max-width:min(220px,24vw)}" +
+    "html.landscape46:not(.portraitFallback46) #hud .hero{max-width:188px}" +
+    "html.shortWindow46 #hud .hero{max-width:168px;padding:2px 8px 2px 2px}" +
+    "html.shortWindow46 #hud .hero img{width:28px;height:28px}" +
+    "html.shortWindow46 #hud .bar{height:6px}" +
+    "html.landscape46:not(.portraitFallback46) #hud .rinfo,html.shortWindow46 #hud .rinfo,html.landscape46:not(.portraitFallback46) #hud .wave,html.shortWindow46 #hud .wave,html.shortWindow46 .aimTip36,html.shortWindow46 #hud .perf,html.shortWindow46 #combo:not(.on51){display:none!important}" +
+    "html.shortWindow46 #hud .mission,html.shortWindow46 #mission{display:none!important}" +
+    "html.shortWindow46 #banter,html.shortWindow46 .banter,html.shortWindow46 #toast{display:none!important}" +
+    "html.shortWindow46 #shopDrawer>.dhead p,html.shortWindow46 .shopSub46,html.shortWindow46 .shopPitch46,html.shortWindow46 .shopRunway46,html.shortWindow46 #shopWallet44,html.shortWindow46 #shopFeatured46 .shellHint46{display:none!important}" +
+    "html.shortWindow46 #shopFeatured46 .shopSkin46 p,html.shortWindow46 #shopFeatured46 .shopSkin46 .skinBias,html.shortWindow46 #shopDrawer .skinCard p,html.shortWindow46 #shopDrawer .skinBias{display:none!important}" +
+    "html.landscape46.shortWindow46:not(.portraitFallback46) #shopDrawer.isBoutique46 #shopList [data-shop-group=skins]{display:none!important}" +
+    "html.shortWindow46 #shopList .shopTabs40{display:flex!important;flex-wrap:wrap;gap:6px}" +
+    "html.shortWindow46 #shopList .shopTabs40 button{min-height:36px;padding:6px 10px}" +
+    "html.shortWindow46 #shopDrawer>.dbody{max-height:calc(100dvh - 52px);overflow:auto}" +
+    "html.shortWindow46 #shopList{max-height:calc(100dvh - 60px);overflow:auto}" +
+    "html.shortWindow46 .shopRail46 button{min-height:44px!important;padding:6px 8px!important}" +
+    "html.shortWindow46 .shopRail46 button small{display:none!important}" +
+    "html.shortWindow46 #shopFeatured46 .shopSkin46{min-height:80px!important;max-height:88px!important;margin:0 0 8px!important}" +
+    "html.shortWindow46 #shopFeatured46 .shopHeroKicker46{top:6px;left:6px;padding:3px 8px;font-size:9px}" +
+    "html.shortWindow46 .bossRule39{top:max(48px,calc(env(safe-area-inset-top) + 40px));font-size:10px;max-width:min(42vw,320px);z-index:18;background:#090716f2;border:1px solid #ff72b5aa;color:#fff}" +
+    "body:has(#dialogue:not(.hidden)) #bossRule39,body:has(#level:not(.hidden)) #bossRule39,body:has(#paused:not(.hidden)) #bossRule39{opacity:0!important}" +
+    "#level .choice .chromeOn46,#level .choice .dots{display:none!important}" +
+    "#result #damageReport,#result #damageReport .routeNote,#result #rstats,#result #rsub,#result #routeNote{color:#fff4e4!important}" +
+    "#result #damageReport h3,#result #rstats b{color:#ffe7a3!important}" +
     "html.landscape46:not(.portraitFallback46) #hud .perf{right:58px}" +
     "html.landscape46:not(.portraitFallback46) #combo.on51{top:max(52px,calc(env(safe-area-inset-top) + 44px));right:14px}" +
-    "html.landscape46:not(.portraitFallback46) .banter,html.landscape46:not(.portraitFallback46) #banter{width:min(32vw,292px)!important;padding:4px 12px!important;bottom:max(14px,env(safe-area-inset-bottom))!important}" +
+    "html.landscape46:not(.portraitFallback46) .banter,html.landscape46:not(.portraitFallback46) #banter{width:min(28vw,240px)!important;padding:3px 10px!important;bottom:max(10px,env(safe-area-inset-bottom))!important;font-size:9px!important;max-height:40px;overflow:hidden}" +
     "html.landscape46:not(.portraitFallback46) #result.sceneOn47 .modal{grid-template-columns:128px minmax(200px,.9fr) minmax(240px,1.25fr);grid-template-areas:'hero title report' 'hero summary report' 'hero stats route' 'actions actions actions'}" +
     "html.landscape46:not(.portraitFallback46) #result .resultHero47{grid-area:hero;position:relative;left:auto;right:auto;top:auto;bottom:auto;width:100%;height:100%;min-height:168px;background-position:center 12%;background-size:auto 100%}" +
     "html.landscape46:not(.portraitFallback46) #result .resultIcon{grid-area:title;justify-self:start;align-self:end;margin:0 8px 0 0;font-size:20px}" +
@@ -69,7 +91,9 @@
     "html.landscape46:not(.portraitFallback46) #result #rtitle{padding-left:64px}" +
     "html.landscape46:not(.portraitFallback46) #result #endingTag{grid-area:hero;align-self:end;justify-self:stretch;position:relative;left:auto;top:auto;max-width:none;margin:0;text-align:center}" +
     "html.landscape46:not(.portraitFallback46) #level .levelRailArt47{background-size:auto 100%;background-position:center 12%}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .start{clip-path:none}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 #start,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .start{clip-path:none!important;border-radius:8px!important;overflow:visible!important}" +
+    "html.landscape46:not(.portraitFallback46) #gachaPull1,html.landscape46:not(.portraitFallback46) #gachaPull10,.revealTake46,.revealSkip46,.revealAgain46,#shopDrawer .close,#shopDrawer button,#result .actions button,#again,#back{clip-path:none!important;border-radius:10px!important}" +
+    "html.shortWindow46 #shopDrawer .close,html.shortWindow46 .revealTake46,html.shortWindow46 .revealSkip46,html.shortWindow46 .revealAgain46,html.shortWindow46 #result .actions button,#again,#back{min-height:44px!important}" +
     "#paused .modal,#result .modal{position:relative;background:#140e24f6;opacity:1!important}" +
     "#paused .actions button.secondary,#result .actions button.secondary,#fxToggle,#banterToggle,#retryP,#quit,#back,#reroll,.revealSkip46,.revealAgain46,.eventChoice{background:#2a1848!important;border:1px solid #f2c75d!important;color:#ffe7a3!important;box-shadow:0 0 0 1px #f2c75d55!important}" +
     "#paused .actions button.primary,#result .actions button.primary,#resume,#again,.revealTake46{background:linear-gradient(135deg,#ff4ea3,#c13bff)!important;border:1px solid #ffe6a3!important;color:#fff!important;box-shadow:0 0 0 1px #ffe6a366,0 8px 18px #f35aa666!important}" +
@@ -96,10 +120,16 @@
     "html.landscape46:not(.portraitFallback46) #stageDrawer.stageShell46 .stageCard button{clip-path:none!important;border-radius:10px!important}" +
     "html.landscape46:not(.portraitFallback46) #hud .perf{display:none!important}" +
     "html.landscape46:not(.portraitFallback46) #combo:not(.on51){opacity:0;pointer-events:none}" +
-    "html.landscape46:not(.portraitFallback46) #hud .mission{max-height:22px;overflow:hidden}" +
+    "html.landscape46:not(.portraitFallback46) #hud .mission{display:none!important}" +
     "body:has(#level:not(.hidden)) #banter,body:has(#paused:not(.hidden)) #banter,body:has(#result:not(.hidden)) #banter,body:has(#event:not(.hidden)) #banter,body:has(#dialogue:not(.hidden)) #banter{opacity:0!important;pointer-events:none!important;visibility:hidden!important}" +
     "#bootArt35.gone{display:none!important;visibility:hidden!important;opacity:0!important}" +
-    "}";
+    "}" +
+    "#tutorialDrawer37.drawer:not(.hidden){z-index:56!important;background:#080713!important}" +
+    "#tutorialDrawer37 .dhead,#tutorialDrawer37 .dbody{position:relative;z-index:1;background:#080713}" +
+    "#tutorialDrawer37 .dhead h2{background:transparent;text-shadow:none}" +
+    "html.shortWindow46 #tutorialDrawer37 .dbody{max-height:calc(100dvh - 64px);overflow:auto}" +
+    "html.shortWindow46 #tutorialNext37,html.shortWindow46 #tutorialSkip37{min-height:44px}" +
+    "html.shortWindow46 #tutorialSkip37{background:#2a1848!important;border:1px solid #f2c75d!important;color:#ffe7a3!important}";
 
   function androidLocked() {
     var html = global.document && global.document.documentElement;

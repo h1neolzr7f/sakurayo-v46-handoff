@@ -85,7 +85,8 @@
       "#dialogueChapter{margin-bottom:6px}" +
       "#dialogue .speaker{align-self:flex-start}" +
       "#dialogue .dialogueText{min-height:3.2em;margin-top:9px;font-size:clamp(12px,1.8vw,15px);line-height:1.65}" +
-      "#dialogue .dialogueHint{margin-top:12px}" +
+      "#dialogue .dialogueHint{margin-top:10px;color:#ffe7a3;font:800 13px/1.2 system-ui;letter-spacing:.16em;opacity:1;text-shadow:0 1px 8px #05020d}" +
+      "html.shortWindow46 #dialogue .dialogueHint{min-height:28px;font-size:13px}" +
       "#dialoguePhase44{margin-bottom:9px}" +
       "#banter{left:220px!important;right:220px!important;top:auto!important;bottom:max(10px,env(safe-area-inset-bottom))!important;width:auto!important;max-width:none!important;padding:8px 11px;transform:none!important}" +
       "#result .modal{position:relative;display:grid;grid-template-columns:112px minmax(220px,.9fr) minmax(280px,1.25fr);grid-template-rows:auto auto 1fr auto;grid-template-areas:'rank title report' 'rank summary report' 'stats stats route' 'actions actions actions';column-gap:14px;row-gap:7px;width:min(96vw,920px);height:min(94vh,404px);max-height:404px;padding:14px 16px;overflow:hidden;text-align:left}" +

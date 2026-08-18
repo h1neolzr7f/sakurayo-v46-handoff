@@ -315,5 +315,6 @@ V.dressArchive(archiveHost);
 const storyBtn = archiveHost.children.find((n) => n.getAttribute("data-open") === "story");
 assert.match(storyBtn.innerHTML, /<b>剧情档案<\/b><small>四章证词<\/small>/);
 assert.match(archiveHost.children[0].innerHTML, /永久天赋/);
+assert.equal(archiveHost.children.find((n) => n.getAttribute("data-open") === "ach"), undefined);
 
 console.log("PASS lobby unit: rates, default two cards, pity, ten-pull, cheat taps, stage modes");

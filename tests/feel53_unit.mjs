@@ -38,15 +38,16 @@ assert.match(gradle, /applicationId "com\.sakurayo\.yeying\.dev"/);
 assert.doesNotMatch(gradle, /applicationId "com\.sakurayo\.zombietide"/);
 assert.match(gradle, /versionName "4\.7\.0-yeying"/);
 assert.match(gradle, /versionCode 6110/);
-assert.match(code, /chip\.textContent !== next/);
+assert.match(code, /#start \.pass53\{display:none!important\}/);
+assert.match(code, /var nodes = \[profile, start\]/);
+assert.doesNotMatch(code, /swapFade53 \.62s/);
 assert.match(code, /startRadio\.busy/);
-assert.match(code, /@media\(max-height:430px\)\{#start \.pass53\{display:none!important\}\}/);
 assert.match(code, /#back,#reroll,\.revealSkip46.*background:#2a1848!important/);
 assert.match(code, /#reroll,\.revealSkip46/);
 assert.match(code, /@media\(max-height:430px\)\{html\.landscape46:not\(\.portraitFallback46\) #menu\.homeDock46 \.homeBanner46\.speak53/);
 assert.match(code, /#paused \.modal\{background:#140e24f8!important;background-image:none!important\}/);
 assert.match(code, /banterHidden && !nowHidden/);
-assert.match(code, /observe\(start, \{ childList: true \}/);
+assert.doesNotMatch(code, /observe\(start, \{ childList: true \}/);
 assert.doesNotMatch(code, /characterData: true/);
 assert.match(strings, /开发版 夜樱/);
 
@@ -87,6 +88,11 @@ function el(id, tag) {
     appendChild(child) {
       child.parentNode = this;
       this.children.push(child);
+      return child;
+    },
+    removeChild(child) {
+      this.children = this.children.filter((c) => c !== child);
+      if (child) child.parentNode = null;
       return child;
     },
     insertBefore(child, _ref) {
@@ -166,7 +172,11 @@ const swap = F.applySwap("aya", { pluck: false });
 assert.equal(swap.id, "aya");
 assert.equal(swap.password, "双月");
 assert.equal(swap.color, "#62eaff");
+const leftoverChip = el("", "em");
+leftoverChip.className = "pass53";
+nodes.start.appendChild(leftoverChip);
 assert.equal(F.applyPassword("rion"), "黄泉");
+assert.equal(nodes.start.children.length, 0);
 
 const radio = F.startRadio(el("banter"));
 assert.equal(radio.ok, true);
