@@ -7081,7 +7081,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       buyMainGodLock46(id){return {bought:buyMainGodLock46(id),snapshot:snapshot35()};},
       grantMainGodShards46(n=1){const c=ensureMainGodCore46();c.shards+=Math.max(0,Math.floor(Number(n)||0));persist();return snapshot35();},
       mainGodCore46(){return JSON.parse(JSON.stringify(ensureMainGodCore46()));},
-      openMainGodShop36(){openMainGodShop36();return {visible:!$("#mainGodDrawer36").classList.contains("hidden"),hall:$("#mainGodDrawer36").classList.contains("mgHall46"),hero:!!$("#mgHero46"),cards:document.querySelectorAll("#mainGodShopList36 .exchangeCard36").length,core:document.querySelectorAll("#mainGodShopList36 .coreCard46").length,tabs:[...document.querySelectorAll("#mainGodTabs38 button")].map(b=>b.textContent)};},
+      openMainGodShop36(){openMainGodShop36();return {visible:!$("#mainGodDrawer36").classList.contains("hidden"),hall:$("#mainGodDrawer36").classList.contains("mgHall46"),hero:!!$("#mgHero46"),cards:document.querySelectorAll("#mainGodShopList36 .exchangeCard36").length,core:document.querySelectorAll("#mainGodShopList36 .coreCard46").length,tabs:[...document.querySelectorAll("#mainGodTabs38 button")].map(b=>b.textContent),art:MAIN_GOD_ART46.length,icons:document.querySelectorAll("#mainGodShopList36 .ei img, #mgHero46 img").length,nextBoss:$("#mgHero46 small")?.textContent||""};},
+      mainGodArt46(){return MAIN_GOD_ART46.slice();},
       mainGodBoss46(){return mainGodBossSnap46();},
       pickMainGodBossType46(clears=0,tier=1,depth=1){return pickMainGodBossType46(clears,tier,depth);},
       currentMainGodBossType46(){return currentMainGodBossType46();},
@@ -7990,6 +7991,37 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     ctx.restore();
     return true;
   }
+  const MAIN_GOD_ART_ROOT46="content-packs/maingod-void";
+  const MAIN_GOD_ART46=[
+    `${MAIN_GOD_ART_ROOT46}/fx/pillar.webp`,`${MAIN_GOD_ART_ROOT46}/fx/rift.webp`,`${MAIN_GOD_ART_ROOT46}/fx/mirror.webp`,`${MAIN_GOD_ART_ROOT46}/fx/ward.webp`,
+    `${MAIN_GOD_ART_ROOT46}/ui/hall.webp`,`${MAIN_GOD_ART_ROOT46}/ui/icon_lock.webp`,
+    `${MAIN_GOD_ART_ROOT46}/ui/emblem_auditor.webp`,`${MAIN_GOD_ART_ROOT46}/ui/emblem_reaper.webp`,`${MAIN_GOD_ART_ROOT46}/ui/emblem_mirror.webp`,`${MAIN_GOD_ART_ROOT46}/ui/emblem_warden.webp`,
+    `${MAIN_GOD_ART_ROOT46}/ui/tpl_mecha.webp`,`${MAIN_GOD_ART_ROOT46}/ui/tpl_crimson.webp`,`${MAIN_GOD_ART_ROOT46}/ui/tpl_qi.webp`,`${MAIN_GOD_ART_ROOT46}/ui/tpl_star.webp`,`${MAIN_GOD_ART_ROOT46}/ui/tpl_titan.webp`
+  ];
+  function preloadMainGodArt46(){MAIN_GOD_ART46.forEach(artImage);}
+  function mainGodFxArt46(kind){return `${MAIN_GOD_ART_ROOT46}/fx/${kind}.webp`;}
+  function mainGodEmblemArt46(type){return `${MAIN_GOD_ART_ROOT46}/ui/emblem_${MAIN_GOD_BOSS_TYPES46[type]?type:"mirror"}.webp`;}
+  function mainGodCardArt46(id,group,kind){
+    if(kind==="template"&&MAIN_GOD_TEMPLATES46[id])return `${MAIN_GOD_ART_ROOT46}/ui/tpl_${id}.webp`;
+    if(kind==="lock")return `${MAIN_GOD_ART_ROOT46}/ui/icon_lock.webp`;
+    const map={"血统与灵能":`${MAIN_GOD_ART_ROOT46}/ui/tpl_crimson.webp`,"职业与技法":`${MAIN_GOD_ART_ROOT46}/ui/tpl_qi.webp`,"特殊效果道具":`${MAIN_GOD_ART_ROOT46}/ui/tpl_star.webp`,"保命防护":`${MAIN_GOD_ART_ROOT46}/ui/emblem_warden.webp`,"基础权能强化":`${MAIN_GOD_ART_ROOT46}/ui/emblem_auditor.webp`};
+    return map[group]||`${MAIN_GOD_ART_ROOT46}/ui/emblem_auditor.webp`;
+  }
+  function drawMainGodArtAt46(rel,fallbackKind,x,y,w,h){
+    const img=artImage(rel);
+    if(artReady(img)){
+      ctx.save();
+      ctx.globalCompositeOperation="source-over";
+      ctx.drawImage(img,x-w/2,y-h/2,w,h);
+      ctx.restore();
+      return true;
+    }
+    return fallbackKind?drawFxStampAt46(fallbackKind,x,y,Math.max(w,h)/2):false;
+  }
+  function dressMainGodIcon46(node,rel,fallback){
+    if(!node)return null;
+    return loadArtInto(node,rel,fallback||"◈");
+  }
   function mainGodBossLines46(type){
     const meta=MAIN_GOD_BOSS_TYPES46[type]||MAIN_GOD_BOSS_TYPES46.mirror;
     const who=char35().short,blade=char35().id==="rion";
@@ -8102,25 +8134,25 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     for(const t of P.mgBoss.fx.slice(0,8)){
       ctx.globalAlpha=t.hp>0?.9:.28;
       if(t.kind==="pillar"){
-        if(!drawFxStampAt46(t.hp>0?"skill":"shatter",t.x,t.y,22)){
+        if(!drawMainGodArtAt46(mainGodFxArt46("pillar"),t.hp>0?"skill":"shatter",t.x,t.y,34,52)){
           ctx.fillStyle="#d7c2ff55";ctx.strokeStyle="#f2deff";ctx.lineWidth=2;
           ctx.beginPath();ctx.roundRect?ctx.roundRect(t.x-10,t.y-28,20,40,6):ctx.rect(t.x-10,t.y-28,20,40);ctx.fill();ctx.stroke();
         }
         ctx.fillStyle="#fff";ctx.font="900 11px system-ui";ctx.textAlign="center";ctx.fillText("柱",t.x,t.y-34);
       }else if(t.kind==="rift"){
-        if(!drawFxStampAt46("dash",t.x,t.y,t.r)){
+        if(!drawMainGodArtAt46(mainGodFxArt46("rift"),"dash",t.x,t.y,t.r*2.6,t.r*1.7)){
           ctx.strokeStyle="#ffd36b";ctx.lineWidth=3;ctx.setLineDash([8,6]);
           ctx.beginPath();ctx.ellipse(t.x,t.y,t.r,t.r*.42,runTime,0,TAU);ctx.stroke();ctx.setLineDash([]);
         }
         ctx.fillStyle="#ffe08a";ctx.font="900 11px system-ui";ctx.textAlign="center";ctx.fillText("裂口",t.x,t.y+4);
       }else if(t.kind==="mirror"){
-        if(!drawFxStampAt46(t.hp>0?"hit":"shatter",t.x,t.y,t.r)){
+        if(!drawMainGodArtAt46(mainGodFxArt46("mirror"),t.hp>0?"hit":"shatter",t.x,t.y,t.r*2.3,t.r*2.3)){
           ctx.strokeStyle="#9ee7ff";ctx.fillStyle="#9ee7ff22";ctx.lineWidth=2;
           ctx.beginPath();ctx.arc(t.x,t.y,t.r,0,TAU);ctx.fill();ctx.stroke();
         }
         ctx.fillStyle="#e8fbff";ctx.font="900 11px system-ui";ctx.textAlign="center";ctx.fillText("镜",t.x,t.y+4);
       }else if(t.kind==="ward"){
-        if(!drawFxStampAt46("levelup",t.x,t.y,t.r*.55)){
+        if(!drawMainGodArtAt46(mainGodFxArt46("ward"),"levelup",t.x,t.y,t.r*2.1,t.r*2.1)){
           ctx.strokeStyle=P.mgBoss.insideWard?"#7ad7ff":"#7ad7ff66";ctx.fillStyle=P.mgBoss.insideWard?"#7ad7ff18":"#7ad7ff0c";
           ctx.setLineDash([10,8]);ctx.beginPath();ctx.arc(t.x,t.y,t.r,0,TAU);ctx.fill();ctx.stroke();ctx.setLineDash([]);
         }
@@ -8132,11 +8164,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function drawMainGodExtraFx46(){
     if(state!=="play"||!Number.isFinite(P.x))return;
     ctx.save();
-    if(P.mgCrimson&&!drawFxStampAt46("hit",P.x,P.y,P.r+14)){ctx.strokeStyle="#ff4d6d66";ctx.lineWidth=2;ctx.beginPath();ctx.arc(P.x,P.y,P.r+11+Math.sin(runTime*6)*2,0,TAU);ctx.stroke();}
-    if((P.mgStar||P.star)&&!drawFxStampAt46("loot",P.x,P.y,20)){ctx.fillStyle="#ffe08a88";for(let i=0;i<3;i++){const a=runTime*2+i*2.1;ctx.beginPath();ctx.arc(P.x+Math.cos(a)*22,P.y+Math.sin(a)*16,2,0,TAU);ctx.fill();}}
-    if(P.mgTitan&&!drawFxStampAt46("skill",P.x,P.y+4,P.r+16)){ctx.strokeStyle="#8dff7288";ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(P.x,P.y+6,P.r+18,P.r+10,0,0,TAU);ctx.stroke();}
-    if(P.mgDashGhost>0){if(!drawFxStampAt46("dash",P.x,P.y,P.r+18)){ctx.globalAlpha=Math.min(.45,P.mgDashGhost*1.4);ctx.strokeStyle="#b7f3ff";ctx.beginPath();ctx.arc(P.x,P.y,P.r+24,0,TAU);ctx.stroke();}P.mgDashGhost=Math.max(0,P.mgDashGhost-0.016);}
-    if(P.mgVoidFlash>0){if(!drawFxStampAt46("shatter",P.x,P.y,P.r+16)){ctx.globalAlpha=Math.min(.5,P.mgVoidFlash*1.6);ctx.strokeStyle="#c792ff";ctx.lineWidth=3;ctx.beginPath();ctx.arc(P.x,P.y,P.r+20,0,TAU);ctx.stroke();}P.mgVoidFlash=Math.max(0,P.mgVoidFlash-0.016);}
+    if(P.mgCrimson&&!drawMainGodArtAt46(`${MAIN_GOD_ART_ROOT46}/ui/tpl_crimson.webp`,"hit",P.x,P.y-P.r-10,22,22)&&!drawFxStampAt46("hit",P.x,P.y,P.r+14)){ctx.strokeStyle="#ff4d6d66";ctx.lineWidth=2;ctx.beginPath();ctx.arc(P.x,P.y,P.r+11+Math.sin(runTime*6)*2,0,TAU);ctx.stroke();}
+    if((P.mgStar||P.star)&&!drawMainGodArtAt46(`${MAIN_GOD_ART_ROOT46}/ui/tpl_star.webp`,"loot",P.x+16,P.y-P.r-6,18,18)&&!drawFxStampAt46("loot",P.x,P.y,20)){ctx.fillStyle="#ffe08a88";for(let i=0;i<3;i++){const a=runTime*2+i*2.1;ctx.beginPath();ctx.arc(P.x+Math.cos(a)*22,P.y+Math.sin(a)*16,2,0,TAU);ctx.fill();}}
+    if(P.mgTitan&&!drawMainGodArtAt46(`${MAIN_GOD_ART_ROOT46}/ui/tpl_titan.webp`,"skill",P.x,P.y+P.r+8,22,22)&&!drawFxStampAt46("skill",P.x,P.y+4,P.r+16)){ctx.strokeStyle="#8dff7288";ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(P.x,P.y+6,P.r+18,P.r+10,0,0,TAU);ctx.stroke();}
+    if(P.mgDashGhost>0){if(!drawMainGodArtAt46(mainGodFxArt46("rift"),"dash",P.x,P.y,P.r+28,P.r+18)){ctx.globalAlpha=Math.min(.45,P.mgDashGhost*1.4);ctx.strokeStyle="#b7f3ff";ctx.beginPath();ctx.arc(P.x,P.y,P.r+24,0,TAU);ctx.stroke();}P.mgDashGhost=Math.max(0,P.mgDashGhost-0.016);}
+    if(P.mgVoidFlash>0){if(!drawMainGodArtAt46(mainGodFxArt46("ward"),"shatter",P.x,P.y,P.r+28,P.r+28)){ctx.globalAlpha=Math.min(.5,P.mgVoidFlash*1.6);ctx.strokeStyle="#c792ff";ctx.lineWidth=3;ctx.beginPath();ctx.arc(P.x,P.y,P.r+20,0,TAU);ctx.stroke();}P.mgVoidFlash=Math.max(0,P.mgVoidFlash-0.016);}
     ctx.restore();
   }
   function applyMainGodExtras46(){
@@ -8153,6 +8185,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if(m.silentPendulum)P.mgPendulum=1;
   }
   function dressMainGodHall46(){
+    preloadMainGodArt46();
     const drawer=ensureMainGodShop36();
     drawer.classList.add("mgHall46");
     const head=drawer.querySelector(".dhead h2");
@@ -8162,7 +8195,13 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const c=ensureMainGodCore46();
     const main=c.eqMain&&MAIN_GOD_TEMPLATES46[c.eqMain]?MAIN_GOD_TEMPLATES46[c.eqMain].n:"空";
     const sub=c.eqSub&&MAIN_GOD_TEMPLATES46[c.eqSub]?MAIN_GOD_TEMPLATES46[c.eqSub].n:"空";
-    hero.innerHTML=`<div class="mgHeroArt46"><i>◈</i><div><b>轮回账户</b><span>${templateLabel46()}</span></div></div><ul><li><em>奖励点</em><b>◈ ${save.mainGod.points}</b></li><li><em>基因锁碎片</em><b>${c.shards}</b></li><li><em>通关</em><b>${save.mainGod.clears}</b></li><li><em>主 / 副模板</em><b>${main} / ${sub}</b></li></ul>`;
+    const type=pickMainGodBossType46(save.mainGod?.clears,selectedMainGodTier36,1);
+    const meta=MAIN_GOD_BOSS_TYPES46[type]||MAIN_GOD_BOSS_TYPES46.mirror;
+    hero.style.backgroundImage=`linear-gradient(180deg,#0b0818d0 0%,#140c24c2 58%,#0b0818ee 100%),url('${artUrl(`${MAIN_GOD_ART_ROOT46}/ui/hall.webp`)}')`;
+    hero.style.backgroundSize="cover";
+    hero.style.backgroundPosition="center";
+    hero.innerHTML=`<div class="mgHeroArt46"></div><div class="mgHeroCopy46"><b>轮回账户</b><span>${templateLabel46()}</span><small>下次监察：${meta.n}</small></div><ul><li><em>奖励点</em><b>◈ ${save.mainGod.points}</b></li><li><em>基因锁碎片</em><b>${c.shards}</b></li><li><em>通关</em><b>${save.mainGod.clears}</b></li><li><em>主 / 副模板</em><b>${main} / ${sub}</b></li></ul>`;
+    dressMainGodIcon46(hero.querySelector(".mgHeroArt46"),mainGodEmblemArt46(type),"◈");
   }
   function bindMainGodTabs46(){
     const list=$("#mainGodShopList36"),tabs=$("#mainGodTabs38");
@@ -8204,6 +8243,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     d.classList.add("mgCard46",id==="cursedHeart"?"mgRareCursed":u.max===1?"mgRareGold":(u.base||0)>=14?"mgRarePurple":"mgRareBlue");
     if((save.mainGod[id]||0)>0)d.classList.add("mgOwned46");
     if(!d.querySelector(".mgTag46")){const tag=document.createElement("em");tag.className="mgTag46";tag.textContent=u.group||"兑换";d.querySelector("div")?.prepend(tag);}
+    dressMainGodIcon46(d.querySelector(".ei"),mainGodCardArt46(id,u.group),"◈");
     const hint=extraOverlapHint46(id);
     if(hint){
       const p=d.querySelector("p");
@@ -8221,6 +8261,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   coreCard46=function(kind,id){
     const d=_coreCardHall46(kind,id);
     d.classList.add("mgCard46",kind==="template"?"mgRareGold":"mgRareBlue");
+    const src=kind==="template"?MAIN_GOD_TEMPLATES46[id]:MAIN_GOD_LOCKS46[id];
+    dressMainGodIcon46(d.querySelector(".ei"),mainGodCardArt46(id,"",kind),src?.i||"◈");
     const c=ensureMainGodCore46();
     if(kind==="template"&&(c.eqMain===id||c.eqSub===id))d.classList.add("mgEquipped46");
     return d;
@@ -8422,10 +8464,21 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     s.overlays.mgHall=!!($("#mainGodDrawer36")&&$("#mainGodDrawer36").classList.contains("mgHall46")&&!$("#mainGodDrawer36").classList.contains("hidden"));
     return s;
   };
+  const _identArt46=drawBossIdentity37;
+  drawBossIdentity37=function(e){
+    const result=_identArt46(e);
+    if(isMainGodRun36()&&e&&e.type==="boss"){
+      const type=currentMainGodBossType46();
+      drawMainGodArtAt46(mainGodEmblemArt46(type),null,e.x,e.y-(e.r||40)-20,30,30);
+    }
+    return result;
+  };
+  if(Array.isArray(COMBAT_ART38))MAIN_GOD_ART46.forEach(path=>{if(!COMBAT_ART38.includes(path))COMBAT_ART38.push(path);});
+  preloadMainGodArt46();
   CONTENT41.hook("combat:after-update",payload=>tickMainGodBoss46(payload?.dt||0),"core.mgBoss46",60);
   CONTENT41.hook("combat:after-draw",drawMainGodBossFx46,"core.mgBoss46",45);
   const styleHall46=document.createElement("style");
-  styleHall46.textContent=`.mgHall46{background:radial-gradient(circle at 12% 0,#ffe6a31c,transparent 36%),radial-gradient(circle at 88% 8%,#9d58e828,transparent 32%),linear-gradient(180deg,#140c24f2,#0b0818f6);border:1px solid #ffe29144}.mgHall46 .dhead{background:linear-gradient(90deg,#20143acc,#3a1d58aa);border-bottom:1px solid #ffe29133}.mgHeadSub46{display:block;margin-top:3px;color:#cfc4df;font-size:10px;font-weight:700;letter-spacing:.08em}.mgHero46{display:grid;gap:8px;margin:0 0 10px;padding:12px;border-radius:16px;border:1px solid #ffe6a355;background:linear-gradient(135deg,#ffd76f22,#7a4bff22),repeating-linear-gradient(45deg,#0000 0 10px,#ffe6a30a 10px 12px)}.mgHero46 ul{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0;padding:0;list-style:none}.mgHero46 li{padding:7px 8px;border-radius:10px;background:#0b0818cc;border:1px solid #ffffff14}.mgHero46 em{display:block;color:#cfc4df;font-size:9px;font-style:normal}.mgHero46 b{color:#ffe6a3;font-size:13px}.mgHeroArt46{display:flex;align-items:center;gap:8px}.mgHeroArt46 i{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:radial-gradient(circle,#ffe08a,#6a3ad8);font-style:normal;font-size:22px}.mgHeroArt46 span{display:block;color:#d7cce4;font-size:10px}.mgCard46{position:relative;box-shadow:0 0 0 1px #ffffff10,0 8px 18px #0005}.mgRareGold{border-color:#ffe29188!important;background:linear-gradient(135deg,#ffe29114,#ffffff08)!important}.mgRarePurple{border-color:#c792ff77!important}.mgRareBlue{border-color:#7ad7ff55!important}.mgRareCursed{border-color:#ff4d6d88!important;background:linear-gradient(135deg,#ff4d6d14,#ffffff08)!important}.mgOwned46:after{content:"已持有";position:absolute;right:8px;top:6px;font-size:8px;color:#9ee7ff}.mgEquipped46{box-shadow:0 0 0 1px #ffe291aa,0 0 16px #ffd76f33}.mgTag46{display:inline-block;margin:0 0 3px;padding:1px 6px;border-radius:99px;background:#ffe29122;color:#ffe291;font-size:8px;font-style:normal}.mgTabs46{display:flex;flex-wrap:wrap;gap:4px;background:#0b0818ee!important;border:1px solid #ffe29133;border-radius:14px;padding:6px!important;overflow-x:auto}.mgTabs46 button{flex:1 0 auto;min-width:52px;font-size:10px}.mgHall46 .exchangeSection36 h3{display:flex;align-items:center;gap:6px}.mgHall46 .exchangeSection36 h3:before{content:"";width:6px;height:6px;border-radius:50%;background:#ffe291}.coreCard46.mgEquipped46 .ei{box-shadow:0 0 12px #ffe29166}.mgOverlap46{color:#9ee7ff;font-size:10px}`;
+  styleHall46.textContent=`.mgHall46{background:linear-gradient(180deg,#140c24e8,#0b0818f4),url('${artUrl(`${MAIN_GOD_ART_ROOT46}/ui/hall.webp`)}') center/cover no-repeat;border:1px solid #ffe29144}.mgHall46 .dhead{background:linear-gradient(90deg,#20143acc,#3a1d58aa);border-bottom:1px solid #ffe29133}.mgHeadSub46{display:block;margin-top:3px;color:#cfc4df;font-size:10px;font-weight:700;letter-spacing:.08em}.mgHero46{display:grid;grid-template-columns:56px 1fr;gap:8px;margin:0 0 10px;padding:12px;border-radius:16px;border:1px solid #ffe6a355;background-size:cover;background-position:center}.mgHero46 ul{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0;padding:0;list-style:none}.mgHero46 li{padding:7px 8px;border-radius:10px;background:#0b0818cc;border:1px solid #ffffff14}.mgHero46 em{display:block;color:#cfc4df;font-size:9px;font-style:normal}.mgHero46 b{color:#ffe6a3;font-size:13px}.mgHeroArt46{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle,#ffe08a66,#6a3ad866);border:1px solid #ffe29155}.mgHeroArt46 img,.mgHall46 .ei img{width:100%;height:100%;object-fit:contain;display:block}.mgHeroCopy46{min-width:0}.mgHeroCopy46 small{display:block;margin-top:3px;color:#ffe6a3;font-size:10px}.mgHeroArt46 i{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:radial-gradient(circle,#ffe08a,#6a3ad8);font-style:normal;font-size:22px}.mgHeroArt46 span{display:block;color:#d7cce4;font-size:10px}.mgCard46{position:relative;box-shadow:0 0 0 1px #ffffff10,0 8px 18px #0005}.mgRareGold{border-color:#ffe29188!important;background:linear-gradient(135deg,#ffe29114,#ffffff08)!important}.mgRarePurple{border-color:#c792ff77!important}.mgRareBlue{border-color:#7ad7ff55!important}.mgRareCursed{border-color:#ff4d6d88!important;background:linear-gradient(135deg,#ff4d6d14,#ffffff08)!important}.mgOwned46:after{content:"已持有";position:absolute;right:8px;top:6px;font-size:8px;color:#9ee7ff}.mgEquipped46{box-shadow:0 0 0 1px #ffe291aa,0 0 16px #ffd76f33}.mgTag46{display:inline-block;margin:0 0 3px;padding:1px 6px;border-radius:99px;background:#ffe29122;color:#ffe291;font-size:8px;font-style:normal}.mgTabs46{display:flex;flex-wrap:wrap;gap:4px;background:#0b0818ee!important;border:1px solid #ffe29133;border-radius:14px;padding:6px!important;overflow-x:auto}.mgTabs46 button{flex:1 0 auto;min-width:52px;font-size:10px}.mgHall46 .exchangeSection36 h3{display:flex;align-items:center;gap:6px}.mgHall46 .exchangeSection36 h3:before{content:"";width:6px;height:6px;border-radius:50%;background:#ffe291}.coreCard46.mgEquipped46 .ei{box-shadow:0 0 12px #ffe29166}.mgOverlap46{color:#9ee7ff;font-size:10px}`;
   document.head.appendChild(styleHall46);
 
   installLobby46();

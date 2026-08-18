@@ -15,6 +15,39 @@ assert.match(html, /function applyMainGodExtras46/);
 assert.match(html, /function hurtMainGodFx46/);
 assert.match(html, /function extraOverlapHint46/);
 assert.match(html, /function drawFxStampAt46/);
+assert.match(html, /function drawMainGodArtAt46/);
+assert.match(html, /function preloadMainGodArt46/);
+assert.match(html, /function dressMainGodIcon46/);
+assert.match(html, /MAIN_GOD_ART_ROOT46="content-packs\/maingod-void"/);
+assert.match(html, /\$\{MAIN_GOD_ART_ROOT46\}\/fx\/pillar\.webp/);
+assert.match(html, /\$\{MAIN_GOD_ART_ROOT46\}\/fx\/rift\.webp/);
+assert.match(html, /\$\{MAIN_GOD_ART_ROOT46\}\/fx\/mirror\.webp/);
+assert.match(html, /\$\{MAIN_GOD_ART_ROOT46\}\/fx\/ward\.webp/);
+assert.match(html, /\$\{MAIN_GOD_ART_ROOT46\}\/ui\/hall\.webp/);
+assert.match(html, /下次监察/);
+
+const artRoot = path.join(root, "android-app/app/src/main/assets/game/art/content-packs/maingod-void");
+for (const rel of [
+  "fx/pillar.webp",
+  "fx/rift.webp",
+  "fx/mirror.webp",
+  "fx/ward.webp",
+  "ui/hall.webp",
+  "ui/emblem_auditor.webp",
+  "ui/emblem_reaper.webp",
+  "ui/emblem_mirror.webp",
+  "ui/emblem_warden.webp",
+  "ui/tpl_mecha.webp",
+  "ui/tpl_crimson.webp",
+  "ui/tpl_qi.webp",
+  "ui/tpl_star.webp",
+  "ui/tpl_titan.webp",
+  "ui/icon_lock.webp",
+]) {
+  const file = path.join(artRoot, rel);
+  assert.ok(fs.existsSync(file), `missing ${rel}`);
+  assert.ok(fs.statSync(file).size > 8000, `${rel} too small`);
+}
 assert.match(html, /function forceMainGodBossType46/);
 assert.match(html, /function currentMainGodBossType46/);
 assert.match(html, /directionalSlash36=function/);
