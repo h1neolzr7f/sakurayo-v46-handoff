@@ -6117,7 +6117,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
   function installNavArt35(){
     $$("#menu .nav button").forEach(button=>{
       const span=button.querySelector("span"),key=button.dataset.open;
-      if(!span||!NAV_ART35[key]||span.querySelector("img"))return;
+      if(!span||!NAV_ART35[key]||span.querySelector("img")||span.querySelector("svg")||span.classList.contains("chromeOn46"))return;
       const fallback=span.textContent,img=document.createElement("img");
       img.alt="";img.src=artUrl(`ui/nav/${NAV_ART35[key]}.webp`);
       img.onerror=()=>{span.textContent=fallback;};

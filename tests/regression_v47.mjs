@@ -60,6 +60,7 @@ assert.match(index, /P\.damageSources = P\.damageSources \|\| \{\}/);
 assert.match(index, /skipped: "short-pause"/);
 assert.match(index, /\.bootArt35\.gone\{opacity:0;visibility:hidden;display:none\}/);
 assert.match(index, /if \(TEST_MODE\) dismissBoot\(\)/);
+assert.match(index, /span\.classList\.contains\("chromeOn46"\)/);
 assert.match(index, /skipped: "short-result"/);
 assert.match(feel, /#back,#reroll,\.revealSkip46.*background:#2a1848!important/);
 assert.match(feel, /#reroll,\.revealSkip46/);
