@@ -84,7 +84,11 @@ async function waitOutfitLive(page, layerId) {
 }
 
 function dropMissingOutfitConsoleErrors(tracker) {
-  tracker.consoleErrors = tracker.consoleErrors.filter(text => !/(?:career_|form_|fusion_)[A-Za-z]+\/anim_|fusions\/[A-Za-z]+\/splash/.test(text));
+  tracker.consoleErrors = tracker.consoleErrors.filter(text =>
+    text !== "Failed to load resource: net::ERR_FILE_NOT_FOUND" &&
+    !/(?:career_|form_|fusion_)[A-Za-z]+\/anim_|fusions\/[A-Za-z]+\/splash/.test(text) &&
+    !/content-packs\/official-example\//.test(text)
+  );
 }
 
 async function openPage(context, tracker, targetUrl = url) {
@@ -95,6 +99,11 @@ async function openPage(context, tracker, targetUrl = url) {
     const text = `${message.text()} ${message.location()?.url || ""}`;
     if (/(?:career_|form_|fusion_)[A-Za-z]+\/anim_|fusions\/[A-Za-z]+\/splash/.test(text)) return;
     tracker.consoleErrors.push(message.text());
+  });
+  page.on("requestfailed", request => {
+    if (/\.(?:webp|png|jpg|jpeg|gif|svg)(?:\?|$)/i.test(request.url())) {
+      tracker.consoleErrors.push(`Failed to load resource: ${request.url()}`);
+    }
   });
   page.on("request", request => {
     if (/^https?:/i.test(request.url()) && new URL(request.url()).origin !== new URL(targetUrl).origin) tracker.externalRequests.push(request.url());
@@ -243,7 +252,7 @@ try {
   await page.locator("#shopDrawer .close").click();
 
   const lobby = await api(page, "lobby46");
-  assert.equal(lobby.version, "4.7.0");
+  assert.equal(lobby.version, "4.7.3");
   assert.ok(lobby.shown.includes("sayo_echo"));
   assert.ok(lobby.shown.includes("aya_petal"));
   assert.equal(lobby.cards.length, 16);
@@ -290,7 +299,7 @@ try {
   assert.match(await page.locator("#archiveDrawer").textContent(), /永久天赋/);
   await shot(page, "01k-archive.png");
   await page.locator("#archiveDrawer .close").click();
-  pass("V4.7.0 镜界寻访、名册与作弊币");
+  pass("V4.7.3 镜界寻访、名册与作弊币");
 
   const betaPanel = await api(page, "openBeta40");
   assert.equal(betaPanel.visible, true);
@@ -367,7 +376,7 @@ try {
   assert.equal(await page.locator("#statsButton37").isVisible(), true);
   await page.locator("#statsButton37").click();
   assert.equal(await page.locator("#analyticsDrawer37").isVisible(), true);
-  assert.match(await page.locator("#analyticsText37").inputValue(), /"version": "4.7.0"/);
+  assert.match(await page.locator("#analyticsText37").inputValue(), /"version": "4.7.3"/);
   await page.locator("#analyticsDrawer37 .close").click();
   await page.locator('[data-home="settings"]').click();
   assert.equal(await page.locator("#settingsDrawer37").isVisible(), true);

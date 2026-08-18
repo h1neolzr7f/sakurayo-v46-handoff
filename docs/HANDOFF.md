@@ -1,4 +1,4 @@
-# 《樱夜·尸潮》V4.7.0 交接规格
+# 《樱夜·尸潮》V4.7.3 交接规格
 
 2026-08-18。给下一位 AI / 维护者。先读根目录 [README.md](../README.md)，再读本文、[REGRESSION.md](REGRESSION.md) 和 [AGENTS.md](../AGENTS.md)。二游分期原文在 [PLAN_V46_ERYOU.md](PLAN_V46_ERYOU.md)。升版本见 [MAINTAIN.md](MAINTAIN.md)。已修错误见 [REGRESSION.md](REGRESSION.md)，不要回潮。
 
@@ -8,8 +8,8 @@
 
 | 项 | 值 |
 |---|---|
-| 源码版本 | **4.7.0**（统一 eaa0 修复线 + cadf 顶栏/手感，未对玩家发正式包） |
-| 开发版夜樱 | `4.7.0-yeying` / versionCode **6110** / 包名 `com.sakurayo.yeying.dev` |
+| 源码版本 | **4.7.3**（立绘完整、寻访叠伤可见、符咒/邮箱精装；未对玩家发正式包） |
+| 开发版夜樱 | `4.7.3-yeying` / versionCode **6113** / 包名 `com.sakurayo.yeying.dev` |
 | 公开仓正式 APK | 仍是 **v4.4.6** |
 | 存档键 | **`sakurayoV3`** |
 | 代码基线 | `src/index.html` + `src/runtime/*.js` |
@@ -27,7 +27,7 @@
 - 触控摇杆、冲刺、主动技能必须可用。
 - 继续 `sakurayoV3`。旧档缺字段自动补齐，禁止清档。
 - 不依赖网络、CDN、外部字体或外部图片。
-- 商店衣装与寻访卡**都不卖永久伤害**。卡只进名册。
+- 商店衣装仍只改外观和职业倾向。**初始核心、武器道具、寻访证词叠层会写入火力**（`rosterPower`，上限 +45%）。不要回退这套。
 - 不要再给 `update` 加包装层。不要改名 `startGame` / `update` / `draw` / `spawnEnemy` / `showDialogue` 却不改调用点。
 - 不允许恢复「每颗子弹遍历全部敌人」的无界碰撞。敌人、子弹、Boss 弹、召唤物、伤害字、粒子都有上限。Boss 阶段不无限召唤普通怪。
 - Android WebView 锁横屏（`landscape`）。大厅/寻访/战场默认就是横版，不靠窗口先变成横的才切换。竖屏只保留射击操作并提示横持。
@@ -44,7 +44,7 @@
   → 结算回大厅
 ```
 
-作弊只保留一种：大厅立绘 10 连点 → 9999 樱花币。不另开商店卖数值。
+玩家界面不再发作弊币。内测资源走邮箱「夜樱内测补给」。`grantCheat46()` 只留给 `?test=1`。不另开商店卖数值。
 
 底栏五格：寻访 / 名册 / 商店 / 关卡 / 档案。出击是大厅主按钮，不进五格。
 
@@ -78,7 +78,7 @@ GitHub：开发仓 `h1neolzr7f/sakurayo-v46-handoff` 分支 `cursor/bc-a381488d-
 
 ### 明确不做
 
-- 抽卡加攻击、加生命、加暴击。
+- 再改寻访爆率/价格，或把叠伤改成直售攻击/生命/暴击面板。
 - 每日任务、邮件、赛季、通行证、广告复活。
 - 联网账号与排行榜。
 - 换引擎，引 Vue / Phaser / 原神素材。
@@ -89,8 +89,8 @@ GitHub：开发仓 `h1neolzr7f/sakurayo-v46-handoff` 分支 `cursor/bc-a381488d-
 
 宽于 640 走左右分栏：
 
-- 左约 **64%**：当前角色全身立绘，**头要完整**。立绘 `height:100%`，不要再写成 138% 裁头。`object-position: center 10%`。标题「樱夜·尸潮」贴左上，角色名贴左下。
-- 右约 **34%**、最宽 **360**：币/更多 → 三角色横排圆钮 → 关卡胶囊 → **出击** → 五格导航。
+- 左 **48%**：当前角色全身立绘，**头要完整**。容器和呼吸层都 `width:100%`，不要再用 62vw/64vw 把立绘撑大。`object-fit: contain`，`object-position: center 18%`。标题「樱夜·尸潮」贴左上，角色名贴左下。
+- 右约 **36%**、最宽 **300**：币/更多 → 三角色横排圆钮 → 关卡胶囊 → **出击** → 五格导航。
 - 圆钮必须在操作台里，禁止漂到立绘上。
 - 出击文案固定「出击」，不要「角色名 · 进入樱夜」。
 - 更窄才叠成竖屏回退，并显示 `#rotateHint46`（「请横持设备」）。提示在顶栏中央，不得挡住出击。
@@ -98,7 +98,7 @@ GitHub：开发仓 `h1neolzr7f/sakurayo-v46-handoff` 分支 `cursor/bc-a381488d-
 `preferLandscape46()` 在 [`src/index.html`](../src/index.html)：
 
 - 永远 `classList.add("landscape46")`
-- `portraitFallback46` 仅当 `width < 640`
+- `portraitFallback46` 仅当 `width < 640`；Android 锁横屏时不要再加，避免立绘突然拉满屏
 - `tallWindow46` 当高>宽且宽仍 ≥ 640
 - 尝试 `screen.orientation.lock("landscape")`
 - 画布跟 `visualViewport` 铺满
@@ -177,7 +177,7 @@ pity, pitySR, pulls, tenPulls, owned, last, cheatUsed
 - 眨眼：Cubism Mean **2.5 ± 2s**，不要 5.4s CSS `steps` 循环。
 - 注视阻尼，松手回正。
 - `#heroTap46` + `#heroHead46`：TapHead / TapBody 淡入淡出。
-- 立绘 10 连点作弊仍走 lobby 的 `portraitTap`。
+- 立绘点头/点身只播 Live 动作。`portraitTap` 发币只在 `?test=1`。
 - 不要给站桩叠多层 `drop-shadow` / `blur`。不要给抽屉整屏 `backdrop-filter`。横屏菜单不要 14px 毛玻璃。
 - `sakurayo-live.js` 不得覆盖大厅 dock / 角色圆钮布局。
 
@@ -290,7 +290,7 @@ powershell -File tools/verify.ps1
 
 `verify.ps1` 目前包含：`static_check`、内容包、各 runtime 语法、3 个 unit、ops / testimony / landscape / framework / browser smoke 与 gacha visual。
 
-`landscape_smoke.mjs` 固定验证 932×430 作战简报、战场、Boss 阶段机制条和战术结算；`browser_smoke.mjs` 仍以 430×932 做大部分兼容回归并断言版本 `"4.7.0"`。竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。`tests/regression_v47.mjs` 锁住已修错误。
+`landscape_smoke.mjs` 固定验证 932×430 作战简报、战场、Boss 阶段机制条和战术结算；`browser_smoke.mjs` 仍以 430×932 做大部分兼容回归并断言版本 `"4.7.3"`。竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。`tests/regression_v47.mjs` 锁住已修错误。
 
 发版（用户明确要求再做）：
 

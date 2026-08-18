@@ -34,7 +34,7 @@ const context = await browser.newContext({
   isMobile: true,
   hasTouch: true,
   userAgent:
-    "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36 SakurayoAndroid/4.7.0-yeying",
+    "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36 SakurayoAndroid/4.7.3-yeying",
 });
 await context.addInitScript(() => {
   window.__SAKURAYO_ANDROID_LANDSCAPE__ = true;

@@ -1,5 +1,40 @@
 Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先阅读根目录的 AGENTS.md、README_FIRST.md 和 CODEX_TASK.md，基于 src/index.html 继续开发，不要使用旧版本文件。
 
+## 2026-08-19 V4.7.3 立绘完整、寻访叠伤可见、符咒/邮箱精装
+
+- 大厅立绘不再被 62/72vw 呼吸层和过重 mask 裁切；横屏脚底 fade 收到 6%，侧向收到 94%。
+- 寻访页写清当前火力与稀有度加伤；揭示卡带本抽叠伤；大厅等级行带「火力 +N%」。
+- 排除符按职业换成符纸 SVG（`tmech`…`tnecro`），邮箱用精装信封/礼物图标。
+- 内测补给置顶并可直接领：🌸25000 · 券×80 · 碎片 800 · 棱晶 500。不走后门。
+- 版本 4.7.3 / `4.7.3-yeying` / versionCode 6113。存档键仍是 `sakurayoV3`。未清档。
+- 本机 APK：`release/YeYing-Dev-v4.7.3-android.apk`（SHA256 `D593B28F5B732D88054208EBC3D72803B5860D3E929F0EA66336DD95BDACA631`）。未清档。
+
+## 2026-08-18 V4.7.2 关掉误开后门并锁图标尺寸
+
+- 开发包不再加载 `?beta=1`；「更多」里的内测后门按钮直接拆掉。游玩仍走大厅、邮箱、商店，不塞进后门抽屉。
+- 立绘点头/点身只播动作，玩家连点不再入账。`grantCheat46` 仅 `?test=1`。
+- 邮箱增加「夜樱内测补给」：8800 樱花币、40 寻访券、360 碎片、240 棱晶。
+- 商店立绘 / 道具格 / 轨与邮箱图标先按最终尺寸占位，橱窗和 chrome 晚到不再把卡片撑大或换一套图标尺寸。
+- 版本 4.7.2 / `4.7.2-yeying` / versionCode 6112。存档键仍是 `sakurayoV3`。
+- 复盘后把同类跳变也锁死：模式图标、商店侧栏、名册/寻访立绘、活动条、邮件格子。`style_lock_unit` + `layout_stable` 会量晚到脚本之后的盒子，避免再只靠源码字符串漏过。
+- 本机 APK：`release/YeYing-Dev-v4.7.2-android.apk`（SHA256 `31CC1458321CDF71145F0C0A8F9E1F6D35CAC9235CB01CA68938A7699C3132DC`）。未清档。
+
+## 2026-08-18 V4.7.1 开发包
+
+- 版本升到 4.7.1 / `4.7.1-yeying` / versionCode 6111，可覆盖安装开发版夜樱。
+- 档案补回成就图鉴；测试 API `unlockMainGod` 不再写第 4 章。
+- 横屏钱包露出棱晶/碎片；竖屏轨图标给尺寸；本地系统文案替换「预览界面」。
+- 本机 APK：`release/YeYing-Dev-v4.7.1-android.apk`（SHA256 `0C37E9DBA1F34FECC71E502AAC69DF36800923CFC27EA770F67DEB3C0CE18AEE`）。未清档，未改 `sakurayoV3`。
+
+## 2026-08-18 主神默认可进 + 局外毛坯收口
+
+- 大厅三丸不再看第 4 章；`paintHomeCommand46` 走 `mainGodOpen36()`。云端锁修复在 `cursor/unlock-maingod-home-pills-a6e9`。
+- 虚空怪不再请求不存在的 `voidling_b` / `voidmaw_b`；`browser_smoke` 52 项全绿。
+- 章节抽屉切模式会同步大厅药丸；选章节不会把主神 pending 留着。
+- 主神局不再自动弹 32%/64% 二次契约（测试 API `openCharacterEvent` 仍可用）。`lordRisk`/`lordXp` 开局清零。
+- 兑换成功刷新货架；结算台词用本局实得点。探索按钮不再叠层。
+- 钱包占位改 0；等级条跟 XP；Banner 圆点可切池；邮件先选再领；矮屏商店不再把皮肤列表藏空。
+
 ## 2026-08-18 V4.7.0 统一夜樱修复线与大厅精装
 
 - 合并 eaa0（触控/橱窗/图标精装）与 cadf（手感/顶栏拆叠），版本升到 4.7.0，开发版夜樱 4.7.0-yeying / 6110。

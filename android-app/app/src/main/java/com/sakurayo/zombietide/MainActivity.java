@@ -37,7 +37,6 @@ import java.util.Locale;
 public final class MainActivity extends Activity {
     private static final String TAG = "SakurayoWebView";
     private static final String GAME_URL = "file:///android_asset/index.html";
-    private static final String DEBUG_GAME_URL = "file:///android_asset/index.html?beta=1";
     private static final String TOUCH54_ASSET = "runtime/sakurayo-touch54.js";
     private static final String LAYOUT52_ASSET = "runtime/sakurayo-layout52.js";
     private static final String FEEL53_ASSET = "runtime/sakurayo-feel53.js";
@@ -83,7 +82,7 @@ public final class MainActivity extends Activity {
 
         boolean restored = savedInstanceState != null && webView.restoreState(savedInstanceState) != null;
         if (!restored) {
-            webView.loadUrl(BuildConfig.DEBUG ? DEBUG_GAME_URL : GAME_URL);
+            webView.loadUrl(GAME_URL);
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -144,7 +143,7 @@ public final class MainActivity extends Activity {
         settings.setTextZoom(100);
         settings.setDefaultTextEncodingName("utf-8");
         settings.setMediaPlaybackRequiresUserGesture(true);
-        settings.setUserAgentString(settings.getUserAgentString() + " SakurayoAndroid/4.7.0-yeying");
+        settings.setUserAgentString(settings.getUserAgentString() + " SakurayoAndroid/4.7.3-yeying");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             settings.setSafeBrowsingEnabled(true);
         }

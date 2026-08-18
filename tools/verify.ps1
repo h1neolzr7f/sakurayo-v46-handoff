@@ -30,6 +30,8 @@ Invoke-Step "layout52 unit" { node tests/layout52_unit.mjs }
 Invoke-Step "touch54 unit" { node tests/touch54_unit.mjs }
 Invoke-Step "chrome unit" { node tests/chrome_unit.mjs }
 Invoke-Step "regression v47" { node tests/regression_v47.mjs }
+Invoke-Step "style lock" { node tests/style_lock_unit.mjs }
+Invoke-Step "layout stable" { node tests/layout_stable.mjs }
 Invoke-Step "shell unit" { node tests/shell_unit.mjs }
 Invoke-Step "live unit" { node tests/live_unit.mjs }
 Invoke-Step "ops unit" { node tests/ops_unit.mjs }

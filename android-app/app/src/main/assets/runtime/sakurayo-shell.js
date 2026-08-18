@@ -1,8 +1,8 @@
 (function (global) {
   "use strict";
 
-  var VERSION = "4.7.0";
-  var PREVIEW = "预览界面 · 暂不联网";
+  var VERSION = "4.7.3";
+  var PREVIEW = "本地系统 · 不联网";
   var DRAWERS = Object.freeze(["mission", "mail", "notice", "friend", "calendar", "profile"]);
   var CHAR_NAMES = Object.freeze({ sayo: "月城小夜", aya: "神代绫", rion: "黑羽凛音" });
   var rosterFilter = "all";
@@ -59,14 +59,14 @@
     "html.landscape46:not(.portraitFallback46) #homeQuick46 .homeIco46.cal:before{content:\"\";position:absolute;left:11px;top:12px;width:18px;height:16px;border:1.5px solid #ffe7a3;border-radius:3px;box-shadow:3px -3px 0 #ffe7a3,11px -3px 0 #ffe7a3;background:radial-gradient(circle at 5px 8px,#ffe7a3 1.1px,transparent 1.2px),radial-gradient(circle at 10px 8px,#ffe7a3 1.1px,transparent 1.2px),radial-gradient(circle at 5px 12px,#ffe7a3 1.1px,transparent 1.2px)}" +
     "html.landscape46:not(.portraitFallback46) #homeQuick46 .homeIco46.cal.hasDot46:after{content:\"\";position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:50%;background:#ff5b74}" +
     "html.landscape46:not(.portraitFallback46) #homeQuick46 .homeIco46.pal:before{content:\"\";position:absolute;left:8px;top:9px;width:10px;height:10px;border:1.5px solid #ffe7a3;border-radius:50%;box-shadow:12px 0 0 -1.5px #120e27ee,12px 0 0 0 #ffe7a3,1px 13px 0 -2px #ffe7a3,13px 13px 0 -2.5px #ffe7a3}" +
-    ".railIco46{display:block;width:16px;height:16px;margin:0 auto;position:relative}" +
+    ".railIco46{display:grid;place-items:center;width:22px;height:22px;margin:0 auto;position:relative;flex:0 0 22px}" +
     ".railIco46.task:before{content:\"\";position:absolute;left:3px;top:3px;right:3px;bottom:1px;border:1.5px solid #f35aa6;border-radius:2px}" +
     ".railIco46.task:after{content:\"\";position:absolute;left:5px;top:1px;right:5px;height:3px;border:1.5px solid #f35aa6;border-bottom:0;border-radius:2px 2px 0 0}" +
     ".railIco46.mail:before{content:\"\";position:absolute;left:1px;top:4px;right:1px;bottom:2px;border:1.5px solid #f35aa6;border-radius:2px}" +
     ".railIco46.mail:after{content:\"\";position:absolute;left:2px;top:4px;right:2px;height:6px;border-left:1.5px solid #f35aa6;border-right:1.5px solid #f35aa6;clip-path:polygon(0 0,50% 100%,100% 0)}" +
     ".railIco46.notice:before{content:\"\";position:absolute;left:2px;top:4px;width:8px;height:8px;border:1.5px solid #f35aa6;border-radius:2px 8px 8px 2px}" +
     ".railIco46.notice:after{content:\"\";position:absolute;right:2px;top:6px;width:3px;height:5px;border:1.5px solid #f35aa6;border-radius:1px}" +
-    ".shellItem46 .railIco46{width:18px;height:18px;margin:0;background:transparent}" +
+    ".shellItem46 .railIco46{width:22px;height:22px;margin:0;background:transparent}" +
     ".profileVoice46{display:grid;gap:8px}" +
     ".profileVoice46 button{min-height:44px;padding:8px 12px;border-radius:12px;border:1px solid #69ddf266;background:#1a2030;color:#fff7fb;text-align:left}" +
     ".friendActs46{display:flex;flex-direction:column;gap:6px}" +
@@ -76,13 +76,13 @@
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeNav46 [data-open=gacha]{position:relative}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .bg:before{content:\"\";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,#08071300 0 46%,#0a081866 72%,#080713cc 100%),radial-gradient(circle at 78% 14%,#f2c75d33 0 7%,transparent 24%)}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .bg:after{content:\"\";position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.42;background:linear-gradient(90deg,#08071300 0 54%,#08071355 100%);box-shadow:none;-webkit-mask-image:none;mask-image:none}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46{grid-template-columns:64px 1fr;width:min(248px,28vw);min-height:72px;align-items:center}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46{grid-template-columns:1fr;width:50px;min-height:48px;align-items:center;justify-items:center}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46 em{display:block;color:#f2c75d;font:800 9px/1 system-ui;letter-spacing:.18em}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46 small{color:#ff9bcc;letter-spacing:.04em;white-space:nowrap}" +
     "html.landscape46:not(.portraitFallback46) .homeBannerDots46{display:flex;gap:4px;margin-top:5px}" +
     "html.landscape46:not(.portraitFallback46) .homeBannerDots46 i{width:5px;height:5px;border-radius:50%;background:#cfc4df55}" +
     "html.landscape46:not(.portraitFallback46) .homeBannerDots46 i.on{background:#f35aa6}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeModes46 .modeIco46{display:block;width:18px;height:18px;margin-bottom:4px}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeModes46 .modeIco46{display:block;width:22px;height:22px;margin-bottom:4px}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeModes46 .modeIco46.testimony{background:conic-gradient(from 20deg,#f35aa6,#ff9bcc,#f35aa6);clip-path:polygon(50% 0,100% 38%,82% 100%,18% 100%,0 38%)}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeModes46 .modeIco46.domain{background:linear-gradient(135deg,#69ddf2,#3d82d8);clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .coins{margin:0}" +
@@ -97,12 +97,15 @@
     ".shellList46{display:grid;gap:8px}" +
     ".shellItem46{display:grid;grid-template-columns:42px 1fr auto;gap:10px;align-items:center;min-height:56px;padding:10px 12px;border-radius:14px;background:#120e27ee;border:1px solid #f35aa644;color:#fff7fb;text-align:left}" +
     ".shellItem46 i{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:#f35aa622;color:#f35aa6;font:900 16px/1 system-ui;font-style:normal}" +
+    ".shellItem46 .railIco46{width:36px;height:36px;background:transparent}" +
+    ".shellItem46 .railIco46:before,.shellItem46 .railIco46:after{display:none!important}" +
     ".shellItem46 b{display:block;font-size:14px;letter-spacing:.06em}" +
     ".shellItem46 small{display:block;margin-top:3px;color:#cfc4df;font-size:11px;line-height:1.4}" +
     ".shellItem46 em{color:#f2c75d;font:800 11px/1 system-ui;font-style:normal}" +
     ".shellItem46 em.ready46{color:#69ddf2}" +
     ".shellItem46 em.done46{color:#cfc4df}" +
     ".shellHint46{margin:0;color:#cfc4df;font-size:11px;letter-spacing:.08em}" +
+    ".shellClaim46{display:block;width:calc(100% - 24px);margin:10px 12px 0;min-height:40px;border-radius:12px;border:1px solid #f2c75d88;background:#2a1848;color:#ffe9a9;font-weight:800}" +
     ".shellCal46{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}" +
     ".shellCal46 button{min-height:64px;padding:6px 4px;border-radius:12px;border:1px solid #f35aa644;background:#120e27ee;color:#fff7fb}" +
     ".shellCal46 button b{display:block;font-size:12px}" +
@@ -189,8 +192,9 @@
     "html.landscape46:not(.portraitFallback46) #shopList [data-shop-group=starters],html.landscape46:not(.portraitFallback46) #shopList [data-shop-group=items],html.landscape46:not(.portraitFallback46) #shopList [data-shop-group=talismans],html.landscape46:not(.portraitFallback46) #shopList [data-shop-group=extensions]{grid-template-columns:repeat(2,minmax(0,1fr))}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer .challengeToggle40,html.landscape46:not(.portraitFallback46) #shopDrawer .routeNote{grid-column:1/-1}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer .skinCard,html.landscape46:not(.portraitFallback46) #shopDrawer .shopItem40{display:flex;flex-direction:column;min-height:0;margin:0;padding:0;overflow:hidden;border:1px solid #69ddf244;background:linear-gradient(135deg,#1a132cf2,#100c1cee)}" +
-    "html.landscape46:not(.portraitFallback46) #shopDrawer .skinPreview{width:100%;height:132px}" +
-    "html.landscape46:not(.portraitFallback46) #shopDrawer .shopIcon40{width:100%;height:64px;border-radius:0;font-size:28px}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .skinPreview{width:100%;height:88px;overflow:hidden}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .skinPreview img{width:100%;height:100%;object-fit:contain;object-position:center 18%}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .shopIcon40{width:64px;height:64px;min-width:64px;min-height:64px;margin:8px auto 0;border-radius:14px;font-size:0;display:grid;place-items:center}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer .skinCard>div,html.landscape46:not(.portraitFallback46) #shopDrawer .shopItem40>div{padding:6px 10px 0}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer .skinCard h3,html.landscape46:not(.portraitFallback46) #shopDrawer .shopItem40 h3{margin:0;font-size:13px}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer .skinCard p,html.landscape46:not(.portraitFallback46) #shopDrawer .skinBias,html.landscape46:not(.portraitFallback46) #shopDrawer .shopItem40 p{display:none}" +
@@ -215,7 +219,7 @@
     "html.landscape46:not(.portraitFallback46) #shopDrawer.isFeatured46 #shopList .shopGroup40{display:none!important}" +
     "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46,html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopGood46,html.landscape46:not(.portraitFallback46) #shopExchange46 .shopGood46{display:flex;flex-direction:column;min-height:148px;padding:0;overflow:hidden;border-radius:16px;border:1px solid #69ddf244;background:linear-gradient(135deg,#1a132cf2,#100c1cee)}" +
     "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkinPrev46,html.landscape46:not(.portraitFallback46) .shopGoodIco46{position:relative;width:100%;height:88px;overflow:hidden;background:#171027}" +
-    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkinPrev46 img{width:100%;height:100%;object-fit:cover;object-position:center top}" +
+    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkinPrev46 img{width:100%;height:100%;object-fit:contain;object-position:center 18%}" +
     "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkinPrev46 span{position:absolute;inset:0;display:grid;place-items:center}" +
     "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46>div{padding:6px 10px 0}" +
     "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46 h3,html.landscape46:not(.portraitFallback46) .shopGoodBar46 b{margin:0;font-size:13px;color:#fff7fb}" +
@@ -233,7 +237,7 @@
     ".shopGoodIco46.prism:before{width:0;height:0;border:10px solid transparent;border-bottom-color:#69ddf2;transform:translate(-50%,-70%)}" +
     ".shopGoodIco46.sakura:before{width:16px;height:16px;border-radius:50%;background:#f35aa6;box-shadow:10px 0 0 #f35aa6,-5px 9px 0 #f35aa6}" +
     "html.shortWindow46 #shopDrawer .shopChip46.prism,html.shortWindow46 #shopDrawer .shopChip46.shard{display:none}" +
-    "html.shortWindow46 #shopFeatured46 .shopSkinPrev46,html.shortWindow46 .shopGoodIco46{height:56px!important}" +
+    "html.shortWindow46 #shopFeatured46 .shopSkinPrev46,html.shortWindow46 .shopGoodIco46,html.shortWindow46 #shopDrawer .skinPreview{height:88px!important}" +
     "html.landscape46:not(.portraitFallback46) #storyList .storyCard.charLore,html.landscape46:not(.portraitFallback46) #storyList .storyCard.recap39,html.landscape46:not(.portraitFallback46) #storyList #storyRecap39,html.landscape46:not(.portraitFallback46) #storyList .hiddenStory40,html.landscape46:not(.portraitFallback46) #storyList .extensionStory41{display:none!important}" +
     "html.landscape46:not(.portraitFallback46) #storyList .storyAct46{display:block;margin-bottom:2px;color:#cfc4df;font:700 10px/1 system-ui;letter-spacing:.12em}" +
     "html.landscape46:not(.portraitFallback46) #storyDrawer>.dhead h2{letter-spacing:.2em}" +
@@ -409,9 +413,10 @@
     { id: "pull", title: "每日：寻访一次证词", sub: "今日真实抽取一次", need: 1, coins: 40, reset: "day" },
   ]);
   var MAILS = Object.freeze([
-    { id: "welcome", title: "补给签收通知", sub: "新档案开通奖励", body: "新档案已在本机开通。补给写入樱花币，核心、道具和寻访都会加伤。", coins: 80, shard: 0, need: "always" },
-    { id: "gacha", title: "镜界寻访周期", sub: "完成一次寻访后可领", body: "完成一次真实寻访后可领取碎片。证词入册会叠层加伤。", coins: 0, shard: 20, need: "pull" },
-    { id: "patch", title: "系统维护回执", sub: "本机离线更新说明", body: "这次维护只整理本机界面与存档字段。没有联网补丁，也没有清档。", coins: 0, shard: 0, need: "always" },
+    { id: "betaCrate", title: "夜樱内测补给", sub: "🌸25000 · 券×80 · 碎片 800 · 棱晶 500", body: "内测期间走邮箱发大量资源，不走后门。樱花币、寻访券、碎片和棱晶一次入账。核心、道具和寻访证词都会写入火力。", coins: 25000, shard: 800, prism: 500, ticket: 80, need: "always" },
+    { id: "welcome", title: "补给签收通知", sub: "新档案开通奖励 · 🌸80", body: "新档案已在本机开通。补给写入樱花币，核心、道具和寻访都会加伤。", coins: 80, shard: 0, prism: 0, ticket: 0, need: "always" },
+    { id: "gacha", title: "镜界寻访周期", sub: "完成一次寻访后可领", body: "完成一次真实寻访后可领取碎片。证词入册会叠层加伤。", coins: 0, shard: 20, prism: 0, ticket: 0, need: "pull" },
+    { id: "patch", title: "系统维护回执", sub: "本机离线更新说明", body: "这次维护只整理本机界面与存档字段。没有联网补丁，也没有清档。", coins: 0, shard: 0, prism: 0, ticket: 0, need: "always" },
   ]);
   var NOTICES = Object.freeze([
     { id: "story", title: "四章主线仍在本地推进", sub: "通关记录沿用现有存档字段", body: "四章主线仍在本地推进。通关记录沿用现有存档字段 done / story，不联网拉取公告。" },
@@ -642,8 +647,8 @@
     if (mail.need === "pull" && missionRaw(save, "pull") < 1) return { ok: false, reason: "need", read: 1 };
     if (meta.claimed.mail[id]) return { ok: false, reason: "claimed", read: 1 };
     meta.claimed.mail[id] = 1;
-    grant(save, meta, { coins: mail.coins || 0, shard: mail.shard || 0, prism: 0 });
-    return { ok: true, coins: save.coins, shard: meta.shard };
+    grant(save, meta, { coins: mail.coins || 0, shard: mail.shard || 0, prism: mail.prism || 0, ticket: mail.ticket || 0 });
+    return { ok: true, coins: save.coins, shard: meta.shard, prism: meta.prism, ticket: meta.ticket };
   }
 
   function readNotice(save, id) {
@@ -937,6 +942,16 @@
     });
   }
 
+  function mailAttach(m) {
+    var parts = [];
+    if (!m) return "";
+    if (m.coins) parts.push("🌸" + m.coins);
+    if (m.ticket) parts.push("券×" + m.ticket);
+    if (m.shard) parts.push("碎片 " + m.shard);
+    if (m.prism) parts.push("棱晶 " + m.prism);
+    return parts.join(" · ");
+  }
+
   function articlePane(title, body) {
     return (
       '<article class="shellPane46"><div class="shellPaneHero46"></div><div class="shellPaneCopy46"><b>' +
@@ -1002,26 +1017,39 @@
     var meta = ensureMeta(save);
     if (!mailPick) mailPick = MAILS[0].id;
     var picked = MAILS.filter(function (m) { return m.id === mailPick; })[0] || MAILS[0];
+    var pickedLocked = picked.need === "pull" && missionRaw(save, "pull") < 1;
+    var pickedGot = !!meta.claimed.mail[picked.id];
+    var canClaim = !pickedGot && !pickedLocked && !!(picked.coins || picked.shard || picked.prism || picked.ticket);
     host.innerHTML =
       '<p class="shellHint46">本地信箱 · 领取写入存档</p><div class="shellSplit46"><div class="shellList46">' +
       MAILS.map(function (m) {
         var locked = m.need === "pull" && missionRaw(save, "pull") < 1;
         var got = !!meta.claimed.mail[m.id];
-        var tag = got ? "已领" : locked ? "未达成" : m.coins || m.shard ? "领取" : "已读";
-        return listButton('<i class="railIco46 mail"></i>', m.title, m.sub, tag, 'data-claim="mail" data-id="' + m.id + '"', got ? "done46" : locked ? "" : "ready46");
+        var tag = got ? "已领" : locked ? "未达成" : m.coins || m.shard || m.prism || m.ticket ? "可领" : "已读";
+        var icoKind = m.id === "betaCrate" ? "gift" : "mail";
+        return listButton('<i class="railIco46 ' + icoKind + '"></i>', m.title, m.sub + (mailAttach(m) && !got ? " · " + mailAttach(m) : ""), tag, 'data-claim="mail" data-id="' + m.id + '"', got ? "done46" : locked ? "" : "ready46");
       }).join("") +
       "</div>" +
-      articlePane(picked.title, picked.body || picked.sub) +
+      articlePane(picked.title, (picked.body || picked.sub) + (mailAttach(picked) ? "<br>附件：" + mailAttach(picked) : "")) +
+      (canClaim ? '<button type="button" class="shellClaim46" data-mail-act="claim">领取附件</button>' : "") +
       "</div>";
+    if (global.SakurayoChrome && typeof global.SakurayoChrome.dress === "function") {
+      global.SakurayoChrome.dress(host);
+    }
     host.onclick = function (ev) {
+      var claim = ev.target.closest ? ev.target.closest("[data-mail-act=claim]") : null;
       var btn = ev.target.closest ? ev.target.closest("[data-claim=mail]") : null;
+      if (claim) {
+        var out = claimMail(save, mailPick);
+        commit(api);
+        if (!out.ok && out.reason === "need") say(api, "先去镜界寻访一次");
+        else if (!out.ok && out.reason === "claimed") say(api, "这封已经领过了");
+        else if (out.ok) feel(api, "reward", "邮件签收");
+        renderMail(host, api);
+        return;
+      }
       if (!btn) return;
       mailPick = btn.getAttribute("data-id") || mailPick;
-      var out = claimMail(save, mailPick);
-      commit(api);
-      if (!out.ok && out.reason === "need") say(api, "先去镜界寻访一次");
-      else if (!out.ok && out.reason === "claimed") say(api, "这封已经领过了");
-      else if (out.ok) feel(api, "reward", "邮件签收");
       renderMail(host, api);
     };
   }
@@ -1447,8 +1475,8 @@
     if (title) title.textContent = "镜界寻访";
     var one = host.querySelector ? host.querySelector("#gachaPull1") : null;
     var ten = host.querySelector ? host.querySelector("#gachaPull10") : null;
-    if (one && one.querySelector("small")) one.childNodes[0].nodeValue = "寻访一次";
-    if (ten && ten.querySelector("small")) ten.childNodes[0].nodeValue = "寻访十次";
+    if (one && one.querySelector("small")) one.childNodes[0].nodeValue = "单次叠伤";
+    if (ten && ten.querySelector("small")) ten.childNodes[0].nodeValue = "十连叠伤";
   }
 
   function decorateRoster(host, save, handlers, api) {
@@ -1874,6 +1902,12 @@
     return lab;
   }
 
+  function cycleBanner() {
+    gachaBanner = gachaBanner === "moon" ? "fate" : gachaBanner === "fate" ? "normal" : "moon";
+    paintHomeBanner();
+    return gachaBanner;
+  }
+
   function ensureShopHead(drawer, save) {
     var money = drawer && drawer.querySelector ? drawer.querySelector(".shopMoney") : null;
     if (!money) return;
@@ -2091,6 +2125,7 @@
     paintSupport: paintSupport,
     paintCurrencies: paintCurrencies,
     paintHomeBanner: paintHomeBanner,
+    cycleBanner: cycleBanner,
     paintDots: paintDots,
     greetLine: greetLine,
     clearFloats: clearFloats,

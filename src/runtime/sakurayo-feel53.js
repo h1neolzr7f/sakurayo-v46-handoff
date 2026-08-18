@@ -6,7 +6,7 @@
   var HOOK_ID = "resultHook53";
   var CHANNEL = "yeying-dev";
   var LABEL = "开发版 夜樱";
-  var VERSION = "4.7.0";
+  var VERSION = "4.7.3";
   var RITUAL_MS = 3000;
   var RADIO_MS = 2200;
   var IDENTS = {

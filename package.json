@@ -1,6 +1,6 @@
 {
   "name": "sakurayo-zombietide",
-  "version": "4.7.0",
+  "version": "4.7.3",
   "private": true,
   "description": "樱夜·尸潮离线游戏开发与回归测试工具",
   "directories": {
@@ -9,7 +9,7 @@
   },
   "scripts": {
     "check": "python3 tools/static_check.py src/index.html && node --check tests/artifacts/static/index.extracted.js && python3 tools/check_content_packs.py && node --check src/runtime/sakurayo-content-runtime.js && node --check src/runtime/sakurayo-lifecycle.js && node --check src/runtime/sakurayo-cutscene.js && node --check src/runtime/sakurayo-economy.js && node --check src/runtime/sakurayo-lobby.js && node --check src/runtime/sakurayo-shell.js && node --check src/runtime/sakurayo-live.js && node --check src/runtime/sakurayo-ops.js && node --check src/runtime/sakurayo-layout52.js && node --check src/runtime/sakurayo-feel53.js && node --check src/runtime/sakurayo-touch54.js && node --check src/runtime/sakurayo-boutique.js && node --check src/runtime/sakurayo-chrome.js",
-    "test:unit": "node tests/lobby_unit.mjs && node tests/live_unit.mjs && node tests/ops_unit.mjs && node tests/shell_unit.mjs && node tests/feel53_unit.mjs && node tests/layout52_unit.mjs && node tests/touch54_unit.mjs && node tests/chrome_unit.mjs && node tests/regression_v47.mjs && node tests/start_hang.mjs",
+    "test:unit": "node tests/lobby_unit.mjs && node tests/live_unit.mjs && node tests/ops_unit.mjs && node tests/shell_unit.mjs && node tests/feel53_unit.mjs && node tests/layout52_unit.mjs && node tests/touch54_unit.mjs && node tests/chrome_unit.mjs && node tests/regression_v47.mjs && node tests/style_lock_unit.mjs && node tests/start_hang.mjs && node tests/layout_stable.mjs",
     "test:smoke": "node tests/ops_smoke.mjs && node tests/framework_smoke.mjs && node tests/testimony_smoke.mjs && node tests/landscape_smoke.mjs && node tests/browser_smoke.mjs",
     "test:mobile": "node tests/mobile_lobby.mjs",
     "test:visual": "node tests/gacha_visual.mjs && node tests/combat_visual.mjs && node tests/player_path.mjs && node tests/mobile_playthrough.mjs && node tests/mobile_ux.mjs && node tests/android_webview_playthrough.mjs",

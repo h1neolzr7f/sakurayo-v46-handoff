@@ -1,7 +1,7 @@
 (function (global) {
   "use strict";
 
-  var VERSION = "4.7.0";
+  var VERSION = "4.7.3";
   // Live2D Cubism AutoEyeBlinkInput defaults: Mean 2.5, Maximum Deviation 2.
   // https://docs.live2d.com/en/cubism-sdk-tutorials/eyeblink/
   var BLINK = Object.freeze({
@@ -41,7 +41,7 @@
     "#menu.homeDock46 .heroLiveBreath46 img,.wishHero46{filter:none!important}" +
     "#menu.homeDock46 .heroLiveBreath46:before{filter:none!important;background:radial-gradient(ellipse at 50% 78%,#1a103066 0%,#12081c00 70%)}" +
     ".drawer.hidden .wishPetals46 i,.drawer.hidden .wishStage46:before{animation:none!important}" +
-    "html.landscape46 #menu.homeDock46 .heroLive46{top:0;bottom:0;left:0;right:auto;width:58%}" +
+    "html.landscape46 #menu.homeDock46 .heroLive46{top:8px;bottom:88px;left:0;right:auto;width:48%}" +
     "html.landscape46 #menu.homeDock46 .menu{width:100%;max-width:none;margin:0}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 #coverTitle36{display:none}" +
     "html.landscape46 .nav,html.landscape46 .homeNav46{grid-template-columns:repeat(5,minmax(0,1fr))!important}" +

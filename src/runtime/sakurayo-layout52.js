@@ -11,16 +11,22 @@
     "#menu.homeDock46 .homeDeck46 .stageMini,#menu.homeDock46 .homeDeck46 .homeModes46,#menu.homeDock46 .homeDeck46 .homeModes46 button,#menu.homeDock46 .homeDeck46 #start,#menu.homeDock46 .homeDeck46 button{pointer-events:auto!important;touch-action:manipulation!important}" +
     "#menu.homeDock46 .homeDeck46 .stageMini{cursor:pointer}" +
     "#menu.homeDock46 .calmUtility39:not(.open39),#menu.homeDock46 #moreButton39,#menu.homeDock46 #statsButton37,#menu.homeDock46 #settingsButton37,#menu.homeDock46 #guideButton37,#menu.homeDock46 #saveButton38{position:relative;z-index:16!important;pointer-events:auto!important}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .calmUtility39.open39{position:fixed!important;top:max(52px,calc(env(safe-area-inset-top) + 44px))!important;right:max(12px,env(safe-area-inset-right))!important;bottom:auto!important;left:auto!important;z-index:42!important;width:min(74vw,280px)!important;max-height:min(68vh,280px)!important;overflow:auto!important;padding:8px!important;border-radius:14px!important;background:#120e27f8!important;border:1px solid #f2c75d66!important;box-shadow:0 16px 36px #05020de8!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .calmUtility39.open39>#moreButton39{grid-column:1/-1!important;position:relative!important;z-index:43!important}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46:has(.calmUtility39.open39)::before{content:\"\";position:fixed;inset:0;z-index:34;background:#05020d99;pointer-events:none}" +
+    "html.landscape46 #menu.homeDock46 .calmUtility39.open39{position:fixed!important;top:max(52px,calc(env(safe-area-inset-top) + 44px))!important;right:max(12px,env(safe-area-inset-right))!important;bottom:auto!important;left:auto!important;z-index:42!important;width:min(74vw,280px)!important;max-height:min(68vh,280px)!important;overflow:auto!important;padding:8px!important;border-radius:14px!important;background:#120e27f8!important;border:1px solid #f2c75d66!important;box-shadow:0 16px 36px #05020de8!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}" +
+    "html.landscape46 #menu.homeDock46 .calmUtility39.open39>#moreButton39{grid-column:1/-1!important;position:relative!important;z-index:43!important}" +
+    "html.landscape46 #menu.homeDock46:has(.calmUtility39.open39)::before{content:\"\";position:fixed;inset:0;z-index:34;background:#05020d99;pointer-events:none}" +
     "#menu.homeDock46 .heroLive46,#menu.homeDock46 .heroLiveBreath46,#menu.homeDock46 .bg,#yeyingDevBadge53{pointer-events:none!important}" +
     "html.landscape46 #menu.homeDock46 .top,html.androidLandscape46 #menu.homeDock46 .top{height:52px!important;max-height:52px!important;overflow:visible!important;z-index:10!important;pointer-events:none!important}" +
     "html.landscape46 #menu.homeDock46 .top .profile,html.landscape46 #menu.homeDock46 .top .coins,html.landscape46 #menu.homeDock46 .top button,html.landscape46 #menu.homeDock46 .top .charSelectPanel,html.landscape46 #menu.homeDock46 .top #homeWallet46,html.landscape46 #menu.homeDock46 .top #homeQuick46,html.androidLandscape46 #menu.homeDock46 .top .profile,html.androidLandscape46 #menu.homeDock46 .top .coins,html.androidLandscape46 #menu.homeDock46 .top button,html.androidLandscape46 #menu.homeDock46 .top .charSelectPanel,html.androidLandscape46 #menu.homeDock46 .top #homeWallet46,html.androidLandscape46 #menu.homeDock46 .top #homeQuick46{pointer-events:auto!important}" +
-    "html.androidLandscape46 #menu.homeDock46 .heroLive46,html.landscape46.portraitFallback46 #menu.homeDock46 .heroLive46{width:42%!important;max-width:46%;top:0!important;bottom:96px!important;z-index:1!important;pointer-events:none!important}" +
+    "html.androidLandscape46 #menu.homeDock46 .heroLive46,html.landscape46.portraitFallback46 #menu.homeDock46 .heroLive46{width:48%!important;max-width:52%;top:8px!important;bottom:88px!important;z-index:1!important;pointer-events:none!important}" +
     "html.androidLandscape46 #menu.homeDock46 .homeDeck46,html.landscape46.portraitFallback46 #menu.homeDock46 .homeDeck46{display:flex!important;flex-direction:column;position:absolute!important;right:max(12px,env(safe-area-inset-right))!important;top:max(58px,calc(env(safe-area-inset-top) + 48px))!important;bottom:max(78px,calc(env(safe-area-inset-bottom) + 68px))!important;width:min(36vw,300px)!important;z-index:12!important;pointer-events:none!important}" +
     "html.androidLandscape46 #menu.homeDock46 .nav.homeNav46,html.landscape46.portraitFallback46 #menu.homeDock46 .nav.homeNav46{position:absolute!important;left:50%!important;bottom:max(8px,env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;z-index:13!important;pointer-events:auto!important}" +
-    "html.androidLandscape46 #menu.homeDock46 .homeRail46,html.landscape46.portraitFallback46 #menu.homeDock46 .homeRail46{position:absolute!important;z-index:12!important;pointer-events:auto!important}" +
+    "html.androidLandscape46:not(.portraitFallback46) #menu.homeDock46 .homeRail46{position:absolute!important;z-index:12!important;pointer-events:auto!important}" +
+    "html.landscape46.portraitFallback46 #menu.homeDock46 .homeRail46{position:absolute!important;left:8px!important;right:8px!important;top:auto!important;bottom:max(78px,calc(env(safe-area-inset-bottom) + 68px))!important;width:auto!important;margin:0!important;z-index:8!important;display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;justify-content:space-between!important;pointer-events:auto!important}" +
+    "html.landscape46.portraitFallback46 #menu.homeDock46 .homeRail46 button{min-width:42px!important;min-height:42px!important;padding:4px 2px!important;flex:1 1 0}" +
+    "html.landscape46.portraitFallback46 #menu.homeDock46 #moreButton39{z-index:20!important}" +
+    "html.landscape46 #menu.homeDock46:has(.calmUtility39.open39) .top{z-index:50!important}" +
+    "html.landscape46 #menu.homeDock46:has(.calmUtility39.open39) .homeDeck46{z-index:1!important;pointer-events:none!important}" +
+    "html.landscape46 #menu.homeDock46:has(.calmUtility39.open39) .calmUtility39{z-index:51!important;pointer-events:auto!important}" +
     "html.androidLandscape46 #menu.homeDock46 .homeBanner46,html.landscape46.portraitFallback46 #menu.homeDock46 .homeBanner46{z-index:12!important;pointer-events:auto!important}" +
     "html.androidLandscape46 #menu.homeDock46 .charSelectPanel,html.landscape46.portraitFallback46 #menu.homeDock46 .charSelectPanel{z-index:14!important;pointer-events:auto!important;bottom:auto!important}" +
     "html.landscape46:not(.portraitFallback46) .utilityButtons37{display:none!important}" +
@@ -30,8 +36,8 @@
   var CSS =
     HIT_CSS +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .menuBrand35{display:none!important}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .heroLive46{width:42%;max-width:46%;top:48px;bottom:108px!important;z-index:1;pointer-events:none!important;-webkit-mask-image:linear-gradient(to right,#000 0%,#000 78%,transparent 100%),linear-gradient(to top,transparent 0%,#000 8%,#000 100%);mask-image:linear-gradient(to right,#000 0%,#000 78%,transparent 100%),linear-gradient(to top,transparent 0%,#000 8%,#000 100%);-webkit-mask-composite:source-in;mask-composite:intersect}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .heroLiveBreath46{width:min(40vw,420px);height:100%}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .heroLive46{width:48%;max-width:52%;top:8px;bottom:88px!important;z-index:1;pointer-events:none!important;-webkit-mask-image:linear-gradient(to right,#000 0%,#000 94%,transparent 100%),linear-gradient(to top,transparent 0%,#000 6%,#000 100%);mask-image:linear-gradient(to right,#000 0%,#000 94%,transparent 100%),linear-gradient(to top,transparent 0%,#000 6%,#000 100%);-webkit-mask-composite:source-in;mask-composite:intersect}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .heroLiveBreath46{width:100%;height:100%}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .heroLiveBreath46 img{object-fit:contain;object-position:center 10%}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .top{align-items:center}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .profile{flex:none;max-width:200px;max-height:44px;overflow:visible;z-index:8}" +
@@ -40,7 +46,7 @@
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .top .charSelectPanel{position:static!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;width:auto;margin:0 8px 0 auto;padding:0;background:transparent;border:0;box-shadow:none;z-index:14;pointer-events:auto;flex:0 0 auto}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .top .charSelectPanel .sectionTitle{display:none!important}" +
     "html.landscape46:not(.portraitFallback46) #homeWallet46{margin-left:0}" +
-    "html.landscape46:not(.portraitFallback46) #homeWallet46 .homeChip46.prism,html.landscape46:not(.portraitFallback46) #homeWallet46 .homeChip46.shard{display:none!important}" +
+    "html.landscape46:not(.portraitFallback46) #homeWallet46{display:flex;flex-wrap:nowrap;align-items:center;gap:4px;max-width:min(58vw,460px);overflow:hidden}html.landscape46:not(.portraitFallback46) #homeWallet46 .homeChip46{padding:2px 5px}html.landscape46:not(.portraitFallback46) #homeWallet46 .homeChip46 button{display:none}html.landscape46:not(.portraitFallback46) #homeWallet46 .homeChip46.prism,html.landscape46:not(.portraitFallback46) #homeWallet46 .homeChip46.shard{display:inline-flex!important}" +
     "html.landscape46:not(.portraitFallback46) #homeQuick46{gap:12px}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 #moreButton39{margin-left:10px;padding:0 12px}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 #homeGreet46,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeGreet46{position:absolute;left:44px;top:calc(100% + 4px);margin:0;max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:6;pointer-events:none}" +
@@ -55,7 +61,7 @@
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46{z-index:12}" +
     "@media(max-height:430px){html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46.speak53{display:none!important}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeRail46{bottom:max(78px,calc(env(safe-area-inset-bottom) + 68px))}}" +
     "@media(max-height:370px){html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46{bottom:max(80px,calc(env(safe-area-inset-bottom) + 70px));gap:4px;overflow:hidden}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini{min-height:48px;padding:6px 10px}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini p,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeStageProg46{display:none!important}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeModes46 button{min-height:36px;padding:4px 8px}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeModes46 button small{display:none}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .start{min-height:40px;flex:0 0 40px}}" +
-    "html.landscape46.shortWindow46 #menu.homeDock46 .heroLive46{width:44%;top:44px!important;bottom:80px!important}" +
+    "html.landscape46.shortWindow46 #menu.homeDock46 .heroLive46{width:48%;top:8px!important;bottom:72px!important}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .top .charSelectPanel{position:static!important;left:auto!important;top:auto!important;margin:0 6px 0 auto}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .homeDeck46{bottom:max(88px,calc(env(safe-area-inset-bottom) + 78px))}" +
     "html.landscape46:not(.portraitFallback46) #hud .hero{max-width:188px}" +
@@ -263,7 +269,7 @@
   }
 
   global.SakurayoLayout52 = {
-    version: "4.7.0",
+    version: "4.7.3",
     css: CSS,
     install: install,
     hangGreet: hangGreet,

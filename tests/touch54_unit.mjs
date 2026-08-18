@@ -23,7 +23,7 @@ assert.doesNotMatch(code, /sakurayoV3/);
 assert.match(ops, /sakurayo-touch54\.js/);
 assert.match(activity, /TOUCH54_ASSET/);
 assert.match(activity, /setOnTouchListener/);
-assert.match(gradle, /versionCode 6110/);
+assert.match(gradle, /versionCode 6113/);
 assert.match(code, /pointer-events:auto!important/);
 assert.match(code, /elementFromPoint/);
 assert.match(code, /syncCinematicHud/);
@@ -122,7 +122,7 @@ sandbox.window.document = document;
 vm.runInNewContext(code, sandbox);
 const T = sandbox.window.SakurayoTouch54;
 
-assert.equal(T.version, "4.7.0");
+assert.equal(T.version, "4.7.3");
 const installed = T.install();
 assert.equal(installed.ok, true);
 assert.equal(installed.blocked, true);

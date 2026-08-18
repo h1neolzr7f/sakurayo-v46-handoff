@@ -11,7 +11,7 @@ sandbox.globalThis = sandbox;
 vm.runInNewContext(code, sandbox);
 const L = sandbox.window.SakurayoLobby;
 
-assert.equal(L.version, "4.7.0");
+assert.equal(L.version, "4.7.3");
 assert.equal(L.CARDS.length, 16);
 assert.deepEqual([...L.DEFAULT_SHOWN], ["sayo_echo", "aya_petal"]);
 for (const card of L.CARDS) {
@@ -103,7 +103,8 @@ assert.equal(typeof L.showReveal, "function");
 assert.equal(typeof L.injectStyle, "function");
 const lobbySrc = fs.readFileSync(path.join(root, "src/runtime/sakurayo-lobby.js"), "utf8");
 assert.match(lobbySrc, /@media\(orientation:landscape\)\{/);
-assert.match(lobbySrc, /homeBanner46\{display:grid;.*left:max\(80px/);
+assert.match(lobbySrc, /homeBanner46\{display:grid;.*left:max\(12px/);
+assert.match(lobbySrc, /homeBanner46\{display:grid;.*width:50px;min-height:48px/);
 assert.match(lobbySrc, /shortWindow46 \.revealGrid46\.ten \.revealCard46\{height:68px\}/);
 assert.match(lobbySrc, /@media\(max-height:430px\)\{html\.landscape46 \.revealGrid46\.ten \.revealCard46\{height:68px\}/);
 assert.match(lobbySrc, /revealSkip46.*min-width:72px/);
@@ -265,6 +266,10 @@ assert.match(reveal.innerHTML, /revealGem46/);
 assert.match(reveal.innerHTML, /镜界开印/);
 assert.match(reveal.innerHTML, /revealSum46/);
 assert.match(reveal.innerHTML, /单次寻访/);
+assert.match(reveal.innerHTML, /revealPow46/);
+assert.match(reveal.innerHTML, /本抽叠伤 \+/);
+assert.match(code, /单次叠伤/);
+assert.match(code, /wishPower46/);
 V.showReveal(
   [
     { id: "last_witness", n: "终章证人立绘", r: "SSR" },
@@ -315,6 +320,14 @@ V.dressArchive(archiveHost);
 const storyBtn = archiveHost.children.find((n) => n.getAttribute("data-open") === "story");
 assert.match(storyBtn.innerHTML, /<b>剧情档案<\/b><small>四章证词<\/small>/);
 assert.match(archiveHost.children[0].innerHTML, /永久天赋/);
-assert.equal(archiveHost.children.find((n) => n.getAttribute("data-open") === "ach"), undefined);
+const achBtn = archiveHost.children.find((n) => n.getAttribute("data-open") === "ach");
+assert.ok(achBtn);
+assert.match(achBtn.innerHTML, /<b>成就图鉴<\/b><small>点亮记录<\/small>/);
+
+const indexHtml = fs.readFileSync(path.join(root, "src/index.html"), "utf8");
+assert.match(indexHtml, /<b>主神<\/b><small>高难轮回<\/small>/);
+assert.doesNotMatch(indexHtml, /通关第4章后解锁主神空间/);
+assert.match(indexHtml, /unlockedGod = mainGodOpen36\(\)/);
+assert.match(indexHtml, /homePrism46">0</);
 
 console.log("PASS lobby unit: rates, default two cards, pity, ten-pull, cheat taps, stage modes");

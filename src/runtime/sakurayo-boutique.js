@@ -56,7 +56,7 @@
     "html.landscape46:not(.portraitFallback46) #shopDrawer>.dhead p.shopSub46{display:block;margin:4px 0 0;color:#ffe7a3;font:700 10px/1.35 system-ui;letter-spacing:.1em}" +
     ".shopMark46{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:linear-gradient(180deg,#f2c75d,#c48a18);box-shadow:0 0 12px #f2c75d66}" +
     ".shopMark46 svg{width:18px;height:18px}" +
-    "html.landscape46:not(.portraitFallback46) .shopRail46 button{display:grid;grid-template-columns:28px 1fr;align-items:center;gap:8px;min-height:58px;padding:8px 10px;border-radius:14px;border:1px solid #f35aa644;background:linear-gradient(180deg,#1a132cee,#120e27ee);color:#fff7fb;text-align:left;box-shadow:inset 0 1px 0 #ffffff14}" +
+    "html.landscape46:not(.portraitFallback46) .shopRail46 button{display:grid;grid-template-columns:28px 1fr;align-items:center;gap:8px;min-height:44px;padding:8px 10px;border-radius:14px;border:1px solid #f35aa644;background:linear-gradient(180deg,#1a132cee,#120e27ee);color:#fff7fb;text-align:left;box-shadow:inset 0 1px 0 #ffffff14}" +
     "html.landscape46:not(.portraitFallback46) .shopRail46 button small{display:block;margin-top:4px;color:#cfc4df;font:700 9px/1 system-ui;letter-spacing:.08em}" +
     "html.landscape46:not(.portraitFallback46) .shopRail46 button.on{border-color:#f2c75d;background:linear-gradient(90deg,#f2c75d33,#120e27ee);box-shadow:inset 3px 0 0 #f2c75d,0 0 16px #f2c75d33}" +
     ".shopRailIco46{display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:#171027;border:1px solid #f2c75d44}" +
@@ -75,8 +75,9 @@
     "#shopDrawer .skinCard{position:relative;border-radius:16px;box-shadow:0 10px 24px #05020d66}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer .skinCard p,html.landscape46:not(.portraitFallback46) #shopDrawer .shopPitch46{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin:4px 0 0;color:#e7d7ef;font-size:11px;line-height:1.4}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer .skinBias{display:block;margin:4px 0 0;color:#ffe7a3;font:700 10px/1.3 system-ui}" +
-    "html.landscape46:not(.portraitFallback46) #shopDrawer .skinPreview{position:relative;height:132px;background:radial-gradient(circle at 50% 20%,#3a2458,#171027 70%)}" +
-    "html.landscape46:not(.portraitFallback46) #shopDrawer .skinPreview:after{content:\"\";position:absolute;inset:auto 0 0;height:42%;background:linear-gradient(180deg,#17102700,#100c1eee)}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .skinPreview{position:relative;height:88px;overflow:hidden;background:radial-gradient(circle at 50% 20%,#3a2458,#171027 70%)}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .skinPreview img{width:100%;height:100%;object-fit:contain;object-position:center 18%}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .skinPreview:after{content:\"\";position:absolute;inset:auto 0 0;height:22%;background:linear-gradient(180deg,#17102700,#100c1eee)}" +
     "#shopCounter46{display:none}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer.isBoutique46 #shopFeatured46{display:block!important}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer.isBoutique46 #shopList .shopGroup40{display:none!important}" +
@@ -85,26 +86,25 @@
     "html.landscape46:not(.portraitFallback46) #shopDrawer.isSupplies46 #shopCounter46{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 12px}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer.isExchange46 #shopFeatured46,html.landscape46:not(.portraitFallback46) #shopDrawer.isExchange46 #shopCounter46,html.landscape46:not(.portraitFallback46) #shopDrawer.isExchange46 #shopList .shopGroup40{display:none!important}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer.isExchange46 #shopExchange46{display:grid!important;grid-template-columns:1fr 1fr;gap:10px}" +
-    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46{position:relative;display:grid;grid-template-columns:minmax(96px,22%) 1fr minmax(128px,22%);min-height:120px;max-height:136px;margin:0 0 12px;overflow:hidden;border-radius:18px;border:1px solid #f2c75d88;background:linear-gradient(135deg,#3a2158f2,#100c1cee);box-shadow:0 12px 28px #05020d88}" +
-    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkinPrev46{position:relative;width:100%;height:136px;overflow:hidden;background:radial-gradient(circle at 40% 20%,#4a2a6e,#171027 72%)}" +
-    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkinPrev46 img{width:100%;height:100%;object-fit:cover;object-position:center top}" +
+    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46{position:relative;display:grid;grid-template-columns:minmax(96px,22%) 1fr minmax(128px,22%);min-height:88px;max-height:none;margin:0 0 12px;overflow:hidden;border-radius:18px;border:1px solid #f2c75d88;background:linear-gradient(135deg,#3a2158f2,#100c1cee);box-shadow:0 12px 28px #05020d88}" +
+    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkinPrev46{position:relative;width:100%;height:88px;overflow:hidden;background:radial-gradient(circle at 40% 20%,#4a2a6e,#171027 72%)}" +
+    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkinPrev46 img{width:100%;height:100%;object-fit:contain;object-position:center 18%}" +
     "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46>div{padding:10px 12px 0}" +
     "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46 h3{margin:0;font-size:16px;letter-spacing:.12em}" +
     "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46 p,html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46 .shopPitch46,html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46 .skinBias{display:block}" +
     "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46 button,html.landscape46:not(.portraitFallback46) #shopDrawer .skinCard button,html.landscape46:not(.portraitFallback46) .shopGood46 button{margin:auto 12px 12px;min-height:42px;border-radius:12px;border:1px solid #f2c75d88;background:linear-gradient(180deg,#ff9ad4,#b02078);color:#fff;box-shadow:0 6px 14px #b0207844}" +
     "#shopDrawer .shopGoodIco46:before,#shopDrawer .shopGoodIco46:after{display:none!important}" +
-    "html.landscape46:not(.portraitFallback46) #shopDrawer .shopGoodIco46{height:108px!important;background:radial-gradient(circle at 50% 30%,#3a2458,#14101f 72%);border-bottom:1px solid #f2c75d33}" +
-    "#shopDrawer .shopGoodIco46 svg{width:56px;height:56px;filter:drop-shadow(0 6px 10px #05020d88)}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .shopGoodIco46{height:88px!important;background:radial-gradient(circle at 50% 30%,#3a2458,#14101f 72%);border-bottom:1px solid #f2c75d33}" +
+    "#shopDrawer .shopGoodIco46 svg{width:40px;height:40px;filter:drop-shadow(0 6px 10px #05020d88)}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer .shopGood46,html.landscape46:not(.portraitFallback46) #shopExchange46 .shopGood46{border-radius:16px;border:1px solid #69ddf255;background:linear-gradient(180deg,#221833f2,#100c1eee);box-shadow:0 10px 22px #05020d66;overflow:hidden}" +
-    "html.landscape46:not(.portraitFallback46) #shopDrawer .shopIcon40{width:100%;height:72px;border-radius:0;border:0;background:radial-gradient(circle at 50% 30%,#3a2458,#171027 72%);font-size:0}" +
-    "#shopDrawer .shopIcon40 svg{width:40px;height:40px;filter:drop-shadow(0 4px 8px #05020d88)}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .shopIcon40{width:64px;height:64px;min-width:64px;min-height:64px;margin:8px auto 0;border-radius:14px;border:0;background:radial-gradient(circle at 50% 30%,#3a2458,#171027 72%);font-size:0;display:grid;place-items:center}" +
+    "#shopDrawer .shopIcon40 svg{width:36px;height:36px;filter:drop-shadow(0 4px 8px #05020d88)}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer .shopItem40{overflow:hidden;border-radius:16px;border:1px solid #f35aa644;box-shadow:0 10px 22px #05020d55}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer .shopChip46 i{display:grid;place-items:center;width:16px;height:16px;font-size:0}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer .shopChip46 i svg{width:14px;height:14px}" +
     "html.shortWindow46 #shopFeatured46 .shopSkin46{grid-template-columns:84px 1fr minmax(110px,24%);min-height:80px;max-height:88px;margin:0 0 8px}" +
     "html.shortWindow46 #shopFeatured46 .shopSkinPrev46,html.shortWindow46 #shopDrawer .skinPreview{height:88px!important}" +
     "html.shortWindow46 #shopFeatured46 .shellHint46,html.shortWindow46 .shopRunway46,html.shortWindow46 .shopSub46,html.shortWindow46 #shopFeatured46 .shopSkin46 p,html.shortWindow46 #shopFeatured46 .shopSkin46 .skinBias,html.shortWindow46 #shopFeatured46 .shopSkin46 .shopPitch46{display:none!important}" +
-    "html.landscape46.shortWindow46:not(.portraitFallback46) #shopDrawer.isBoutique46 #shopList [data-shop-group=skins]{display:none!important}" +
     "html.shortWindow46 #shopList .shopTabs40{display:flex!important;flex-wrap:wrap;gap:6px;margin:0 0 8px}" +
     "html.shortWindow46 #shopList .shopTabs40 button{min-height:36px;padding:6px 10px}";
 
@@ -140,6 +140,7 @@
   }
 
   function dressIcons(root) {
+    if (global.SakurayoChrome && typeof global.SakurayoChrome.dress === "function") return;
     $$(".shopGoodIco46", root).forEach(function (el) {
       var kind = kindOfIco(el) || "gift";
       if (el.getAttribute("data-shop-ico") === kind && el.querySelector("svg")) return;
@@ -148,10 +149,10 @@
     });
     $$(".shopIcon40", root).forEach(function (el) {
       var raw = (el.getAttribute("data-shop-raw") || el.textContent || "").trim();
-      if (!el.getAttribute("data-shop-raw")) el.setAttribute("data-shop-raw", raw);
-      var kind = EMOJI[raw] || "gift";
+      if (!el.getAttribute("data-shop-raw") && raw.indexOf("<svg") < 0) el.setAttribute("data-shop-raw", raw);
+      var kind = el.getAttribute("data-shop-ico") || EMOJI[raw] || "seal";
       if (el.getAttribute("data-shop-ico") === kind && el.querySelector("svg")) return;
-      el.innerHTML = ICO[kind] || ICO.gift;
+      el.innerHTML = ICO[kind] || ICO.seal;
       el.setAttribute("data-shop-ico", kind);
     });
     $$(".shopChip46", root).forEach(function (chip) {
@@ -386,7 +387,7 @@
     return false;
   }
 
-  global.SakurayoBoutique = { version: "4.7.0", install: install, decorate: decorate };
+  global.SakurayoBoutique = { version: "4.7.3", install: install, decorate: decorate };
   if (global.document && global.document.readyState !== "loading") install();
   else if (global.document) global.document.addEventListener("DOMContentLoaded", install);
 })(typeof window !== "undefined" ? window : globalThis);

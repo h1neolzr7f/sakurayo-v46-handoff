@@ -14,8 +14,8 @@ android {
         applicationId "com.sakurayo.yeying.dev"
         minSdk 23
         targetSdk 36
-        versionCode 6110
-        versionName "4.7.0-yeying"
+        versionCode 6113
+        versionName "4.7.3-yeying"
     }
 
     signingConfigs {

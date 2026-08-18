@@ -24,7 +24,7 @@ sandbox.globalThis = sandbox;
 vm.runInNewContext(code, sandbox);
 const L = sandbox.window.SakurayoLive;
 
-assert.equal(L.version, "4.7.0");
+assert.equal(L.version, "4.7.3");
 assert.equal(L.BLINK.mean, 2.5);
 assert.equal(L.BLINK.deviation, 2);
 assert.deepEqual(Object.keys(L.PROFILES), ["sayo", "aya", "rion"]);

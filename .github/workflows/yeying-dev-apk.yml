@@ -7,6 +7,7 @@ on:
       - cursor/yeying-dev-apk-eaa0
       - cursor/yeying-touch-fix-eaa0
       - cursor/unify-v47-da3d
+      - yeying-qa-hotfix
   workflow_dispatch:
 
 permissions:
@@ -56,6 +57,9 @@ jobs:
           cp src/runtime/sakurayo-feel53.js android-app/app/src/main/assets/runtime/sakurayo-feel53.js
           cp src/runtime/sakurayo-boutique.js android-app/app/src/main/assets/runtime/sakurayo-boutique.js
           cp src/runtime/sakurayo-chrome.js android-app/app/src/main/assets/runtime/sakurayo-chrome.js
+          cp src/runtime/sakurayo-shell.js android-app/app/src/main/assets/runtime/sakurayo-shell.js
+          cp src/runtime/sakurayo-lobby.js android-app/app/src/main/assets/runtime/sakurayo-lobby.js
+          cp src/runtime/sakurayo-live.js android-app/app/src/main/assets/runtime/sakurayo-live.js
           python3 tools/build_game.py \
             --source src/index.html \
             --output android-app/app/src/main/assets/index.html \
@@ -67,32 +71,32 @@ jobs:
 
       - name: Name the side-load APK
         run: |
-          cp android-app/app/build/outputs/apk/debug/app-debug.apk YeYing-Dev-v4.7.0-android.apk
-          sha256sum YeYing-Dev-v4.7.0-android.apk | tee yeying-dev-apk.sha256
+          cp android-app/app/build/outputs/apk/debug/app-debug.apk YeYing-Dev-v4.7.3-android.apk
+          sha256sum YeYing-Dev-v4.7.3-android.apk | tee yeying-dev-apk.sha256
 
       - uses: actions/upload-artifact@v4
         with:
-          name: YeYing-Dev-v4.7.0-android
+          name: YeYing-Dev-v4.7.3-android
           path: |
-            YeYing-Dev-v4.7.0-android.apk
+            YeYing-Dev-v4.7.3-android.apk
             yeying-dev-apk.sha256
 
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: yeying-dev-v4.7.0
-          name: 开发版 夜樱 4.7.0
+          tag_name: yeying-dev-v4.7.3
+          name: 开发版 夜樱 4.7.3
           draft: false
           prerelease: true
           make_latest: false
-          files: YeYing-Dev-v4.7.0-android.apk
+          files: YeYing-Dev-v4.7.3-android.apk
           body: |
             给作者自己试玩的侧载包，**不是对玩家发的正式版**。
 
             - 桌面名：开发版 夜樱
             - 包名：`com.sakurayo.yeying.dev`
-            - versionName：`4.7.0-yeying` / versionCode 6110
+            - versionName：`4.7.3-yeying` / versionCode 6113
             - 合并触控修复、图标精装与大厅顶栏拆叠。覆盖安装即可，不会动正式《樱夜·尸潮》。
             - 不会覆盖正式《樱夜·尸潮》（`com.sakurayo.zombietide`）
             - Debug 证书签名，只适合自己装
 
-            文件：`YeYing-Dev-v4.7.0-android.apk`
+            文件：`YeYing-Dev-v4.7.3-android.apk`

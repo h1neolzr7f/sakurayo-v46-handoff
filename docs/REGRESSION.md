@@ -35,5 +35,14 @@
 | 寻访「跳过」点不到 | 揭示钮 `min-width:72px`，430px 高仍保底 72×42 | 再只缩 padding 让「跳过」收到 62px |
 | 升级「重抽」落到屏外 | 430px 高压缩标题/说明/读出，描述最多 3 行，重抽固定在卡底 | 再让升级卡按 175px 最小高度把重抽顶出 412px |
 | 启动层盖住大厅/升级 | `?test=1` 立刻摘掉 `#bootArt35`；`.gone` 直接 `display:none`，900ms 不再等 window.load | 再让启动层 opacity 过渡盖住升级卡中间 |
+| 玩家误开后门 | 开发包不带 `?beta=1`；「更多」不放后门钮；立绘连点只播动作 | 再把 `grantCheat46` 绑到大厅立绘，或 Debug 加载 `index.html?beta=1` |
+| 商店/立绘过一会变大 | 大厅立绘容器 48%，呼吸层 `width:100%`；商店预览/货图标 88px，道具格 64px；Android 锁横屏不加 `portraitFallback46` | 再用 62vw/64vw 撑立绘，或 58→132→88 来回改商店预览 |
+| 邮箱/轨图标换一套尺寸 | `railIco46` 先占 22px；邮件格子 42px；chrome 只换 SVG | 再让 `.homeRail46 button i` 先 16px 后 22/28px，或把 `.shellItem46>i` 从 42 收到 22 |
+| 模式钮/商店侧栏/名册立绘跳 | 模式图标 22px，商店轨 44px，名册图 118px，寻访立绘 52%/142%，活动条 50×48 | 再写 18→22、44→58、108→118、58%→52%、220→248→50 |
+| 晚到脚本改尺寸 | `tests/style_lock_unit.mjs` 锁源码，`tests/layout_stable.mjs` 量 1.6s + 再注入后的实测盒子 | 只靠字符串单测、不量 `getComputedStyle` |
+| 大厅立绘被裁 | 呼吸层 `width:100%;height:100%`；竖向 fade 6%，横向 fade 94%；`object-position:center 10%` | 再用 62/72vw 撑呼吸层，或 mask 从 24%/82% 切掉头身 |
+| 寻访看不出叠伤 | 寻访标题 `wishPower46`、揭示 `revealPow46`/`本抽叠伤`、大厅 `火力 +N%` | 只改按钮字、不写百分比 |
+| 排除符仍是 emoji | `shopCard40(..., "","t"+id)` + chrome `talismanIco` | 商店格只喂 🤖🔫 却不写 `data-shop-ico` |
+| 邮箱图标简陋 / 内测补给不好找 | `betaCrate` 置顶、礼物图标、附件写进列表；数额 25000/80/800/500 | 再把补给藏到第二封，或改回草稿框 |
 
 选择器与测试 API 仍以 [HANDOFF.md](HANDOFF.md) 为准。`selectStage` 永远把 `runMode36` 写成 `"story"`。

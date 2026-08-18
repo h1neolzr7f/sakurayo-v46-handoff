@@ -21,7 +21,7 @@ const context = await browser.newContext({
   viewport: { width: 800, height: 360 },
   isMobile: true,
   hasTouch: true,
-  userAgent: "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36 SakurayoAndroid/4.7.0-yeying",
+  userAgent: "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 Chrome/120.0.0.0 Mobile Safari/537.36 SakurayoAndroid/4.7.3-yeying",
 });
 const page = await context.newPage();
 await page.goto(pathToFileURL(fixture).href, { waitUntil: "domcontentloaded", timeout: 15000 });

@@ -29,7 +29,7 @@ fs.mkdirSync(out, { recursive: true });
 
 const PIXEL7_LANDSCAPE = { width: 915, height: 412 };
 const ANDROID_UA =
-  "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36 SakurayoAndroid/4.7.0-yeying";
+  "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36 SakurayoAndroid/4.7.3-yeying";
 
 function overlap(a, b) {
   if (!a || !b || a.w < 1 || a.h < 1 || b.w < 1 || b.h < 1) return 0;

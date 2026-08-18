@@ -1,33 +1,32 @@
 # 接手检查清单
 
-当前：**V4.7.0 源码，开发版 夜樱可侧载。** 公开玩家仓已发布 APK 仍是 v4.4.6。
+当前：**V4.7.3 源码，开发版 夜樱可侧载。** 公开玩家仓已发布 APK 仍是 v4.4.6。
 
 ## GitHub 在哪
 
 | 项 | 值 |
 |---|---|
 | 开发仓 | https://github.com/h1neolzr7f/sakurayo-v46-handoff |
-| 工作分支 | `cursor/unify-v47-da3d` |
+| 工作分支 | `yeying-qa-hotfix` |
 | 开发版包名 | `com.sakurayo.yeying.dev` |
 | 桌面名 | 开发版 夜樱 |
 | 正式版包名 | `com.sakurayo.zombietide` |
 | `main` | 还没有这批 4.6 精修 |
 | 公开玩家仓 | https://github.com/h1neolzr7f/sakurayo-zombietide |
 
-开发版和正式版可以同时装。**没有对玩家发正式 4.7.0。** 侧载包走本仓 Releases 预发布 `yeying-dev-v4.7.0` 的 `YeYing-Dev-v4.7.0-android.apk`。已修错误见 [docs/REGRESSION.md](docs/REGRESSION.md)。
+开发版和正式版可以同时装。**没有对玩家发正式 4.7.3。** 本机最新包在 `release/YeYing-Dev-v4.7.3-android.apk`（gitignore，不进 git）。已修错误见 [docs/REGRESSION.md](docs/REGRESSION.md)。
 
 ## 本机模拟器侧载（当前可下）
 
-最新开发包已挂在预发布，对应提交 `884d7c5`（含 412px 横屏热区/对比度修复）。**不要把 APK 提交进 git。**
+本机 4.7.3 开发包已打好。**不要把 APK 提交进 git。**
 
-- 下载：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/yeying-dev-v4.7.0/YeYing-Dev-v4.7.0-android.apk
-- 发布页：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/yeying-dev-v4.7.0
-- SHA256：`f618362956dfd544764c1fb0866d4d28950e2460931d66cac4dcffab8da650b9`
-- 桌面名：开发版 夜樱 / 包名 `com.sakurayo.yeying.dev` / `4.7.0-yeying` / versionCode **6110**
+- 本机包：`release/YeYing-Dev-v4.7.3-android.apk`
+- SHA256：`D593B28F5B732D88054208EBC3D72803B5860D3E929F0EA66336DD95BDACA631`
+- 桌面名：开发版 夜樱 / 包名 `com.sakurayo.yeying.dev` / `4.7.3-yeying` / versionCode **6113**
 - Debug 签名，只给自己装。可与正式包 `com.sakurayo.zombietide` 并存，**不要卸正式包**（会清档）。
 
 ```bash
-adb install -r YeYing-Dev-v4.7.0-android.apk
+adb install -r release/YeYing-Dev-v4.7.3-android.apk
 adb shell settings put system user_rotation 1
 adb shell am start -n com.sakurayo.yeying.dev/com.sakurayo.zombietide.MainActivity
 ```
@@ -57,7 +56,7 @@ Windows 也可：`powershell -File tools/verify.ps1`
 
 ## 这一版已经有了
 
-横屏大厅、五房、16 卡寻访（只收藏）、证词模式、局内 2 干员 DP、真实眨眼、作战简报、四阶段机制条、Boss 阶段字幕、三角色技能演出、分层打击反馈、三相飞升签名、触控修复、图标精装、顶栏拆叠。版本号 **4.7.0**。
+横屏大厅、五房、16 卡寻访（入册叠伤）、证词模式、主神默认可进、局内 2 干员 DP、真实眨眼、作战简报、四阶段机制条、Boss 阶段字幕、三角色技能演出、分层打击反馈、三相飞升签名、触控修复、图标精装、顶栏拆叠。版本号 **4.7.3**。
 
 ## 当前交付状态
 
@@ -67,7 +66,7 @@ Windows 也可：`powershell -File tools/verify.ps1`
 
 - 再包 `update`
 - 改存档键或清档
-- 抽卡/商店卖永久伤害
+- 回退寻访叠伤或把衣装改成直售攻击面板
 - 改名 `startGame` / `update` / `draw` / `spawnEnemy` / `showDialogue` 却不改调用点
 - 提交 `keystore.properties`、`local.properties`、APK、`assets/image2/source/`
 - 卸掉模拟器上签名对不上的旧正式包（会清档）
