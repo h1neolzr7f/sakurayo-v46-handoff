@@ -11,7 +11,12 @@
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .profile{flex:none;max-width:200px;max-height:44px;overflow:visible;z-index:8}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .profile>div{flex-wrap:nowrap;overflow:hidden}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeSupport46{display:none}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charSelectPanel{position:absolute!important;left:max(220px,calc(env(safe-area-inset-left) + 204px))!important;right:auto!important;top:max(10px,env(safe-area-inset-top))!important;bottom:auto!important;width:auto;margin:0;z-index:8}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charSelectPanel{position:static!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;width:auto;margin:0 8px 0 auto;padding:0;background:transparent;border:0;box-shadow:none;z-index:8;pointer-events:auto;flex:0 0 auto}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charSelectPanel .sectionTitle{display:none!important}" +
+    "html.landscape46:not(.portraitFallback46) #homeWallet46{margin-left:0}" +
+    "html.landscape46:not(.portraitFallback46) #homeWallet46 .homeChip46.prism,html.landscape46:not(.portraitFallback46) #homeWallet46 .homeChip46.shard{display:none!important}" +
+    "html.landscape46:not(.portraitFallback46) #homeQuick46{gap:12px}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 #moreButton39{margin-left:10px;padding:0 12px}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 #homeGreet46,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeGreet46{position:absolute;left:44px;top:calc(100% + 4px);margin:0;max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:6}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeRail46{top:max(58px,calc(env(safe-area-inset-top) + 48px));bottom:max(140px,calc(env(safe-area-inset-bottom) + 128px));padding:4px 3px;gap:3px;justify-content:space-between;overflow:hidden}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeRail46 button{min-width:42px;min-height:42px;padding:6px 4px}" +
@@ -23,7 +28,7 @@
     "@media(max-height:409px){html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46{display:none!important}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeRail46{bottom:max(78px,calc(env(safe-area-inset-bottom) + 68px))}}" +
     "@media(max-height:370px){html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46{bottom:max(80px,calc(env(safe-area-inset-bottom) + 70px));gap:4px;overflow:hidden}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini{min-height:48px;padding:6px 10px}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini p,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeStageProg46{display:none!important}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeModes46 button{min-height:36px;padding:4px 8px}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeModes46 button small{display:none}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .start{min-height:40px;flex:0 0 40px}}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .heroLive46{width:56%;bottom:88px!important}" +
-    "html.landscape46.shortWindow46 #menu.homeDock46 .charSelectPanel{position:absolute!important;left:max(208px,calc(env(safe-area-inset-left) + 192px))!important;top:max(6px,env(safe-area-inset-top))!important}" +
+    "html.landscape46.shortWindow46 #menu.homeDock46 .charSelectPanel{position:static!important;left:auto!important;top:auto!important;margin:0 6px 0 auto}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .homeDeck46{bottom:max(88px,calc(env(safe-area-inset-bottom) + 78px))}" +
     "html.landscape46:not(.portraitFallback46) #hud .hero{max-width:220px}" +
     "html.landscape46:not(.portraitFallback46) #hud .rinfo{display:none}" +
@@ -52,13 +57,32 @@
     if (line.parentNode !== profile) profile.appendChild(line);
   }
 
+  function hangChars() {
+    var doc = global.document;
+    if (!doc) return;
+    var top = doc.querySelector("#menu .top");
+    var panel = doc.querySelector("#menu .charSelectPanel");
+    var wallet = doc.getElementById("homeWallet46");
+    if (!top || !panel) return;
+    if (wallet && wallet.parentNode === top) {
+      if (panel.parentNode !== top || panel.nextElementSibling !== wallet) top.insertBefore(panel, wallet);
+    } else if (panel.parentNode !== top) {
+      top.appendChild(panel);
+    }
+  }
+
+  function hangLobbyTop() {
+    hangGreet();
+    hangChars();
+  }
+
   function watchGreet() {
     var doc = global.document;
     if (!doc || !doc.body || watchGreet.bound) return;
     watchGreet.bound = true;
-    var obs = new global.MutationObserver(hangGreet);
+    var obs = new global.MutationObserver(hangLobbyTop);
     obs.observe(doc.body, { childList: true, subtree: true });
-    hangGreet();
+    hangLobbyTop();
   }
 
   function install() {
@@ -71,7 +95,7 @@
       (doc.head || doc.documentElement).appendChild(style);
     }
     style.textContent = CSS;
-    hangGreet();
+    hangLobbyTop();
     watchGreet();
     return { ok: true, id: STYLE_ID };
   }
@@ -80,6 +104,7 @@
     version: "4.6.0",
     install: install,
     hangGreet: hangGreet,
+    hangChars: hangChars,
   };
 
   if (global.document) {
