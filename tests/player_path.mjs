@@ -140,13 +140,15 @@ await page.locator("#profileDrawer .close").click();
 await api(page, "openDrawer", "shop");
 await page.waitForSelector("#shopFeatured46");
 assert.equal(await page.locator("#shopList .skinCard").count(), 11);
-assert.equal(await page.locator("#shopFeatured46 .shopGood46").count(), 3);
+assert.match(await page.locator("#shopDrawer .dhead h2").textContent(), /时装商店/);
 assert.match(await page.locator("#shopTicket46").textContent(), /^\d+$/);
+await page.locator('[data-shop-rail="supplies"]').click();
+assert.equal(await page.locator("#shopCounter46 .shopGood46").count(), 3);
 const shopBefore = await coinsOf(page);
 const ticketBefore = Number(await page.locator("#homeTicket46").textContent());
-await page.locator('#shopFeatured46 [data-shop-buy="starter:assault"] button').click();
+await page.locator('#shopCounter46 [data-shop-buy="starter:assault"] button').click();
 assert.ok((await coinsOf(page)) < shopBefore, "featured core must spend coins");
-await page.locator('#shopFeatured46 [data-shop-buy="exchange:coin-ticket"] button').click();
+await page.locator('#shopCounter46 [data-shop-buy="exchange:coin-ticket"] button').click();
 assert.ok(Number(await page.locator("#homeTicket46").textContent()) > ticketBefore, "featured ticket must credit");
 await page.locator("#shopDrawer .close").click();
 
