@@ -29,7 +29,7 @@ assert.match(index, /function draw\s*\(/);
 assert.match(index, /function spawnEnemy\s*\(/);
 assert.match(index, /function showDialogue\s*\(/);
 assert.match(read("src/runtime/sakurayo-cutscene.js"), /!beats\.length \|\| !!\(opts && opts\.testMode\)/);
-assert.match(read("src/runtime/sakurayo-cutscene.js"), /#paused:not\(\.hidden\) \.modal\{opacity:1;animation:sakurayoCutIn/);
+assert.match(read("src/runtime/sakurayo-cutscene.js"), /#paused:not\(\.hidden\) \.modal\{opacity:1;transform:none;animation:none\}/);
 assert.match(read("src/runtime/sakurayo-cutscene.js"), /from\{transform:translateY\(12px\) scale\(\.98\)\}/);
 assert.doesNotMatch(read("src/runtime/sakurayo-cutscene.js"), /sakurayoCutIn\{from\{opacity:0/);
 assert.match(index, /state === "menu" && !menuUpdate\.busy/);
