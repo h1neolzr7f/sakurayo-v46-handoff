@@ -22,7 +22,7 @@ assert.equal(version, "4.7.0");
 assert.match(index, /SAKURAYO_GAME_VERSION = "4\.7\.0"/);
 assert.match(index, /sakurayoV3/);
 assert.doesNotMatch(index, /localStorage\.clear\s*\(/);
-assert.doesNotMatch(index, /update\s*=\s*\(\s*_update|update\s*=\s*function\s*\(\s*dt/);
+assert.doesNotMatch(index, /_update47\s*=\s*update|const _update47/);
 assert.match(index, /function startGame\s*\(/);
 assert.match(index, /function update\s*\(/);
 assert.match(index, /function draw\s*\(/);

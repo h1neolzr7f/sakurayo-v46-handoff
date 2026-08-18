@@ -306,8 +306,8 @@
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeRankBar46 i{display:block;height:100%;width:0;background:linear-gradient(90deg,#f35aa6,#f2c75d)}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .coins{display:flex;align-items:center;gap:8px;margin:0 0 0 auto;padding:4px 8px 4px 12px;border-radius:999px;background:#120e27ee;border:1px solid #f2c75d55;color:#ffe7a3}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeCoinPlus46{display:grid;place-items:center;width:28px;height:28px;padding:0;border:0;border-radius:50%;background:#f35aa6;color:#fff7fb;font:900 16px/1 system-ui}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charSelectPanel{position:static!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;width:auto;margin:0 8px 0 auto;padding:0;background:transparent;border:0;box-shadow:none;z-index:8;pointer-events:auto;flex:0 0 auto}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charSelectPanel .sectionTitle{display:none!important}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .top .charSelectPanel{position:static!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;width:auto;margin:0 8px 0 auto;padding:0;background:transparent;border:0;box-shadow:none;z-index:8;pointer-events:auto;flex:0 0 auto}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .top .charSelectPanel .sectionTitle{display:none!important}" +
     "html.landscape46:not(.portraitFallback46) #homeWallet46{margin-left:0}" +
     "html.landscape46:not(.portraitFallback46) #homeWallet46 .homeChip46.prism,html.landscape46:not(.portraitFallback46) #homeWallet46 .homeChip46.shard{display:none!important}" +
     "html.landscape46:not(.portraitFallback46) #homeQuick46{gap:12px}" +
@@ -363,7 +363,7 @@
     "html.landscape46.shortWindow46 #menu.homeDock46 .heroLive46{width:62%}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .heroLiveBreath46{width:min(64vw,760px)}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .top{top:max(6px,env(safe-area-inset-top))}" +
-    "html.landscape46.shortWindow46 #menu.homeDock46 .charSelectPanel{position:static!important;left:auto!important;top:auto!important;margin:0 6px 0 auto}" +
+    "html.landscape46.shortWindow46 #menu.homeDock46 .top .charSelectPanel{position:static!important;left:auto!important;top:auto!important;margin:0 6px 0 auto}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .homeDeck46{top:max(52px,calc(env(safe-area-inset-top) + 44px));bottom:max(72px,calc(env(safe-area-inset-bottom) + 62px));width:min(34vw,300px);gap:4px}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .stageMini{min-height:56px;padding:6px 10px}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .stageMini h3{font-size:13px}" +
