@@ -41,6 +41,7 @@ public final class MainActivity extends Activity {
     private static final String LAYOUT52_ASSET = "runtime/sakurayo-layout52.js";
     private static final String FEEL53_ASSET = "runtime/sakurayo-feel53.js";
     private static final String BOUTIQUE_ASSET = "runtime/sakurayo-boutique.js";
+    private static final String CHROME_ASSET = "runtime/sakurayo-chrome.js";
     private static final long EXIT_CONFIRM_WINDOW_MS = 1800L;
     private static final String ANDROID_LANDSCAPE_SCRIPT =
             "window.__SAKURAYO_ANDROID_LANDSCAPE__=true;" +
@@ -216,6 +217,7 @@ public final class MainActivity extends Activity {
         injectAssetScript(view, LAYOUT52_ASSET);
         injectAssetScript(view, FEEL53_ASSET);
         injectAssetScript(view, BOUTIQUE_ASSET);
+        injectAssetScript(view, CHROME_ASSET);
     }
 
     private void injectAssetScript(WebView view, String assetPath) {
