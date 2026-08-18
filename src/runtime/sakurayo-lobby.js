@@ -122,6 +122,7 @@
     "html.landscape46.shortWindow46 .revealSum46{margin:4px 0 0;font-size:10px}" +
     "html.landscape46.shortWindow46 .revealActs46{margin-top:6px}" +
     "html.landscape46.shortWindow46 .revealTake46,html.landscape46.shortWindow46 .revealSkip46,html.landscape46.shortWindow46 .revealAgain46{min-height:42px;padding:0 14px}" +
+    "@media(max-height:430px){html.landscape46 .revealGrid46.ten .revealCard46{height:68px}html.landscape46 .revealGrid46.one .revealCard46{width:132px;height:168px}html.landscape46 .revealHead46 b{font-size:15px}html.landscape46 .revealActs46{margin-top:6px}html.landscape46 .revealTake46,html.landscape46 .revealSkip46,html.landscape46 .revealAgain46{min-height:42px;padding:0 14px}}" +
     ".revealCard46{position:relative;width:104px;height:146px;perspective:900px}" +
     ".revealGrid46.one .revealCard46{width:196px;height:276px}" +
     ".revealInner46{position:relative;width:100%;height:100%;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transition:transform .7s cubic-bezier(.2,.8,.2,1)}" +

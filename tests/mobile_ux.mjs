@@ -82,6 +82,7 @@ const lobby = await page.evaluate(() => {
     greetDisplay: gs ? gs.display : "missing",
     greetPe: gs ? gs.pointerEvents : "missing",
     passDisplay: ps ? ps.display : "missing",
+    bannerDisplay: getComputedStyle(document.getElementById("homeBanner46") || document.body).display,
     corners,
     calendarHidden: !document.getElementById("calendarDrawer") || document.getElementById("calendarDrawer").classList.contains("hidden"),
   };
@@ -92,6 +93,7 @@ assert.equal(lobby.deckPe, "none");
 assert.equal(lobby.startPe, "auto");
 assert.equal(lobby.greetDisplay, "none");
 assert.equal(lobby.passDisplay, "none");
+assert.equal(lobby.bannerDisplay, "none", "412px 高须藏左下寻访条，避免和左栏底栏抢位");
 assert.equal(lobby.calendarHidden, true);
 assert.ok(
   lobby.corners.every((c) => c.ok),
@@ -138,11 +140,150 @@ const api = (method, ...args) =>
     { method, args },
   );
 
+const inView = (box, vw = 915, vh = 412, pad = 2) =>
+  !!box && box.w >= 8 && box.h >= 8 && box.x >= -pad && box.y >= -pad && box.x + box.w <= vw + pad && box.y + box.h <= vh + pad;
+
+await api("grantCheat46");
+await api("openDrawer", "gacha");
+await page.waitForSelector("#gachaDrawer:not(.hidden) #gachaPull1", { timeout: 8000 });
+const gacha = await page.evaluate(() => {
+  const one = document.getElementById("gachaPull1");
+  const close = document.querySelector("#gachaDrawer .close");
+  const r = one.getBoundingClientRect();
+  const corners = [
+    [r.x + 8, r.y + 8],
+    [r.x + r.width / 2, r.y + r.height / 2],
+    [r.x + r.width - 8, r.y + r.height - 8],
+  ].map(([x, y]) => {
+    const top = document.elementFromPoint(x, y);
+    return { ok: !!(top && (top === one || one.contains(top))) };
+  });
+  return {
+    clip: getComputedStyle(one).clipPath,
+    close: close && { w: close.getBoundingClientRect().width, h: close.getBoundingClientRect().height },
+    corners,
+  };
+});
+assert.match(gacha.clip, /none/, "矮横屏寻访键不得斜切掉四角");
+assert.ok(gacha.corners.every((c) => c.ok), `寻访单抽四角必须点到按钮 ${JSON.stringify(gacha.corners)}`);
+assert.ok(gacha.close && gacha.close.w >= 40 && gacha.close.h >= 40);
+await page.screenshot({ path: path.join(out, "05-gacha.png"), fullPage: true });
+await api("pullGacha46", 1);
+await page.waitForSelector("#gachaReveal46 .revealTake46", { timeout: 8000 });
+const reveal = await page.evaluate(() => {
+  const take = document.querySelector(".revealTake46");
+  const skip = document.querySelector(".revealSkip46");
+  const r = take.getBoundingClientRect();
+  const ts = getComputedStyle(take);
+  const ss = skip && getComputedStyle(skip);
+  return {
+    take: { x: r.x, y: r.y, w: r.width, h: r.height, image: ts.backgroundImage, color: ts.color },
+    skip: skip && { bg: ss.backgroundColor, color: ss.color, w: skip.getBoundingClientRect().width, h: skip.getBoundingClientRect().height },
+    cardH: document.querySelector(".revealCard46")?.getBoundingClientRect().height || 0,
+  };
+});
+assert.ok(inView(reveal.take), `收下证词必须完整在视口内 ${JSON.stringify(reveal.take)}`);
+assert.match(reveal.take.image, /linear-gradient|rgb\(255/, "收下证词必须有实心底");
+assert.ok(reveal.skip && reveal.skip.w >= 64 && reveal.skip.h >= 36);
+assert.doesNotMatch(reveal.skip.bg, /rgba\(255, 255, 255, 0\.0?6/);
+assert.ok(reveal.cardH <= 200, `单抽卡不得撑破 412px 高 ${reveal.cardH}`);
+await page.screenshot({ path: path.join(out, "06-reveal.png"), fullPage: true });
+await page.locator(".revealTake46").tap({ timeout: 6000 }).catch(() => page.locator(".revealTake46").click({ force: true }));
+await page.waitForFunction(() => !document.getElementById("gachaReveal46"), null, { timeout: 6000 });
+await page.evaluate(() => document.querySelectorAll(".drawer").forEach((n) => n.classList.add("hidden")));
+
+await api("openDrawer", "shop");
+await page.waitForSelector("#shopDrawer:not(.hidden)", { timeout: 8000 });
+const shop = await page.evaluate(() => {
+  const close = document.querySelector("#shopDrawer .close");
+  const buy = document.querySelector("#shopDrawer button:not(.close)");
+  const cr = close.getBoundingClientRect();
+  const br = buy && buy.getBoundingClientRect();
+  return {
+    title: document.querySelector("#shopDrawer h2")?.textContent,
+    close: { w: cr.width, h: cr.height, pe: getComputedStyle(close).pointerEvents },
+    buy: buy && { w: br.width, h: br.height, text: buy.textContent.replace(/\s+/g, " ").trim().slice(0, 24) },
+  };
+});
+assert.match(shop.title || "", /商店|时装/);
+assert.ok(shop.close.w >= 40 && shop.close.h >= 40);
+assert.equal(shop.close.pe, "auto");
+assert.ok(shop.buy && shop.buy.w >= 64 && shop.buy.h >= 36, "商店购买钮够点");
+await page.screenshot({ path: path.join(out, "07-shop.png"), fullPage: true });
+await page.locator("#shopDrawer .close").tap({ timeout: 6000 }).catch(() =>
+  page.locator("#shopDrawer .close").click({ force: true }),
+);
+
+await api("openDrawer", "roster");
+await page.waitForSelector("#rosterDrawer:not(.hidden)", { timeout: 8000 });
+const roster = await page.evaluate(() => {
+  const close = document.querySelector("#rosterDrawer .close");
+  const card = document.querySelector(".rosterSlot46");
+  const cr = close.getBoundingClientRect();
+  return {
+    close: { w: cr.width, h: cr.height },
+    card: card && { w: card.getBoundingClientRect().width, h: card.getBoundingClientRect().height },
+  };
+});
+assert.ok(roster.close.w >= 40 && roster.close.h >= 40);
+await page.screenshot({ path: path.join(out, "08-roster.png"), fullPage: true });
+await page.evaluate(() => document.querySelectorAll(".drawer").forEach((n) => n.classList.add("hidden")));
+
 await api("selectCharacter", "sayo");
 await api("selectStage", 1);
 const started = await api("start");
 if (started.mode === "dialogue") await api("dismissDialogue");
 assert.equal((await page.evaluate(() => JSON.parse(window.render_game_to_text()).mode)), "play");
+
+const combat = await page.evaluate(() => {
+  const box = (id) => {
+    const el = document.getElementById(id);
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    return { w: r.width, h: r.height, x: r.x, y: r.y, pe: getComputedStyle(el).pointerEvents };
+  };
+  return {
+    joy: box("joy"),
+    dash: box("dash"),
+    skill: box("skill"),
+    pause: box("pause"),
+    perfDisplay: getComputedStyle(document.getElementById("perf") || document.body).display,
+    overlayBlur: getComputedStyle(document.getElementById("paused")).backdropFilter || getComputedStyle(document.getElementById("level")).backdropFilter,
+  };
+});
+assert.ok(combat.dash && combat.dash.w >= 44 && combat.dash.h >= 44, "冲刺够点");
+assert.ok(combat.skill && combat.skill.w >= 44 && combat.skill.h >= 44, "技能够点");
+assert.ok(combat.pause && combat.pause.w >= 36 && combat.pause.h >= 36, "暂停够点");
+assert.ok(combat.joy && combat.joy.w >= 64 && combat.joy.h >= 64, "摇杆可见");
+assert.equal(combat.perfDisplay, "none", "矮横屏藏画质角标减 HUD 负担");
+await page.screenshot({ path: path.join(out, "09-combat.png"), fullPage: true });
+
+await api("protectPlayer");
+await api("freezeProgression");
+const leveled = await api("triggerUpgrade");
+if (leveled.mode === "level" || !(await page.evaluate(() => document.getElementById("level")?.classList.contains("hidden")))) {
+  await page.waitForSelector("#level:not(.hidden) #reroll", { timeout: 6000 });
+  const level = await page.evaluate(() => {
+    const reroll = document.getElementById("reroll");
+    const choice = document.querySelector("#choices .choice");
+    const banter = document.getElementById("banter");
+    const rs = getComputedStyle(reroll);
+    const rr = reroll.getBoundingClientRect();
+    const cr = choice && choice.getBoundingClientRect();
+    return {
+      reroll: { x: rr.x, y: rr.y, w: rr.width, h: rr.height, bg: rs.backgroundColor, color: rs.color },
+      choice: choice && { x: cr.x, y: cr.y, w: cr.width, h: cr.height },
+      banterHidden: !banter || banter.classList.contains("hidden") || getComputedStyle(banter).visibility === "hidden" || Number(getComputedStyle(banter).opacity) === 0,
+    };
+  });
+  assert.ok(inView(level.reroll), `重抽必须完整在视口内 ${JSON.stringify(level.reroll)}`);
+  assert.ok(level.choice && inView(level.choice), `升级选项必须完整在视口内 ${JSON.stringify(level.choice)}`);
+  assert.doesNotMatch(level.reroll.bg, /rgba\(255, 255, 255, 0\.0?6/);
+  assert.match(level.reroll.color, /rgb\(255, 231, 163\)|rgb\(255, 255, 255\)/);
+  assert.equal(level.banterHidden, true, "升级模态须收起吐槽电台");
+  await page.screenshot({ path: path.join(out, "10-upgrade.png"), fullPage: true });
+  await api("chooseUpgrade", 0);
+}
 
 await page.locator("#pause").tap({ timeout: 6000 }).catch(() => page.locator("#pause").click({ force: true }));
 await page.waitForSelector("#paused:not(.hidden) #resume", { timeout: 6000 });
@@ -193,14 +334,25 @@ await page.waitForSelector("#result:not(.hidden) #back", { timeout: 8000 });
 const result = await page.evaluate(() => {
   const back = document.getElementById("back");
   const again = document.getElementById("again");
+  const stats = document.getElementById("rstats");
+  const report = document.getElementById("damageReport");
   const s = getComputedStyle(back);
   const r = back.getBoundingClientRect();
+  const ss = stats && getComputedStyle(stats);
+  const rs = report && getComputedStyle(report);
   return {
     backBg: s.backgroundColor,
     backColor: s.color,
     w: r.width,
     h: r.height,
     againW: again.getBoundingClientRect().width,
+    splash: document.querySelector("#result .modal")?.classList.contains("outfitSplash45") || false,
+    bgImage: document.querySelector("#result .modal")?.style.backgroundImage || "",
+    overlayBlur: getComputedStyle(document.getElementById("result")).backdropFilter,
+    statsBg: ss ? ss.backgroundColor : "",
+    statsColor: ss ? ss.color : "",
+    reportBg: rs ? rs.backgroundColor : "",
+    reportColor: rs ? rs.color : "",
   };
 });
 assert.ok(result.w >= 80 && result.h >= 36);
@@ -208,6 +360,12 @@ assert.ok(result.againW >= 80);
 assert.doesNotMatch(result.backBg, /rgba\(255, 255, 255, 0\.0?6/);
 assert.match(result.backColor, /rgb\(255, 231, 163\)|rgb\(255, 255, 255\)/);
 assert.match(result.backBg, /rgb\(42, 24, 72\)|rgba\(42, 24, 72/);
+assert.equal(result.splash, false, "矮横屏结算不得铺闪图压暗诊断");
+assert.equal(result.bgImage, "");
+assert.match(result.overlayBlur, /none|^$/);
+assert.doesNotMatch(result.statsBg, /rgba\(255, 255, 255, 0\.0?3|rgba\(0, 0, 0, 0\)/);
+assert.match(result.statsColor, /rgb\(255, 244, 228\)|rgb\(255, 231, 163\)|rgb\(255, 255, 255\)/);
+assert.match(result.reportColor, /rgb\(255, 244, 228\)|rgb\(255, 231, 163\)|rgb\(255, 255, 255\)/);
 await page.screenshot({ path: path.join(out, "04-result.png"), fullPage: true });
 
 await browser.close();

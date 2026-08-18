@@ -166,9 +166,13 @@ assert.match(L.css, /position:static!important/);
 assert.match(L.css, /homeChip46\.prism/);
 assert.match(L.css, /#menu\.homeDock46 \.homeDeck46\{pointer-events:none!important\}/);
 assert.match(L.css, /#menu\.homeDock46 \.start\{clip-path:none\}/);
-assert.match(L.css, /#back\{background:#2a1848!important/);
-assert.match(L.css, /#paused \.modal\{background:#140e24f8!important;background-image:none!important\}/);
+assert.match(L.css, /#back,#reroll,\.revealSkip46.*background:#2a1848!important/);
+assert.match(L.css, /#paused \.modal.*background:#140e24f8!important;background-image:none!important/);
 assert.match(code, /max-height:430px.*#homeGreet46/);
+assert.match(code, /max-height:430px.*homeBanner46/);
+assert.match(L.css, /#result #rstats,#result #damageReport,#result #routeNote\{background:#161028!important/);
+assert.match(L.css, /backdrop-filter:none!important/);
+assert.match(L.css, /#reroll,\.revealSkip46/);
 
 const installed = L.install();
 assert.equal(installed.ok, true);
