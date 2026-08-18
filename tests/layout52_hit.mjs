@@ -51,9 +51,14 @@ const state = await page.evaluate(() => {
     start: box("#start"),
     shop: box("#navShop"),
     char: box("#charAya"),
+    panel: box(".charSelectPanel"),
+    wallet: box("#homeWallet46"),
+    prism: box("#homeWallet46 .prism"),
+    more: box("#moreButton39"),
     hero: box("#heroLive46"),
     deck: box(".homeDeck46"),
     menu: box("#menu .menu"),
+    hung: !!document.querySelector("#menu .top .charSelectPanel"),
     bodyTouch: getComputedStyle(document.body).touchAction,
   };
 });
@@ -70,6 +75,11 @@ assert.equal(state.menu.pointer, "auto");
 assert.equal(state.deck.pointer, "auto");
 assert.ok(state.start.w > 40 && state.start.h > 30, "出击按钮应有可点面积");
 assert.ok(overlapArea(state.start, state.hero) < state.start.w * state.start.h * 0.35, "出击不应被立绘大面积盖住");
+assert.equal(state.hung, true, "换角圆钮必须挂进顶栏 flex");
+assert.ok(state.panel && state.wallet, "顶栏换角和钱包都要在");
+assert.ok(overlapArea(state.panel, state.wallet) < 8, "换角不得压在货币条上");
+assert.ok(state.prism && (state.prism.w === 0 || state.prism.h === 0), "横屏应藏预览 prism");
+assert.equal(state.char.pointer, "auto");
 
 await page.locator("#start").click();
 await page.locator("#navShop").click();

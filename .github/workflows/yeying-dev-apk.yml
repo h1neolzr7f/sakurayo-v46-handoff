@@ -6,6 +6,7 @@ on:
     branches:
       - cursor/yeying-dev-apk-eaa0
       - cursor/yeying-touch-fix-eaa0
+      - cursor/unify-v47-da3d
   workflow_dispatch:
 
 permissions:
@@ -66,32 +67,32 @@ jobs:
 
       - name: Name the side-load APK
         run: |
-          cp android-app/app/build/outputs/apk/debug/app-debug.apk YeYing-Dev-v4.6.0-android.apk
-          sha256sum YeYing-Dev-v4.6.0-android.apk | tee yeying-dev-apk.sha256
+          cp android-app/app/build/outputs/apk/debug/app-debug.apk YeYing-Dev-v4.7.0-android.apk
+          sha256sum YeYing-Dev-v4.7.0-android.apk | tee yeying-dev-apk.sha256
 
       - uses: actions/upload-artifact@v4
         with:
-          name: YeYing-Dev-v4.6.0-android
+          name: YeYing-Dev-v4.7.0-android
           path: |
-            YeYing-Dev-v4.6.0-android.apk
+            YeYing-Dev-v4.7.0-android.apk
             yeying-dev-apk.sha256
 
       - uses: softprops/action-gh-release@v2
         with:
-          tag_name: yeying-dev-v4.6.0
-          name: 开发版 夜樱 4.6.0
+          tag_name: yeying-dev-v4.7.0
+          name: 开发版 夜樱 4.7.0
           draft: false
           prerelease: true
           make_latest: false
-          files: YeYing-Dev-v4.6.0-android.apk
+          files: YeYing-Dev-v4.7.0-android.apk
           body: |
-            给作者自己试玩的侧载包，**不是对玩家发的 4.6.0**。
+            给作者自己试玩的侧载包，**不是对玩家发的正式版**。
 
             - 桌面名：开发版 夜樱
             - 包名：`com.sakurayo.yeying.dev`
-            - versionName：`4.6.0-yeying` / versionCode 6109
-            - 本包把大厅、商店、成就、教程、档案、升级卡和结算里的字块、色块、表情图标全部换成精装。覆盖安装即可，不会动正式《樱夜·尸潮》。
+            - versionName：`4.7.0-yeying` / versionCode 6110
+            - 合并触控修复、图标精装与大厅顶栏拆叠。覆盖安装即可，不会动正式《樱夜·尸潮》。
             - 不会覆盖正式《樱夜·尸潮》（`com.sakurayo.zombietide`）
             - Debug 证书签名，只适合自己装
 
-            文件：`YeYing-Dev-v4.6.0-android.apk`
+            文件：`YeYing-Dev-v4.7.0-android.apk`

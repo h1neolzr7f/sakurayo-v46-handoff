@@ -1,5 +1,13 @@
 Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先阅读根目录的 AGENTS.md、README_FIRST.md 和 CODEX_TASK.md，基于 src/index.html 继续开发，不要使用旧版本文件。
 
+## 2026-08-18 V4.7.0 统一夜樱修复线与大厅精装
+
+- 合并 eaa0（触控/橱窗/图标精装）与 cadf（手感/顶栏拆叠），版本升到 4.7.0，开发版夜樱 4.7.0-yeying / 6110。
+- 换角圆钮挂进顶栏 flex，不再压货币条；prism/shard 预览芯片横屏隐藏。
+- 浏览器也会从 ops 启动 chrome 精装，不再只靠 Android 注入。
+- 已修错误写进 `docs/REGRESSION.md`，`tests/regression_v47.mjs` 锁住。存档键仍是 `sakurayoV3`，没有再包 `update`。
+- 主神货架精装修仍留在 `cursor/maingod-shop-volume1-3dfe`，这次没有混进，避免把已修 bug 冲掉。
+
 ## 2026-08-17 局外毛坯收完并换皮
 
 - 公告/邮件改成左列表右正文；档案房补通关/成就/天赋/证词统计；角色档案天赋/剧情列出真进度。

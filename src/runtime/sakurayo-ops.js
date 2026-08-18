@@ -1,7 +1,7 @@
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.0";
+  var VERSION = "4.7.0";
   var MAX = 2;
   var COST = 8;
   var REFUND = 4;
@@ -281,6 +281,12 @@
         global.SakurayoBoutique.install();
       }
       return !!(global.SakurayoBoutique && global.SakurayoBoutique.install);
+    });
+    bootScript("sakurayo-chrome-js", "runtime/sakurayo-chrome.js", function () {
+      if (global.SakurayoChrome && typeof global.SakurayoChrome.install === "function") {
+        global.SakurayoChrome.install();
+      }
+      return !!(global.SakurayoChrome && global.SakurayoChrome.install);
     });
   }
 

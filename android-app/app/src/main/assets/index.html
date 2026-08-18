@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" name="viewport"/>
 <meta content="#090714" name="theme-color"/>
-<title>樱夜·尸潮：Mod Kit V4.6.0</title>
+<title>樱夜·尸潮：Mod Kit V4.7.0</title>
 <style>
 :root{--p:#ff58a7;--p2:#ffb4d5;--c:#56ddff;--g:#ffd36b;--bg:#080713;--panel:rgba(18,14,39,.96);--line:rgba(170,220,255,.24);--mut:#cfc4df;--red:#ff4e72}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:#fff;font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;touch-action:none}button{border:0;color:inherit;font:inherit}button:active{transform:scale(.985)}canvas{position:fixed;inset:0;width:100%;height:100%}.hidden{display:none!important}.screen{position:fixed;inset:0;z-index:10}
@@ -142,7 +142,7 @@ html.shortWindow46 .tutorialArt37 p{font-size:12px;line-height:1.4}
 <div class="overlay hidden" id="result"><div class="modal"><div class="resultIcon" id="ricon">🌸</div><div class="rankBig" id="rankBig"></div><h2 id="rtitle"></h2><p class="sub" id="rsub"></p><div class="stats" id="rstats"></div><div class="endingTag" id="endingTag">结局演算中</div><div class="report" id="damageReport"></div><div class="routeNote" id="routeNote"></div><div class="actions"><button class="primary" id="again">再次迎击</button><button class="secondary" id="back">返回主界面</button></div></div></div>
 <div class="warn hidden" id="warning"></div><div id="toast"></div>
 <script>
-window.SAKURAYO_GAME_VERSION = "4.6.0";
+window.SAKURAYO_GAME_VERSION = "4.7.0";
 (() => {
   "use strict";
   const enabled = /(?:\?|&)(?:debug|test)=1(?:&|$)/.test(location.search || "");
@@ -191,7 +191,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   "use strict";
 
   var API_VERSION = 2;
-  var GAME_VERSION = String(global.SAKURAYO_GAME_VERSION || "4.6.0");
+  var GAME_VERSION = String(global.SAKURAYO_GAME_VERSION || "4.7.0");
   var packs = [];
   var orderedPacks = [];
   var packById = Object.create(null);
@@ -661,7 +661,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.0";
+  var VERSION = "4.7.0";
   var TAU = Math.PI * 2;
   var EARLY_WINDOW = 20;
   var EARLY_INTERVAL = 0.45;
@@ -1607,7 +1607,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.0";
+  var VERSION = "4.7.0";
   var typing = null;
   var flashTimer = 0;
   var styleInjected = false;
@@ -2037,7 +2037,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.0";
+  var VERSION = "4.7.0";
   var TABS = ["skins", "starters", "items", "talismans", "extensions"];
   var FIRST_CLEAR = 40;
   var styleInjected = false;
@@ -2181,7 +2181,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.0";
+  var VERSION = "4.7.0";
   var portraitTaps = 0;
   var portraitStamp = 0;
   var TAP_WINDOW = 1200;
@@ -3200,7 +3200,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.0";
+  var VERSION = "4.7.0";
   var PREVIEW = "预览界面 · 暂不联网";
   var DRAWERS = Object.freeze(["mission", "mail", "notice", "friend", "calendar", "profile"]);
   var CHAR_NAMES = Object.freeze({ sayo: "月城小夜", aya: "神代绫", rion: "黑羽凛音" });
@@ -4802,7 +4802,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.0";
+  var VERSION = "4.7.0";
   // Live2D Cubism AutoEyeBlinkInput defaults: Mean 2.5, Maximum Deviation 2.
   // https://docs.live2d.com/en/cubism-sdk-tutorials/eyeblink/
   var BLINK = Object.freeze({
@@ -5224,7 +5224,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.0";
+  var VERSION = "4.7.0";
   var MAX = 2;
   var COST = 8;
   var REFUND = 4;
@@ -12000,7 +12000,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   const _menuUpdate39=menuUpdate;
   menuUpdate=function(){const result=_menuUpdate39();installCalmMenu39();return result;};
   const _runAnalytics39=runAnalytics37;
-  runAnalytics37=function(){return {..._runAnalytics39(),version:"4.6.0"};};
+  runAnalytics37=function(){return {..._runAnalytics39(),version:"4.7.0"};};
 
   function drawMechanics39(){
     if(state!=="play")return;
@@ -12163,7 +12163,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   renderChoices=function(){const result=_renderChoices40();document.querySelectorAll("#choices .choice").forEach(card=>{const u=U.find(x=>x.id===card.dataset.upgradeId);if(!u?.conflict40)return;card.classList.add("conflictChoice40");const p=card.querySelector("p");if(p)p.insertAdjacentHTML("beforeend",'<strong class="conflictWarn40">高风险冲突：收益与削弱同时生效，可能让构筑失控。</strong>');});return result;};
 
   style37.textContent+=`.shopTabs40{margin:0 0 10px}.shopGroup40{display:grid;gap:9px}.shopItem40{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:11px;border-radius:14px;background:#100c20e8;border:1px solid #ffffff18;margin-bottom:9px}.shopItem40 h3{margin:0 0 4px;font-size:14px}.shopItem40 p{margin:0;color:#c7bfd2;font-size:11px;line-height:1.45}.shopItem40 button,.shopUpgrade40,.challengeToggle40,.betaActions40 button,.betaDrawer40>[class] button[data-beta="refresh"],.betaDrawer40 .dbody>button[data-beta="refresh"]{padding:9px;border-radius:10px;border:1px solid #8463aa;background:#261b3d;color:#fff}.shopIcon40{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:#27183d;font-size:24px}.shopUpgrade40{grid-column:3;margin-top:-6px}.challengeToggle40{width:100%;margin-bottom:10px;border-color:#ffd36b;color:#ffe69b;background:#35251d}.conflictChoice40{border-color:#ff6f7e!important;background:linear-gradient(145deg,#2a101be8,#160d22e8)!important}.conflictWarn40{display:block;margin-top:6px;color:#ff8793}.betaGrid40{display:grid;grid-template-columns:1fr 1fr;gap:8px}.betaGrid40 label{display:grid;gap:5px;font-size:11px}.betaGrid40 select{padding:9px;border-radius:9px;background:#141025;color:#fff;border:1px solid #70558c}.betaActions40{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}.betaDrawer40 textarea{width:100%;height:230px;background:#080713;color:#bdf4de;border:1px solid #6b548b;border-radius:10px;padding:9px;font:10px/1.4 ui-monospace,monospace}.betaDrawer40 .dbody>button[data-beta="refresh"]{width:100%;margin-top:8px}.hiddenStory40{border-color:#ffe6a455!important}.utilityButtons37.open39>#betaButton40{display:block!important}`;
-  document.title="樱夜·尸潮：Mod Kit V4.6.0";
+  document.title="樱夜·尸潮：Mod Kit V4.7.0";
 
   /* ================= V4.0 融合扩展：24种跨职业机制 ================= */
   const FUSION_ICON_ALIAS41={elementalbeast:"chimera",plagueidol:"plagueforge",soulgun:"gunshrine",nanoninja:"shadowmage",fleshshrine:"corpseimmortal",bloodmage:"bloodstar"};

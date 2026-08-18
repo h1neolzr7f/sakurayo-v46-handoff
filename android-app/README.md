@@ -7,7 +7,7 @@
 
 - 桌面名：`开发版 夜樱`
 - applicationId：`com.sakurayo.yeying.dev`
-- versionName：`4.6.0-yeying`
+- versionName：`4.7.0-yeying`
 
 它和正式包 `com.sakurayo.zombietide`（樱夜·尸潮）是两个应用，可以同时装，不会互相覆盖。
 

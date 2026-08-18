@@ -11,7 +11,7 @@ sandbox.globalThis = sandbox;
 vm.runInNewContext(code, sandbox);
 const S = sandbox.window.SakurayoShell;
 
-assert.equal(S.version, "4.6.0");
+assert.equal(S.version, "4.7.0");
 assert.deepEqual([...S.DRAWERS], ["mission", "mail", "notice", "friend", "calendar", "profile"]);
 assert.equal(S.PREVIEW, "预览界面 · 暂不联网");
 
