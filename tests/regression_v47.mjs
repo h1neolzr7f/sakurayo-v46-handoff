@@ -33,6 +33,7 @@ assert.match(index, /state === "menu" && !menuUpdate\.busy/);
 assert.match(index, /drawerVisible47/);
 assert.match(index, /dataset\.cmd47/);
 assert.match(index, /_openDrawer47/);
+assert.match(index, /resize\.busy/);
 assert.match(touch, /scheduleHits/);
 
 assert.match(ops, /sakurayo-touch54\.js/);
@@ -58,9 +59,12 @@ assert.match(lobby, /position:static!important/);
 assert.match(lobby, /homeChip46\.prism/);
 
 assert.match(feel, /applyPassword\.busy/);
+assert.match(feel, /applyPassword\.pulse47/);
 assert.match(feel, /observe\(start, \{ childList: true \}/);
 assert.doesNotMatch(feel, /characterData: true/);
 assert.doesNotMatch(feel, /update\s*=\s*function/);
+assert.doesNotMatch(index, /void box\.offsetWidth/);
+assert.doesNotMatch(read("src/runtime/sakurayo-cutscene.js"), /void \w+\.offsetWidth/);
 
 assert.match(touch, /syncCinematicHud/);
 assert.match(touch, /elementFromPoint/);

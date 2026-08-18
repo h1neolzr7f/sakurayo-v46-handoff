@@ -588,7 +588,10 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     banterBusy=true;banterTick=0;
     let [sp,tx]=banterQueue.shift(),box=$("#banter");
     $("#banterSpeaker").textContent=sp;$("#banterText").textContent=tx;
-    box.classList.remove("hidden","pop");void box.offsetWidth;box.classList.add("pop");
+    box.classList.remove("hidden","pop");
+    if (TEST_MODE) box.classList.add("pop");
+    else if (typeof requestAnimationFrame === "function") requestAnimationFrame(() => box.classList.add("pop"));
+    else box.classList.add("pop");
     clearTimeout(playBanter.t);playBanter.t=setTimeout(()=>{box.classList.add("hidden");banterBusy=false;setTimeout(playBanter,280)},2850);
   }
   function upgradeBanter(u){
@@ -2360,17 +2363,24 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     } catch (err) {}
   }
   function resize() {
-    const view = viewportSize46();
-    D = Math.min(view.w >= 640 && view.h < 360 ? 1.25 : 2, devicePixelRatio || 1);
-    W = view.w;
-    H = view.h;
-    cv.width = Math.floor(W * D);
-    cv.height = Math.floor(H * D);
-    ctx.setTransform(D, 0, 0, D, 0, 0);
-    preferLandscape46();
-    if (state === "menu") {
-      background();
-      paintHomeCommand46();
+    if (resize.busy) return;
+    resize.busy = true;
+    try {
+      const view = viewportSize46();
+      D = Math.min(view.w >= 640 && view.h < 360 ? 1.25 : 2, devicePixelRatio || 1);
+      W = view.w;
+      H = view.h;
+      const nextW = Math.floor(W * D);
+      const nextH = Math.floor(H * D);
+      if (cv.width !== nextW || cv.height !== nextH) {
+        cv.width = nextW;
+        cv.height = nextH;
+        ctx.setTransform(D, 0, 0, D, 0, 0);
+      }
+      preferLandscape46();
+      if (state === "menu") background();
+    } finally {
+      resize.busy = false;
     }
   }
   addEventListener("resize", resize);
@@ -7257,7 +7267,23 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
       attackNow(){if(state!=="play")throw new Error("attackNow requires play mode");grid.clear();for(const e of enemies)if(!e.dead)grid.add(e);P.fire=0;shoot();draw();return {snapshot:snapshot35(),bullets:bullets.map(b=>({x:b.x,y:b.y,vx:b.vx,vy:b.vy,source:b.source})),enemies:enemies.map((e,index)=>({index,x:e.x,y:e.y,hp:e.hp,max:e.max,dead:e.dead}))};},
       start(){startGame();try{return snapshot35();}catch{return {mode:state,runMode:runMode36};}},
       pauseNow(){pauseGame();return snapshot35();},
-      dismissDialogue(){let guard=80;while(state==="dialogue"&&guard-->0)nextDialogue();if(guard<=0)throw new Error("Dialogue guard exhausted");return snapshot35();},
+      dismissDialogue(){
+        let guard=80;
+        while(state==="dialogue"&&guard-->0){
+          if(window.SakurayoCutscene?.isPlaying?.()) window.SakurayoCutscene.stopVictory?.();
+          nextDialogue();
+        }
+        if(state==="dialogue"){
+          dialogueQueue.length=0;
+          const cb=dialogueDone;
+          dialogueDone=null;
+          $("#dialogue")?.classList.add("hidden");
+          window.SakurayoCutscene?.dismiss?.();
+          state="play";
+          if(cb) cb();
+        }
+        try{return snapshot35();}catch{return {mode:state,runMode:runMode36};}
+      },
       protectPlayer(){P.inv=9999;return snapshot35();},freezeProgression(){P.xp=0;P.next=1e9;return snapshot35();},
       playerGeometry(){return {...PLAYER_GEOMETRY35,radius:PLAYER_GEOMETRY35.collisionRadius};},
       circleCollision(distance,firstRadius,secondRadius){return circlesOverlap35(0,0,Number(firstRadius),Number(distance),0,Number(secondRadius));},

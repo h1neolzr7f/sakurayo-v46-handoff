@@ -289,7 +289,16 @@
     if (start) {
       observe(start, { childList: true }, function () {
         if (applyPassword.busy) return;
+        applyPassword.pulse47 = (applyPassword.pulse47 || 0) + 1;
+        if (applyPassword.pulse47 > 6) return;
         applyPassword(detectChar());
+        if (global.requestAnimationFrame && !applyPassword.reset47) {
+          applyPassword.reset47 = true;
+          global.requestAnimationFrame(function () {
+            applyPassword.pulse47 = 0;
+            applyPassword.reset47 = false;
+          });
+        }
       });
     }
 
