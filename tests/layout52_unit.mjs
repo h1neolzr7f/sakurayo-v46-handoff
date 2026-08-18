@@ -39,6 +39,7 @@ assert.match(feel, /touch-action:manipulation!important/);
 assert.match(code, /position:static!important/);
 assert.match(code, /homeChip46\.prism/);
 assert.match(code, /hangChars\.busy/);
+assert.match(code, /\.utilityButtons37\{display:none!important\}/);
 assert.doesNotMatch(code, /update\s*=\s*\(/);
 
 class FakeClassList {
