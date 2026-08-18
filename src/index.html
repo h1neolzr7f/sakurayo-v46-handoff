@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" name="viewport"/>
 <meta content="#090714" name="theme-color"/>
-<title>樱夜·尸潮：Mod Kit V4.6.0</title>
+<title>樱夜·尸潮：Mod Kit V4.7.0</title>
 <style>
 :root{--p:#ff58a7;--p2:#ffb4d5;--c:#56ddff;--g:#ffd36b;--bg:#080713;--panel:rgba(18,14,39,.96);--line:rgba(170,220,255,.24);--mut:#cfc4df;--red:#ff4e72}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:#fff;font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;touch-action:none}button{border:0;color:inherit;font:inherit}button:active{transform:scale(.985)}canvas{position:fixed;inset:0;width:100%;height:100%}.hidden{display:none!important}.screen{position:fixed;inset:0;z-index:10}
@@ -55,6 +55,46 @@
   .banter{bottom:max(118px,calc(env(safe-area-inset-bottom) + 105px))!important;font-size:11px!important}
   #toast{top:max(96px,calc(env(safe-area-inset-top) + 86px))!important;font-size:11px!important}
 }
+html.landscape46:not(.portraitFallback46) .hudtop{padding:max(8px,env(safe-area-inset-top)) 10px 0}
+html.landscape46:not(.portraitFallback46) .hero{grid-template-columns:42px 1fr;max-width:236px;padding:3px 12px 3px 3px;border-radius:999px 16px 16px 999px;clip-path:none;background:linear-gradient(90deg,#120e27f4,#120e2700);border:1px solid #f2c75d44}
+html.landscape46:not(.portraitFallback46) .hero img{width:38px;height:38px;border:2px solid #f2c75d;box-shadow:0 0 12px #f35aa666}
+html.landscape46:not(.portraitFallback46) .bar{height:8px}
+html.landscape46:not(.portraitFallback46) .rinfo{justify-self:end;text-align:right;opacity:.82}
+html.landscape46:not(.portraitFallback46) .wave{top:max(10px,env(safe-area-inset-top));width:min(28vw,240px);height:12px;border-color:#f2c75d33;background:#0b0818cc}
+html.landscape46:not(.portraitFallback46) .mission{left:50%;transform:translateX(-50%);top:max(26px,calc(env(safe-area-inset-top) + 16px));max-width:32vw;background:#0b0818cc;border:1px solid #69ddf244}
+html.landscape46:not(.portraitFallback46) .combo{top:max(52px,calc(env(safe-area-inset-top) + 44px));right:16px;color:#f35aa6;font-size:22px;letter-spacing:.08em;text-shadow:0 0 12px #f35aa688}
+html.landscape46:not(.portraitFallback46) .perf{top:max(10px,env(safe-area-inset-top));right:58px}
+html.landscape46:not(.portraitFallback46) #pause{top:max(8px,env(safe-area-inset-top));border-color:#f2c75d66;background:#120e27ee}
+html.landscape46:not(.portraitFallback46) #joy{border-color:#f35aa666;box-shadow:0 0 0 1px #f2c75d33,inset 0 0 22px #f35aa622}
+html.landscape46:not(.portraitFallback46) #joy .stick{background:radial-gradient(circle at 40% 32%,#ffd8e8,#f35aa6aa 58%,#c13bff55)}
+html.landscape46:not(.portraitFallback46) #dash{box-shadow:0 0 0 3px #69ddf266,0 0 16px #69ddf244}
+html.landscape46:not(.portraitFallback46) #skill{box-shadow:0 0 0 3px #f35aa666,0 0 18px #f35aa655}
+html.landscape46:not(.portraitFallback46) .banter,html.landscape46:not(.portraitFallback46) #banter{top:auto!important;bottom:max(12px,env(safe-area-inset-bottom))!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;width:min(42vw,380px)!important;padding:6px 14px!important;border-radius:999px!important;background:#0b0818ee!important;border:1px solid #f35aa666!important}
+html.shortWindow46 .hudtop{padding:max(4px,env(safe-area-inset-top)) 8px 0}
+html.shortWindow46 .hero{grid-template-columns:36px 1fr;max-width:236px;padding:3px 10px 3px 3px}
+html.shortWindow46 .hero img{width:34px;height:34px}
+html.shortWindow46 .rinfo{display:none}
+html.shortWindow46 .wave{top:max(8px,env(safe-area-inset-top));width:min(30vw,220px);height:10px}
+html.shortWindow46 .mission{top:max(22px,calc(env(safe-area-inset-top) + 14px));max-width:34vw}
+html.shortWindow46 .combo{top:max(8px,env(safe-area-inset-top));right:118px;font-size:16px}
+html.shortWindow46 .perf{top:max(8px,env(safe-area-inset-top));right:166px}
+html.shortWindow46 #pause{top:max(6px,env(safe-area-inset-top));width:36px;height:36px}
+html.shortWindow46 #joy{transform:scale(.82);transform-origin:left bottom}
+html.shortWindow46 #skill,html.shortWindow46 #dash{width:52px;height:52px}
+html.shortWindow46 .banter,html.shortWindow46 #banter{bottom:max(10px,env(safe-area-inset-bottom))!important;width:min(46vw,360px)!important;padding:5px 12px!important;font-size:10px!important}
+html.shortWindow46 #toast{top:max(48px,calc(env(safe-area-inset-top) + 40px))!important;font-size:10px!important}
+html.shortWindow46 .warn{top:max(64px,calc(env(safe-area-inset-top) + 56px))!important}
+html.shortWindow46 .overlay{padding:6px 10px}
+html.shortWindow46 .modal{padding:12px 14px;max-height:94vh;border:1px solid #f2c75d55;box-shadow:0 16px 40px #05020d99,inset 0 0 0 1px #ffe6a318}
+html.shortWindow46 .modal h2{font-size:18px;letter-spacing:.12em}
+html.shortWindow46 .sub{margin:0 0 6px;font-size:10px}
+html.shortWindow46 .choice{min-height:0;padding:8px 6px;gap:6px;border:1px solid #f2c75d33;background:linear-gradient(180deg,#221436,#120c20)}
+html.shortWindow46 .choice img{width:40px;height:40px;border-radius:10px}
+html.shortWindow46 #paused .actions button,html.shortWindow46 #result .actions button{min-height:40px}
+html.shortWindow46 .tutorialArt37{min-height:0;padding:8px 10px}
+html.shortWindow46 .tutorialIcon37{font-size:28px}
+html.shortWindow46 .tutorialArt37 h3{font-size:16px}
+html.shortWindow46 .tutorialArt37 p{font-size:12px;line-height:1.4}
 
 /* V3.5 三角色与衣装商店 */
 .charSelectPanel{pointer-events:auto;position:relative;margin:10px 0 8px;padding:10px;border:1px solid #ffffff16;border-radius:17px;background:linear-gradient(135deg,#14102ce8,#21133be8);box-shadow:0 10px 28px #0006}.sectionTitle{display:flex;align-items:end;justify-content:space-between;gap:8px;margin-bottom:8px}.sectionTitle b{font-size:13px;color:#ffd6e9}.sectionTitle small{font-size:8px;color:#bfb1d3;text-align:right}.characterList{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.charCard{position:relative;min-width:0;padding:8px 6px;border:1px solid #ffffff17;border-radius:14px;background:#ffffff08;text-align:center;overflow:hidden}.charCard.selected{border-color:var(--p);box-shadow:0 0 20px #ff58a733;background:linear-gradient(155deg,#ff58a718,#56ddff0d)}.charCard img{width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid #ffffff30;background:#171027}.charCard b{display:block;margin-top:4px;font-size:11px}.charCard em{display:block;font-style:normal;font-size:8px;color:var(--c);margin:2px 0}.charCard p{margin:0;font-size:7px;line-height:1.35;color:#cfc4df}.charCard .selectedMark{position:absolute;right:5px;top:5px;font-size:8px;color:#7dffbf}.nav{grid-template-columns:repeat(6,1fr)!important}.nav button{min-width:0;font-size:8px;padding-inline:2px}.shopMoney{margin-left:auto;color:var(--g);font-weight:1000;font-size:13px;white-space:nowrap}.shopNotice{padding:9px;border-radius:12px;background:#56ddff0b;border:1px solid #56ddff22;color:#cfefff;font-size:9px;line-height:1.55}.shopList{display:grid;gap:9px;margin-top:10px}.skinCard{display:grid;grid-template-columns:64px 1fr auto;gap:10px;align-items:center;padding:10px;border:1px solid #ffffff16;border-radius:16px;background:linear-gradient(135deg,#ffffff09,#ffffff04)}.skinCard.equipped{border-color:#ff69b988;box-shadow:0 0 18px #ff58a71f}.skinPreview{height:72px;border-radius:14px;display:grid;place-items:center;font-size:32px;border:1px solid #ffffff1b;box-shadow:inset 0 0 24px #0005}.skinCard h3{margin:0 0 3px;font-size:12px}.skinCard p{margin:0;color:#cfc4df;font-size:8px;line-height:1.45}.skinBias{display:inline-block;margin-top:5px;padding:3px 7px;border-radius:99px;background:#56ddff12;color:#8eeaff;font-size:8px}.skinCard button{padding:8px 9px;border-radius:10px;background:linear-gradient(135deg,#ff58a7,#8156e8);font-size:9px;font-weight:900}.skinCard button:disabled{opacity:.45}.charLore{border-left:3px solid var(--p)}
@@ -69,7 +109,7 @@
 #menu .nav span{width:34px;height:34px;margin:0 auto 4px}
 #menu .nav span img{display:block;width:100%;height:100%;border-radius:8px;object-fit:cover;box-shadow:0 0 10px #ff73bc38}
 #menu .profile img,#hud .hero img,.charCard img{background:#100b22}
-.storyIcon{overflow:hidden}.storyIcon>img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}.choice>img{object-fit:cover}.menuBrand35{width:46px;height:46px;object-fit:cover;border-radius:14px;border:1px solid #ffd1e377;box-shadow:0 0 22px #ff6fb755;flex:0 0 auto}.achievementMaster35{border-color:#ffd36b88!important;background:linear-gradient(135deg,#ffb44f17,#ff68b016)!important}.achievementMaster35 .badge{overflow:hidden}.achievementMaster35 .badge img{width:100%;height:100%;object-fit:cover;border-radius:inherit}.bootArt35{position:fixed;z-index:9998;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 42%,#35174d 0,#150d29 34%,#090713 72%);opacity:1;transition:opacity .35s ease;pointer-events:none}.bootArt35.gone{opacity:0}.bootCore411{display:grid;justify-items:center;gap:14px;color:#fff;text-align:center}.bootMark411{position:relative;width:74px;height:74px;display:grid;place-items:center;border:2px solid #fff7;border-radius:24px;background:linear-gradient(145deg,#ff6faf,#8c63ff);box-shadow:0 0 38px #ff6fab66;font-size:34px;font-weight:1000}.bootMark411:before,.bootMark411:after{content:"";position:absolute;inset:-12px;border:2px solid #ff9bcc88;border-radius:30px;animation:bootPulse411 1.4s ease-out infinite}.bootMark411:after{animation-delay:.7s}.bootCore411 b{font-size:20px;letter-spacing:.16em}.bootCore411 span{color:#ffd8e9;font-size:11px;letter-spacing:.18em;text-shadow:0 2px 12px #000}.bootDots411:after{content:"";animation:bootDots411 1.2s steps(4,end) infinite}@keyframes bootPulse411{0%{transform:scale(.82);opacity:.8}100%{transform:scale(1.32);opacity:0}}@keyframes bootDots411{0%{content:""}25%{content:"."}50%{content:".."}75%,100%{content:"..."}}@media(prefers-reduced-motion:reduce){.bootMark411:before,.bootMark411:after,.bootDots411:after{animation:none}}
+.storyIcon{overflow:hidden}.storyIcon>img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}.choice>img{object-fit:cover}.menuBrand35{width:46px;height:46px;object-fit:cover;border-radius:14px;border:1px solid #ffd1e377;box-shadow:0 0 22px #ff6fb755;flex:0 0 auto}.achievementMaster35{border-color:#ffd36b88!important;background:linear-gradient(135deg,#ffb44f17,#ff68b016)!important}.achievementMaster35 .badge{overflow:hidden}.achievementMaster35 .badge img{width:100%;height:100%;object-fit:cover;border-radius:inherit}.bootArt35{position:fixed;z-index:9998;inset:0;display:grid;place-items:center;background:radial-gradient(circle at 50% 42%,#35174d 0,#150d29 34%,#090713 72%);opacity:1;transition:opacity .35s ease;pointer-events:none}.bootArt35.gone{opacity:0;visibility:hidden;display:none}.bootCore411{display:grid;justify-items:center;gap:14px;color:#fff;text-align:center}.bootMark411{position:relative;width:74px;height:74px;display:grid;place-items:center;border:2px solid #fff7;border-radius:24px;background:linear-gradient(145deg,#ff6faf,#8c63ff);box-shadow:0 0 38px #ff6fab66;font-size:34px;font-weight:1000}.bootMark411:before,.bootMark411:after{content:"";position:absolute;inset:-12px;border:2px solid #ff9bcc88;border-radius:30px;animation:bootPulse411 1.4s ease-out infinite}.bootMark411:after{animation-delay:.7s}.bootCore411 b{font-size:20px;letter-spacing:.16em}.bootCore411 span{color:#ffd8e9;font-size:11px;letter-spacing:.18em;text-shadow:0 2px 12px #000}.bootDots411:after{content:"";animation:bootDots411 1.2s steps(4,end) infinite}@keyframes bootPulse411{0%{transform:scale(.82);opacity:.8}100%{transform:scale(1.32);opacity:0}}@keyframes bootDots411{0%{content:""}25%{content:"."}50%{content:".."}75%,100%{content:"..."}}@media(prefers-reduced-motion:reduce){.bootMark411:before,.bootMark411:after,.bootDots411:after{animation:none}}
 .mainGodCard36{border-color:#ffd76f88!important;box-shadow:0 0 28px #c792ff24}.mainGodCard36:after{background:linear-gradient(90deg,#120b20fa,#211441c9 74%,#ffd76f18)!important}.mainGodPanel36{position:relative;z-index:5;margin-top:10px;padding:10px;border:1px solid #ffd76f55;border-radius:13px;background:#090713d9}.mainGodPanel36 h4{margin:0 0 6px;color:#ffe291;font-size:12px}.mainGodPanel36 p{margin:3px 0!important}.mainGodGrid36{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:7px}.mainGodGrid36 button{padding:7px!important;font-size:9px!important}.aimTip36{position:fixed;z-index:5;right:14px;bottom:max(154px,calc(env(safe-area-inset-bottom) + 146px));padding:5px 8px;border-radius:99px;border:1px solid #71e5ff55;background:#0b1731c7;color:#8defff;font-size:8px;pointer-events:none}
 .mainGodActions36{display:flex;gap:7px;flex-wrap:wrap}.mainGodActions36 .exchange36{background:linear-gradient(135deg,#ffd05c,#9d58e8)!important;color:#1a1028}.mainGodBalance36{padding:11px;border:1px solid #ffd76f66;border-radius:14px;background:linear-gradient(135deg,#ffd76f14,#a35cff14);color:#ffe6a5;font-weight:900}.exchangeSection36{display:grid;gap:8px}.exchangeSection36 h3{margin:8px 0 0;color:#ffe291}.exchangeCard36{display:grid;grid-template-columns:44px 1fr auto;gap:9px;align-items:center;padding:10px;border:1px solid #ffffff18;border-radius:14px;background:#ffffff08}.exchangeCard36 .ei{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:radial-gradient(circle,#dba6ff,#3c285f);font-size:22px}.exchangeCard36 h4{margin:0;font-size:12px}.exchangeCard36 p{margin:3px 0;color:#cfc4df;font-size:9px;line-height:1.4}.exchangeCard36 button{padding:8px;border-radius:10px;background:linear-gradient(135deg,#ffd05c,#9d58e8);font-size:9px;font-weight:900}.exchangeCard36 button:disabled{opacity:.4}
 .coverTitle36{position:absolute;z-index:2;left:50%;top:18.5%;transform:translateX(-50%);width:92%;text-align:center;pointer-events:none;text-shadow:0 4px 18px #05020d,0 0 28px #ff5ab999}.coverTitle36 b{display:block;font-size:clamp(34px,10vw,66px);line-height:.95;letter-spacing:.04em;font-weight:1000;background:linear-gradient(180deg,#fff8fc,#ff9bca 56%,#d95bff);-webkit-background-clip:text;background-clip:text;color:transparent}.coverTitle36 span{display:inline-block;margin-top:8px;padding:4px 13px;border:1px solid #ffe6a655;border-radius:99px;background:#120b2bb8;color:#ffe7a3;font-size:11px;letter-spacing:.3em}
@@ -102,7 +142,7 @@
 <div class="overlay hidden" id="result"><div class="modal"><div class="resultIcon" id="ricon">🌸</div><div class="rankBig" id="rankBig"></div><h2 id="rtitle"></h2><p class="sub" id="rsub"></p><div class="stats" id="rstats"></div><div class="endingTag" id="endingTag">结局演算中</div><div class="report" id="damageReport"></div><div class="routeNote" id="routeNote"></div><div class="actions"><button class="primary" id="again">再次迎击</button><button class="secondary" id="back">返回主界面</button></div></div></div>
 <div class="warn hidden" id="warning"></div><div id="toast"></div>
 <script>
-window.SAKURAYO_GAME_VERSION = "4.6.0";
+window.SAKURAYO_GAME_VERSION = "4.7.0";
 (() => {
   "use strict";
   const enabled = /(?:\?|&)(?:debug|test)=1(?:&|$)/.test(location.search || "");
@@ -151,6 +191,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 <script src="runtime/sakurayo-cutscene.js"></script>
 <script src="runtime/sakurayo-economy.js"></script>
 <script src="runtime/sakurayo-lobby.js"></script>
+<script src="runtime/sakurayo-shell.js"></script>
 <script src="runtime/sakurayo-live.js"></script>
 <script src="runtime/sakurayo-ops.js"></script>
 <script src="content/extensions.manifest.js"></script>
@@ -222,13 +263,21 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }
     const boot = document.querySelector("#bootArt35");
     const dismissBoot = () => {
-      if (!boot || !boot.isConnected || boot.classList.contains("gone")) return;
+      if (!boot || !boot.isConnected) return;
       boot.classList.add("gone");
-      setTimeout(() => boot.remove(), 420);
+      if (TEST_MODE) {
+        boot.remove();
+        return;
+      }
+      if (!dismissBoot.timer) dismissBoot.timer = setTimeout(() => boot.remove(), 420);
     };
-    if (document.readyState === "complete") setTimeout(dismissBoot, 260);
-    else window.addEventListener("load", () => setTimeout(dismissBoot, 260), { once: true });
-    setTimeout(dismissBoot, 12000);
+    if (TEST_MODE) dismissBoot();
+    else {
+      if (document.readyState === "complete") setTimeout(dismissBoot, 260);
+      else window.addEventListener("load", () => setTimeout(dismissBoot, 260), { once: true });
+      setTimeout(dismissBoot, 900);
+      setTimeout(dismissBoot, 12000);
+    }
   })();
   window.__SAKURAYO_ART__ = Object.freeze({
     root: ART_ROOT,
@@ -313,9 +362,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     skin: "default",
     ownedSkins: ["default"],
     mainGod: { points: 0, unlockedTier: 1, bestTier: 0, clears: 0, runs: 0, deepest: 0, contracts: {}, challenges: {}, power: 0, vitality: 0, tempo: 0, resonance: 0, fortune: 0, regenBlood: 0, psiLink: 0, gunBlade: 0, mageCircuit: 0, summonPage: 0, spaceRing: 0, rebirthDoll: 0, sideKey: 0, cursedHeart: 0 },
+    shell46: { ready: 0, prism: 0, shard: 0, login: { date: "", streak: 0 }, claimed: { missions: {}, mail: {} }, read: { mail: {}, notices: {} }, bond: { sayo: 0, aya: 0, rion: 0 }, friend: "sayo", gachaSeen: 0 },
   };
   const FORBIDDEN_SAVE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
-  const ALLOWED_SAVE_KEYS = ["coins","unlock","done","kills","bosses","best","runs","tal","ach","claim","story","forms","fusions","endings","runHistory","banter","tutorialDone","settings","character","skin","ownedSkins","mainGod","storyChoices38","storySeen38","shop40","balance40","hiddenStory40","pendingLoneStory40","extensions"];
+  const ALLOWED_SAVE_KEYS = ["coins","unlock","done","kills","bosses","best","runs","tal","ach","claim","story","forms","fusions","endings","runHistory","banter","tutorialDone","settings","character","skin","ownedSkins","mainGod","storyChoices38","storySeen38","shop40","balance40","hiddenStory40","pendingLoneStory40","extensions","shell46"];
   function isPlainObject(value) {
     return !!value && typeof value === "object" && !Array.isArray(value);
   }
@@ -370,7 +420,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       const quota = error && (error.name === "QuotaExceededError" || error.code === 22);
       toast(quota ? "存档空间已满，进度未能写入" : "存档写入失败，请导出备份");
     }
-    menuUpdate();
+    if (state === "menu" && !menuUpdate.busy) menuUpdate();
   };
 
 
@@ -520,11 +570,14 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     warSinger:["小夜","尸潮歌姬成型。副歌一响，僵尸负责倒下。"],healingIdol:["凛","治愈偶像进阶。","小夜","终于有观众看完演出后生命值会上升。"],
     boneKing:["小夜","白骨君王成型。王座先免了，我不想知道材料来源。"],soulHerd:["小夜","群魂牧者进阶。请亡魂排队，不要挤占弹幕通道。"],
   };
-  function transientBlocked(){return ["dialogue","event","level","pause","result","menu"].includes(state) || !$("#warning").classList.contains("hidden") || (P.outfitReveal||0)>0.18;}
+  function transientBlocked(){return ["dialogue","event","level","pause","result","menu"].includes(state) || !$("#warning").classList.contains("hidden") || (P.outfitReveal||0)>0.18 || !!window.SakurayoLifecycle?.presentationActive?.();}
   function hideTransient(){
     $("#banter").classList.add("hidden");
     $("#toast").classList.remove("show");
+    $("#toast").textContent="";
+    $("#warning").classList.add("hidden");
     banterBusy=false;toastBusy=false;
+    toastQueue.length=0;
     clearTimeout(playBanter.t);clearTimeout(playToast.t);
   }
   function showBanter(lines,force=false){
@@ -543,7 +596,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     banterBusy=true;banterTick=0;
     let [sp,tx]=banterQueue.shift(),box=$("#banter");
     $("#banterSpeaker").textContent=sp;$("#banterText").textContent=tx;
-    box.classList.remove("hidden","pop");void box.offsetWidth;box.classList.add("pop");
+    box.classList.remove("hidden","pop");
+    if (TEST_MODE) box.classList.add("pop");
+    else if (typeof requestAnimationFrame === "function") requestAnimationFrame(() => box.classList.add("pop"));
+    else box.classList.add("pop");
     clearTimeout(playBanter.t);playBanter.t=setTimeout(()=>{box.classList.add("hidden");banterBusy=false;setTimeout(playBanter,280)},2850);
   }
   function upgradeBanter(u){
@@ -578,8 +634,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     return bits.join("　");
   }
   function renderRunReport(){
-    let src=Object.entries(P.damageSources).sort((a,b)=>b[1]-a[1]),total=src.reduce((a,x)=>a+x[1],0)||1;
-    $("#damageReport").innerHTML='<h3>伤害构成</h3>'+src.slice(0,7).map(([k,v])=>`<div class="reportRow"><span>${SOURCE_NAME[k]||k}</span><div class="reportBar"><i style="width:${Math.max(2,v/total*100).toFixed(1)}%"></i></div><b>${(v/total*100).toFixed(0)}%</b></div>`).join('')+`<h3>战斗诊断</h3><div class="routeNote">最常击破：${Object.entries(P.killsByType).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${ENEMY_NAME[k]||k} ${v}`).join(' · ')||'暂无'}<br>Boss各阶段耗时：${P.phaseTimes.length?P.phaseTimes.map((v,i)=>`P${i+1} ${v.toFixed(1)}秒`).join(' · '):'未进入完整阶段'}<br>稳定度区间：${P.lowestRank} → ${P.peakRank}　受到伤害：${Math.round(P.damageTaken)}<br>${runCoach45(!!runWin)}</div>`;
+    let src=Object.entries(P.damageSources||{}).sort((a,b)=>b[1]-a[1]),total=src.reduce((a,x)=>a+x[1],0)||1;
+    $("#damageReport").innerHTML='<h3>伤害构成</h3>'+src.slice(0,7).map(([k,v])=>`<div class="reportRow"><span>${SOURCE_NAME[k]||k}</span><div class="reportBar"><i style="width:${Math.max(2,v/total*100).toFixed(1)}%"></i></div><b>${(v/total*100).toFixed(0)}%</b></div>`).join('')+`<h3>战斗诊断</h3><div class="routeNote">最常击破：${Object.entries(P.killsByType||{}).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${ENEMY_NAME[k]||k} ${v}`).join(' · ')||'暂无'}<br>Boss各阶段耗时：${P.phaseTimes.length?P.phaseTimes.map((v,i)=>`P${i+1} ${v.toFixed(1)}秒`).join(' · '):'未进入完整阶段'}<br>稳定度区间：${P.lowestRank} → ${P.peakRank}　受到伤害：${Math.round(P.damageTaken)}<br>${runCoach45(!!runWin)}</div>`;
     let ed=endingData();$("#endingTag").textContent=ed.name;$("#routeNote").textContent=ed.text;
   }
   function spawnArenaHazards(kind,count=1){
@@ -800,6 +856,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     tenvisit: { n:"十连证词", i:"🎴", d:"完成一次十连寻访", r:80, c:()=>!!(save.shop40&&save.shop40.ops&&save.shop40.ops.tenPulls) },
     ssrwitness: { n:"终章证人", i:"👑", d:"抽到终章证人立绘", r:200, c:()=>((save.shop40&&save.shop40.ops&&save.shop40.ops.owned&&save.shop40.ops.owned.last_witness)||0)>0 },
     rosterfull: { n:"八页名册", i:"📚", d:"集齐 8 张证词卡", r:360, c:()=>["sayo_echo","aya_petal","rion_edge","night_radio","shrine_seal","void_ticket","cherry_crown","last_witness"].every(id=>((save.shop40&&save.shop40.ops&&save.shop40.ops.owned&&save.shop40.ops.owned[id])||0)>0) },
+    rostercomplete: { n:"镜界全证词", i:"🪞", d:"集齐全部 16 张证词卡", r:680, c:()=>["sayo_echo","aya_petal","rion_edge","night_radio","shrine_seal","void_ticket","cherry_crown","last_witness","sayo_318","aya_channel","rion_names","rin_signal","corp_contract","sister_reply","swordmaster_oath","mirror_twins"].every(id=>((save.shop40&&save.shop40.ops&&save.shop40.ops.owned&&save.shop40.ops.owned[id])||0)>0) },
   };
 
   const P = {};
@@ -2299,6 +2356,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     document.documentElement.classList.add("landscape46");
     document.documentElement.classList.toggle("portraitFallback46", view.w < 640);
     document.documentElement.classList.toggle("tallWindow46", portrait && view.w >= 640);
+    document.documentElement.classList.toggle("shortWindow46", view.w >= 640 && view.h < 360);
     let hint = $("#rotateHint46");
     if (!hint) {
       hint = document.createElement("div");
@@ -2313,15 +2371,25 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     } catch (err) {}
   }
   function resize() {
-    D = Math.min(2, devicePixelRatio || 1);
-    const view = viewportSize46();
-    W = view.w;
-    H = view.h;
-    cv.width = Math.floor(W * D);
-    cv.height = Math.floor(H * D);
-    ctx.setTransform(D, 0, 0, D, 0, 0);
-    preferLandscape46();
-    if (state === "menu") background();
+    if (resize.busy) return;
+    resize.busy = true;
+    try {
+      const view = viewportSize46();
+      D = Math.min(view.w >= 640 && view.h < 360 ? 1.25 : 2, devicePixelRatio || 1);
+      W = view.w;
+      H = view.h;
+      const nextW = Math.floor(W * D);
+      const nextH = Math.floor(H * D);
+      if (cv.width !== nextW || cv.height !== nextH) {
+        cv.width = nextW;
+        cv.height = nextH;
+        ctx.setTransform(D, 0, 0, D, 0, 0);
+      }
+      preferLandscape46();
+      if (state === "menu") background();
+    } finally {
+      resize.busy = false;
+    }
   }
   addEventListener("resize", resize);
   addEventListener("orientationchange", () => resize());
@@ -2482,9 +2550,18 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
 
   /* ================= UI: MENU / DRAWERS / HUD / MODALS ================= */
+  function drawerVisible47(id) {
+    const n = document.getElementById(id);
+    return !!(n && !n.classList.contains("hidden"));
+  }
   function menuUpdate() {
     let s = stage();
-    $("#coins").textContent = save.coins;
+    const coinsEl = $("#coins");
+    if (coinsEl) {
+      const plus = coinsEl.querySelector("#homeCoinPlus46");
+      coinsEl.textContent = save.coins;
+      if (plus) coinsEl.appendChild(plus);
+    }
     $("#tcoins").textContent = save.coins;
     $("#simg").src = s.img;
     $("#sname").textContent = s.name;
@@ -2492,12 +2569,14 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     $("#sno").textContent = s.no;
     $("#rank").textContent =
       `防线等级 ${1 + save.done.length + Object.values(save.tal).reduce((a, b) => a + b, 0)}`;
-    renderStages();
-    renderTalents();
-    renderAch();
-    renderStory();
-    renderAscensionGuide();
+    const first = !menuUpdate.painted47;
+    if (first || drawerVisible47("stageDrawer")) renderStages();
+    if (first || drawerVisible47("talentDrawer")) renderTalents();
+    if (first || drawerVisible47("achDrawer")) renderAch();
+    if (first || drawerVisible47("storyDrawer")) renderStory();
+    if (first || drawerVisible47("ascDrawer")) renderAscensionGuide();
     if($("#banterToggle"))$("#banterToggle").textContent=`吐槽电台：${save.banter?"开":"关"}`;
+    menuUpdate.painted47 = true;
   }
   function renderStages() {
     let box = $("#stageList");
@@ -2512,6 +2591,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       if (!lock)
         d.querySelector("button").onclick = () => {
           runMode36 = "story";
+          pendingMode46 = "story";
           selected = s.id;
           menuUpdate();
           closeDrawers();
@@ -2523,7 +2603,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     card.className="stageCard mainGodCard36"+(unlocked?"":" lock");
     card.dataset.stageId="mainGod";
     card.innerHTML=`<img src="${ST[3].img}"><div class="i"><h3>◈ 主神空间 · 高难爽发育</h3><p>终章后开放。经验倍率 ${t.xp.toFixed(2)}×；局内构筑轮回清空，兑换强化跨局保留。<br>当前：${t.endless?`无限回廊第${Math.max(1,(save.mainGod.deepest||0)+1)}层`:`T${t.tier} ${t.name}`} · 奖励点 ${save.mainGod.points}</p><div class="tierPick37"><button class="tierPrev37" ${!unlocked||selectedMainGodTier36<=1?"disabled":""}>◀</button><span>难度 ${t.endless?"∞":`T${t.tier}`}</span><button class="tierNext37" ${!unlocked||selectedMainGodTier36>=Math.min(4,save.mainGod.unlockedTier)?"disabled":""}>▶</button></div><div class="mainGodActions36"><button class="enter36" ${unlocked?"":"disabled"}>${unlocked?(isMainGodRun36()?"已选择":"进入轮回"):"通关终章后解锁"}</button><button class="exchange36" ${unlocked?"":"disabled"}>◈ 主神兑换大厅</button></div></div><div class="rankTag">最高 T${save.mainGod.bestTier}${save.mainGod.deepest?` · ∞${save.mainGod.deepest}`:""}</div>${unlocked?"":'<div class="lockmark">🔒</div>'}`;
-    if(unlocked){card.querySelector(".tierPrev37").onclick=()=>{selectedMainGodTier36=Math.max(1,selectedMainGodTier36-1);renderStages();};card.querySelector(".tierNext37").onclick=()=>{selectedMainGodTier36=Math.min(Math.min(4,save.mainGod.unlockedTier),selectedMainGodTier36+1);renderStages();};card.querySelector(".enter36").onclick=()=>{runMode36="mainGod";selectedMainGodTier36=Math.min(save.mainGod.unlockedTier,Math.max(1,selectedMainGodTier36));menuUpdate();closeDrawers();toast(selectedMainGodTier36===4?`无限回廊 第${Math.max(1,(save.mainGod.deepest||0)+1)}层`:`主神空间 T${selectedMainGodTier36}`);};card.querySelector(".exchange36").onclick=()=>openMainGodShop36();}
+    if(unlocked){card.querySelector(".tierPrev37").onclick=()=>{selectedMainGodTier36=Math.max(1,selectedMainGodTier36-1);renderStages();};card.querySelector(".tierNext37").onclick=()=>{selectedMainGodTier36=Math.min(Math.min(4,save.mainGod.unlockedTier),selectedMainGodTier36+1);renderStages();};card.querySelector(".enter36").onclick=()=>{runMode36="mainGod";pendingMode46="mainGod";selectedMainGodTier36=Math.min(save.mainGod.unlockedTier,Math.max(1,selectedMainGodTier36));menuUpdate();closeDrawers();toast(selectedMainGodTier36===4?`无限回廊 第${Math.max(1,(save.mainGod.deepest||0)+1)}层`:`主神空间 T${selectedMainGodTier36}`);};card.querySelector(".exchange36").onclick=()=>openMainGodShop36();}
     box.appendChild(card);
   }
   function renderTalents() {
@@ -2719,6 +2799,26 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     );
   }
   /* ================= GAME FLOW / RUN LIFECYCLE ================= */
+  function operationBriefing44() {
+    const c = char35();
+    const s = stage();
+    const mg = typeof isMainGodRun36 === "function" && isMainGodRun36();
+    const chap = Math.max(1, Math.min(4, s.id || selected || 1));
+    const bg = mg
+      ? artUrl("ui/cover_v36_main_god.webp")
+      : artUrl(`stages/stage_${chap}/battle_bg.webp`);
+    const portrait = artUrl(charArtPath35(c, "battle", skin35()));
+    return [{
+      kicker: `${mg ? "REINCARNATION ORDER" : "OPERATION ORDER"} · ${s.no}`,
+      title: s.short || s.name,
+      line: mg
+        ? `${c.short}进入监管回廊。奖励点只在击破监察投影后结算。`
+        : `${c.short}执行节点回收。目标：${s.boss}。四阶段机制已写入战术终端。`,
+      bg,
+      portrait,
+      hold: 1800,
+    }];
+  }
   function startGame() {
     window.SakurayoCutscene?.stopVictory?.();
     window.SakurayoCutscene?.stopType?.();
@@ -2759,18 +2859,30 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     $("#warning").classList.add("hidden");
     $("#hud").classList.remove("hidden");
     $("#stageHud").textContent = stage().short;
-    showDialogue(openingDialogue(), () => {
-      state = "play";
-      const radio44 = window.SakurayoLifecycle?.radio?.(lifecycleWorld44(), save.character);
-      const hint44 = window.SakurayoLifecycle?.hint?.(lifecycleWorld44());
-      showBanter(["雨宫凛", radio44 || "电台接通。你负责走位，构筑去暂停页看。"], true);
-      if (hint44 && !P.banterSeen.has("ground44")) {
-        P.banterSeen.add("ground44");
-        toast(hint44);
-      }
-      last = performance.now();
-      scheduleLoop();
-    }, "opening");
+    const enterOperation = () => showDialogue(openingDialogue(), () => {
+        state = "play";
+        const radio44 = window.SakurayoLifecycle?.radio?.(lifecycleWorld44(), save.character);
+        const hint44 = window.SakurayoLifecycle?.hint?.(lifecycleWorld44());
+        showBanter(["雨宫凛", radio44 || "电台接通。你负责走位，构筑去暂停页看。"], true);
+        if (hint44 && !P.banterSeen.has("ground44")) {
+          P.banterSeen.add("ground44");
+          toast(hint44);
+        }
+        last = performance.now();
+        scheduleLoop();
+      }, "opening");
+    const mg = typeof isMainGodRun36 === "function" && isMainGodRun36();
+    const profile = window.SakurayoLifecycle?.stageProfile?.(selected, { mainGod: mg });
+    if (window.SakurayoCutscene?.playBriefing) {
+      window.SakurayoCutscene.playBriefing({
+        testMode: TEST_MODE,
+        ground: profile?.ground || "torii",
+        beats: operationBriefing44(),
+        onDone: enterOperation,
+      });
+    } else {
+      enterOperation();
+    }
   }
   function backMenu() {
     window.SakurayoCutscene?.stopType?.();
@@ -2788,6 +2900,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
   function finish(win) {
     if (state === "result") return;
+    if (P) { P.damageSources = P.damageSources || {}; P.killsByType = P.killsByType || {}; if (!Array.isArray(P.phaseTimes)) P.phaseTimes = []; }
     window.SakurayoCutscene?.stopVictory?.();
     runWin=win;hideTransient();state="result";$("#hud").classList.add("hidden");
     save.kills += P.kills; save.best = Math.max(save.best, runTime); save.runs++;
@@ -2799,7 +2912,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (win) { save.bosses++; if(!save.done.includes(selected))save.done.push(selected); save.unlock=Math.max(save.unlock,Math.min(ST.length,selected+1)); if(!save.story.includes(stage().story))save.story.push(stage().story); }
     if(P.form&&!save.forms.includes(P.form))save.forms.push(P.form);
     let ed=endingData(); if(win&&selected===4&&!save.endings.includes(ed.name))save.endings.push(ed.name);
-    let top=Object.entries(P.damageSources).sort((a,b)=>b[1]-a[1])[0]?.[0]||"shot";
+    let top=Object.entries(P.damageSources||{}).sort((a,b)=>b[1]-a[1])[0]?.[0]||"shot";
     save.runHistory.unshift({time:Date.now(),mode:"story",stage:selected,character:save.character,skin:save.skin,duration:runTime,win,kills:P.kills,eliteKills:P.eliteKills,level:P.level,fusion:P.fusion,form:P.form,careers:careerSummary(),top,damageSources:{...P.damageSources},damageTaken:P.damageTaken,phaseTimes:[...P.phaseTimes],rank:P.plan?.rank||"?",ending:ed.name}); save.runHistory=save.runHistory.slice(0,30);
     checkAch(); persist();
     $("#ricon").textContent=win?"🌸":"☠️"; $("#rankBig").textContent=win?(P.damageTaken===0?"S":P.plan?.rank||"A"):(runTime>stage().dur*.65?"B":"C");
@@ -3071,6 +3184,25 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       ]
     );
   }
+  function bossPhaseCue(p) {
+    const sid = stage().id;
+    const phase = clamp(Math.floor(Number(p) || 1), 1, 4);
+    if (typeof isMainGodRun36 === "function" && isMainGodRun36()) {
+      return [
+        "权限锁定 · 观察回廊弹道",
+        "监管增压 · 保留冲刺窗口",
+        "轮回收束 · 优先清理召唤",
+        "最终审查 · 打破投影核心",
+      ][phase - 1];
+    }
+    const cues = {
+      1: ["百目锁定 · 远离目印", "镜卫护盾 · 优先击破镜卫", "恐惧扩散 · 观察弹幕缺口", "百目狂视 · 持续移动"],
+      2: ["雨幕定位 · 避开重叠射线", "干扰尸群 · 保留主动技能", "暴雨协议 · 治疗与瞄准受阻", "删除程序 · 弹幕全面加速"],
+      3: ["剑冢开阵 · 不要停在剑域", "亡剑追猎 · 近身后立刻撤离", "封灵剑卫 · 先破护阵", "万剑归坟 · 借冲刺穿过缺口"],
+      4: ["镜核读取 · 暴露主构筑", "反构筑镜像 · 切换伤害来源", "镜卫封锁 · 先解除防护", "三相归零 · 抢在适应前决胜"],
+    };
+    return cues[sid]?.[phase - 1] || `阶段 ${phase} · 观察地面危险`;
+  }
   function advanceBossPhase(e, p) {
     if (!e || e.dead || p <= e.phase) return false;
     if(e.phaseStarted||e.phaseStarted===0){P.phaseTimes.push(Math.max(0,runTime-e.phaseStarted));}
@@ -3307,6 +3439,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       stageNo: stage()?.no,
       stageName: stage()?.short || stage()?.name,
       ground: profile?.ground || "torii",
+      phase: kind === "phase" ? boss?.phase || 1 : kind === "boss" ? 1 : 0,
+      phaseCue: kind === "phase" || kind === "boss" ? bossPhaseCue(kind === "phase" ? boss?.phase || 1 : 1) : "",
     });
     $("#dialogue").classList.remove("hidden");
     nextDialogue();
@@ -3414,22 +3548,27 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     let cap = caps();
     if (enemies.length >= cap.e) return;
     let s = stage(),
-      pad = 65,
-      side = Math.floor(Math.random() * 4),
-      x,
-      y;
-    if (side === 0) {
-      x = rnd(0, W);
-      y = -pad;
-    } else if (side === 1) {
-      x = W + pad;
-      y = rnd(0, H);
-    } else if (side === 2) {
-      x = rnd(0, W);
-      y = H + pad;
-    } else {
-      x = -pad;
-      y = rnd(0, H);
+      edge = window.SakurayoLifecycle?.spawnEdge
+        ? window.SakurayoLifecycle.spawnEdge(lifecycleWorld44())
+        : null,
+      pad = edge ? edge.pad : 65,
+      side = edge ? edge.side : Math.floor(Math.random() * 4),
+      x = edge ? edge.x : 0,
+      y = edge ? edge.y : 0;
+    if (!edge) {
+      if (side === 0) {
+        x = rnd(0, W);
+        y = -pad;
+      } else if (side === 1) {
+        x = W + pad;
+        y = rnd(0, H);
+      } else if (side === 2) {
+        x = rnd(0, W);
+        y = H + pad;
+      } else {
+        x = -pad;
+        y = rnd(0, H);
+      }
     }
     let type = forced || "normal",
       r = Math.random(),
@@ -3561,9 +3700,6 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       dead: false,
     };
     enemies.push(boss);
-    $("#warning").textContent = `BOSS ${s.boss} 降临 · 四阶段战斗`;
-    $("#warning").classList.remove("hidden");
-    setTimeout(() => $("#warning").classList.add("hidden"), 2300);
     sound("boss");
     showDialogue(bossDialogue(), () => {
       state = "play";
@@ -3773,6 +3909,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       crit ? 6 : 3,
       crit ? "#ffd36b" : match >= 1.28 ? "#78f6ff" : "#ff76ad",
     );
+    if (crit && !(opt.depth > 0)) combatImpact47(e.type === "boss" ? "bossCrit" : "crit", e);
     if (P.thunder && opt.source === "blade" && chance(P.thunder)) {
       let n = nearest(e.x, e.y, 170, e);
       if (n) {
@@ -3823,7 +3960,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     P.killsByType[e.type]=(P.killsByType[e.type]||0)+1;
     P.combo++;
     P.comboClock = 2.5;
-    if (e.elite && e.type !== "boss") P.eliteKills++;
+    if (e.elite && e.type !== "boss") {
+      P.eliteKills++;
+      combatImpact47("elite", e);
+    }
     if (e.guardFor && boss) {
       boss.guard = Math.max(0, (boss.guard || 0) - 1);
       toast(
@@ -3832,6 +3972,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }
     if (e.type === "boss") {
       if(e.phaseStarted||e.phaseStarted===0)P.phaseTimes.push(Math.max(0,runTime-e.phaseStarted));
+      combatImpact47("bossKill", e);
       boss = null;
       fxStamp("shatter", e.x, e.y, { size: 118, life: 0.55 });
       draw();
@@ -4032,6 +4173,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
             school: "magical",
           });
       }, 160);
+    window.SakurayoLifecycle?.triggerSkill?.(save.character || "sayo", fusionData()?.c || "#ff77bd");
     sound("skill");
   }
   function dash() {
@@ -5125,6 +5267,26 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     updateHud();
   }
 
+  let bossGateKey46="";
+  function updateBossGates46(){
+    const rail=$("#waveF")?.parentElement;
+    if(!rail)return;
+    let gates=$("#bossPhaseGates46");
+    if(!gates){
+      gates=document.createElement("div");
+      gates.id="bossPhaseGates46";
+      gates.setAttribute("aria-hidden","true");
+      gates.innerHTML='<i data-phase="2"></i><i data-phase="3"></i><i data-phase="4"></i>';
+      rail.appendChild(gates);
+    }
+    gates.hidden=!(boss&&!boss.dead);
+    if(gates.hidden){bossGateKey46="";return;}
+    const key=`${stage().id}:${boss.phase}`;
+    if(key===bossGateKey46)return;
+    bossGateKey46=key;
+    gates.dataset.phase=String(boss.phase||1);
+    gates.querySelectorAll("i").forEach(mark=>mark.classList.toggle("passed",Number(mark.dataset.phase)<=Number(boss.phase||1)));
+  }
   function rankValue(r){return ({D:0,C:1,B:2,A:3,S:4})[r]??2;}
   function updateHud() {
     let s = stage(),
@@ -5154,6 +5316,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     $("#kill").textContent = `击破 ${P.kills}`;
     let prog = bossBorn ? (boss ? 1 - boss.hp / boss.max : 1) : runTime / s.dur;
     $("#waveF").style.width = `${clamp(prog * 100, 0, 100)}%`;
+    updateBossGates46();
     $("#waveT").textContent = bossBorn
       ? boss
         ? `${s.boss} · 阶段 ${boss.phase}${boss.guard ? ` · 镜卫 ${boss.guard}` : ""}`
@@ -5563,6 +5726,13 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function draw() {
     ctx.save();
     if (shake) ctx.translate(rnd(-shake / 2, shake / 2), rnd(-shake / 2, shake / 2));
+    if ((P.impactPunch47 || 0) > 0 && quality >= 0.62) {
+      const punch = clamp((P.impactPunch47 || 0) / 0.28, 0, 1);
+      const zoom = 1 + punch * (save.settings?.fx === 0 ? 0.008 : 0.016);
+      ctx.translate(W / 2, H / 2);
+      ctx.scale(zoom, zoom);
+      ctx.translate(-W / 2, -H / 2);
+    }
     background();
     drawArenaHazards();
     gems.forEach(gemDraw);
@@ -5947,7 +6117,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function installNavArt35(){
     $$("#menu .nav button").forEach(button=>{
       const span=button.querySelector("span"),key=button.dataset.open;
-      if(!span||!NAV_ART35[key]||span.querySelector("img"))return;
+      if(!span||!NAV_ART35[key]||span.querySelector("img")||span.querySelector("svg")||span.classList.contains("chromeOn46"))return;
       const fallback=span.textContent,img=document.createElement("img");
       img.alt="";img.src=artUrl(`ui/nav/${NAV_ART35[key]}.webp`);
       img.onerror=()=>{span.textContent=fallback;};
@@ -5976,14 +6146,13 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if($("#charName"))$("#charName").textContent=c.name;
     setCharacterImage35($("#menu .profile img"),c,"portrait",sk);
     setCharacterImage35($("#hud .hero img"),c,"portrait",sk);
-    if($("#start"))$("#start").textContent="出击";
     if($("#skill"))$("#skill").innerHTML=c.id==="sayo"?"✦<br>樱花榴弹":c.id==="aya"?"✦<br>双月居合":"✦<br>断界一文字";
     if($("#shopCoins"))$("#shopCoins").textContent=save.coins;
     refreshOutfitChip45();
   }
   function renderCharacters35(){
     let box=$("#characterList");if(!box)return;box.innerHTML="";
-    Object.values(CHARACTERS35).forEach(c=>{let b=document.createElement("button"),sk=skin35();b.className="charCard "+(save.character===c.id?"selected":"");b.dataset.character=c.id;b.innerHTML=`${save.character===c.id?'<span class="selectedMark">✓ 出击</span>':''}<img><b>${c.name}</b><em>${c.weapon}</em><p>${c.desc}</p>`;setCharacterImage35(b.querySelector("img"),c,"portrait",sk);b.onclick=()=>{save.character=c.id;persist();renderCharacters35();renderShop35();updateCharacterUI35();toast(`出击角色：${c.name}`);};box.appendChild(b);});
+    Object.values(CHARACTERS35).forEach(c=>{let b=document.createElement("button"),sk=skin35();b.className="charCard "+(save.character===c.id?"selected":"");b.dataset.character=c.id;b.innerHTML=`${save.character===c.id?'<span class="selectedMark">✓ 出击</span>':''}<img><b>${c.name}</b><em>${c.weapon}</em><p>${c.desc}</p>`;setCharacterImage35(b.querySelector("img"),c,"portrait",sk);b.onclick=()=>{save.character=c.id;persist();updateCharacterUI35();toast(`出击角色：${c.name}`);};box.appendChild(b);});
   }
   function renderShop35(){
     let box=$("#shopList");if(!box)return;box.innerHTML="";if($("#shopCoins"))$("#shopCoins").textContent=save.coins;
@@ -5993,7 +6162,17 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     let box=$("#storyList");if(!box||box.querySelector(".charLore"))return;let c=char35(),sk=skin35(),d=document.createElement("div");d.className="storyCard open charLore";d.innerHTML=`<div class="storyIcon"><img style="width:100%;height:100%;border-radius:50%"></div><div><h3>${c.title}</h3><p><b>${c.weapon} · ${c.role}</b><br>${c.desc}<br><span style="color:#8eeaff">基础加成：${c.bonus}</span></p></div>`;setCharacterImage35(d.querySelector("img"),c,"portrait",sk);box.prepend(d);
   }
   const _menuUpdate35=menuUpdate;
-  menuUpdate=function(){_menuUpdate35();installNavArt35();updateCharacterUI35();renderCharacters35();renderShop35();prependLore35();};
+  menuUpdate=function(){
+    _menuUpdate35();
+    installNavArt35();
+    updateCharacterUI35();
+    renderCharacters35();
+    if(!renderShop35.booted47 || drawerVisible47("shopDrawer")){
+      renderShop35();
+      renderShop35.booted47=true;
+    }else if($("#shopCoins"))$("#shopCoins").textContent=save.coins;
+    prependLore35();
+  };
   const _setFormCharacter35=setForm;
   setForm=function(form){const result=_setFormCharacter35(form);updateCharacterUI35();if(typeof beginOutfitSwap35==="function")beginOutfitSwap35();return result;};
   const _renderStory35=renderStory;
@@ -6054,7 +6233,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     P.fire=P.rate;sound("skill");
   };
   const _skill35=skill;
-  skill=function(){let c=char35();if(c.id==="sayo")return _skill35();if(state!=="play"||P.skill>0)return;P.skill=P.skillCd;if(c.id==="aya"){slash35(150,P.skillD*P.skillPow*1.15,true);setTimeout(()=>{if(state==="play")slash35(190,P.skillD*P.skillPow*.82,true)},120);for(let i=0;i<6;i++){let a=i*TAU/6;pushBullet({x:P.x,y:P.y,vx:Math.cos(a)*P.bSpeed,vy:Math.sin(a)*P.bSpeed,r:4,life:1,dmg:P.dmg*.65,pierce:2,source:"shot",school:"gun",hit:new Set()});}}else{P.inv=Math.max(P.inv,.45);slash35(230,P.skillD*P.skillPow*1.85,true);for(const e of grid.near(P.x,P.y,260))e.frozen=Math.max(e.frozen,.55);}sound("skill");};
+  skill=function(){let c=char35();if(c.id==="sayo")return _skill35();if(state!=="play"||P.skill>0)return;P.skill=P.skillCd;if(c.id==="aya"){slash35(150,P.skillD*P.skillPow*1.15,true);setTimeout(()=>{if(state==="play")slash35(190,P.skillD*P.skillPow*.82,true)},120);for(let i=0;i<6;i++){let a=i*TAU/6;pushBullet({x:P.x,y:P.y,vx:Math.cos(a)*P.bSpeed,vy:Math.sin(a)*P.bSpeed,r:4,life:1,dmg:P.dmg*.65,pierce:2,source:"shot",school:"gun",hit:new Set()});}}else{P.inv=Math.max(P.inv,.45);slash35(230,P.skillD*P.skillPow*1.85,true);for(const e of grid.near(P.x,P.y,260))e.frozen=Math.max(e.frozen,.55);}window.SakurayoLifecycle?.triggerSkill?.(c.id,fusionData()?.c||c.main);sound("skill");};
   function drawChar35(x,y){let c=char35(),sk=skin35(),m=sk.id==="default"?c.main:sk.c1,h=c.hair,light=c.light,a=Math.atan2(P.fy,P.fx);ctx.save();ctx.translate(x,y);if(P.inv>0&&Math.floor(P.inv*15)%2===0)ctx.globalAlpha=.35;ctx.fillStyle="#0006";ctx.beginPath();ctx.ellipse(0,23,25,8,0,0,TAU);ctx.fill();if(P.form||P.fusion){ctx.strokeStyle=m;ctx.lineWidth=2;ctx.globalAlpha=.55;ctx.beginPath();ctx.arc(0,0,31+Math.sin(runTime*4)*3,0,TAU);ctx.stroke();ctx.globalAlpha=1;}ctx.fillStyle=h;ctx.beginPath();ctx.ellipse(0,-4,21,27,0,0,TAU);ctx.fill();if(c.id==="sayo"){for(const s of [-1,1]){ctx.beginPath();ctx.moveTo(s*15,-7);ctx.quadraticCurveTo(s*35,5,s*20,31);ctx.quadraticCurveTo(s*7,20,s*8,0);ctx.fill();}}else if(c.id==="aya"){ctx.beginPath();ctx.ellipse(-20,-2,10,30,-.35,0,TAU);ctx.fill();}else{ctx.beginPath();ctx.moveTo(-17,-4);ctx.quadraticCurveTo(-28,20,-13,35);ctx.lineTo(0,15);ctx.lineTo(14,35);ctx.quadraticCurveTo(29,18,17,-5);ctx.fill();}ctx.fillStyle=m;ctx.beginPath();ctx.moveTo(-14,9);ctx.lineTo(14,9);ctx.lineTo(18,29);ctx.lineTo(-18,29);ctx.fill();ctx.fillStyle=light;ctx.fillRect(-11,10,22,5);ctx.fillStyle="#ffe1d5";ctx.beginPath();ctx.arc(0,-8,14,0,TAU);ctx.fill();ctx.fillStyle=h;ctx.beginPath();ctx.arc(0,-12,14,Math.PI,TAU);ctx.fill();ctx.beginPath();ctx.moveTo(-13,-11);ctx.lineTo(-5,0);ctx.lineTo(0,-17);ctx.lineTo(5,-1);ctx.lineTo(13,-11);ctx.fill();ctx.fillStyle=c.id==="rion"?"#b92849":"#6c347c";ctx.beginPath();ctx.ellipse(-5,-7,2.1,3,0,0,TAU);ctx.ellipse(5,-7,2.1,3,0,0,TAU);ctx.fill();ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(-4.3,-8,.8,0,TAU);ctx.arc(5.7,-8,.8,0,TAU);ctx.fill();ctx.rotate(a);if(c.id==="sayo"){ctx.fillStyle="#e8f8ff";ctx.fillRect(10,-3,25,7);ctx.fillStyle="#5be1ff";ctx.fillRect(28,-2,13,5);}else if(c.id==="aya"){ctx.fillStyle="#eef8ff";ctx.fillRect(10,-3,18,6);ctx.strokeStyle="#a6c8ff";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-8,13);ctx.lineTo(33,-25);ctx.stroke();}else{ctx.strokeStyle="#fff5f6";ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(-8,14);ctx.lineTo(38,-27);ctx.stroke();ctx.strokeStyle="#ff526f";ctx.lineWidth=2;ctx.stroke();}ctx.restore();}
   hero=drawChar35;
   const _vectorDrawChar35=drawChar35;
@@ -6109,7 +6288,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     ctx.globalAlpha=(P.inv>0&&Math.floor(P.inv*15)%2===0)?.35:1;
     ctx.scale(P.fx<-.08?-1:1,1);
     ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";
-    const vis=PLAYER_GEOMETRY35.visualSize*(window.SakurayoLifecycle?window.SakurayoLifecycle.heroVisualScale(W):1),ox=vis/2,oy=vis-PLAYER_GEOMETRY35.footOffset;
+    const vis=PLAYER_GEOMETRY35.visualSize*(window.SakurayoLifecycle?window.SakurayoLifecycle.heroVisualScale(W,H):1),ox=vis/2,oy=vis-PLAYER_GEOMETRY35.footOffset;
     if((P.animDash||0)>0){const a=ctx.globalAlpha;ctx.globalAlpha=a*.32;ctx.drawImage(image,-ox-12,-oy,vis,vis);ctx.globalAlpha=a;}
     if(save.settings?.contrast){ctx.filter="brightness(0)";const a=ctx.globalAlpha;ctx.globalAlpha=.82;for(const [dx,dy] of [[-2,0],[2,0],[0,-2],[0,2]])ctx.drawImage(image,-ox+dx,-oy+dy,vis,vis);ctx.filter="none";ctx.globalAlpha=a;}
     const liveRing=liveOutfitLayer35();
@@ -6133,13 +6312,13 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   const _shootAnim35=shoot;
   shoot=function(){const before=P.shotCount,result=_shootAnim35();if(P.shotCount!==before)P.animAttack=.16;return result;};
   const _skillAnim35=skill;
-  skill=function(){const before=P.skill,result=_skillAnim35();if(P.skill>before){P.animSkill=.42;fxStamp("skill",P.x,P.y,{size:86,life:.42});}return result;};
+  skill=function(){const before=P.skill,result=_skillAnim35();if(P.skill>before){P.animSkill=.42;fxStamp("skill",P.x,P.y,{size:86,life:.42});combatImpact47("skill",P);}return result;};
   const _dashAnim35=dash;
   dash=function(){const before=P.dash,result=_dashAnim35();if(P.dash>before)P.animDash=.32;return result;};
   const _damagePlayerAnim35=damagePlayer;
   damagePlayer=function(amount){const before=P.hp,result=_damagePlayerAnim35(amount);if(P.hp<before)P.animHit=.24;return result;};
   const _updateAnim35=update;
-  update=function(dt){const beforeX=P.x,beforeY=P.y,result=_updateAnim35(dt);P.animAttack=Math.max(0,(P.animAttack||0)-dt);P.animDash=Math.max(0,(P.animDash||0)-dt);P.animHit=Math.max(0,(P.animHit||0)-dt);P.animSkill=Math.max(0,(P.animSkill||0)-dt);P.outfitFade=Math.max(0,(P.outfitFade||0)-dt);P.outfitReveal=Math.max(0,(P.outfitReveal||0)-dt);P.animMoving=Math.hypot(P.x-beforeX,P.y-beforeY)>.08;return result;};
+  update=function(dt){const beforeX=P.x,beforeY=P.y,result=_updateAnim35(dt);P.animAttack=Math.max(0,(P.animAttack||0)-dt);P.animDash=Math.max(0,(P.animDash||0)-dt);P.animHit=Math.max(0,(P.animHit||0)-dt);P.animSkill=Math.max(0,(P.animSkill||0)-dt);P.outfitFade=Math.max(0,(P.outfitFade||0)-dt);P.outfitReveal=Math.max(0,(P.outfitReveal||0)-dt);P.impactPunch47=Math.max(0,(P.impactPunch47||0)-dt);P.animMoving=Math.hypot(P.x-beforeX,P.y-beforeY)>.08;return result;};
   hero=drawChar35;
   const OPENING35={
     sayo:null,
@@ -6280,7 +6459,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   const _endingData36=endingData;endingData=function(){if(isMainGodRun36())return {name:`主神空间 T${selectedMainGodTier36} · 轮回存续`,text:"监察投影被击碎，白色大厅却没有关闭。奖励点和强化被保留，说明这不是一次挑战，而是一份仍在续签的轮回契约。"};return _endingData36();};
   const _spawnBoss36=spawnBoss;spawnBoss=function(){const result=_spawnBoss36();if(isMainGodRun36()&&boss){const mul=1+selectedMainGodTier36*.16;boss.hp*=mul;boss.max=boss.hp;boss.dmg*=1+selectedMainGodTier36*.08;boss.bossRes=boss.bossRes||{};boss.color="#d8a7ff";}return result;};
 
-  function finishMainGod36(win){if(state==="result")return;runWin=win;hideTransient();state="result";$("#hud").classList.add("hidden");const phasePoints=win?0:Math.max(0,Math.min(3,(boss?.phase||1)-1)),points=win?stage().pointReward+Math.min(4,P.eliteKills)+save.mainGod.sideKey*2:phasePoints;save.mainGod.points+=points;save.mainGod.runs++;save.kills+=P.kills;save.best=Math.max(save.best,runTime);save.runs++;if(win){save.mainGod.clears++;save.mainGod.bestTier=Math.max(save.mainGod.bestTier,selectedMainGodTier36);if(selectedMainGodTier36===4)save.mainGod.deepest=Math.max(save.mainGod.deepest||0,stage().depth||1);save.mainGod.unlockedTier=Math.min(4,Math.max(save.mainGod.unlockedTier,selectedMainGodTier36+1));}const ed=endingData(),top=Object.entries(P.damageSources).sort((a,b)=>b[1]-a[1])[0]?.[0]||"shot";save.runHistory.unshift({time:Date.now(),mode:"mainGod",tier:selectedMainGodTier36,depth:stage().depth||0,contract:P.mgContract?.id||null,challenge:P.mgChallenge?.id||null,challengeDone:!!P.mgChallengeDone,points,win,kills:P.kills,level:P.level,fusion:P.fusion,form:P.form,careers:careerSummary(),top,rank:P.plan?.rank||"?",ending:ed.name});save.runHistory=save.runHistory.slice(0,30);persist();$("#ricon").textContent=win?"◈":"☠️";$("#rankBig").textContent=win?(P.plan?.rank||"S"):(runTime>stage().dur*.65?"B":"C");$("#rtitle").textContent=win?(selectedMainGodTier36===4?`无限回廊第 ${stage().depth} 层完成`:"主神试炼完成"):"轮回中断";$("#rsub").textContent=win?`本轮已结算；兑换强化保留，局内构筑清空。`:"失败不会清空既有主神兑换，Boss 阶段提供少量保底点。";$("#rstats").innerHTML=`坚持 <b>${fmt(runTime)}</b><br>击破 <b>${P.kills}</b> · 等级 <b>${P.level}</b><br>职业：<b>${careerSummary()}</b><br>契约：<b>${P.mgContract?.n||"未签署"}</b><br>挑战：<b>${P.mgChallenge?.n||"无"} ${P.mgChallengeDone?"✓":"×"}</b><br>本轮获得奖励点 <b style="color:var(--g)">◈ ${points}</b><br>主神账户余额 <b>◈ ${save.mainGod.points}</b>`;renderRunReport();$("#result").classList.remove("hidden");sound(win?"win":"over");}
+  function finishMainGod36(win){if(state==="result")return;if(P){P.damageSources=P.damageSources||{};P.killsByType=P.killsByType||{};if(!Array.isArray(P.phaseTimes))P.phaseTimes=[];}runWin=win;hideTransient();state="result";$("#hud").classList.add("hidden");const phasePoints=win?0:Math.max(0,Math.min(3,(boss?.phase||1)-1)),points=win?stage().pointReward+Math.min(4,P.eliteKills)+save.mainGod.sideKey*2:phasePoints;save.mainGod.points+=points;save.mainGod.runs++;save.kills+=P.kills;save.best=Math.max(save.best,runTime);save.runs++;if(win){save.mainGod.clears++;save.mainGod.bestTier=Math.max(save.mainGod.bestTier,selectedMainGodTier36);if(selectedMainGodTier36===4)save.mainGod.deepest=Math.max(save.mainGod.deepest||0,stage().depth||1);save.mainGod.unlockedTier=Math.min(4,Math.max(save.mainGod.unlockedTier,selectedMainGodTier36+1));}const ed=endingData(),top=Object.entries(P.damageSources||{}).sort((a,b)=>b[1]-a[1])[0]?.[0]||"shot";save.runHistory.unshift({time:Date.now(),mode:"mainGod",tier:selectedMainGodTier36,depth:stage().depth||0,contract:P.mgContract?.id||null,challenge:P.mgChallenge?.id||null,challengeDone:!!P.mgChallengeDone,points,win,kills:P.kills,level:P.level,fusion:P.fusion,form:P.form,careers:careerSummary(),top,rank:P.plan?.rank||"?",ending:ed.name});save.runHistory=save.runHistory.slice(0,30);persist();$("#ricon").textContent=win?"◈":"☠️";$("#rankBig").textContent=win?(P.plan?.rank||"S"):(runTime>stage().dur*.65?"B":"C");$("#rtitle").textContent=win?(selectedMainGodTier36===4?`无限回廊第 ${stage().depth} 层完成`:"主神试炼完成"):"轮回中断";$("#rsub").textContent=win?`本轮已结算；兑换强化保留，局内构筑清空。`:"失败不会清空既有主神兑换，Boss 阶段提供少量保底点。";$("#rstats").innerHTML=`坚持 <b>${fmt(runTime)}</b><br>击破 <b>${P.kills}</b> · 等级 <b>${P.level}</b><br>职业：<b>${careerSummary()}</b><br>契约：<b>${P.mgContract?.n||"未签署"}</b><br>挑战：<b>${P.mgChallenge?.n||"无"} ${P.mgChallengeDone?"✓":"×"}</b><br>本轮获得奖励点 <b style="color:var(--g)">◈ ${points}</b><br>主神账户余额 <b>◈ ${save.mainGod.points}</b>`;renderRunReport();$("#result").classList.remove("hidden");sound(win?"win":"over");}
   const _finish36=finish;finish=function(win){if(isMainGodRun36())return finishMainGod36(!!win);return _finish36(win);};
   const _damagePlayer36=damagePlayer;damagePlayer=function(amount){return _damagePlayer36(amount*(P.lordRisk||1));};
 
@@ -6339,7 +6518,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   const _startSensory37=startGame;startGame=function(){quality=save.settings?.fx===0?.62:1;const result=_startSensory37();if(save.tutorialDone)ensureMusic37();return result;};
   const _backMenuSensory37=backMenu;backMenu=function(){setMusic37(false);return _backMenuSensory37();};
   const _finishSensory37=finish;finish=function(win){setMusic37(false);return _finishSensory37(win);};
-  const _advanceBossPhase37=advanceBossPhase;advanceBossPhase=function(e,p){sound("phase");haptic37([45,30,70]);setMusic37(true,p);return _advanceBossPhase37(e,p);};
+  const _advanceBossPhase37=advanceBossPhase;advanceBossPhase=function(e,p){sound("phase");haptic37([45,30,70]);setMusic37(true,p);combatImpact47("phase",e||P);return _advanceBossPhase37(e,p);};
   const _damagePlayerSensory37=damagePlayer;damagePlayer=function(amount){const before=P.hp,result=_damagePlayerSensory37(amount);if(P.hp<before)haptic37(20);return result;};
   const _dashSensory37=dash;dash=function(){const before=P.dash,result=_dashSensory37();if(P.dash>before)haptic37(10);return result;};
   const _skillSensory37=skill;skill=function(){const before=P.skill,result=_skillSensory37();if(P.skill>before)haptic37([12,18,24]);return result;};
@@ -6452,7 +6631,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   MAIN_GOD_ITEMS36.cursedHeart={n:"诅咒遗物·猩红心核",i:"🫀",d:"全伤害 +25%，最大生命 -18%；高风险永久兑换，可在重置时返还",max:1,base:24,step:0,group:"特殊效果道具"};
 
   const _resetP39=resetP;
-  resetP=function(){const result=_resetP39();P.perfectDodges=0;P.dodgeFlash=0;P.bossRule39="";P.signalLane39=null;if(isMainGodRun36()&&save.mainGod.cursedHeart){P.dmg*=1.25;P.skillPow*=1.25;P.spellPow*=1.25;P.bladePower*=1.25;P.maxHp*=.82;P.hp=Math.min(P.hp,P.maxHp);}return result;};
+  resetP=function(){const result=_resetP39();window.SakurayoLifecycle?.updatePresentation?.(99);P.perfectDodges=0;P.dodgeFlash=0;P.bossRule39="";P.signalLane39=null;P.impactPunch47=0;P.impactKind47="";P.impactNext47=0;if(isMainGodRun36()&&save.mainGod.cursedHeart){P.dmg*=1.25;P.skillPow*=1.25;P.spellPow*=1.25;P.bladePower*=1.25;P.maxHp*=.82;P.hp=Math.min(P.hp,P.maxHp);}return result;};
 
   function immediateThreat39(){
     for(const b of ebullets)if(Math.hypot(b.x-P.x,b.y-P.y)<78+(b.r||4))return true;
@@ -6517,7 +6696,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   const _menuUpdate39=menuUpdate;
   menuUpdate=function(){const result=_menuUpdate39();installCalmMenu39();return result;};
   const _runAnalytics39=runAnalytics37;
-  runAnalytics37=function(){return {..._runAnalytics39(),version:"4.6.0"};};
+  runAnalytics37=function(){return {..._runAnalytics39(),version:"4.7.0"};};
 
   function drawMechanics39(){
     if(state!=="play")return;
@@ -6568,6 +6747,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   save.shop40={...SHOP_DEF40,...(save.shop40||{}),starter:{...SHOP_DEF40.starter,...(save.shop40?.starter||{})},items:{...SHOP_DEF40.items,...(save.shop40?.items||{})},ops:{...SHOP_DEF40.ops,...(save.shop40?.ops||{}),owned:{...(save.shop40?.ops?.owned||{})}}};
   if(window.SakurayoLobby)save.shop40=window.SakurayoLobby.normalizeOps(save.shop40);
   save.shop40.lastTab=["skins","starters","items","talismans","extensions"].includes(save.shop40.lastTab)?save.shop40.lastTab:"skins";
+  if(window.SakurayoShell)save.shell46=window.SakurayoShell.ensureMeta(save);
+  const _validateSaveShell46=validateSave39;
+  validateSave39=function(raw){const clean=_validateSaveShell46(raw);if(window.SakurayoShell)clean.shell46=window.SakurayoShell.ensureMeta(clean);return clean;};
   save.balance40=save.balance40&&typeof save.balance40==="object"?save.balance40:{samples:[],betaSessions:0};
   save.hiddenStory40=save.hiddenStory40&&typeof save.hiddenStory40==="object"?save.hiddenStory40:{};
   const _validateSave40=validateSave39;
@@ -6677,7 +6859,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   renderChoices=function(){const result=_renderChoices40();document.querySelectorAll("#choices .choice").forEach(card=>{const u=U.find(x=>x.id===card.dataset.upgradeId);if(!u?.conflict40)return;card.classList.add("conflictChoice40");const p=card.querySelector("p");if(p)p.insertAdjacentHTML("beforeend",'<strong class="conflictWarn40">高风险冲突：收益与削弱同时生效，可能让构筑失控。</strong>');});return result;};
 
   style37.textContent+=`.shopTabs40{margin:0 0 10px}.shopGroup40{display:grid;gap:9px}.shopItem40{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:11px;border-radius:14px;background:#100c20e8;border:1px solid #ffffff18;margin-bottom:9px}.shopItem40 h3{margin:0 0 4px;font-size:14px}.shopItem40 p{margin:0;color:#c7bfd2;font-size:11px;line-height:1.45}.shopItem40 button,.shopUpgrade40,.challengeToggle40,.betaActions40 button,.betaDrawer40>[class] button[data-beta="refresh"],.betaDrawer40 .dbody>button[data-beta="refresh"]{padding:9px;border-radius:10px;border:1px solid #8463aa;background:#261b3d;color:#fff}.shopIcon40{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:#27183d;font-size:24px}.shopUpgrade40{grid-column:3;margin-top:-6px}.challengeToggle40{width:100%;margin-bottom:10px;border-color:#ffd36b;color:#ffe69b;background:#35251d}.conflictChoice40{border-color:#ff6f7e!important;background:linear-gradient(145deg,#2a101be8,#160d22e8)!important}.conflictWarn40{display:block;margin-top:6px;color:#ff8793}.betaGrid40{display:grid;grid-template-columns:1fr 1fr;gap:8px}.betaGrid40 label{display:grid;gap:5px;font-size:11px}.betaGrid40 select{padding:9px;border-radius:9px;background:#141025;color:#fff;border:1px solid #70558c}.betaActions40{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}.betaDrawer40 textarea{width:100%;height:230px;background:#080713;color:#bdf4de;border:1px solid #6b548b;border-radius:10px;padding:9px;font:10px/1.4 ui-monospace,monospace}.betaDrawer40 .dbody>button[data-beta="refresh"]{width:100%;margin-top:8px}.hiddenStory40{border-color:#ffe6a455!important}.utilityButtons37.open39>#betaButton40{display:block!important}`;
-  document.title="樱夜·尸潮：Mod Kit V4.6.0";
+  document.title="樱夜·尸潮：Mod Kit V4.7.0";
 
   /* ================= V4.0 融合扩展：24种跨职业机制 ================= */
   const FUSION_ICON_ALIAS41={elementalbeast:"chimera",plagueidol:"plagueforge",soulgun:"gunshrine",nanoninja:"shadowmage",fleshshrine:"corpseimmortal",bloodmage:"bloodstar"};
@@ -6727,6 +6909,15 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       const track=pool.find(item=>item.paused||item.ended)||pool[0],gain=clamp((save.settings?.master??.8)*(save.settings?.sfx??.8)*volume,0,1);track.pause();track.currentTime=0;track.volume=gain;track.play().catch(()=>{});return true;
     }catch(error){CONTENT41?.guard("official.feedback","audio:"+key,()=>{throw error;});return false;}
   }
+  let navFeedbackAt411=0;
+  document.addEventListener("click",event=>{
+    const now=performance.now();
+    if(now-navFeedbackAt411<70)return;
+    const target=event.target?.closest?.(".drawer .close,[data-open],[data-character]");
+    if(!target)return;
+    navFeedbackAt411=now;
+    playFeedback411(target.matches(".drawer .close")?"close":target.matches("[data-open]")?"open":"click",.2);
+  },{passive:true});
   const _soundFeedback411=sound;
   sound=function(key){const result=_soundFeedback411(key),sample={level:"reward",ach:"reward",win:"reward",over:"error",phase:"phase",boss:"boss"}[key];if(sample)playFeedback411(sample,key==="boss"?.44:.3);return result;};
   addEventListener("pointerdown",event=>{const button=event.target.closest?.("button");if(!button||button.disabled||button.closest("#hud"))return;playFeedback411(button.classList.contains("close")||button.id==="exploreClose41"?"close":button.dataset.open?"open":"click",.2);},{capture:true,passive:true});
@@ -6911,6 +7102,18 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   CONTENT41.hook("combat:after-update",payload=>{if(boss?.transformFx412>0)boss.transformFx412=Math.max(0,boss.transformFx412-payload.dt);},"core.boss-art412",10);
   function drawBossStage412(){if(!boss||boss.dead||state!=="play"||quality<.7)return;const p=boss.phase||1,t=runTime,sid=stage().id;ctx.save();ctx.globalCompositeOperation="screen";ctx.globalAlpha=.05+p*.018;ctx.strokeStyle=sid===2?"#5ceaff":sid===3?"#e4d7ff":"#ff6dbb";ctx.lineWidth=2;if(sid===1){for(let i=0;i<4+p;i++){const x=(i+.5)*W/(4+p);ctx.beginPath();ctx.ellipse(x,88+Math.sin(t+i)*18,18,6,0,0,TAU);ctx.stroke();}}else if(sid===2){for(let y=80;y<H;y+=34+p*2){ctx.beginPath();ctx.moveTo(0,y+Math.sin(t*7+y)*4);ctx.lineTo(W,y);ctx.stroke();}}else if(sid===3){for(let i=0;i<5+p;i++){const x=(i+.5)*W/(5+p),y=74+(i%2)*28;ctx.beginPath();ctx.moveTo(x-9,y-18);ctx.lineTo(x+9,y+18);ctx.stroke();}}else{for(let i=0;i<4+p;i++){const a=t*.08+i*TAU/(4+p),x=W/2+Math.cos(a)*W*.43,y=H/2+Math.sin(a)*H*.42;ctx.strokeRect(x-10,y-16,20,32);}}ctx.restore();}
   CONTENT41.hook("combat:after-draw",drawBossStage412,"core.boss-stage412",40);
+  CONTENT41.hook("boss:after-spawn",()=>{
+    if(boss)window.SakurayoLifecycle?.triggerBoss?.(stage().id,stage().boss,isMainGodRun36());
+  },"core.combat-presentation46",45);
+  CONTENT41.hook("boss:after-phase",payload=>{
+    window.SakurayoLifecycle?.triggerPhase?.(stage().id,payload?.bossPhase||boss?.phase||1,isMainGodRun36());
+  },"core.combat-presentation46",45);
+  CONTENT41.hook("combat:after-update",payload=>{
+    if(state==="play")window.SakurayoLifecycle?.updatePresentation?.(payload?.dt||0);
+  },"core.combat-presentation46",60);
+  CONTENT41.hook("combat:after-draw",()=>{
+    if(state==="play")window.SakurayoLifecycle?.drawPresentation?.(ctx,lifecycleWorld44());
+  },"core.combat-presentation46",60);
 
   /* ================= V4.2 MOD KIT LIFECYCLE SEAM ================= */
   const CORE_LIFECYCLE42=Object.freeze({spawnBoss,advanceBossPhase,update,draw,world:lifecycleWorld44,lifecycle:()=>window.SakurayoLifecycle});
@@ -6932,7 +7135,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
   function installModKitButton42(){installUtilityButtons37();const wrap=document.querySelector(".utilityButtons37");if(!wrap||$("#modKitButton42"))return;const button=document.createElement("button");button.id="modKitButton42";button.textContent=`扩展包 ${CONTENT41.packs().filter(pack=>pack.enabled).length}`;button.onclick=openModKit42;wrap.appendChild(button);}
   style37.textContent+=`.modKitSummary42{padding:10px 12px;margin-bottom:10px;border:1px solid #70e4ff55;border-radius:12px;background:#0b1724;color:#9cecff;font-weight:800}.modKitPack42{margin:8px 0;padding:11px 12px;border:1px solid #ffffff20;border-radius:13px;background:#100d24}.modKitPack42.enabled{border-color:#63e6b455}.modKitPack42.disabled{border-color:#ff6c8c66;background:#26101c}.modKitPack42 h3{margin:0 0 5px;font-size:14px}.modKitPack42.enabled h3{color:#8ff2ca}.modKitPack42.disabled h3{color:#ff9eb4}.modKitPack42 code{color:#aeb6d9;font-size:10px;word-break:break-all}.modKitPack42 p{margin:7px 0 0;color:#d5cee4;font-size:11px}.modKitErrorTitle42{margin:16px 0 6px;color:#ff98b0}.modKitError42{padding:9px;border-radius:9px;background:#2b111c;color:#ffd4df;white-space:pre-wrap;font-size:10px}`;
-  style37.textContent+=`#skill{filter:brightness(.72) saturate(.8);box-shadow:0 0 0 3px #fff1,0 8px 18px #0009}#dash{filter:brightness(.84) saturate(.85)}#skill:active,#dash:active,#skill.ready44,#dash.ready44{filter:brightness(1.08) saturate(1.12)}#skill.ready44{box-shadow:0 0 0 3px #ffe6a866,0 0 18px #ff8ad888}#dash.ready44{box-shadow:0 0 0 3px #9befff88,0 0 16px #72e9ff66}.careerTree44{margin:0 0 12px;padding:10px 12px;border:1px solid #ffb2d444;border-radius:14px;background:#140f24;text-align:left}.careerTree44 em{display:block;margin:0 0 6px;color:#ffd3ea;letter-spacing:.22em;font-size:10px;font-style:normal}.careerTree44 div{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid #ffffff0f;color:#f4eaf4;font-size:12px}.careerTree44 div:last-of-type{border-bottom:0}.careerTree44 small{display:block;margin-top:6px;color:#9ee7ff;line-height:1.45}.careerTree44 b{color:#ffd3ea}.ground44-1:after{background:linear-gradient(90deg,#140a14fa,#3a18288a 72%,transparent)!important}.ground44-2:after{background:linear-gradient(90deg,#071018fa,#1230448a 72%,transparent)!important}.ground44-3:after{background:linear-gradient(90deg,#100e16fa,#2a24388a 72%,transparent)!important}.ground44-4:after{background:linear-gradient(90deg,#120e22fa,#2c1a448a 72%,transparent)!important}.choice{border-left-width:5px}.wave .fill{transition:width .2s linear}#paused .modal{border-color:#ffb2d455}#paused .sub{max-width:28em;margin-left:auto;margin-right:auto;line-height:1.55}.coverTitle36 span{letter-spacing:.22em}.mission{color:#f3e7f4}.mission b{color:#ffe6a3}#toast{max-width:86vw;white-space:normal;line-height:1.45;text-align:center}.dialogueHint{letter-spacing:.18em;color:#ffb7d8}.charSelectPanel .sectionTitle small{color:#c9b8d8}@media(min-width:720px){#menu .menu{transform:scale(1.04);transform-origin:top center}.coverTitle36 b{font-size:clamp(40px,8vw,72px)}}`;
+  style37.textContent+=`#skill{filter:brightness(.72) saturate(.8);box-shadow:0 0 0 3px #fff1,0 8px 18px #0009}#dash{filter:brightness(.84) saturate(.85)}#skill:active,#dash:active,#skill.ready44,#dash.ready44{filter:brightness(1.08) saturate(1.12)}#skill.ready44{box-shadow:0 0 0 3px #ffe6a866,0 0 18px #ff8ad888}#dash.ready44{box-shadow:0 0 0 3px #9befff88,0 0 16px #72e9ff66}.careerTree44{margin:0 0 12px;padding:10px 12px;border:1px solid #ffb2d444;border-radius:14px;background:#140f24;text-align:left}.careerTree44 em{display:block;margin:0 0 6px;color:#ffd3ea;letter-spacing:.22em;font-size:10px;font-style:normal}.careerTree44 div{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-bottom:1px solid #ffffff0f;color:#f4eaf4;font-size:12px}.careerTree44 div:last-of-type{border-bottom:0}.careerTree44 small{display:block;margin-top:6px;color:#9ee7ff;line-height:1.45}.careerTree44 b{color:#ffd3ea}.ground44-1:after{background:linear-gradient(90deg,#140a14fa,#3a18288a 72%,transparent)!important}.ground44-2:after{background:linear-gradient(90deg,#071018fa,#1230448a 72%,transparent)!important}.ground44-3:after{background:linear-gradient(90deg,#100e16fa,#2a24388a 72%,transparent)!important}.ground44-4:after{background:linear-gradient(90deg,#120e22fa,#2c1a448a 72%,transparent)!important}.choice{border-left-width:5px}.wave .fill{transition:width .2s linear}#bossPhaseGates46{position:absolute;inset:0;z-index:2;pointer-events:none}#bossPhaseGates46[hidden]{display:none}#bossPhaseGates46 i{position:absolute;top:0;bottom:0;width:2px;background:#fff8;box-shadow:0 0 4px #000;transform:translateX(-1px)}#bossPhaseGates46 i:nth-child(1){left:25%}#bossPhaseGates46 i:nth-child(2){left:50%}#bossPhaseGates46 i:nth-child(3){left:75%}#bossPhaseGates46 i:after{content:"";position:absolute;left:50%;top:50%;width:6px;height:6px;border:1px solid #fff;background:#24152f;transform:translate(-50%,-50%) rotate(45deg)}#bossPhaseGates46 i.passed{background:#ffe6a3}#bossPhaseGates46 i.passed:after{background:#f35aa6;border-color:#ffe6a3}#paused .modal{border-color:#ffb2d455}#paused .sub{max-width:28em;margin-left:auto;margin-right:auto;line-height:1.55}.coverTitle36 span{letter-spacing:.22em}.mission{color:#f3e7f4}.mission b{color:#ffe6a3}#toast{max-width:86vw;white-space:normal;line-height:1.45;text-align:center}.dialogueHint{letter-spacing:.18em;color:#ffb7d8}.charSelectPanel .sectionTitle small{color:#c9b8d8}@media(min-width:720px){#menu .menu{transform:scale(1.04);transform-origin:top center}.coverTitle36 b{font-size:clamp(40px,8vw,72px)}}`;
   style37.textContent+=`.exploreEvent412{position:absolute;z-index:7;inset:0;display:grid;place-items:center;padding:22px;background:#05030bbd;backdrop-filter:blur(4px)}.exploreEvent412.hidden{display:none}.exploreEvent412>div{width:min(430px,92vw);padding:18px;border:1px solid #8deaff88;border-radius:20px;background:linear-gradient(145deg,#17102cf2,#080713f5);box-shadow:0 22px 70px #000b}.exploreEvent412 small{color:#7ee9ff;letter-spacing:.18em}.exploreEvent412 h3{margin:8px 0;color:#fff;font-size:22px}.exploreEvent412 p{color:#d9d0e5;line-height:1.65}.exploreEvent412 #exploreEventChoices412{display:grid;gap:9px;margin:14px 0}.exploreEvent412 #exploreEventChoices412 button{padding:12px;text-align:left;border:1px solid #ffffff22;border-radius:14px;background:#ffffff0b}.exploreEvent412 #exploreEventChoices412 b,.exploreEvent412 #exploreEventChoices412 span{display:block}.exploreEvent412 #exploreEventChoices412 b{color:#fff}.exploreEvent412 #exploreEventChoices412 span{margin-top:4px;color:#bfb2d2;font-size:10px}.exploreEvent412 #exploreEventLeave412{width:100%;padding:10px;border-radius:12px;background:#332748;color:#cabed8}`;
   CONTENT41?.emit("core:contentApplied",{packs:CONTENT41.packs(),costumes:CONTENT41.content("costumes").length,achievements:CONTENT41.content("achievements").length});
   style37.textContent+=`.extensionStory41{border-color:#72dcff55!important}.shopTabs40 button[data-shop="extensions"]{color:#91efff}.exploreEntry41{margin-left:7px;background:linear-gradient(135deg,#36b9d9,#7659ee)!important}.exploration41{position:fixed;inset:0;z-index:90;background:#080713;overflow:hidden;touch-action:none}.exploration41 canvas{position:absolute;inset:0}.exploreTop41{position:absolute;z-index:2;left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));top:max(12px,env(safe-area-inset-top));display:flex;justify-content:space-between;align-items:center;padding:10px 12px;border:1px solid #ffffff2b;border-radius:15px;background:#0b0923d9;backdrop-filter:blur(6px)}.exploreTop41 b,.exploreTop41 small{display:block}.exploreTop41 small{margin-top:3px;color:#8fe8ff}.exploreTop41 button{width:40px;height:40px;border-radius:50%;background:#ffffff17;font-size:24px}.explorePad41{position:absolute;z-index:3;left:max(22px,env(safe-area-inset-left));bottom:max(52px,env(safe-area-inset-bottom));width:116px;height:116px;border-radius:50%;border:2px solid #ffffff55;background:#0c0a24a8}.explorePad41 i{position:absolute;left:31px;top:31px;width:50px;height:50px;border-radius:50%;background:linear-gradient(145deg,#ff69b7,#7468ff);box-shadow:0 0 20px #ff70c477}.exploreHint41{position:absolute;z-index:2;right:16px;bottom:max(20px,env(safe-area-inset-bottom));padding:7px 10px;border-radius:10px;background:#090719b8;color:#ddd0ed;font-size:10px}.exploreToast41,#exploreToast41{position:absolute;z-index:4;left:50%;top:19%;transform:translate(-50%,-12px);opacity:0;padding:9px 13px;border-radius:12px;background:#1a1234e8;border:1px solid #ffd36b99;color:#fff1b0;transition:.2s;white-space:nowrap}.exploreToast41.show,#exploreToast41.show{opacity:1;transform:translate(-50%,0)}`;
@@ -6942,10 +7145,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const visible=selector=>{const node=$(selector);return !!node&&!node.classList.contains("hidden")&&!node.hidden;};
     const finite=(value,fallback=0)=>Number.isFinite(value)?value:fallback;
     const damageSources=P.damageSources||{};
-    return {
+    const raw = {
       mode:state,runMode:runMode36,stageKey:isMainGodRun36()?stage().key:`story-${selected}`,stageDuration:finite(stage().dur),stage44:window.SakurayoLifecycle?window.SakurayoLifecycle.snapshot(lifecycleWorld44()):null,viewport:{width:W,height:H,coordinates:"origin top-left; +x right; +y down"},stage:selected,runTime:finite(runTime),
       player:{character:P.character||save.character||"sayo",skin:save.skin||"default",outfit:liveOutfitLayer35()?.id||null,careerBranch:careerBranchId35(),outfitFade:finite(P.outfitFade),outfitReveal:finite(P.outfitReveal),outfitTitle:P.outfitRevealTitle||"",animation:state==="play"?charPose35():"idle",portraitMode:"static",direction:facingName36(),aim:{x:finite(P.aimX,P.fx),y:finite(P.aimY,P.fy),angle:finite(P.weaponAngle)},manualAim:!!P.manualAim,x:finite(P.x),y:finite(P.y),radius:finite(P.r),visualSize:PLAYER_GEOMETRY35.visualSize,footOffset:PLAYER_GEOMETRY35.footOffset,hp:finite(P.hp),maxHp:finite(P.maxHp),shield:finite(P.sh),maxShield:finite(P.maxSh),level:finite(P.level),xp:finite(P.xp),nextXp:finite(P.next),attackDamage:finite(P.dmg),attackInterval:finite(P.rate),attackRange:finite(P.range),multishot:finite(P.multi),pierce:finite(P.pierce),skillCooldown:finite(P.skill),dashCooldown:finite(P.dash),shotCount:finite(P.shotCount),meleeChain:finite(P.meleeChain),perfectDodges:finite(P.perfectDodges),initialCore:P.initialCore40||null,initialCoreLevel:finite(P.initialCoreLevel40),noUpgradeChallenge:!!P.noUpgradeChallenge40,upgradeChoices:finite(P.upgradeChoices40),baitLevel:finite(P.baitLevel40),baitSpawns:finite(P.baitSpawns40)},
       counts:{enemies:enemies.filter(e=>!e.dead).length,bullets:bullets.length,enemyBullets:ebullets.length,gems:gems.length,pets:pets.length,      ops:window.SakurayoOps?window.SakurayoOps.snapshot().units.length:0},
+      feedback:{kind:P.impactKind47||"",punch:finite(P.impactPunch47),shake:finite(shake),ascension:ascensionVisual47()},
       live:window.SakurayoLive?window.SakurayoLive.snapshot():null,
       ops:window.SakurayoOps?window.SakurayoOps.snapshot():null,
       boss:boss?{phase:boss.phase,hp:finite(boss.hp),maxHp:finite(boss.max),ratio:boss.max?finite(boss.hp/boss.max):0,guard:finite(boss.guard),dead:!!boss.dead,pointerVisible:bossPointerVisible38,rule:boss.rule39||"",adaptSource:boss.adaptSource39||null,x:finite(boss.x),y:finite(boss.y)}:null,
@@ -6953,6 +7157,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       overlays:{menu:visible("#menu"),hud:visible("#hud"),level:visible("#level"),dialogue:visible("#dialogue"),event:visible("#event"),paused:visible("#paused"),result:visible("#result"),storyBeat:visible("#storyBeat44")},
       mainGod:{tier:selectedMainGodTier36,...save.mainGod},shop40:JSON.parse(JSON.stringify(save.shop40||{})),extensions:{packs:CONTENT41?.packs()||[],errors:CONTENT41?.errors()||[],state:JSON.parse(JSON.stringify(save.extensions||{})),exploration:explorationSnapshot41()},balanceSamples:save.balance40?.samples?.length||0,result:{win:!!runWin,title:$("#rtitle")?.textContent||""},devErrors:window.__SAKURAYO_DEV__?.errors.length||0,
     };
+    try{return JSON.parse(JSON.stringify(raw));}catch{return {mode:state,runMode:runMode36,stage:selected};}
   }
   if(TEST_MODE){
     window.render_game_to_text=()=>JSON.stringify(snapshot35());
@@ -6976,6 +7181,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
           ready:outfitLayers35().filter(layer=>outfitSpecial35(layer.id)).map(layer=>({id:layer.id,idle:outfitLayerReady35(c,layer)})),
         };
       },
+      combatFeedback47(){return snapshot35().feedback;},
+      ascensionVisual47,
       forceOutfit45(kind,id,rank=1){
         if(kind==="form"){
           if(!["tech","bio","psi"].includes(id))throw new Error(`Unknown form: ${id}`);
@@ -6995,10 +7202,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         }
         throw new Error(`Unknown outfit kind: ${kind}`);
       },
-      selectStage(id){const value=Number(id);if(!ST.some(s=>s.id===value))throw new Error(`Unknown stage: ${id}`);runMode36="story";selected=value;menuUpdate();return snapshot35();},
+      selectStage(id){const value=Number(id);if(!ST.some(s=>s.id===value))throw new Error(`Unknown stage: ${id}`);runMode36="story";pendingMode46="story";selected=value;menuUpdate();return snapshot35();},
       setRunMode46(mode){if(!["story","testimony","mainGod"].includes(mode))throw new Error(`Unknown mode: ${mode}`);runMode36=mode;pendingMode46=mode;menuUpdate();return snapshot35();},
       unlockMainGod(){if(!save.done.includes(4))save.done.push(4);save.unlock=Math.max(save.unlock,4);persist();return snapshot35();},
-      selectMainGodTier(tier=1){const value=clamp(Math.floor(Number(tier)||1),1,4);runMode36="mainGod";selectedMainGodTier36=value;save.mainGod.unlockedTier=Math.max(save.mainGod.unlockedTier,value);menuUpdate();return snapshot35();},
+      selectMainGodTier(tier=1){const value=clamp(Math.floor(Number(tier)||1),1,4);runMode36="mainGod";pendingMode46="mainGod";selectedMainGodTier36=value;save.mainGod.unlockedTier=Math.max(save.mainGod.unlockedTier,value);menuUpdate();return snapshot35();},
       grantMainGodPoints(points){save.mainGod.points+=Math.max(0,Math.floor(Number(points)||0));persist();return snapshot35();},
       grantCoins40(points=9999){save.coins+=Math.max(0,Math.floor(Number(points)||0));persist();return snapshot35();},
       reseed40(value=0x40c0de){let seed=(Number(value)||0)>>>0;Math.random=()=>((seed=(seed*1664525+1013904223)>>>0)/4294967296);return seed;},
@@ -7067,9 +7274,25 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       clearCombat(){bullets=[];enemies=[];ebullets=[];return snapshot35();},
       spawnEnemyRelative(type="normal",dx=100,dy=0){if(state!=="play")throw new Error("spawnEnemyRelative requires play mode");spawnEnemy(type,false);const enemy=enemies[enemies.length-1];enemy.x=P.x+Number(dx);enemy.y=P.y+Number(dy);enemy.hp=enemy.max=Math.max(enemy.hp,P.dmg*30);return {index:enemies.length-1,hp:enemy.hp};},
       attackNow(){if(state!=="play")throw new Error("attackNow requires play mode");grid.clear();for(const e of enemies)if(!e.dead)grid.add(e);P.fire=0;shoot();draw();return {snapshot:snapshot35(),bullets:bullets.map(b=>({x:b.x,y:b.y,vx:b.vx,vy:b.vy,source:b.source})),enemies:enemies.map((e,index)=>({index,x:e.x,y:e.y,hp:e.hp,max:e.max,dead:e.dead}))};},
-      start(){startGame();return snapshot35();},
+      start(){startGame();try{return snapshot35();}catch{return {mode:state,runMode:runMode36};}},
       pauseNow(){pauseGame();return snapshot35();},
-      dismissDialogue(){let guard=80;while(state==="dialogue"&&guard-->0)nextDialogue();if(guard<=0)throw new Error("Dialogue guard exhausted");return snapshot35();},
+      dismissDialogue(){
+        let guard=80;
+        while(state==="dialogue"&&guard-->0){
+          if(window.SakurayoCutscene?.isPlaying?.()) window.SakurayoCutscene.stopVictory?.();
+          nextDialogue();
+        }
+        if(state==="dialogue"){
+          dialogueQueue.length=0;
+          const cb=dialogueDone;
+          dialogueDone=null;
+          $("#dialogue")?.classList.add("hidden");
+          window.SakurayoCutscene?.dismiss?.();
+          state="play";
+          if(cb) cb();
+        }
+        try{return snapshot35();}catch{return {mode:state,runMode:runMode36};}
+      },
       protectPlayer(){P.inv=9999;return snapshot35();},freezeProgression(){P.xp=0;P.next=1e9;return snapshot35();},
       playerGeometry(){return {...PLAYER_GEOMETRY35,radius:PLAYER_GEOMETRY35.collisionRadius};},
       circleCollision(distance,firstRadius,secondRadius){return circlesOverlap35(0,0,Number(firstRadius),Number(distance),0,Number(secondRadius));},
@@ -7124,13 +7347,13 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         }
         return last;
       },
-      openDrawer(name){openDrawer(String(name||""));const el=$(`#${name}Drawer`);return {visible:!!el&&!el.classList.contains("hidden")};},
+      openDrawer(name){openDrawer(String(name||""));const el=name==="settings"?$("#settingsDrawer37"):$(`#${name}Drawer`);return {visible:!!el&&!el.classList.contains("hidden")};},
       triggerError(kind="error"){if(kind==="promise")Promise.reject(new Error("SMOKE_EXPECTED_PROMISE_ERROR"));else setTimeout(()=>{throw new Error("SMOKE_EXPECTED_RUNTIME_ERROR");},0);},
     });
   }
 
   if(BETA40)window.__SAKURAYO_BETA__=Object.freeze({
-    select({character=save.character,stageId=selected}={}){if(CHARACTERS35[character])save.character=character;if(ST.some(s=>s.id===Number(stageId)))selected=Number(stageId);runMode36="story";menuUpdate();return snapshot35();},
+    select({character=save.character,stageId=selected}={}){if(CHARACTERS35[character])save.character=character;if(ST.some(s=>s.id===Number(stageId)))selected=Number(stageId);runMode36="story";pendingMode46="story";menuUpdate();return snapshot35();},
     grantCoins(points=9999){save.coins+=Math.max(0,Math.floor(Number(points)||0));persist();return save.coins;},
     unlockAll(){save.unlock=4;save.done=[1,2,3,4];persist();return snapshot35();},
     setStarter(id="assault",level=5,challenge=true){if(!STARTERS40[id])throw new Error(`Unknown starter: ${id}`);save.shop40.starter[id]=clamp(Math.floor(Number(level)||0),0,5);save.shop40.equippedStarter=id;save.shop40.noUpgradeChallenge=!!challenge;persist();return snapshot35();},
@@ -7192,6 +7415,220 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const top = $("#menu .top");
     if (wrap && top && wrap.parentElement !== top) top.appendChild(wrap);
     if ($("#moreButton39")) $("#moreButton39").textContent = "更多";
+    const more = document.querySelector(".utilityButtons37");
+    if (more && !$("#friendButton46")) {
+      more.insertAdjacentHTML("beforeend", '<button id="friendButton46" type="button">支援名册</button><button id="calendarButton46" type="button">登录日历</button><button id="noticeButton46" type="button">作战公告</button><button id="profileButton46" type="button">角色档案</button>');
+      more.querySelector("#friendButton46").onclick = () => openDrawer("friend");
+      more.querySelector("#calendarButton46").onclick = () => openDrawer("calendar");
+      more.querySelector("#noticeButton46").onclick = () => openDrawer("notice");
+      more.querySelector("#profileButton46").onclick = () => openDrawer("profile");
+    }
+    if (!$("#homeQuick46") && more && more.parentElement) {
+      const quick = document.createElement("div");
+      quick.id = "homeQuick46";
+      quick.className = "homeQuick46";
+      quick.innerHTML = '<button type="button" class="homeIco46 cal" data-shell-open="calendar" aria-label="登录日历"></button><button type="button" class="homeIco46 pal" data-shell-open="friend" aria-label="支援名册"></button>';
+      more.parentElement.insertBefore(quick, more);
+      quick.addEventListener("click", ev => {
+        const btn = ev.target.closest("[data-shell-open]");
+        if (btn) openDrawer(btn.getAttribute("data-shell-open"));
+      });
+    }
+    const navEn = { gacha: "GACHA", roster: "ROSTER", shop: "SHOP", stage: "STAGE", archive: "ARCHIVE" };
+    $$("#menu .homeNav46 [data-open]").forEach(btn => {
+      const key = btn.getAttribute("data-open");
+      if (navEn[key]) btn.setAttribute("data-en", navEn[key]);
+    });
+    installHomeCommand46();
+  }
+  function lobbyWide46(){
+    return document.documentElement.classList.contains("landscape46") && !document.documentElement.classList.contains("portraitFallback46");
+  }
+  function installHomeCommand46(){
+    const menu = $("#menu");
+    const host = $("#menu .menu");
+    if (!menu || !host) return;
+    menu.classList.add("homeCommand46");
+    if ($("#homeRail46") && $("#homeRail46").dataset.shell !== "1") $("#homeRail46").remove();
+    if (!$("#homeRail46")) {
+      const rail = document.createElement("nav");
+      rail.id = "homeRail46";
+      rail.className = "homeRail46";
+      rail.dataset.shell = "1";
+      rail.innerHTML = [["mission","<i class=\"railIco46 task\"></i>","任务","TASK"],["ach","<i class=\"railIco46 ach\"></i>","成就","ACHIEVE"],["mail","<i class=\"railIco46 mail\"></i>","邮件","MAIL"],["notice","<i class=\"railIco46 notice\"></i>","公告","NOTICE"],["settings","<i class=\"railIco46 set\"></i>","设置","SETTING"]].map(([id,icon,cn,en]) => `<button type="button" data-home="${id}">${icon}<b>${cn}</b><small>${en}</small></button>`).join("");
+      menu.appendChild(rail);
+      rail.addEventListener("click", ev => {
+        const btn = ev.target.closest("[data-home]");
+        if (!btn) return;
+        const id = btn.getAttribute("data-home");
+        if (id === "settings") openSettings37();
+        else openDrawer(id);
+      });
+    }
+    if (!$("#homeBanner46")) {
+      const banner = document.createElement("button");
+      banner.id = "homeBanner46";
+      banner.type = "button";
+      banner.className = "homeBanner46";
+      banner.innerHTML = "<img alt=\"\"><div><em>★★★★★</em><b>新月之誓</b><small>本期概率提升</small><i class=\"homeBannerDots46\"><i class=\"on\"></i><i></i><i></i></i></div>";
+      menu.appendChild(banner);
+      banner.onclick = () => openDrawer("gacha");
+      const img = banner.querySelector("img");
+      if (img) img.onerror = () => { img.style.display = "none"; };
+    }
+    let deck = $("#homeDeck46");
+    if (!deck) {
+      deck = document.createElement("div");
+      deck.id = "homeDeck46";
+      deck.className = "homeDeck46";
+      const start = $("#start");
+      const mini = host.querySelector(".stageMini");
+      host.insertBefore(deck, start || null);
+      if (mini) deck.appendChild(mini);
+      const modes = document.createElement("div");
+      modes.id = "homeModes46";
+      modes.className = "homeModes46";
+      modes.innerHTML = '<button type="button" data-mode="testimony"><i class="modeIco46 testimony"></i><b>证词模式</b><small>TESTIMONY</small></button><button type="button" data-mode="mainGod"><i class="modeIco46 domain"></i><b>主神空间</b><small>DOMAIN</small></button>';
+      deck.appendChild(modes);
+      if (start) deck.appendChild(start);
+      modes.addEventListener("click", ev => {
+        const btn = ev.target.closest("[data-mode]");
+        if (btn) pickHomeMode46(btn.getAttribute("data-mode"));
+      });
+    }
+    const mini = host.querySelector(".stageMini");
+    if (mini && !mini.dataset.homeBound46) {
+      mini.dataset.homeBound46 = "1";
+      mini.addEventListener("click", () => openDrawer("stage"));
+    }
+    if (mini && !$("#homeStageProg46")) {
+      mini.insertAdjacentHTML("beforeend", '<div id="homeStageProg46" class="homeStageProg46"><i></i><em></em></div><small id="homeRec46" class="homeRec46"></small>');
+    }
+    const coins = $("#menu .coins");
+    if (coins && !$("#homeCoinPlus46")) {
+      const plus = document.createElement("button");
+      plus.id = "homeCoinPlus46";
+      plus.type = "button";
+      plus.className = "homeCoinPlus46";
+      plus.textContent = "+";
+      plus.onclick = ev => { ev.stopPropagation(); openDrawer("shop"); };
+      coins.appendChild(plus);
+    }
+    if (coins && !$("#homeWallet46")) {
+      const wallet = document.createElement("div");
+      wallet.id = "homeWallet46";
+      wallet.className = "homeWallet46";
+      coins.parentNode.insertBefore(wallet, coins);
+      wallet.insertAdjacentHTML("beforeend", '<span class="homeChip46 prism" data-shell="preview"><i>◆</i><b id="homePrism46">12840</b><button type="button">+</button></span>');
+      wallet.insertAdjacentHTML("beforeend", '<span class="homeChip46 shard" data-shell="preview"><i>◇</i><b id="homeShard46">3960</b><button type="button">+</button></span>');
+      wallet.appendChild(coins);
+      wallet.insertAdjacentHTML("beforeend", '<span class="homeChip46 ticket" data-shell="preview"><i>券</i><b id="homeTicket46">0</b><button type="button">+</button></span>');
+      wallet.addEventListener("click", ev => {
+        if (ev.target.closest(".homeChip46")) {
+          ev.stopPropagation();
+          window.SakurayoShell?.setShopRail("exchange");
+          openDrawer("shop");
+        }
+      });
+    }
+    const plate = $("#menu .profile");
+    if (plate && !plate.dataset.shellBound) {
+      plate.dataset.shellBound = "1";
+      plate.addEventListener("click", () => openDrawer("profile"));
+    }
+    const rank = $("#rank");
+    if (rank && !$(".homeRankBar46")) {
+      const bar = document.createElement("i");
+      bar.className = "homeRankBar46";
+      bar.innerHTML = "<i></i>";
+      rank.insertAdjacentElement("afterend", bar);
+    }
+    if (rank && !$("#homeXp46")) {
+      const xp = document.createElement("em");
+      xp.id = "homeXp46";
+      xp.className = "homeXp46";
+      const bar = $(".homeRankBar46");
+      (bar || rank).insertAdjacentElement("afterend", xp);
+    }
+    paintHomeCommand46();
+  }
+  function pickHomeMode46(mode){
+    if (mode === "mainGod") {
+      if (!save.done.includes(4)) {
+        toast("通关第4章后解锁主神空间");
+        pendingMode46 = "story";
+        paintHomeCommand46();
+        return;
+      }
+      pendingMode46 = "mainGod";
+      runMode36 = "mainGod";
+      toast(selectedMainGodTier36 === 4 ? `无限回廊 第${Math.max(1, (save.mainGod.deepest || 0) + 1)}层` : `主神空间 T${selectedMainGodTier36}`);
+    } else if (mode === "testimony") {
+      pendingMode46 = "testimony";
+      runMode36 = "testimony";
+      toast("证词模式 · 不发放升级卡");
+    } else {
+      pendingMode46 = "story";
+      runMode36 = "story";
+    }
+    paintHomeCommand46();
+  }
+  function applyPendingMode46(){
+    if (pendingMode46 === "mainGod") {
+      if (!save.done.includes(4)) {
+        toast("通关第4章后解锁主神空间");
+        pendingMode46 = "story";
+        runMode36 = "story";
+        return true;
+      }
+      runMode36 = "mainGod";
+      return true;
+    }
+    if (pendingMode46 === "testimony") {
+      runMode36 = "testimony";
+      return true;
+    }
+    runMode36 = "story";
+    return true;
+  }
+  function paintHomeCommand46(){
+    const done = (save.done || []).length;
+    const pct = Math.round((Math.min(4, done) / 4) * 100);
+    const prog = $("#homeStageProg46 i");
+    const lab = $("#homeStageProg46 em");
+    if (prog) prog.style.setProperty("--home-prog", pct + "%");
+    if (lab) lab.textContent = pct + "%";
+    const rankBar = $(".homeRankBar46 i");
+    if (rankBar) rankBar.style.width = pct + "%";
+    $$("#homeModes46 [data-mode]").forEach(btn => {
+      const mode = btn.getAttribute("data-mode");
+      btn.classList.toggle("on", mode === pendingMode46);
+      if (mode === "mainGod") btn.classList.toggle("lock", !save.done.includes(4));
+    });
+    const start = $("#start");
+    if (start) {
+      const wide = lobbyWide46();
+      const label = !wide ? "出击" : pendingMode46 === "testimony" ? "证词" : pendingMode46 === "mainGod" ? "轮回" : "出击";
+      const key = (wide ? "wide|" : "narrow|") + label;
+      if (start.dataset.cmd47 !== key) {
+        const pass = start.querySelector(".pass53");
+        if (wide) start.innerHTML = `${label} <small>START</small><b>>>></b>`;
+        else start.textContent = label;
+        if (pass) start.appendChild(pass);
+        start.dataset.cmd47 = key;
+      }
+    }
+    const bannerImg = $("#homeBanner46 img");
+    const hero = save.character === "aya" ? "aya" : save.character === "rion" ? "rion" : "sayo";
+    if (bannerImg) bannerImg.src = artUrl(`gacha/hero_${hero}.webp`);
+    const S = window.SakurayoShell;
+    if (S) {
+      S.paintCurrencies(save);
+      if (lobbyWide46() && $("#rank")) $("#rank").textContent = `Lv.${S.defenseLevel(save)}`;
+      const xp = S.xpOf ? S.xpOf(save) : null;
+      if (xp && $("#homeXp46")) $("#homeXp46").textContent = `${xp.now}/${xp.max}`;
+      if ($("#homeRec46")) $("#homeRec46").textContent = `推荐等级 Lv.${S.recLevel ? S.recLevel(selected) : 1}`;
+    }
   }
   function installHeroLive46() {
     if ($("#heroLive46") || !$("#menu") || !$("#menu .menu")) return;
@@ -7224,7 +7661,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const name = root.querySelector(".heroLiveName46 b");
     const weapon = root.querySelector(".heroLiveName46 small");
     if (name) name.textContent = c.name;
-    if (weapon) weapon.textContent = c.weapon;
+    if (weapon) weapon.textContent = `${c.role} · ${c.weapon}`;
     const livePath = skinId === "default" ? `characters/${c.id}/default/live_idle.webp` : "";
     const key = `${c.id}|${skinId}|${livePath || charArtPath35(c, "dialogue", sk)}`;
     if (key === heroLiveKey46) return;
@@ -7264,6 +7701,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (L) L.bindHeroTap(root, () => grantCheat46(), kind => Live && Live.trigger(kind));
     if (Live) Live.attach(root, {
       test: TEST_MODE,
+      character: save.character || "sayo",
       hidden() {
         const menu = $("#menu");
         if (!menu || menu.classList.contains("hidden") || document.hidden) return true;
@@ -7275,7 +7713,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   updateCharacterUI35 = function () {
     _updateCharacterUI46();
     updateHeroLive46();
-    if ($("#start")) $("#start").textContent = "出击";
+    paintHomeCommand46();
   };
   const _menuUpdate46 = menuUpdate;
   menuUpdate = function () {
@@ -7286,7 +7724,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     wireLivePuppet46();
     return result;
   };
-  style37.textContent += `#menu.homeDock46{overflow-x:hidden}#menu.homeDock46 .bg{filter:brightness(.7) saturate(.9)}#menu.homeDock46 .bg:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#05051266 0%,#05051200 22%,#08071300 54%,#080713f0 86%);pointer-events:none}#coverTitle36{z-index:4}#menu.homeDock46 #coverTitle36{top:max(8px,env(safe-area-inset-top));left:50%;width:auto;max-width:86%;transform:translateX(-50%);pointer-events:auto}#menu.homeDock46 .coverTitle36 b{font-size:clamp(15px,4.2vw,22px);letter-spacing:.2em}#menu.homeDock46 .coverTitle36 span{margin-top:3px;padding:2px 8px;font-size:8px;letter-spacing:.22em;opacity:.88}.heroLive46{position:absolute;z-index:1;left:-18%;right:-18%;top:-4%;bottom:19%;pointer-events:none;overflow:hidden;-webkit-mask-image:linear-gradient(to top,transparent 0%,#000 24%,#000 100%);mask-image:linear-gradient(to top,transparent 0%,#000 24%,#000 100%);-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}.heroLiveSway46{height:100%;width:100%;display:grid;place-items:end center;transform-origin:50% 100%;animation:heroSway46 5.4s ease-in-out infinite}.heroLiveBreath46{position:relative;height:100%;width:min(72vw,680px);transform-origin:50% 100%;animation:heroBreath46 3.8s ease-in-out infinite}.heroLiveBreath46 img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center 8%;background:transparent!important;pointer-events:none;filter:none}.heroLiveBlink46,.heroLiveHair46,.heroLiveBlink46.off,.heroLiveHair46.off{opacity:0}.heroLiveName46{position:absolute;z-index:2;left:14px;right:auto;top:18%;bottom:auto;text-align:left;text-shadow:0 2px 16px #05020d;max-width:48%}.heroLiveName46 b{display:block;font-size:22px;letter-spacing:.22em}.heroLiveName46 small{display:block;margin-top:4px;color:#ffe7a3;font-size:10px;letter-spacing:.28em}#menu.homeDock46 .menu{transform:none;z-index:3;justify-content:flex-end}#menu.homeDock46 .top{z-index:5;gap:8px;align-items:center}#menu.homeDock46 .profile{display:none}#menu.homeDock46 .coins{margin-right:auto;padding:4px 10px;border-radius:99px;background:#0b0818cc;border:1px solid #ff9bcc44}#menu.homeDock46 .menuBrand35{width:30px;height:30px;border-radius:10px}#menu.homeDock46 .utilityButtons37{position:static;margin:0;max-width:148px;gap:6px}#menu.homeDock46 .calmUtility39.open39{position:absolute;top:0;right:0;width:min(74vw,280px);max-width:none;padding:8px;border-radius:14px;background:#0b0818f2;border:1px solid #ff9bcc55;z-index:8}#menu.homeDock46 .charSelectPanel{position:absolute;left:8px;bottom:30%;width:auto;margin:0;padding:0;border:0;background:none;box-shadow:none;z-index:6;pointer-events:auto}#menu.homeDock46 .sectionTitle{display:none}#menu.homeDock46 .characterList{display:flex;flex-direction:column;justify-content:flex-end;gap:9px}#menu.homeDock46 .charCard{width:52px;height:52px;min-width:52px;padding:3px;border-radius:50%;background:#0b0818d8}#menu.homeDock46 .charCard.selected{box-shadow:0 0 0 2px #fff7d8,0 0 16px #ff4fa8aa}#menu.homeDock46 .charCard img{width:44px;height:44px}#menu.homeDock46 .charCard b,#menu.homeDock46 .charCard em,#menu.homeDock46 .charCard p,#menu.homeDock46 .charCard .selectedMark{display:none}#menu.homeDock46 .stageMini{width:min(100%,560px);grid-template-columns:48px 1fr auto;padding:6px 10px;margin:0 auto 8px;border-radius:16px;background:#0b0818e8;backdrop-filter:blur(8px)}#menu.homeDock46 .stageMini img{width:48px;height:32px}#menu.homeDock46 .stageMini h3{font-size:13px}#menu.homeDock46 .stageMini p{display:none}#menu.homeDock46 .stageMini strong{font-size:16px}#menu.homeDock46 .start{margin:0 auto 8px;padding:14px;font-size:17px;letter-spacing:.14em;width:min(100%,560px);border-radius:16px;box-shadow:0 8px 28px #ff4ea355}#menu.homeDock46 .nav{width:min(100%,560px);margin:0 auto;padding:6px 4px calc(8px + env(safe-area-inset-bottom));border-radius:18px 18px 0 0;background:#0b0818f0;border:1px solid #ff9bcc33}@keyframes heroSway46{0%,100%{transform:rotate(-0.55deg) translate3d(-0.5%,0,0)}50%{transform:rotate(0.65deg) translate3d(0.5%,0,0)}}@keyframes heroBreath46{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-1%) scale(1.01)}}@keyframes heroHair46{0%,100%{transform:rotate(-1.8deg)}50%{transform:rotate(2deg)}}@keyframes heroBlink46{0%,94%,100%{opacity:0}95.2%,96.4%{opacity:1}}@keyframes heroBaseBlink46{0%,94%,100%{opacity:1}95.2%,96.4%{opacity:0}}@media(prefers-reduced-motion:reduce){.heroLiveSway46,.heroLiveBreath46,.heroLive46.hasBlink .heroLiveBase46,.heroLive46.hasBlink .heroLiveBlink46,.heroLive46.hasHair .heroLiveHair46{animation:none}}@media(max-height:760px){#menu.homeDock46 .heroLive46{bottom:28%}#menu.homeDock46 .charSelectPanel{bottom:32%}#menu.homeDock46 .charCard{width:44px;height:44px;min-width:44px}#menu.homeDock46 .charCard img{width:36px;height:36px}#menu.homeDock46 .heroLiveName46{top:14%;font-size:16px}}@media(orientation:landscape){#menu.homeDock46 .heroLive46{top:0;bottom:0;left:0;right:auto;width:58%;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 8%,#000 82%,transparent 100%);mask-image:linear-gradient(to right,transparent 0%,#000 8%,#000 82%,transparent 100%);-webkit-mask-size:100% 100%;mask-size:100% 100%}#menu.homeDock46 .menu{width:min(34vw,360px);max-width:360px;margin-left:auto;padding-left:0;transform:none;box-sizing:border-box}#menu.homeDock46 #coverTitle36{left:max(16px,env(safe-area-inset-left));right:auto;width:auto;transform:none;text-align:left}#menu.homeDock46 .charSelectPanel{position:relative;left:auto;right:auto;bottom:auto;width:100%}#menu.homeDock46 .charSelectPanel,#menu.homeDock46 .stageMini,#menu.homeDock46 .start,#menu.homeDock46 .nav{margin-left:auto;width:100%}#joy{left:max(18px,env(safe-area-inset-left));bottom:max(16px,env(safe-area-inset-bottom))}#hud .acts{right:max(18px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom))}}`;
+  style37.textContent += `#menu.homeDock46{overflow-x:hidden}#menu.homeDock46 .bg{filter:brightness(.7) saturate(.9)}#menu.homeDock46 .bg:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#05051266 0%,#05051200 22%,#08071300 54%,#080713f0 86%);pointer-events:none}#coverTitle36{z-index:4}#menu.homeDock46 #coverTitle36{top:max(8px,env(safe-area-inset-top));left:50%;width:auto;max-width:86%;transform:translateX(-50%);pointer-events:auto}#menu.homeDock46 .coverTitle36 b{font-size:clamp(15px,4.2vw,22px);letter-spacing:.2em}#menu.homeDock46 .coverTitle36 span{margin-top:3px;padding:2px 8px;font-size:8px;letter-spacing:.22em;opacity:.88}.heroLive46{position:absolute;z-index:1;left:-18%;right:-18%;top:-4%;bottom:19%;pointer-events:none;overflow:hidden;-webkit-mask-image:linear-gradient(to top,transparent 0%,#000 24%,#000 100%);mask-image:linear-gradient(to top,transparent 0%,#000 24%,#000 100%);-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}.heroLiveSway46{height:100%;width:100%;display:grid;place-items:end center;transform-origin:50% 100%;animation:heroSway46 5.4s ease-in-out infinite}.heroLiveBreath46{position:relative;height:100%;width:min(72vw,680px);transform-origin:50% 100%;animation:heroBreath46 3.8s ease-in-out infinite}.heroLiveBreath46 img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center 8%;background:transparent!important;pointer-events:none;filter:none}.heroLiveBlink46,.heroLiveHair46,.heroLiveBlink46.off,.heroLiveHair46.off{opacity:0}.heroLiveName46{position:absolute;z-index:2;left:14px;right:auto;top:18%;bottom:auto;text-align:left;text-shadow:0 2px 16px #05020d;max-width:48%}.heroLiveName46 b{display:block;font-size:22px;letter-spacing:.22em}.heroLiveName46 small{display:block;margin-top:4px;color:#ffe7a3;font-size:10px;letter-spacing:.28em}#menu.homeDock46 .menu{transform:none;z-index:3;justify-content:flex-end}#menu.homeDock46 .top{z-index:5;gap:8px;align-items:center}#menu.homeDock46 .profile{display:none}#menu.homeDock46 .coins{margin-right:auto;padding:4px 10px;border-radius:99px;background:#0b0818cc;border:1px solid #ff9bcc44}#menu.homeDock46 .menuBrand35{width:30px;height:30px;border-radius:10px}#menu.homeDock46 .utilityButtons37{position:static;margin:0;max-width:148px;gap:6px}#menu.homeDock46 .calmUtility39.open39{position:absolute;top:0;right:0;width:min(74vw,280px);max-width:none;padding:8px;border-radius:14px;background:#0b0818f2;border:1px solid #ff9bcc55;z-index:8}#menu.homeDock46 .charSelectPanel{position:absolute;left:8px;bottom:30%;width:auto;margin:0;padding:0;border:0;background:none;box-shadow:none;z-index:6;pointer-events:auto}#menu.homeDock46 .sectionTitle{display:none}#menu.homeDock46 .characterList{display:flex;flex-direction:column;justify-content:flex-end;gap:9px}#menu.homeDock46 .charCard{width:52px;height:52px;min-width:52px;padding:3px;border-radius:50%;background:#0b0818d8}#menu.homeDock46 .charCard.selected{box-shadow:0 0 0 2px #fff7d8,0 0 16px #ff4fa8aa}#menu.homeDock46 .charCard img{width:44px;height:44px}#menu.homeDock46 .charCard b,#menu.homeDock46 .charCard em,#menu.homeDock46 .charCard p,#menu.homeDock46 .charCard .selectedMark{display:none}#menu.homeDock46 .stageMini{width:min(100%,560px);grid-template-columns:48px 1fr auto;padding:6px 10px;margin:0 auto 8px;border-radius:16px;background:#0b0818e8;backdrop-filter:blur(8px)}#menu.homeDock46 .stageMini img{width:48px;height:32px}#menu.homeDock46 .stageMini h3{font-size:13px}#menu.homeDock46 .stageMini p{display:none}#menu.homeDock46 .stageMini strong{font-size:16px}#menu.homeDock46 .start{margin:0 auto 8px;padding:14px;font-size:17px;letter-spacing:.14em;width:min(100%,560px);border-radius:16px;box-shadow:0 8px 28px #ff4ea355}#menu.homeDock46 .nav{width:min(100%,560px);margin:0 auto;padding:6px 4px calc(8px + env(safe-area-inset-bottom));border-radius:18px 18px 0 0;background:#0b0818f0;border:1px solid #ff9bcc33}@keyframes heroSway46{0%,100%{transform:rotate(-0.55deg) translate3d(-0.5%,0,0)}50%{transform:rotate(0.65deg) translate3d(0.5%,0,0)}}@keyframes heroBreath46{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-1%) scale(1.01)}}@keyframes heroHair46{0%,100%{transform:rotate(-1.8deg)}50%{transform:rotate(2deg)}}@keyframes heroBlink46{0%,94%,100%{opacity:0}95.2%,96.4%{opacity:1}}@keyframes heroBaseBlink46{0%,94%,100%{opacity:1}95.2%,96.4%{opacity:0}}@media(prefers-reduced-motion:reduce){.heroLiveSway46,.heroLiveBreath46,.heroLive46.hasBlink .heroLiveBase46,.heroLive46.hasBlink .heroLiveBlink46,.heroLive46.hasHair .heroLiveHair46{animation:none}}@media(max-height:760px){#menu.homeDock46 .heroLive46{bottom:28%}#menu.homeDock46 .charSelectPanel{bottom:32%}#menu.homeDock46 .charCard{width:44px;height:44px;min-width:44px}#menu.homeDock46 .charCard img{width:36px;height:36px}#menu.homeDock46 .heroLiveName46{top:14%;font-size:16px}}@media(orientation:landscape){#menu.homeDock46 .heroLive46{top:0;bottom:0;left:0;right:auto;width:68%;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 8%,#000 82%,transparent 100%);mask-image:linear-gradient(to right,transparent 0%,#000 8%,#000 82%,transparent 100%);-webkit-mask-size:100% 100%;mask-size:100% 100%}#menu.homeDock46 .menu{width:min(30vw,300px);max-width:300px;margin-left:auto;padding-left:0;transform:none;box-sizing:border-box}#menu.homeDock46 #coverTitle36{left:max(16px,env(safe-area-inset-left));right:auto;width:auto;transform:none;text-align:left}#menu.homeDock46 .charSelectPanel{position:relative;left:auto;right:auto;bottom:auto;width:100%}#menu.homeDock46 .charSelectPanel,#menu.homeDock46 .stageMini,#menu.homeDock46 .start,#menu.homeDock46 .nav{margin-left:auto;width:100%}#joy{left:max(18px,env(safe-area-inset-left));bottom:max(16px,env(safe-area-inset-bottom))}#hud .acts{right:max(18px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom))}}`;
 
   /* ================= V4.5.2 闪图结算、图鉴三行、融合色特效 ================= */
   function liveSplashPath45(){
@@ -7296,12 +7734,21 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function paintOutfitModal45(sel){
     const modal=$(sel)?.querySelector(".modal");
     if(!modal)return {ok:false,path:""};
+    const short = document.documentElement.classList.contains("shortWindow46") || innerHeight < 431;
+    if (sel === "#paused" && short) {
+      clearOutfitModal45(sel);
+      return { ok: false, path: "", skipped: "short-pause" };
+    }
+    if (sel === "#result" && short) {
+      clearOutfitModal45(sel);
+      return { ok: false, path: "", skipped: "short-result" };
+    }
     const path=liveSplashPath45();
     modal.classList.toggle("outfitSplash45",!!path);
     if(!path){modal.style.backgroundImage="";return {ok:false,path:""};}
     const img=new Image();
     img.onload=()=>{
-      modal.style.backgroundImage=`linear-gradient(180deg,#0d0a20f4 12%,#0d0a20cc 48%,#0d0a20f0),url("${img.src}")`;
+      modal.style.backgroundImage=`linear-gradient(180deg,#0d0a20f8 8%,#0d0a20ee 40%,#0d0a20f6),url("${img.src}")`;
       modal.style.backgroundSize="cover";
       modal.style.backgroundPosition="center top";
     };
@@ -7342,6 +7789,88 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if(P.elementalBeast41)return ["#ff8a55","#78ddff","#c18cff"][P.fusionPulse41||0];
     return fusionData()?.c||"";
   }
+  const SIGNATURE_FUSIONS46=new Set(["magitech","gunshrine","bloodsword","shadowblade","shikigami","idolgun"]);
+  function drawFusionAction46(){
+    const id=P.fusion||"";
+    const skill=P.animSkill||0,dash=P.animDash||0;
+    if(state!=="play"||quality<.62||!SIGNATURE_FUSIONS46.has(id)||(skill<=0&&dash<=0))return;
+    const active=Math.max(skill/.42,dash/.32),q=clamp(active,0,1),t=runTime||0,color=fusionFxColor45()||"#ffd36b";
+    ctx.save();
+    ctx.translate(P.x,P.y);
+    ctx.globalAlpha=.16+q*.2;
+    ctx.strokeStyle=color;
+    ctx.fillStyle=color;
+    ctx.lineWidth=1+q*1.2;
+    if(id==="magitech"){
+      for(let i=0;i<3;i++){const a=t*1.8+i*TAU/3,r=34+i*8;ctx.save();ctx.rotate(a);ctx.strokeRect(-r,-r,r*2,r*2);ctx.restore();}
+    }else if(id==="gunshrine"){
+      for(let i=0;i<6;i++){const a=i*TAU/6+t*.4,r=30+q*22;ctx.beginPath();ctx.ellipse(Math.cos(a)*r,Math.sin(a)*r,8,3,a,0,TAU);ctx.fill();}
+      ctx.beginPath();ctx.arc(0,0,28+q*25,0,TAU);ctx.stroke();
+    }else if(id==="bloodsword"){
+      ctx.lineWidth=3+q*3;
+      for(let i=0;i<3;i++){ctx.beginPath();ctx.arc(0,0,38+i*13,-1.1+i*.16,.8+i*.14);ctx.stroke();}
+    }else if(id==="shadowblade"){
+      for(let i=0;i<4;i++){const a=t*2+i*TAU/4,r=28+i*7,x=Math.cos(a)*r,y=Math.sin(a)*r;ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.strokeRect(-8,-8,16,16);ctx.restore();}
+    }else if(id==="shikigami"){
+      for(let i=0;i<5;i++){const a=-t*1.5+i*TAU/5,r=34+q*18;ctx.save();ctx.translate(Math.cos(a)*r,Math.sin(a)*r);ctx.rotate(a+Math.PI/2);ctx.strokeRect(-4,-10,8,20);ctx.restore();}
+    }else if(id==="idolgun"){
+      for(let i=0;i<3;i++){ctx.globalAlpha=(.18+q*.25)*(1-i*.18);ctx.beginPath();ctx.arc(0,0,30+i*14+q*12,0,TAU);ctx.stroke();}
+      ctx.globalAlpha=.24+q*.32;ctx.beginPath();ctx.moveTo(-55,34);ctx.lineTo(0,-42-q*18);ctx.lineTo(55,34);ctx.closePath();ctx.stroke();
+    }
+    ctx.restore();
+  }
+  CONTENT41.hook("combat:after-draw",drawFusionAction46,"core.fusion-action46",27);
+  const IMPACT_PROFILE47=Object.freeze({
+    crit:Object.freeze({punch:.09,shake:2.2,stamp:null,size:24,haptic:0}),
+    bossCrit:Object.freeze({punch:.12,shake:3.8,stamp:null,size:34,haptic:0}),
+    skill:Object.freeze({punch:.18,shake:6,stamp:null,size:94,haptic:0}),
+    elite:Object.freeze({punch:.2,shake:7,stamp:"shatter",size:62,haptic:22}),
+    phase:Object.freeze({punch:.28,shake:10,stamp:"shatter",size:112,haptic:0}),
+    bossKill:Object.freeze({punch:.34,shake:13,stamp:null,size:138,haptic:36}),
+  });
+  function combatImpact47(kind,target){
+    if(state!=="play"&&kind!=="phase"&&kind!=="bossKill")return false;
+    const profile=IMPACT_PROFILE47[kind];
+    if(!profile)return false;
+    const now=runTime||0;
+    if((kind==="crit"||kind==="bossCrit")&&now<(P.impactNext47||0))return false;
+    if(kind==="crit"||kind==="bossCrit")P.impactNext47=now+.085;
+    const reduced=save.settings?.fx===0||quality<.7;
+    P.impactKind47=kind;
+    P.impactPunch47=Math.max(P.impactPunch47||0,profile.punch*(reduced?.62:1));
+    shake=Math.max(shake,profile.shake*(reduced?.62:1));
+    if(profile.stamp&&quality>=.62){
+      const x=Number.isFinite(target?.x)?target.x:P.x,y=Number.isFinite(target?.y)?target.y:P.y;
+      fxStamp(profile.stamp,x,y,{size:profile.size*(reduced?.78:1),life:Math.max(.16,profile.punch*1.9)});
+    }
+    if(profile.haptic)haptic37(profile.haptic);
+    return true;
+  }
+  const ASCENSION_SIGNATURE47=Object.freeze({tech:"多重演算环",bio:"血肉花冠",psi:"灵能星轨"});
+  function ascensionVisual47(){
+    const form=P.form||null;
+    const active=form&&state==="play"&&quality>=.7&&Math.max((P.animSkill||0)/.42,(P.outfitReveal||0)/2.4)>0;
+    return {form,active:!!active,signature:form?ASCENSION_SIGNATURE47[form]||"":""};
+  }
+  function drawAscensionAction47(){
+    const visual=ascensionVisual47();
+    if(!visual.active)return;
+    const q=clamp(Math.max((P.animSkill||0)/.42,(P.outfitReveal||0)/2.4),0,1),t=runTime||0;
+    const color=visual.form==="tech"?"#65eaff":visual.form==="bio"?"#ff6f94":"#c98aff";
+    ctx.save();ctx.translate(P.x,P.y);ctx.globalAlpha=.1+q*.17;ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=.9+q*1.05;
+    if(visual.form==="tech"){
+      for(let ring=0;ring<3;ring++){const sides=6,r=32+ring*15+q*7;ctx.save();ctx.rotate((ring%2?1:-1)*t*(.5+ring*.18));ctx.beginPath();for(let i=0;i<=sides;i++){const a=i*TAU/sides-Math.PI/2,x=Math.cos(a)*r,y=Math.sin(a)*r;i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();ctx.restore();}
+      for(let i=0;i<6;i++){const a=i*TAU/6+t*.25;ctx.beginPath();ctx.moveTo(Math.cos(a)*28,Math.sin(a)*28);ctx.lineTo(Math.cos(a)*(62+q*12),Math.sin(a)*(62+q*12));ctx.stroke();}
+    }else if(visual.form==="bio"){
+      for(let i=0;i<8;i++){const a=i*TAU/8-t*.28,r=35+q*20;ctx.save();ctx.translate(Math.cos(a)*r,Math.sin(a)*r);ctx.rotate(a);ctx.beginPath();ctx.ellipse(0,0,11+q*5,4+q*2,0,0,TAU);ctx.fill();ctx.restore();}
+      ctx.beginPath();ctx.arc(0,0,28+q*22,-.15,Math.PI+.15);ctx.stroke();ctx.beginPath();ctx.arc(0,0,28+q*22,Math.PI-.15,TAU+.15);ctx.stroke();
+    }else{
+      for(let i=0;i<3;i++){const r=30+i*16+q*8;ctx.save();ctx.rotate((i%2?1:-1)*t*(.55+i*.14));ctx.beginPath();ctx.ellipse(0,0,r,r*.46,i*.45,0,TAU);ctx.stroke();ctx.restore();}
+      for(let i=0;i<5;i++){const a=t*.7+i*TAU/5,r=38+(i%2)*19;ctx.save();ctx.translate(Math.cos(a)*r,Math.sin(a)*r);ctx.rotate(a);ctx.fillRect(-3-q*2,-3-q*2,6+q*4,6+q*4);ctx.restore();}
+    }
+    ctx.restore();
+  }
+  CONTENT41.hook("combat:after-draw",drawAscensionAction47,"core.ascension-action47",28);
   const _finish45=finish;
   finish=function(win){const result=_finish45(win);paintOutfitModal45("#result");return result;};
   const _finishMainGod45=finishMainGod36;
@@ -7365,22 +7894,40 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   style37.textContent+=`.compactHud38 #outfitChip45{display:none!important}#result .modal.outfitSplash45,#paused .modal.outfitSplash45{background-color:#0d0a20}#pauseOutfit45{display:flex;align-items:center;gap:10px;margin:0 0 10px;padding:8px 10px;border-radius:14px;background:#120e27cc;border:1px solid #ff9bcc44}#pauseOutfit45[hidden]{display:none}#pauseOutfit45 img{width:56px;height:56px;object-fit:contain;background:transparent}#pauseOutfit45 b{display:block;font-size:13px}#pauseOutfit45 small{color:#ffd6ea;font-size:10px}`;
 
   function lobbyHandlers46(){
-    return {pull:n=>doPull46(n),art:artUrl,character:save.character};
+    const S=window.SakurayoShell;
+    const money=S?S.wallets(save):{ticket:0,energy:0};
+    return {
+      pull:n=>doPull46(n),
+      art:artUrl,
+      character:save.character,
+      tickets:money.ticket,
+      energy:money.energy,
+      banner:S&&S.currentBanner?S.currentBanner():"moon",
+      feedback:(k,v)=>playFeedback411(k||"click",v||.2)
+    };
   }
   function refreshLobby46(){
     const L=window.SakurayoLobby;
     if(!L)return;
     L.injectStyle();
     save.shop40=L.normalizeOps(save.shop40||{});
-    if($("#gachaDrawer")&&!$("#gachaDrawer").classList.contains("hidden"))L.renderGacha($("#gachaBody46"),save,lobbyHandlers46());
-    if($("#rosterDrawer")&&!$("#rosterDrawer").classList.contains("hidden"))L.renderRoster($("#rosterBody46"),save,lobbyHandlers46());
+    if($("#gachaDrawer")&&!$("#gachaDrawer").classList.contains("hidden")){
+      L.renderGacha($("#gachaBody46"),save,lobbyHandlers46());
+      window.SakurayoShell?.decorateGacha($("#gachaBody46"),save,lobbyHandlers46(),toast);
+    }
+    if($("#rosterDrawer")&&!$("#rosterDrawer").classList.contains("hidden")){
+      L.renderRoster($("#rosterBody46"),save,lobbyHandlers46());
+      window.SakurayoShell?.decorateRoster($("#rosterBody46"),save,lobbyHandlers46());
+    }
   }
   function doPull46(count){
     const L=window.SakurayoLobby;
     if(!L)return {ok:false,reason:"lobby",results:[]};
-    const result=L.pull(save,count);
+    const banner=window.SakurayoShell?.currentBanner?.()||"moon";
+    const result=L.pull(save,count,null,banner);
     if(!result.ok){
-      toast(result.reason==="coins"?"樱花币不足":"寻访失败");
+      toast(result.reason==="coins"?"樱花币或寻访券不足":"寻访失败");
+      playFeedback411("error",.24);
       refreshLobby46();
       return result;
     }
@@ -7388,8 +7935,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     toast(count===10?`十连完成：${names}…`:`寻访：${result.results[0].n}`);
     checkAch();
     persist();
+    playFeedback411("reward",result.results.some(item=>item.r==="SSR")?.48:.3);
     refreshLobby46();
-    if(L.showReveal)L.showReveal(result.results,{art:artUrl,again:()=>doPull46(count)});
+    if(result.energyGrant)toast("能量满额 · 寻访券 +"+result.energyGrant);
+    if(L.showReveal)L.showReveal(result.results,{art:artUrl,again:()=>doPull46(count),feedback:(k,v)=>playFeedback411(k||"click",v||.2)});
     return result;
   }
   function grantCheat46(){
@@ -7397,6 +7946,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if(!L)return {coins:save.coins,cheatUsed:0};
     const result=L.grantCheat(save);
     toast(L.cheatToast);
+    playFeedback411("reward",.35);
     persist();
     refreshLobby46();
     return { coins: result.coins, cheatUsed: true };
@@ -7438,19 +7988,58 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       };
     });
   }
+  function installShell46(){
+    const S=window.SakurayoShell;
+    if(!S||installShell46.done)return;
+    installShell46.done=true;
+    S.injectStyle();
+    S.ensureDrawers();
+    save.shell46=S.ensureMeta(save);
+    const _shop=renderShop35;
+    renderShop35=function(){
+      const result=_shop();
+      S.decorateShop($("#shopDrawer"),{
+        toast,
+        save,
+        commit(){ persist(); },
+        feedback(kind,vol){ playFeedback411(kind||"reward",vol||.34); },
+        clickTab(id){
+          const btn=document.querySelector(`.shopTabs40 [data-shop="${id}"]`);
+          if(btn)btn.click();
+        }
+      });
+      return result;
+    };
+    const _story=renderStory;
+    renderStory=function(){
+      const result=_story();
+      setTimeout(()=>S.decorateStory($("#storyDrawer"),STORIES,save,{stages:ST,save}),0);
+      return result;
+    };
+  }
   function installLobby46(){
     const L=window.SakurayoLobby;
     if(!L||installLobby46.done)return;
     installLobby46.done=true;
     if(!window.artUrl)window.artUrl=artUrl;
-    L.injectStyle();
     window.SakurayoLive?.injectStyle();
+    L.injectStyle();
     save.shop40=L.normalizeOps(save.shop40||{});
     wireLivePuppet46();
     L.dressArchive($("#archiveDrawer .archiveDock46"));
     ["shopDrawer","stageDrawer","archiveDrawer"].forEach(id=>$(`#${id}`)?.classList.add("room46"));
+    const _openSettings46=openSettings37;
+    openSettings37=function(){
+      const result=_openSettings46.apply(this,arguments);
+      window.SakurayoShell?.decorateSettings($("#settingsDrawer37"));
+      return result;
+    };
     const _openDrawer46=openDrawer;
     openDrawer=function(n){
+      if(n==="settings"){
+        openSettings37();
+        return;
+      }
       _openDrawer46(n);
       if(n==="gacha"){
         const rev=$("#gachaReveal46");
@@ -7459,6 +8048,26 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       }
       if(n==="roster")L.renderRoster($("#rosterBody46"),save,lobbyHandlers46());
       if(n==="archive")L.dressArchive($("#archiveDrawer .archiveDock46"));
+      window.SakurayoShell?.onOpen(n,{
+        toast,
+        save,
+        artUrl,
+        commit(){ persist(); },
+        feedback(kind,vol){ playFeedback411(kind||"reward",vol||.34); },
+        openDrawer,
+        handlers:lobbyHandlers46(),
+        characters:CHARACTERS35,
+        stories:STORIES,
+        stages:ST.map(s=>({id:s.id,img:s.img,name:s.name})),
+        talents:Object.entries(TAL).map(([id,a])=>({id,n:a.n,i:a.i,d:a.d,lv:save.tal[id]||0,max:a.max})),
+        achDone:Object.entries(ACH).filter(([id,a])=>!!save.ach[id]||a.c()).length,
+        achTotal:Object.keys(ACH).length,
+        characterId:save.character||"sayo",
+        clickTab(id){
+          const btn=document.querySelector(`.shopTabs40 [data-shop="${id}"]`);
+          if(btn)btn.click();
+        }
+      });
     };
     const _renderStages46=renderStages;
     renderStages=function(){const result=_renderStages46();bindStageModes46();return result;};
@@ -7473,6 +8082,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     };
     const _startGame46=startGame;
     startGame=function(){
+      applyPendingMode46();
+      window.SakurayoShell?.clearFloats?.();
+      hideTransient();
       const result=_startGame46();
       if(runMode36==="testimony"&&$("#stageHud")) $("#stageHud").textContent=`证词 · ${stage().short}`;
       return result;
@@ -7484,6 +8096,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       if(runMode36==="testimony"&&$("#sdesc")) $("#sdesc").textContent="证词模式 · 不发放升级卡";
       refreshLobby46();
       paintHomeBg46();
+      paintHomeCommand46();
       return result;
     };
   }
@@ -7519,12 +8132,12 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const name=O.NAMES[id]||id;
     if(O.snapshot().units.some(u=>u.id===id)){
       const r=O.retreat(id);
-      if(r.ok)toast(`${name} 已撤回`);
+      if(r.ok){toast(`${name} 已撤回`);playFeedback411("close",.24);}
       opsPaint46();
       return r;
     }
     const r=O.deploy(id,save.character||P.character,P.x,P.y,W,H);
-    if(r.ok)toast(`${name} 已部署`);
+    if(r.ok){toast(`${name} 已部署`);playFeedback411("open",.28);}
     else if(r.reason==="dp")toast("部署点不足");
     else if(r.reason==="full")toast("最多两名干员");
     else if(r.reason==="self")toast("不能部署当前角色");
@@ -7555,8 +8168,14 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         ctx.beginPath();
         ctx.ellipse(0,16,13,5,0,0,Math.PI*2);
         ctx.fill();
-        const img=artImage(`characters/${u.id}/default/portrait.webp`);
-        if(artReady(img))ctx.drawImage(img,-16,-30,32,36);
+        const firing=(u.fire||0)>0;
+        const img=artImage(`characters/${u.id}/default/anim_${firing?"attack":"idle"}.webp`);
+        if(artReady(img)){
+          ctx.save();
+          if(Math.cos(u.aim||0)<0)ctx.scale(-1,1);
+          ctx.drawImage(img,-24,-34,48,48);
+          ctx.restore();
+        }
         else{
           ctx.fillStyle="#ffe6a3";
           ctx.beginPath();
@@ -7568,6 +8187,33 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         ctx.beginPath();
         ctx.arc(0,2,20,0,Math.PI*2);
         ctx.stroke();
+        if(firing){
+          const q=clamp((u.fire||0)/(u.weapon==="blade"?.24:.16),0,1),a=u.aim||0;
+          ctx.globalCompositeOperation="screen";
+          ctx.globalAlpha=.32+q*.62;
+          ctx.strokeStyle=u.id==="sayo"?"#ff77bd":u.id==="aya"?"#70c8ff":"#ff6c82";
+          ctx.lineWidth=2+q*2;
+          if(u.weapon==="blade"){
+            ctx.beginPath();
+            ctx.arc(0,-4,26+(1-q)*18,a-.8,a+.8);
+            ctx.stroke();
+          }else{
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(a)*15,-4+Math.sin(a)*15);
+            ctx.lineTo(Math.cos(a)*(34+(1-q)*18),-4+Math.sin(a)*(34+(1-q)*18));
+            ctx.stroke();
+          }
+        }
+        if(u.pulse>0){
+          const q=clamp(u.pulse/.72,0,1);
+          ctx.globalCompositeOperation="screen";
+          ctx.globalAlpha=q*.8;
+          ctx.strokeStyle=u.id==="sayo"?"#ff77bd":u.id==="aya"?"#70c8ff":"#ff6c82";
+          ctx.lineWidth=2+q*2;
+          ctx.beginPath();
+          ctx.arc(0,2,22+(1-q)*34,0,Math.PI*2);
+          ctx.stroke();
+        }
         ctx.restore();
       }
     },"core.ops46",15);
@@ -7594,7 +8240,32 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     });
   }
   installLobby46();
+  installShell46();
   installOps46();
+  const _openDrawer47 = openDrawer;
+  openDrawer = function (n) {
+    const result = _openDrawer47.apply(this, arguments);
+    if (n === "shop") renderShop35();
+    else if (n === "stage") renderStages();
+    else if (n === "talent") renderTalents();
+    else if (n === "ach") renderAch();
+    else if (n === "story") {
+      renderStory();
+      prependLore35();
+    } else if (n === "asc") renderAscensionGuide();
+    else if ((n === "gacha" || n === "roster") && typeof refreshLobby46 === "function") refreshLobby46();
+    return result;
+  };
+  const _menuUpdateGuard47 = menuUpdate;
+  menuUpdate = function () {
+    if (menuUpdate.busy) return;
+    menuUpdate.busy = true;
+    try {
+      return _menuUpdateGuard47.apply(this, arguments);
+    } finally {
+      menuUpdate.busy = false;
+    }
+  };
   checkAch();
   menuUpdate();
   installModKitButton42();

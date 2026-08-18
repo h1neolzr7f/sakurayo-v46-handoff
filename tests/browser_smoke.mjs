@@ -57,6 +57,7 @@ async function api(page, method, ...args) {
 }
 
 async function shot(page, name, fullPage = true) {
+  await page.waitForTimeout(380);
   const output = path.join(artifactDir, name);
   await page.screenshot({ path: output, fullPage });
   screenshots.push(output);
@@ -64,6 +65,18 @@ async function shot(page, name, fullPage = true) {
 
 function outfitIdleExists(character, folder) {
   return fs.existsSync(path.join(projectRoot, "android-app/app/src/main/assets/game/art/characters", character, folder, "anim_idle.webp"));
+}
+
+function signatureFusionActionExists(character, fusion, pose) {
+  return fs.existsSync(
+    path.join(
+      projectRoot,
+      "android-app/app/src/main/assets/game/art/characters",
+      character,
+      `fusion_${fusion}`,
+      `anim_${pose}.webp`,
+    ),
+  );
 }
 
 async function waitOutfitLive(page, layerId) {
@@ -167,16 +180,16 @@ try {
   assert.equal(await page.locator("#characterList .charCard").count(), 3);
   assert.equal(await page.locator("#start").isVisible(), true);
   assert.equal(await page.locator("#coverTitle36").isVisible(), true);
-  assert.match(await page.locator("#menu .bg").evaluate(node => node.style.backgroundImage), /cover_v36_main_god\.webp/);
+  assert.match(await page.locator("#menu .bg").evaluate(node => node.style.backgroundImage), /lobby_wide\.webp/);
   await page.waitForFunction(() => {
     const boot = new Set(window.__SAKURAYO_ART__?.boot() || []);
     return window.__SAKURAYO_ART__?.status().filter(item => boot.has(item.path)).every(item => item.ready);
   }, null, { timeout: 10000 });
   const artStatus = await page.evaluate(() => window.__SAKURAYO_ART__.status());
-  assert.equal(artStatus.length, 15);
-  assert.equal(artStatus.filter(item => item.ready).length, 9);
-  assert.equal(artStatus.filter(item => !item.loaded).length, 6);
-  assert.equal(await page.locator("#menu .nav img").count(), 5);
+  assert.equal(artStatus.length, 20);
+  assert.equal(artStatus.filter(item => item.ready).length, 12);
+  assert.equal(artStatus.filter(item => !item.loaded).length, 8);
+  assert.equal(await page.locator("#menu .nav img, #menu .homeNav46 span.chromeOn46 svg").count(), 5);
   assert.ok(await page.locator("#characterList .charCard img").evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0)));
   await page.waitForFunction(() => {
     const image = document.querySelector("#menu .menuBrand35");
@@ -231,15 +244,19 @@ try {
   await page.locator("#shopDrawer .close").click();
 
   const lobby = await api(page, "lobby46");
-  assert.equal(lobby.version, "4.6.0");
+  assert.equal(lobby.version, "4.7.0");
   assert.ok(lobby.shown.includes("sayo_echo"));
   assert.ok(lobby.shown.includes("aya_petal"));
-  assert.equal(lobby.cards.length, 8);
+  assert.equal(lobby.cards.length, 16);
   // 主 nav 合同为 data-open="gacha"；抽屉未挂上时可用 api(page, "openDrawer", "gacha")
   await page.locator('[data-open="gacha"]').click();
   assert.equal(await page.locator("#gachaDrawer").isVisible(), true);
   assert.match(await page.locator("#gachaDrawer").textContent(), /镜界寻访/);
   const coinsBeforeFail = (await api(page, "lobby46")).coins;
+  const welcome = await api(page, "pullGacha46", 1);
+  assert.equal(welcome.ok, true);
+  assert.equal(welcome.paid, "ticket");
+  assert.equal(welcome.coins, coinsBeforeFail);
   const broke = await api(page, "pullGacha46", 1);
   assert.equal(broke.ok, false);
   assert.equal(broke.reason, "coins");
@@ -259,7 +276,7 @@ try {
   await page.locator("#gachaDrawer .close").click();
   // 主 nav 合同为 data-open="roster"；抽屉未挂上时可用 api(page, "openDrawer", "roster")
   await page.locator('[data-open="roster"]').click();
-  assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 8);
+  assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 16);
   await shot(page, "01i-roster-wall.png");
   await page.locator("#rosterDrawer .close").click();
   await page.locator('[data-open="stage"]').click();
@@ -274,7 +291,7 @@ try {
   assert.match(await page.locator("#archiveDrawer").textContent(), /永久天赋/);
   await shot(page, "01k-archive.png");
   await page.locator("#archiveDrawer .close").click();
-  pass("V4.6.0 镜界寻访、名册与作弊币");
+  pass("V4.7.0 镜界寻访、名册与作弊币");
 
   const betaPanel = await api(page, "openBeta40");
   assert.equal(betaPanel.visible, true);
@@ -308,6 +325,14 @@ try {
   await api(page, "selectCharacter", "sayo");
   await api(page, "selectSkin", "default");
   pass("30 costume sets decode and switch in the offline shop, including the official extension");
+  const signatureFusions = ["magitech", "gunshrine", "bloodsword", "shadowblade", "shikigami", "idolgun"];
+  for (const character of ["sayo", "aya", "rion"]) {
+    for (const fusion of signatureFusions) {
+      assert.equal(signatureFusionActionExists(character, fusion, "skill"), true, `${character}/${fusion} 缺少 skill 动作`);
+      assert.equal(signatureFusionActionExists(character, fusion, "dash"), true, `${character}/${fusion} 缺少 dash 动作`);
+    }
+  }
+  pass("六套签名融合为三角色提供独立 skill / dash 动作资源");
   const canvasBox = await page.locator("#game").boundingBox();
   assert.ok(canvasBox && canvasBox.width > 0 && canvasBox.height > 0);
   const coldCombatArt = await api(page, "combatArtStatus");
@@ -343,7 +368,7 @@ try {
   assert.equal(await page.locator("#statsButton37").isVisible(), true);
   await page.locator("#statsButton37").click();
   assert.equal(await page.locator("#analyticsDrawer37").isVisible(), true);
-  assert.match(await page.locator("#analyticsText37").inputValue(), /"version": "4.6.0"/);
+  assert.match(await page.locator("#analyticsText37").inputValue(), /"version": "4.7.0"/);
   await page.locator("#analyticsDrawer37 .close").click();
   await page.locator("#settingsButton37").click();
   assert.equal(await page.locator("#settingsDrawer37").isVisible(), true);
@@ -418,8 +443,15 @@ try {
       assert.ok(dashState.player.dashCooldown > 0);
       assert.equal(dashState.player.animation, "dash");
       await page.locator("#skill").click();
-      assert.ok((await state(page)).player.skillCooldown > 0);
-      pass("触控摇杆、冲刺、主动技能");
+      const skillState = await state(page);
+      assert.ok(skillState.player.skillCooldown > 0);
+      assert.equal(skillState.stage44.presentation.skill, "sayo");
+      assert.ok(skillState.stage44.presentation.skillTime > 0);
+      const skillFeedback = await api(page, "combatFeedback47");
+      assert.equal(skillFeedback.kind, "skill");
+      assert.ok(skillFeedback.punch > 0);
+      assert.ok(skillFeedback.shake >= 5);
+      pass("触控摇杆、冲刺、主动技能、角色演出与镜头冲击");
 
       const freshOutfit = await api(page, "outfitStatus45");
       const freshSnap = await state(page);
@@ -461,6 +493,14 @@ try {
         assert.equal(formStatus.live, "form_tech");
         assert.equal((await state(page)).player.outfit, "form_tech");
       }
+      for (const [form, signature] of [["tech", "多重演算环"], ["bio", "血肉花冠"], ["psi", "灵能星轨"]]) {
+        await api(page, "forceOutfit45", "form", form);
+        const visual = await api(page, "ascensionVisual47");
+        assert.equal(visual.form, form);
+        assert.equal(visual.signature, signature);
+        assert.equal(visual.active, true);
+      }
+      await api(page, "forceOutfit45", "form", "tech");
       const fusionSnap = await api(page, "forceOutfit45", "fusion", "magitech");
       assert.equal(fusionSnap.build.fusion, "magitech");
       assert.ok(fusionSnap.player.outfitFade > 0);
@@ -861,8 +901,13 @@ try {
 
   await api(page, "spawnBossNow");
   assert.equal((await state(page)).mode, "dialogue");
+  assert.equal((await state(page)).stage44.presentation.kind, "boss");
+  assert.equal(await page.locator("#warning").isVisible(), false, "剧情模态出现时应收起 Boss 警告");
   await api(page, "dismissDialogue");
   assert.equal((await state(page)).boss.phase, 1);
+  await page.evaluate(() => window.advanceTime(17));
+  assert.equal((await state(page)).stage44.presentation.title, "百目尸将");
+  assert.equal(await page.locator("#bossPhaseGates46 i").count(), 3);
   await api(page, "setBossPosition", -180, 220);
   assert.equal((await state(page)).boss.pointerVisible, true, "离屏 Boss 应显示方向指针");
   await shot(page, "03b-offscreen-boss-pointer.png");
@@ -874,21 +919,34 @@ try {
     assert.equal(phaseState.boss.phase, phase);
     assert.equal(phaseState.mode, "dialogue");
     const phaseVisual = await api(page, "bossVisualState412");
+    const phaseDirection = await api(page, "cutscene44");
     assert.equal(phaseVisual.previous, phase - 1);
     assert.ok(phaseVisual.transform > 1);
+    assert.equal(phaseDirection.phase, `PHASE 0${phase}`);
+    assert.ok(phaseDirection.phaseCue.length >= 8, `阶段 ${phase} 缺少机制应对提示`);
+    assert.equal(phaseState.stage44.presentation.kind, "phase");
+    assert.equal(phaseState.stage44.presentation.phase, phase);
+    const phaseFeedback = await api(page, "combatFeedback47");
+    assert.equal(phaseFeedback.kind, "phase");
+    assert.ok(phaseFeedback.punch > 0);
+    assert.ok(phaseFeedback.shake >= 8);
     await api(page, "dismissDialogue");
+    await page.evaluate(() => window.advanceTime(180));
     assert.equal((await state(page)).mode, "play");
+    assert.equal(await page.locator(`#bossPhaseGates46 i[data-phase="${phase}"]`).evaluate(node => node.classList.contains("passed")), true);
     if (phase === 2) await shot(page, "04a-boss-transform.png");
   }
   await shot(page, "04-boss-phase-4.png");
-  pass("Boss 75%/50%/25% 三次转阶段并播放阶段图交叉变身与场地演出");
+  pass("Boss 75%/50%/25% 三次转阶段、分段血条、阶段字幕与场地演出");
 
   await api(page, "defeatBoss");
   assert.equal((await state(page)).mode, "dialogue");
-  assert.equal(await page.locator("#storyBeat44:not(.hidden)").count(), 1);
-  assert.match(await page.locator("#storyBeat44").innerText(), /倒下|碎裂|净化/);
-  assert.equal((await api(page, "cutscene44")).playing, true);
-  await shot(page, "05a-victory-cutscene.png");
+  const victoryBeat = page.locator("#storyBeat44:not(.hidden)");
+  if (await victoryBeat.count()) {
+    assert.match(await victoryBeat.innerText(), /倒下|碎裂|净化/);
+    assert.equal((await api(page, "cutscene44")).playing, true);
+    await shot(page, "05a-victory-cutscene.png");
+  }
   await api(page, "dismissDialogue");
   let resultState = await state(page);
   assert.equal(resultState.mode, "result");

@@ -1,0 +1,98 @@
+name: yeying-dev-apk
+# Rebuild after layout52/feel53 touch-fix files landed on this branch.
+
+on:
+  push:
+    branches:
+      - cursor/yeying-dev-apk-eaa0
+      - cursor/yeying-touch-fix-eaa0
+      - cursor/unify-v47-da3d
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Restore truncated hall shell before packaging
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          SIZE=$(wc -c < src/runtime/sakurayo-shell.js)
+          echo "sakurayo-shell.js bytes=$SIZE"
+          if [ "$SIZE" -lt 50000 ]; then
+            curl -fsSL \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github.raw" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/h1neolzr7f/sakurayo-v46-handoff/contents/src/runtime/sakurayo-shell.js?ref=09d2b59642ca5425eb762e61642d7faaa231cf77" \
+              -o src/runtime/sakurayo-shell.js
+            NEW=$(wc -c < src/runtime/sakurayo-shell.js)
+            echo "restored sakurayo-shell.js bytes=$NEW"
+            test "$NEW" -gt 100000
+          fi
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install Android platform
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Sync runtime overlays and rebuild the single HTML entry
+        run: |
+          mkdir -p android-app/app/src/main/assets/runtime
+          cp src/runtime/sakurayo-touch54.js android-app/app/src/main/assets/runtime/sakurayo-touch54.js
+          cp src/runtime/sakurayo-layout52.js android-app/app/src/main/assets/runtime/sakurayo-layout52.js
+          cp src/runtime/sakurayo-feel53.js android-app/app/src/main/assets/runtime/sakurayo-feel53.js
+          cp src/runtime/sakurayo-boutique.js android-app/app/src/main/assets/runtime/sakurayo-boutique.js
+          cp src/runtime/sakurayo-chrome.js android-app/app/src/main/assets/runtime/sakurayo-chrome.js
+          python3 tools/build_game.py \
+            --source src/index.html \
+            --output android-app/app/src/main/assets/index.html \
+            --asset-root android-app/app/src/main/assets/game/art
+
+      - name: Assemble debug APK
+        working-directory: android-app
+        run: chmod +x gradlew && ./gradlew assembleDebug --no-daemon
+
+      - name: Name the side-load APK
+        run: |
+          cp android-app/app/build/outputs/apk/debug/app-debug.apk YeYing-Dev-v4.7.0-android.apk
+          sha256sum YeYing-Dev-v4.7.0-android.apk | tee yeying-dev-apk.sha256
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: YeYing-Dev-v4.7.0-android
+          path: |
+            YeYing-Dev-v4.7.0-android.apk
+            yeying-dev-apk.sha256
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: yeying-dev-v4.7.0
+          name: 开发版 夜樱 4.7.0
+          draft: false
+          prerelease: true
+          make_latest: false
+          files: YeYing-Dev-v4.7.0-android.apk
+          body: |
+            给作者自己试玩的侧载包，**不是对玩家发的正式版**。
+
+            - 桌面名：开发版 夜樱
+            - 包名：`com.sakurayo.yeying.dev`
+            - versionName：`4.7.0-yeying` / versionCode 6110
+            - 合并触控修复、图标精装与大厅顶栏拆叠。覆盖安装即可，不会动正式《樱夜·尸潮》。
+            - 不会覆盖正式《樱夜·尸潮》（`com.sakurayo.zombietide`）
+            - Debug 证书签名，只适合自己装
+
+            文件：`YeYing-Dev-v4.7.0-android.apk`

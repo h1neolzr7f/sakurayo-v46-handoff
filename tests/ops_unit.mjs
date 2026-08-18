@@ -19,7 +19,7 @@ sandbox.globalThis = sandbox;
 vm.runInNewContext(code, sandbox);
 const O = sandbox.window.SakurayoOps;
 
-assert.equal(O.version, "4.6.0");
+assert.equal(O.version, "4.7.0");
 assert.equal(O.MAX, 2);
 assert.equal(O.COST, 8);
 assert.equal(O.START, 10);
@@ -38,6 +38,7 @@ assert.equal(first.ok, true);
 assert.equal(first.snapshot.dp, 2);
 assert.equal(first.snapshot.units.length, 1);
 assert.equal(first.snapshot.units[0].id, "aya");
+assert.ok(first.snapshot.units[0].pulse > 0);
 assert.ok(Math.abs(first.snapshot.units[0].x - 200) > 40);
 
 assert.equal(O.deploy("rion", "sayo", 200, 400, 430, 932).reason, "dp");
@@ -57,7 +58,8 @@ O.deploy("aya", "sayo", 120, 300, 430, 932);
 const idle = O.tick(0.2, { play: true, mode: "story", dmg: 10, petPow: 1, nearest: () => null });
 assert.equal(idle.shots.length, 0);
 
-const target = { x: 160, y: 300 };
+const deployedUnit = O.snapshot().units[0];
+const target = { x: deployedUnit.x + 40, y: deployedUnit.y };
 const ready = O.tick(1.2, {
   play: true,
   mode: "story",
@@ -66,8 +68,12 @@ const ready = O.tick(1.2, {
   nearest: () => target,
 });
 assert.equal(ready.shots.length, 1);
+assert.equal(ready.snapshot.units[0].pulse, 0);
 assert.equal(ready.shots[0].id, "aya");
 assert.equal(ready.shots[0].weapon, "pistol");
+assert.ok(ready.snapshot.units[0].fire > 0);
+assert.ok(Math.abs(ready.snapshot.units[0].aim) < 0.01);
+assert.equal(ready.snapshot.units[0].weapon, "pistol");
 
 const bullets = [];
 const slashes = [];
@@ -93,6 +99,8 @@ const blade = O.tick(1.2, {
   nearest: () => ({ x: 130, y: 300 }),
 });
 assert.equal(blade.shots[0].weapon, "blade");
+assert.ok(blade.snapshot.units[0].fire > ready.snapshot.units[0].fire);
+assert.equal(blade.snapshot.units[0].weapon, "blade");
 const cuts = [];
 O.fireShots(blade.shots, {
   aoe(x, y, r, dmg, _c, _p, opt) {

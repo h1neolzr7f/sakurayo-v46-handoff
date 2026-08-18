@@ -8,6 +8,12 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const html = fs.readFileSync(path.join(root, "src/index.html"), "utf8");
 assert.match(html, /runtime\/sakurayo-live\.js/);
 assert.doesNotMatch(html, /update\s*=\s*function[\s\S]{0,80}SakurayoLive/);
+for (const character of ["sayo", "aya", "rion"]) {
+  const artRoot = path.join(root, "android-app/app/src/main/assets/game/art/characters", character, "default");
+  const idle = fs.readFileSync(path.join(artRoot, "live_idle.webp"));
+  const blink = fs.readFileSync(path.join(artRoot, "live_blink.webp"));
+  assert.notDeepEqual(blink, idle, `${character} 的眨眼帧不得与待机帧相同`);
+}
 
 const code = fs.readFileSync(path.join(root, "src/runtime/sakurayo-live.js"), "utf8");
 const sandbox = { window: {}, document: null, Math, Object, Number, String };
@@ -15,9 +21,10 @@ sandbox.globalThis = sandbox;
 vm.runInNewContext(code, sandbox);
 const L = sandbox.window.SakurayoLive;
 
-assert.equal(L.version, "4.6.0");
+assert.equal(L.version, "4.7.0");
 assert.equal(L.BLINK.mean, 2.5);
 assert.equal(L.BLINK.deviation, 2);
+assert.deepEqual(Object.keys(L.PROFILES), ["sayo", "aya", "rion"]);
 assert.equal(L.blinkEnvelope(-1), 1);
 assert.equal(L.blinkEnvelope(0), 1);
 assert.ok(L.blinkEnvelope(L.BLINK.close) <= 0.001);
@@ -53,5 +60,10 @@ const look = L.createState({ test: true });
 look.targetX = 1;
 for (let i = 0; i < 20; i++) L.stepState(look, 0.016, () => 0);
 assert.ok(look.lookX > 0.4);
+
+const sayoPose = L.stepState(L.createState({ test: true, character: "sayo" }), 0.016, () => 0);
+const rionPose = L.stepState(L.createState({ test: true, character: "rion" }), 0.016, () => 0);
+assert.ok(Math.abs(rionPose.sway) < Math.abs(sayoPose.sway));
+assert.ok(rionPose.breath < sayoPose.breath);
 
 console.log("PASS live unit: blink interval, look damp, tapHead trigger");

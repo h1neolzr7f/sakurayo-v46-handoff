@@ -1,7 +1,7 @@
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.0";
+  var VERSION = "4.7.0";
   // Live2D Cubism AutoEyeBlinkInput defaults: Mean 2.5, Maximum Deviation 2.
   // https://docs.live2d.com/en/cubism-sdk-tutorials/eyeblink/
   var BLINK = Object.freeze({
@@ -16,6 +16,11 @@
   // CubismLookController damping ~0.15s, then return to center when idle.
   var LOOK = Object.freeze({ damp: 0.16, maxX: 7.2, maxY: 4.8, maxTX: 1.35, maxTY: 0.7, idle: 1.35 });
   var IDLE = Object.freeze({ swayA: 4.7, swayB: 7.3, drift: 5.6, breath: 3.15, hair: 0.22 });
+  var PROFILES = Object.freeze({
+    sayo: Object.freeze({ sway: 0.92, breath: 1, look: 0.92, motion: 0.94 }),
+    aya: Object.freeze({ sway: 0.72, breath: 0.86, look: 1.12, motion: 1.08 }),
+    rion: Object.freeze({ sway: 0.56, breath: 0.74, look: 0.82, motion: 0.78 }),
+  });
   var MOTIONS = Object.freeze({
     tapHead: Object.freeze({ dur: 0.92, fadeIn: 0.1, fadeOut: 0.26, lean: -2.6, lift: 0.7, lookY: -0.38 }),
     tapBody: Object.freeze({ dur: 1.12, fadeIn: 0.12, fadeOut: 0.34, lean: 3.1, lift: -0.45, lookY: 0.18 }),
@@ -34,13 +39,15 @@
     "#menu.homeDock46 .heroLiveBreath46 img,.wishHero46{filter:none!important}" +
     "#menu.homeDock46 .heroLiveBreath46:before{filter:none!important;background:radial-gradient(ellipse at 50% 78%,#1a103066 0%,#12081c00 70%)}" +
     ".drawer.hidden .wishPetals46 i,.drawer.hidden .wishStage46:before{animation:none!important}" +
-    "html.landscape46 #menu.homeDock46 .heroLive46{top:0;bottom:0;left:0;right:auto;width:64%}" +
-    "html.landscape46 #menu.homeDock46 .menu{width:min(34vw,360px);max-width:360px;margin-left:auto}" +
-    "html.landscape46 #menu.homeDock46 #coverTitle36{left:max(16px,env(safe-area-inset-left));right:auto;transform:none;text-align:left}" +
+    "html.landscape46 #menu.homeDock46 .heroLive46{top:0;bottom:0;left:0;right:auto;width:58%}" +
+    "html.landscape46 #menu.homeDock46 .menu{width:100%;max-width:none;margin:0}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 #coverTitle36{display:none}" +
     "html.landscape46 .nav,html.landscape46 .homeNav46{grid-template-columns:repeat(5,minmax(0,1fr))!important}" +
     "html.landscape46 .heroHead46{left:22%;width:18%;top:8%;height:26%}" +
     "html.landscape46 .heroLive46 .heroTap46{left:18%;width:28%;top:34%;bottom:14%}" +
     "html.portraitFallback46 #rotateHint46,html.tallWindow46 #rotateHint46{display:block}" +
+    "html.shortWindow46 .heroHead46{left:22%;width:18%;top:6%;height:26%}" +
+    "html.shortWindow46 .heroLive46 .heroTap46{left:18%;width:28%;top:32%;bottom:14%}" +
     "@media(orientation:landscape){.heroHead46{left:18%;width:16%;top:10%;height:28%}.heroLive46 .heroTap46{left:14%;width:22%;top:36%;bottom:12%}}" +
     "@media(prefers-reduced-motion:reduce){.heroLive46.livePuppet46 .heroLiveSway46,.heroLive46.livePuppet46 .heroLivePhys46,.heroLive46.livePuppet46 .heroLiveBreath46,.heroLive46.livePuppet46 .heroLiveLook46{transform:none!important}}";
 
@@ -109,6 +116,7 @@
       motionT: 0,
       lastKind: "",
       test: !!opts.test,
+      profileId: PROFILES[opts.character] ? opts.character : "sayo",
     };
   }
 
@@ -141,6 +149,7 @@
 
   function stepState(state, dt, rand) {
     dt = clamp(Number(dt) || 0, 0, 0.05);
+    var profile = PROFILES[state.profileId] || PROFILES.sayo;
     state.t += dt;
     state.idleLook += dt;
     if (state.idleLook > LOOK.idle) {
@@ -193,13 +202,13 @@
       }
     }
 
-    var lean = idle.sway + (motion ? motion.lean * weight : 0);
-    var lift = idle.breath * 0.85 + (motion ? motion.lift * weight : 0);
-    var lookY = state.lookY + (motion ? motion.lookY * weight : 0);
+    var lean = idle.sway * profile.sway + (motion ? motion.lean * weight * profile.motion : 0);
+    var lift = idle.breath * 0.85 * profile.breath + (motion ? motion.lift * weight * profile.motion : 0);
+    var lookY = (state.lookY + (motion ? motion.lookY * weight : 0)) * profile.look;
     return {
       sway: lean,
-      x: idle.x + state.lookX * 0.35,
-      breath: idle.breath,
+      x: idle.x * profile.sway + state.lookX * 0.35 * profile.look,
+      breath: idle.breath * profile.breath,
       lift: lift,
       hair: state.hair,
       lookX: state.lookX,
@@ -302,6 +311,7 @@
     if (puppet && puppet.root === root) {
       puppet.opts = opts;
       puppet.state.test = !!opts.test;
+      puppet.state.profileId = PROFILES[opts.character] ? opts.character : "sayo";
       root.classList.add("livePuppet46");
       return snapshot();
     }
@@ -311,7 +321,7 @@
     puppet = {
       root: root,
       nodes: nodes,
-      state: createState({ test: !!opts.test }),
+      state: createState({ test: !!opts.test, character: opts.character }),
       opts: opts,
       last: 0,
       raf: 0,
@@ -380,6 +390,7 @@
       lastKind: puppet.state.lastKind,
       lookX: puppet.state.lookX,
       lookY: puppet.state.lookY,
+      profile: puppet.state.profileId,
       t: puppet.state.t,
     };
   }
@@ -388,6 +399,7 @@
     version: VERSION,
     BLINK: BLINK,
     LOOK: LOOK,
+    PROFILES: PROFILES,
     MOTIONS: MOTIONS,
     nextBlinkWait: nextBlinkWait,
     blinkEnvelope: blinkEnvelope,
