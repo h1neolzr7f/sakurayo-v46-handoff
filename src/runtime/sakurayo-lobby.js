@@ -121,8 +121,8 @@
     "html.landscape46.shortWindow46 .revealHead46 b{font-size:15px}" +
     "html.landscape46.shortWindow46 .revealSum46{margin:4px 0 0;font-size:10px}" +
     "html.landscape46.shortWindow46 .revealActs46{margin-top:6px}" +
-    "html.landscape46.shortWindow46 .revealTake46,html.landscape46.shortWindow46 .revealSkip46,html.landscape46.shortWindow46 .revealAgain46{min-height:42px;padding:0 14px}" +
-    "@media(max-height:430px){html.landscape46 .revealGrid46.ten .revealCard46{height:68px}html.landscape46 .revealGrid46.one .revealCard46{width:132px;height:168px}html.landscape46 .revealHead46 b{font-size:15px}html.landscape46 .revealActs46{margin-top:6px}html.landscape46 .revealTake46,html.landscape46 .revealSkip46,html.landscape46 .revealAgain46{min-height:42px;padding:0 14px}}" +
+    "html.landscape46.shortWindow46 .revealTake46,html.landscape46.shortWindow46 .revealSkip46,html.landscape46.shortWindow46 .revealAgain46{min-height:42px;min-width:72px;padding:0 14px}" +
+    "@media(max-height:430px){html.landscape46 .revealGrid46.ten .revealCard46{height:68px}html.landscape46 .revealGrid46.one .revealCard46{width:132px;height:168px}html.landscape46 .revealHead46 b{font-size:15px}html.landscape46 .revealActs46{margin-top:6px}html.landscape46 .revealTake46,html.landscape46 .revealSkip46,html.landscape46 .revealAgain46{min-height:42px;min-width:72px;padding:0 14px}}" +
     ".revealCard46{position:relative;width:104px;height:146px;perspective:900px}" +
     ".revealGrid46.one .revealCard46{width:196px;height:276px}" +
     ".revealInner46{position:relative;width:100%;height:100%;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transition:transform .7s cubic-bezier(.2,.8,.2,1)}" +
@@ -143,7 +143,7 @@
     ".revealCard46.r-SSR .revealFace46{border-color:#ffe6a3;box-shadow:0 0 22px #ffd36b88}" +
     ".revealCard46.r-SSR.flipped .revealFace46.front{animation:ssrGlow46 1.4s ease-in-out infinite}" +
     ".revealActs46{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:16px}" +
-    ".revealTake46,.revealSkip46,.revealAgain46{min-height:44px;padding:0 22px;border-radius:999px;border:1px solid #ffe6a388;font:800 14px/1 system-ui;letter-spacing:.16em}" +
+    ".revealTake46,.revealSkip46,.revealAgain46{min-height:44px;min-width:72px;padding:0 22px;border-radius:999px;border:1px solid #ffe6a388;font:800 14px/1 system-ui;letter-spacing:.16em}" +
     ".revealTake46{background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;box-shadow:0 10px 24px #05020d66}" +
     ".revealSkip46,.revealAgain46{background:#0b0818cc;color:#fff7fb}" +
     "#gachaReveal46.isTest .revealInner46,#gachaReveal46.isTest .revealFace46.front:after,#gachaReveal46.isTest .revealCard46.r-SSR.flipped .revealFace46.front,#gachaReveal46.isTest:before{transition:none;animation:none}" +
