@@ -23,7 +23,17 @@ assert.equal(L.RATES.pitySSR, 80);
 assert.equal(L.RATES.softPity, 65);
 assert.equal(L.RATES.spark, 200);
 assert.ok(L.CARDS.every((card) => card.r === "R" && card.kind === "scrap"));
+assert.ok(L.CARDS.every((card) => Array.isArray(card.lore) && card.lore.length === 4));
 assert.equal(L.cardOf("last_witness").n, "碎镜后的人");
+assert.match(L.cardOf("last_witness").lore[0], /他不是小夜/);
+["school_shrine","school_idol","school_magical","school_mech","school_spore","school_gun","school_mage","school_alch","school_ninja","school_vamp","school_cult","school_necro","school_gene","school_summon"].forEach((id) => {
+  const art = path.join(root, "android-app/app/src/main/assets/game/art/gacha", id + ".webp");
+  assert.equal(fs.existsSync(art), true, "missing " + id);
+  assert.ok(fs.statSync(art).size > 8000, id + " too small");
+});
+["sayo_echo","aya_petal","rion_edge","night_radio","shrine_seal","void_ticket","cherry_crown","last_witness","banner_bg","card_back","hero_sayo","hero_aya","hero_rion"].forEach((id) => {
+  assert.equal(fs.existsSync(path.join(root, "android-app/app/src/main/assets/game/art/gacha", id + ".webp")), true);
+});
 
 const fresh = { coins: 90, shop40: {} };
 const shop = L.normalizeOps(fresh.shop40);
