@@ -302,8 +302,20 @@ assert.match(modes, /id="modeMainGod46"/);
 assert.match(modes, /回收演习/);
 assert.match(modes, /证词模式/);
 assert.match(modes, /主神空间/);
+assert.match(modes, /高难轮回/);
 assert.match(modes, /id="modeTestimony46"[^>]*class="on"/);
 assert.match(V.renderStageModes("story"), /id="modeStory46"[^>]*class="on"/);
+assert.match(V.renderStageModes("mainGod"), /id="modeMainGod46"[^>]*class="on"/);
+
+const indexSrc = fs.readFileSync(path.join(root, "src/index.html"), "utf8");
+assert.match(indexSrc, /const mainGodOpen36=\(\)=>true/);
+assert.match(indexSrc, /data-mode="mainGod"><b>主神<\/b><small>高难轮回<\/small>/);
+assert.match(indexSrc, /const unlockedGod = mainGodOpen36\(\)/);
+assert.doesNotMatch(indexSrc, /通关第4章后解锁主神空间/);
+assert.doesNotMatch(indexSrc, /unlockedGod = \(save\.done \|\| \[\]\)\.includes\(4\)/);
+assert.doesNotMatch(indexSrc, /if \(!unlockedGod && pendingMode46 === "mainGod"\)/);
+assert.doesNotMatch(indexSrc, /btn\.hidden = !unlockedGod/);
+assert.match(fs.readFileSync(path.join(root, "src/content/packs/maingod-void/pack.js"), "utf8"), /主神空间默认可进/);
 
 const archiveHost = fakeEl("div", { className: "archiveDock46" });
 for (const [id, label] of [["talent", "永久天赋"], ["story", "剧情档案"], ["asc", "职业与飞升"], ["ach", "成就图鉴"]]) {

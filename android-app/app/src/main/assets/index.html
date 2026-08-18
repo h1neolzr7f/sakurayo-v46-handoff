@@ -6173,7 +6173,7 @@ SakurayoContent.loadBundledPack("content/packs/official-feedback/pack.js","(func
 SakurayoContent.loadBundledPack("content/packs/official-modkit-addon/pack.js","(function () {\n  \"use strict\";\n  SakurayoContent.register({\n    id: \"official.modkit-addon\",\n    version: 1,\n    apiVersion: 2,\n    game: { min: \"4.2.0\", maxExclusive: \"5.0.0\" },\n    dependencies: [{ id: \"official.framework-example\", minVersion: 1 }],\n    conflicts: [],\n    title: \"官方 Mod Kit 依赖示例\",\n    description: \"证明内容包可声明依赖，并在不修改核心的情况下追加商店条目、成就、档案和独立存档。\",\n    saveDefaults: { purchases: {}, flags: { inspected: false } },\n    shop: {\n      items: [{\n        id: \"modkit_seal\",\n        n: \"Mod Kit 校验符\",\n        i: \"🧰\",\n        price: 18,\n        max: 1,\n        d: \"依赖 official.framework-example 的官方示例道具；移除依赖包时本包会自动停用，本体仍能启动。\"\n      }]\n    },\n    achievements: [{\n      id: \"dependency_ready\",\n      n: \"依赖链就绪\",\n      i: \"🔗\",\n      d: \"取得 Mod Kit 校验符\",\n      r: 24,\n      condition: { type: \"ownedItem\", itemId: \"modkit_seal\" }\n    }],\n    stories: [{\n      id: \"dependency_notes\",\n      n: \"扩展档案：依赖不是加载顺序\",\n      i: \"🧰\",\n      d: \"清单只决定候选包。真正启用前，运行时会检查格式版本、游戏版本、依赖与冲突，再生成确定顺序。\",\n      unlock: { type: \"ownedItem\", itemId: \"modkit_seal\" }\n    }],\n    texts: { installed: \"Mod Kit 依赖示例已启用\" }\n  });\n})();\n");
 </script>
 <script data-sakurayo-pack="content/packs/maingod-void/pack.js">
-SakurayoContent.loadBundledPack("content/packs/maingod-void/pack.js","(function () {\n  \"use strict\";\n\n  window.SakurayoContent.register({\n    id: \"official.maingod-void\",\n    version: 1,\n    apiVersion: 2,\n    title: \"主神空间 · 虚空圣所\",\n    description:\n      \"通关终章后开放的可自由探索区域。在主神空间最深处的虚空圣所收集监察碎片与回声火花，并见证镜零的异常。\",\n    saveDefaults: {\n      collected: {},\n      visits: {},\n      choices: {},\n    },\n    explorations: [\n      {\n        id: \"void-sanctum\",\n        stageId: \"mainGod\",\n        title: \"虚空圣所\",\n        entryLabel: \"探索虚空圣所\",\n        background: \"content-packs/maingod-void/maps/chapter5.webp\",\n        spawn: [0.5, 0.76],\n        walkable: [\n          { type: \"rect\", x: 0.5, y: 0.76, w: 0.6, h: 0.32 },\n          { type: \"rect\", x: 0.3, y: 0.52, w: 0.48, h: 0.56 },\n          { type: \"rect\", x: 0.68, y: 0.46, w: 0.52, h: 0.6 },\n          { type: \"rect\", x: 0.5, y: 0.3, w: 0.6, h: 0.28 },\n        ],\n        nodes: [\n          {\n            id: \"shard-1\",\n            icon: \"◆\",\n            label: \"监察碎片：它记录着所有轮回者的构筑曲线\",\n            x: 0.26,\n            y: 0.4,\n            reward: { type: \"fragment\", value: \"监察碎片·一\", coins: 42 },\n          },\n          {\n            id: \"shard-2\",\n            icon: \"◆\",\n            label: \"监察碎片：包括你上一次轮回忘记选的技能\",\n            x: 0.72,\n            y: 0.34,\n            reward: { type: \"fragment\", value: \"监察碎片·二\", coins: 42 },\n          },\n          {\n            id: \"echo-1\",\n            icon: \"✦\",\n            label: \"回声火花：虚灵尸在重复别人的死亡姿势\",\n            x: 0.55,\n            y: 0.56,\n            reward: { type: \"fragment\", value: \"回声火花·安魂\", coins: 30 },\n          },\n          {\n            id: \"echo-2\",\n            icon: \"✦\",\n            label: \"回声火花：凛音认出那是黄泉流的安魂调\",\n            x: 0.4,\n            y: 0.26,\n            reward: { type: \"fragment\", value: \"回声火花·摇篮曲\", coins: 30 },\n          },\n          {\n            id: \"clue-1\",\n            icon: \"✧\",\n            label: \"裂口坐标：指向现实层的某个物流仓库\",\n            x: 0.62,\n            y: 0.2,\n            reward: { type: \"fragment\", value: \"裂口坐标\", coins: 55 },\n          },\n        ],\n        events: [\n          {\n            id: \"kagami-glitch\",\n            icon: \"👁\",\n            title: \"镜零的异常\",\n            text: \"镜零的镜像在裂口前闪烁了三次。『监察者读取你的构筑，复制你的短板。下次轮回，带上它没见过的东西。』\",\n            x: 0.5,\n            y: 0.46,\n            choices: [\n              {\n                id: \"listen\",\n                label: \"听完镜零的警告\",\n                description: \"了解主神投影的四阶段权能。\",\n                coins: 80,\n                fragment: \"四阶段权能记录\",\n              },\n              {\n                id: \"pry\",\n                label: \"追问裂口的去向\",\n                description: \"把坐标转交给雨宫凛。\",\n                coins: 60,\n                fragment: \"雨宫凛的回信\",\n              },\n            ],\n          },\n        ],\n      },\n    ],\n  });\n})();\n");
+SakurayoContent.loadBundledPack("content/packs/maingod-void/pack.js","(function () {\n  \"use strict\";\n\n  window.SakurayoContent.register({\n    id: \"official.maingod-void\",\n    version: 1,\n    apiVersion: 2,\n    title: \"主神空间 · 虚空圣所\",\n    description:\n      \"主神空间默认可进。在虚空圣所收集监察碎片与回声火花，并见证镜零的异常。\",\n    saveDefaults: {\n      collected: {},\n      visits: {},\n      choices: {},\n    },\n    explorations: [\n      {\n        id: \"void-sanctum\",\n        stageId: \"mainGod\",\n        title: \"虚空圣所\",\n        entryLabel: \"探索虚空圣所\",\n        background: \"content-packs/maingod-void/maps/chapter5.webp\",\n        spawn: [0.5, 0.76],\n        walkable: [\n          { type: \"rect\", x: 0.5, y: 0.76, w: 0.6, h: 0.32 },\n          { type: \"rect\", x: 0.3, y: 0.52, w: 0.48, h: 0.56 },\n          { type: \"rect\", x: 0.68, y: 0.46, w: 0.52, h: 0.6 },\n          { type: \"rect\", x: 0.5, y: 0.3, w: 0.6, h: 0.28 },\n        ],\n        nodes: [\n          {\n            id: \"shard-1\",\n            icon: \"◆\",\n            label: \"监察碎片：它记录着所有轮回者的构筑曲线\",\n            x: 0.26,\n            y: 0.4,\n            reward: { type: \"fragment\", value: \"监察碎片·一\", coins: 42 },\n          },\n          {\n            id: \"shard-2\",\n            icon: \"◆\",\n            label: \"监察碎片：包括你上一次轮回忘记选的技能\",\n            x: 0.72,\n            y: 0.34,\n            reward: { type: \"fragment\", value: \"监察碎片·二\", coins: 42 },\n          },\n          {\n            id: \"echo-1\",\n            icon: \"✦\",\n            label: \"回声火花：虚灵尸在重复别人的死亡姿势\",\n            x: 0.55,\n            y: 0.56,\n            reward: { type: \"fragment\", value: \"回声火花·安魂\", coins: 30 },\n          },\n          {\n            id: \"echo-2\",\n            icon: \"✦\",\n            label: \"回声火花：凛音认出那是黄泉流的安魂调\",\n            x: 0.4,\n            y: 0.26,\n            reward: { type: \"fragment\", value: \"回声火花·摇篮曲\", coins: 30 },\n          },\n          {\n            id: \"clue-1\",\n            icon: \"✧\",\n            label: \"裂口坐标：指向现实层的某个物流仓库\",\n            x: 0.62,\n            y: 0.2,\n            reward: { type: \"fragment\", value: \"裂口坐标\", coins: 55 },\n          },\n        ],\n        events: [\n          {\n            id: \"kagami-glitch\",\n            icon: \"👁\",\n            title: \"镜零的异常\",\n            text: \"镜零的镜像在裂口前闪烁了三次。『监察者读取你的构筑，复制你的短板。下次轮回，带上它没见过的东西。』\",\n            x: 0.5,\n            y: 0.46,\n            choices: [\n              {\n                id: \"listen\",\n                label: \"听完镜零的警告\",\n                description: \"了解主神投影的四阶段权能。\",\n                coins: 80,\n                fragment: \"四阶段权能记录\",\n              },\n              {\n                id: \"pry\",\n                label: \"追问裂口的去向\",\n                description: \"把坐标转交给雨宫凛。\",\n                coins: 60,\n                fragment: \"雨宫凛的回信\",\n              },\n            ],\n          },\n        ],\n      },\n    ],\n  });\n})();\n");
 </script>
 <script data-sakurayo-pack="content/packs/broken-fixture/pack.js">
 if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoContent.loadBundledPack("content/packs/broken-fixture/pack.js","(function () {\n  \"use strict\";\n  SakurayoContent.register({\n    id: \"fixture.broken-content\",\n    version: 1,\n    title: \"故意损坏的回归夹具\",\n    shop: { costumes: \"this-must-be-an-array\" }\n  });\n})();\n");}
@@ -8313,17 +8313,18 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   const fusionData = () => FUSION.find((f) => f.id === P.fusion);
 
   const MAIN_GOD_TIERS36=[
-    {tier:1,name:"回廊试炼",dur:105,scale:1.72,points:12,xp:2.8},
-    {tier:2,name:"权能试炼",dur:125,scale:2.02,points:20,xp:3.2},
-    {tier:3,name:"轮回试炼",dur:145,scale:2.34,points:32,xp:3.6},
-    {tier:4,name:"无限回廊",dur:165,scale:2.65,points:42,xp:4.0,endless:true},
+    {tier:1,name:"回廊试炼",dur:72,scale:1.58,points:14,xp:3.4},
+    {tier:2,name:"权能试炼",dur:88,scale:1.88,points:22,xp:3.8},
+    {tier:3,name:"轮回试炼",dur:104,scale:2.18,points:34,xp:4.2},
+    {tier:4,name:"无限回廊",dur:118,scale:2.48,points:44,xp:4.6,endless:true},
   ];
   const MAIN_GOD_DEF36={points:0,unlockedTier:1,bestTier:0,clears:0,runs:0,deepest:0,contracts:{},challenges:{},power:0,vitality:0,tempo:0,resonance:0,fortune:0,regenBlood:0,psiLink:0,gunBlade:0,mageCircuit:0,summonPage:0,spaceRing:0,rebirthDoll:0,sideKey:0};
   save.mainGod={...MAIN_GOD_DEF36,...(save.mainGod||{})};
   let runMode36="story",selectedMainGodTier36=1,pendingMode46="story";
   const isMainGodRun36=()=>runMode36==="mainGod";
+  const mainGodOpen36=()=>true;
   const mainGodTier36=()=>MAIN_GOD_TIERS36[selectedMainGodTier36-1]||MAIN_GOD_TIERS36[0];
-  const mainGodStage36=()=>{const t=mainGodTier36(),depth=t.endless?Math.max(1,P?.mgDepth||(save.mainGod.deepest||0)+1):0,deepMul=t.endless?1+(depth-1)*.09:1;return {id:4,mechanicsId:4,key:t.endless?`mainGod-4-${depth}`:`mainGod-${t.tier}`,no:t.endless?`∞-${depth}`:`EX-${t.tier}`,name:`主神空间 · ${t.name}${depth?` 第${depth}层`:""}`,short:t.endless?`无限回廊 · 第${depth}层`:`主神空间 T${t.tier}`,desc:"白色回廊每三层换一次色温。高压尸潮、加速成长，活到最后才能带走奖励点。",dur:t.dur+Math.min(45,Math.max(0,depth-1)*4),scale:t.scale*deepMul,reward:0,pointReward:t.points+Math.min(30,Math.max(0,depth-1)*3)+(P?.mgChallengeBonus||0),boss:"主神投影·轮回监察者",story:null,img:ST[3].img,depth};};
+  const mainGodStage36=()=>{const t=mainGodTier36(),depth=t.endless?Math.max(1,P?.mgDepth||(save.mainGod.deepest||0)+1):0,deepMul=t.endless?1+(depth-1)*.09:1;return {id:4,mechanicsId:4,key:t.endless?`mainGod-4-${depth}`:`mainGod-${t.tier}`,no:t.endless?`∞-${depth}`:`EX-${t.tier}`,name:`主神空间 · ${t.name}${depth?` 第${depth}层`:""}`,short:t.endless?`无限回廊 · 第${depth}层`:`主神空间 T${t.tier}`,desc:"白色回廊高压尸潮。经验加速、升级立刻加伤，击碎监察投影带走奖励点。",dur:t.dur+Math.min(24,Math.max(0,depth-1)*3),scale:t.scale*deepMul,reward:0,pointReward:t.points+Math.min(30,Math.max(0,depth-1)*3)+(P?.mgChallengeBonus||0),boss:"主神投影·轮回监察者",story:null,img:artUrl("content-packs/maingod-void/maps/void_arena.webp"),depth};};
   const stage = () => isMainGodRun36()?mainGodStage36():ST[selected - 1],
     fmt = (x) =>
       `${String(Math.floor(x / 60)).padStart(2, "0")}:${String(Math.floor(x % 60)).padStart(2, "0")}`;
@@ -8582,10 +8583,10 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
         };
       box.appendChild(d);
     });
-    const unlocked=save.done.includes(4),t=mainGodTier36(),card=document.createElement("div");
+    const unlocked=mainGodOpen36(),t=mainGodTier36(),card=document.createElement("div");
     card.className="stageCard mainGodCard36"+(unlocked?"":" lock");
     card.dataset.stageId="mainGod";
-    card.innerHTML=`<img src="${ST[3].img}"><div class="i"><h3>◈ 主神空间 · 高难爽发育</h3><p>终章后开放。经验倍率 ${t.xp.toFixed(2)}×；局内构筑轮回清空，兑换强化跨局保留。<br>当前：${t.endless?`无限回廊第${Math.max(1,(save.mainGod.deepest||0)+1)}层`:`T${t.tier} ${t.name}`} · 奖励点 ${save.mainGod.points}</p><div class="tierPick37"><button class="tierPrev37" ${!unlocked||selectedMainGodTier36<=1?"disabled":""}>◀</button><span>难度 ${t.endless?"∞":`T${t.tier}`}</span><button class="tierNext37" ${!unlocked||selectedMainGodTier36>=Math.min(4,save.mainGod.unlockedTier)?"disabled":""}>▶</button></div><div class="mainGodActions36"><button class="enter36" ${unlocked?"":"disabled"}>${unlocked?(isMainGodRun36()?"已选择":"进入轮回"):"通关终章后解锁"}</button><button class="exchange36" ${unlocked?"":"disabled"}>◈ 主神兑换大厅</button></div></div><div class="rankTag">最高 T${save.mainGod.bestTier}${save.mainGod.deepest?` · ∞${save.mainGod.deepest}`:""}</div>${unlocked?"":'<div class="lockmark">🔒</div>'}`;
+    card.innerHTML=`<img src="${artUrl("content-packs/maingod-void/maps/void_arena.webp")}"><div class="i"><h3>◈ 主神空间 · 高难爽发育</h3><p>默认开放。经验倍率 ${t.xp.toFixed(2)}×；局内构筑轮回清空，兑换强化跨局保留。<br>当前：${t.endless?`无限回廊第${Math.max(1,(save.mainGod.deepest||0)+1)}层`:`T${t.tier} ${t.name}`} · 奖励点 ${save.mainGod.points}</p><div class="tierPick37"><button class="tierPrev37" ${!unlocked||selectedMainGodTier36<=1?"disabled":""}>◀</button><span>难度 ${t.endless?"∞":`T${t.tier}`}</span><button class="tierNext37" ${!unlocked||selectedMainGodTier36>=Math.min(4,save.mainGod.unlockedTier)?"disabled":""}>▶</button></div><div class="mainGodActions36"><button class="enter36" ${unlocked?"":"disabled"}>${unlocked?(isMainGodRun36()?"已选择":"进入轮回"):"通关终章后解锁"}</button><button class="exchange36" ${unlocked?"":"disabled"}>◈ 主神兑换大厅</button></div></div><div class="rankTag">最高 T${save.mainGod.bestTier}${save.mainGod.deepest?` · ∞${save.mainGod.deepest}`:""}</div>${unlocked?"":'<div class="lockmark">🔒</div>'}`;
     if(unlocked){card.querySelector(".tierPrev37").onclick=()=>{selectedMainGodTier36=Math.max(1,selectedMainGodTier36-1);renderStages();};card.querySelector(".tierNext37").onclick=()=>{selectedMainGodTier36=Math.min(Math.min(4,save.mainGod.unlockedTier),selectedMainGodTier36+1);renderStages();};card.querySelector(".enter36").onclick=()=>{runMode36="mainGod";pendingMode46="mainGod";selectedMainGodTier36=Math.min(save.mainGod.unlockedTier,Math.max(1,selectedMainGodTier36));menuUpdate();closeDrawers();toast(selectedMainGodTier36===4?`无限回廊 第${Math.max(1,(save.mainGod.deepest||0)+1)}层`:`主神空间 T${selectedMainGodTier36}`);};card.querySelector(".exchange36").onclick=()=>openMainGodShop36();}
     box.appendChild(card);
   }
@@ -8799,7 +8800,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
         : `${c.short}执行节点回收。目标：${s.boss}。四阶段机制已写入战术终端。`,
       bg,
       portrait,
-      hold: 1800,
+      hold: mg ? 1100 : 1800,
     }];
   }
   function startGame() {
@@ -9610,6 +9611,9 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
                     : r > 0.92 && unlockEnemy("specter", w)
                       ? "specter"
                       : "normal";
+    }
+    if (!forced && isMainGodRun36() && (type === "normal" || type === "fast")) {
+      if (r > 0.58) type = r > 0.9 ? "voidmaw" : "voidling";
     }
     if (!EDEF[type]) type = "normal";
     if (
@@ -12429,13 +12433,13 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   };
   function triggerEgg36(key,force=true){const seen=`egg36:${save.character}:${key}`;if(P.banterSeen.has(seen))return;const lines=CHARACTER_EGGS36[save.character]?.[key];if(!lines)return;P.banterSeen.add(seen);showBanter(lines,force);}
 
-  const _resetP36=resetP;resetP=function(){_resetP36();P.aimX=P.fx;P.aimY=P.fy;P.weaponAngle=Math.atan2(P.fy,P.fx);P.manualAim=false;P.weaponLock=0;P.moveX=P.moveY=0;P.banterSeen.add("lowhp");P.banterSeen.add("combo80");P.banterSeen.add("rankD");P.eggPrevKills=0;P.eggPrevBossPhase=0;P.eggFusion=null;P.eggForm=null;if(isMainGodRun36()){const m=save.mainGod,t=mainGodTier36();P.lordMode=1;P.dmg*=1.15*(1+m.power*.06)*(1+m.gunBlade*.05);P.maxHp*=1+m.vitality*.08+m.regenBlood*.06;P.hp=P.maxHp;P.regen+=m.regenBlood*.35;P.maxSh+=28+m.psiLink*22;P.sh=P.maxSh;P.skillPow*=1+m.psiLink*.08+m.mageCircuit*.1;P.spellPow*=1+m.mageCircuit*.1;P.rate/=(1.12+m.tempo*.04);P.skillCd*=.88*(1-m.tempo*.04);P.dashCd*=.9*(1-m.tempo*.04);P.bSpeed*=1+m.gunBlade*.05;P.bladePower*=1+m.gunBlade*.05;P.multi=Math.max(P.multi,2)+(m.spaceRing?1:0);P.pierce+=1+(m.spaceRing?1:0);P.next=Math.max(5,Math.floor(P.next*.68));P.lordXp=t.xp*(1+m.resonance*.12);P.mag*=m.spaceRing?2.1:1.55;P.revive=Math.max(P.revive,m.rebirthDoll?1:0);if(m.summonPage){P.familiar+=1;P.petPow*=1+m.summonPage*.15;syncPets();}levelRerolls+=2+m.fortune;}};
+  const _resetP36=resetP;resetP=function(){_resetP36();P.aimX=P.fx;P.aimY=P.fy;P.weaponAngle=Math.atan2(P.fy,P.fx);P.manualAim=false;P.weaponLock=0;P.moveX=P.moveY=0;P.banterSeen.add("lowhp");P.banterSeen.add("combo80");P.banterSeen.add("rankD");P.eggPrevKills=0;P.eggPrevBossPhase=0;P.eggFusion=null;P.eggForm=null;if(isMainGodRun36()){const m=save.mainGod,t=mainGodTier36();P.lordMode=1;P.dmg*=1.15*(1+m.power*.06)*(1+m.gunBlade*.05);P.maxHp*=1+m.vitality*.08+m.regenBlood*.06;P.hp=P.maxHp;P.regen+=m.regenBlood*.35;P.maxSh+=28+m.psiLink*22;P.sh=P.maxSh;P.skillPow*=1+m.psiLink*.08+m.mageCircuit*.1;P.spellPow*=1+m.mageCircuit*.1;P.rate/=(1.12+m.tempo*.04);P.skillCd*=.88*(1-m.tempo*.04);P.dashCd*=.9*(1-m.tempo*.04);P.bSpeed*=1+m.gunBlade*.05;P.bladePower*=1+m.gunBlade*.05;P.multi=Math.max(P.multi,2)+(m.spaceRing?1:0);P.pierce+=1+(m.spaceRing?1:0);P.next=Math.max(5,Math.floor(P.next*.55));P.lordXp=t.xp*(1+m.resonance*.12);P.mag*=m.spaceRing?2.1:1.55;P.revive=Math.max(P.revive,m.rebirthDoll?1:0);if(m.summonPage){P.familiar+=1;P.petPow*=1+m.summonPage*.15;syncPets();}levelRerolls+=2+m.fortune;}};
   const _gainXp36=gainXp;gainXp=function(v){const before=P.level,result=_gainXp36(v*(isMainGodRun36()?(P.lordXp||mainGodTier36().xp):1));if(isMainGodRun36()&&P.level>before){P.dmg*=1.025;P.hp=Math.min(P.maxHp,P.hp+P.maxHp*.08);if(P.level%3===0)P.pierce=Math.min(12,P.pierce+1);if(P.level%5===0)P.multi=Math.min(7,P.multi+1);toast(`主神灌注 · Lv.${P.level}`);}return result;};
   const _update36=update;update=function(dt){const result=_update36(dt);if(state==="play"){if(!P.manualAim){const target=nearest(P.x,P.y,P.range);if(target)setAimVector36(target.x-P.x,target.y-P.y,false);else if(P.moveX||P.moveY)setAimVector36(P.moveX,P.moveY,false);}if(isMainGodRun36()){if($("#mission"))$("#mission").textContent=`轮回 T${selectedMainGodTier36} · ${mainGodTier36().xp.toFixed(1)}×`;if(runTime>.3)triggerEgg36("entry");}if(P.kills>0)triggerEgg36("firstKill",false);if(P.hp/P.maxHp<.23)triggerEgg36("lowhp");if(P.combo>=80)triggerEgg36("combo",false);if(P.plan?.rank==="D")triggerEgg36("rankD");if(boss?.phase===4)triggerEgg36("boss4");if(P.fusion&&P.fusion!==P.eggFusion){P.eggFusion=P.fusion;triggerEgg36("fusion");}if(P.form&&P.form!==P.eggForm){P.eggForm=P.form;triggerEgg36("asc");}}return result;};
 
   function renderMainGodEvent36(){const idx=eventIndex++;hideTransient();state="event";$("#hud").classList.add("hidden");$("#event").classList.remove("hidden");const data=idx===0?{t:"主神契约 · 第一次结算",x:"光球允许你在安全和收益之间选择。它强调：自愿只代表你按下过按钮。",o:[["修复轮回体","生命与护盾回满",()=>{P.hp=P.maxHp;P.sh=P.maxSh;}],["签署高危条款","全伤害 +25%，受到伤害 +18%",()=>{P.dmg*=1.25;P.lordRisk=1.18;}]]}:{t:"主神契约 · 预测删除",x:"监管层开始用上一轮死亡数据预测你的构筑。你只能删除一部分未来。",o:[["灌注战斗经验","伤害 +10%，立即获得两级强度",()=>{P.dmg*=1.1;P.maxHp+=12;P.hp+=12;}],["删除 Boss 适应","Boss 抗性穿透 +18%，失去一次重抽",()=>{P.bossPierce+=.18;levelRerolls=Math.max(0,levelRerolls-1);}]]};$("#eventTitle").textContent=data.t;$("#eventText").textContent=data.x;const box=$("#eventChoices");box.innerHTML="";for(const [name,desc,effect] of data.o){const b=document.createElement("button");b.className="eventChoice";b.innerHTML=`<b>${name}</b><p>${desc}</p>`;b.onclick=()=>{effect();refreshPlan();$("#event").classList.add("hidden");$("#hud").classList.remove("hidden");state="play";toast(`主神契约：${name}`);showBanter([["主神",`选择已记录：${name}。代价不会退款。`],[char35().short,"你们连退款条款都省了？"]],true);last=performance.now();scheduleLoop();};box.appendChild(b);}}
   const _midEvent36=midEvent;midEvent=function(){if(isMainGodRun36())return renderMainGodEvent36();return _midEvent36();};
-  const _opening36=openingDialogue;openingDialogue=function(){if(!isMainGodRun36())return _opening36();return [{sp:"主神",tx:"轮回者编号确认。任务：在白色监管层投放的尸潮中存活，并清除监察投影。"},{sp:char35().short,tx:char35().id==="sayo"?"编号可以记，名字别写错。奖励点也别少一个零。":char35().id==="aya"?"我见过把人格写成资产的系统。你只是把合同换成了任务。":"黄泉流不接受无名委托。但我会斩完，再问你为何困住亡者。"},{sp:"主神",tx:"本副本经验获取加速。死亡会终止结算，强化仅在主神空间保留。"},{sp:"雨宫凛",tx:"信号无法穿透白色大厅。我只能提醒你：会主动解释规则的系统，通常藏着更贵的代价。"}];};
+  const _opening36=openingDialogue;openingDialogue=function(){if(!isMainGodRun36())return _opening36();return [{sp:"主神",tx:"轮回确认。高压尸潮，经验加速，击碎监察投影结算奖励点。"},{sp:char35().short,tx:char35().id==="sayo"?"少废话。奖励点别少一个零。":char35().id==="aya"?"合同我签过。这次只负责打完。":"先斩投影，再问光球后面是谁。"}];};
   const _bossDialogue36=bossDialogue;bossDialogue=function(){if(!isMainGodRun36())return _bossDialogue36();return [{sp:"警报",tx:"主神投影·轮回监察者降临。它读取过往构筑并拥有四阶段权能。"},{sp:"主神",tx:"成长曲线已达到回收阈值。现在证明奖励点没有被浪费。"},{sp:char35().short,tx:char35().id==="rion"?"奖励点留着。先把你从光球里斩出来。":"你想看构筑答案？那就站稳，别在第四阶段改题。"}];};
   const _bossPhaseDialogue36=bossPhaseDialogue;bossPhaseDialogue=function(p){if(!isMainGodRun36())return _bossPhaseDialogue36(p);return [[{sp:"主神",tx:"第二权限开放：复制轮回者的短板。"},{sp:char35().short,tx:"复制得了数值，复制不了临场决定。"}],[{sp:"主神",tx:"第三权限开放：以失败记录训练新的监察体。"},{sp:"雨宫凛",tx:"它在用你之前的死亡喂养自己。别按旧路线走。"}],[{sp:"主神",tx:"最终权限：本轮回不存在撤退选项。"},{sp:char35().short,tx:"很好。我选的本来就是让你停机。"}]][clamp(p-2,0,2)];};
   const _endingDialogue36=endingDialogue;endingDialogue=function(){if(!isMainGodRun36())return _endingDialogue36();return [{sp:"主神",tx:`试炼完成。奖励点 ${mainGodTier36().points} 已进入轮回账户。监管层将保留你的强化与战斗记录。`},{sp:char35().short,tx:"你保存强化，我保存疑问。下一次回来，我会查清是谁在光球后面记账。"},{sp:"雨宫凛",tx:"频道恢复。你消失了不到一分钟，但日志里多出了数百次死亡校验。主神空间的时间不是单向的。"}];};
@@ -12460,7 +12464,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   ];
   const MAIN_GOD_CHALLENGES37=[
     {id:"untouched",n:"无伤校验",d:"通关且未受到伤害",bonus:10,ok:()=>P.damageTaken<=0},
-    {id:"hunter",n:"过量清除",d:"击破至少 140 个敌人",bonus:7,ok:()=>P.kills>=140},
+    {id:"hunter",n:"过量清除",d:"击破至少 100 个敌人",bonus:7,ok:()=>P.kills>=100},
     {id:"growth",n:"高速进化",d:"达到 18 级",bonus:7,ok:()=>P.level>=18},
     {id:"specialist",n:"单核构筑",d:"通关时成型职业不超过 2 个",bonus:8,ok:()=>Object.values(P.careerFormed||{}).filter(Boolean).length<=2},
     {id:"ascend",n:"协议突破",d:"完成融合或飞升",bonus:6,ok:()=>!!(P.fusion||P.form)},
@@ -12471,7 +12475,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function resetMainGodBuild37(){const refund=totalMainGodInvestment37();if(!refund)return false;if(!confirm(`重置全部主神兑换并返还 ◈ ${refund}？关卡进度、契约记录和深层纪录不会清除。`))return false;for(const id of [...Object.keys(MAIN_GOD_UPGRADES36),...Object.keys(MAIN_GOD_ITEMS36)])save.mainGod[id]=0;save.mainGod.points+=refund;persist();renderMainGodShop36();toast(`已返还 ◈ ${refund}`);return true;}
   const _renderMainGodShop37=renderMainGodShop36;renderMainGodShop36=function(){_renderMainGodShop37();const balance=$("#mainGodBalance36");if(balance&&!$("#mgReset37")){const meta=document.createElement("div");meta.className="mgMeta37";meta.innerHTML=`<span>完成 ${save.mainGod.clears} 次</span><span>无限回廊 ${save.mainGod.deepest||0} 层</span><button id="mgReset37">重置兑换 · 返还 ◈ ${totalMainGodInvestment37()}</button>`;balance.appendChild(meta);meta.querySelector("button").onclick=resetMainGodBuild37;}};
   const _resetP37=resetP;resetP=function(){_resetP37();if(isMainGodRun36()){P.mgDepth=selectedMainGodTier36===4?Math.max(1,(save.mainGod.deepest||0)+1):0;P.mgContractPrompted=0;P.mgContract=null;P.mgChallenge=randomOffers37(MAIN_GOD_CHALLENGES37,1)[0];P.mgChallengeDone=false;P.mgChallengeBonus=0;P.mgPressure=0;}};
-  const _update37=update;update=function(dt){const result=_update37(dt);if(state==="play"&&isMainGodRun36()){if(!P.mgContractPrompted&&runTime>.18){showMainGodContract37();return result;}if(P.mgPressure)P.pressure=(P.pressure||1)*(1+P.mgPressure*dt/Math.max(1,stage().dur));if($("#mission")&&P.mgContract)$("#mission").textContent=`${stage().short} · ${P.mgContract.n} · 挑战：${P.mgChallenge.n}`;}return result;};
+  const _update37=update;update=function(dt){const result=_update37(dt);if(state==="play"&&isMainGodRun36()){if(!P.mgContractPrompted&&runTime>(TEST_MODE?0.18:8)){showMainGodContract37();return result;}if(P.mgPressure)P.pressure=(P.pressure||1)*(1+P.mgPressure*dt/Math.max(1,stage().dur));if($("#mission")&&P.mgContract)$("#mission").textContent=`${stage().short} · ${P.mgContract.n} · 挑战：${P.mgChallenge.n}`;}return result;};
   const _finish37=finish;finish=function(win){if(isMainGodRun36()){P.mgChallengeDone=!!win&&!!P.mgChallenge?.ok();P.mgChallengeBonus=P.mgChallengeDone?(P.mgChallenge.bonus||0):0;if(P.mgChallengeDone)save.mainGod.challenges[P.mgChallenge.id]=(save.mainGod.challenges[P.mgChallenge.id]||0)+1;}return _finish37(win);};
   const style37=document.createElement("style");style37.textContent=`.tierPick37{display:flex;align-items:center;gap:8px;margin:7px 0}.tierPick37 span{min-width:72px;text-align:center;color:#ffe9a9;font-weight:800}.tierPick37 button{min-width:40px;padding:7px}.mgMeta37{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:8px}.mgMeta37 span{padding:5px 8px;border-radius:10px;background:#ffffff12}.mgMeta37 button{margin-left:auto;background:#33264d;color:#ffe5a4;border:1px solid #a887df;border-radius:10px;padding:7px 10px}`;document.head.appendChild(style37);
 
@@ -13008,7 +13012,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   addEventListener("keydown",e=>{if(exploration41){exploreKeys41[e.key.toLowerCase()]=1;e.preventDefault();}});
   addEventListener("keyup",e=>{exploreKeys41[e.key.toLowerCase()]=0;});
   const _renderStagesExtension41=renderStages;
-  renderStages=function(){const result=_renderStagesExtension41();for(const scene of CONTENT41?.content("explorations")||[]){const isMG=scene.stageId==="mainGod";const card=document.querySelector(`.stageCard[data-stage-id="${isMG?"mainGod":Number(scene.stageId)}"]`);if(!card)continue;if(isMG){if(!save.done.includes(4))continue;}else if(Number(scene.stageId)>save.unlock)continue;const area=card.querySelector(".i"),button=document.createElement("button");button.className="exploreEntry41";button.textContent=scene.entryLabel||"探索地图";button.onclick=e=>{e.stopPropagation();openExploration41(scene);};area?.appendChild(button);}return result;};
+  renderStages=function(){const result=_renderStagesExtension41();for(const scene of CONTENT41?.content("explorations")||[]){const isMG=scene.stageId==="mainGod";const card=document.querySelector(`.stageCard[data-stage-id="${isMG?"mainGod":Number(scene.stageId)}"]`);if(!card)continue;if(isMG){if(!mainGodOpen36())continue;}else if(Number(scene.stageId)>save.unlock)continue;const area=card.querySelector(".i"),button=document.createElement("button");button.className="exploreEntry41";button.textContent=scene.entryLabel||"探索地图";button.onclick=e=>{e.stopPropagation();openExploration41(scene);};area?.appendChild(button);}return result;};
 
   /* ================= V4.1.2 EXPLORATION / LAZY ART / COMBAT READABILITY ================= */
   function explorationData412(){return exploration41?extensionState41(exploration41.scene.__packId):null;}
@@ -13477,7 +13481,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       const modes = document.createElement("div");
       modes.id = "homeModes46";
       modes.className = "homeModes46";
-      modes.innerHTML = '<button type="button" data-mode="story"><b>回收</b><small>四章</small></button><button type="button" data-mode="testimony"><b>证词</b><small>无升级卡</small></button><button type="button" data-mode="mainGod"><b>主神</b><small>通关第4章</small></button>';
+      modes.innerHTML = '<button type="button" data-mode="story"><b>回收</b><small>四章</small></button><button type="button" data-mode="testimony"><b>证词</b><small>无升级卡</small></button><button type="button" data-mode="mainGod"><b>主神</b><small>高难轮回</small></button>';
       deck.appendChild(modes);
       if (start) deck.appendChild(start);
       modes.addEventListener("click", ev => {
@@ -13487,7 +13491,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     }
     const modesHost = $("#homeModes46");
     if (modesHost && !modesHost.querySelector("[data-mode=story]")) {
-      modesHost.innerHTML = '<button type="button" data-mode="story"><b>回收</b><small>四章</small></button><button type="button" data-mode="testimony"><b>证词</b><small>无升级卡</small></button><button type="button" data-mode="mainGod"><b>主神</b><small>通关第4章</small></button>';
+      modesHost.innerHTML = '<button type="button" data-mode="story"><b>回收</b><small>四章</small></button><button type="button" data-mode="testimony"><b>证词</b><small>无升级卡</small></button><button type="button" data-mode="mainGod"><b>主神</b><small>高难轮回</small></button>';
     }
     const mini = host.querySelector(".stageMini");
     if (mini && !mini.dataset.homeBound46) {
@@ -13560,12 +13564,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   }
   function pickHomeMode46(mode){
     if (mode === "mainGod") {
-      if (!save.done.includes(4)) {
-        toast("通关第4章后解锁主神空间");
-        pendingMode46 = "story";
-        paintHomeCommand46();
-        return;
-      }
+      if (!mainGodOpen36()) return;
       pendingMode46 = "mainGod";
       runMode36 = "mainGod";
       toast(selectedMainGodTier36 === 4 ? `无限回廊 第${Math.max(1, (save.mainGod.deepest || 0) + 1)}层` : `主神空间 T${selectedMainGodTier36}`);
@@ -13581,12 +13580,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   }
   function applyPendingMode46(){
     if (pendingMode46 === "mainGod") {
-      if (!save.done.includes(4)) {
-        toast("通关第4章后解锁主神空间");
-        pendingMode46 = "story";
-        runMode36 = "story";
-        return true;
-      }
+      if (!mainGodOpen36()) return true;
       runMode36 = "mainGod";
       return true;
     }
@@ -13606,18 +13600,14 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     if (lab) lab.textContent = pct + "%";
     const rankBar = $(".homeRankBar46 i");
     if (rankBar) rankBar.style.width = pct + "%";
-    const unlockedGod = (save.done || []).includes(4);
-    if (!unlockedGod && pendingMode46 === "mainGod") {
-      pendingMode46 = "story";
-      runMode36 = "story";
-    }
+    const unlockedGod = mainGodOpen36();
     const modesHost = $("#homeModes46");
-    if (modesHost) modesHost.classList.toggle("two46", !unlockedGod);
+    if (modesHost) modesHost.classList.remove("two46");
     $$("#homeModes46 [data-mode]").forEach(btn => {
       const mode = btn.getAttribute("data-mode");
       if (mode === "mainGod") {
-        btn.hidden = !unlockedGod;
-        btn.classList.toggle("away46", !unlockedGod);
+        btn.hidden = false;
+        btn.classList.remove("away46");
         btn.classList.toggle("lock", !unlockedGod);
       }
       btn.classList.toggle("on", mode === pendingMode46);

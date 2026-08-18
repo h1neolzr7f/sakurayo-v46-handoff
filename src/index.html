@@ -7581,12 +7581,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
   }
   function pickHomeMode46(mode){
     if (mode === "mainGod") {
-      if (!save.done.includes(4)) {
-        toast("通关第4章后解锁主神空间");
-        pendingMode46 = "story";
-        paintHomeCommand46();
-        return;
-      }
+      if (!mainGodOpen36()) return;
       pendingMode46 = "mainGod";
       runMode36 = "mainGod";
       toast(selectedMainGodTier36 === 4 ? `无限回廊 第${Math.max(1, (save.mainGod.deepest || 0) + 1)}层` : `主神空间 T${selectedMainGodTier36}`);
@@ -7602,12 +7597,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
   }
   function applyPendingMode46(){
     if (pendingMode46 === "mainGod") {
-      if (!save.done.includes(4)) {
-        toast("通关第4章后解锁主神空间");
-        pendingMode46 = "story";
-        runMode36 = "story";
-        return true;
-      }
+      if (!mainGodOpen36()) return true;
       runMode36 = "mainGod";
       return true;
     }
@@ -7627,18 +7617,14 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     if (lab) lab.textContent = pct + "%";
     const rankBar = $(".homeRankBar46 i");
     if (rankBar) rankBar.style.width = pct + "%";
-    const unlockedGod = (save.done || []).includes(4);
-    if (!unlockedGod && pendingMode46 === "mainGod") {
-      pendingMode46 = "story";
-      runMode36 = "story";
-    }
+    const unlockedGod = mainGodOpen36();
     const modesHost = $("#homeModes46");
-    if (modesHost) modesHost.classList.toggle("two46", !unlockedGod);
+    if (modesHost) modesHost.classList.remove("two46");
     $$("#homeModes46 [data-mode]").forEach(btn => {
       const mode = btn.getAttribute("data-mode");
       if (mode === "mainGod") {
-        btn.hidden = !unlockedGod;
-        btn.classList.toggle("away46", !unlockedGod);
+        btn.hidden = false;
+        btn.classList.remove("away46");
         btn.classList.toggle("lock", !unlockedGod);
       }
       btn.classList.toggle("on", mode === pendingMode46);
