@@ -14,7 +14,7 @@ android {
         applicationId "com.sakurayo.yeying.dev"
         minSdk 23
         targetSdk 36
-        versionCode 6104
+        versionCode 6105
         versionName "4.6.0-yeying"
     }
 
