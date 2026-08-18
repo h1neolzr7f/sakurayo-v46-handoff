@@ -31,5 +31,6 @@
 | 412px 寻访条抢左栏/底栏 | `@media(max-height:430px)` 藏 `#homeBanner46`，左栏落到底栏之上 | 再只在 409px 才藏条，让 412px 手机露出 50px 图标 |
 | 结算诊断看不清 | `#rstats`/`#damageReport` 实心底 `#161028`；矮横屏结算不铺闪图、去掉 overlay 模糊 | 再给结算盖闪图，或把诊断做成 `#ffffff08` |
 | 寻访斜切热区 | 430px 高 `#gachaPull1`/`#gachaPull10` `clip-path:none` | 再给单抽/十连切掉四角却让底板接点击 |
+| 寻访「跳过」点不到 | 揭示钮 `min-width:72px`，430px 高仍保底 72×42 | 再只缩 padding 让「跳过」收到 62px |
 
 选择器与测试 API 仍以 [HANDOFF.md](HANDOFF.md) 为准。`selectStage` 永远把 `runMode36` 写成 `"story"`。

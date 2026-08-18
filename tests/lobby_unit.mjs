@@ -106,6 +106,7 @@ assert.match(lobbySrc, /@media\(orientation:landscape\)\{/);
 assert.match(lobbySrc, /homeBanner46\{display:grid;.*left:max\(80px/);
 assert.match(lobbySrc, /shortWindow46 \.revealGrid46\.ten \.revealCard46\{height:68px\}/);
 assert.match(lobbySrc, /@media\(max-height:430px\)\{html\.landscape46 \.revealGrid46\.ten \.revealCard46\{height:68px\}/);
+assert.match(lobbySrc, /revealSkip46.*min-width:72px/);
 assert.doesNotMatch(lobbySrc, /12天22时/);
 assert.doesNotMatch(fs.readFileSync(path.join(root, "src/runtime/sakurayo-lobby.js"), "utf8"), /orientation:landscape\) and \(min-width:700px\)/);
 assert.match(fs.readFileSync(path.join(root, "src/index.html"), "utf8"), /class="landscape46"/);
