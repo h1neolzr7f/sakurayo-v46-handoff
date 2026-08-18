@@ -1853,8 +1853,13 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     var node = ensureFlash();
     if (!node) return;
     node.classList.remove("on");
-    void node.offsetWidth;
-    node.classList.add("on");
+    if (global.requestAnimationFrame) {
+      global.requestAnimationFrame(function () {
+        node.classList.add("on");
+      });
+    } else {
+      node.classList.add("on");
+    }
     if (flashTimer) global.clearTimeout(flashTimer);
     flashTimer = global.setTimeout(function () {
       node.classList.remove("on");
@@ -1881,8 +1886,13 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
         portrait.classList.remove("empty");
         portrait.style.backgroundImage = "url('" + String(beat.portrait).replace(/'/g, "%27") + "')";
         portrait.style.animation = "none";
-        void portrait.offsetWidth;
-        portrait.style.animation = "";
+        if (global.requestAnimationFrame) {
+          global.requestAnimationFrame(function () {
+            portrait.style.animation = "";
+          });
+        } else {
+          portrait.style.animation = "";
+        }
       } else {
         portrait.classList.add("empty");
         portrait.style.backgroundImage = "";
@@ -1890,8 +1900,13 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     }
     if (copy) {
       copy.style.animation = "none";
-      void copy.offsetWidth;
-      copy.style.animation = "";
+      if (global.requestAnimationFrame) {
+        global.requestAnimationFrame(function () {
+          copy.style.animation = "";
+        });
+      } else {
+        copy.style.animation = "";
+      }
     }
     var kicker = node.querySelector(".storyBeatKicker");
     var title = node.querySelector(".storyBeatTitle");
@@ -6310,7 +6325,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       const quota = error && (error.name === "QuotaExceededError" || error.code === 22);
       toast(quota ? "存档空间已满，进度未能写入" : "存档写入失败，请导出备份");
     }
-    if (!menuUpdate.busy) menuUpdate();
+    if (state === "menu" && !menuUpdate.busy) menuUpdate();
   };
 
 
@@ -6486,7 +6501,10 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     banterBusy=true;banterTick=0;
     let [sp,tx]=banterQueue.shift(),box=$("#banter");
     $("#banterSpeaker").textContent=sp;$("#banterText").textContent=tx;
-    box.classList.remove("hidden","pop");void box.offsetWidth;box.classList.add("pop");
+    box.classList.remove("hidden","pop");
+    if (TEST_MODE) box.classList.add("pop");
+    else if (typeof requestAnimationFrame === "function") requestAnimationFrame(() => box.classList.add("pop"));
+    else box.classList.add("pop");
     clearTimeout(playBanter.t);playBanter.t=setTimeout(()=>{box.classList.add("hidden");banterBusy=false;setTimeout(playBanter,280)},2850);
   }
   function upgradeBanter(u){
@@ -8258,17 +8276,24 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     } catch (err) {}
   }
   function resize() {
-    const view = viewportSize46();
-    D = Math.min(view.w >= 640 && view.h < 360 ? 1.25 : 2, devicePixelRatio || 1);
-    W = view.w;
-    H = view.h;
-    cv.width = Math.floor(W * D);
-    cv.height = Math.floor(H * D);
-    ctx.setTransform(D, 0, 0, D, 0, 0);
-    preferLandscape46();
-    if (state === "menu") {
-      background();
-      paintHomeCommand46();
+    if (resize.busy) return;
+    resize.busy = true;
+    try {
+      const view = viewportSize46();
+      D = Math.min(view.w >= 640 && view.h < 360 ? 1.25 : 2, devicePixelRatio || 1);
+      W = view.w;
+      H = view.h;
+      const nextW = Math.floor(W * D);
+      const nextH = Math.floor(H * D);
+      if (cv.width !== nextW || cv.height !== nextH) {
+        cv.width = nextW;
+        cv.height = nextH;
+        ctx.setTransform(D, 0, 0, D, 0, 0);
+      }
+      preferLandscape46();
+      if (state === "menu") background();
+    } finally {
+      resize.busy = false;
     }
   }
   addEventListener("resize", resize);
@@ -8430,6 +8455,10 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   }
 
   /* ================= UI: MENU / DRAWERS / HUD / MODALS ================= */
+  function drawerVisible47(id) {
+    const n = document.getElementById(id);
+    return !!(n && !n.classList.contains("hidden"));
+  }
   function menuUpdate() {
     let s = stage();
     const coinsEl = $("#coins");
@@ -8445,12 +8474,14 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     $("#sno").textContent = s.no;
     $("#rank").textContent =
       `防线等级 ${1 + save.done.length + Object.values(save.tal).reduce((a, b) => a + b, 0)}`;
-    renderStages();
-    renderTalents();
-    renderAch();
-    renderStory();
-    renderAscensionGuide();
+    const first = !menuUpdate.painted47;
+    if (first || drawerVisible47("stageDrawer")) renderStages();
+    if (first || drawerVisible47("talentDrawer")) renderTalents();
+    if (first || drawerVisible47("achDrawer")) renderAch();
+    if (first || drawerVisible47("storyDrawer")) renderStory();
+    if (first || drawerVisible47("ascDrawer")) renderAscensionGuide();
     if($("#banterToggle"))$("#banterToggle").textContent=`吐槽电台：${save.banter?"开":"关"}`;
+    menuUpdate.painted47 = true;
   }
   function renderStages() {
     let box = $("#stageList");
@@ -12019,14 +12050,13 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     if($("#charName"))$("#charName").textContent=c.name;
     setCharacterImage35($("#menu .profile img"),c,"portrait",sk);
     setCharacterImage35($("#hud .hero img"),c,"portrait",sk);
-    if($("#start"))$("#start").textContent="出击";
     if($("#skill"))$("#skill").innerHTML=c.id==="sayo"?"✦<br>樱花榴弹":c.id==="aya"?"✦<br>双月居合":"✦<br>断界一文字";
     if($("#shopCoins"))$("#shopCoins").textContent=save.coins;
     refreshOutfitChip45();
   }
   function renderCharacters35(){
     let box=$("#characterList");if(!box)return;box.innerHTML="";
-    Object.values(CHARACTERS35).forEach(c=>{let b=document.createElement("button"),sk=skin35();b.className="charCard "+(save.character===c.id?"selected":"");b.dataset.character=c.id;b.innerHTML=`${save.character===c.id?'<span class="selectedMark">✓ 出击</span>':''}<img><b>${c.name}</b><em>${c.weapon}</em><p>${c.desc}</p>`;setCharacterImage35(b.querySelector("img"),c,"portrait",sk);b.onclick=()=>{save.character=c.id;persist();renderCharacters35();renderShop35();updateCharacterUI35();toast(`出击角色：${c.name}`);};box.appendChild(b);});
+    Object.values(CHARACTERS35).forEach(c=>{let b=document.createElement("button"),sk=skin35();b.className="charCard "+(save.character===c.id?"selected":"");b.dataset.character=c.id;b.innerHTML=`${save.character===c.id?'<span class="selectedMark">✓ 出击</span>':''}<img><b>${c.name}</b><em>${c.weapon}</em><p>${c.desc}</p>`;setCharacterImage35(b.querySelector("img"),c,"portrait",sk);b.onclick=()=>{save.character=c.id;persist();updateCharacterUI35();toast(`出击角色：${c.name}`);};box.appendChild(b);});
   }
   function renderShop35(){
     let box=$("#shopList");if(!box)return;box.innerHTML="";if($("#shopCoins"))$("#shopCoins").textContent=save.coins;
@@ -12036,7 +12066,17 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     let box=$("#storyList");if(!box||box.querySelector(".charLore"))return;let c=char35(),sk=skin35(),d=document.createElement("div");d.className="storyCard open charLore";d.innerHTML=`<div class="storyIcon"><img style="width:100%;height:100%;border-radius:50%"></div><div><h3>${c.title}</h3><p><b>${c.weapon} · ${c.role}</b><br>${c.desc}<br><span style="color:#8eeaff">基础加成：${c.bonus}</span></p></div>`;setCharacterImage35(d.querySelector("img"),c,"portrait",sk);box.prepend(d);
   }
   const _menuUpdate35=menuUpdate;
-  menuUpdate=function(){_menuUpdate35();installNavArt35();updateCharacterUI35();renderCharacters35();renderShop35();prependLore35();};
+  menuUpdate=function(){
+    _menuUpdate35();
+    installNavArt35();
+    updateCharacterUI35();
+    renderCharacters35();
+    if(!renderShop35.booted47 || drawerVisible47("shopDrawer")){
+      renderShop35();
+      renderShop35.booted47=true;
+    }else if($("#shopCoins"))$("#shopCoins").textContent=save.coins;
+    prependLore35();
+  };
   const _setFormCharacter35=setForm;
   setForm=function(form){const result=_setFormCharacter35(form);updateCharacterUI35();if(typeof beginOutfitSwap35==="function")beginOutfitSwap35();return result;};
   const _renderStory35=renderStory;
@@ -13138,9 +13178,25 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       clearCombat(){bullets=[];enemies=[];ebullets=[];return snapshot35();},
       spawnEnemyRelative(type="normal",dx=100,dy=0){if(state!=="play")throw new Error("spawnEnemyRelative requires play mode");spawnEnemy(type,false);const enemy=enemies[enemies.length-1];enemy.x=P.x+Number(dx);enemy.y=P.y+Number(dy);enemy.hp=enemy.max=Math.max(enemy.hp,P.dmg*30);return {index:enemies.length-1,hp:enemy.hp};},
       attackNow(){if(state!=="play")throw new Error("attackNow requires play mode");grid.clear();for(const e of enemies)if(!e.dead)grid.add(e);P.fire=0;shoot();draw();return {snapshot:snapshot35(),bullets:bullets.map(b=>({x:b.x,y:b.y,vx:b.vx,vy:b.vy,source:b.source})),enemies:enemies.map((e,index)=>({index,x:e.x,y:e.y,hp:e.hp,max:e.max,dead:e.dead}))};},
-      start(){startGame();return snapshot35();},
+      start(){startGame();try{return snapshot35();}catch{return {mode:state,runMode:runMode36};}},
       pauseNow(){pauseGame();return snapshot35();},
-      dismissDialogue(){let guard=80;while(state==="dialogue"&&guard-->0)nextDialogue();if(guard<=0)throw new Error("Dialogue guard exhausted");return snapshot35();},
+      dismissDialogue(){
+        let guard=80;
+        while(state==="dialogue"&&guard-->0){
+          if(window.SakurayoCutscene?.isPlaying?.()) window.SakurayoCutscene.stopVictory?.();
+          nextDialogue();
+        }
+        if(state==="dialogue"){
+          dialogueQueue.length=0;
+          const cb=dialogueDone;
+          dialogueDone=null;
+          $("#dialogue")?.classList.add("hidden");
+          window.SakurayoCutscene?.dismiss?.();
+          state="play";
+          if(cb) cb();
+        }
+        try{return snapshot35();}catch{return {mode:state,runMode:runMode36};}
+      },
       protectPlayer(){P.inv=9999;return snapshot35();},freezeProgression(){P.xp=0;P.next=1e9;return snapshot35();},
       playerGeometry(){return {...PLAYER_GEOMETRY35,radius:PLAYER_GEOMETRY35.collisionRadius};},
       circleCollision(distance,firstRadius,secondRadius){return circlesOverlap35(0,0,Number(firstRadius),Number(distance),0,Number(secondRadius));},
@@ -13455,11 +13511,15 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     });
     const start = $("#start");
     if (start) {
-      if (lobbyWide46()) {
-        const label = pendingMode46 === "testimony" ? "证词" : pendingMode46 === "mainGod" ? "轮回" : "出击";
-        start.innerHTML = `${label} <small>START</small><b>>>></b>`;
-      } else {
-        start.textContent = "出击";
+      const wide = lobbyWide46();
+      const label = !wide ? "出击" : pendingMode46 === "testimony" ? "证词" : pendingMode46 === "mainGod" ? "轮回" : "出击";
+      const key = (wide ? "wide|" : "narrow|") + label;
+      if (start.dataset.cmd47 !== key) {
+        const pass = start.querySelector(".pass53");
+        if (wide) start.innerHTML = `${label} <small>START</small><b>>>></b>`;
+        else start.textContent = label;
+        if (pass) start.appendChild(pass);
+        start.dataset.cmd47 = key;
       }
     }
     const bannerImg = $("#homeBanner46 img");
@@ -14077,6 +14137,20 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   installLobby46();
   installShell46();
   installOps46();
+  const _openDrawer47 = openDrawer;
+  openDrawer = function (n) {
+    const result = _openDrawer47.apply(this, arguments);
+    if (n === "shop") renderShop35();
+    else if (n === "stage") renderStages();
+    else if (n === "talent") renderTalents();
+    else if (n === "ach") renderAch();
+    else if (n === "story") {
+      renderStory();
+      prependLore35();
+    } else if (n === "asc") renderAscensionGuide();
+    else if ((n === "gacha" || n === "roster") && typeof refreshLobby46 === "function") refreshLobby46();
+    return result;
+  };
   const _menuUpdateGuard47 = menuUpdate;
   menuUpdate = function () {
     if (menuUpdate.busy) return;

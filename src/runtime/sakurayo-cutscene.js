@@ -247,8 +247,13 @@
     var node = ensureFlash();
     if (!node) return;
     node.classList.remove("on");
-    void node.offsetWidth;
-    node.classList.add("on");
+    if (global.requestAnimationFrame) {
+      global.requestAnimationFrame(function () {
+        node.classList.add("on");
+      });
+    } else {
+      node.classList.add("on");
+    }
     if (flashTimer) global.clearTimeout(flashTimer);
     flashTimer = global.setTimeout(function () {
       node.classList.remove("on");
@@ -275,8 +280,13 @@
         portrait.classList.remove("empty");
         portrait.style.backgroundImage = "url('" + String(beat.portrait).replace(/'/g, "%27") + "')";
         portrait.style.animation = "none";
-        void portrait.offsetWidth;
-        portrait.style.animation = "";
+        if (global.requestAnimationFrame) {
+          global.requestAnimationFrame(function () {
+            portrait.style.animation = "";
+          });
+        } else {
+          portrait.style.animation = "";
+        }
       } else {
         portrait.classList.add("empty");
         portrait.style.backgroundImage = "";
@@ -284,8 +294,13 @@
     }
     if (copy) {
       copy.style.animation = "none";
-      void copy.offsetWidth;
-      copy.style.animation = "";
+      if (global.requestAnimationFrame) {
+        global.requestAnimationFrame(function () {
+          copy.style.animation = "";
+        });
+      } else {
+        copy.style.animation = "";
+      }
     }
     var kicker = node.querySelector(".storyBeatKicker");
     var title = node.querySelector(".storyBeatTitle");

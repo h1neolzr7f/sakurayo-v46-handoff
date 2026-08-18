@@ -17,6 +17,9 @@
 - chrome6109：大厅到抽屉、成就、教程、天赋、飞升、事件、结算、抉择的草稿 emoji 换成精装图标；`dress` 节流，不再每 90ms 重写整页 CSS（手机点教程/出击会抖）
 - 手机横屏藏 `.utilityButtons37`，冲刺/技能最小 52px；开发版 Debug 开 `?beta=1` 方便实机过 Boss 节点
 - `persist` 不再在 `menuUpdate` 里重入；测试模式作战简报立刻回调，避免卡在 briefing 层
+- 对白/战斗里 `persist` 不再整页重建大厅；隐藏抽屉不重绘；出击键就地改字
+- `resize` 带 `busy`，画布尺寸没变不重设 `canvas.width`，避免量热区卡死
+- 吐槽/过场不再用 `offsetWidth` 强制回流；口令观察者同一帧最多脉冲 6 次
 
 ## 明确不再犯
 
