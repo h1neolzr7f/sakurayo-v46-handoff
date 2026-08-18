@@ -79,9 +79,16 @@
     ".overlay{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:#05040ef5!important}" +
     "#result #rstats,#result #damageReport,#result #routeNote{background:#161028!important;border:1px solid #f2c75d55!important;color:#fff4e4!important}" +
     "#result #damageReport h3,#result #rstats b,#result #rsub{color:#ffe7a3!important}" +
+    "#level .modal{display:flex!important;flex-direction:column!important;padding:8px 12px!important;max-height:96vh!important;overflow:hidden!important}" +
+    "#level .modal h2{font-size:16px!important;margin:0 0 2px!important}" +
+    "#level .sub{margin:0 0 4px!important;font-size:10px!important;max-height:2.6em;overflow:hidden}" +
+    "#level #choices{min-height:0;flex:1 1 auto;overflow:auto}" +
     "#level .choice{min-height:0!important;background:#1a1230!important;border:1px solid #f2c75d44!important}" +
     "#level .choice p,.eventChoice p{color:#e8dcc8!important}" +
-    "#reroll{min-height:40px}" +
+    "#level .choice p{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;max-height:3.4em}" +
+    "#level .choiceReadout38{margin-top:4px!important;padding:3px 6px!important;font-size:9px!important}" +
+    "#level .choiceReadout38 em{display:none!important}" +
+    "#reroll{min-height:40px;flex:0 0 auto}" +
     ".drawer .close{min-width:44px;min-height:44px}" +
     "html.landscape46:not(.portraitFallback46) #gachaPull1,html.landscape46:not(.portraitFallback46) #gachaPull10{clip-path:none!important;border-radius:12px!important}" +
     "html.landscape46:not(.portraitFallback46) #stageDrawer.stageShell46 .stageCard button{clip-path:none!important;border-radius:10px!important}" +
@@ -89,6 +96,7 @@
     "html.landscape46:not(.portraitFallback46) #combo:not(.on51){opacity:0;pointer-events:none}" +
     "html.landscape46:not(.portraitFallback46) #hud .mission{max-height:22px;overflow:hidden}" +
     "body:has(#level:not(.hidden)) #banter,body:has(#paused:not(.hidden)) #banter,body:has(#result:not(.hidden)) #banter,body:has(#event:not(.hidden)) #banter,body:has(#dialogue:not(.hidden)) #banter{opacity:0!important;pointer-events:none!important;visibility:hidden!important}" +
+    "#bootArt35.gone{display:none!important;visibility:hidden!important;opacity:0!important}" +
     "}";
 
   function androidLocked() {

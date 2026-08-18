@@ -173,6 +173,9 @@ assert.match(code, /max-height:430px.*homeBanner46/);
 assert.match(L.css, /#result #rstats,#result #damageReport,#result #routeNote\{background:#161028!important/);
 assert.match(L.css, /backdrop-filter:none!important/);
 assert.match(L.css, /#reroll,\.revealSkip46/);
+assert.match(L.css, /#level \.choiceReadout38 em\{display:none!important\}/);
+assert.match(L.css, /#bootArt35\.gone\{display:none!important;visibility:hidden!important;opacity:0!important\}/);
+assert.match(L.css, /#level \.choice p\{display:-webkit-box;-webkit-line-clamp:3/);
 
 const installed = L.install();
 assert.equal(installed.ok, true);
