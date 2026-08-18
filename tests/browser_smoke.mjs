@@ -284,7 +284,8 @@ try {
   assert.match(await page.locator("#rosterDrawer").textContent(), /镜界仓库/);
   assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 8);
   await page.locator('#rosterTabs46 [data-roster="school"]').click();
-  assert.match(await page.locator("#rosterDrawer").textContent(), /后续写入/);
+  assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 14);
+  assert.match(await page.locator("#rosterDrawer").textContent(), /待寻访/);
   await page.locator('#rosterTabs46 [data-roster="scrap"]').click();
   assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 8);
   await shot(page, "01i-roster-wall.png");

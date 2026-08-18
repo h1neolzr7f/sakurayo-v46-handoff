@@ -42,7 +42,22 @@
 
   var FASHION_CARDS = Object.freeze([]);
   var WEAPON_CARDS = Object.freeze([]);
-  var SCHOOL_CARDS = Object.freeze([]);
+  var SCHOOL_CARDS = Object.freeze([
+    { id: "school_shrine", n: "未归·巫女小夜", r: "SR", kind: "school", tag: "基础", school: "shrine", face: "sayo", dmg: 0.006, d: "符没封住镜核。拥有即巫女倾向 ×1.3。", lore: ["我是神社那一夜的小夜。符纸写着我的名字，镜核比名字先亮。", "我把封条一层层贴上步枪，贴上鸟居，贴上自己的袖口。外面的备份还在扫地。", "符烧完了，镜核还在转。裂口从镜里爬到我肩上，朱砂写成失败。", "我仍举着枪。封条先落地。"] },
+    { id: "school_idol", n: "未归·歌姬小夜", r: "R", kind: "school", tag: "基础", school: "idol", face: "sayo", dmg: 0.003, d: "电台还在响人已不在。拥有即歌姬倾向 ×1.3。", lore: ["我是被推进舞台的那一版小夜。观众席是空的，只有电台还在报时。", "歌比子弹先出门。我把步枪靠在脚边，对着没有人的灯光把词唱完。", "声带还在，人已经不在频率上。电台替我鞠躬，我跪在花瓣里。", "下一首歌自动连播。没有返场。"] },
+    { id: "school_magical", n: "未归·魔法少女小夜", r: "R", kind: "school", tag: "基础", school: "magical", face: "sayo", dmg: 0.003, d: "冠亮着变身没转好。拥有即魔法少女倾向 ×1.3。", lore: ["我是想把完整的一夜戴在头上的小夜。冠比我先发光。", "变身只走到一只手套。其余的我还是神社那件外套，步枪没有变成权杖。", "冠还亮，身体没转完。花瓣往上飞，我往下坠，妆裂在眼角。", "金边还烫。咒语停在一半。"] },
+    { id: "school_mech", n: "未归·机械师小夜", r: "R", kind: "school", tag: "基础", school: "mech", face: "sayo", dmg: 0.003, d: "无人机先死步枪还在。拥有即机械师倾向 ×1.3。", lore: ["我是把无人机当姐姐的那一版。它先看见镜核，也先掉下来。", "油污和樱花一起沾在白外套上。我修它的镜头，比修自己的准星勤快。", "螺旋桨停转的时候，步枪还在我手里。火花比求救声响。", "屏幕黑了。我还握着没坏的那一边。"] },
+    { id: "school_spore", n: "未归·菌群小夜", r: "R", kind: "school", tag: "基础", school: "spore", face: "sayo", dmg: 0.003, d: "菌海不认主人。拥有即菌群倾向 ×1.3。", lore: ["我是把菌海认作姐妹的小夜。它们发光，却不听我的姓。", "孢子爬上步枪和脸颊，像另一层妆。我伸手，菌丝绕开我，去找更热的东西。", "菌海选择了镜核，没有选择主人。我变成它们路过的一截木头。", "蘑菇还亮。我的手是空的。"] },
+    { id: "school_gun", n: "未归·枪斗绫", r: "SR", kind: "school", tag: "基础", school: "gun", face: "aya", dmg: 0.006, d: "弹打空近身刀没来得及。拥有即枪斗倾向 ×1.3。", lore: ["我是零号企业最锋利的那条枪线。手枪是呼吸，太刀是没来得及说的话。", "我把弹匣数得很干净。花瓣总是提醒我再快一点，我偏要再稳一点。", "最后一发打空，刀还在鞘里。近身的爪子已经摸到领口。", "套筒后锁。刀柄是凉的。"] },
+    { id: "school_mage", n: "未归·魔法师绫", r: "R", kind: "school", tag: "基础", school: "mage", face: "aya", dmg: 0.003, d: "主神券作废。拥有即魔法师倾向 ×1.3。", lore: ["我是捏着通行证进圣所的绫。券是金的，门是假的。", "法阵画在水里，手枪还在腰上。我以为规则能被念咒改写。", "券面盖了作废。墨从掌心滴进法阵，法阵先死。", "VOID 两个字母比我的名字清楚。"] },
+    { id: "school_alch", n: "未归·炼金绫", r: "R", kind: "school", tag: "基础", school: "alch", face: "aya", dmg: 0.003, d: "封条当坩埚盖。拥有即炼金倾向 ×1.3。", lore: ["我是把神社封条当瓶盖的绫。朱印能骗人，骗不了沸腾。", "手枪看守火候，太刀切开试剂。我把别人的名字熬成能喝的东西。", "盖子先着。封条在坩埚里烧成失败的味道，玻璃也裂了。", "药还在响。人已经不值得过滤。"] },
+    { id: "school_ninja", n: "未归·忍者绫", r: "R", kind: "school", tag: "基础", school: "ninja", face: "aya", dmg: 0.003, d: "影遁出界人没回来。拥有即忍者倾向 ×1.3。", lore: ["我是从镜缝里进出的那条影。外面的我负责开枪，里面的我负责消失。", "分身比本体勤快。我把太刀留给回来的那一格，手枪留给还在的这一格。", "影遁出了界。分身散掉，本体没有从裂镜对面走回来。", "残影还举着枪。人已经不在这一侧。"] },
+    { id: "school_vamp", n: "未归·血族绫", r: "R", kind: "school", tag: "基础", school: "vamp", face: "aya", dmg: 0.003, d: "最后一口吸空的是自己。拥有即血族倾向 ×1.3。", lore: ["我是把活下去做成饮品的绫。血不是别人的，是企业拆剩下的我。", "手枪守墓园，太刀守喉咙。花谢得比夜快，我喝得比花快。", "最后一瓶写着自己的名字。吸空以后，连开枪的力气都退色。", "瓶是空的。泪比血晚到。"] },
+    { id: "school_cult", n: "未归·修仙凛音", r: "SR", kind: "school", tag: "基础", school: "cult", face: "rion", dmg: 0.006, d: "飞剑折在剑冢。拥有即修仙倾向 ×1.3。", lore: ["我是黑羽家被送去飞升的那一页。飞剑比家谱先出门。", "剑冢里每把剑都认识我。我路过那些失败的小夜，没有对任何一把鞠躬。", "飞剑折在别人的坟上。刃还在振，飞的那一半回不来。", "我握住折断的那截。天没有开。"] },
+    { id: "school_necro", n: "未归·死灵凛音", r: "R", kind: "school", tag: "基础", school: "necro", face: "rion", dmg: 0.003, d: "看见终章把自己收成魂火。拥有即死灵倾向 ×1.3。", lore: ["我是看见终章以后还想收尸的凛音。先收下的是自己。", "魂火从掌心往上爬。刀还在，名字开始透明。", "我把凛音当成可召唤物。契约成立的瞬间，人变成燃料。", "火还亮。署名栏空了。"] },
+    { id: "school_gene", n: "未归·基因凛音", r: "R", kind: "school", tag: "基础", school: "gene", face: "rion", dmg: 0.003, d: "再生没跑过突变。拥有即基因倾向 ×1.3。", lore: ["我是被改过刀法和血的凛音。再生写在合同里，突变写在肉里。", "实验室的灯和鸟居的灯一起亮。我用刀压住往外长的那只手臂。", "再生追上伤口，没追上镜裂。红晶比皮肤先成为我。", "刀还认得手。手不太认得我。"] },
+    { id: "school_summon", n: "未归·召唤凛音", r: "R", kind: "school", tag: "基础", school: "summon", face: "rion", dmg: 0.003, d: "契约反噬。拥有即召唤倾向 ×1.3。", lore: ["我是把影子当部下的凛音。契约纸比刀快，反噬比部下快。", "我在腕上缠满符。刀尖指着该来的东西，它从背后先来。", "契约反咬署名。红线勒进刀柄，影子比我更高。", "符烧完了。部下还在，主人不在。"] },
+  ]);
 
   var SCRAP_BONUS = Object.freeze({
     sayo_echo: { crit: 0.005 },
@@ -66,10 +81,14 @@
   indexCards(WEAPON_CARDS);
   indexCards(SCHOOL_CARDS);
 
+  function remnantList() {
+    return CARDS.concat(SCHOOL_CARDS);
+  }
+
   function cardsForPool(pool) {
     if (pool === "fashion") return FASHION_CARDS;
     if (pool === "weapon") return WEAPON_CARDS;
-    return CARDS;
+    return remnantList();
   }
 
   function groupByRarity(list) {
@@ -360,9 +379,10 @@
   function normalizeOps(shop40) {
     var shop = shop40 && typeof shop40 === "object" && !Array.isArray(shop40) ? shop40 : {};
     var incoming = shop.ops && typeof shop.ops === "object" && !Array.isArray(shop.ops) ? shop.ops : {};
-    var owned = emptyOwned(CARDS);
+    var catalog = remnantList();
+    var owned = emptyOwned(catalog);
     var rawOwned = incoming.owned && typeof incoming.owned === "object" && !Array.isArray(incoming.owned) ? incoming.owned : {};
-    CARDS.forEach(function (card) {
+    catalog.forEach(function (card) {
       owned[card.id] = clampInt(rawOwned[card.id], 0, 9999);
     });
     var seeded = Object.keys(rawOwned).length === 0;
@@ -401,10 +421,27 @@
     DEFAULT_SHOWN.forEach(function (id) {
       if (out.indexOf(id) < 0) out.push(id);
     });
-    CARDS.forEach(function (card) {
+    remnantList().forEach(function (card) {
       if ((ops.owned[card.id] || 0) > 0 && out.indexOf(card.id) < 0) out.push(card.id);
     });
     return out;
+  }
+
+  function ownedCount(ops, list) {
+    var n = 0;
+    (list || []).forEach(function (card) {
+      if ((ops.owned[card.id] || 0) > 0) n += 1;
+    });
+    return n;
+  }
+
+  function hasSchool(save, school) {
+    var shop = normalizeOps((save && save.shop40) || {});
+    var id = String(school || "");
+    if (!id) return false;
+    return SCHOOL_CARDS.some(function (card) {
+      return card.school === id && (shop.ops.owned[card.id] || 0) > 0;
+    });
   }
 
   function pickOfRarity(rarity, rng, list) {
@@ -556,6 +593,10 @@
       cards: CARDS.map(function (card) {
         return { id: card.id, n: card.n, r: card.r, kind: card.kind || "scrap", count: ops.owned[card.id] || 0 };
       }),
+      schoolCards: SCHOOL_CARDS.map(function (card) {
+        return { id: card.id, n: card.n, r: card.r, kind: "school", school: card.school, count: ops.owned[card.id] || 0 };
+      }),
+      schoolOwned: ownedCount(ops, SCHOOL_CARDS),
       shown: shownIds(ops),
       owned: ops.owned,
       pity: ops.pity,
@@ -597,6 +638,14 @@
         player.hp = player.maxHp;
       }
     });
+    var schoolN = 0;
+    SCHOOL_CARDS.forEach(function (card) {
+      if ((owned[card.id] || 0) < 1) return;
+      schoolN += 1;
+      if (card.dmg) player.dmg = (player.dmg || 0) * (1 + card.dmg);
+    });
+    if (schoolN >= 7) player.dmg = (player.dmg || 0) * 1.02;
+    if (schoolN >= 14) player.dmg = (player.dmg || 0) * 1.03;
     return player;
   }
 
@@ -809,12 +858,13 @@
     if (!host) return snapshot(save);
     var info = snapshot(save);
     var tab = info.rosterTab || "scrap";
-    var got = info.shown.length;
+    var list = tab === "school" ? SCHOOL_CARDS : CARDS;
+    var got = ownedCount(info, list);
     var wall = "";
-    if (tab === "school") {
+    if (tab === "school" && !SCHOOL_CARDS.length) {
       wall = '<div class="rosterLater46">后续写入</div>';
     } else {
-      wall = CARDS.map(function (card) {
+      wall = list.map(function (card) {
         var count = info.owned[card.id] || 0;
         var locked = count < 1 && DEFAULT_SHOWN.indexOf(card.id) < 0;
         return (
@@ -840,7 +890,9 @@
     host.innerHTML =
       '<div class="rosterStage46"><div class="rosterHead46"><h3>镜界仓库</h3><span>已点亮 ' +
       got +
-      " / 8</span></div>" +
+      " / " +
+      list.length +
+      "</span></div>" +
       '<div class="rosterTabs46" id="rosterTabs46">' +
       '<button type="button" data-roster="scrap"' + (tab === "scrap" ? ' class="on"' : "") + ">残件</button>" +
       '<button type="button" data-roster="school"' + (tab === "school" ? ' class="on"' : "") + ">基础</button>" +
@@ -1046,6 +1098,7 @@
     FASHION_CARDS: FASHION_CARDS,
     WEAPON_CARDS: WEAPON_CARDS,
     SCHOOL_CARDS: SCHOOL_CARDS,
+    hasSchool: hasSchool,
     POOL_IDS: POOL_IDS,
     ROSTER_TABS: ROSTER_TABS,
     SCRAP_BONUS: SCRAP_BONUS,
