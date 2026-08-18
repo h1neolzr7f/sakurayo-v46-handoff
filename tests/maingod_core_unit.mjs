@@ -50,6 +50,9 @@ assert.match(html, /深廊投影·压境者/);
 assert.match(html, /mgHall46/);
 assert.match(html, /mgHero46/);
 assert.match(html, /spawnBossAdds=function\(type,count,guard\)\{if\(isMainGodRun36\(\)\)return 0/);
+assert.match(html, /isMainGodRun36\(\)&&P\.mgBoss\?\.type==="mirror"/);
+assert.match(html, /function hurtMainGodFx46/);
+assert.match(html, /group:"保命防护"/);
 
 const catalog = html.match(/const MAIN_GOD_ITEMS36=\{([\s\S]*?)\n  \};/);
 assert.ok(catalog, "MAIN_GOD_ITEMS36 应可解析");
