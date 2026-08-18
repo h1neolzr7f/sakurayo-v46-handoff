@@ -89,8 +89,8 @@ jobs:
 
             - 桌面名：开发版 夜樱
             - 包名：`com.sakurayo.yeying.dev`
-            - versionName：`4.6.0-yeying` / versionCode 6108
-            - 本包把大厅底栏、轨道、模式入口、货币条、时装商店、任务邮件、档案天赋、结算与战斗键里的草稿字块/emoji 全部换成精装图标。覆盖安装即可，不会动正式《樱夜·尸潮》。
+            - versionName：`4.6.0-yeying` / versionCode 6109
+            - 本包把大厅、商店、成就、教程、档案、升级卡和结算里的字块、色块、表情图标全部换成精装。覆盖安装即可，不会动正式《樱夜·尸潮》。
             - 不会覆盖正式《樱夜·尸潮》（`com.sakurayo.zombietide`）
             - Debug 证书签名，只适合自己装
 
