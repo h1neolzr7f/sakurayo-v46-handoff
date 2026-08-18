@@ -48,13 +48,39 @@
     return d.getElementById("cv") || d.querySelector("canvas:not(#exploreCanvas41)");
   }
 
+  function visibleId(id) {
+    var n = doc() && doc().getElementById(id);
+    return !!(n && n.classList && !n.classList.contains("hidden"));
+  }
+
+  function syncCinematicHud() {
+    var d = doc();
+    var hud = d && d.getElementById("hud");
+    if (!hud || !hud.classList) return { ok: false, cinematic: false };
+    var cinematic = visibleId("storyBeat44") || visibleId("dialogue") || visibleId("level");
+    if (cinematic) {
+      hud.classList.add("hidden");
+      return { ok: true, cinematic: true };
+    }
+    if (!visibleId("menu") && !visibleId("paused") && !visibleId("result")) {
+      hud.classList.remove("hidden");
+    }
+    return { ok: true, cinematic: false };
+  }
+
   function syncHits() {
     var canvas = playCanvas();
     var blocked = uiBlocking();
     if (canvas && canvas.style) {
       canvas.style.pointerEvents = blocked ? "none" : "auto";
     }
-    return { ok: true, blocked: blocked, canvas: canvas ? canvas.style.pointerEvents : "" };
+    var hud = syncCinematicHud();
+    return {
+      ok: true,
+      blocked: blocked,
+      cinematic: !!hud.cinematic,
+      canvas: canvas ? canvas.style.pointerEvents : "",
+    };
   }
 
   function installCss() {
@@ -153,6 +179,7 @@
     clickable: CLICKABLE,
     install: install,
     syncHits: syncHits,
+    syncCinematicHud: syncCinematicHud,
     closestClickable: closestClickable,
     fireClick: fireClick,
   };
