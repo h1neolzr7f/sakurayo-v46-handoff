@@ -28,6 +28,8 @@ assert.match(index, /function update\s*\(/);
 assert.match(index, /function draw\s*\(/);
 assert.match(index, /function spawnEnemy\s*\(/);
 assert.match(index, /function showDialogue\s*\(/);
+assert.match(read("src/runtime/sakurayo-cutscene.js"), /!beats\.length \|\| !!\(opts && opts\.testMode\)/);
+assert.match(index, /if \(!menuUpdate\.busy\) menuUpdate\(\)/);
 
 assert.match(ops, /sakurayo-touch54\.js/);
 assert.match(ops, /sakurayo-layout52\.js/);
@@ -38,6 +40,7 @@ assert.doesNotMatch(ops, /pets\.push/);
 assert.doesNotMatch(ops, /update\s*=\s*function/);
 
 assert.match(layout, /hangChars\.busy/);
+assert.match(layout, /observe\(root, \{ childList: true, subtree: false \}\)/);
 assert.match(layout, /utilityButtons37\{display:none!important\}/);
 assert.match(layout, /position:static!important/);
 assert.match(layout, /homeChip46\.prism/);
@@ -66,7 +69,9 @@ assert.doesNotMatch(boutique, /update\s*=\s*function/);
 assert.match(chrome, /chrome6109/);
 assert.match(chrome, /version:"4\.7\.0"/);
 assert.match(chrome, /dress\.busy/);
+assert.match(chrome, /install\.done/);
 assert.match(chrome, /if\(style&&style\.textContent\)return/);
+assert.doesNotMatch(chrome, /documentElement\.__chromeWatch/);
 assert.doesNotMatch(chrome, /n>40&&global\.clearInterval/);
 assert.doesNotMatch(chrome, /update\s*=\s*function/);
 

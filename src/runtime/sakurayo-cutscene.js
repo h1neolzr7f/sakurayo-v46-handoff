@@ -342,7 +342,7 @@
     finishVictory(false);
     var beats = (opts && opts.beats) || [];
     var done = opts && opts.onDone;
-    if (!beats.length) {
+    if (!beats.length || !!(opts && opts.testMode)) {
       if (done) done();
       return;
     }

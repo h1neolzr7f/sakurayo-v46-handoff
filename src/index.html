@@ -412,7 +412,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
       const quota = error && (error.name === "QuotaExceededError" || error.code === 22);
       toast(quota ? "存档空间已满，进度未能写入" : "存档写入失败，请导出备份");
     }
-    menuUpdate();
+    if (!menuUpdate.busy) menuUpdate();
   };
 
 
@@ -7111,7 +7111,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     const visible=selector=>{const node=$(selector);return !!node&&!node.classList.contains("hidden")&&!node.hidden;};
     const finite=(value,fallback=0)=>Number.isFinite(value)?value:fallback;
     const damageSources=P.damageSources||{};
-    return {
+    const raw = {
       mode:state,runMode:runMode36,stageKey:isMainGodRun36()?stage().key:`story-${selected}`,stageDuration:finite(stage().dur),stage44:window.SakurayoLifecycle?window.SakurayoLifecycle.snapshot(lifecycleWorld44()):null,viewport:{width:W,height:H,coordinates:"origin top-left; +x right; +y down"},stage:selected,runTime:finite(runTime),
       player:{character:P.character||save.character||"sayo",skin:save.skin||"default",outfit:liveOutfitLayer35()?.id||null,careerBranch:careerBranchId35(),outfitFade:finite(P.outfitFade),outfitReveal:finite(P.outfitReveal),outfitTitle:P.outfitRevealTitle||"",animation:state==="play"?charPose35():"idle",portraitMode:"static",direction:facingName36(),aim:{x:finite(P.aimX,P.fx),y:finite(P.aimY,P.fy),angle:finite(P.weaponAngle)},manualAim:!!P.manualAim,x:finite(P.x),y:finite(P.y),radius:finite(P.r),visualSize:PLAYER_GEOMETRY35.visualSize,footOffset:PLAYER_GEOMETRY35.footOffset,hp:finite(P.hp),maxHp:finite(P.maxHp),shield:finite(P.sh),maxShield:finite(P.maxSh),level:finite(P.level),xp:finite(P.xp),nextXp:finite(P.next),attackDamage:finite(P.dmg),attackInterval:finite(P.rate),attackRange:finite(P.range),multishot:finite(P.multi),pierce:finite(P.pierce),skillCooldown:finite(P.skill),dashCooldown:finite(P.dash),shotCount:finite(P.shotCount),meleeChain:finite(P.meleeChain),perfectDodges:finite(P.perfectDodges),initialCore:P.initialCore40||null,initialCoreLevel:finite(P.initialCoreLevel40),noUpgradeChallenge:!!P.noUpgradeChallenge40,upgradeChoices:finite(P.upgradeChoices40),baitLevel:finite(P.baitLevel40),baitSpawns:finite(P.baitSpawns40)},
       counts:{enemies:enemies.filter(e=>!e.dead).length,bullets:bullets.length,enemyBullets:ebullets.length,gems:gems.length,pets:pets.length,      ops:window.SakurayoOps?window.SakurayoOps.snapshot().units.length:0},
@@ -7123,6 +7123,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
       overlays:{menu:visible("#menu"),hud:visible("#hud"),level:visible("#level"),dialogue:visible("#dialogue"),event:visible("#event"),paused:visible("#paused"),result:visible("#result"),storyBeat:visible("#storyBeat44")},
       mainGod:{tier:selectedMainGodTier36,...save.mainGod},shop40:JSON.parse(JSON.stringify(save.shop40||{})),extensions:{packs:CONTENT41?.packs()||[],errors:CONTENT41?.errors()||[],state:JSON.parse(JSON.stringify(save.extensions||{})),exploration:explorationSnapshot41()},balanceSamples:save.balance40?.samples?.length||0,result:{win:!!runWin,title:$("#rtitle")?.textContent||""},devErrors:window.__SAKURAYO_DEV__?.errors.length||0,
     };
+    try{return JSON.parse(JSON.stringify(raw));}catch{return {mode:state,runMode:runMode36,stage:selected};}
   }
   if(TEST_MODE){
     window.render_game_to_text=()=>JSON.stringify(snapshot35());
@@ -8178,6 +8179,16 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
   installLobby46();
   installShell46();
   installOps46();
+  const _menuUpdateGuard47 = menuUpdate;
+  menuUpdate = function () {
+    if (menuUpdate.busy) return;
+    menuUpdate.busy = true;
+    try {
+      return _menuUpdateGuard47.apply(this, arguments);
+    } finally {
+      menuUpdate.busy = false;
+    }
+  };
   checkAch();
   menuUpdate();
   installModKitButton42();

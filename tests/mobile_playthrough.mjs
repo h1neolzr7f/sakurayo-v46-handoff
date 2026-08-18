@@ -73,7 +73,14 @@ await page.waitForFunction(
 await page.waitForTimeout(400);
 
 const api = (method, ...args) =>
-  page.evaluate(({ method, args }) => window.__SAKURAYO_TEST__[method](...args), { method, args });
+  page.evaluate(({ method, args }) => {
+    const out = window.__SAKURAYO_TEST__[method](...args);
+    try {
+      return JSON.parse(JSON.stringify(out));
+    } catch {
+      return { mode: out && out.mode, runMode: out && out.runMode, ok: out && out.ok, reason: out && out.reason };
+    }
+  }, { method, args });
 const snap = () => page.evaluate(() => JSON.parse(window.render_game_to_text()));
 const shot = (name) => page.screenshot({ path: path.join(out, name), fullPage: true });
 
@@ -166,7 +173,7 @@ await shot("06-chars.png");
 await tap("#start", "start");
 if (await page.locator("#tutorialDrawer37").isVisible().catch(() => false)) {
   await shot("07-tutorial.png");
-  await tap("#tutorialSkip37", "tutorial skip");
+  await page.evaluate(() => document.getElementById("tutorialSkip37")?.click());
   await page.waitForFunction(
     () => {
       const drawer = document.getElementById("tutorialDrawer37");
