@@ -1,7 +1,17 @@
-# 樱夜·尸潮 Android WebView 壳
+# 开发版 夜樱 Android WebView 壳
 
 最小原生 Java Android 工程。游戏运行于应用内 WebView，HTML 从
 `app/src/main/assets/index.html` 加载，APK 不申请 `INTERNET` 权限。
+
+当前侧载身份：
+
+- 桌面名：`开发版 夜樱`
+- applicationId：`com.sakurayo.yeying.dev`
+- versionName：`4.6.0-yeying`
+
+它和正式包 `com.sakurayo.zombietide`（樱夜·尸潮）是两个应用，可以同时装，不会互相覆盖。
+
+页面加载完成后，`MainActivity` 会把 `assets/runtime/sakurayo-feel53.js` 注入 WebView。即使旧的单入口 HTML 还没内联 feel53，角标、寻访仪式和结算钩子也会出现。`install()` 可重复调用，不会叠两套观察器。
 
 ## 同步游戏源码
 

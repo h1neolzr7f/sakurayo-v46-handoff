@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowInsets;
@@ -27,12 +28,26 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 public final class MainActivity extends Activity {
     private static final String TAG = "SakurayoWebView";
     private static final String GAME_URL = "file:///android_asset/index.html";
+    private static final String TOUCH54_ASSET = "runtime/sakurayo-touch54.js";
+    private static final String LAYOUT52_ASSET = "runtime/sakurayo-layout52.js";
+    private static final String FEEL53_ASSET = "runtime/sakurayo-feel53.js";
+    private static final String BOUTIQUE_ASSET = "runtime/sakurayo-boutique.js";
+    private static final String CHROME_ASSET = "runtime/sakurayo-chrome.js";
     private static final long EXIT_CONFIRM_WINDOW_MS = 1800L;
+    private static final String ANDROID_LANDSCAPE_SCRIPT =
+            "window.__SAKURAYO_ANDROID_LANDSCAPE__=true;" +
+            "(function(){var h=document.documentElement;if(!h||!h.classList)return;" +
+            "h.classList.add('androidLandscape46','landscape46');" +
+            "h.classList.remove('portraitFallback46');})()";
 
     private static final String ANDROID_BACK_SCRIPT =
             "(function(){" +
@@ -98,6 +113,16 @@ public final class MainActivity extends Activity {
         view.setBackgroundColor(Color.rgb(8, 6, 17));
         view.setFocusable(true);
         view.setFocusableInTouchMode(true);
+        view.setClickable(true);
+        view.setLongClickable(false);
+        view.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        view.setOnLongClickListener(v -> true);
+        view.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                v.requestFocus();
+            }
+            return false;
+        });
         view.requestFocus(View.FOCUS_DOWN);
 
         WebSettings settings = view.getSettings();
@@ -118,7 +143,7 @@ public final class MainActivity extends Activity {
         settings.setTextZoom(100);
         settings.setDefaultTextEncodingName("utf-8");
         settings.setMediaPlaybackRequiresUserGesture(true);
-        settings.setUserAgentString(settings.getUserAgentString() + " SakurayoAndroid/4.6.0");
+        settings.setUserAgentString(settings.getUserAgentString() + " SakurayoAndroid/4.6.0-yeying");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             settings.setSafeBrowsingEnabled(true);
         }
@@ -181,6 +206,37 @@ public final class MainActivity extends Activity {
             super.onPageFinished(view, url);
             applyImmersiveMode();
             view.requestFocus(View.FOCUS_DOWN);
+            injectRuntime(view);
+        }
+    }
+
+    private void injectRuntime(WebView view) {
+        if (view == null) return;
+        view.evaluateJavascript(ANDROID_LANDSCAPE_SCRIPT, null);
+        injectAssetScript(view, TOUCH54_ASSET);
+        injectAssetScript(view, LAYOUT52_ASSET);
+        injectAssetScript(view, FEEL53_ASSET);
+        injectAssetScript(view, BOUTIQUE_ASSET);
+        injectAssetScript(view, CHROME_ASSET);
+    }
+
+    private void injectAssetScript(WebView view, String assetPath) {
+        try {
+            view.evaluateJavascript(readAssetUtf8(assetPath), null);
+        } catch (IOException error) {
+            Log.w(TAG, "Unable to boot runtime from " + assetPath, error);
+        }
+    }
+
+    private String readAssetUtf8(String path) throws IOException {
+        try (InputStream input = getAssets().open(path);
+             ByteArrayOutputStream output = new ByteArrayOutputStream()) {
+            byte[] buffer = new byte[4096];
+            int read;
+            while ((read = input.read(buffer)) != -1) {
+                output.write(buffer, 0, read);
+            }
+            return output.toString(StandardCharsets.UTF_8.name());
         }
     }
 

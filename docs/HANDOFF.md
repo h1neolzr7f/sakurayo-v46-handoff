@@ -57,17 +57,24 @@
 | 局外精装修 | 五房同一套玻璃、立绘软边无损、商店一栏钱包 | 已落地 |
 | C | 局内 DP + 最多 2 干员钉地 | 已落地 |
 | 横屏主体验 | `html.landscape46` 默认就在；Android 锁 `landscape` | 已落地 |
-| 仿 Live2D | 随机眨眼 / 注视 / 点触，去掉卡顿滤镜 | 已落地 |
-| D | 寻访卡扩到 16 以内；站桩与大厅背景重出；商店/档案换皮 | **未做** |
-| E | 全量 `verify.ps1`、`release/`、APK、CHANGELOG | **未做** |
+| 仿 Live2D | 真实随机眨眼 / 注视 / 点触，去掉卡顿滤镜 | 已落地 |
+| D | 16 卡寻访；真实闭眼帧；商店/档案换皮；六套签名融合动作 | **已落地** |
+| E | 全量回归、单入口、Android Debug、CHANGELOG、最终报告 | **已落地；正式签名待原证书** |
+| F | 横屏作战简报、四阶段机制条、左右对白、双栏战术结算 | **已落地** |
+| 第二轮成熟化 | Boss 阶段字幕/血条门槛、三角色技能演出、干员攻击帧、横屏战斗视觉门禁 | **已落地** |
+| 战斗峰值反馈 | 分层镜头冲击、三相飞升签名、与成熟化演出无损合并 | **已落地并推到开发仓草稿 PR** |
+
+GitHub：开发仓 `h1neolzr7f/sakurayo-v46-handoff` 分支 `cursor/bc-a381488d-90d5-4ff1-914f-6cabd630c2b2-074d`，最新提交 `fabbdfa`，草稿 [PR #1](https://github.com/h1neolzr7f/sakurayo-v46-handoff/pull/1)。**未合并 `main`，未对公开仓发 4.6.0。**
 
 ### 下一步（按优先级）
 
-1. I2V 绿幕重出三角色站桩（需 infsh login）。现用 `battle.webp` / `live_idle` 静帧 + JS 动。
-2. 有独特动作的融合再补 `anim_skill.webp` / `anim_dash.webp`。缺图回退，不要借错融合的图。
-3. 寻访卡扩到 16 以内；`ui/lobby_wide.webp` 去左右黑边。
-4. 全量 `powershell -File tools/verify.ps1`（`browser_smoke` 主视口仍是 430×932）。
-5. `android-app/sync-game.ps1` 后发版。模拟器上的正式包可能仍是签名对不上的 **4.2.3 / versionCode 47**；debug 不能覆盖（`INSTALL_FAILED_UPDATE_INCOMPATIBLE`）。不要擅自卸包清档。用本机 HTTP 打开 `src/index.html` 验收。
+1. 先读根目录 `README.md` 的「当前状态」和 `docs/FINAL_UPGRADE_REPORT.md`；不要重复实现 16 卡、闭眼帧、作战简报、Boss 字幕、技能演出、干员攻击帧、分层冲击或三相飞升签名。
+2. 使用原正式证书构建 Release，并在至少一台横屏 Android 实体设备验证覆盖安装、触控、刘海安全区、发热和长期帧率。
+3. 明确要求后再把草稿 PR 合进 `main`，以及是否同步公开玩家仓。
+4. 若继续升级站桩，只做像素稳定的分层/I2V 路线；不得退回待机与眨眼同图，也不要用高开销滤镜伪装动画。
+5. 六套签名融合已有三角色 `anim_skill.webp` / `anim_dash.webp`。新增动作仍须缺图回退，禁止借错融合。
+6. 横屏主路径已有 `tests/landscape_smoke.mjs`，不得只跑 430×932 就声称 Android 横屏可用。
+7. 日常验证优先 `npm test && npm run test:visual`；visual 现同时覆盖寻访/名册和 932×430 战斗。Windows 仍可运行 `powershell -File tools/verify.ps1`。
 
 ### 明确不做
 
@@ -137,7 +144,7 @@ pity, pitySR, pulls, tenPulls, owned, last, cheatUsed
 
 禁止新 top-level save key。证词进度若以后要记，加 `shop40.ops.story` 或沿用现有剧情字段。
 
-名册 8 格。未回收只用卡背，禁止灰图剧透。点开详情。重复只加计数，不进战斗。锁卡脚注「待寻访」，墙上仍可写「未回收」。
+名册 16 格。未回收只用卡背，禁止灰图剧透。点开详情。重复只加计数，不进战斗。锁卡脚注「待寻访」，墙上仍可写「未回收」。
 
 揭示层挂在 `#gachaDrawer`，不要挂在 `#gachaBody46`（刷新会抹掉翻牌）。`TEST_MODE` / `?test=1` 立即翻开。
 
@@ -235,6 +242,7 @@ sakurayo-lifecycle.js
 sakurayo-cutscene.js
 sakurayo-economy.js
 sakurayo-lobby.js
+sakurayo-shell.js
 sakurayo-live.js
 sakurayo-ops.js
 ```
@@ -255,7 +263,7 @@ ART_ROOT =
 - 新图同时考虑进 `game/art`；源 PNG 在 `assets/image2/source/`（本仓未收录）。
 - 规格见 [IMAGE2_ASSET_SPEC.md](IMAGE2_ASSET_SPEC.md)。
 - 已入库但未发版的包括：职业/融合闪图、三角色 career/form/fusion 战斗帧、`gacha/`、`ui/lobby_wide.webp`、寻访/名册/档案导航图。
-- 还缺：I2V 绿幕全身站桩、无缝大厅宽背景、部分融合的 skill/dash。
+- 当前限制：站桩仍是轻量 2D puppet 而非网格 Live2D；Android 正式签名与实体设备长测待原证书/设备。大厅宽背景、16 卡和六套签名融合动作已完成。
 
 ## 14. 怎么跑
 
@@ -265,6 +273,7 @@ ART_ROOT =
 
 ```powershell
 node --check src/runtime/sakurayo-lobby.js
+node --check src/runtime/sakurayo-shell.js
 node --check src/runtime/sakurayo-live.js
 node --check src/runtime/sakurayo-ops.js
 node tests/lobby_unit.mjs
@@ -279,14 +288,9 @@ node tests/ops_smoke.mjs
 powershell -File tools/verify.ps1
 ```
 
-`verify.ps1` 目前包含：`static_check`、各 runtime 语法、`lobby_unit`、`live_unit`、`ops_unit`、`ops_smoke`、`framework_smoke`、`browser_smoke`。
+`verify.ps1` 目前包含：`static_check`、内容包、各 runtime 语法、3 个 unit、ops / testimony / landscape / framework / browser smoke 与 gacha visual。
 
-**没有**自动跑：
-
-- `tests/testimony_smoke.mjs`
-- `tests/gacha_visual.mjs`（会出 932×430 截图到 `tests/artifacts/gacha/`，该目录 gitignore）
-
-改证词或寻访视觉时请单独跑这两项。`browser_smoke.mjs` 断言版本 `"4.6.0"`，主视口 430×932；竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。
+`landscape_smoke.mjs` 固定验证 932×430 作战简报、战场、Boss 阶段机制条和战术结算；`browser_smoke.mjs` 仍以 430×932 做大部分兼容回归并断言版本 `"4.6.0"`。竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。
 
 发版（用户明确要求再做）：
 
