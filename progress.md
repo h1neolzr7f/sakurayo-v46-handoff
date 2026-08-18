@@ -15,6 +15,12 @@ Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先
 
 # Progress
 
+## 2026-08-18 主神精装修补洞
+
+- 太刀/AOE 可打碎校验柱与镜核；四种 Boss 各有专属技能、场地和台词，适应只对抄袭者。
+- 外设与模板互补并写重叠提示；保命防护单独成栏。交互物优先画现有 fx stamp。
+- 测试：`maingod_shop_unit` / `maingod_core_unit` / `maingod_polish_unit` / `maingod_core_smoke`（四类型 force + 打碎镜核）。
+
 ## 2026-08-17 主神精装修
 
 - 货架加 8 件原创外设；兑换大厅改玻璃账户条和七栏分类，不再是黄字列表毛坯。

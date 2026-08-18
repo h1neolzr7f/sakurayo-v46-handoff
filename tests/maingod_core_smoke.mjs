@@ -45,7 +45,7 @@ assert.equal(shop.hall, true, "兑换大厅应有精装修外壳");
 assert.equal(shop.hero, true, "兑换大厅应有账户条");
 assert.equal(shop.cards, 28, "旧货架 + 8 件外设应为 28 张 exchangeCard36");
 assert.equal(shop.core, 8);
-assert.ok(shop.tabs.includes("模板") && shop.tabs.includes("特效"));
+assert.ok(shop.tabs.includes("模板") && shop.tabs.includes("特效") && shop.tabs.includes("保命"));
 assert.equal(await api(page, "pickMainGodBossType46", 0, 1, 1), "mirror");
 await api(page, "grantMainGodPoints", 80);
 const bought = await api(page, "buyMainGodTemplate46", "crimson");
@@ -106,6 +106,17 @@ const bossFx = await api(page, "mainGodBoss46");
 assert.equal(bossFx.type, "mirror", "clears0+T1+depth1 应为镜像投影");
 assert.ok(bossFx.fx.some(x => x.kind === "mirror"), "镜像投影应有可打碎的镜核");
 assert.match(bossFx.rule || "", /镜核|适应/);
+const shattered = await api(page, "hitMainGodFx46", "mirror");
+assert.ok(shattered.hit > 0, "太刀/命中路径应能打碎镜核");
+assert.ok(shattered.boss.fx.every(x => x.kind !== "mirror" || x.hp <= 0), "镜核被打碎后 hp 应为 0");
+for (const type of ["auditor", "reaper", "mirror", "warden"]) {
+  const forced = await api(page, "forceMainGodBossType46", type);
+  assert.equal(forced.ok, true, `${type} 应可强制`);
+  assert.equal(forced.type, type);
+  assert.equal(forced.boss.type, type);
+  const kind = { auditor: "pillar", reaper: "rift", mirror: "mirror", warden: "ward" }[type];
+  assert.ok(forced.boss.fx.some(x => x.kind === kind), `${type} 应生成 ${kind}`);
+}
 const beforeFinish = await api(page, "saveSnapshot");
 await api(page, "finish", true);
 const after = await api(page, "saveSnapshot");

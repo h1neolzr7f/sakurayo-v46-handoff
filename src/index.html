@@ -6217,9 +6217,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     summonPage:{n:"英灵召唤契约页",i:"👻",d:"开局获得使魔；每级召唤伤害 +15%",max:3,base:12,step:9,group:"职业与技法"},
     captainMark:{n:"轮回队长印",i:"🎖️",d:"每级挑战奖励点 +2，经验 +8%，召唤伤害 +8%",max:3,base:12,step:9,group:"职业与技法"},
     spaceRing:{n:"折叠军械空间戒",i:"💍",d:"永久解锁：主神空间开局额外弹幕、穿透和磁吸",max:1,base:22,step:0,group:"特殊效果道具"},
-    rebirthDoll:{n:"因果替身人偶",i:"🪆",d:"永久解锁：每轮第一次致死时重构身体",max:1,base:28,step:0,group:"特殊效果道具"},
+    rebirthDoll:{n:"因果替身人偶",i:"🪆",d:"永久解锁：每轮第一次致死时重构身体",max:1,base:28,step:0,group:"保命防护"},
     sideKey:{n:"支线剧情权限钥匙",i:"🗝️",d:"每级通关额外奖励点 +2，并解锁隐藏日志",max:3,base:14,step:10,group:"特殊效果道具"},
-    wardWeave:{n:"监管防弹织层",i:"🦺",d:"每级受到伤害 -7%",max:3,base:10,step:8,group:"特殊效果道具"},
+    wardWeave:{n:"监管防弹织层",i:"🦺",d:"每级受到伤害 -7%",max:3,base:10,step:8,group:"保命防护"},
     judgmentPin:{n:"裁决投针",i:"🔱",d:"每级对 Boss 伤害 +12%",max:3,base:14,step:10,group:"特殊效果道具"},
   };
   function mainGodUpgradeCost36(id){return 3+(save.mainGod[id]||0)*4;}
@@ -6228,7 +6228,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function buyMainGodItem36(id){const u=MAIN_GOD_ITEMS36[id];if(!u)throw new Error(`Unknown main-god item: ${id}`);const lv=save.mainGod[id]||0,cost=mainGodItemCost36(id);if(lv>=u.max||save.mainGod.points<cost)return false;save.mainGod.points-=cost;save.mainGod[id]=lv+1;persist();toast(`兑换完成：${u.n}`);return true;}
   function ensureMainGodShop36(){let drawer=$("#mainGodDrawer36");if(drawer)return drawer;drawer=document.createElement("section");drawer.id="mainGodDrawer36";drawer.className="drawer hidden";drawer.innerHTML='<div class="dhead"><h2>◈ 主神兑换大厅</h2><button class="close">×</button></div><div class="dbody"><div class="mainGodBalance36" id="mainGodBalance36"></div><div id="mainGodShopList36"></div></div>';drawer.querySelector(".close").onclick=()=>drawer.classList.add("hidden");document.body.appendChild(drawer);return drawer;}
   function exchangeCard36(id,u,buyer,cost){const lv=save.mainGod[id]||0,d=document.createElement("div");d.className="exchangeCard36";d.innerHTML=`<div class="ei">${u.i}</div><div><h4>${u.n} · Lv.${lv}/${u.max}</h4><p>${u.d}<br><span style="color:#ffe291">只在主神空间生效，跨轮回保留</span></p></div><button ${lv>=u.max||save.mainGod.points<cost?"disabled":""}>${lv>=u.max?"MAX":`◈ ${cost}`}</button>`;d.querySelector("button").onclick=()=>buyer(id);return d;}
-  function renderMainGodShop36(){ensureMainGodShop36();const balance=$("#mainGodBalance36"),list=$("#mainGodShopList36");balance.innerHTML=`奖励点余额 ◈ ${save.mainGod.points}<br><small>兑换强化永久保留；职业、升级、融合、飞升仍在每轮结算后清空。</small>`;list.innerHTML="";const basic=document.createElement("section");basic.className="exchangeSection36";basic.innerHTML="<h3>基础权能强化</h3>";for(const [id,u] of Object.entries(MAIN_GOD_UPGRADES36))basic.appendChild(exchangeCard36(id,u,buyMainGodUpgrade36,mainGodUpgradeCost36(id)));list.appendChild(basic);for(const group of ["血统与灵能","职业与技法","特殊效果道具"]){const section=document.createElement("section");section.className="exchangeSection36";section.innerHTML=`<h3>${group}</h3>`;for(const [id,u] of Object.entries(MAIN_GOD_ITEMS36))if(u.group===group)section.appendChild(exchangeCard36(id,u,buyMainGodItem36,mainGodItemCost36(id)));list.appendChild(section);}}
+  function renderMainGodShop36(){ensureMainGodShop36();const balance=$("#mainGodBalance36"),list=$("#mainGodShopList36");balance.innerHTML=`奖励点余额 ◈ ${save.mainGod.points}<br><small>兑换强化永久保留；职业、升级、融合、飞升仍在每轮结算后清空。</small>`;list.innerHTML="";const basic=document.createElement("section");basic.className="exchangeSection36";basic.innerHTML="<h3>基础权能强化</h3>";for(const [id,u] of Object.entries(MAIN_GOD_UPGRADES36))basic.appendChild(exchangeCard36(id,u,buyMainGodUpgrade36,mainGodUpgradeCost36(id)));list.appendChild(basic);for(const group of ["血统与灵能","职业与技法","特殊效果道具","保命防护"]){const section=document.createElement("section");section.className="exchangeSection36";section.innerHTML=`<h3>${group}</h3>`;for(const [id,u] of Object.entries(MAIN_GOD_ITEMS36))if(u.group===group)section.appendChild(exchangeCard36(id,u,buyMainGodItem36,mainGodItemCost36(id)));list.appendChild(section);}}
   function openMainGodShop36(){closeDrawers();renderMainGodShop36();ensureMainGodShop36().classList.remove("hidden");}
 
   const aimInput36={on:false,id:null,x:0,y:0};
@@ -6437,7 +6437,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function installSaveButton38(){installUtilityButtons37();const wrap=document.querySelector(".utilityButtons37");if(!wrap||$("#saveButton38"))return;const b=document.createElement("button");b.id="saveButton38";b.textContent="存档";b.onclick=openSaveManager38;wrap.appendChild(b);}
   installSaveButton38();
   const _renderMainGodShop38=renderMainGodShop36;
-  renderMainGodShop36=function(){_renderMainGodShop38();const list=$("#mainGodShopList36");if(!list||$("#mainGodTabs38"))return;const tabs=document.createElement("nav");tabs.id="mainGodTabs38";tabs.className="filterTabs38";tabs.innerHTML=['全部','基础权能强化','血统与灵能','职业与技法','特殊效果道具'].map((name,i)=>`<button class="${i===0?'on':''}" data-group="${name}">${i===0?'全部':name.replace('强化','')}</button>`).join('');list.prepend(tabs);tabs.querySelectorAll("button").forEach(button=>button.onclick=()=>{tabs.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b===button));list.querySelectorAll(".exchangeSection36").forEach(section=>{const title=section.querySelector("h3")?.textContent||"";section.style.display=button.dataset.group==="全部"||title===button.dataset.group?"":"none";});});};
+  renderMainGodShop36=function(){_renderMainGodShop38();const list=$("#mainGodShopList36");if(!list||$("#mainGodTabs38"))return;const tabs=document.createElement("nav");tabs.id="mainGodTabs38";tabs.className="filterTabs38";tabs.innerHTML=['全部','基础权能强化','血统与灵能','职业与技法','特殊效果道具','保命防护'].map((name,i)=>`<button class="${i===0?'on':''}" data-group="${name}">${i===0?'全部':name.replace('强化','')}</button>`).join('');list.prepend(tabs);tabs.querySelectorAll("button").forEach(button=>button.onclick=()=>{tabs.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b===button));list.querySelectorAll(".exchangeSection36").forEach(section=>{const title=section.querySelector("h3")?.textContent||"";section.style.display=button.dataset.group==="全部"||title===button.dataset.group?"":"none";});});};
   const _renderAscensionGuide38=renderAscensionGuide;
   renderAscensionGuide=function(){_renderAscensionGuide38();const box=$("#ascList");if(!box||$("#careerTabs38"))return;const tabs=document.createElement("nav");tabs.id="careerTabs38";tabs.className="filterTabs38";tabs.innerHTML='<button class="on" data-filter="">全部</button><button data-filter="职业">职业</button><button data-filter="融合">融合</button><button data-filter="飞升">飞升</button><button data-filter="天敌">克制</button>';const search=$("#careerSearch37");search?.insertAdjacentElement("afterend",tabs);tabs.querySelectorAll("button").forEach(button=>button.onclick=()=>{tabs.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b===button));const q=button.dataset.filter;box.querySelectorAll(".storyCard").forEach(card=>card.style.display=!q||card.textContent.includes(q)?"":"none");});};
   const _menuUpdate38=menuUpdate;
@@ -6517,7 +6517,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     P.dodgeFlash=Math.max(0,(P.dodgeFlash||0)-dt);updateEnemyRoles39(dt);
     if(boss&&!boss.dead){
       if(stage().id===2&&boss.signalX39!=null){P.signalLane39=boss.signalX39;if(Math.abs(P.x-boss.signalX39)<42){P.jam=Math.max(0,(P.jam||0)-dt*3.8);P.healSupp=Math.max(0,(P.healSupp||0)-dt*2.4);}}
-      if((stage().id===4||isMainGodRun36())){boss.ruleClock39=(boss.ruleClock39||7)-dt;if(boss.ruleClock39<=0){boss.ruleClock39=7;const sources=Object.entries(P.damageSources||{}).sort((a,b)=>b[1]-a[1]);boss.adaptSource39=sources[0]?.[0]||"shot";boss.bossRes={...(boss.bossRes||{}),[boss.adaptSource39]:.58};toast(`镜像适应：${SOURCE_NAME[boss.adaptSource39]||boss.adaptSource39} 受抑制`);}}
+      if((stage().id===4&&!isMainGodRun36())||(isMainGodRun36()&&P.mgBoss?.type==="mirror")){boss.ruleClock39=(boss.ruleClock39||7)-dt;if(boss.ruleClock39<=0){boss.ruleClock39=7;const sources=Object.entries(P.damageSources||{}).sort((a,b)=>b[1]-a[1]);boss.adaptSource39=sources[0]?.[0]||"shot";boss.bossRes={...(boss.bossRes||{}),[boss.adaptSource39]:.58};toast(`镜像适应：${SOURCE_NAME[boss.adaptSource39]||boss.adaptSource39} 受抑制`);}}
     }
   }return result;};
 
@@ -7084,6 +7084,16 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       openMainGodShop36(){openMainGodShop36();return {visible:!$("#mainGodDrawer36").classList.contains("hidden"),hall:$("#mainGodDrawer36").classList.contains("mgHall46"),hero:!!$("#mgHero46"),cards:document.querySelectorAll("#mainGodShopList36 .exchangeCard36").length,core:document.querySelectorAll("#mainGodShopList36 .coreCard46").length,tabs:[...document.querySelectorAll("#mainGodTabs38 button")].map(b=>b.textContent)};},
       mainGodBoss46(){return mainGodBossSnap46();},
       pickMainGodBossType46(clears=0,tier=1,depth=1){return pickMainGodBossType46(clears,tier,depth);},
+      currentMainGodBossType46(){return currentMainGodBossType46();},
+      forceMainGodBossType46(type){return {ok:forceMainGodBossType46(type),type:currentMainGodBossType46(),boss:mainGodBossSnap46()};},
+      hitMainGodFx46(kindOrX,y,r,dmg,source){
+        if(typeof kindOrX==="string"&&!Number.isFinite(Number(kindOrX))){
+          const t=(P.mgBoss?.fx||[]).find(f=>f.kind===kindOrX&&f.hp>0);
+          if(!t)return {hit:0,boss:mainGodBossSnap46()};
+          return {hit:hurtMainGodFx46(t.x,t.y,t.r+(Number(y)||0),r||9999,dmg||"blade"),boss:mainGodBossSnap46()};
+        }
+        return {hit:hurtMainGodFx46(kindOrX,y,r,dmg,source||"blade"),boss:mainGodBossSnap46()};
+      },
       characterEggCatalog(id=save.character){return JSON.parse(JSON.stringify(CHARACTER_EGGS36[id]||{}));},
       setAim(x,y){setAimVector36(Number(x),Number(y),true);return snapshot35();},
       directionalHit(distance,enemyRadius,radius,angleOffset,halfArc){return directionalHit36(Number(distance),Number(enemyRadius),Number(radius),Number(angleOffset),Number(halfArc));},
@@ -7930,25 +7940,88 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 
   /* ================= V4.6 主神精装修：货架 / 大厅 / Boss 类型与交互 ================= */
   const MAIN_GOD_EXTRA_IDS46=["echoBoots","railLens","bloodVial","swordMark","starClip","voidCharm","blindKey","silentPendulum"];
-  MAIN_GOD_ITEMS36.echoBoots={n:"折跃残影靴",i:"🥾",d:"冲刺距离略增并延长无敌。只在主神空间生效。",max:1,base:16,step:0,group:"特殊效果道具"};
-  MAIN_GOD_ITEMS36.railLens={n:"磁轨校准镜",i:"🔭",d:"每隔数发补一发磁轨，穿透 +1。机甲手感的轻量外设。",max:2,base:14,step:10,group:"职业与技法"};
-  MAIN_GOD_ITEMS36.bloodVial={n:"血露回廊瓶",i:"🧴",d:"每级微量吸血与回复。不替代猩红模板，只做续航垫层。",max:2,base:12,step:9,group:"血统与灵能"};
-  MAIN_GOD_ITEMS36.swordMark={n:"飞剑胎记",i:"🗡️",d:"开局保底一柄飞剑。已有气机模板时不重复叠剑。",max:1,base:14,step:0,group:"职业与技法"};
-  MAIN_GOD_ITEMS36.starClip={n:"星屑弹夹",i:"🌟",d:"开局追加星辉弹。已有星辉模板时只补微量法术倍率。",max:1,base:14,step:0,group:"职业与技法"};
-  MAIN_GOD_ITEMS36.voidCharm={n:"虚空避弹符",i:"🧿",d:"释放主动技能时获得短暂无敌。",max:1,base:18,step:0,group:"特殊效果道具"};
+  MAIN_GOD_ITEMS36.echoBoots={n:"折跃残影靴",i:"🥾",d:"冲刺距离略增并延长无敌。只在主神空间生效。",max:1,base:16,step:0,group:"保命防护"};
+  MAIN_GOD_ITEMS36.railLens={n:"磁轨校准镜",i:"🔭",d:"每隔数发补一发磁轨。已有机甲时改为射速校准，不再只加穿透。",max:2,base:14,step:10,group:"职业与技法"};
+  MAIN_GOD_ITEMS36.bloodVial={n:"血露回廊瓶",i:"🧴",d:"每级微量吸血与回复。已有猩红时改为护盾回廊，不再叠吸血。",max:2,base:12,step:9,group:"血统与灵能"};
+  MAIN_GOD_ITEMS36.swordMark={n:"飞剑胎记",i:"🗡️",d:"开局保底一柄飞剑。已有气机模板时改为刀势，不重复叠剑。",max:1,base:14,step:0,group:"职业与技法"};
+  MAIN_GOD_ITEMS36.starClip={n:"星屑弹夹",i:"🌟",d:"开局追加星辉弹。已有星辉模板时改为法术过载，不再叠弹。",max:1,base:14,step:0,group:"职业与技法"};
+  MAIN_GOD_ITEMS36.voidCharm={n:"虚空避弹符",i:"🧿",d:"释放主动技能时获得短暂无敌。",max:1,base:18,step:0,group:"保命防护"};
   MAIN_GOD_ITEMS36.blindKey={n:"监察盲区钥",i:"👁️",d:"经验晶核磁吸范围扩大，方便单手拾取。",max:2,base:10,step:8,group:"特殊效果道具"};
   MAIN_GOD_ITEMS36.silentPendulum={n:"静默钟摆",i:"🕰️",d:"冲刺冻结附近普通怪（最多 8 个）。沿用局内冻结，不另开无界扫描。",max:1,base:16,step:0,group:"血统与灵能"};
   for(const id of MAIN_GOD_EXTRA_IDS46)save.mainGod[id]=Number(save.mainGod[id])||0;
 
   const MAIN_GOD_BOSS_TYPES46={
-    auditor:{n:"监察投影·校验者",color:"#d7c2ff",rule:"打碎两侧校验柱，解除抗性加码",hint:"柱在则监察加抗。子弹打柱，不是再刷一波普通怪。"},
+    auditor:{n:"监察投影·校验者",color:"#d7c2ff",rule:"打碎两侧校验柱，解除抗性加码",hint:"柱在则监察加抗。枪弹或斩击打柱，不是再刷一波普通怪。"},
     reaper:{n:"收割投影·断线者",color:"#ffd36b",rule:"冲刺穿过金色裂口，解除技能封锁",hint:"它会周期性锁技能。裂口是交互物，不是召唤物。"},
-    mirror:{n:"镜像投影·抄袭者",color:"#9ee7ff",rule:"打碎镜核，重置伤害适应",hint:"它抄你最高伤来源。打碎镜核才能改题。"},
+    mirror:{n:"镜像投影·抄袭者",color:"#9ee7ff",rule:"打碎镜核，重置伤害适应",hint:"它抄你最高伤来源。枪弹或斩击打碎镜核才能改题。"},
     warden:{n:"深廊投影·压境者",color:"#7ad7ff",rule:"站进压境纹内减伤，纹外承伤加重",hint:"安全纹像第二章信道，但是圆形交互区。"}
   };
   function pickMainGodBossType46(clears,tier,depth){
     const n=Math.abs((Number(clears)||0)+(Number(tier)||1)+(Number(depth)||1));
     return ["auditor","reaper","mirror","warden"][n%4];
+  }
+  function currentMainGodBossType46(){
+    const forced=P.mgBossForce46;
+    if(forced&&MAIN_GOD_BOSS_TYPES46[forced])return forced;
+    return P.mgBoss?.type||pickMainGodBossType46(save.mainGod?.clears,selectedMainGodTier36,stage()?.depth||1);
+  }
+  function forceMainGodBossType46(type){
+    if(!MAIN_GOD_BOSS_TYPES46[type])return false;
+    P.mgBossForce46=type;
+    if(isMainGodRun36()&&boss)initMainGodBoss46();
+    return true;
+  }
+  function extraOverlapHint46(id){
+    const c=ensureMainGodCore46();
+    const has=k=>c.eqMain===k||c.eqSub===k;
+    if(id==="swordMark"&&has("qi"))return "已有气机：改为刀势 +8%，不再叠剑";
+    if(id==="starClip"&&has("star"))return "已有星辉：改为法术过载，不再叠弹";
+    if(id==="railLens"&&has("mecha"))return "已有机甲：改为射速校准，不再只加穿透";
+    if(id==="bloodVial"&&has("crimson"))return "已有猩红：改为护盾回廊，不再叠吸血";
+    return "";
+  }
+  function drawFxStampAt46(kind,x,y,size){
+    const stamp=artImage(`fx/${kind}.webp`);
+    if(!artReady(stamp))return false;
+    ctx.save();
+    ctx.globalCompositeOperation="screen";
+    ctx.drawImage(stamp,x-size,y-size,size*2,size*2);
+    ctx.restore();
+    return true;
+  }
+  function mainGodBossLines46(type){
+    const meta=MAIN_GOD_BOSS_TYPES46[type]||MAIN_GOD_BOSS_TYPES46.mirror;
+    const who=char35().short,blade=char35().id==="rion";
+    const lines={
+      auditor:[{sp:"警报",tx:`${meta.n} 降临。两侧校验柱还在时，它会加抗。`},{sp:"主神",tx:"打碎柱，再谈回收。枪弹或斩击都可以。"},{sp:who,tx:blade?"柱也挡不住刀。":"先拆柱。"}],
+      reaper:[{sp:"警报",tx:`${meta.n} 降临。它会周期性锁技能。`},{sp:"主神",tx:"金色裂口是逃生缝。冲过去，别站着挨封锁。"},{sp:who,tx:blade?"锁技能？那我就用普通斩拆它。":"看到裂口就冲。"}],
+      mirror:[{sp:"警报",tx:`${meta.n} 降临。它会抄你最高伤来源。`},{sp:"主神",tx:"打碎镜核才能改题。枪弹或斩击都可以。"},{sp:who,tx:blade?"镜核也是一刀的事。":"别让它把答案抄完。"}],
+      warden:[{sp:"警报",tx:`${meta.n} 降临。站进压境纹才安全。`},{sp:"主神",tx:"纹会收缩、挪位。出纹承伤加重。"},{sp:who,tx:blade?"纹里挥刀。":"跟着纹走。"}]
+    };
+    return lines[type]||lines.mirror;
+  }
+  function hurtMainGodFx46(x,y,r,dmg,source){
+    if(!isMainGodRun36()||!P.mgBoss)return 0;
+    const fx=P.mgBoss.fx;if(!fx)return 0;
+    if(fx.length>8)fx.length=8;
+    let hits=0;
+    const shot=source==="shot"||source==="tech"||source==="bullet";
+    for(const t of fx){
+      if(!t||t.hp<=0||(t.kind!=="pillar"&&t.kind!=="mirror"))continue;
+      if(Math.hypot((x||0)-t.x,(y||0)-t.y)<(r||0)+t.r){
+        t.hp-=dmg||P.dmg||8;
+        hits++;
+        if(t.hp<=0){
+          t.hp=0;P.mgBoss.adaptReset=(P.mgBoss.adaptReset||0)+1;
+          fxStamp("shatter",t.x,t.y,{size:42,life:.22});
+          if(t.kind==="pillar")toast("校验柱破碎");
+          if(t.kind==="mirror"){if(boss){boss.adaptSource39=null;boss.bossRes={};}toast("镜核破碎：适应重置");}
+        }
+        if(shot)break;
+      }
+    }
+    P.mgBoss.pillarAlive=fx.filter(item=>item.kind==="pillar"&&item.hp>0).length;
+    return hits;
   }
   function mainGodBossSnap46(){
     const fx=(P.mgBoss?.fx||[]).slice(0,8).map(x=>({kind:x.kind,hp:Number(x.hp)||0,max:Number(x.max)||0,x:Number(x.x)||0,y:Number(x.y)||0}));
@@ -7956,25 +8029,28 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
   function refreshMainGodBossFx46(){
     if(!P.mgBoss||!boss)return;
-    const type=P.mgBoss.type,hp=Math.max(72,(boss.max||800)*0.045),fx=[];
+    const type=P.mgBoss.type,phase=Math.max(1,boss.phase||1);
+    const hp=Math.max(72,(boss.max||800)*0.045)*(1+0.18*(phase-1)),fx=[];
     if(type==="auditor"){
       fx.push({kind:"pillar",x:W*0.22,y:H*0.34,r:18,hp,max:hp});
       fx.push({kind:"pillar",x:W*0.78,y:H*0.34,r:18,hp,max:hp});
     }else if(type==="reaper"){
-      fx.push({kind:"rift",x:W*0.5,y:H*0.64,r:30,hp:1,max:1});
+      fx.push({kind:"rift",x:W*0.5,y:H*0.64,r:Math.max(18,30-4*(phase-1)),hp:1,max:1});
     }else if(type==="mirror"){
       fx.push({kind:"mirror",x:boss.x||W*0.5,y:Math.min(H*0.42,(boss.y||120)+74),r:20,hp:hp*1.1,max:hp*1.1});
     }else{
-      fx.push({kind:"ward",x:W*0.5,y:H*0.56,r:80,hp:1,max:1});
+      fx.push({kind:"ward",x:W*0.5,y:H*0.56,r:Math.max(48,80-8*(phase-1)),hp:1,max:1});
     }
     P.mgBoss.fx=fx.slice(0,8);
     P.mgBoss.pillarAlive=fx.filter(x=>x.kind==="pillar"&&x.hp>0).length;
+    P.mgBoss.lockInterval=Math.max(3.4,6.2-0.7*(phase-1));
   }
   function initMainGodBoss46(){
     if(!isMainGodRun36()||!boss)return;
-    const type=pickMainGodBossType46(save.mainGod.clears,selectedMainGodTier36,stage().depth||1);
+    const type=currentMainGodBossType46();
     const meta=MAIN_GOD_BOSS_TYPES46[type];
-    P.mgBoss={type,name:meta.n,fx:[],adaptReset:0,riftClear:0,skillLock:3.2,pillarAlive:0,insideWard:false};
+    const keepReset=P.mgBoss?.adaptReset||0,keepRift=P.mgBoss?.riftClear||0;
+    P.mgBoss={type,name:meta.n,fx:[],adaptReset:keepReset,riftClear:keepRift,skillLock:3.2,pillarAlive:0,insideWard:false,lockInterval:6.2};
     boss.mgType=type;boss.color=meta.color;boss.rule39=meta.rule;P.bossRule39=meta.rule;
     refreshMainGodBossFx46();
     const warn=$("#warning");if(warn){warn.textContent=`BOSS ${meta.n} 降临 · ${meta.rule}`;warn.classList.remove("hidden");setTimeout(()=>warn.classList.add("hidden"),2300);}
@@ -7987,7 +8063,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       P.mgBoss.skillLock=(P.mgBoss.skillLock||0)+dt;
       const rift=fx.find(x=>x.kind==="rift");
       if(rift){rift.x=W*0.5+Math.sin(runTime*0.7)*W*0.2;rift.y=H*0.62+Math.cos(runTime*0.45)*28;}
-      if(P.mgBoss.skillLock>6.2){P.skill=Math.max(P.skill,2.2);P.mgBoss.skillLock=0;toast("断线封锁：冲进裂口解除");}
+      if(P.mgBoss.skillLock>(P.mgBoss.lockInterval||6.2)){P.skill=Math.max(P.skill,2.2);P.mgBoss.skillLock=0;toast("断线封锁：冲进裂口解除");}
     }
     if(P.mgBoss.type==="mirror"){
       const mirror=fx.find(x=>x.kind==="mirror"&&x.hp>0);
@@ -7997,24 +8073,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       const ward=fx.find(x=>x.kind==="ward");
       P.mgBoss.insideWard=!!(ward&&Math.hypot(P.x-ward.x,P.y-ward.y)<ward.r);
     }
-    const targets=fx.filter(x=>x.hp>0&&(x.kind==="pillar"||x.kind==="mirror"));
-    if(targets.length){
-      for(const b of bullets){
-        if(!b||b.life<=0)continue;
-        for(const t of targets){
-          if(t.hp<=0)continue;
-          if(Math.hypot((b.x||0)-t.x,(b.y||0)-t.y)<(b.r||4)+t.r){
-            t.hp-=b.dmg||P.dmg||8;b.life=0;
-            if(t.hp<=0){
-              t.hp=0;P.mgBoss.adaptReset=(P.mgBoss.adaptReset||0)+1;
-              fxStamp("shatter",t.x,t.y,{size:42,life:.22});
-              if(t.kind==="pillar")toast("校验柱破碎");
-              if(t.kind==="mirror"){boss.adaptSource39=null;boss.bossRes={};toast("镜核破碎：适应重置");}
-            }
-            break;
-          }
-        }
-      }
+    for(const b of bullets){
+      if(!b||b.life<=0)continue;
+      if(hurtMainGodFx46(b.x,b.y,b.r||4,b.dmg||P.dmg||8,b.source||"shot"))b.life=0;
     }
     P.mgBoss.pillarAlive=fx.filter(x=>x.kind==="pillar"&&x.hp>0).length;
   }
@@ -8024,20 +8085,28 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     for(const t of P.mgBoss.fx.slice(0,8)){
       ctx.globalAlpha=t.hp>0?.9:.28;
       if(t.kind==="pillar"){
-        ctx.fillStyle="#d7c2ff55";ctx.strokeStyle="#f2deff";ctx.lineWidth=2;
-        ctx.beginPath();ctx.roundRect?ctx.roundRect(t.x-10,t.y-28,20,40,6):ctx.rect(t.x-10,t.y-28,20,40);ctx.fill();ctx.stroke();
+        if(!drawFxStampAt46(t.hp>0?"skill":"shatter",t.x,t.y,22)){
+          ctx.fillStyle="#d7c2ff55";ctx.strokeStyle="#f2deff";ctx.lineWidth=2;
+          ctx.beginPath();ctx.roundRect?ctx.roundRect(t.x-10,t.y-28,20,40,6):ctx.rect(t.x-10,t.y-28,20,40);ctx.fill();ctx.stroke();
+        }
         ctx.fillStyle="#fff";ctx.font="900 11px system-ui";ctx.textAlign="center";ctx.fillText("柱",t.x,t.y-34);
       }else if(t.kind==="rift"){
-        ctx.strokeStyle="#ffd36b";ctx.lineWidth=3;ctx.setLineDash([8,6]);
-        ctx.beginPath();ctx.ellipse(t.x,t.y,t.r,t.r*.42,runTime,0,TAU);ctx.stroke();ctx.setLineDash([]);
+        if(!drawFxStampAt46("dash",t.x,t.y,t.r)){
+          ctx.strokeStyle="#ffd36b";ctx.lineWidth=3;ctx.setLineDash([8,6]);
+          ctx.beginPath();ctx.ellipse(t.x,t.y,t.r,t.r*.42,runTime,0,TAU);ctx.stroke();ctx.setLineDash([]);
+        }
         ctx.fillStyle="#ffe08a";ctx.font="900 11px system-ui";ctx.textAlign="center";ctx.fillText("裂口",t.x,t.y+4);
       }else if(t.kind==="mirror"){
-        ctx.strokeStyle="#9ee7ff";ctx.fillStyle="#9ee7ff22";ctx.lineWidth=2;
-        ctx.beginPath();ctx.arc(t.x,t.y,t.r,0,TAU);ctx.fill();ctx.stroke();
+        if(!drawFxStampAt46(t.hp>0?"hit":"shatter",t.x,t.y,t.r)){
+          ctx.strokeStyle="#9ee7ff";ctx.fillStyle="#9ee7ff22";ctx.lineWidth=2;
+          ctx.beginPath();ctx.arc(t.x,t.y,t.r,0,TAU);ctx.fill();ctx.stroke();
+        }
         ctx.fillStyle="#e8fbff";ctx.font="900 11px system-ui";ctx.textAlign="center";ctx.fillText("镜",t.x,t.y+4);
       }else if(t.kind==="ward"){
-        ctx.strokeStyle=P.mgBoss.insideWard?"#7ad7ff":"#7ad7ff66";ctx.fillStyle=P.mgBoss.insideWard?"#7ad7ff18":"#7ad7ff0c";
-        ctx.setLineDash([10,8]);ctx.beginPath();ctx.arc(t.x,t.y,t.r,0,TAU);ctx.fill();ctx.stroke();ctx.setLineDash([]);
+        if(!drawFxStampAt46("levelup",t.x,t.y,t.r*.55)){
+          ctx.strokeStyle=P.mgBoss.insideWard?"#7ad7ff":"#7ad7ff66";ctx.fillStyle=P.mgBoss.insideWard?"#7ad7ff18":"#7ad7ff0c";
+          ctx.setLineDash([10,8]);ctx.beginPath();ctx.arc(t.x,t.y,t.r,0,TAU);ctx.fill();ctx.stroke();ctx.setLineDash([]);
+        }
         ctx.fillStyle="#d9f6ff";ctx.font="900 11px system-ui";ctx.textAlign="center";ctx.fillText("压境纹",t.x,t.y+4);
       }
     }
@@ -8046,11 +8115,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function drawMainGodExtraFx46(){
     if(state!=="play"||!Number.isFinite(P.x))return;
     ctx.save();
-    if(P.mgCrimson){ctx.strokeStyle="#ff4d6d66";ctx.lineWidth=2;ctx.beginPath();ctx.arc(P.x,P.y,P.r+11+Math.sin(runTime*6)*2,0,TAU);ctx.stroke();}
-    if(P.mgStar||P.star){ctx.fillStyle="#ffe08a88";for(let i=0;i<3;i++){const a=runTime*2+i*2.1;ctx.beginPath();ctx.arc(P.x+Math.cos(a)*22,P.y+Math.sin(a)*16,2,0,TAU);ctx.fill();}}
-    if(P.mgTitan){ctx.strokeStyle="#8dff7288";ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(P.x,P.y+6,P.r+18,P.r+10,0,0,TAU);ctx.stroke();}
-    if(P.mgDashGhost>0){ctx.globalAlpha=Math.min(.45,P.mgDashGhost*1.4);ctx.strokeStyle="#b7f3ff";ctx.beginPath();ctx.arc(P.x,P.y,P.r+24,0,TAU);ctx.stroke();P.mgDashGhost=Math.max(0,P.mgDashGhost-0.016);}
-    if(P.mgVoidFlash>0){ctx.globalAlpha=Math.min(.5,P.mgVoidFlash*1.6);ctx.strokeStyle="#c792ff";ctx.lineWidth=3;ctx.beginPath();ctx.arc(P.x,P.y,P.r+20,0,TAU);ctx.stroke();P.mgVoidFlash=Math.max(0,P.mgVoidFlash-0.016);}
+    if(P.mgCrimson&&!drawFxStampAt46("hit",P.x,P.y,P.r+14)){ctx.strokeStyle="#ff4d6d66";ctx.lineWidth=2;ctx.beginPath();ctx.arc(P.x,P.y,P.r+11+Math.sin(runTime*6)*2,0,TAU);ctx.stroke();}
+    if((P.mgStar||P.star)&&!drawFxStampAt46("loot",P.x,P.y,20)){ctx.fillStyle="#ffe08a88";for(let i=0;i<3;i++){const a=runTime*2+i*2.1;ctx.beginPath();ctx.arc(P.x+Math.cos(a)*22,P.y+Math.sin(a)*16,2,0,TAU);ctx.fill();}}
+    if(P.mgTitan&&!drawFxStampAt46("skill",P.x,P.y+4,P.r+16)){ctx.strokeStyle="#8dff7288";ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(P.x,P.y+6,P.r+18,P.r+10,0,0,TAU);ctx.stroke();}
+    if(P.mgDashGhost>0){if(!drawFxStampAt46("dash",P.x,P.y,P.r+18)){ctx.globalAlpha=Math.min(.45,P.mgDashGhost*1.4);ctx.strokeStyle="#b7f3ff";ctx.beginPath();ctx.arc(P.x,P.y,P.r+24,0,TAU);ctx.stroke();}P.mgDashGhost=Math.max(0,P.mgDashGhost-0.016);}
+    if(P.mgVoidFlash>0){if(!drawFxStampAt46("shatter",P.x,P.y,P.r+16)){ctx.globalAlpha=Math.min(.5,P.mgVoidFlash*1.6);ctx.strokeStyle="#c792ff";ctx.lineWidth=3;ctx.beginPath();ctx.arc(P.x,P.y,P.r+20,0,TAU);ctx.stroke();}P.mgVoidFlash=Math.max(0,P.mgVoidFlash-0.016);}
     ctx.restore();
   }
   function applyMainGodExtras46(){
@@ -8058,10 +8127,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if(!isMainGodRun36())return;
     const m=save.mainGod||{};
     if(m.echoBoots){P.mgEcho=1;P.spd*=1.04;}
-    if(m.railLens){P.mgRail=m.railLens;P.pierce=Math.min(12,P.pierce+1);}
-    if(m.bloodVial){P.mgVial=m.bloodVial;P.steal=Math.min(.22,(P.steal||0)+.04*m.bloodVial);P.regen+=.18*m.bloodVial;}
-    if(m.swordMark)P.orbit=Math.max(P.orbit||0,1);
-    if(m.starClip){if(P.star)P.spellPow*=1.04;else P.star=1;}
+    if(m.railLens){P.mgRail=m.railLens;if(P.mgMecha)P.rate=Math.max(0.08,P.rate*0.92);else P.pierce=Math.min(12,P.pierce+1);}
+    if(m.bloodVial){P.mgVial=m.bloodVial;if(P.mgCrimson){P.maxSh+=8*m.bloodVial;P.sh=Math.min(P.maxSh,(P.sh||0)+6*m.bloodVial);P.regen+=.12*m.bloodVial;}else{P.steal=Math.min(.22,(P.steal||0)+.04*m.bloodVial);P.regen+=.18*m.bloodVial;}}
+    if(m.swordMark){if(P.mgQi)P.bladePower*=1.08;else P.orbit=Math.max(P.orbit||0,1);}
+    if(m.starClip){if(P.mgStar||P.star)P.spellPow*=1.08;else P.star=1;}
     if(m.voidCharm)P.mgVoid=1;
     if(m.blindKey)P.mag=(P.mag||95)+36*m.blindKey;
     if(m.silentPendulum)P.mgPendulum=1;
@@ -8070,7 +8139,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const drawer=ensureMainGodShop36();
     drawer.classList.add("mgHall46");
     const head=drawer.querySelector(".dhead h2");
-    if(head)head.innerHTML="◈ 主神兑换大厅<span class=\"mgHeadSub46\">模板 · 基因锁 · 权能 · 特效</span>";
+    if(head)head.innerHTML="◈ 主神兑换大厅<span class=\"mgHeadSub46\">模板 · 基因锁 · 权能 · 保命 · 特效</span>";
     let hero=$("#mgHero46");
     if(!hero){hero=document.createElement("div");hero.id="mgHero46";hero.className="mgHero46";$("#mainGodBalance36")?.insertAdjacentElement("beforebegin",hero);}
     const c=ensureMainGodCore46();
@@ -8082,7 +8151,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const list=$("#mainGodShopList36"),tabs=$("#mainGodTabs38");
     if(!list||!tabs)return;
     tabs.classList.add("mgTabs46");
-    const groups=[["全部","全部"],["轮回模板","模板"],["基因锁碎片","基因锁"],["基础权能强化","权能"],["血统与灵能","血统"],["职业与技法","技法"],["特殊效果道具","特效"]];
+    const groups=[["全部","全部"],["轮回模板","模板"],["基因锁碎片","基因锁"],["基础权能强化","权能"],["血统与灵能","血统"],["职业与技法","技法"],["特殊效果道具","特效"],["保命防护","保命"]];
     tabs.innerHTML=groups.map(([g,label],i)=>`<button class="${i===0?"on":""}" data-group="${g}">${label}</button>`).join("");
     tabs.querySelectorAll("button").forEach(button=>button.onclick=()=>{
       tabs.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b===button));
@@ -8118,6 +8187,17 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     d.classList.add("mgCard46",id==="cursedHeart"?"mgRareCursed":u.max===1?"mgRareGold":(u.base||0)>=14?"mgRarePurple":"mgRareBlue");
     if((save.mainGod[id]||0)>0)d.classList.add("mgOwned46");
     if(!d.querySelector(".mgTag46")){const tag=document.createElement("em");tag.className="mgTag46";tag.textContent=u.group||"兑换";d.querySelector("div")?.prepend(tag);}
+    const hint=extraOverlapHint46(id);
+    if(hint){
+      const p=d.querySelector("p");
+      if(p&&!p.querySelector(".mgOverlap46")){
+        const note=document.createElement("small");
+        note.className="mgOverlap46";
+        note.textContent=hint;
+        p.appendChild(document.createElement("br"));
+        p.appendChild(note);
+      }
+    }
     return d;
   };
   const _coreCardHall46=coreCard46;
@@ -8171,6 +8251,71 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if(isMainGodRun36()&&P.mgVoid&&before<=0&&P.skill>0){P.inv=Math.max(P.inv||0,.26);P.mgVoidFlash=.28;}
     return result;
   };
+  const _slashFx46=directionalSlash36;
+  directionalSlash36=function(radius,dmg,big=false,angle=P.weaponAngle||Math.atan2(P.fy,P.fx),halfArc=big?1.66:1.05){
+    const result=_slashFx46(radius,dmg,big,angle,halfArc);
+    if(!isMainGodRun36()||!P.mgBoss)return result;
+    for(const t of (P.mgBoss.fx||[]).slice(0,8)){
+      if(!t||t.hp<=0||(t.kind!=="pillar"&&t.kind!=="mirror"))continue;
+      const dx=t.x-P.x,dy=t.y-P.y,d=Math.hypot(dx,dy),off=angleDelta36(Math.atan2(dy,dx),angle);
+      if(directionalHit36(d,t.r,radius,off,halfArc))hurtMainGodFx46(t.x,t.y,0,dmg*(P.bladePower||1),"blade");
+    }
+    return result;
+  };
+  const _aoeFx46=aoe;
+  aoe=function(x,y,r,dmg,color,push,opt){
+    const result=_aoeFx46(x,y,r,dmg,color,push,opt);
+    if(dmg)hurtMainGodFx46(x,y,r,dmg,(opt&&opt.source)||"aoe");
+    return result;
+  };
+  const _specialMg46=bossSpecial;
+  bossSpecial=function(e){
+    if(!(isMainGodRun36()&&P.mgBoss))return _specialMg46(e);
+    if(!e||e.dead)return;
+    e.specialCount=(e.specialCount||0)+1;
+    const type=P.mgBoss.type,p=e.phase||1,meta=MAIN_GOD_BOSS_TYPES46[type];
+    const map={auditor:"eye",reaper:"sword",mirror:"mirror",warden:"emp"};
+    if(chance(.42))spawnArenaHazards(map[type]||"eye",1);
+    if(type==="auditor"){
+      radialBossShot(e,8+p*2,150+p*14,null,meta.color,e.specialCount*0.18);
+      if((P.mgBoss.pillarAlive||0)>0&&Math.hypot(P.x-e.x,P.y-e.y)<140){damagePlayer(8+p*3);toast("校验柱脉冲");}
+    }else if(type==="reaper"){
+      radialBossShot(e,7+p*2,155+p*12,"seal",meta.color,e.specialCount*0.2);
+      P.skill=Math.max(P.skill,1.6+p*0.3);P.mgBoss.skillLock=0;toast("断线封锁");
+    }else if(type==="mirror"){
+      radialBossShot(e,9+p*2,160+p*16,null,meta.color,e.specialCount*0.22);
+      const sources=Object.entries(P.damageSources||{}).sort((a,b)=>b[1]-a[1]);
+      e.adaptSource39=sources[0]?.[0]||"shot";
+      e.bossRes={...(e.bossRes||{}),[e.adaptSource39]:.58};
+      toast(`抄袭适应：${SOURCE_NAME[e.adaptSource39]||e.adaptSource39}`);
+    }else{
+      radialBossShot(e,8+p*2,150+p*14,null,meta.color,e.specialCount*0.18);
+      const ward=(P.mgBoss.fx||[]).find(x=>x.kind==="ward");
+      if(ward){
+        ward.r=Math.max(42,ward.r-6);
+        ward.x=clamp(W*0.5+Math.sin(runTime)*W*0.16,80,W-80);
+        ward.y=clamp(H*0.56+Math.cos(runTime*0.7)*24,120,H-60);
+      }
+      toast("压境纹收缩");
+    }
+  };
+  const _hazMg46=spawnArenaHazards;
+  spawnArenaHazards=function(kind,count=1){
+    if(isMainGodRun36()){
+      const map={auditor:"eye",reaper:"sword",mirror:"mirror",warden:"emp"};
+      const mapped=map[currentMainGodBossType46()]||kind;
+      const live=arenaHazards.filter(h=>!h.fired).length;
+      const n=Math.min(2,Math.max(0,Math.min(Number(count)||1,2-live)));
+      if(n<=0)return;
+      return _hazMg46(mapped,n);
+    }
+    return _hazMg46(kind,count);
+  };
+  const _dlgMg46=bossDialogue;
+  bossDialogue=function(){
+    if(!isMainGodRun36())return _dlgMg46();
+    return mainGodBossLines46(currentMainGodBossType46());
+  };
   const _addsMain46=spawnBossAdds;
   spawnBossAdds=function(type,count,guard){if(isMainGodRun36())return 0;return _addsMain46(type,count,guard);};
   const _spawnBossType46=spawnBoss;
@@ -8181,7 +8326,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if(isMainGodRun36()&&P.mgBoss){
       refreshMainGodBossFx46();
       const meta=MAIN_GOD_BOSS_TYPES46[P.mgBoss.type];
-      if(meta&&e){e.rule39=`阶段 ${p} · ${meta.rule}`;P.bossRule39=e.rule39;const node=$("#bossRule39");if(node)node.textContent=e.rule39;}
+      if(meta&&e){e.rule39=`阶段 ${p} · ${meta.rule}`;P.bossRule39=e.rule39;const node=$("#bossRule39");if(node)node.textContent=e.rule39;toast(`${meta.n} 进入阶段 ${p}`);}
     }
     return result;
   };
@@ -8251,7 +8396,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   CONTENT41.hook("combat:after-update",payload=>tickMainGodBoss46(payload?.dt||0),"core.mgBoss46",60);
   CONTENT41.hook("combat:after-draw",drawMainGodBossFx46,"core.mgBoss46",45);
   const styleHall46=document.createElement("style");
-  styleHall46.textContent=`.mgHall46{background:radial-gradient(circle at 12% 0,#ffe6a31c,transparent 36%),radial-gradient(circle at 88% 8%,#9d58e828,transparent 32%),linear-gradient(180deg,#140c24f2,#0b0818f6);border:1px solid #ffe29144}.mgHall46 .dhead{background:linear-gradient(90deg,#20143acc,#3a1d58aa);border-bottom:1px solid #ffe29133}.mgHeadSub46{display:block;margin-top:3px;color:#cfc4df;font-size:10px;font-weight:700;letter-spacing:.08em}.mgHero46{display:grid;gap:8px;margin:0 0 10px;padding:12px;border-radius:16px;border:1px solid #ffe6a355;background:linear-gradient(135deg,#ffd76f22,#7a4bff22),repeating-linear-gradient(45deg,#0000 0 10px,#ffe6a30a 10px 12px)}.mgHero46 ul{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0;padding:0;list-style:none}.mgHero46 li{padding:7px 8px;border-radius:10px;background:#0b0818cc;border:1px solid #ffffff14}.mgHero46 em{display:block;color:#cfc4df;font-size:9px;font-style:normal}.mgHero46 b{color:#ffe6a3;font-size:13px}.mgHeroArt46{display:flex;align-items:center;gap:8px}.mgHeroArt46 i{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:radial-gradient(circle,#ffe08a,#6a3ad8);font-style:normal;font-size:22px}.mgHeroArt46 span{display:block;color:#d7cce4;font-size:10px}.mgCard46{position:relative;box-shadow:0 0 0 1px #ffffff10,0 8px 18px #0005}.mgRareGold{border-color:#ffe29188!important;background:linear-gradient(135deg,#ffe29114,#ffffff08)!important}.mgRarePurple{border-color:#c792ff77!important}.mgRareBlue{border-color:#7ad7ff55!important}.mgRareCursed{border-color:#ff4d6d88!important;background:linear-gradient(135deg,#ff4d6d14,#ffffff08)!important}.mgOwned46:after{content:"已持有";position:absolute;right:8px;top:6px;font-size:8px;color:#9ee7ff}.mgEquipped46{box-shadow:0 0 0 1px #ffe291aa,0 0 16px #ffd76f33}.mgTag46{display:inline-block;margin:0 0 3px;padding:1px 6px;border-radius:99px;background:#ffe29122;color:#ffe291;font-size:8px;font-style:normal}.mgTabs46{background:#0b0818ee!important;border:1px solid #ffe29133;border-radius:14px;padding:6px!important}.mgHall46 .exchangeSection36 h3{display:flex;align-items:center;gap:6px}.mgHall46 .exchangeSection36 h3:before{content:"";width:6px;height:6px;border-radius:50%;background:#ffe291}.coreCard46.mgEquipped46 .ei{box-shadow:0 0 12px #ffe29166}`;
+  styleHall46.textContent=`.mgHall46{background:radial-gradient(circle at 12% 0,#ffe6a31c,transparent 36%),radial-gradient(circle at 88% 8%,#9d58e828,transparent 32%),linear-gradient(180deg,#140c24f2,#0b0818f6);border:1px solid #ffe29144}.mgHall46 .dhead{background:linear-gradient(90deg,#20143acc,#3a1d58aa);border-bottom:1px solid #ffe29133}.mgHeadSub46{display:block;margin-top:3px;color:#cfc4df;font-size:10px;font-weight:700;letter-spacing:.08em}.mgHero46{display:grid;gap:8px;margin:0 0 10px;padding:12px;border-radius:16px;border:1px solid #ffe6a355;background:linear-gradient(135deg,#ffd76f22,#7a4bff22),repeating-linear-gradient(45deg,#0000 0 10px,#ffe6a30a 10px 12px)}.mgHero46 ul{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0;padding:0;list-style:none}.mgHero46 li{padding:7px 8px;border-radius:10px;background:#0b0818cc;border:1px solid #ffffff14}.mgHero46 em{display:block;color:#cfc4df;font-size:9px;font-style:normal}.mgHero46 b{color:#ffe6a3;font-size:13px}.mgHeroArt46{display:flex;align-items:center;gap:8px}.mgHeroArt46 i{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;background:radial-gradient(circle,#ffe08a,#6a3ad8);font-style:normal;font-size:22px}.mgHeroArt46 span{display:block;color:#d7cce4;font-size:10px}.mgCard46{position:relative;box-shadow:0 0 0 1px #ffffff10,0 8px 18px #0005}.mgRareGold{border-color:#ffe29188!important;background:linear-gradient(135deg,#ffe29114,#ffffff08)!important}.mgRarePurple{border-color:#c792ff77!important}.mgRareBlue{border-color:#7ad7ff55!important}.mgRareCursed{border-color:#ff4d6d88!important;background:linear-gradient(135deg,#ff4d6d14,#ffffff08)!important}.mgOwned46:after{content:"已持有";position:absolute;right:8px;top:6px;font-size:8px;color:#9ee7ff}.mgEquipped46{box-shadow:0 0 0 1px #ffe291aa,0 0 16px #ffd76f33}.mgTag46{display:inline-block;margin:0 0 3px;padding:1px 6px;border-radius:99px;background:#ffe29122;color:#ffe291;font-size:8px;font-style:normal}.mgTabs46{background:#0b0818ee!important;border:1px solid #ffe29133;border-radius:14px;padding:6px!important}.mgHall46 .exchangeSection36 h3{display:flex;align-items:center;gap:6px}.mgHall46 .exchangeSection36 h3:before{content:"";width:6px;height:6px;border-radius:50%;background:#ffe291}.coreCard46.mgEquipped46 .ei{box-shadow:0 0 12px #ffe29166}.mgOverlap46{color:#9ee7ff;font-size:10px}`;
   document.head.appendChild(styleHall46);
 
   installLobby46();
