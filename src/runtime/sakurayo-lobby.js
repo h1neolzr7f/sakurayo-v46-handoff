@@ -68,6 +68,13 @@
     { id: "weapon_aya_mirror", n: "月切·镜反", r: "SSR", kind: "weapon", face: "aya", legend: true, d: "刀刃是碎掉的镜子。", lore: ["月切反的是镜，不是月。", "我从刃里看见自己出鞘太慢。", "手枪还在另一只手。", "反出去的是空弹壳。"] },
     { id: "weapon_rion_burial", n: "黑羽葬", r: "SSR", kind: "weapon", face: "rion", legend: true, d: "这把刀是墓碑。", lore: ["黑羽葬插在剑冢最深处。", "它比飞剑更像结局。", "我握住它，像握住自己的坟。", "没有人来上香。"] },
   ]);
+  var CHRONICLE = Object.freeze([
+    { id: "ch_zero_death", n: "第零次死亡", lore: ["三年前我就死在镜界实验里。神社扫地的那个人，可能只是备份。", "他们把我的名字写回名册，像把打翻的水倒回杯里。水已经不是原来那杯。", "我记得冷，记得镜核亮起来，不记得谁把我从名册上擦掉。", "如果现在的我是备份，那第一夜的我，还欠一句再见。"] },
+    { id: "ch_hundred_eyes", n: "百目共视", lore: ["百目不是监视器。是很多双已经死过的眼睛，叠在同一副眼眶里。", "每次有人走进镜核，那些眼睛就替我再看一次。看到的都是同一条死路。", "绫说企业管这叫采集。凛音说黄泉流早写过。我只觉得眼睛不够用。", "共视结束的时候，没有人眨眼。"] },
+    { id: "ch_zero_corp", n: "零号企业", lore: ["绫的企业不生产枪，生产可替换的人。我是被拆借过的零件之一。", "他们把「会怕」单独装进一间实验室，把「还会回来」装进另一间。", "巫女那一夜不是这条线。这条线没有符，只有工号和作废券。", "拆完以后，他们说还可以再组装一个小夜。价格另议。"] },
+    { id: "ch_sword_mound", n: "失败者剑冢", lore: ["剑冢里每一把剑都是一条没走到核心的我。所有小夜都来过，没人留下脚印。", "我数过，数到后来不敢数。刀柄上的名字有的是我，有的快要不是。", "凛音从旁边走过，没有鞠躬。她认得这些刀，比我更认得。", "核心还在最里面。我们都走到过门口，门上没有锁，只有上一夜的我。"] },
+    { id: "ch_after_zero", n: "镜零之后", lore: ["镜零是失败的小夜训练出来的。训练的不是胜利，是怎么把下一夜送回去。", "碎镜以后又醒来一个我。她问这是第几次。我没有数字可以给她。", "电台还在播，封条还在写同一个字。备份和原件已经吵不清楚。", "如果还有下一夜，让她别再把我写成一张完整的卡。"] },
+  ]);
   var SCHOOL_CARDS = Object.freeze([
     { id: "school_shrine", n: "未归·巫女小夜", r: "SR", kind: "school", tag: "基础", school: "shrine", face: "sayo", dmg: 0.006, d: "符没封住镜核。拥有即巫女倾向 ×1.3。", lore: ["我是神社那一夜的小夜。符纸写着我的名字，镜核比名字先亮。", "我把封条一层层贴上步枪，贴上鸟居，贴上自己的袖口。外面的备份还在扫地。", "符烧完了，镜核还在转。裂口从镜里爬到我肩上，朱砂写成失败。", "我仍举着枪。封条先落地。"] },
     { id: "school_idol", n: "未归·歌姬小夜", r: "R", kind: "school", tag: "基础", school: "idol", face: "sayo", dmg: 0.003, d: "电台还在响人已不在。拥有即歌姬倾向 ×1.3。", lore: ["我是被推进舞台的那一版小夜。观众席是空的，只有电台还在报时。", "歌比子弹先出门。我把步枪靠在脚边，对着没有人的灯光把词唱完。", "声带还在，人已经不在频率上。电台替我鞠躬，我跪在花瓣里。", "下一首歌自动连播。没有返场。"] },
@@ -178,6 +185,12 @@
     ".wishSpark46 button{min-height:28px;padding:0 8px;border-radius:999px;border:1px solid #ffe6a355;background:#0b0818cc;color:#ffe7a3;font:800 10px/1 system-ui}" +
     ".wishSpark46 button.poor{opacity:.42}" +
     ".rosterEquip46{margin-top:8px;min-height:36px;padding:0 12px;border-radius:10px;border:1px solid #ffe6a366;background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;font:800 12px/1 system-ui}" +
+    ".chronicleBox46{display:grid;gap:10px}" +
+    ".chronicleCard46{padding:12px;border-radius:14px;border:1px solid #ffe6a344;background:#0b0818cc;color:#fff7fb;text-align:left}" +
+    ".chronicleCard46 b{display:block;margin:0 0 6px;color:#ffe7a3;letter-spacing:.14em}" +
+    ".chronicleCard46 p{margin:0 0 6px;color:#f4eaf4;font-size:12px;line-height:1.55}" +
+    ".homeNav46{position:relative;z-index:8}" +
+    "#menu.homeDock46 .nav{position:relative;z-index:8}" +
     "#gachaPull1{background:linear-gradient(180deg,#ff86cc,#ff3d9a 58%,#b02078);border-color:#ffb6d888}" +
     "#gachaPull10{background:linear-gradient(180deg,#ffe08a,#f0c14a 42%,#d8892b);border-color:#ffe6a3aa;color:#2a1608}" +
     "#gachaReveal46{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(44px,env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom));background:radial-gradient(circle at 50% 40%,#4a2878ee,#12081cf6 68%)}" +
@@ -992,6 +1005,7 @@
     if (tab === "school") return SCHOOL_CARDS;
     if (tab === "fashion") return FASHION_CARDS;
     if (tab === "weapon") return WEAPON_CARDS;
+    if (tab === "chronicle") return CHRONICLE;
     return CARDS;
   }
 
@@ -1011,7 +1025,11 @@
     var got = 0;
     list.forEach(function (card) { if ((ownedMap[card.id] || 0) > 0) got += 1; });
     var wall = "";
-    if (tab === "school" && !SCHOOL_CARDS.length) {
+    if (tab === "chronicle") {
+      wall = '<div class="chronicleBox46"><h4>月城小夜 · 未写完的夜</h4>' + CHRONICLE.map(function (item) {
+        return '<article class="chronicleCard46" data-chronicle="' + item.id + '"><b>' + item.n + "</b>" + item.lore.map(function (p) { return "<p>" + p + "</p>"; }).join("") + "</article>";
+      }).join("") + "</div>";
+    } else if (tab === "school" && !SCHOOL_CARDS.length) {
       wall = '<div class="rosterLater46">后续写入</div>';
     } else {
       wall = list.map(function (card) {
@@ -1039,16 +1057,15 @@
       }).join("");
     }
     host.innerHTML =
-      '<div class="rosterStage46"><div class="rosterHead46"><h3>镜界仓库</h3><span>已点亮 ' +
-      got +
-      " / " +
-      list.length +
+      '<div class="rosterStage46"><div class="rosterHead46"><h3>镜界仓库</h3><span>' +
+      (tab === "chronicle" ? "月城小夜 · 未写完的夜" : "已点亮 " + got + " / " + list.length) +
       "</span></div>" +
       '<div class="rosterTabs46" id="rosterTabs46">' +
       '<button type="button" data-roster="scrap"' + (tab === "scrap" ? ' class="on"' : "") + ">残件</button>" +
       '<button type="button" data-roster="school"' + (tab === "school" ? ' class="on"' : "") + ">基础</button>" +
       '<button type="button" data-roster="fashion"' + (tab === "fashion" ? ' class="on"' : "") + ">时装</button>" +
       '<button type="button" data-roster="weapon"' + (tab === "weapon" ? ' class="on"' : "") + ">武器</button>" +
+      '<button type="button" data-roster="chronicle"' + (tab === "chronicle" ? ' class="on"' : "") + ">编年</button>" +
       "</div><div id=\"rosterWall46\">" +
       wall +
       "</div></div>";
@@ -1251,6 +1268,7 @@
     FASHION_CARDS: FASHION_CARDS,
     WEAPON_CARDS: WEAPON_CARDS,
     SCHOOL_CARDS: SCHOOL_CARDS,
+    CHRONICLE: CHRONICLE,
     hasSchool: hasSchool,
     POOL_IDS: POOL_IDS,
     ROSTER_TABS: ROSTER_TABS,

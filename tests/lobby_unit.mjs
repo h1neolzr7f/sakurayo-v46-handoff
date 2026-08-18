@@ -13,6 +13,9 @@ const L = sandbox.window.SakurayoLobby;
 
 assert.equal(L.version, "4.6.0");
 assert.equal(L.CARDS.length, 8);
+assert.equal(L.CHRONICLE.length, 5);
+assert.equal(L.CHRONICLE[0].n, "第零次死亡");
+assert.equal(L.CHRONICLE[4].n, "镜零之后");
 assert.equal(L.SCHOOL_CARDS.length, 14);
 assert.equal([...L.SCHOOL_CARDS].filter((card) => card.r === "SR").map((card) => card.id).sort().join(","), "school_cult,school_gun,school_shrine");
 assert.ok(L.SCHOOL_CARDS.every((card) => card.kind === "school" && Array.isArray(card.lore) && card.lore.length === 4));
@@ -324,7 +327,17 @@ V.renderRoster(rosterHost, save, { art: (p) => "game/art/" + p });
 assert.equal((rosterHost.innerHTML.match(/class="rosterSlot46/g) || []).length, 12);
 assert.match(rosterHost.innerHTML, /data-roster="fashion"/);
 assert.match(rosterHost.innerHTML, /data-roster="weapon"/);
+V.setRosterTab(save, "chronicle");
+V.renderRoster(rosterHost, save, { art: (p) => "game/art/" + p });
+assert.match(rosterHost.innerHTML, /月城小夜 · 未写完的夜/);
+assert.match(rosterHost.innerHTML, /第零次死亡/);
+assert.match(rosterHost.innerHTML, /百目共视/);
+assert.match(rosterHost.innerHTML, /零号企业/);
+assert.match(rosterHost.innerHTML, /失败者剑冢/);
+assert.match(rosterHost.innerHTML, /镜零之后/);
+assert.equal((rosterHost.innerHTML.match(/class="chronicleCard46/g) || []).length, 5);
 V.setRosterTab(save, "scrap");
+V.renderRoster(rosterHost, save, { art: (p) => "game/art/" + p });
 
 const drawer = fakeEl("section", { id: "gachaDrawer" });
 drawer.className = "drawer wishDrawer46";

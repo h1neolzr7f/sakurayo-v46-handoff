@@ -290,6 +290,10 @@ try {
   assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 12);
   await page.locator('#rosterTabs46 [data-roster="weapon"]').click();
   assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 12);
+  await page.locator('#rosterTabs46 [data-roster="chronicle"]').click();
+  assert.match(await page.locator("#rosterDrawer").textContent(), /第零次死亡/);
+  assert.match(await page.locator("#rosterDrawer").textContent(), /镜零之后/);
+  assert.equal(await page.locator(".chronicleCard46").count(), 5);
   await page.locator('#rosterTabs46 [data-roster="scrap"]').click();
   assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 8);
   await shot(page, "01i-roster-wall.png");
