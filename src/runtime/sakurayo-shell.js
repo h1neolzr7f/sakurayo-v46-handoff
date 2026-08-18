@@ -109,6 +109,7 @@
     ".shellCal46 button small{display:block;margin-top:4px;color:#cfc4df;font-size:9px;line-height:1.35}" +
     "html.landscape46:not(.portraitFallback46) .shellCal46{gap:8px;margin-top:6px}" +
     "html.landscape46:not(.portraitFallback46) .shellCal46 button{min-height:120px;padding:12px 6px}" +
+    "@media(max-height:430px){html.landscape46:not(.portraitFallback46) .shellCal46 button{min-height:88px;padding:8px 4px}}" +
     "html.landscape46:not(.portraitFallback46) .shellCal46 button b{font-size:14px}" +
     "html.landscape46:not(.portraitFallback46) .shellCal46 button small{font-size:11px}" +
     ".shellCal46 button.on{border-color:#f2c75d;box-shadow:0 0 12px #f35aa644}" +
@@ -271,8 +272,9 @@
     "html.landscape46:not(.portraitFallback46) #homePetals46{display:block}" +
     "#homePetals46 i{position:absolute;top:-8%;width:7px;height:10px;border-radius:0 70% 0 70%;background:linear-gradient(135deg,#ff9bcc,#f35aa6);opacity:.55;animation:petalFall46 9s linear infinite}" +
     "#homeGreet46{display:none}" +
-    "html.landscape46:not(.portraitFallback46) #homeGreet46{display:block;margin-top:4px;max-width:220px;color:#ffe7a3;font:700 10px/1.35 system-ui;letter-spacing:.04em;text-shadow:0 2px 8px #05020d}" +
+    "html.landscape46:not(.portraitFallback46) #homeGreet46{display:block;margin-top:4px;max-width:220px;color:#ffe7a3;font:700 10px/1.35 system-ui;letter-spacing:.04em;text-shadow:0 2px 8px #05020d;pointer-events:none}" +
     "html.landscape46.shortWindow46 #homeGreet46,html.landscape46.shortWindow46 #homePetals46{display:none!important}" +
+    "@media(max-height:430px){html.landscape46:not(.portraitFallback46) #homeGreet46{display:none!important}}" +
     ".shellDrawer46:not(.hidden),.drawer.wishDrawer46:not(.hidden){animation:shellIn46 .28s ease}" +
     ".shellFloat46{position:fixed;left:50%;top:30%;z-index:90;color:#f2c75d;font:900 22px/1 system-ui;letter-spacing:.08em;pointer-events:none;text-shadow:0 0 16px #f2c75d88;animation:shellFloat46 .9s ease forwards}" +
     ".homeChip46.pop46 b,.homeChip46.pop46,#coins.pop46{animation:chipPop46 .28s ease}" +

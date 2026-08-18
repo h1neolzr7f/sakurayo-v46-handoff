@@ -316,7 +316,8 @@
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charCard img{width:38px;height:38px;border-radius:50%;border:2px solid #ffd8e066;box-shadow:0 0 0 1px #05020d,0 0 12px #f35aa644}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charCard.selected img{border-color:#f2c75d;box-shadow:0 0 0 2px #f2c75dcc,0 0 16px #f35aa688}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charCard b,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charCard p,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charCard em,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charCard .selectedMark{display:none!important}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46{display:flex;flex-direction:column;position:absolute;right:max(16px,env(safe-area-inset-right));top:max(64px,calc(env(safe-area-inset-top) + 52px));bottom:max(86px,calc(env(safe-area-inset-bottom) + 76px));width:min(34vw,320px);gap:8px;z-index:6;pointer-events:auto}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46{display:flex;flex-direction:column;position:absolute;right:max(16px,env(safe-area-inset-right));top:max(64px,calc(env(safe-area-inset-top) + 52px));bottom:max(86px,calc(env(safe-area-inset-bottom) + 76px));width:min(34vw,320px);gap:8px;z-index:6;pointer-events:none}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46 .stageMini,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46 .homeModes46,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46 #start,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46 button{pointer-events:auto}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini{position:relative;width:100%;margin:0;flex:1 1 auto;min-height:96px;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto 1fr auto;gap:4px 8px;padding:12px 14px 10px;border-radius:16px;overflow:hidden;background:#120e27ee;border:1px solid #69ddf266;box-shadow:0 0 0 1px #05020d,0 12px 28px #05020d66,inset 0 0 0 1px #69ddf222;backdrop-filter:none}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.32;border-radius:0}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini>div,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini h3,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini p,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini strong,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeStageProg46{position:relative;z-index:1}" +
@@ -334,7 +335,7 @@
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeModes46 button small{display:block;margin-top:3px;color:#cfc4df;font:700 9px/1 system-ui;letter-spacing:.14em}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeModes46 button.on{border-color:#f2c75d;box-shadow:0 0 16px #f35aa644,inset 0 0 0 1px #f2c75d66}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeModes46 button.lock{opacity:.55}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .start{width:100%;margin:0;flex:0 0 auto;min-height:52px;padding:0 18px;letter-spacing:.18em;font-size:20px;border-radius:8px;clip-path:polygon(14px 0,100% 0,calc(100% - 14px) 100%,0 100%);display:flex;align-items:center;justify-content:center;gap:8px}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .start{width:100%;margin:0;flex:0 0 auto;min-height:52px;padding:0 18px;letter-spacing:.18em;font-size:20px;border-radius:8px;clip-path:none;display:flex;align-items:center;justify-content:center;gap:8px}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .start small{font-size:10px;letter-spacing:.22em;opacity:.88}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .start b{letter-spacing:0;font-size:16px}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .nav.homeNav46{position:absolute;left:50%;bottom:max(10px,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(560px,60vw);padding:5px 8px;gap:6px;border-radius:20px;background:#0b0818d8;border:1px solid #f35aa644;box-shadow:0 10px 28px #05020d88;z-index:8;pointer-events:auto}" +
@@ -370,7 +371,7 @@
     "html.landscape46.shortWindow46 #menu.homeDock46 .stageMini p,html.landscape46.shortWindow46 #menu.homeDock46 .homeStageProg46{display:none!important}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .homeModes46 button{min-height:42px;padding:5px 8px}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .homeModes46 button small{display:none}" +
-    "html.landscape46.shortWindow46 #menu.homeDock46 .start{min-height:44px;font-size:16px;letter-spacing:.14em;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)}" +
+    "html.landscape46.shortWindow46 #menu.homeDock46 .start{min-height:44px;font-size:16px;letter-spacing:.14em;clip-path:none}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .nav.homeNav46{bottom:max(6px,env(safe-area-inset-bottom));width:min(520px,58vw);padding:4px}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .homeNav46 button{min-height:44px}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .homeNav46 button:after{display:none}" +

@@ -17,7 +17,7 @@
   var CSS =
     "html,body{touch-action:manipulation!important}" +
     "canvas,#hud,#level,#joy{touch-action:none}" +
-    "#menu.homeDock46 button,#menu.homeDock46 .charCard,#menu.homeDock46 .homeDeck46,#menu.homeDock46 .homeNav46,#menu.homeDock46 .homeRail46,#menu.homeDock46 .homeBanner46,#menu.homeDock46 .charSelectPanel,#menu.homeDock46 .start,.drawer button,.choice,#pause,#dash,#skill,#resume,#back{pointer-events:auto!important;touch-action:manipulation!important}" +
+    "#menu.homeDock46 button,#menu.homeDock46 .charCard,#menu.homeDock46 .homeNav46,#menu.homeDock46 .homeRail46,#menu.homeDock46 .homeBanner46,#menu.homeDock46 .charSelectPanel,#menu.homeDock46 .start,.drawer button,.choice,#pause,#dash,#skill,#resume,#back{pointer-events:auto!important;touch-action:manipulation!important}" +
     "#" + BADGE_ID + "{pointer-events:none!important}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46.speak53{width:min(168px,22vw)!important;min-height:48px!important;padding:4px 8px 4px 4px!important;grid-template-columns:42px 1fr!important;justify-items:start;gap:6px;align-items:center}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46.speak53 b,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46.speak53 small{display:block!important;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}" +
@@ -27,7 +27,8 @@
     "#menu.swap53 .heroLive46 img,#menu .heroLive46.swap53 img{animation:swapFade53 .62s ease}" +
     "#menu .profile.swap53{box-shadow:0 0 0 1px var(--swapAccent53,#f35aa0),0 0 18px var(--swapAccent53,#f35aa0)}" +
     "#start.swap53{box-shadow:0 0 0 1px var(--swapAccent53,#f2c75d),0 0 22px var(--swapAccent53,#f35aa0)}" +
-    "#start .pass53{display:block;margin-top:2px;color:var(--swapAccent53,#ffe7a3);font:800 9px/1 system-ui;letter-spacing:.16em}" +
+    "#start .pass53{display:inline;margin:0 0 0 8px;color:var(--swapAccent53,#ffe7a3);font:800 9px/1 system-ui;letter-spacing:.16em}" +
+    "@media(max-height:430px){#start .pass53{display:none!important}}" +
     "@keyframes swapFade53{0%{opacity:.28;filter:saturate(.7)}40%{opacity:1}100%{opacity:1}}" +
     "@media(prefers-reduced-motion:reduce){#menu.swap53 .heroLive46 img,#menu .heroLive46.swap53 img{animation:none}}" +
     "html.landscape46:not(.portraitFallback46) #banter:not(.live53){opacity:0!important;pointer-events:none!important;transform:translate(-50%,10px)!important}" +
@@ -36,7 +37,11 @@
     "#resultHook53.lose53{border-color:#ff5b7466;color:#ffb3c0}" +
     "#resultHook53:empty{display:none}" +
     "html.landscape46:not(.portraitFallback46) #resultHook53{grid-area:title;justify-self:end;align-self:start;margin:0;max-width:42%;z-index:3}" +
-    "#" + BADGE_ID + "{position:fixed;z-index:40;left:max(8px,env(safe-area-inset-left));top:max(8px,env(safe-area-inset-top));padding:4px 10px;border-radius:999px;border:1px solid #f2c75d88;background:#120e27ee;color:#ffe7a3;font:800 10px/1 system-ui;letter-spacing:.14em;pointer-events:none}";
+    "#" + BADGE_ID + "{position:fixed;z-index:40;left:max(8px,env(safe-area-inset-left));top:max(8px,env(safe-area-inset-top));padding:4px 10px;border-radius:999px;border:1px solid #f2c75d88;background:#120e27ee;color:#ffe7a3;font:800 10px/1 system-ui;letter-spacing:.14em;pointer-events:none}" +
+    "#paused .actions button.secondary,#result .actions button.secondary,#fxToggle,#banterToggle,#retryP,#quit,#back{background:#1c1634ee!important;border:1px solid #ffe7a366!important;color:#fff7fb!important}" +
+    "#paused .actions button.primary,#result .actions button.primary,#resume,#again{background:linear-gradient(135deg,#ff3d91,#a44ded)!important;border:1px solid #ffe6a355!important;color:#fff!important}" +
+    "#result .modal.outfitSplash45:before,#paused .modal.outfitSplash45:before{content:\"\";position:absolute;inset:0;z-index:0;pointer-events:none;border-radius:inherit;background:linear-gradient(180deg,#0d0a20f2 8%,#0d0a20d8 46%,#0d0a20f4)}" +
+    "#result .modal.outfitSplash45 > *,#paused .modal.outfitSplash45 > *{position:relative;z-index:1}";
 
   var state = {
     lastChar: "",
