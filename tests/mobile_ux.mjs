@@ -152,13 +152,30 @@ const pause = await page.evaluate(() => {
   const cs = (el) => {
     const s = getComputedStyle(el);
     const r = el.getBoundingClientRect();
-    return { bg: s.backgroundColor, w: r.width, h: r.height, color: s.color };
+    return {
+      bg: s.backgroundColor,
+      image: s.backgroundImage,
+      w: r.width,
+      h: r.height,
+      color: s.color,
+    };
   };
-  return { resume: cs(resume), quit: cs(quit) };
+  return {
+    resume: cs(resume),
+    quit: cs(quit),
+    splash: document.querySelector("#paused .modal")?.classList.contains("outfitSplash45") || false,
+    bgImage: document.querySelector("#paused .modal")?.style.backgroundImage || "",
+    modalOpacity: getComputedStyle(document.querySelector("#paused .modal")).opacity,
+  };
 });
+assert.equal(pause.splash, false, "矮横屏暂停不得铺闪图");
+assert.equal(pause.bgImage, "");
+assert.equal(pause.modalOpacity, "1", "暂停卡不得停在透明帧");
 assert.ok(pause.resume.w >= 80 && pause.resume.h >= 36, "继续迎击够点");
 assert.ok(pause.quit.w >= 80 && pause.quit.h >= 36, "返回主界面够点");
 assert.doesNotMatch(pause.quit.bg, /rgba\(255, 255, 255, 0\.0?6/);
+assert.match(pause.quit.color, /rgb\(255, 231, 163\)|rgb\(255, 255, 255\)/);
+assert.match(pause.resume.image, /linear-gradient|rgb\(255/, "继续迎击必须有实心底");
 await page.screenshot({ path: path.join(out, "03-pause.png"), fullPage: true });
 await page.locator("#resume").tap({ timeout: 6000 }).catch(() => page.locator("#resume").click({ force: true }));
 
@@ -189,6 +206,8 @@ const result = await page.evaluate(() => {
 assert.ok(result.w >= 80 && result.h >= 36);
 assert.ok(result.againW >= 80);
 assert.doesNotMatch(result.backBg, /rgba\(255, 255, 255, 0\.0?6/);
+assert.match(result.backColor, /rgb\(255, 231, 163\)|rgb\(255, 255, 255\)/);
+assert.match(result.backBg, /rgb\(42, 24, 72\)|rgba\(42, 24, 72/);
 await page.screenshot({ path: path.join(out, "04-result.png"), fullPage: true });
 
 await browser.close();
