@@ -11,6 +11,9 @@ fs.mkdirSync(out, { recursive: true });
 
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({ viewport: { width: 800, height: 360 }, isMobile: true, hasTouch: true });
+page.on("pageerror", (err) => {
+  throw err;
+});
 await page.addInitScript(() => {
   window.__SAKURAYO_ANDROID_LANDSCAPE__ = true;
   localStorage.setItem("sakurayoV3", JSON.stringify({ tutorialDone: true, coins: 20000 }));
@@ -24,13 +27,16 @@ await page.waitForTimeout(400);
 const api = (method, ...args) => page.evaluate(({ method, args }) => window.__SAKURAYO_TEST__[method](...args), { method, args });
 await api("openDrawer", "shop");
 await page.waitForSelector("#shopList .skinCard", { timeout: 8000 });
+assert.match(
+  (await page.locator("#shopDrawer .dhead h2").textContent()) || "",
+  /时装商店/,
+  "opening shop must use the boutique, not the supply-station title"
+);
 await page.evaluate(() => {
   window.SakurayoBoutique?.install?.();
   window.SakurayoShell?.decorateShop?.(document.getElementById("shopDrawer"), {
     save: JSON.parse(localStorage.getItem("sakurayoV3") || "{}"),
-    clickTab(id) {
-      document.querySelector(`.shopTabs40 [data-shop="${id}"]`)?.click();
-    },
+    clickTab() {},
   });
 });
 

@@ -42,6 +42,8 @@
     "html.landscape46:not(.portraitFallback46) #shopDrawer.isBoutique46 #shopList [data-shop-group=skins]{display:grid!important}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer.isSupplies46 #shopFeatured46{display:none!important}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer.isSupplies46 #shopCounter46{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 10px}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer.isExchange46 #shopFeatured46,html.landscape46:not(.portraitFallback46) #shopDrawer.isExchange46 #shopCounter46,html.landscape46:not(.portraitFallback46) #shopDrawer.isExchange46 #shopList .shopGroup40{display:none!important}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer.isExchange46 #shopExchange46{display:grid!important;grid-template-columns:1fr 1fr;gap:8px}" +
     "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46{position:relative;display:grid;grid-template-columns:minmax(96px,22%) 1fr minmax(128px,22%);min-height:112px;max-height:128px;margin:0 0 10px;overflow:hidden;border-radius:18px;border:1px solid #f2c75d66;background:linear-gradient(135deg,#2a183ef2,#100c1cee)}" +
     "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkinPrev46{position:relative;width:100%;height:128px;overflow:hidden;background:#171027}" +
     "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkinPrev46 img{width:100%;height:100%;object-fit:cover;object-position:center top}" +
@@ -196,9 +198,12 @@
       if (shelf.nextSibling) list.insertBefore(counter, shelf.nextSibling);
       else list.appendChild(counter);
     }
-    leftoverGoods.forEach(function (node) {
-      counter.appendChild(node);
-    });
+    if (leftoverGoods.length) {
+      counter.innerHTML = "";
+      leftoverGoods.forEach(function (node) {
+        counter.appendChild(node);
+      });
+    }
   }
 
   function paintRail(drawer) {
@@ -218,27 +223,25 @@
     var body = drawer.querySelector(".dbody");
     if (!body) return;
     var rail = body.querySelector(".shopRail46");
-    if (!rail) {
-      rail = global.document.createElement("nav");
-      rail.className = "shopRail46";
+    var next = global.document.createElement("nav");
+    next.className = "shopRail46";
+    if (rail && rail.parentNode) rail.parentNode.replaceChild(next, rail);
+    else {
       var list = body.querySelector("#shopList");
-      if (list) body.insertBefore(rail, list);
-      else body.appendChild(rail);
+      if (list) body.insertBefore(next, list);
+      else body.appendChild(next);
     }
-    rail.innerHTML =
+    next.innerHTML =
       '<button type="button" data-shop-rail="boutique">橱窗<small>全套上架</small></button>' +
       '<button type="button" data-shop-rail="supplies">补给柜<small>核心道具</small></button>' +
       '<button type="button" data-shop-rail="exchange">兑换<small>货币柜台</small></button>';
-    rail.onclick = function (ev) {
+    next.onclick = function (ev) {
       var btn = ev.target.closest ? ev.target.closest("[data-shop-rail]") : null;
       if (!btn) return;
       setRail(btn.getAttribute("data-shop-rail"));
-      if (shopRail === "boutique" && api && api.clickTab) api.clickTab("skins");
-      if (shopRail === "supplies" && api && api.clickTab) api.clickTab("starters");
       paintRail(drawer);
       fillHero(drawer);
     };
-    if (shopRail === "boutique" && api && api.clickTab) api.clickTab("skins");
     paintRail(drawer);
     fillHero(drawer);
   }
@@ -249,14 +252,30 @@
     S.__boutique6105 = true;
     injectStyle();
     var orig = S.decorateShop;
+    var busy = false;
     S.decorateShop = function (drawer, api) {
-      if (typeof orig === "function") orig(drawer, api);
-      decorate(drawer || (global.document && global.document.getElementById("shopDrawer")), api);
+      if (busy) return;
+      busy = true;
+      try {
+        if (typeof orig === "function") orig(drawer, api);
+        decorate(drawer || (global.document && global.document.getElementById("shopDrawer")), api);
+      } finally {
+        busy = false;
+      }
     };
     if (typeof S.setShopRail === "function") {
       var oldSet = S.setShopRail;
       S.setShopRail = function (id) {
         return oldSet(setRail(id));
+      };
+    }
+    if (typeof S.onOpen === "function") {
+      var origOpen = S.onOpen;
+      S.onOpen = function (name, api) {
+        origOpen(name, api);
+        if (name === "shop") {
+          decorate(global.document && global.document.getElementById("shopDrawer"), api);
+        }
       };
     }
     var drawer = global.document && global.document.getElementById("shopDrawer");
