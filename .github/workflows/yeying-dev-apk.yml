@@ -68,8 +68,8 @@ jobs:
 
             - 桌面名：开发版 夜樱
             - 包名：`com.sakurayo.yeying.dev`
-            - versionName：`4.6.0-yeying` / versionCode 6104
-            - 本包修了大厅口令 MutationObserver 把 WebView 主线程卡死（开屏转圈、所有按钮没反应），以及点穿到画布。覆盖安装即可，不会动正式《樱夜·尸潮》。
+            - versionName：`4.6.0-yeying` / versionCode 6105
+            - 本包把商店改成时装卖场：全套服装上架、橱窗主推和卖点文案，补给降成柜台。覆盖安装即可，不会动正式《樱夜·尸潮》。
             - 不会覆盖正式《樱夜·尸潮》（`com.sakurayo.zombietide`）
             - Debug 证书签名，只适合自己装
 
