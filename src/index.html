@@ -7463,6 +7463,16 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         return out;
       };
     }
+    if(!installLobby46.weightWrapped){
+      installLobby46.weightWrapped=true;
+      const _upgradeWeightLobby46=upgradeWeight;
+      upgradeWeight=function(u){
+        let w=_upgradeWeightLobby46(u);
+        const school=u&& (u.s||u.school);
+        if(school&&L.hasSchool(save,school))w*=1.3;
+        return w;
+      };
+    }
     wireLivePuppet46();
     L.dressArchive($("#archiveDrawer .archiveDock46"));
     ["shopDrawer","stageDrawer","archiveDrawer"].forEach(id=>$(`#${id}`)?.classList.add("room46"));
