@@ -1,6 +1,6 @@
-# 《樱夜·尸潮》V4.6.0 交接规格
+# 《樱夜·尸潮》V4.7.0 交接规格
 
-2026-08-14。给下一位 AI / 维护者。先读根目录 [README.md](../README.md)，再读本文和 [AGENTS.md](../AGENTS.md)。二游分期原文在 [PLAN_V46_ERYOU.md](PLAN_V46_ERYOU.md)。升版本见 [MAINTAIN.md](MAINTAIN.md)。
+2026-08-18。给下一位 AI / 维护者。先读根目录 [README.md](../README.md)，再读本文、[REGRESSION.md](REGRESSION.md) 和 [AGENTS.md](../AGENTS.md)。二游分期原文在 [PLAN_V46_ERYOU.md](PLAN_V46_ERYOU.md)。升版本见 [MAINTAIN.md](MAINTAIN.md)。已修错误见 [REGRESSION.md](REGRESSION.md)，不要回潮。
 
 这不是另做一款原神。局外做成能横着玩的二次元手游大厅，局内继续是离线肉鸽射击。
 
@@ -8,14 +8,14 @@
 
 | 项 | 值 |
 |---|---|
-| 源码版本 | **4.6.0**（未发版，不要擅自升 4.6.1） |
-| Android `versionName` / `versionCode` | 4.6.0 / **61** |
-| 公开仓 | https://github.com/h1neolzr7f/sakurayo-zombietide |
-| 已发布 APK | **v4.4.6** |
+| 源码版本 | **4.7.0**（统一 eaa0 修复线 + cadf 顶栏/手感，未对玩家发正式包） |
+| 开发版夜樱 | `4.7.0-yeying` / versionCode **6110** / 包名 `com.sakurayo.yeying.dev` |
+| 公开仓正式 APK | 仍是 **v4.4.6** |
 | 存档键 | **`sakurayoV3`** |
 | 代码基线 | `src/index.html` + `src/runtime/*.js` |
 | 运行时美术 | `android-app/app/src/main/assets/game/art` |
 | 生成源 PNG | `assets/image2/source/`（gitignore，约 329MB，不进本仓） |
+| 统一分支 | `cursor/unify-v47-da3d` |
 
 `progress.md` 顶部 Original prompt 不得删除或改写。
 
@@ -290,7 +290,7 @@ powershell -File tools/verify.ps1
 
 `verify.ps1` 目前包含：`static_check`、内容包、各 runtime 语法、3 个 unit、ops / testimony / landscape / framework / browser smoke 与 gacha visual。
 
-`landscape_smoke.mjs` 固定验证 932×430 作战简报、战场、Boss 阶段机制条和战术结算；`browser_smoke.mjs` 仍以 430×932 做大部分兼容回归并断言版本 `"4.6.0"`。竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。
+`landscape_smoke.mjs` 固定验证 932×430 作战简报、战场、Boss 阶段机制条和战术结算；`browser_smoke.mjs` 仍以 430×932 做大部分兼容回归并断言版本 `"4.7.0"`。竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。`tests/regression_v47.mjs` 锁住已修错误。
 
 发版（用户明确要求再做）：
 

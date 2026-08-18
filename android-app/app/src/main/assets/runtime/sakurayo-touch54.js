@@ -2,7 +2,7 @@
   "use strict";
 
   var STYLE_ID = "sakurayo-touch54-css";
-  var VERSION = "4.6.0";
+  var VERSION = "4.7.0";
   var CLICKABLE =
     "button,a,input,select,textarea,label,summary,.choice,.charCard,.stageCard,.stageMini,.eventChoice,.close,.start,.revealCard46,.rosterSlot46,.skinCard,[onclick],[data-open],[data-home],[data-mode],[data-character],[data-shell-open],[data-shell],[role='button'],#pause,#dash,#skill,#resume,#back,#opsDock46";
   var UI_UP =

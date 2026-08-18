@@ -9,7 +9,7 @@
     "#menu.homeDock46 button,#menu.homeDock46 .charCard,#menu.homeDock46 .homeDeck46,#menu.homeDock46 .homeNav46,#menu.homeDock46 .homeRail46,#menu.homeDock46 .homeBanner46,#menu.homeDock46 .charSelectPanel,#menu.homeDock46 .start,#menu.homeDock46 .homeModes46,#menu.homeDock46 .stageMini,#menu.homeDock46 .profile,#menu.homeDock46 .coins,#menu.homeDock46 .homeCoinPlus46,#menu.homeDock46 .heroTap46,.drawer button,.drawer .close,.choice,#pause,#dash,#skill,#resume,#back,#opsDock46,#opsDock46 button{pointer-events:auto!important;touch-action:manipulation!important}" +
     "#menu.homeDock46 .heroLive46,#menu.homeDock46 .heroLiveBreath46,#menu.homeDock46 .bg,#yeyingDevBadge53{pointer-events:none!important}" +
     "html.landscape46 #menu.homeDock46 .top,html.androidLandscape46 #menu.homeDock46 .top{height:52px!important;max-height:52px!important;overflow:visible!important;z-index:10!important;pointer-events:none!important}" +
-    "html.landscape46 #menu.homeDock46 .top .profile,html.landscape46 #menu.homeDock46 .top .coins,html.landscape46 #menu.homeDock46 .top button,html.androidLandscape46 #menu.homeDock46 .top .profile,html.androidLandscape46 #menu.homeDock46 .top .coins,html.androidLandscape46 #menu.homeDock46 .top button{pointer-events:auto!important}" +
+    "html.landscape46 #menu.homeDock46 .top .profile,html.landscape46 #menu.homeDock46 .top .coins,html.landscape46 #menu.homeDock46 .top button,html.landscape46 #menu.homeDock46 .top .charSelectPanel,html.landscape46 #menu.homeDock46 .top #homeWallet46,html.landscape46 #menu.homeDock46 .top #homeQuick46,html.androidLandscape46 #menu.homeDock46 .top .profile,html.androidLandscape46 #menu.homeDock46 .top .coins,html.androidLandscape46 #menu.homeDock46 .top button,html.androidLandscape46 #menu.homeDock46 .top .charSelectPanel,html.androidLandscape46 #menu.homeDock46 .top #homeWallet46,html.androidLandscape46 #menu.homeDock46 .top #homeQuick46{pointer-events:auto!important}" +
     "html.androidLandscape46 #menu.homeDock46 .heroLive46,html.landscape46.portraitFallback46 #menu.homeDock46 .heroLive46{width:42%!important;max-width:46%;top:0!important;bottom:96px!important;z-index:1!important;pointer-events:none!important}" +
     "html.androidLandscape46 #menu.homeDock46 .homeDeck46,html.landscape46.portraitFallback46 #menu.homeDock46 .homeDeck46{display:flex!important;flex-direction:column;position:absolute!important;right:max(12px,env(safe-area-inset-right))!important;top:max(58px,calc(env(safe-area-inset-top) + 48px))!important;bottom:max(78px,calc(env(safe-area-inset-bottom) + 68px))!important;width:min(36vw,300px)!important;z-index:12!important;pointer-events:auto!important}" +
     "html.androidLandscape46 #menu.homeDock46 .nav.homeNav46,html.landscape46.portraitFallback46 #menu.homeDock46 .nav.homeNav46{position:absolute!important;left:50%!important;bottom:max(8px,env(safe-area-inset-bottom))!important;transform:translateX(-50%)!important;z-index:13!important;pointer-events:auto!important}" +
@@ -27,7 +27,12 @@
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .profile{flex:none;max-width:200px;max-height:44px;overflow:visible;z-index:8}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .profile>div{flex-wrap:nowrap;overflow:hidden}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeSupport46{display:none}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charSelectPanel{position:absolute!important;left:max(220px,calc(env(safe-area-inset-left) + 204px))!important;right:auto!important;top:max(10px,env(safe-area-inset-top))!important;bottom:auto!important;width:auto;margin:0;z-index:14}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charSelectPanel{position:static!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;width:auto;margin:0 8px 0 auto;padding:0;background:transparent;border:0;box-shadow:none;z-index:14;pointer-events:auto;flex:0 0 auto}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charSelectPanel .sectionTitle{display:none!important}" +
+    "html.landscape46:not(.portraitFallback46) #homeWallet46{margin-left:0}" +
+    "html.landscape46:not(.portraitFallback46) #homeWallet46 .homeChip46.prism,html.landscape46:not(.portraitFallback46) #homeWallet46 .homeChip46.shard{display:none!important}" +
+    "html.landscape46:not(.portraitFallback46) #homeQuick46{gap:12px}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 #moreButton39{margin-left:10px;padding:0 12px}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 #homeGreet46,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeGreet46{position:absolute;left:44px;top:calc(100% + 4px);margin:0;max-width:190px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:6}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeRail46{top:max(58px,calc(env(safe-area-inset-top) + 48px));bottom:max(140px,calc(env(safe-area-inset-bottom) + 128px));padding:4px 3px;gap:3px;justify-content:space-between;overflow:hidden}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeRail46 button{min-width:42px;min-height:42px;padding:6px 4px}" +
@@ -40,7 +45,7 @@
     "@media(max-height:409px){html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46{display:none!important}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeRail46{bottom:max(78px,calc(env(safe-area-inset-bottom) + 68px))}}" +
     "@media(max-height:370px){html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46{bottom:max(80px,calc(env(safe-area-inset-bottom) + 70px));gap:4px;overflow:hidden}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini{min-height:48px;padding:6px 10px}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini p,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeStageProg46{display:none!important}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeModes46 button{min-height:36px;padding:4px 8px}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeModes46 button small{display:none}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .start{min-height:40px;flex:0 0 40px}}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .heroLive46{width:40%;bottom:88px!important}" +
-    "html.landscape46.shortWindow46 #menu.homeDock46 .charSelectPanel{position:absolute!important;left:max(208px,calc(env(safe-area-inset-left) + 192px))!important;top:max(6px,env(safe-area-inset-top))!important}" +
+    "html.landscape46.shortWindow46 #menu.homeDock46 .charSelectPanel{position:static!important;left:auto!important;top:auto!important;margin:0 6px 0 auto}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .homeDeck46{bottom:max(88px,calc(env(safe-area-inset-bottom) + 78px))}" +
     "html.landscape46:not(.portraitFallback46) #hud .hero{max-width:220px}" +
     "html.landscape46:not(.portraitFallback46) #hud .rinfo{display:none}" +
@@ -90,17 +95,48 @@
     if (line.parentNode !== profile) profile.appendChild(line);
   }
 
+  function hangChars() {
+    if (hangChars.busy) return;
+    hangChars.busy = true;
+    try {
+      var doc = global.document;
+      if (!doc) return;
+      var top = doc.querySelector("#menu .top");
+      var panel = doc.querySelector("#menu .charSelectPanel");
+      var wallet = doc.getElementById("homeWallet46");
+      if (!top || !panel) return;
+      if (wallet && wallet.parentNode === top) {
+        if (panel.parentNode !== top || panel.nextElementSibling !== wallet) top.insertBefore(panel, wallet);
+      } else if (panel.parentNode !== top) {
+        top.appendChild(panel);
+      }
+    } finally {
+      hangChars.busy = false;
+    }
+  }
+
+  function hangLobbyTop() {
+    if (hangLobbyTop.busy) return;
+    hangLobbyTop.busy = true;
+    try {
+      hangGreet();
+      hangChars();
+    } finally {
+      hangLobbyTop.busy = false;
+    }
+  }
+
   function watchGreet() {
     var doc = global.document;
     if (!doc || !doc.body || watchGreet.bound) return;
     watchGreet.bound = true;
     if (!global.MutationObserver) {
-      hangGreet();
+      hangLobbyTop();
       return;
     }
-    var obs = new global.MutationObserver(hangGreet);
+    var obs = new global.MutationObserver(hangLobbyTop);
     obs.observe(doc.body, { childList: true, subtree: true });
-    hangGreet();
+    hangLobbyTop();
   }
 
   function watchOrientation() {
@@ -134,17 +170,19 @@
     }
     style.textContent = CSS;
     var orient = syncAndroidLandscape();
-    hangGreet();
+    hangLobbyTop();
     watchGreet();
     watchOrientation();
     return { ok: true, id: STYLE_ID, locked: !!orient.locked, fallback: !!orient.fallback };
   }
 
   global.SakurayoLayout52 = {
-    version: "4.6.0",
+    version: "4.7.0",
     css: CSS,
     install: install,
     hangGreet: hangGreet,
+    hangChars: hangChars,
+    hangLobbyTop: hangLobbyTop,
     syncAndroidLandscape: syncAndroidLandscape,
   };
 

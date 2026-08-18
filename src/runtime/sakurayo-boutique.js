@@ -381,7 +381,7 @@
     return false;
   }
 
-  global.SakurayoBoutique = { version: "4.6.0", install: install, decorate: decorate };
+  global.SakurayoBoutique = { version: "4.7.0", install: install, decorate: decorate };
   if (global.document && global.document.readyState !== "loading") install();
   else if (global.document) global.document.addEventListener("DOMContentLoaded", install);
 })(typeof window !== "undefined" ? window : globalThis);

@@ -11,7 +11,7 @@ sandbox.globalThis = sandbox;
 vm.runInNewContext(code, sandbox);
 const L = sandbox.window.SakurayoLobby;
 
-assert.equal(L.version, "4.6.0");
+assert.equal(L.version, "4.7.0");
 assert.equal(L.CARDS.length, 16);
 assert.deepEqual([...L.DEFAULT_SHOWN], ["sayo_echo", "aya_petal"]);
 for (const card of L.CARDS) {

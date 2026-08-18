@@ -1,8 +1,8 @@
-# 樱夜·尸潮 V4.6.0
+# 樱夜·尸潮 V4.7.0
 
 横屏、手机端、离线二次元肉鸽射击。三角色是月城小夜、神代绫、黑羽凛音。
 
-**当前源码版本 4.6.0，未正式发版。不要开工就改版本号。**
+**当前源码版本 4.7.0**，统一了并行的修复线与素材线，仍未对玩家发正式包。已修错误见 `docs/REGRESSION.md`，不要回潮。
 
 ---
 
@@ -14,14 +14,13 @@
 | 离线单入口 HTML | 已同步到本仓 `release/` |
 | Android Debug 候选包 | 已构建，无 INTERNET，v1/v2 Debug 签名通过 |
 | GitHub 开发仓 | 已上传，见下方链接 |
-| 开发分支 | `cursor/bc-a381488d-90d5-4ff1-914f-6cabd630c2b2-074d` |
-| 最新提交 | `fabbdfa` · `Polish combat impact and ascension effects` |
-| 拉取请求 | [PR #1](https://github.com/h1neolzr7f/sakurayo-v46-handoff/pull/1)（Draft，未合并） |
-| `main` | 还没有这批 4.6 精修 |
-| 公开玩家仓正式发布 | 仍是 **v4.4.6**，不是 4.6.0 |
+| 开发分支 | `cursor/unify-v47-da3d` |
+| 拉取请求 | 本分支统一 PR（Draft，未合并 `main`） |
+| `main` | 还停在 4.6.0 交接快照 |
+| 公开玩家仓正式发布 | 仍是 **v4.4.6** |
 | 正式签名 Release | 未做，缺原正式证书和实体横屏机验收 |
 
-一句话：代码和 Debug 包已经推到 GitHub 开发仓的草稿 PR；**还没有合进 `main`，也没有对玩家发 4.6.0。**
+一句话：V4.7.0 已把并行的修复线和素材线收进统一分支；**还没有合进 `main`，也没有对玩家发正式包。**
 
 详细验收见 [docs/FINAL_UPGRADE_REPORT.md](docs/FINAL_UPGRADE_REPORT.md)。一页清单见 [README_FIRST.md](README_FIRST.md)。
 
@@ -104,7 +103,7 @@ powershell -File tools/verify.ps1
 
 - 唯一玩法源码：`src/index.html` + `src/runtime/*.js`
 - 运行时美术：`android-app/app/src/main/assets/game/art`
-- 离线单入口：`release/樱夜尸潮_V4.6.0_单文件.html`
+- 离线单入口：开发时直接打开 `src/index.html`；发版仍走 `tools/build_game.py`
 - Android 工程：`android-app/`
 - 交接规格：[docs/HANDOFF.md](docs/HANDOFF.md)
 - 美术规则：[docs/ART_BIBLE.md](docs/ART_BIBLE.md)

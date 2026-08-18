@@ -1,20 +1,20 @@
 # 接手检查清单
 
-当前：**V4.6.0 源码，开发版 夜樱可侧载。** 公开玩家仓已发布 APK 仍是 v4.4.6。
+当前：**V4.7.0 源码，开发版 夜樱可侧载。** 公开玩家仓已发布 APK 仍是 v4.4.6。
 
 ## GitHub 在哪
 
 | 项 | 值 |
 |---|---|
 | 开发仓 | https://github.com/h1neolzr7f/sakurayo-v46-handoff |
-| 工作分支 | `cursor/yeying-dev-apk-eaa0` |
+| 工作分支 | `cursor/unify-v47-da3d` |
 | 开发版包名 | `com.sakurayo.yeying.dev` |
 | 桌面名 | 开发版 夜樱 |
 | 正式版包名 | `com.sakurayo.zombietide` |
 | `main` | 还没有这批 4.6 精修 |
 | 公开玩家仓 | https://github.com/h1neolzr7f/sakurayo-zombietide |
 
-开发版和正式版可以同时装。**没有对玩家发 4.6.0。** 侧载包：本仓 Releases 预发布 `yeying-dev-v4.6.0` 的 `YeYing-Dev-v4.6.0-android.apk`。
+开发版和正式版可以同时装。**没有对玩家发正式 4.7.0。** 侧载包走本仓 Releases 预发布 `yeying-dev-v4.7.0` 的 `YeYing-Dev-v4.7.0-android.apk`。已修错误见 [docs/REGRESSION.md](docs/REGRESSION.md)。
 
 按这个顺序读：
 
@@ -39,7 +39,7 @@ Windows 也可：`powershell -File tools/verify.ps1`
 
 ## 这一版已经有了
 
-横屏大厅、五房、16 卡寻访（只收藏）、证词模式、局内 2 干员 DP、真实眨眼、作战简报、四阶段机制条、Boss 阶段字幕、三角色技能演出、分层打击反馈、三相飞升签名。版本号仍是 4.6.0。
+横屏大厅、五房、16 卡寻访（只收藏）、证词模式、局内 2 干员 DP、真实眨眼、作战简报、四阶段机制条、Boss 阶段字幕、三角色技能演出、分层打击反馈、三相飞升签名、触控修复、图标精装、顶栏拆叠。版本号 **4.7.0**。
 
 ## 当前交付状态
 
