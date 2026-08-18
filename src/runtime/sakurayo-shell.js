@@ -15,3 +15,24 @@
   var jumpProfile = "";
   var noticePick = "";
   var mailPick = "";
+
+  var DOSSIERS = Object.freeze({
+    sayo: Object.freeze({
+      en: "SAYO Tsukishiro",
+      birth: "7月24日",
+      height: "167cm",
+      team: "樱夜特助小队",
+    }),
+    aya: Object.freeze({
+      en: "AYA Jindai",
+      birth: "11月3日",
+      height: "165cm",
+      team: "零号企业追缉课",
+    }),
+    rion: Object.freeze({
+      en: "RION Kuroha",
+      birth: "2月14日",
+      height: "170cm",
+      team: "黄泉流道场",
+    }),
+  });
