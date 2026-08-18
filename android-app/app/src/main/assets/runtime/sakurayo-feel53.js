@@ -288,6 +288,7 @@
     var start = $("start");
     if (start) {
       observe(start, { childList: true }, function () {
+        if (applyPassword.busy) return;
         applyPassword(detectChar());
       });
     }

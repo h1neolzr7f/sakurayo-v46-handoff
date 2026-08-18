@@ -137,10 +137,22 @@
     state.lastAt = Date.now();
   }
 
+  function scheduleHits() {
+    if (scheduleHits.queued) return;
+    scheduleHits.queued = true;
+    var run = function () {
+      scheduleHits.queued = false;
+      syncHits();
+    };
+    if (global.requestAnimationFrame) global.requestAnimationFrame(run);
+    else if (global.setTimeout) global.setTimeout(run, 0);
+    else run();
+  }
+
   function watch() {
     var d = doc();
     if (!d || !d.body || !global.MutationObserver) return;
-    var obs = new global.MutationObserver(syncHits);
+    var obs = new global.MutationObserver(scheduleHits);
     obs.observe(d.body, { attributes: true, attributeFilter: ["class", "hidden"], subtree: true });
     syncHits();
   }

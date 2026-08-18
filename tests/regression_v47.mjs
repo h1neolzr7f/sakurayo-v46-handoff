@@ -29,7 +29,11 @@ assert.match(index, /function draw\s*\(/);
 assert.match(index, /function spawnEnemy\s*\(/);
 assert.match(index, /function showDialogue\s*\(/);
 assert.match(read("src/runtime/sakurayo-cutscene.js"), /!beats\.length \|\| !!\(opts && opts\.testMode\)/);
-assert.match(index, /if \(!menuUpdate\.busy\) menuUpdate\(\)/);
+assert.match(index, /state === "menu" && !menuUpdate\.busy/);
+assert.match(index, /drawerVisible47/);
+assert.match(index, /dataset\.cmd47/);
+assert.match(index, /_openDrawer47/);
+assert.match(touch, /scheduleHits/);
 
 assert.match(ops, /sakurayo-touch54\.js/);
 assert.match(ops, /sakurayo-layout52\.js/);
