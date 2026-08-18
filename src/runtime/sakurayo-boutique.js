@@ -331,6 +331,9 @@
     };
     paintRail(drawer);
     fillHero(drawer);
+    if (global.SakurayoChrome && typeof global.SakurayoChrome.dress === "function") {
+      global.SakurayoChrome.dress(drawer);
+    }
   }
 
   function hook() {

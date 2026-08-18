@@ -27,8 +27,8 @@
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .profile{flex:none;max-width:200px;max-height:44px;overflow:visible;z-index:8}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .profile>div{flex-wrap:nowrap;overflow:hidden}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeSupport46{display:none}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charSelectPanel{position:static!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;width:auto;margin:0 8px 0 auto;padding:0;background:transparent;border:0;box-shadow:none;z-index:14;pointer-events:auto;flex:0 0 auto}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charSelectPanel .sectionTitle{display:none!important}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .top .charSelectPanel{position:static!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;width:auto;margin:0 8px 0 auto;padding:0;background:transparent;border:0;box-shadow:none;z-index:14;pointer-events:auto;flex:0 0 auto}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .top .charSelectPanel .sectionTitle{display:none!important}" +
     "html.landscape46:not(.portraitFallback46) #homeWallet46{margin-left:0}" +
     "html.landscape46:not(.portraitFallback46) #homeWallet46 .homeChip46.prism,html.landscape46:not(.portraitFallback46) #homeWallet46 .homeChip46.shard{display:none!important}" +
     "html.landscape46:not(.portraitFallback46) #homeQuick46{gap:12px}" +
@@ -45,7 +45,7 @@
     "@media(max-height:409px){html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46{display:none!important}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeRail46{bottom:max(78px,calc(env(safe-area-inset-bottom) + 68px))}}" +
     "@media(max-height:370px){html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeDeck46{bottom:max(80px,calc(env(safe-area-inset-bottom) + 70px));gap:4px;overflow:hidden}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini{min-height:48px;padding:6px 10px}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .stageMini p,html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeStageProg46{display:none!important}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeModes46 button{min-height:36px;padding:4px 8px}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeModes46 button small{display:none}html.landscape46:not(.portraitFallback46) #menu.homeDock46 .start{min-height:40px;flex:0 0 40px}}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .heroLive46{width:40%;bottom:88px!important}" +
-    "html.landscape46.shortWindow46 #menu.homeDock46 .charSelectPanel{position:static!important;left:auto!important;top:auto!important;margin:0 6px 0 auto}" +
+    "html.landscape46.shortWindow46 #menu.homeDock46 .top .charSelectPanel{position:static!important;left:auto!important;top:auto!important;margin:0 6px 0 auto}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .homeDeck46{bottom:max(88px,calc(env(safe-area-inset-bottom) + 78px))}" +
     "html.landscape46:not(.portraitFallback46) #hud .hero{max-width:220px}" +
     "html.landscape46:not(.portraitFallback46) #hud .rinfo{display:none}" +
@@ -126,16 +126,33 @@
     }
   }
 
+  function scheduleLobbyTop() {
+    if (scheduleLobbyTop.queued) return;
+    scheduleLobbyTop.queued = true;
+    var run = function () {
+      scheduleLobbyTop.queued = false;
+      hangLobbyTop();
+    };
+    if (global.requestAnimationFrame) global.requestAnimationFrame(run);
+    else if (global.setTimeout) global.setTimeout(run, 0);
+    else run();
+  }
+
   function watchGreet() {
     var doc = global.document;
-    if (!doc || !doc.body || watchGreet.bound) return;
+    if (!doc || watchGreet.bound) return;
     watchGreet.bound = true;
     if (!global.MutationObserver) {
       hangLobbyTop();
       return;
     }
-    var obs = new global.MutationObserver(hangLobbyTop);
-    obs.observe(doc.body, { childList: true, subtree: true });
+    var root = doc.getElementById("menu") || doc.body;
+    if (!root) {
+      hangLobbyTop();
+      return;
+    }
+    var obs = new global.MutationObserver(scheduleLobbyTop);
+    obs.observe(root, { childList: true, subtree: true });
     hangLobbyTop();
   }
 
