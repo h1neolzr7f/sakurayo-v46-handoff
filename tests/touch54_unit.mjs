@@ -23,7 +23,7 @@ assert.doesNotMatch(code, /sakurayoV3/);
 assert.match(ops, /sakurayo-touch54\.js/);
 assert.match(activity, /TOUCH54_ASSET/);
 assert.match(activity, /setOnTouchListener/);
-assert.match(gradle, /versionCode 6108/);
+assert.match(gradle, /versionCode 6109/);
 assert.match(code, /pointer-events:auto!important/);
 assert.match(code, /elementFromPoint/);
 assert.match(code, /syncCinematicHud/);
