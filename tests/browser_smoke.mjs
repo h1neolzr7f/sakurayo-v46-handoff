@@ -167,15 +167,15 @@ try {
   assert.equal(await page.locator("#characterList .charCard").count(), 3);
   assert.equal(await page.locator("#start").isVisible(), true);
   assert.equal(await page.locator("#coverTitle36").isVisible(), true);
-  assert.match(await page.locator("#menu .bg").evaluate(node => node.style.backgroundImage), /cover_v36_main_god\.webp/);
+  assert.match(await page.locator("#menu .bg").evaluate(node => node.style.backgroundImage), /lobby_wide\.webp/);
   await page.waitForFunction(() => {
     const boot = new Set(window.__SAKURAYO_ART__?.boot() || []);
     return window.__SAKURAYO_ART__?.status().filter(item => boot.has(item.path)).every(item => item.ready);
   }, null, { timeout: 10000 });
   const artStatus = await page.evaluate(() => window.__SAKURAYO_ART__.status());
-  assert.equal(artStatus.length, 15);
-  assert.equal(artStatus.filter(item => item.ready).length, 9);
-  assert.equal(artStatus.filter(item => !item.loaded).length, 6);
+  assert.equal(artStatus.length, 20);
+  assert.equal(artStatus.filter(item => item.ready).length, 12);
+  assert.equal(artStatus.filter(item => !item.loaded).length, 8);
   assert.equal(await page.locator("#menu .nav img").count(), 5);
   assert.ok(await page.locator("#characterList .charCard img").evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0)));
   await page.waitForFunction(() => {
@@ -235,10 +235,30 @@ try {
   assert.ok(lobby.shown.includes("sayo_echo"));
   assert.ok(lobby.shown.includes("aya_petal"));
   assert.equal(lobby.cards.length, 8);
-  // 主 nav 合同为 data-open="gacha"；抽屉未挂上时可用 api(page, "openDrawer", "gacha")
-  await page.locator('[data-open="gacha"]').click();
+  assert.deepEqual(lobby.pages, ["remnant", "fashion", "weapon"]);
+  assert.deepEqual(lobby.rosterTabs, ["scrap", "school"]);
+  assert.equal(lobby.rates.single, 160);
+  assert.equal(lobby.rates.ten, 1440);
+  assert.equal(lobby.rates.softPity, 65);
+  assert.equal(lobby.rates.spark, 200);
+  // 竖屏角色卡会挡住底栏左两格；寻访/仓库走测试 API，不放宽抽屉合同
+  const gachaOpen = await api(page, "openDrawer", "gacha");
+  assert.equal(gachaOpen.visible, true);
   assert.equal(await page.locator("#gachaDrawer").isVisible(), true);
   assert.match(await page.locator("#gachaDrawer").textContent(), /镜界寻访/);
+  assert.equal(await page.locator("#gachaTabs46 [data-pool]").count(), 3);
+  await page.locator('#gachaTabs46 [data-pool="fashion"]').click();
+  assert.match(await page.locator("#gachaDrawer").textContent(), /时装/);
+  const emptyFashion = await api(page, "pullGacha46", 1);
+  assert.equal(emptyFashion.ok, false);
+  assert.equal(emptyFashion.reason, "empty");
+  await page.locator('#gachaTabs46 [data-pool="weapon"]').click();
+  assert.match(await page.locator("#gachaDrawer").textContent(), /武器/);
+  const emptyWeapon = await api(page, "pullGacha46", 1);
+  assert.equal(emptyWeapon.ok, false);
+  assert.equal(emptyWeapon.reason, "empty");
+  await page.locator('#gachaTabs46 [data-pool="remnant"]').click();
+  assert.match(await page.locator("#gachaDrawer").textContent(), /残片进仓库/);
   const coinsBeforeFail = (await api(page, "lobby46")).coins;
   const broke = await api(page, "pullGacha46", 1);
   assert.equal(broke.ok, false);
@@ -247,18 +267,25 @@ try {
   const cheat = await api(page, "grantCheat46");
   assert.ok(cheat.coins >= 9999);
   assert.equal(cheat.cheatUsed, true);
+  const shardsBefore = (await api(page, "lobby46")).shards;
   const single = await api(page, "pullGacha46", 1);
   assert.equal(single.ok, true);
   assert.equal(single.results.length, 1);
   assert.ok(single.pulls >= 1);
+  assert.ok((await api(page, "lobby46")).shards >= shardsBefore + 1);
   const ten = await api(page, "pullGacha46", 10);
   assert.equal(ten.ok, true);
   assert.equal(ten.results.length, 10);
   assert.ok(ten.tenPulls >= 1);
   await shot(page, "01h-gacha-drawer.png");
   await page.locator("#gachaDrawer .close").click();
-  // 主 nav 合同为 data-open="roster"；抽屉未挂上时可用 api(page, "openDrawer", "roster")
-  await page.locator('[data-open="roster"]').click();
+  const rosterOpen = await api(page, "openDrawer", "roster");
+  assert.equal(rosterOpen.visible, true);
+  assert.match(await page.locator("#rosterDrawer").textContent(), /镜界仓库/);
+  assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 8);
+  await page.locator('#rosterTabs46 [data-roster="school"]').click();
+  assert.match(await page.locator("#rosterDrawer").textContent(), /后续写入/);
+  await page.locator('#rosterTabs46 [data-roster="scrap"]').click();
   assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 8);
   await shot(page, "01i-roster-wall.png");
   await page.locator("#rosterDrawer .close").click();
@@ -274,7 +301,7 @@ try {
   assert.match(await page.locator("#archiveDrawer").textContent(), /永久天赋/);
   await shot(page, "01k-archive.png");
   await page.locator("#archiveDrawer .close").click();
-  pass("V4.6.0 镜界寻访、名册与作弊币");
+  pass("V4.6.0 镜界寻访三页、仓库与作弊币");
 
   const betaPanel = await api(page, "openBeta40");
   assert.equal(betaPanel.visible, true);

@@ -14,6 +14,10 @@
     SSR: 0.01,
     pitySSR: 80,
     pitySR: 10,
+    softPity: 65,
+    spark: 200,
+    shardPull: 1,
+    shardDupe: 8,
     single: 160,
     ten: 1440,
     cheat: 9999,
@@ -21,27 +25,62 @@
   });
 
   var DEFAULT_SHOWN = Object.freeze(["sayo_echo", "aya_petal"]);
+  var POOL_IDS = Object.freeze(["remnant", "fashion", "weapon"]);
+  var ROSTER_TABS = Object.freeze(["scrap", "school"]);
+  var RARITY_RANK = Object.freeze(["SSR", "SR", "R", "N"]);
 
   var CARDS = Object.freeze([
-    { id: "sayo_echo", n: "小夜·镜中残影", r: "N", tag: "证词残页", d: "回收演习里裁下的半张立绘。只进名册，不改枪口。" },
-    { id: "aya_petal", n: "绫·花瓣证词", r: "N", tag: "证词残页", d: "居合前落下的花瓣拓本。收藏用，不加伤害。" },
-    { id: "rion_edge", n: "凛音·刀光残页", r: "R", tag: "道场残简", d: "黄泉流未署名的一页。墙上的光，不是刀锋。" },
-    { id: "night_radio", n: "夜话电台贴纸", r: "R", tag: "夜话残响", d: "吐槽电台的备用台标。贴在名册上，不进战斗。" },
-    { id: "shrine_seal", n: "神社封条拓本", r: "R", tag: "鸟居拓本", d: "第一章鸟居下揭下的封条影。只作收藏。" },
-    { id: "void_ticket", n: "主神回收券影", r: "SR", tag: "主神残券", d: "虚空圣所的作废回收券。不能兑换属性。" },
-    { id: "cherry_crown", n: "樱冠残片", r: "SR", tag: "樱冠残片", d: "镜界冠冕裂开后的一片。好看，不卖伤害。" },
-    { id: "last_witness", n: "终章证人立绘", r: "SSR", tag: "终章证人", d: "碎镜后面那个人终于肯露面。这是收藏，不是数值。" },
+    { id: "sayo_echo", n: "小夜·镜中残影", r: "R", kind: "scrap", tag: "残件", d: "半张立绘还卡在裂镜里。拥有即暴击 +0.5%，重复不加。" },
+    { id: "aya_petal", n: "绫·花瓣残件", r: "R", kind: "scrap", tag: "残件", d: "居合前落下的花瓣。拥有即移速 +0.5%，重复不加。" },
+    { id: "rion_edge", n: "凛音·刀光残件", r: "R", kind: "scrap", tag: "残件", d: "黄泉流未署名的一页刀光。拥有即刀伤 +1%，重复不加。" },
+    { id: "night_radio", n: "夜话电台残件", r: "R", kind: "scrap", tag: "残件", d: "吐槽电台还在响。拥有即技能冷却 -0.5%，重复不加。" },
+    { id: "shrine_seal", n: "神社封条残件", r: "R", kind: "scrap", tag: "残件", d: "鸟居下揭下的封条影。拥有即减伤 +0.4%，重复不加。" },
+    { id: "void_ticket", n: "主神作废券", r: "R", kind: "scrap", tag: "残件", d: "虚空圣所的作废回收券。拥有即开局护盾 +4，重复不加。" },
+    { id: "cherry_crown", n: "樱冠残片", r: "R", kind: "scrap", tag: "残件", d: "镜界冠冕裂开后的一片。拥有即全伤害 +0.8%，重复不加。" },
+    { id: "last_witness", n: "碎镜后的人", r: "R", kind: "scrap", tag: "残件", d: "碎镜后面那个人不是三女之一。拥有即生命 +1%，重复不加。" },
   ]);
 
-  var CARD_MAP = Object.create(null);
-  CARDS.forEach(function (card) {
-    CARD_MAP[card.id] = card;
+  var FASHION_CARDS = Object.freeze([]);
+  var WEAPON_CARDS = Object.freeze([]);
+  var SCHOOL_CARDS = Object.freeze([]);
+
+  var SCRAP_BONUS = Object.freeze({
+    sayo_echo: { crit: 0.005 },
+    aya_petal: { spd: 0.005 },
+    rion_edge: { blade: 0.01 },
+    night_radio: { skillCd: 0.005 },
+    shrine_seal: { reduce: 0.004 },
+    void_ticket: { shield: 4 },
+    cherry_crown: { dmg: 0.008 },
+    last_witness: { hp: 0.01 },
   });
 
-  var BY_RARITY = { N: [], R: [], SR: [], SSR: [] };
-  CARDS.forEach(function (card) {
-    BY_RARITY[card.r].push(card);
-  });
+  var CARD_MAP = Object.create(null);
+  function indexCards(list) {
+    list.forEach(function (card) {
+      CARD_MAP[card.id] = card;
+    });
+  }
+  indexCards(CARDS);
+  indexCards(FASHION_CARDS);
+  indexCards(WEAPON_CARDS);
+  indexCards(SCHOOL_CARDS);
+
+  function cardsForPool(pool) {
+    if (pool === "fashion") return FASHION_CARDS;
+    if (pool === "weapon") return WEAPON_CARDS;
+    return CARDS;
+  }
+
+  function groupByRarity(list) {
+    var out = { N: [], R: [], SR: [], SSR: [] };
+    list.forEach(function (card) {
+      if (out[card.r]) out[card.r].push(card);
+    });
+    return out;
+  }
+
+  var BY_RARITY = groupByRarity(CARDS);
 
   var LOBBY_CSS =
     "html,body{width:100%;height:100%;overscroll-behavior:none}" +
@@ -64,7 +103,7 @@
     ".wishHero46{position:absolute;z-index:2;left:-4%;bottom:-6%;width:58%;height:118%;object-fit:contain;object-position:left bottom;background:transparent!important;pointer-events:none;-webkit-mask-image:linear-gradient(to top,transparent 0%,#000 12%,#000 100%);mask-image:linear-gradient(to top,transparent 0%,#000 12%,#000 100%)}" +
     ".wishPetals46{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden}" +
     ".wishPetals46 i{position:absolute;top:-12%;width:7px;height:9px;border-radius:0 70% 0 70%;background:#ff9bcc99;box-shadow:0 0 8px #ff9bcc66;animation:petalFall46 11s linear infinite}" +
-    ".wishTitle46{position:absolute;z-index:4;top:max(14px,calc(env(safe-area-inset-top) + 6px));right:16px;left:auto;text-align:right;max-width:58%;pointer-events:none}" +
+    ".wishTitle46{position:absolute;z-index:4;top:max(52px,calc(env(safe-area-inset-top) + 44px));right:16px;left:auto;text-align:right;max-width:58%;pointer-events:none}" +
     ".wishTitle46 h3{margin:0;font-size:clamp(26px,5.6vw,40px);letter-spacing:.28em;color:#fff7fb;text-shadow:0 0 22px #ff9bcc99,0 4px 18px #05020d}" +
     ".wishTitle46 p{margin:6px 0 0;color:#ffe7a3;font-size:11px;letter-spacing:.18em;text-shadow:0 2px 10px #05020d}" +
     ".wishPity46{position:absolute;z-index:4;left:12px;right:12px;bottom:118px;padding:8px 10px;border-radius:14px;background:#0b0818cc;border:1px solid #ffe6a333}" +
@@ -75,8 +114,17 @@
     ".pityRail46 i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ffe08a,#ffd36b 70%,#fff4c4);box-shadow:0 0 12px #ffd36b}" +
     ".pityRow46.sr .pityRail46 i{background:linear-gradient(90deg,#c18cff,#9c8cff)}" +
     ".wishDock46{position:absolute;z-index:5;left:0;right:0;bottom:0;padding:10px 12px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#06041000,#060410ee 34%,#060410)}" +
+    ".wishTabs46{position:absolute;z-index:6;top:max(14px,calc(env(safe-area-inset-top) + 6px));left:12px;display:flex;gap:6px}" +
+    ".wishTabs46 button{min-height:32px;padding:0 12px;border-radius:999px;border:1px solid #ffe6a355;background:#0b0818cc;color:#ffe7a3;font:800 11px/1 system-ui;letter-spacing:.12em}" +
+    ".wishTabs46 button.on{background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;border-color:#ffe6a3aa}" +
     ".wishPills46{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px}" +
     ".wishPills46 b{padding:4px 10px;border-radius:999px;background:#0b0818cc;border:1px solid #ffe6a355;color:#ffe7a3;font-size:10px;letter-spacing:.1em}" +
+    ".rosterTabs46{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}" +
+    ".rosterTabs46 button{min-height:32px;padding:0 12px;border-radius:999px;border:1px solid #ffe6a355;background:#0b0818cc;color:#ffe7a3;font:800 11px/1 system-ui;letter-spacing:.12em}" +
+    ".rosterTabs46 button.on{background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;border-color:#ffe6a3aa}" +
+    ".rosterLater46{min-height:180px;display:grid;place-items:center;border:1px dashed #ffe6a344;border-radius:16px;color:#bfb1d3;letter-spacing:.2em;font:800 13px/1.4 system-ui}" +
+    ".revealCard46.r-LEGEND .revealFace46{border-color:#ffe6a3;box-shadow:0 0 26px #ffd36baa}" +
+    ".revealLegend46{position:absolute;z-index:4;left:7px;bottom:36px;padding:3px 7px;border-radius:6px;background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;font:800 9px/1 system-ui;letter-spacing:.14em}" +
     ".gachaActions46{display:grid;grid-template-columns:1fr 1fr;gap:10px}" +
     ".gachaActions46 button{min-height:54px;border-radius:16px;border:1px solid #ff9bcc66;color:#fff;font:800 15px/1.1 system-ui;letter-spacing:.14em;box-shadow:0 10px 24px #05020d66}" +
     ".gachaActions46 button small{display:block;margin-top:3px;font:700 10px/1 system-ui;letter-spacing:.08em;opacity:.88}" +
@@ -282,18 +330,37 @@
     return n;
   }
 
-  function emptyOwned() {
+  function emptyOwned(list) {
     var owned = {};
-    CARDS.forEach(function (card) {
+    (list || CARDS).forEach(function (card) {
       owned[card.id] = 0;
     });
     return owned;
   }
 
+  function normalizePool(raw, list) {
+    var incoming = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+    var owned = emptyOwned(list);
+    var rawOwned = incoming.owned && typeof incoming.owned === "object" && !Array.isArray(incoming.owned) ? incoming.owned : {};
+    list.forEach(function (card) {
+      owned[card.id] = clampInt(rawOwned[card.id], 0, 9999);
+    });
+    return {
+      pity: clampInt(incoming.pity, 0, RATES.pitySSR),
+      pitySR: clampInt(incoming.pitySR, 0, RATES.pitySR),
+      pulls: clampInt(incoming.pulls, 0, 999999),
+      tenPulls: clampInt(incoming.tenPulls, 0, 999999),
+      owned: owned,
+      last: Array.isArray(incoming.last) ? incoming.last.slice(0, 20) : [],
+      equipped: typeof incoming.equipped === "string" ? incoming.equipped : "",
+      shards: clampInt(incoming.shards, 0, 999999),
+    };
+  }
+
   function normalizeOps(shop40) {
     var shop = shop40 && typeof shop40 === "object" && !Array.isArray(shop40) ? shop40 : {};
     var incoming = shop.ops && typeof shop.ops === "object" && !Array.isArray(shop.ops) ? shop.ops : {};
-    var owned = emptyOwned();
+    var owned = emptyOwned(CARDS);
     var rawOwned = incoming.owned && typeof incoming.owned === "object" && !Array.isArray(incoming.owned) ? incoming.owned : {};
     CARDS.forEach(function (card) {
       owned[card.id] = clampInt(rawOwned[card.id], 0, 9999);
@@ -304,6 +371,10 @@
         if (owned[id] < 1) owned[id] = 1;
       });
     }
+    var pool = incoming.pool === "fashion" || incoming.pool === "weapon" ? incoming.pool : "remnant";
+    var rosterTab = incoming.rosterTab === "school" || incoming.rosterTab === "fashion" || incoming.rosterTab === "weapon" || incoming.rosterTab === "chronicle"
+      ? incoming.rosterTab
+      : "scrap";
     shop.ops = {
       pity: clampInt(incoming.pity, 0, RATES.pitySSR),
       pitySR: clampInt(incoming.pitySR, 0, RATES.pitySR),
@@ -312,6 +383,11 @@
       owned: owned,
       last: Array.isArray(incoming.last) ? incoming.last.slice(0, 20) : [],
       cheatUsed: incoming.cheatUsed ? 1 : 0,
+      shards: clampInt(incoming.shards, 0, 999999),
+      pool: pool,
+      rosterTab: rosterTab,
+      fashion: normalizePool(incoming.fashion, FASHION_CARDS),
+      weapon: normalizePool(incoming.weapon, WEAPON_CARDS),
     };
     return shop;
   }
@@ -331,24 +407,68 @@
     return out;
   }
 
-  function pickOfRarity(rarity, rng) {
-    var pool = BY_RARITY[rarity] || BY_RARITY.N;
+  function pickOfRarity(rarity, rng, list) {
+    var grouped = groupByRarity(list || CARDS);
+    var pool = grouped[rarity] && grouped[rarity].length ? grouped[rarity] : grouped.R.length ? grouped.R : grouped.N;
+    if (!pool || !pool.length) return null;
     return pool[Math.floor(rng() * pool.length) % pool.length];
   }
 
-  function rollRarity(ops, rng) {
-    if (ops.pity + 1 >= RATES.pitySSR) return "SSR";
-    if (ops.pitySR + 1 >= RATES.pitySR) return "SR";
-    var roll = rng();
-    if (roll < RATES.SSR) return "SSR";
-    if (roll < RATES.SSR + RATES.SR) return "SR";
-    if (roll < RATES.SSR + RATES.SR + RATES.R) return "R";
-    return "N";
+  function highestRarity(list) {
+    var i;
+    for (i = 0; i < RARITY_RANK.length; i++) {
+      for (var c = 0; c < list.length; c++) {
+        if (list[c].r === RARITY_RANK[i]) return RARITY_RANK[i];
+      }
+    }
+    return null;
   }
 
-  function applyPull(ops, rng) {
-    var rarity = rollRarity(ops, rng);
-    var card = pickOfRarity(rarity, rng);
+  function downgradeRarity(want, list) {
+    var start = RARITY_RANK.indexOf(want);
+    if (start < 0) start = 0;
+    var i;
+    for (i = start; i < RARITY_RANK.length; i++) {
+      for (var c = 0; c < list.length; c++) {
+        if (list[c].r === RARITY_RANK[i]) return RARITY_RANK[i];
+      }
+    }
+    return highestRarity(list);
+  }
+
+  function ssrRate(pity) {
+    if (pity + 1 >= RATES.pitySSR) return 1;
+    if (pity + 1 < RATES.softPity) return RATES.SSR;
+    var span = RATES.pitySSR - RATES.softPity;
+    var step = (pity + 1 - RATES.softPity) / span;
+    return Math.min(1, RATES.SSR + step * (1 - RATES.SSR));
+  }
+
+  function rollRarity(ops, rng, list) {
+    var want;
+    if (ops.pity + 1 >= RATES.pitySSR) want = "SSR";
+    else if (ops.pitySR + 1 >= RATES.pitySR) want = "SR";
+    else {
+      var ssr = ssrRate(ops.pity);
+      var roll = rng();
+      if (roll < ssr) want = "SSR";
+      else if (roll < ssr + RATES.SR) want = "SR";
+      else if (roll < ssr + RATES.SR + RATES.R) want = "R";
+      else want = "N";
+    }
+    return downgradeRarity(want, list);
+  }
+
+  function poolState(ops, pool) {
+    if (pool === "fashion") return ops.fashion;
+    if (pool === "weapon") return ops.weapon;
+    return ops;
+  }
+
+  function applyPull(ops, rng, list, shardHost) {
+    var rarity = rollRarity(ops, rng, list);
+    var card = pickOfRarity(rarity, rng, list);
+    if (!card) return null;
     ops.pity += 1;
     ops.pitySR += 1;
     if (card.r === "SSR") {
@@ -360,33 +480,48 @@
     var prev = ops.owned[card.id] || 0;
     ops.owned[card.id] = clampInt(prev + 1, 0, 9999);
     ops.pulls += 1;
-    return { id: card.id, r: card.r, n: card.n, pity: ops.pity, isNew: prev === 0 };
+    shardHost.shards = clampInt((shardHost.shards || 0) + RATES.shardPull, 0, 999999);
+    if (prev > 0) shardHost.shards = clampInt(shardHost.shards + RATES.shardDupe, 0, 999999);
+    return { id: card.id, r: card.r, n: card.n, pity: ops.pity, isNew: prev === 0, kind: card.kind || "" };
   }
 
-  function pull(save, count, rng) {
+  function pull(save, count, rng, poolId) {
     var n = count === 10 ? 10 : 1;
     var cost = n === 10 ? RATES.ten : RATES.single;
     if (!save || typeof save !== "object") return { ok: false, reason: "save", results: [] };
     save.shop40 = normalizeOps(save.shop40 || {});
+    var pool = poolId || save.shop40.ops.pool || "remnant";
+    if (POOL_IDS.indexOf(pool) < 0) pool = "remnant";
+    var list = cardsForPool(pool);
     var coins = clampInt(save.coins, 0, 99999999);
+    if (!list.length) {
+      return { ok: false, reason: "empty", results: [], coins: coins, pool: pool, pity: save.shop40.ops.pity, pitySR: save.shop40.ops.pitySR, owned: save.shop40.ops.owned };
+    }
     if (coins < cost) {
-      return { ok: false, reason: "coins", results: [], coins: coins, pity: save.shop40.ops.pity, pitySR: save.shop40.ops.pitySR, owned: save.shop40.ops.owned };
+      return { ok: false, reason: "coins", results: [], coins: coins, pool: pool, pity: save.shop40.ops.pity, pitySR: save.shop40.ops.pitySR, owned: save.shop40.ops.owned };
     }
     var rand = typeof rng === "function" ? rng : Math.random;
+    var state = poolState(save.shop40.ops, pool);
+    var shardHost = pool === "remnant" ? save.shop40.ops : state;
     var results = [];
-    for (var i = 0; i < n; i++) results.push(applyPull(save.shop40.ops, rand));
-    if (n === 10) save.shop40.ops.tenPulls += 1;
-    save.shop40.ops.last = results.slice();
+    for (var i = 0; i < n; i++) {
+      var row = applyPull(state, rand, list, shardHost);
+      if (row) results.push(row);
+    }
+    if (n === 10) state.tenPulls += 1;
+    state.last = results.slice();
     save.coins = coins - cost;
     return {
       ok: true,
       results: results,
       coins: save.coins,
+      pool: pool,
       pity: save.shop40.ops.pity,
       pitySR: save.shop40.ops.pitySR,
       owned: save.shop40.ops.owned,
       pulls: save.shop40.ops.pulls,
       tenPulls: save.shop40.ops.tenPulls,
+      shards: save.shop40.ops.shards,
     };
   }
 
@@ -414,8 +549,12 @@
     return {
       version: VERSION,
       rates: RATES,
+      pages: POOL_IDS.slice(),
+      rosterTabs: ROSTER_TABS.slice(),
+      pool: ops.pool,
+      rosterTab: ops.rosterTab,
       cards: CARDS.map(function (card) {
-        return { id: card.id, n: card.n, r: card.r, count: ops.owned[card.id] || 0 };
+        return { id: card.id, n: card.n, r: card.r, kind: card.kind || "scrap", count: ops.owned[card.id] || 0 };
       }),
       shown: shownIds(ops),
       owned: ops.owned,
@@ -423,9 +562,56 @@
       pitySR: ops.pitySR,
       pulls: ops.pulls,
       tenPulls: ops.tenPulls,
+      shards: ops.shards,
+      fashion: ops.fashion,
+      weapon: ops.weapon,
       coins: clampInt(save && save.coins, 0, 99999999),
       cheatUsed: !!ops.cheatUsed,
     };
+  }
+
+  function applyOwnedBonus(player, save) {
+    if (!player || typeof player !== "object") return player;
+    var shop = normalizeOps((save && save.shop40) || {});
+    var owned = shop.ops.owned || {};
+    var cid = (save && save.character) || player.character || "";
+    CARDS.forEach(function (card) {
+      if ((owned[card.id] || 0) < 1) return;
+      var bonus = SCRAP_BONUS[card.id];
+      if (!bonus) return;
+      if (bonus.crit) player.crit = (player.crit || 0) + bonus.crit;
+      if (bonus.spd) player.spd = (player.spd || 0) * (1 + bonus.spd);
+      if (bonus.blade) {
+        player.bladePower = (player.bladePower || 1) * (1 + bonus.blade);
+        if (cid === "rion") player.dmg = (player.dmg || 0) * (1 + bonus.blade);
+      }
+      if (bonus.skillCd) player.skillCd = (player.skillCd || 0) * (1 - bonus.skillCd);
+      if (bonus.reduce) player.damageReduce = (player.damageReduce || 0) + bonus.reduce;
+      if (bonus.shield) {
+        player.maxSh = (player.maxSh || 0) + bonus.shield;
+        player.sh = (player.sh || 0) + bonus.shield;
+      }
+      if (bonus.dmg) player.dmg = (player.dmg || 0) * (1 + bonus.dmg);
+      if (bonus.hp) {
+        player.maxHp = (player.maxHp || 0) * (1 + bonus.hp);
+        player.hp = player.maxHp;
+      }
+    });
+    return player;
+  }
+
+  function setPool(save, pool) {
+    save = save || {};
+    save.shop40 = normalizeOps(save.shop40 || {});
+    save.shop40.ops.pool = pool === "fashion" || pool === "weapon" ? pool : "remnant";
+    return save.shop40.ops.pool;
+  }
+
+  function setRosterTab(save, tab) {
+    save = save || {};
+    save.shop40 = normalizeOps(save.shop40 || {});
+    save.shop40.ops.rosterTab = ROSTER_TABS.indexOf(tab) >= 0 || tab === "fashion" || tab === "weapon" || tab === "chronicle" ? tab : "scrap";
+    return save.shop40.ops.rosterTab;
   }
 
   function rarityLabel(r) {
@@ -499,10 +685,20 @@
     if (!host) return snapshot(save);
     var info = snapshot(save);
     var hero = liveChar(save, handlers);
-    var ssrLeft = Math.max(0, RATES.pitySSR - info.pity);
-    var srLeft = Math.max(0, RATES.pitySR - info.pitySR);
-    var ssrPct = Math.max(0, Math.min(100, Math.round((info.pity / RATES.pitySSR) * 100)));
-    var srPct = Math.max(0, Math.min(100, Math.round((info.pitySR / RATES.pitySR) * 100)));
+    var pool = info.pool || "remnant";
+    var state = pool === "fashion" ? info.fashion : pool === "weapon" ? info.weapon : info;
+    var pity = state.pity || 0;
+    var pitySR = state.pitySR || 0;
+    var pulls = state.pulls || 0;
+    var shards = pool === "remnant" ? info.shards : state.shards || 0;
+    var ssrLeft = Math.max(0, RATES.pitySSR - pity);
+    var srLeft = Math.max(0, RATES.pitySR - pitySR);
+    var ssrPct = Math.max(0, Math.min(100, Math.round((pity / RATES.pitySSR) * 100)));
+    var srPct = Math.max(0, Math.min(100, Math.round((pitySR / RATES.pitySR) * 100)));
+    var empty = !cardsForPool(pool).length;
+    var poor1 = info.coins < RATES.single || empty;
+    var poor10 = info.coins < RATES.ten || empty;
+    var sub = pool === "fashion" ? "时装装备才吃满" : pool === "weapon" ? "武器装备才吃满" : "残片进仓库 · 拥有即加成";
     host.innerHTML =
       '<div class="wishStage46">' +
       '<img class="wishBanner46" data-art alt="" src="' +
@@ -514,7 +710,14 @@
       '<div class="wishPetals46">' +
       petalMarks() +
       "</div>" +
-      '<div class="wishTitle46"><h3>镜界寻访</h3><p>只进名册 · 不改枪口</p></div>' +
+      '<div class="wishTabs46" id="gachaTabs46">' +
+      '<button type="button" data-pool="remnant"' + (pool === "remnant" ? ' class="on"' : "") + ">残片</button>" +
+      '<button type="button" data-pool="fashion"' + (pool === "fashion" ? ' class="on"' : "") + ">时装</button>" +
+      '<button type="button" data-pool="weapon"' + (pool === "weapon" ? ' class="on"' : "") + ">武器</button>" +
+      "</div>" +
+      '<div class="wishTitle46"><h3>镜界寻访</h3><p>' +
+      sub +
+      "</p></div>" +
       '<div class="wishPity46"><div class="pityRow46"><span>距证人保底还有 ' +
       ssrLeft +
       ' 抽</span><div class="pityRail46"><i style="width:' +
@@ -527,18 +730,33 @@
       '<div class="wishDock46"><div class="wishPills46"><b>樱花币 ' +
       info.coins +
       "</b><b>寻访 " +
-      info.pulls +
+      pulls +
+      "</b><b>软保 " +
+      RATES.softPity +
+      "</b><b>碎镜片 " +
+      shards +
+      " / " +
+      RATES.spark +
       "</b></div>" +
       '<div class="gachaActions46"><button type="button" id="gachaPull1"' +
-      (info.coins < RATES.single ? ' class="poor"' : "") +
+      (poor1 ? ' class="poor"' : "") +
       ">单次寻访<small>" +
       RATES.single +
       '</small></button><button type="button" id="gachaPull10"' +
-      (info.coins < RATES.ten ? ' class="poor"' : "") +
+      (poor10 ? ' class="poor"' : "") +
       ">十连寻访<small>" +
       RATES.ten +
       "</small></button></div></div></div>";
     hideBrokenArt(host);
+    var tabs = host.querySelectorAll("#gachaTabs46 [data-pool]");
+    for (var t = 0; t < tabs.length; t++) {
+      tabs[t].onclick = function () {
+        var next = this.getAttribute("data-pool");
+        setPool(save, next);
+        if (handlers && typeof handlers.setPool === "function") handlers.setPool(next);
+        else renderGacha(host, save, handlers);
+      };
+    }
     var one = host.querySelector("#gachaPull1");
     var ten = host.querySelector("#gachaPull10");
     if (one) one.onclick = function () { (handlers && handlers.pull ? handlers.pull : function () {})(1); };
@@ -583,12 +801,13 @@
     injectStyle();
     if (!host) return snapshot(save);
     var info = snapshot(save);
+    var tab = info.rosterTab || "scrap";
     var got = info.shown.length;
-    host.innerHTML =
-      '<div class="rosterStage46"><div class="rosterHead46"><h3>证词名册</h3><span>已点亮 ' +
-      got +
-      " / 8</span></div><div id=\"rosterWall46\">" +
-      CARDS.map(function (card) {
+    var wall = "";
+    if (tab === "school") {
+      wall = '<div class="rosterLater46">后续写入</div>';
+    } else {
+      wall = CARDS.map(function (card) {
         var count = info.owned[card.id] || 0;
         var locked = count < 1 && DEFAULT_SHOWN.indexOf(card.id) < 0;
         return (
@@ -609,9 +828,28 @@
           (locked ? rarityLabel(card.r) : "×" + count) +
           "</small></button>"
         );
-      }).join("") +
+      }).join("");
+    }
+    host.innerHTML =
+      '<div class="rosterStage46"><div class="rosterHead46"><h3>镜界仓库</h3><span>已点亮 ' +
+      got +
+      " / 8</span></div>" +
+      '<div class="rosterTabs46" id="rosterTabs46">' +
+      '<button type="button" data-roster="scrap"' + (tab === "scrap" ? ' class="on"' : "") + ">残件</button>" +
+      '<button type="button" data-roster="school"' + (tab === "school" ? ' class="on"' : "") + ">基础</button>" +
+      "</div><div id=\"rosterWall46\">" +
+      wall +
       "</div></div>";
     hideBrokenArt(host);
+    var tabs = host.querySelectorAll("#rosterTabs46 [data-roster]");
+    for (var t = 0; t < tabs.length; t++) {
+      tabs[t].onclick = function () {
+        var next = this.getAttribute("data-roster");
+        setRosterTab(save, next);
+        if (handlers && typeof handlers.setRosterTab === "function") handlers.setRosterTab(next);
+        else renderRoster(host, save, handlers);
+      };
+    }
     var slots = host.querySelectorAll(".rosterSlot46");
     for (var i = 0; i < slots.length; i++) {
       (function (node) {
@@ -663,6 +901,7 @@
             '"><span class="revealGem46">' +
             rarity +
             "</span>" +
+            (card.legend || rarity === "LEGEND" ? '<span class="revealLegend46">传说</span>' : "") +
             (isNew ? '<span class="revealNew46">NEW</span>' : "") +
             "<b>" +
             (card.n || item.n || "") +
@@ -797,6 +1036,12 @@
     version: VERSION,
     RATES: RATES,
     CARDS: CARDS,
+    FASHION_CARDS: FASHION_CARDS,
+    WEAPON_CARDS: WEAPON_CARDS,
+    SCHOOL_CARDS: SCHOOL_CARDS,
+    POOL_IDS: POOL_IDS,
+    ROSTER_TABS: ROSTER_TABS,
+    SCRAP_BONUS: SCRAP_BONUS,
     DEFAULT_SHOWN: DEFAULT_SHOWN,
     injectStyle: injectStyle,
     normalizeOps: normalizeOps,
@@ -804,6 +1049,9 @@
     pull: pull,
     grantCheat: grantCheat,
     portraitTap: portraitTap,
+    applyOwnedBonus: applyOwnedBonus,
+    setPool: setPool,
+    setRosterTab: setRosterTab,
     renderGacha: renderGacha,
     renderRoster: renderRoster,
     showReveal: showReveal,
