@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>feel53 hang probe</title>
+</head>
+<body>
+  <section id="menu" class="homeDock46">
+    <div class="profile"><b id="charName">月城小夜</b></div>
+    <button class="charCard selected" data-character="sayo">小夜</button>
+    <div id="characterList"></div>
+    <button class="start" id="start">出击</button>
+    <button id="homeBanner46">活动</button>
+  </section>
+  <div id="banter" class="hidden"></div>
+  <div id="result" class="hidden"><h2 id="rtitle"></h2><p id="rsub"></p></div>
+  <script src="../../src/runtime/sakurayo-feel53.js"></script>
+  <script>
+    window.__feel53Probe = { ticks: 0 };
+    window.setInterval(function () {
+      window.__feel53Probe.ticks += 1;
+    }, 30);
+  </script>
+</body>
+</html>
