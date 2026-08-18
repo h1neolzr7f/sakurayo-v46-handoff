@@ -164,6 +164,10 @@ assert.match(L.css, /touch-action:manipulation!important/);
 assert.match(L.css, /pointer-events:auto!important/);
 assert.match(L.css, /position:static!important/);
 assert.match(L.css, /homeChip46\.prism/);
+assert.match(L.css, /#menu\.homeDock46 \.homeDeck46\{pointer-events:none!important\}/);
+assert.match(L.css, /#menu\.homeDock46 \.start\{clip-path:none\}/);
+assert.match(L.css, /#back\{background:#1c1634ee!important/);
+assert.match(code, /max-height:430px.*#homeGreet46/);
 
 const installed = L.install();
 assert.equal(installed.ok, true);

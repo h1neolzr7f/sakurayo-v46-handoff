@@ -130,6 +130,22 @@ const lobby = await boxesOf({
 assert.ok(lobby.start && lobby.start.w >= 88 && lobby.start.h >= 42, "出击按钮够大");
 assert.equal(overlap(lobby.start, lobby.nav), 0, "出击不得被底栏盖住");
 assert.equal(overlap(lobby.chars, lobby.wallet), 0, "换角不得压钱包");
+const startHits = await page.evaluate(() => {
+  const start = document.getElementById("start");
+  const r = start.getBoundingClientRect();
+  return [
+    [r.x + 8, r.y + 8],
+    [r.x + r.width - 8, r.y + r.height - 8],
+  ].every(([x, y]) => {
+    const top = document.elementFromPoint(x, y);
+    return top && (top === start || start.contains(top));
+  });
+});
+assert.equal(startHits, true, "出击斜角必须点到按钮");
+assert.equal(
+  await page.evaluate(() => getComputedStyle(document.getElementById("homeGreet46") || document.body).display),
+  "none",
+);
 await shot("01-lobby.png");
 
 await tap('#homeRail46 [data-home="settings"]', "settings");
