@@ -1948,7 +1948,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     finishVictory(false);
     var beats = (opts && opts.beats) || [];
     var done = opts && opts.onDone;
-    if (!beats.length) {
+    if (!beats.length || !!(opts && opts.testMode)) {
       if (done) done();
       return;
     }
@@ -2486,7 +2486,11 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeRankBar46 i{display:block;height:100%;width:0;background:linear-gradient(90deg,#f35aa6,#f2c75d)}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .coins{display:flex;align-items:center;gap:8px;margin:0 0 0 auto;padding:4px 8px 4px 12px;border-radius:999px;background:#120e27ee;border:1px solid #f2c75d55;color:#ffe7a3}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeCoinPlus46{display:grid;place-items:center;width:28px;height:28px;padding:0;border:0;border-radius:50%;background:#f35aa6;color:#fff7fb;font:900 16px/1 system-ui}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charSelectPanel{position:absolute!important;left:max(228px,calc(env(safe-area-inset-left) + 216px))!important;right:auto!important;top:max(10px,env(safe-area-inset-top))!important;bottom:auto!important;width:auto;margin:0;padding:0;background:transparent;border:0;box-shadow:none;z-index:7;pointer-events:auto}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .top .charSelectPanel{position:static!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;width:auto;margin:0 8px 0 auto;padding:0;background:transparent;border:0;box-shadow:none;z-index:8;pointer-events:auto;flex:0 0 auto}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .top .charSelectPanel .sectionTitle{display:none!important}" +
+    "html.landscape46:not(.portraitFallback46) #homeWallet46{margin-left:0}" +
+    "html.landscape46:not(.portraitFallback46) #homeWallet46 .homeChip46.prism,html.landscape46:not(.portraitFallback46) #homeWallet46 .homeChip46.shard{display:none!important}" +
+    "html.landscape46:not(.portraitFallback46) #homeQuick46{gap:12px}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .characterList{display:flex!important;flex-direction:row;gap:8px}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charCard{width:42px;height:42px;min-width:42px;max-width:42px;margin:0;aspect-ratio:auto;padding:1px;background:#120e27cc;border:0;box-shadow:none}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .charCard img{width:38px;height:38px;border-radius:50%;border:2px solid #ffd8e066;box-shadow:0 0 0 1px #05020d,0 0 12px #f35aa644}" +
@@ -2520,7 +2524,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .utilityButtons37{position:static;width:auto;margin:0;max-width:none;z-index:8;display:grid!important;grid-template-columns:1fr!important}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .calmUtility39>button:not(#moreButton39){display:none!important}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .calmUtility39.open39>button{display:block!important}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 #moreButton39{min-height:42px;padding:0 14px;border-radius:999px;border:1px solid #f2c75d66;background:#120e27ee;color:#ffe7a3;letter-spacing:.14em;font-size:11px}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 #moreButton39{min-height:42px;margin-left:10px;padding:0 12px;border-radius:999px;border:1px solid #f2c75d66;background:#120e27ee;color:#ffe7a3;letter-spacing:.14em;font-size:11px}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .calmUtility39.open39{position:absolute;top:48px;right:0;bottom:auto;width:min(74vw,280px)}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeRail46{display:flex;flex-direction:column;position:absolute;left:max(12px,env(safe-area-inset-left));top:max(76px,calc(env(safe-area-inset-top) + 64px));transform:none;gap:6px;z-index:6;pointer-events:auto}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeRail46 button{min-height:46px;min-width:56px;padding:6px 8px;border-radius:12px;border:1px solid #f35aa644;background:#120e27d4;color:#fff7fb;text-align:center}" +
@@ -2539,7 +2543,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     "html.landscape46.shortWindow46 #menu.homeDock46 .heroLive46{width:62%}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .heroLiveBreath46{width:min(64vw,760px)}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .top{top:max(6px,env(safe-area-inset-top))}" +
-    "html.landscape46.shortWindow46 #menu.homeDock46 .charSelectPanel{top:max(6px,env(safe-area-inset-top))!important}" +
+    "html.landscape46.shortWindow46 #menu.homeDock46 .top .charSelectPanel{position:static!important;left:auto!important;top:auto!important;margin:0 6px 0 auto}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .homeDeck46{top:max(52px,calc(env(safe-area-inset-top) + 44px));bottom:max(72px,calc(env(safe-area-inset-bottom) + 62px));width:min(34vw,300px);gap:4px}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .stageMini{min-height:56px;padding:6px 10px}" +
     "html.landscape46.shortWindow46 #menu.homeDock46 .stageMini h3{font-size:13px}" +
@@ -2929,6 +2933,10 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
           (locked ? " lock" : "") +
           '" data-card="' +
           card.id +
+          '" data-role="' +
+          (/^(sayo_|aya_|rion_)/.test(card.id) ? "main" : "item") +
+          '" data-count="' +
+          count +
           '"><div class="rosterArt46"><img data-art alt="" src="' +
           artSrc(handlers, locked ? "gacha/card_back.webp" : "gacha/" + card.id + ".webp") +
           '"><i>' +
@@ -3212,6 +3220,8 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
   var profileTab = "base";
   var profileId = "sayo";
   var jumpProfile = "";
+  var noticePick = "";
+  var mailPick = "";
 
   var DOSSIERS = Object.freeze({
     sayo: Object.freeze({
@@ -3247,23 +3257,23 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     "#homeQuick46 button{width:42px;height:42px;padding:0;border-radius:50%;border:1px solid #f2c75d66;background:#120e27ee;color:#ffe7a3;font:800 12px/1 system-ui}" +
     ".homeXp46,.homeRec46{display:none}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .top{flex-wrap:nowrap}" +
-    "html.landscape46:not(.portraitFallback46) #homeWallet46{display:flex;flex:0 1 auto;min-width:0}" +
-    "html.landscape46:not(.portraitFallback46) .homeChip46{display:flex}" +
-    "html.landscape46:not(.portraitFallback46) .homeChip46.ticket{display:none}" +
+    "html.landscape46:not(.portraitFallback46) #homeWallet46{display:flex;flex:0 1 auto;min-width:0;gap:6px}" +
+    "html.landscape46:not(.portraitFallback46) .homeChip46{display:flex;padding:4px 6px 4px 8px;gap:4px}" +
+    "html.landscape46:not(.portraitFallback46) .homeChip46.ticket{display:flex}" +
+    "html.landscape46:not(.portraitFallback46) .homeChip46.ticket button{display:none}" +
     "html.landscape46:not(.portraitFallback46) #homeQuick46{display:flex;flex:0 0 auto}" +
     "html.landscape46:not(.portraitFallback46) #homeQuick46 .homeIco46{position:relative;width:42px;height:42px;padding:0;border-radius:50%;border:1px solid #f2c75d66;background:#120e27ee}" +
-    "html.landscape46:not(.portraitFallback46) #homeQuick46 .homeIco46.cal:before{content:\"\";position:absolute;left:12px;top:13px;width:16px;height:14px;border:1.5px solid #ffe7a3;border-radius:3px;box-shadow:0 -3px 0 #ffe7a3}" +
+    "html.landscape46:not(.portraitFallback46) #homeQuick46 .homeIco46.cal:before{content:\"\";position:absolute;left:11px;top:12px;width:18px;height:16px;border:1.5px solid #ffe7a3;border-radius:3px;box-shadow:3px -3px 0 #ffe7a3,11px -3px 0 #ffe7a3;background:radial-gradient(circle at 5px 8px,#ffe7a3 1.1px,transparent 1.2px),radial-gradient(circle at 10px 8px,#ffe7a3 1.1px,transparent 1.2px),radial-gradient(circle at 5px 12px,#ffe7a3 1.1px,transparent 1.2px)}" +
     "html.landscape46:not(.portraitFallback46) #homeQuick46 .homeIco46.cal.hasDot46:after{content:\"\";position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:50%;background:#ff5b74}" +
-    "html.landscape46:not(.portraitFallback46) #homeQuick46 .homeIco46.pal:before,html.landscape46:not(.portraitFallback46) #homeQuick46 .homeIco46.pal:after{content:\"\";position:absolute;border:1.5px solid #ffe7a3;border-radius:50%}" +
-    "html.landscape46:not(.portraitFallback46) #homeQuick46 .homeIco46.pal:before{left:10px;top:10px;width:9px;height:9px;box-shadow:12px 1px 0 -1.5px #120e27ee,12px 1px 0 0 #ffe7a3,2px 13px 0 -2px #ffe7a3,13px 13px 0 -2.5px #ffe7a3}" +
-    "html.landscape46:not(.portraitFallback46) #homeQuick46 .homeIco46.pal:after{display:none}" +
-    "html.landscape46:not(.portraitFallback46) #homeRail46 .railIco46{display:block;width:16px;height:16px;margin:0 auto;position:relative}" +
-    "html.landscape46:not(.portraitFallback46) #homeRail46 .railIco46.task:before{content:\"\";position:absolute;left:3px;top:3px;right:3px;bottom:1px;border:1.5px solid #f35aa6;border-radius:2px}" +
-    "html.landscape46:not(.portraitFallback46) #homeRail46 .railIco46.task:after{content:\"\";position:absolute;left:5px;top:1px;right:5px;height:3px;border:1.5px solid #f35aa6;border-bottom:0;border-radius:2px 2px 0 0}" +
-    "html.landscape46:not(.portraitFallback46) #homeRail46 .railIco46.mail:before{content:\"\";position:absolute;left:1px;top:4px;right:1px;bottom:2px;border:1.5px solid #f35aa6;border-radius:2px}" +
-    "html.landscape46:not(.portraitFallback46) #homeRail46 .railIco46.mail:after{content:\"\";position:absolute;left:2px;top:4px;right:2px;height:6px;border-left:1.5px solid #f35aa6;border-right:1.5px solid #f35aa6;transform:rotate(0);clip-path:polygon(0 0,50% 100%,100% 0)}" +
-    "html.landscape46:not(.portraitFallback46) #homeRail46 .railIco46.notice:before{content:\"\";position:absolute;left:2px;top:4px;width:8px;height:8px;border:1.5px solid #f35aa6;border-radius:2px 8px 8px 2px}" +
-    "html.landscape46:not(.portraitFallback46) #homeRail46 .railIco46.notice:after{content:\"\";position:absolute;right:2px;top:6px;width:3px;height:5px;border:1.5px solid #f35aa6;border-radius:1px}" +
+    "html.landscape46:not(.portraitFallback46) #homeQuick46 .homeIco46.pal:before{content:\"\";position:absolute;left:8px;top:9px;width:10px;height:10px;border:1.5px solid #ffe7a3;border-radius:50%;box-shadow:12px 0 0 -1.5px #120e27ee,12px 0 0 0 #ffe7a3,1px 13px 0 -2px #ffe7a3,13px 13px 0 -2.5px #ffe7a3}" +
+    ".railIco46{display:block;width:16px;height:16px;margin:0 auto;position:relative}" +
+    ".railIco46.task:before{content:\"\";position:absolute;left:3px;top:3px;right:3px;bottom:1px;border:1.5px solid #f35aa6;border-radius:2px}" +
+    ".railIco46.task:after{content:\"\";position:absolute;left:5px;top:1px;right:5px;height:3px;border:1.5px solid #f35aa6;border-bottom:0;border-radius:2px 2px 0 0}" +
+    ".railIco46.mail:before{content:\"\";position:absolute;left:1px;top:4px;right:1px;bottom:2px;border:1.5px solid #f35aa6;border-radius:2px}" +
+    ".railIco46.mail:after{content:\"\";position:absolute;left:2px;top:4px;right:2px;height:6px;border-left:1.5px solid #f35aa6;border-right:1.5px solid #f35aa6;clip-path:polygon(0 0,50% 100%,100% 0)}" +
+    ".railIco46.notice:before{content:\"\";position:absolute;left:2px;top:4px;width:8px;height:8px;border:1.5px solid #f35aa6;border-radius:2px 8px 8px 2px}" +
+    ".railIco46.notice:after{content:\"\";position:absolute;right:2px;top:6px;width:3px;height:5px;border:1.5px solid #f35aa6;border-radius:1px}" +
+    ".shellItem46 .railIco46{width:18px;height:18px;margin:0;background:transparent}" +
     ".profileVoice46{display:grid;gap:8px}" +
     ".profileVoice46 button{min-height:44px;padding:8px 12px;border-radius:12px;border:1px solid #69ddf266;background:#1a2030;color:#fff7fb;text-align:left}" +
     ".friendActs46{display:flex;flex-direction:column;gap:6px}" +
@@ -3275,7 +3285,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .bg:after{content:\"\";position:absolute;z-index:1;top:7%;right:3%;width:36%;height:58%;pointer-events:none;opacity:.5;background:repeating-linear-gradient(90deg,transparent 0 17px,#08071399 17px 19px),repeating-linear-gradient(180deg,transparent 0 13px,#08071399 13px 15px),repeating-linear-gradient(90deg,#69ddf218 0 7px,transparent 7px 19px),repeating-linear-gradient(180deg,#f2c75d1c 0 5px,transparent 5px 15px);box-shadow:inset 0 0 0 1px #f2c75d33;-webkit-mask-image:linear-gradient(90deg,transparent,#000 28%);mask-image:linear-gradient(90deg,transparent,#000 28%)}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46{grid-template-columns:64px 1fr;width:min(248px,28vw);min-height:72px;align-items:center}" +
     "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46 em{display:block;color:#f2c75d;font:800 9px/1 system-ui;letter-spacing:.18em}" +
-    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46 small{color:#ff9bcc}" +
+    "html.landscape46:not(.portraitFallback46) #menu.homeDock46 .homeBanner46 small{color:#ff9bcc;letter-spacing:.04em;white-space:nowrap}" +
     "html.landscape46:not(.portraitFallback46) .homeBannerDots46{display:flex;gap:4px;margin-top:5px}" +
     "html.landscape46:not(.portraitFallback46) .homeBannerDots46 i{width:5px;height:5px;border-radius:50%;background:#cfc4df55}" +
     "html.landscape46:not(.portraitFallback46) .homeBannerDots46 i.on{background:#f35aa6}" +
@@ -3303,7 +3313,11 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     ".shellCal46{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}" +
     ".shellCal46 button{min-height:64px;padding:6px 4px;border-radius:12px;border:1px solid #f35aa644;background:#120e27ee;color:#fff7fb}" +
     ".shellCal46 button b{display:block;font-size:12px}" +
-    ".shellCal46 button small{display:block;margin-top:4px;color:#cfc4df;font-size:9px}" +
+    ".shellCal46 button small{display:block;margin-top:4px;color:#cfc4df;font-size:9px;line-height:1.35}" +
+    "html.landscape46:not(.portraitFallback46) .shellCal46{gap:8px;margin-top:6px}" +
+    "html.landscape46:not(.portraitFallback46) .shellCal46 button{min-height:120px;padding:12px 6px}" +
+    "html.landscape46:not(.portraitFallback46) .shellCal46 button b{font-size:14px}" +
+    "html.landscape46:not(.portraitFallback46) .shellCal46 button small{font-size:11px}" +
     ".shellCal46 button.on{border-color:#f2c75d;box-shadow:0 0 12px #f35aa644}" +
     ".shellCal46 button.done{opacity:.55}" +
     ".gachaBanners46,.gachaFeature46,.gachaEnergy46{display:none}" +
@@ -3315,6 +3329,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     ".rosterSlot46 .rosterAwaken46{position:absolute;z-index:3;top:10px;left:-18px;padding:3px 22px;background:linear-gradient(90deg,#f35aa6,#ff7ec0);color:#fff;font:800 8px/1 system-ui;letter-spacing:.14em;transform:rotate(-32deg);box-shadow:0 4px 10px #05020d66}" +
     ".rosterSlot46.off{display:none}" +
     ".shopRail46{display:none}" +
+    ".shopChip46{display:inline-flex;align-items:center;gap:4px;min-height:32px}" +
     ".storyDock46{display:contents}" +
     ".storyPane46{display:none}" +
     "#profileDrawer.shellWide46 .dbody{display:grid;gap:12px}" +
@@ -3358,22 +3373,34 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     "html.landscape46:not(.portraitFallback46) #gachaPull1,html.landscape46:not(.portraitFallback46) #gachaPull10{clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);border-radius:0}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer,html.landscape46:not(.portraitFallback46) #storyDrawer,html.landscape46:not(.portraitFallback46) #profileDrawer{background:#080713}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer>.dhead,html.landscape46:not(.portraitFallback46) #storyDrawer>.dhead,html.landscape46:not(.portraitFallback46) #profileDrawer>.dhead{background:#0b0818}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer>.dhead p{display:none}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer .shopNotice{display:none}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer>.dbody{display:grid;grid-template-columns:minmax(132px,16%) 1fr;gap:12px;align-items:start}" +
     "html.landscape46:not(.portraitFallback46) #shopWallet44{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .shopMoney{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .shopChip46{display:flex;align-items:center;gap:4px;min-height:36px;padding:4px 8px;border-radius:999px;background:#120e27ee;border:1px solid #69ddf255;color:#fff7fb;font:800 12px/1 system-ui}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .shopChip46 i{font:900 11px/1 system-ui;font-style:normal;color:#69ddf2}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .shopChip46.shard{border-color:#a78bfa66}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .shopChip46.shard i{color:#c4b5fd}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .shopChip46.sakura{border-color:#f2c75d55;color:#ffe7a3}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .shopChip46.ticket{border-color:#ff5b7455}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .shopChip46.ticket i{color:#ff5b74}" +
     "html.landscape46:not(.portraitFallback46) .shopRail46{display:flex;flex-direction:column;gap:6px;position:sticky;top:8px}" +
     "html.landscape46:not(.portraitFallback46) .shopRail46 button{min-height:44px;padding:8px 10px;border-radius:12px;border:1px solid #f35aa644;background:#120e27ee;color:#fff7fb;text-align:left}" +
-    "html.landscape46:not(.portraitFallback46) .shopRail46 button.on{border-color:#69ddf2;color:#69ddf2;box-shadow:0 0 12px #69ddf233}" +
+    "html.landscape46:not(.portraitFallback46) .shopRail46 button.on{border-color:#f35aa6;color:#fff7fb;background:linear-gradient(90deg,#f35aa633,#120e27ee);box-shadow:inset 3px 0 0 #f35aa6,0 0 12px #f35aa622}" +
     "html.landscape46:not(.portraitFallback46) #shopList .shopTabs40{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}" +
     "html.landscape46:not(.portraitFallback46) #shopList .shopGroup40[style*=\"display: grid\"],html.landscape46:not(.portraitFallback46) #shopList .shopGroup40[style*=\"display: block\"]{display:grid!important;gap:10px}" +
     "html.landscape46:not(.portraitFallback46) #shopList [data-shop-group=skins]{grid-template-columns:repeat(3,minmax(0,1fr))}" +
     "html.landscape46:not(.portraitFallback46) #shopList [data-shop-group=starters],html.landscape46:not(.portraitFallback46) #shopList [data-shop-group=items],html.landscape46:not(.portraitFallback46) #shopList [data-shop-group=talismans],html.landscape46:not(.portraitFallback46) #shopList [data-shop-group=extensions]{grid-template-columns:repeat(2,minmax(0,1fr))}" +
-    "html.landscape46:not(.portraitFallback46) #shopDrawer .skinCard{display:flex;flex-direction:column;min-height:0;padding:0;overflow:hidden}" +
-    "html.landscape46:not(.portraitFallback46) #shopDrawer .skinPreview{width:100%;height:148px}" +
-    "html.landscape46:not(.portraitFallback46) #shopDrawer .skinCard>div{padding:8px 10px 0}" +
-    "html.landscape46:not(.portraitFallback46) #shopDrawer .skinCard h3{margin:0;font-size:13px}" +
-    "html.landscape46:not(.portraitFallback46) #shopDrawer .skinCard p,html.landscape46:not(.portraitFallback46) #shopDrawer .skinBias{display:none}" +
-    "html.landscape46:not(.portraitFallback46) #shopDrawer .skinCard button{margin:8px 10px 10px;min-height:36px}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .challengeToggle40,html.landscape46:not(.portraitFallback46) #shopDrawer .routeNote{grid-column:1/-1}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .skinCard,html.landscape46:not(.portraitFallback46) #shopDrawer .shopItem40{display:flex;flex-direction:column;min-height:0;margin:0;padding:0;overflow:hidden;border:1px solid #69ddf244;background:linear-gradient(135deg,#1a132cf2,#100c1cee)}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .skinPreview{width:100%;height:132px}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .shopIcon40{width:100%;height:64px;border-radius:0;font-size:28px}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .skinCard>div,html.landscape46:not(.portraitFallback46) #shopDrawer .shopItem40>div{padding:6px 10px 0}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .skinCard h3,html.landscape46:not(.portraitFallback46) #shopDrawer .shopItem40 h3{margin:0;font-size:13px}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .skinCard p,html.landscape46:not(.portraitFallback46) #shopDrawer .skinBias,html.landscape46:not(.portraitFallback46) #shopDrawer .shopItem40 p{display:none}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .skinCard button,html.landscape46:not(.portraitFallback46) #shopDrawer .shopItem40>button{margin:6px 10px 8px;min-height:42px;border-radius:10px;border:1px solid #ff9bcc66;background:linear-gradient(180deg,#ff86cc,#b02078);color:#fff}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer .shopUpgrade40{margin:0 10px 8px;min-height:36px}" +
     "html.landscape46:not(.portraitFallback46) .rosterHead46 span{display:none}" +
     "html.landscape46:not(.portraitFallback46) #rosterDrawer>.dbody{overflow:auto}" +
     "html.landscape46:not(.portraitFallback46) #rosterWall46{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:10px;max-height:calc(100dvh - 118px);overflow:auto;align-content:start}" +
@@ -3385,22 +3412,33 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     "html.landscape46:not(.portraitFallback46) .rosterSlot46.r-SR i{color:#69ddf2;text-shadow:0 0 10px #69ddf266}" +
     "#shopFeatured46{display:none}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer.isFeatured46 #shopFeatured46{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-content:start}" +
+    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shellHint46{grid-column:1/-1;margin:0}" +
     "html.landscape46:not(.portraitFallback46) #shopExchange46{display:none}" +
-    "html.landscape46:not(.portraitFallback46) #shopDrawer.isExchange46 #shopExchange46{display:grid;gap:8px}" +
+    "html.landscape46:not(.portraitFallback46) #shopDrawer.isExchange46 #shopExchange46{display:grid;grid-template-columns:1fr 1fr;gap:8px}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer.isExchange46 #shopFeatured46,html.landscape46:not(.portraitFallback46) #shopDrawer.isExchange46 #shopList .shopGroup40{display:none!important}" +
-    "html.landscape46:not(.portraitFallback46) #shopExchange46 .shopGood46{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:64px;padding:10px 12px;border-radius:14px;border:1px solid #ff9bcc33;background:linear-gradient(135deg,#1a132cf2,#100c1cee)}" +
-    "html.landscape46:not(.portraitFallback46) #shopExchange46 .shopGood46 button{min-height:42px;padding:0 14px;border-radius:10px;border:1px solid #ff9bcc66;background:linear-gradient(180deg,#ff86cc,#b02078);color:#fff}" +
+    "html.landscape46:not(.portraitFallback46) #shopExchange46 .shellHint46{grid-column:1/-1;margin:0}" +
     "html.landscape46:not(.portraitFallback46) #shopDrawer.isFeatured46 #shopList .shopGroup40{display:none!important}" +
-    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46,html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopGood46{display:flex;flex-direction:column;min-height:148px;padding:0;overflow:hidden;border-radius:16px;border:1px solid #ff9bcc33;background:linear-gradient(135deg,#1a132cf2,#100c1cee)}" +
-    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkinPrev46{position:relative;width:100%;height:72px;overflow:hidden;background:#171027}" +
-    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkinPrev46 img{width:100%;height:100%;object-fit:cover}" +
+    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46,html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopGood46,html.landscape46:not(.portraitFallback46) #shopExchange46 .shopGood46{display:flex;flex-direction:column;min-height:148px;padding:0;overflow:hidden;border-radius:16px;border:1px solid #69ddf244;background:linear-gradient(135deg,#1a132cf2,#100c1cee)}" +
+    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkinPrev46,html.landscape46:not(.portraitFallback46) .shopGoodIco46{position:relative;width:100%;height:88px;overflow:hidden;background:#171027}" +
+    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkinPrev46 img{width:100%;height:100%;object-fit:cover;object-position:center top}" +
     "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkinPrev46 span{position:absolute;inset:0;display:grid;place-items:center}" +
     "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46>div{padding:6px 10px 0}" +
-    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46 h3{margin:0;font-size:13px}" +
+    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46 h3,html.landscape46:not(.portraitFallback46) .shopGoodBar46 b{margin:0;font-size:13px;color:#fff7fb}" +
     "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46 p,html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46 .skinBias{display:none}" +
-    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopGood46 i{display:grid;place-items:center;height:72px;font:900 36px/1 system-ui;font-style:normal;background:#171027}" +
-    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopGood46 b{display:block;padding:6px 10px 0;font-size:13px}" +
-    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46 button,html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopGood46 button{margin:6px 10px 8px;min-height:42px;border-radius:10px;border:1px solid #ff9bcc66;background:linear-gradient(180deg,#ff86cc,#b02078);color:#fff}" +
+    "html.landscape46:not(.portraitFallback46) .shopGoodBar46{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px 10px}" +
+    "html.landscape46:not(.portraitFallback46) .shopGoodBar46 small{display:block;color:#cfc4df;font-size:10px}" +
+    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46 button,html.landscape46:not(.portraitFallback46) .shopGood46 button{min-height:42px;padding:0 12px;border-radius:10px;border:1px solid #f2c75d66;background:linear-gradient(180deg,#ff86cc,#b02078);color:#fff;font:800 12px/1 system-ui}" +
+    "html.landscape46:not(.portraitFallback46) #shopFeatured46 .shopSkin46 button{margin:6px 10px 8px}" +
+    ".shopGoodIco46{display:grid;place-items:center}" +
+    ".shopGoodIco46:before{content:\"\";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%)}" +
+    ".shopGoodIco46.core:before{width:22px;height:22px;border:2px solid #ff5b74;border-radius:50%;box-shadow:0 0 0 5px #ff5b7433,inset 0 0 0 4px #171027}" +
+    ".shopGoodIco46.ammo:before{width:16px;height:34px;border:2px solid #69ddf2;border-radius:3px;box-shadow:6px 4px 0 -2px #69ddf266}" +
+    ".shopGoodIco46.ticket:before{width:34px;height:20px;border:2px solid #f2c75d;border-radius:3px;transform:translate(-50%,-50%) rotate(-12deg)}" +
+    ".shopGoodIco46.shard:before{width:18px;height:18px;border:2px solid #c4b5fd;transform:translate(-50%,-50%) rotate(45deg)}" +
+    ".shopGoodIco46.prism:before{width:0;height:0;border:10px solid transparent;border-bottom-color:#69ddf2;transform:translate(-50%,-70%)}" +
+    ".shopGoodIco46.sakura:before{width:16px;height:16px;border-radius:50%;background:#f35aa6;box-shadow:10px 0 0 #f35aa6,-5px 9px 0 #f35aa6}" +
+    "html.shortWindow46 #shopDrawer .shopChip46.prism,html.shortWindow46 #shopDrawer .shopChip46.shard{display:none}" +
+    "html.shortWindow46 #shopFeatured46 .shopSkinPrev46,html.shortWindow46 .shopGoodIco46{height:56px!important}" +
     "html.landscape46:not(.portraitFallback46) #storyList .storyCard.charLore,html.landscape46:not(.portraitFallback46) #storyList .storyCard.recap39,html.landscape46:not(.portraitFallback46) #storyList #storyRecap39,html.landscape46:not(.portraitFallback46) #storyList .hiddenStory40,html.landscape46:not(.portraitFallback46) #storyList .extensionStory41{display:none!important}" +
     "html.landscape46:not(.portraitFallback46) #storyList .storyAct46{display:block;margin-bottom:2px;color:#cfc4df;font:700 10px/1 system-ui;letter-spacing:.12em}" +
     "html.landscape46:not(.portraitFallback46) #storyDrawer>.dhead h2{letter-spacing:.2em}" +
@@ -3454,7 +3492,48 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     ".shellCal46 button.stamped46 .shellStamp46{animation:stampIn46 .45s cubic-bezier(.2,1.4,.3,1)}" +
     "@keyframes stampIn46{0%{transform:rotate(-18deg) scale(2.1);opacity:0}100%{transform:rotate(-18deg) scale(1);opacity:1}}" +
     "@media(prefers-reduced-motion:reduce){.shellCal46 button.stamped46 .shellStamp46{animation:none}}" +
-    ".shellItem46 em.ready46{animation:calPulse46 1.8s ease-in-out infinite}";
+    ".shellItem46 em.ready46{animation:calPulse46 1.8s ease-in-out infinite}" +
+    ".shellPane46{display:none}" +
+    ".shellSplit46{display:grid;gap:10px}" +
+    "html.landscape46:not(.portraitFallback46) .shellSplit46{grid-template-columns:minmax(220px,32%) 1fr;align-items:start;min-height:calc(100dvh - 96px)}" +
+    "html.landscape46:not(.portraitFallback46) .shellPane46{display:block;position:sticky;top:8px;min-height:240px;height:calc(100dvh - 96px);padding:0;overflow:hidden;border-radius:16px;background:#100b1e;border:1px solid #f2c75d44}" +
+    "html.landscape46:not(.portraitFallback46) .shellPaneHero46{height:38%;min-height:110px;background:radial-gradient(circle at 70% 20%,#f2c75d22,#1a2030 46%,#100b1e);border-bottom:1px solid #f2c75d33}" +
+    "html.landscape46:not(.portraitFallback46) .shellPaneCopy46{padding:16px;overflow:auto;height:62%}" +
+    "html.landscape46:not(.portraitFallback46) .shellPane46 b{display:block;font-size:18px;letter-spacing:.1em}" +
+    "html.landscape46:not(.portraitFallback46) .shellPane46 p{margin:8px 0 0;color:#cfc4df;line-height:1.55}" +
+    "html.shortWindow46 .shellPane46{display:block;min-height:96px;height:auto;padding:10px 12px;border-radius:14px;background:#100b1e;border:1px solid #f2c75d44}" +
+    ".friendCard46 img{width:42px;height:42px;object-fit:cover;border-radius:12px;border:1px solid #69ddf244;background:#1a1230}" +
+    ".homeSupport46{display:none}" +
+    "html.landscape46:not(.portraitFallback46) .homeSupport46{display:inline-block;margin-left:6px;padding:2px 8px;border-radius:999px;border:1px solid #69ddf266;background:#1a2030;color:#69ddf2;font:800 9px/1 system-ui;letter-spacing:.08em;vertical-align:middle}" +
+    ".railIco46.ach:before{content:\"\";position:absolute;left:2px;top:3px;width:12px;height:12px;border:1.5px solid #f2c75d;border-radius:50%}" +
+    ".railIco46.ach:after{content:\"\";position:absolute;left:6px;top:1px;width:4px;height:4px;background:#f2c75d;clip-path:polygon(50% 0,61% 35%,100% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,0 35%,39% 35%)}" +
+    ".railIco46.set:before{content:\"\";position:absolute;left:3px;top:3px;width:10px;height:10px;border:1.5px solid #f35aa6;border-radius:50%;box-shadow:0 -6px 0 -3px #f35aa6,0 6px 0 -3px #f35aa6,6px 0 0 -3px #f35aa6,-6px 0 0 -3px #f35aa6}" +
+    "#archiveStats46{display:none}" +
+    "html.landscape46:not(.portraitFallback46) #archiveStats46{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 12px}" +
+    "html.landscape46:not(.portraitFallback46) #archiveStats46 i{display:block;min-height:56px;padding:10px 12px;border-radius:14px;background:#120e27ee;border:1px solid #f2c75d44;color:#fff7fb;font-style:normal}" +
+    "html.landscape46:not(.portraitFallback46) #archiveStats46 b{display:block;color:#69ddf2;font:900 16px/1 system-ui}" +
+    "html.landscape46:not(.portraitFallback46) #archiveStats46 small{display:block;margin-top:4px;color:#cfc4df;font:700 10px/1 system-ui;letter-spacing:.08em}" +
+    "html.landscape46:not(.portraitFallback46) #archiveDrawer .archiveDock46 button{position:relative;border-color:#f2c75d55;box-shadow:inset 0 0 0 1px #f35aa622}" +
+    "html.landscape46:not(.portraitFallback46) #archiveDrawer .archiveDock46 button:before,html.landscape46:not(.portraitFallback46) #archiveDrawer .archiveDock46 button:after{content:\"\";position:absolute;width:8px;height:8px;border:1px solid #f2c75d}" +
+    "html.landscape46:not(.portraitFallback46) #archiveDrawer .archiveDock46 button:before{top:8px;left:8px;border-right:0;border-bottom:0}" +
+    "html.landscape46:not(.portraitFallback46) #archiveDrawer .archiveDock46 button:after{right:8px;bottom:8px;border-left:0;border-top:0}" +
+    "html.landscape46:not(.portraitFallback46) #achDrawer.achShell46 #achList{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}" +
+    "html.landscape46:not(.portraitFallback46) #achDrawer.achShell46 .achievementMaster35{grid-column:1/-1;display:grid;grid-template-columns:72px 1fr auto;align-items:center;min-height:88px;padding:12px;border-color:#f2c75d88}" +
+    "html.landscape46:not(.portraitFallback46) #achDrawer.achShell46 .ach{min-height:120px;padding:12px;border-radius:16px;border:1px solid #f35aa644;background:linear-gradient(135deg,#1a132cf2,#100c1cee)}" +
+    "html.landscape46:not(.portraitFallback46) #achDrawer.achShell46 .ach.lock{opacity:.55}" +
+    "html.landscape46:not(.portraitFallback46) #achDrawer.achShell46 .ach .claim{min-height:42px}" +
+    "html.landscape46:not(.portraitFallback46) #settingsDrawer37.settingsShell46>.dbody{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}" +
+    "html.landscape46:not(.portraitFallback46) #settingsDrawer37 .settingsSliders46,html.landscape46:not(.portraitFallback46) #settingsDrawer37 .settingsToggles46{display:grid;gap:8px}" +
+    "html.landscape46:not(.portraitFallback46) #settingsDrawer37 .settingRow37{padding:14px;border-radius:14px;border:1px solid #69ddf244;background:#120e27ee}" +
+    "html.landscape46:not(.portraitFallback46) #settingsDrawer37 .settingRow37 input{accent-color:#f35aa6}" +
+    "html.landscape46:not(.portraitFallback46) #settingsDrawer37 .settingToggle37{min-height:44px;border-radius:12px;border:1px solid #f35aa644;background:#120e27ee;color:#fff7fb}" +
+    "html.landscape46:not(.portraitFallback46) #settingsDrawer37 .routeNote{grid-column:1/-1;color:#cfc4df}" +
+    "html.landscape46:not(.portraitFallback46) #stageDrawer.stageShell46 .stageCard{min-height:200px;border-color:#f2c75d44}" +
+    "html.landscape46:not(.portraitFallback46) #stageDrawer.stageShell46 .stageCard.lock{filter:saturate(.45) brightness(.72)}" +
+    "html.landscape46:not(.portraitFallback46) #stageDrawer.stageShell46 .stageCard button{min-height:42px;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)}" +
+    "html.shortWindow46 #archiveStats46{display:none!important}" +
+    "html.shortWindow46 #settingsDrawer37.settingsShell46>.dbody{grid-template-columns:1fr}" +
+    "html.shortWindow46 #achDrawer.achShell46 #achList{grid-template-columns:repeat(2,minmax(0,1fr))!important}";
 
   function $(sel, root) {
     var doc = root || (global.document || null);
@@ -3534,13 +3613,27 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     { id: "pull", title: "每日：寻访一次证词", sub: "今日真实抽取一次", need: 1, coins: 40, reset: "day" },
   ]);
   var MAILS = Object.freeze([
-    { id: "welcome", title: "补给签收通知", sub: "新档案开通奖励", coins: 80, shard: 0, need: "always" },
-    { id: "gacha", title: "镜界寻访周期", sub: "完成一次寻访后可领", coins: 0, shard: 20, need: "pull" },
-    { id: "patch", title: "系统维护回执", sub: "本机离线更新说明", coins: 0, shard: 0, need: "always" },
+    { id: "welcome", title: "补给签收通知", sub: "新档案开通奖励", body: "新档案已在本机开通。补给写入樱花币，不外链、不改枪口。", coins: 80, shard: 0, need: "always" },
+    { id: "gacha", title: "镜界寻访周期", sub: "完成一次寻访后可领", body: "完成一次真实寻访后可领取碎片。卡只进名册，不出售永久伤害。", coins: 0, shard: 20, need: "pull" },
+    { id: "patch", title: "系统维护回执", sub: "本机离线更新说明", body: "这次维护只整理本机界面与存档字段。没有联网补丁，也没有清档。", coins: 0, shard: 0, need: "always" },
   ]);
   var NOTICES = Object.freeze([
-    { id: "story", title: "四章主线仍在本地推进", sub: "通关记录沿用现有存档字段" },
-    { id: "shop", title: "衣装不出售永久伤害", sub: "商店真分类可买，兑换区只换货币" },
+    { id: "story", title: "四章主线仍在本地推进", sub: "通关记录沿用现有存档字段", body: "四章主线仍在本地推进。通关记录沿用现有存档字段 done / story，不联网拉取公告。" },
+    { id: "shop", title: "衣装不出售永久伤害", sub: "商店真分类可买，兑换区只换货币", body: "衣装与寻访卡都不出售永久伤害。商店真分类可买，兑换区只换货币。" },
+  ]);
+  var TALENT_FALLBACK = Object.freeze([
+    { id: "atk", n: "破魔弹芯", i: "⚔", d: "每级基础伤害 +5%", max: 10 },
+    { id: "hp", n: "巫女护体", i: "♥", d: "每级初始生命 +8", max: 10 },
+    { id: "luck", n: "神乐祝福", i: "✦", d: "每级暴击率 +2%", max: 8 },
+    { id: "mag", n: "灵核感应", i: "◎", d: "每级拾取范围 +12", max: 8 },
+    { id: "flow", n: "战斗演算", i: "⏱", d: "每级技能与冲刺冷却 -2%", max: 8 },
+  ]);
+  var STORY_FALLBACK = Object.freeze([
+    { n: "序章：第零次死亡", i: "🌸", d: "三年前，小夜在镜界实验中已经死亡一次。神社保存的“她”，究竟是幸存者、备份，还是镜像？" },
+    { n: "档案一：百目共视", i: "💎", d: "僵尸并非失控。它们共享视觉、痛觉和记忆，背后有一个意识在借整座城市观察小夜。" },
+    { n: "档案二：零号企业", i: "🏙️", d: "飞升协议从来不是救灾技术。企业计划把人格拆成可替换组件，让死亡成为无限续费的劳动。" },
+    { n: "档案三：失败者剑冢", i: "⚔️", d: "剑冢中的每一把剑都来自一次失败时间线。所有“小夜”都曾走到这里，却没有一个抵达核心。" },
+    { n: "终章：镜零之后", i: "🜂", d: "镜零声称自己由所有失败的小夜训练而成。核心崩塌时，另一名“小夜”却在碎片后醒来。" },
   ]);
   var EXCHANGES = Object.freeze([
     { id: "shard-coin", title: "碎片兑换樱花币", pay: "shard", payN: 100, get: "coins", getN: 50 },
@@ -3620,6 +3713,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
       ticket: 0,
       energy: 0,
       missionStamp: { day: "", week: "", kills: 0, pulls: 0, clears: 0 },
+      seenCards: {},
     };
   }
 
@@ -3638,6 +3732,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     if (!meta.missionStamp || typeof meta.missionStamp !== "object" || Array.isArray(meta.missionStamp)) {
       meta.missionStamp = { day: "", week: "", kills: 0, pulls: 0, clears: 0 };
     }
+    if (!meta.seenCards || typeof meta.seenCards !== "object" || Array.isArray(meta.seenCards)) meta.seenCards = {};
     if (!meta.ready) {
       meta.prism = 80;
       meta.shard = 40;
@@ -3729,7 +3824,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     meta.login.date = st.today;
     meta.login.streak = st.next;
     grant(save, meta, st.reward);
-    return { ok: true, day: st.next, coins: save.coins, prism: meta.prism, shard: meta.shard };
+    return { ok: true, day: st.next, coins: save.coins, prism: meta.prism, shard: meta.shard, ticket: meta.ticket };
   }
 
   function claimMission(save, id) {
@@ -3778,6 +3873,62 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     return { ok: true, friend: meta.friend };
   }
 
+  function friendOf(save) {
+    return charId(ensureMeta(save).friend);
+  }
+
+  function isMainCard(id) {
+    return /^(sayo_|aya_|rion_)/.test(String(id || ""));
+  }
+
+  function markSeen(save, id) {
+    var meta = ensureMeta(save);
+    if (!id) return { ok: false };
+    meta.seenCards[id] = 1;
+    return { ok: true, id: id };
+  }
+
+  function isNewCard(save, id, count) {
+    if (!id || count < 1) return false;
+    if (id === "sayo_echo" || id === "aya_petal") return false;
+    return !ensureMeta(save).seenCards[id];
+  }
+
+  function archiveStats(save, api) {
+    var done = Math.min(4, (((save && save.done) || []).length) || 0);
+    var achDone = api && api.achDone != null ? Number(api.achDone) || 0 : 0;
+    var achTotal = api && api.achTotal != null ? Number(api.achTotal) || 0 : 0;
+    var tal = 0;
+    var bag = (save && save.tal) || {};
+    Object.keys(bag).forEach(function (key) {
+      tal += Number(bag[key]) || 0;
+    });
+    var owned = 0;
+    var cards = ((((save || {}).shop40) || {}).ops || {}).owned || {};
+    Object.keys(cards).forEach(function (key) {
+      if (Number(cards[key]) > 0) owned += 1;
+    });
+    return { done: done, achDone: achDone, achTotal: achTotal, tal: tal, owned: owned };
+  }
+
+  function talentRows(api) {
+    var save = api && api.save;
+    var src = api && api.talents && api.talents.length ? api.talents : TALENT_FALLBACK;
+    return src.map(function (row) {
+      var lv = row.lv != null ? row.lv : ((((save && save.tal) || {})[row.id]) || 0);
+      return { id: row.id, n: row.n, i: row.i || "✦", d: row.d || "", lv: lv, max: row.max || 10 };
+    });
+  }
+
+  function storyRows(api) {
+    var save = api && api.save;
+    var src = api && api.stories && api.stories.length ? api.stories : STORY_FALLBACK;
+    var unlocked = (save && save.story) || [];
+    return src.map(function (row, index) {
+      return { n: row.n, i: row.i, d: row.d, on: unlocked.indexOf(index) >= 0 };
+    });
+  }
+
   function exchange(save, id) {
     var meta = ensureMeta(save);
     var row = EXCHANGES.filter(function (x) { return x.id === id; })[0];
@@ -3797,20 +3948,36 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     return meta;
   }
 
+  function canSpeak() {
+    var synth = global.speechSynthesis;
+    if (!synth || !global.SpeechSynthesisUtterance) return false;
+    var ua = "";
+    try {
+      ua = String((global.navigator && global.navigator.userAgent) || "");
+    } catch (err) {}
+    if (/SakurayoAndroid/i.test(ua)) return false;
+    if (/Android/i.test(ua) && /;\s*wv\)/i.test(ua)) return false;
+    if (/Android/i.test(ua) && typeof synth.getVoices === "function" && !(synth.getVoices() || []).length) return false;
+    return true;
+  }
+
   function speakLine(text, api) {
     var line = String(text || "");
     if (!line) return { ok: false };
     var spoken = false;
-    try {
-      if (global.speechSynthesis && global.SpeechSynthesisUtterance) {
+    if (canSpeak()) {
+      try {
         var utter = new global.SpeechSynthesisUtterance(line);
         utter.lang = "zh-CN";
         utter.rate = 0.92;
+        utter.onerror = function () {
+          if (api && typeof api.feedback === "function") api.feedback("reward", 0.26);
+        };
         global.speechSynthesis.cancel();
         global.speechSynthesis.speak(utter);
         spoken = true;
-      }
-    } catch (err) {}
+      } catch (err) {}
+    }
     if (api && typeof api.feedback === "function") api.feedback(spoken ? "open" : "reward", 0.26);
     say(api, line);
     return { ok: true, spoken: spoken };
@@ -3862,7 +4029,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
   }
 
   function greetLine(save) {
-    var id = charId(save && save.character);
+    var id = charId((save && save.shell46 && save.shell46.friend) || (save && save.character));
     var name = CHAR_NAMES[id] || "月城小夜";
     var login = loginState(save);
     var bond = bondOf(save, id);
@@ -3974,13 +4141,26 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     });
   }
 
+  function articlePane(title, body) {
+    return (
+      '<article class="shellPane46"><div class="shellPaneHero46"></div><div class="shellPaneCopy46"><b>' +
+      title +
+      "</b><p>" +
+      body +
+      "</p></div></article>"
+    );
+  }
+
   function listButton(icon, title, sub, tag, attr, tagClass) {
+    var ico = String(icon || "");
+    if (ico.indexOf("<i class=\"railIco46") === 0) ico = "<i>" + ico + "</i>";
+    else if (ico.indexOf("<") !== 0) ico = "<i>" + ico + "</i>";
     return (
       '<button type="button" class="shellItem46" ' +
       (attr || "") +
-      "><i>" +
-      icon +
-      "</i><div><b>" +
+      ">" +
+      ico +
+      "<div><b>" +
       title +
       "</b><small>" +
       sub +
@@ -4003,7 +4183,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
         var got = !!meta.claimed.missions[m.id];
         var ready = !got && have >= m.need;
         var tag = got ? "已领" : ready ? "领取 🌸" + m.coins : have + "/" + m.need;
-        return listButton("任", m.title, m.sub, tag, 'data-claim="mission" data-id="' + m.id + '"', got ? "done46" : ready ? "ready46" : "");
+        return listButton('<i class="railIco46 task"></i>', m.title, m.sub, tag, 'data-claim="mission" data-id="' + m.id + '"', got ? "done46" : ready ? "ready46" : "");
       }).join("") +
       "</div>";
     host.onclick = function (ev) {
@@ -4024,19 +4204,24 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     if (!host) return;
     var save = api && api.save;
     var meta = ensureMeta(save);
+    if (!mailPick) mailPick = MAILS[0].id;
+    var picked = MAILS.filter(function (m) { return m.id === mailPick; })[0] || MAILS[0];
     host.innerHTML =
-      '<p class="shellHint46">本地信箱 · 领取写入存档</p><div class="shellList46">' +
+      '<p class="shellHint46">本地信箱 · 领取写入存档</p><div class="shellSplit46"><div class="shellList46">' +
       MAILS.map(function (m) {
         var locked = m.need === "pull" && missionRaw(save, "pull") < 1;
         var got = !!meta.claimed.mail[m.id];
         var tag = got ? "已领" : locked ? "未达成" : m.coins || m.shard ? "领取" : "已读";
-        return listButton("邮", m.title, m.sub, tag, 'data-claim="mail" data-id="' + m.id + '"', got ? "done46" : locked ? "" : "ready46");
+        return listButton('<i class="railIco46 mail"></i>', m.title, m.sub, tag, 'data-claim="mail" data-id="' + m.id + '"', got ? "done46" : locked ? "" : "ready46");
       }).join("") +
+      "</div>" +
+      articlePane(picked.title, picked.body || picked.sub) +
       "</div>";
     host.onclick = function (ev) {
       var btn = ev.target.closest ? ev.target.closest("[data-claim=mail]") : null;
       if (!btn) return;
-      var out = claimMail(save, btn.getAttribute("data-id"));
+      mailPick = btn.getAttribute("data-id") || mailPick;
+      var out = claimMail(save, mailPick);
       commit(api);
       if (!out.ok && out.reason === "need") say(api, "先去镜界寻访一次");
       else if (!out.ok && out.reason === "claimed") say(api, "这封已经领过了");
@@ -4049,17 +4234,22 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     if (!host) return;
     var save = api && api.save;
     var meta = ensureMeta(save);
+    if (!noticePick) noticePick = NOTICES[0].id;
+    var picked = NOTICES.filter(function (n) { return n.id === noticePick; })[0] || NOTICES[0];
     host.innerHTML =
-      '<p class="shellHint46">本地公告 · 不联网</p><div class="shellList46">' +
+      '<p class="shellHint46">本地公告 · 不联网</p><div class="shellSplit46"><div class="shellList46">' +
       NOTICES.map(function (n) {
         var read = !!meta.read.notices[n.id];
-        return listButton("告", n.title, n.sub, read ? "已读" : "未读", 'data-claim="notice" data-id="' + n.id + '"', read ? "done46" : "ready46");
+        return listButton('<i class="railIco46 notice"></i>', n.title, n.sub, read ? "已读" : "未读", 'data-claim="notice" data-id="' + n.id + '"', read ? "done46" : "ready46");
       }).join("") +
+      "</div>" +
+      articlePane(picked.title, picked.body || picked.sub) +
       "</div>";
     host.onclick = function (ev) {
       var btn = ev.target.closest ? ev.target.closest("[data-claim=notice]") : null;
       if (!btn) return;
-      readNotice(save, btn.getAttribute("data-id"));
+      noticePick = btn.getAttribute("data-id") || noticePick;
+      readNotice(save, noticePick);
       commit(api);
       renderNotice(host, api);
     };
@@ -4080,8 +4270,11 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
       rows
         .map(function (row) {
           var on = meta.friend === row[0];
+          var art = artOf(api, "characters/" + row[0] + "/default/portrait.webp");
           return (
-            '<div class="shellItem46"><i>友</i><div><b>' +
+            '<div class="shellItem46 friendCard46">' +
+            (art ? '<img alt="" src="' + art + '">' : "<i>友</i>") +
+            "<div><b>" +
             row[1] +
             "</b><small>" +
             row[2] +
@@ -4123,22 +4316,30 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     };
   }
 
+  function rewardLab(pack, mode) {
+    var extra = pack && pack.ticket ? "券+" + pack.ticket : "";
+    if (mode === "done") return "已领";
+    if (mode === "on") return extra ? "领取 · " + extra : "领取";
+    return extra ? "🌸 " + pack.coins + " · " + extra : "🌸 " + pack.coins;
+  }
+
   function renderCalendar(host, api) {
     if (!host) return;
     var save = api && api.save;
     var st = loginState(save);
     var days = ["一", "二", "三", "四", "五", "六", "日"];
-    var html = '<p class="shellHint46">七日登录 · 领取写入樱花币</p><div class="shellCal46">';
+    var html = '<p class="shellHint46">七日登录 · 樱花币与寻访券写入存档</p><div class="shellCal46">';
     for (var i = 0; i < 7; i++) {
       var day = i + 1;
       var state = "";
-      var lab = "🌸 " + LOGIN_REWARDS[i].coins;
+      var pack = LOGIN_REWARDS[i];
+      var lab = rewardLab(pack, "");
       if (st.claimedToday && day <= st.streak) {
         state = "done";
         lab = "已领";
       } else if (!st.claimedToday && day === st.next) {
         state = "on";
-        lab = "领取";
+        lab = rewardLab(pack, "on");
       } else if (day < st.next) {
         state = "done";
         lab = "已领";
@@ -4180,11 +4381,53 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
       }
       var small = btn.querySelector("small");
       if (small) small.textContent = "已领";
-      feel(api, "reward", "第" + out.day + "日 +" + (st.reward && st.reward.coins ? st.reward.coins : "") + "🌸");
+      var fly = "第" + out.day + "日 +" + (st.reward && st.reward.coins ? st.reward.coins : "") + "🌸";
+      if (st.reward && st.reward.ticket) fly += " · 券+" + st.reward.ticket;
+      feel(api, "reward", fly);
       setTimeout(function () {
         if (host && host.parentNode) renderCalendar(host, api);
       }, 720);
     };
+  }
+
+  function talentBlock(api) {
+    var rows = talentRows(api);
+    var html = '<p>永久天赋写入现有存档。本页只读等级，升级仍走天赋房。</p><div class="shellList46">';
+    rows.forEach(function (row) {
+      html +=
+        '<div class="shellItem46"><i>' +
+        row.i +
+        "</i><div><b>" +
+        row.n +
+        "</b><small>" +
+        row.d +
+        "</small></div><em>" +
+        row.lv +
+        "/" +
+        row.max +
+        "</em></div>";
+    });
+    return html + '</div><p><button type="button" data-open-real="talent">打开天赋</button></p>';
+  }
+
+  function storyBlock(api) {
+    var rows = storyRows(api);
+    var html = '<p>正文章节仍走樱夜档案。通关后的抉择留在剧情房，不改枪口。</p><div class="shellList46">';
+    rows.forEach(function (row) {
+      html +=
+        '<div class="shellItem46"><i>' +
+        (row.on ? row.i || "章" : "?") +
+        "</i><div><b>" +
+        (row.on ? row.n : "未解锁档案") +
+        "</b><small>" +
+        (row.on ? row.d : "通关对应章节后解锁。") +
+        '</small></div><em class="' +
+        (row.on ? "done46" : "") +
+        '">' +
+        (row.on ? "已阅" : "锁定") +
+        "</em></div>";
+    });
+    return html + '</div><p><button type="button" data-open-real="story">打开剧情档案</button></p>';
   }
 
   function artOf(api, rel) {
@@ -4212,9 +4455,9 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     var tab = profileTab;
     var body =
       tab === "talent"
-        ? "<p>永久天赋仍在档案房。点下方「打开天赋」进入现有升级页。</p><div class=\"profileMeta46\"><div><b>远程</b><span>射程倾向</span></div><div><b>近战</b><span>太刀倾向</span></div><div><b>生存</b><span>不改局内伤害</span></div><div><b>代价</b><span>🌸 只走现有天赋</span></div></div><p><button type=\"button\" data-open-real=\"talent\">打开天赋</button></p>"
+        ? talentBlock(api)
         : tab === "story"
-          ? "<p>正文章节仍走樱夜档案。通关后的抉择留在剧情房，不改枪口。</p><p><button type=\"button\" data-open-real=\"story\">打开剧情档案</button></p>"
+          ? storyBlock(api)
           : tab === "voice"
             ? '<p>离线语音 · 本机合成，不外链。</p><div class="profileVoice46">' +
               voiceLines(id)
@@ -4397,6 +4640,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
           try { hero.src = handlers.art("gacha/hero_" + who + ".webp") || hero.src; } catch (err) {}
         }
         paintGachaBanners(host);
+        paintHomeBanner();
       });
     }
     if (stage && !stage.querySelector(".gachaFeature46")) {
@@ -4411,7 +4655,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     if (ten && ten.querySelector("small")) ten.childNodes[0].nodeValue = "寻访十次";
   }
 
-  function decorateRoster(host, save, handlers) {
+  function decorateRoster(host, save, handlers, api) {
     if (!host) return;
     var stage = host.querySelector ? host.querySelector(".rosterStage46") : null;
     var wall = host.querySelector ? host.querySelector("#rosterWall46") : null;
@@ -4421,6 +4665,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
       bar.className = "rosterFilter46";
       bar.innerHTML =
         '<button type="button" data-roster-filter="all">全部</button>' +
+        '<button type="button" data-roster-filter="main">主攻</button>' +
         '<button type="button" data-roster-filter="SSR">SSR</button>' +
         '<button type="button" data-roster-filter="SR">SR</button>' +
         "<span></span>";
@@ -4434,24 +4679,38 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     }
     $$(".rosterSlot46", host).forEach(function (slot) {
       if (slot.classList.contains("lock")) return;
-      if (!slot.querySelector(".rosterNew46")) {
+      var id = slot.getAttribute("data-card") || "";
+      var count = Number(slot.getAttribute("data-count") || 0);
+      if (!count) {
         var small = slot.querySelector("small");
         var text = small ? String(small.textContent || "") : "";
-        if (text.indexOf("×1") >= 0) {
-          var mark = global.document.createElement("span");
-          mark.className = "rosterNew46";
-          mark.textContent = "NEW";
-          var art = slot.querySelector(".rosterArt46") || slot;
-          art.appendChild(mark);
-        }
+        var hit = text.match(/×(\d+)/);
+        count = hit ? Number(hit[1]) : 0;
       }
-      if (slot.classList.contains("r-SSR") && !slot.querySelector(".rosterAwaken46")) {
+      var neu = isNewCard(save, id, count);
+      var oldNew = slot.querySelector(".rosterNew46");
+      if (neu && !oldNew) {
+        var mark = global.document.createElement("span");
+        mark.className = "rosterNew46";
+        mark.textContent = "NEW";
+        (slot.querySelector(".rosterArt46") || slot).appendChild(mark);
+      } else if (!neu && oldNew && oldNew.parentNode) {
+        oldNew.parentNode.removeChild(oldNew);
+      }
+      if (count >= 2 && !slot.querySelector(".rosterAwaken46")) {
         var ribbon = global.document.createElement("span");
         ribbon.className = "rosterAwaken46";
         ribbon.textContent = "AWAKEN";
-        var face = slot.querySelector(".rosterArt46") || slot;
-        face.appendChild(ribbon);
+        (slot.querySelector(".rosterArt46") || slot).appendChild(ribbon);
       }
+      var prev = slot.onclick;
+      slot.onclick = function (ev) {
+        if (typeof prev === "function") prev.call(slot, ev);
+        if (id && save) {
+          markSeen(save, id);
+          commit(api);
+        }
+      };
     });
     paintRosterFilter(host);
   }
@@ -4467,7 +4726,10 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
       var rare = "all";
       if (slot.classList.contains("r-SSR")) rare = "SSR";
       else if (slot.classList.contains("r-SR")) rare = "SR";
-      var hide = rosterFilter !== "all" && rare !== rosterFilter;
+      var role = slot.getAttribute("data-role") || (isMainCard(slot.getAttribute("data-card")) ? "main" : "item");
+      var hide = false;
+      if (rosterFilter === "main") hide = role !== "main";
+      else if (rosterFilter !== "all") hide = rare !== rosterFilter;
       slot.classList.toggle("off", hide);
       if (!slot.classList.contains("lock") && !hide) shown += 1;
     });
@@ -4479,6 +4741,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     if (!drawer) return;
     var body = drawer.querySelector ? drawer.querySelector(".dbody") : null;
     if (!body) return;
+    ensureShopHead(drawer, api && api.save);
     var rail = body.querySelector(".shopRail46");
     if (!rail) {
       rail = global.document.createElement("nav");
@@ -4486,9 +4749,9 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
       rail.innerHTML =
         '<button type="button" data-shop-rail="featured">羁绊</button>' +
         '<button type="button" data-shop-rail="skins">衣装</button>' +
-        '<button type="button" data-shop-rail="starters">初始核心</button>' +
+        '<button type="button" data-shop-rail="starters">初心</button>' +
         '<button type="button" data-shop-rail="items">道具</button>' +
-        '<button type="button" data-shop-rail="talismans">排除符</button>' +
+        '<button type="button" data-shop-rail="talismans">补给符</button>' +
         '<button type="button" data-shop-rail="exchange">兑换区</button>';
       var list = body.querySelector("#shopList");
       if (list) body.insertBefore(rail, list);
@@ -4525,6 +4788,54 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     return shopRail;
   }
 
+  function moneyLab(kind) {
+    if (kind === "coins") return "🌸";
+    if (kind === "prism") return "棱晶";
+    if (kind === "ticket") return "寻访券";
+    return "碎片";
+  }
+
+  function moneyIco(kind) {
+    if (kind === "coins") return "sakura";
+    if (kind === "prism") return "prism";
+    if (kind === "ticket") return "ticket";
+    return "shard";
+  }
+
+  function findShopAction(drawer, group, titlePart) {
+    var cards = $$("[data-shop-group=" + group + "] .shopItem40", drawer);
+    for (var i = 0; i < cards.length; i++) {
+      var h = cards[i].querySelector("h3");
+      if (!h || String(h.textContent || "").indexOf(titlePart) < 0) continue;
+      var up = cards[i].querySelector(".shopUpgrade40");
+      if (up && !up.disabled) return up;
+      return cards[i].querySelector("button");
+    }
+    return null;
+  }
+
+  function buyFeatured(drawer, api, kind, id, title) {
+    if (kind === "exchange") {
+      var out = exchange(api && api.save, id);
+      if (!out.ok) {
+        say(api, "货币不足");
+        return out;
+      }
+      commit(api);
+      feel(api, "reward", id === "coin-ticket" ? "寻访券 +1" : "兑换完成");
+      paintCurrencies(api && api.save);
+      return out;
+    }
+    var group = kind === "starter" ? "starters" : kind === "item" ? "items" : "talismans";
+    var btn = findShopAction(drawer, group, title);
+    if (!btn || btn.disabled) {
+      say(api, "货币不足或已满级");
+      return { ok: false };
+    }
+    btn.click();
+    return { ok: true };
+  }
+
   function fillExchange(drawer, api) {
     var list = drawer && drawer.querySelector ? drawer.querySelector("#shopList") : null;
     if (!list) return;
@@ -4537,22 +4848,22 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     var save = api && api.save;
     var money = wallets(save);
     shelf.innerHTML = EXCHANGES.map(function (row) {
-      var payLab = row.pay === "coins" ? "🌸" : row.pay === "prism" ? "棱晶" : row.pay === "ticket" ? "寻访券" : "碎片";
-      var getLab = row.get === "coins" ? "🌸" : row.get === "prism" ? "棱晶" : row.get === "ticket" ? "寻访券" : "碎片";
       return (
-        '<div class="shopGood46"><div><b>' +
+        '<div class="shopGood46"><i class="shopGoodIco46 ' +
+        moneyIco(row.get) +
+        '"></i><div class="shopGoodBar46"><div><b>' +
         row.title +
         "</b><small>" +
-        payLab +
+        moneyLab(row.pay) +
         " " +
         row.payN +
         " → " +
-        getLab +
+        moneyLab(row.get) +
         " " +
         row.getN +
-        "</small></div><button type=\"button\" data-exchange=\"" +
+        '</small></div><button type="button" data-exchange="' +
         row.id +
-        "\">兑换</button></div>"
+        '">兑换</button></div></div>'
       );
     }).join("") + "<p class=\"shellHint46\">当前 棱晶 " + money.prism + " · 碎片 " + money.shard + " · 寻访券 " + money.ticket + " · 🌸 " + money.sakura + "</p>";
     shelf.onclick = function (ev) {
@@ -4568,6 +4879,41 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
       fillExchange(drawer, api);
       paintCurrencies(save);
     };
+  }
+
+  function featuredGoods(save) {
+    var shop = (save && save.shop40) || {};
+    var starterLv = ((shop.starter || {}).assault) || 0;
+    var itemLv = ((shop.items || {}).ammo) || 0;
+    var coins = clampInt(save && save.coins, 0, 999999);
+    var starterCost = 65 + starterLv * 55;
+    var itemCost = 140;
+    return [
+      {
+        id: "assault",
+        kind: "starter",
+        title: "夜樱火控核心",
+        ico: "core",
+        label: starterLv >= 5 ? "已满级" : starterLv ? "升级 🌸 " + starterCost : coins >= starterCost ? "🌸 " + starterCost : "还差 🌸 " + (starterCost - coins),
+        disabled: starterLv >= 5 || coins < starterCost,
+      },
+      {
+        id: "ammo",
+        kind: "item",
+        title: "穿甲弹匣",
+        ico: "ammo",
+        label: itemLv ? "已购" : coins >= itemCost ? "🌸 " + itemCost : "还差 🌸 " + (itemCost - coins),
+        disabled: !!itemLv || coins < itemCost,
+      },
+      {
+        id: "coin-ticket",
+        kind: "exchange",
+        title: "寻访券",
+        ico: "ticket",
+        label: coins >= 160 ? "🌸 160" : "还差 🌸 " + (160 - coins),
+        disabled: coins < 160,
+      },
+    ];
   }
 
   function fillFeatured(drawer, api) {
@@ -4594,28 +4940,29 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
       clone.setAttribute("data-shelf", "skin-" + index);
       shelf.appendChild(clone);
     });
-    [
-      { title: "夜樱火控核心", price: 65, icon: "🎯", tab: "starters" },
-      { title: "穿甲弹匣", price: 140, icon: "🔩", tab: "items" },
-      { title: "排除符", price: 80, icon: "符", tab: "talismans" },
-    ].forEach(function (good) {
+    featuredGoods(api && api.save).forEach(function (good) {
       var node = global.document.createElement("div");
       node.className = "shopGood46";
+      node.setAttribute("data-shop-buy", good.kind + ":" + good.id);
       node.innerHTML =
-        "<i>" +
-        good.icon +
-        "</i><b>" +
+        '<i class="shopGoodIco46 ' +
+        good.ico +
+        '"></i><div class="shopGoodBar46"><b>' +
         good.title +
-        '</b><button type="button">🌸 ' +
-        good.price +
-        "</button>";
+        '</b><button type="button"' +
+        (good.disabled ? " disabled" : "") +
+        ">" +
+        good.label +
+        "</button></div>";
       node.querySelector("button").onclick = function () {
-        shopRail = good.tab;
-        if (api && typeof api.clickTab === "function") api.clickTab(good.tab);
-        paintShopRail(drawer);
+        buyFeatured(drawer, api, good.kind, good.id, good.title);
       };
       shelf.appendChild(node);
     });
+    var hint = global.document.createElement("p");
+    hint.className = "shellHint46";
+    hint.textContent = "衣装只改外观 · 核心/道具写入存档 · 不出售永久伤害";
+    shelf.appendChild(hint);
   }
 
   function chapterIndex(cards) {
@@ -4629,7 +4976,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     return 0;
   }
 
-  function decorateStory(drawer, stories, save) {
+  function decorateStory(drawer, stories, save, api) {
     if (!drawer) return;
     var list = drawer.querySelector ? drawer.querySelector("#storyList") : null;
     if (!list) return;
@@ -4669,7 +5016,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
       card.onclick = function () {
         storyTouched = true;
         storyPick = index;
-        decorateStory(drawer, stories, save);
+        decorateStory(drawer, stories, save, api);
       };
     });
     var selected = cards[storyPick];
@@ -4677,7 +5024,9 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     var text = selected && selected.querySelector("p");
     var done = ((save && save.done) || []).length;
     var face = selected && selected.querySelector("img");
-    var src = face && face.getAttribute("src") ? face.getAttribute("src") : artOf(null, "ui/lobby_wide.webp");
+    var stages = (api && api.stages) || [];
+    var stage = stages.length ? stages[Math.min(storyPick, stages.length - 1)] : null;
+    var src = stage && stage.img ? stage.img : face && face.getAttribute("src") ? face.getAttribute("src") : artOf(api, "ui/lobby_wide.webp");
     pane.innerHTML =
       (src ? '<img alt="" src="' + src + '">' : "") +
       '<div class="storyPaneCopy46"><b>' +
@@ -4707,6 +5056,148 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     return d;
   }
 
+  function bannerLab() {
+    return gachaBanner === "normal" ? "常规均权" : "本期概率提升";
+  }
+
+  function paintHomeBanner() {
+    var host = global.document && global.document.getElementById("homeBanner46");
+    if (!host) return "";
+    var lab = bannerLab() + " · " + eventLeft();
+    var small = host.querySelector("small");
+    if (small) small.textContent = lab;
+    var title = host.querySelector("b");
+    if (title) {
+      title.textContent = gachaBanner === "fate" ? "命运交错" : gachaBanner === "normal" ? "常规寻访" : "新月之誓";
+    }
+    var dots = host.querySelectorAll(".homeBannerDots46 > i");
+    if (dots && dots.length) {
+      var idx = gachaBanner === "fate" ? 1 : gachaBanner === "normal" ? 2 : 0;
+      for (var i = 0; i < dots.length; i++) dots[i].classList.toggle("on", i === idx);
+    }
+    return lab;
+  }
+
+  function ensureShopHead(drawer, save) {
+    var money = drawer && drawer.querySelector ? drawer.querySelector(".shopMoney") : null;
+    if (!money) return;
+    if (!money.querySelector("#shopPrism46")) {
+      var coins = money.querySelector("#shopCoins");
+      money.textContent = "";
+      money.insertAdjacentHTML(
+        "beforeend",
+        '<span class="shopChip46 prism"><i>◆</i><b id="shopPrism46">0</b></span><span class="shopChip46 shard"><i>◇</i><b id="shopShard46">0</b></span>'
+      );
+      var sakura = global.document.createElement("span");
+      sakura.className = "shopChip46 sakura";
+      sakura.innerHTML = "<i>🌸</i>";
+      if (coins) sakura.appendChild(coins);
+      else sakura.insertAdjacentHTML("beforeend", '<b id="shopCoins">0</b>');
+      money.appendChild(sakura);
+      money.insertAdjacentHTML("beforeend", '<span class="shopChip46 ticket"><i>券</i><b id="shopTicket46">0</b></span>');
+    }
+    paintShopWallet(save);
+  }
+
+  function paintShopWallet(save) {
+    var money = wallets(save);
+    var prism = global.document && global.document.getElementById("shopPrism46");
+    var shard = global.document && global.document.getElementById("shopShard46");
+    var ticket = global.document && global.document.getElementById("shopTicket46");
+    var coins = global.document && global.document.getElementById("shopCoins");
+    if (prism) popChip(prism, money.prism);
+    if (shard) popChip(shard, money.shard);
+    if (ticket) ticket.textContent = money.ticket;
+    if (coins) coins.textContent = money.sakura;
+    return money;
+  }
+
+  function paintSupport(save) {
+    var plate = global.document && global.document.querySelector("#menu .profile");
+    if (!plate) return "";
+    var id = friendOf(save);
+    var tag = plate.querySelector(".homeSupport46");
+    if (!tag) {
+      tag = global.document.createElement("em");
+      tag.className = "homeSupport46";
+      var box = plate.querySelector("div") || plate;
+      box.appendChild(tag);
+    }
+    tag.textContent = "支援 · " + (CHAR_NAMES[id] || "");
+    return tag.textContent;
+  }
+
+  function decorateAch(drawer) {
+    if (drawer && drawer.classList) drawer.classList.add("achShell46", "room46");
+    return drawer;
+  }
+
+  function decorateSettings(drawer) {
+    if (!drawer) return drawer;
+    if (drawer.classList) drawer.classList.add("settingsShell46", "room46");
+    var body = drawer.querySelector("#settingsBody37") || drawer.querySelector(".dbody");
+    if (!body || body.querySelector(".settingsCols46")) return drawer;
+    var left = global.document.createElement("div");
+    left.className = "settingsCols46 settingsSliders46";
+    var right = global.document.createElement("div");
+    right.className = "settingsCols46 settingsToggles46";
+    var kids = Array.prototype.slice.call(body.children);
+    kids.forEach(function (node) {
+      if (node.tagName === "LABEL") left.appendChild(node);
+      else if (node.classList && node.classList.contains("routeNote")) return;
+      else right.appendChild(node);
+    });
+    var note = body.querySelector(".routeNote");
+    body.insertBefore(left, body.firstChild);
+    body.insertBefore(right, left.nextSibling);
+    if (note) body.appendChild(note);
+    return drawer;
+  }
+
+  function decorateStage(drawer) {
+    if (drawer && drawer.classList) drawer.classList.add("stageShell46", "room46");
+    return drawer;
+  }
+
+  function decorateArchive(drawer, api) {
+    if (!drawer) return drawer;
+    var body = drawer.querySelector(".dbody");
+    if (!body) return drawer;
+    var dock = body.classList && body.classList.contains("archiveDock46") ? body : body.querySelector(".archiveDock46");
+    if (dock === body) {
+      var wrap = global.document.createElement("div");
+      wrap.className = "archiveDock46";
+      while (body.firstChild) wrap.appendChild(body.firstChild);
+      body.classList.remove("archiveDock46");
+      body.appendChild(wrap);
+      dock = wrap;
+    }
+    if (!dock) return drawer;
+    var strip = drawer.querySelector("#archiveStats46");
+    if (!strip) {
+      strip = global.document.createElement("div");
+      strip.id = "archiveStats46";
+      if (dock.parentNode) dock.parentNode.insertBefore(strip, dock);
+    }
+    var stats = archiveStats(api && api.save, api);
+    strip.innerHTML =
+      "<i><b>" +
+      stats.done +
+      "/4</b><small>主线通关</small></i><i><b>" +
+      stats.achDone +
+      "/" +
+      stats.achTotal +
+      "</b><small>成就点亮</small></i><i><b>" +
+      stats.tal +
+      "</b><small>天赋等级</small></i><i><b>" +
+      stats.owned +
+      "/16</b><small>证词回收</small></i>";
+    if (global.SakurayoLobby && typeof global.SakurayoLobby.dressArchive === "function") {
+      global.SakurayoLobby.dressArchive(dock);
+    }
+    return drawer;
+  }
+
   function paintCurrencies(save) {
     var money = wallets(save);
     var prism = global.document && global.document.getElementById("homePrism46");
@@ -4715,7 +5206,10 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     if (prism) popChip(prism, money.prism);
     if (shard) popChip(shard, money.shard);
     if (ticket) ticket.textContent = money.ticket;
+    paintShopWallet(save);
+    paintHomeBanner();
     paintDots(save);
+    paintSupport(save);
     ensurePetals();
     ensureGreet(save);
     return money;
@@ -4742,12 +5236,16 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
         commit(api);
       }
     }
-    if (name === "roster") decorateRoster($("#rosterBody46"), api && api.save, api && api.handlers);
+    if (name === "roster") decorateRoster($("#rosterBody46"), api && api.save, api && api.handlers, api);
     if (name === "shop") decorateShop($("#shopDrawer"), api);
     if (name === "story") {
       storyTouched = false;
-      decorateStory($("#storyDrawer"), api && api.stories, api && api.save);
+      decorateStory($("#storyDrawer"), api && api.stories, api && api.save, api);
     }
+    if (name === "ach") decorateAch($("#achDrawer"));
+    if (name === "stage") decorateStage($("#stageDrawer"));
+    if (name === "archive") decorateArchive($("#archiveDrawer"), api);
+    if (name === "settings") decorateSettings($("#settingsDrawer37"));
     if (api && api.save) paintCurrencies(api.save);
   }
 
@@ -4770,6 +5268,11 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     readNotice: readNotice,
     giftBond: giftBond,
     setFriend: setFriend,
+    friendOf: friendOf,
+    isMainCard: isMainCard,
+    markSeen: markSeen,
+    isNewCard: isNewCard,
+    archiveStats: archiveStats,
     exchange: exchange,
     dots: dots,
     setShopRail: setShopRail,
@@ -4783,8 +5286,15 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     decorateGacha: decorateGacha,
     decorateRoster: decorateRoster,
     decorateShop: decorateShop,
+    buyFeatured: buyFeatured,
     decorateStory: decorateStory,
+    decorateAch: decorateAch,
+    decorateSettings: decorateSettings,
+    decorateStage: decorateStage,
+    decorateArchive: decorateArchive,
+    paintSupport: paintSupport,
     paintCurrencies: paintCurrencies,
+    paintHomeBanner: paintHomeBanner,
     paintDots: paintDots,
     greetLine: greetLine,
     clearFloats: clearFloats,
@@ -5253,7 +5763,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     ".opsSlots46 button.poor{opacity:.42}" +
     ".opsSlots46 button small{display:block;margin-top:2px;color:#ffe7a3;font:700 9px/1 system-ui}" +
     "@media(orientation:landscape){#opsDock46{left:max(12px,env(safe-area-inset-left));bottom:max(18px,env(safe-area-inset-bottom));width:196px}}" +
-    "html.landscape46:not(.portraitFallback46) #opsDock46{left:max(248px,calc(env(safe-area-inset-left) + 232px));top:max(8px,env(safe-area-inset-top));bottom:auto;width:auto;padding:4px 8px;display:flex;align-items:center;gap:8px;border-radius:999px;background:#120e27d8;border:1px solid #f2c75d44}" +
+    "html.landscape46:not(.portraitFallback46) #opsDock46{left:max(236px,calc(env(safe-area-inset-left) + 220px));top:max(8px,env(safe-area-inset-top));bottom:auto;width:auto;padding:4px 8px;display:flex;align-items:center;gap:8px;border-radius:999px;background:#120e27d8;border:1px solid #f2c75d44}" +
     "html.landscape46:not(.portraitFallback46) .opsDp46{margin:0;min-width:52px}" +
     "html.landscape46:not(.portraitFallback46) .opsSlots46{display:flex;gap:6px}" +
     "html.landscape46:not(.portraitFallback46) .opsSlots46 button{width:44px;min-height:44px;padding:2px;border-radius:50%}" +
@@ -5469,6 +5979,50 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     return snapshot();
   }
 
+  function bootScript(id, src, ready) {
+    if (!global.document) return;
+    if (ready()) return;
+    if (global.document.getElementById(id)) return;
+    var script = global.document.createElement("script");
+    script.id = id;
+    script.src = src;
+    script.onload = ready;
+    (global.document.head || global.document.documentElement).appendChild(script);
+  }
+
+  function bootLayout52() {
+    bootScript("sakurayo-touch54-js", "runtime/sakurayo-touch54.js", function () {
+      if (global.SakurayoTouch54 && typeof global.SakurayoTouch54.install === "function") {
+        global.SakurayoTouch54.install();
+      }
+      return !!(global.SakurayoTouch54 && global.SakurayoTouch54.install);
+    });
+    bootScript("sakurayo-layout52-js", "runtime/sakurayo-layout52.js", function () {
+      if (global.SakurayoLayout52 && typeof global.SakurayoLayout52.install === "function") {
+        global.SakurayoLayout52.install();
+      }
+      return !!(global.SakurayoLayout52 && global.SakurayoLayout52.install);
+    });
+    bootScript("sakurayo-feel53-js", "runtime/sakurayo-feel53.js", function () {
+      if (global.SakurayoFeel53 && typeof global.SakurayoFeel53.install === "function") {
+        global.SakurayoFeel53.install();
+      }
+      return !!(global.SakurayoFeel53 && global.SakurayoFeel53.install);
+    });
+    bootScript("sakurayo-boutique-js", "runtime/sakurayo-boutique.js", function () {
+      if (global.SakurayoBoutique && typeof global.SakurayoBoutique.install === "function") {
+        global.SakurayoBoutique.install();
+      }
+      return !!(global.SakurayoBoutique && global.SakurayoBoutique.install);
+    });
+    bootScript("sakurayo-chrome-js", "runtime/sakurayo-chrome.js", function () {
+      if (global.SakurayoChrome && typeof global.SakurayoChrome.install === "function") {
+        global.SakurayoChrome.install();
+      }
+      return !!(global.SakurayoChrome && global.SakurayoChrome.install);
+    });
+  }
+
   function injectStyle() {
     if (!global.document) return;
     var style = global.document.getElementById("sakurayo-ops-css");
@@ -5477,6 +6031,7 @@ window.SAKURAYO_GAME_VERSION = "4.7.0";
     style.id = "sakurayo-ops-css";
     style.textContent = CSS;
     (global.document.head || global.document.documentElement).appendChild(style);
+    bootLayout52();
   }
 
   global.SakurayoOps = {
@@ -5755,7 +6310,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       const quota = error && (error.name === "QuotaExceededError" || error.code === 22);
       toast(quota ? "存档空间已满，进度未能写入" : "存档写入失败，请导出备份");
     }
-    menuUpdate();
+    if (!menuUpdate.busy) menuUpdate();
   };
 
 
@@ -7877,7 +8432,12 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   /* ================= UI: MENU / DRAWERS / HUD / MODALS ================= */
   function menuUpdate() {
     let s = stage();
-    $("#coins").textContent = save.coins;
+    const coinsEl = $("#coins");
+    if (coinsEl) {
+      const plus = coinsEl.querySelector("#homeCoinPlus46");
+      coinsEl.textContent = save.coins;
+      if (plus) coinsEl.appendChild(plus);
+    }
     $("#tcoins").textContent = save.coins;
     $("#simg").src = s.img;
     $("#sname").textContent = s.name;
@@ -12449,7 +13009,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     const visible=selector=>{const node=$(selector);return !!node&&!node.classList.contains("hidden")&&!node.hidden;};
     const finite=(value,fallback=0)=>Number.isFinite(value)?value:fallback;
     const damageSources=P.damageSources||{};
-    return {
+    const raw = {
       mode:state,runMode:runMode36,stageKey:isMainGodRun36()?stage().key:`story-${selected}`,stageDuration:finite(stage().dur),stage44:window.SakurayoLifecycle?window.SakurayoLifecycle.snapshot(lifecycleWorld44()):null,viewport:{width:W,height:H,coordinates:"origin top-left; +x right; +y down"},stage:selected,runTime:finite(runTime),
       player:{character:P.character||save.character||"sayo",skin:save.skin||"default",outfit:liveOutfitLayer35()?.id||null,careerBranch:careerBranchId35(),outfitFade:finite(P.outfitFade),outfitReveal:finite(P.outfitReveal),outfitTitle:P.outfitRevealTitle||"",animation:state==="play"?charPose35():"idle",portraitMode:"static",direction:facingName36(),aim:{x:finite(P.aimX,P.fx),y:finite(P.aimY,P.fy),angle:finite(P.weaponAngle)},manualAim:!!P.manualAim,x:finite(P.x),y:finite(P.y),radius:finite(P.r),visualSize:PLAYER_GEOMETRY35.visualSize,footOffset:PLAYER_GEOMETRY35.footOffset,hp:finite(P.hp),maxHp:finite(P.maxHp),shield:finite(P.sh),maxShield:finite(P.maxSh),level:finite(P.level),xp:finite(P.xp),nextXp:finite(P.next),attackDamage:finite(P.dmg),attackInterval:finite(P.rate),attackRange:finite(P.range),multishot:finite(P.multi),pierce:finite(P.pierce),skillCooldown:finite(P.skill),dashCooldown:finite(P.dash),shotCount:finite(P.shotCount),meleeChain:finite(P.meleeChain),perfectDodges:finite(P.perfectDodges),initialCore:P.initialCore40||null,initialCoreLevel:finite(P.initialCoreLevel40),noUpgradeChallenge:!!P.noUpgradeChallenge40,upgradeChoices:finite(P.upgradeChoices40),baitLevel:finite(P.baitLevel40),baitSpawns:finite(P.baitSpawns40)},
       counts:{enemies:enemies.filter(e=>!e.dead).length,bullets:bullets.length,enemyBullets:ebullets.length,gems:gems.length,pets:pets.length,      ops:window.SakurayoOps?window.SakurayoOps.snapshot().units.length:0},
@@ -12461,6 +13021,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       overlays:{menu:visible("#menu"),hud:visible("#hud"),level:visible("#level"),dialogue:visible("#dialogue"),event:visible("#event"),paused:visible("#paused"),result:visible("#result"),storyBeat:visible("#storyBeat44")},
       mainGod:{tier:selectedMainGodTier36,...save.mainGod},shop40:JSON.parse(JSON.stringify(save.shop40||{})),extensions:{packs:CONTENT41?.packs()||[],errors:CONTENT41?.errors()||[],state:JSON.parse(JSON.stringify(save.extensions||{})),exploration:explorationSnapshot41()},balanceSamples:save.balance40?.samples?.length||0,result:{win:!!runWin,title:$("#rtitle")?.textContent||""},devErrors:window.__SAKURAYO_DEV__?.errors.length||0,
     };
+    try{return JSON.parse(JSON.stringify(raw));}catch{return {mode:state,runMode:runMode36,stage:selected};}
   }
   if(TEST_MODE){
     window.render_game_to_text=()=>JSON.stringify(snapshot35());
@@ -12634,7 +13195,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
         }
         return last;
       },
-      openDrawer(name){openDrawer(String(name||""));const el=$(`#${name}Drawer`);return {visible:!!el&&!el.classList.contains("hidden")};},
+      openDrawer(name){openDrawer(String(name||""));const el=name==="settings"?$("#settingsDrawer37"):$(`#${name}Drawer`);return {visible:!!el&&!el.classList.contains("hidden")};},
       triggerError(kind="error"){if(kind==="promise")Promise.reject(new Error("SMOKE_EXPECTED_PROMISE_ERROR"));else setTimeout(()=>{throw new Error("SMOKE_EXPECTED_RUNTIME_ERROR");},0);},
     });
   }
@@ -12742,7 +13303,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       rail.id = "homeRail46";
       rail.className = "homeRail46";
       rail.dataset.shell = "1";
-      rail.innerHTML = [["mission","<i class=\"railIco46 task\"></i>","任务","TASK"],["ach","<i>★</i>","成就","ACHIEVE"],["mail","<i class=\"railIco46 mail\"></i>","邮件","MAIL"],["notice","<i class=\"railIco46 notice\"></i>","公告","NOTICE"],["settings","<i>⚙</i>","设置","SETTING"]].map(([id,icon,cn,en]) => `<button type="button" data-home="${id}">${icon}<b>${cn}</b><small>${en}</small></button>`).join("");
+      rail.innerHTML = [["mission","<i class=\"railIco46 task\"></i>","任务","TASK"],["ach","<i class=\"railIco46 ach\"></i>","成就","ACHIEVE"],["mail","<i class=\"railIco46 mail\"></i>","邮件","MAIL"],["notice","<i class=\"railIco46 notice\"></i>","公告","NOTICE"],["settings","<i class=\"railIco46 set\"></i>","设置","SETTING"]].map(([id,icon,cn,en]) => `<button type="button" data-home="${id}">${icon}<b>${cn}</b><small>${en}</small></button>`).join("");
       menu.appendChild(rail);
       rail.addEventListener("click", ev => {
         const btn = ev.target.closest("[data-home]");
@@ -12757,7 +13318,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       banner.id = "homeBanner46";
       banner.type = "button";
       banner.className = "homeBanner46";
-      banner.innerHTML = "<img alt=\"\"><div><em>★★★★★</em><b>新月之誓</b><small>限时概率UP!</small><i class=\"homeBannerDots46\"><i class=\"on\"></i><i></i><i></i></i></div>";
+      banner.innerHTML = "<img alt=\"\"><div><em>★★★★★</em><b>新月之誓</b><small>本期概率提升</small><i class=\"homeBannerDots46\"><i class=\"on\"></i><i></i><i></i></i></div>";
       menu.appendChild(banner);
       banner.onclick = () => openDrawer("gacha");
       const img = banner.querySelector("img");
@@ -12809,7 +13370,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       wallet.insertAdjacentHTML("beforeend", '<span class="homeChip46 prism" data-shell="preview"><i>◆</i><b id="homePrism46">12840</b><button type="button">+</button></span>');
       wallet.insertAdjacentHTML("beforeend", '<span class="homeChip46 shard" data-shell="preview"><i>◇</i><b id="homeShard46">3960</b><button type="button">+</button></span>');
       wallet.appendChild(coins);
-      wallet.insertAdjacentHTML("beforeend", '<span class="homeChip46 ticket" data-shell="preview"><i>●</i><b id="homeTicket46">0</b><button type="button">+</button></span>');
+      wallet.insertAdjacentHTML("beforeend", '<span class="homeChip46 ticket" data-shell="preview"><i>券</i><b id="homeTicket46">0</b><button type="button">+</button></span>');
       wallet.addEventListener("click", ev => {
         if (ev.target.closest(".homeChip46")) {
           ev.stopPropagation();
@@ -13287,7 +13848,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     const _story=renderStory;
     renderStory=function(){
       const result=_story();
-      setTimeout(()=>S.decorateStory($("#storyDrawer"),STORIES,save),0);
+      setTimeout(()=>S.decorateStory($("#storyDrawer"),STORIES,save,{stages:ST,save}),0);
       return result;
     };
   }
@@ -13302,8 +13863,18 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     wireLivePuppet46();
     L.dressArchive($("#archiveDrawer .archiveDock46"));
     ["shopDrawer","stageDrawer","archiveDrawer"].forEach(id=>$(`#${id}`)?.classList.add("room46"));
+    const _openSettings46=openSettings37;
+    openSettings37=function(){
+      const result=_openSettings46.apply(this,arguments);
+      window.SakurayoShell?.decorateSettings($("#settingsDrawer37"));
+      return result;
+    };
     const _openDrawer46=openDrawer;
     openDrawer=function(n){
+      if(n==="settings"){
+        openSettings37();
+        return;
+      }
       _openDrawer46(n);
       if(n==="gacha"){
         const rev=$("#gachaReveal46");
@@ -13322,6 +13893,10 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
         handlers:lobbyHandlers46(),
         characters:CHARACTERS35,
         stories:STORIES,
+        stages:ST.map(s=>({id:s.id,img:s.img,name:s.name})),
+        talents:Object.entries(TAL).map(([id,a])=>({id,n:a.n,i:a.i,d:a.d,lv:save.tal[id]||0,max:a.max})),
+        achDone:Object.entries(ACH).filter(([id,a])=>!!save.ach[id]||a.c()).length,
+        achTotal:Object.keys(ACH).length,
         characterId:save.character||"sayo",
         clickTab(id){
           const btn=document.querySelector(`.shopTabs40 [data-shop="${id}"]`);
@@ -13502,6 +14077,16 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   installLobby46();
   installShell46();
   installOps46();
+  const _menuUpdateGuard47 = menuUpdate;
+  menuUpdate = function () {
+    if (menuUpdate.busy) return;
+    menuUpdate.busy = true;
+    try {
+      return _menuUpdateGuard47.apply(this, arguments);
+    } finally {
+      menuUpdate.busy = false;
+    }
+  };
   checkAch();
   menuUpdate();
   installModKitButton42();

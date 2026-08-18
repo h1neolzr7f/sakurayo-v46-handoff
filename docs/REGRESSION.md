@@ -13,7 +13,7 @@
 | 换角压货币条 | 圆钮 `position:static` 挂进 `.top` flex | `position:absolute; left:max(220px,…)` |
 | 日历/支援/「更多」金边挨在一起 | `#homeQuick46` gap 12px，「更多」左留 10px | 再绝对叠在钱包上 |
 | 草稿 emoji 回潮 | 保留 `chrome6109` 覆盖层 | 大厅/抽屉改回裸 emoji |
-| 图标层把按钮抖到点不稳 | `injectStyle` 只写一次，`dress.busy` + 180ms 节流，🌸/✦ 只替换一次 | 观察者里反复写 `style.textContent` 或 `n>40` 连刷 `hook()` |
+| 图标层把按钮抖到点不稳 | `injectStyle` 只写一次，`dress.busy` 节流，装完后不再对整棵 DOM 开 `MutationObserver` | 观察 `documentElement`+`subtree` 或扫遍 `button, p, small, em` |
 | 横屏出击下方挤出「新手说明」三钮 | 横屏藏 `.utilityButtons37`，声音走左栏设置 | 再把桌面用工具条叠回 412px 高的手机大厅 |
 | 干员被 `syncPets` 清掉 | 单位走独立 `deployed[]` | `pets.push` |
 | 再包 `update` | 局内扩展走 hook | `update = function` 包装层 |

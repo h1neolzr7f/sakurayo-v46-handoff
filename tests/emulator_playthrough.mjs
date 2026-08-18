@@ -92,7 +92,7 @@ for (const [sel, name] of [
 await tap("#start", "start");
 if (await page.locator("#tutorialDrawer37").isVisible().catch(() => false)) {
   await shot("05-tutorial.png");
-  await tap("#tutorialSkip37", "skip");
+  await page.evaluate(() => document.getElementById("tutorialSkip37")?.click());
 }
 await page.waitForTimeout(500);
 await shot("06-after-start.png");

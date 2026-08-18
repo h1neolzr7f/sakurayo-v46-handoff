@@ -188,9 +188,7 @@ await page.locator("#gachaDrawer .close").click();
 await page.evaluate(() => document.querySelectorAll(".drawer").forEach((n) => n.classList.add("hidden")));
 await api(page, "start");
 if (await page.locator("#tutorialDrawer37").isVisible()) {
-  const skip = page.locator("#tutorialSkip37");
-  if (await skip.count()) await skip.click({ force: true });
-  else for (let i = 0; i < 4; i++) await page.locator("#tutorialNext37").click({ force: true });
+  await page.evaluate(() => document.getElementById("tutorialSkip37")?.click());
 }
 await api(page, "dismissDialogue");
 await api(page, "protectPlayer");

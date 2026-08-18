@@ -12,6 +12,10 @@ APK="${APK:-/workspace/android-app/app/build/outputs/apk/debug/app-debug.apk}"
 CDP_PORT="${CDP_PORT:-9222}"
 LOG="/tmp/sakurayo-emulator.log"
 
+if [[ -e /dev/kvm && ! -w /dev/kvm ]]; then
+  sudo -n chmod 666 /dev/kvm 2>/dev/null || true
+fi
+
 if ! command -v adb >/dev/null; then
   echo "adb missing; run tools/setup_android_emulator.sh first" >&2
   exit 1

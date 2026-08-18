@@ -155,7 +155,7 @@
       return;
     }
     var obs = new global.MutationObserver(scheduleLobbyTop);
-    obs.observe(root, { childList: true, subtree: true });
+    obs.observe(root, { childList: true, subtree: false });
     hangLobbyTop();
   }
 
