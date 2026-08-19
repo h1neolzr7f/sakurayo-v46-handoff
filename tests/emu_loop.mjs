@@ -91,6 +91,18 @@ async function runViewport(width, height, tag) {
   const page = await ctx.newPage();
   await waitMenu(page);
   await shot(page, `${tag}-menu.png`);
+  const classes = await page.evaluate(() => ({
+    landscape: document.documentElement.classList.contains("landscape46"),
+    portrait: document.documentElement.classList.contains("portraitFallback46"),
+    tall: document.documentElement.classList.contains("tallWindow46"),
+    hint: !!document.querySelector("#rotateHint46"),
+  }));
+  assert.equal(classes.landscape, true, `${tag} 必须走横屏 class`);
+  assert.equal(classes.portrait, false, `${tag} 禁止 portraitFallback46`);
+  assert.equal(classes.tall, false, `${tag} 禁止 tallWindow46`);
+  assert.equal(classes.hint, false, `${tag} 禁止创建横持提示`);
+  const heroTop = await page.evaluate(() => getComputedStyle(document.querySelector(".heroLive46") || document.body).top);
+  assert.equal(heroTop, "0px", `${tag} 立绘容器 top 必须是 0，实际 ${heroTop}`);
   const save = await api(page, "saveSnapshot");
   assert.ok(save.shop40 && save.shop40.ops, `${tag} 新档应补齐 shop40.ops`);
   pass(`${tag} 新档进主菜单`);
@@ -164,15 +176,7 @@ async function runViewport(width, height, tag) {
   }
 
   await shot(page, `${tag}-combat.png`);
-  const hintPlay = await page.evaluate(() => {
-    const hint = document.querySelector("#rotateHint46");
-    if (!hint) return { shown: false, display: "none" };
-    const s = getComputedStyle(hint);
-    const box = hint.getBoundingClientRect();
-    return { shown: s.display !== "none" && box.height > 0, display: s.display, height: box.height };
-  });
-  assert.equal(hintPlay.display, "none", `${tag} 战斗中横持提示必须 display:none，实际 ${hintPlay.display}`);
-  assert.equal(hintPlay.shown, false, `${tag} 战斗中横持提示不得挡住 HUD`);
+  assert.equal(await page.evaluate(() => !!document.querySelector("#rotateHint46")), false, `${tag} 战斗中不得再出现横持提示`);
   pass(`${tag} 战斗中无横持提示`);
 
   const before = await snap(page);
@@ -235,6 +239,19 @@ try {
 
   await runViewport(430, 932, "p430");
   await runViewport(932, 430, "l932");
+  const thin = await browser.newContext({ viewport: { width: 600, height: 400 }, hasTouch: true });
+  const thinPage = await thin.newPage();
+  await waitMenu(thinPage);
+  const thinCls = await thinPage.evaluate(() => ({
+    portrait: document.documentElement.classList.contains("portraitFallback46"),
+    hint: !!document.querySelector("#rotateHint46"),
+    landscape: document.documentElement.classList.contains("landscape46"),
+  }));
+  assert.equal(thinCls.landscape, true);
+  assert.equal(thinCls.portrait, false, "600×400 窄横屏不得走竖版回退");
+  assert.equal(thinCls.hint, false, "600×400 不得出现横持提示");
+  pass("窄横屏仍走横版不分竖屏回退");
+  await thin.close();
   console.log(`EMU LOOP PASS ${passed.length} checks`);
   await browser.close();
 } catch (error) {

@@ -176,7 +176,10 @@ async function scanViewport(width, height, tag) {
     };
   });
   console.log(`${tag} HUD_HINT`, JSON.stringify(hud));
-  if (hud.hintDisplay !== "none") findings.push({ sev: "P1", tag, msg: `战斗中横持提示 display=${hud.hintDisplay}` });
+  if (hud.hintDisplay && hud.hintDisplay !== "none") findings.push({ sev: "P1", tag, msg: `战斗中横持提示 display=${hud.hintDisplay}` });
+  if (await page.evaluate(() => !!document.querySelector("#rotateHint46"))) {
+    findings.push({ sev: "P1", tag, msg: "横持提示节点仍在，竖版回退未删干净" });
+  }
   if (hud.hint && hud.hud && hud.hintDisplay !== "none" && boxOverlap(hud.hint, hud.hud) > 0) {
     findings.push({ sev: "P1", tag, msg: "横持提示压住 HUD" });
   }

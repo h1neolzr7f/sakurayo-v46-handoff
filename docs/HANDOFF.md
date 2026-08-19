@@ -86,13 +86,11 @@
 - 右约 **34%**、最宽 **360**：币/更多 → 三角色横排圆钮 → 关卡胶囊 → **出击** → 五格导航。
 - 圆钮必须在操作台里，禁止漂到立绘上。
 - 出击文案固定「出击」，不要「角色名 · 进入樱夜」。
-- 更窄才叠成竖屏回退，并显示 `#rotateHint46`（「请横持设备」）。提示在顶栏中央，不得挡住出击。
+- **不做竖版。** 不要 `#rotateHint46`、不要 `portraitFallback46` / `tallWindow46`。窄窗也走左右分栏，不叠竖屏回退。
 
 `preferLandscape46()` 在 [`src/index.html`](../src/index.html)：
 
-- 永远 `classList.add("landscape46")`
-- `portraitFallback46` 仅当 `width < 640`
-- `tallWindow46` 当高>宽且宽仍 ≥ 640
+- 永远 `classList.add("landscape46")`，并去掉竖版 class 与横持提示节点
 - 尝试 `screen.orientation.lock("landscape")`
 - 画布跟 `visualViewport` 铺满
 
@@ -193,7 +191,6 @@ pity, pitySR, pulls, tenPulls, owned, last, cheatUsed
 #heroTap46
 #heroHead46
 #modeBar46
-#rotateHint46
 #start
 [data-open="gacha|roster|shop|stage|archive|story"]
 ```

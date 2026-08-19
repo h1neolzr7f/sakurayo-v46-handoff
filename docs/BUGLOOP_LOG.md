@@ -59,3 +59,17 @@
 这一轮怎么查到的：复跑门 A + `emu_loop` + `emu_scan`（含 2400×1080 走到左缘、编年点回、寻访叠字、`grid.near`）。`adb devices` 仍无设备。
 
 三层：门A 绿 / Playwright视口 绿 / Android 无 adb。
+
+---
+
+## 轮 5（扩大：不做竖版）
+
+自动打回：**未过。不要进入下一类。**
+层：Playwright视口
+类：竖版回退（#rotateHint46 / portraitFallback46 / tallWindow46 / top:-4%）仍会进横屏和窄横屏
+复现：600×400 仍挂 portraitFallback46 并显示「请横持设备」；932×430 立绘默认 top:-4% 裁头
+上一轮为什么没发现：轮 1–4 只在战斗里藏 hint，没删竖版 class；也没测 w<640 的横屏。子智能体横屏审计才标出。
+回归：`lobby_unit` 禁止再写提示/竖版回退；`emu_loop` 断言无 hint、无 portraitFallback、立绘 top=0、600×400 仍走横版
+
+本轮新问题：竖版逻辑污染横版。
+变成哪条回归：lobby_unit + emu_loop 窄横屏/无提示/立绘 top=0。

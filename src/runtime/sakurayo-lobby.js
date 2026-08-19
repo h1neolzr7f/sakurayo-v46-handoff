@@ -335,12 +335,6 @@
     "html.landscape46 #rosterWall46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
     "html.landscape46 #archiveDrawer .archiveDock46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
     "html.landscape46 #stageList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}" +
-    "#rotateHint46{display:none;position:fixed;z-index:80;left:50%;top:max(8px,env(safe-area-inset-top));transform:translateX(-50%);padding:6px 12px;border-radius:999px;background:#0b0818cc;border:1px solid #ffe6a355;color:#ffe7a3;font:800 11px/1 system-ui;letter-spacing:.12em;pointer-events:none;white-space:nowrap}" +
-    "@media(orientation:portrait){" +
-    "#rotateHint46{display:block}" +
-    "}" +
-    "html.tallWindow46 #rotateHint46{display:block}" +
-    "html.playing46 #rotateHint46{display:none!important}" +
     "@media(prefers-reduced-motion:reduce){.wishStage46:before,.wishPetals46 i,.revealInner46,.revealFace46.front:after,.revealCard46.r-SSR.flipped .revealFace46.front{animation:none;transition:none}}";
 
   var ROOM_CSS =
@@ -427,11 +421,6 @@
     "html.landscape46 #menu.homeDock46 .charCard{width:auto;height:auto;min-width:0;max-width:56px;margin:0 auto;aspect-ratio:1}" +
     "html.landscape46 #menu.homeDock46 .charCard img{width:100%;height:100%}" +
     "html.landscape46 #menu.homeDock46 .stageMini,html.landscape46 #menu.homeDock46 .start,html.landscape46 #menu.homeDock46 .nav{width:100%;margin-left:0;margin-right:0}" +
-    "html.portraitFallback46 #menu.homeDock46 .heroLive46{width:100%;left:0;right:0;top:0;bottom:34%}" +
-    "html.portraitFallback46 #menu.homeDock46 .menu{width:100%;max-width:none;margin:0;border-radius:18px 18px 0 0}" +
-    "html.portraitFallback46 #menu.homeDock46 .charSelectPanel{position:absolute!important;left:8px;right:auto;bottom:36%;width:auto}" +
-    "html.portraitFallback46 #menu.homeDock46 .characterList{display:flex!important;flex-direction:column}" +
-    "html.portraitFallback46 #menu.homeDock46 #coverTitle36{left:50%;right:auto;transform:translateX(-50%);text-align:center}" +
     "@media(prefers-reduced-motion:reduce){.heroLive46.hasBlink .heroLiveBlink46,.heroLive46.hasBlink .heroLiveBase46{animation:none}}";
 
   function injectStyle() {
