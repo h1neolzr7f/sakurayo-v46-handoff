@@ -73,3 +73,7 @@
 
 本轮新问题：竖版逻辑污染横版。
 变成哪条回归：lobby_unit + emu_loop 窄横屏/无提示/立绘 top=0。
+
+三层：门A 绿 / Playwright视口 红（本类） / Android 无 adb。
+
+修完复跑：门A 绿（static/lobby/live/ops/chronicle/camera/lifecycle/framework 8/browser 52/ops_smoke/gacha_visual/testimony） / emu_loop 24 绿含「窄横屏仍走横版」 / emu_scan 0 P0/P1 / Android 无 adb。已 sync `android-app/.../assets/index.html`（未交 APK）。
