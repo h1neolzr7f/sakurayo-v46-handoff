@@ -32,7 +32,19 @@
 | `node tests/browser_smoke.mjs` | 未跑（同上） |
 | `pwsh tools/verify.ps1` | 未跑：无 pwsh |
 
-`npx playwright --version` 能打出 1.62.1（缓存在 `~/.npm/_npx/...`），但测试脚本默认 import 路径对不上。刀 1 再决定是否用 `NODE_PATH` 补跑，禁止为绿删测试或放宽 `"4.6.0"`。
+`npx playwright --version` 能打出 1.62.1（缓存在 `~/.npm/_npx/...`），但测试脚本默认 import 路径对不上。刀 1 已在本机安装 Playwright Chromium（`node_modules/` gitignore，不进仓）并补跑。禁止为绿删测试或放宽 `"4.6.0"`。
+
+## 刀 1 门 A 复跑（2026-08-19）
+
+未改玩法、未删测试、未放宽版本断言。
+
+| 脚本 | 结果 |
+|---|---|
+| static / node --check / lobby / live / ops / chronicle / camera | 绿（与刀 0 同） |
+| `node tests/framework_smoke.mjs` | **绿** 8 checks |
+| `node tests/browser_smoke.mjs` | **绿** 52 checks |
+
+无测试红，无代码修复。下一刀同步 Android 壳。
 
 核心函数未改名：`startGame` / `update` / `draw` / `spawnEnemy` / `showDialogue` 仍在 `src/index.html`。`update(dt)` 仍是 `return fixedUpdate(dt)`，无新包装层。
 
