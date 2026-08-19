@@ -71,13 +71,25 @@ collageIds.forEach((id) => {
 assert.notEqual(artHash("fashion_sayo_neon"), artHash("weapon_radio_bat"), "霓虹不得再等于电台短棍");
 assert.notEqual(artHash("fashion_rion_keiko"), artHash("weapon_rion_wood"), "稽古不得再等于无铭木刀");
 assert.equal(new Set(collageIds.map(artHash)).size, collageIds.length, "18 张必须互不相同");
+const legendIds = [
+  "fashion_sayo_crown",
+  "fashion_aya_funeral",
+  "fashion_rion_bride",
+  "weapon_sayo_final",
+  "weapon_aya_mirror",
+  "weapon_rion_burial",
+];
+assert.equal(new Set(legendIds.map(artHash)).size, legendIds.length, "6 张传说必须互不相同");
+legendIds.forEach((id) => {
+  assert.ok(!collageIds.map(artHash).includes(artHash(id)), id + " 不得复用 18 张非传说");
+});
 const keepHashes = {
-  fashion_sayo_crown: "b313dd1872cdf4793d138d5c8d9490d8357a9348ace5b3deb3c656f039a1484f",
-  fashion_aya_funeral: "5d07014661d7d90ec4cd6febf944a3b2538c6e5dc5c08e6829ae747cabb9cdea",
-  fashion_rion_bride: "abf79d5ae6e1ce299dda578bf6c88d80580fe85b18f1e3c5c899e3dde28e03f1",
-  weapon_sayo_final: "8f8b58bb150a2253b94e2dca43d0bfe4a2f96ebe5fbfdb8907060632729a7e38",
-  weapon_aya_mirror: "04c2bc41f4d71aa9691735de6e04937488b3fed3715910ff4de03d3f86ff75dc",
-  weapon_rion_burial: "544626968de7ff0f184e186370a26839ffd0908c3c655ed5cdb8771a354b20d5",
+  fashion_sayo_crown: "ffb582cdcafce1f3f54d3a9af0b816811ad549a33db47a3a8b50f6aca8e4fd06",
+  fashion_aya_funeral: "1c901bbbf7b8d5461585316729b6792a7eb8ee0a2a6d946ea891fba481829b06",
+  fashion_rion_bride: "5a5ee31c6c84a24a2629e2b6206eabeddf67136c31cf6d0c177ff54abc21bec0",
+  weapon_sayo_final: "c4977335357a0ea207fb027700da01e60af43fad802e06887f1da0bcdf043d22",
+  weapon_aya_mirror: "f87e9d938cc1493b105e8a9f0d2ae49a0e9c606a48bc6f823a9b6d6cc23a3263",
+  weapon_rion_burial: "9dc5b859248a2b3ce39506ec1d82ce7c047536828ee0d4e761707e41d9ed433b",
   sayo_echo: "a1f99f31bf5c4c2e8059cde650dc40cd0d9ef97533aabb2c0f3e62f6ce614409",
   school_shrine: "3f3c6a3ce029e954b916b18cc3d1d55bdfe7283f8a1111d330cb3fc8b6131abc",
   job_garden: "3970b76d407c313c22b49efacd7ef9b62b2ca7da376f5c0376f877fa15220a6c",
