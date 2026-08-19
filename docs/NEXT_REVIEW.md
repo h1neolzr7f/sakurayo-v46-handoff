@@ -32,7 +32,7 @@
 
 [#16](https://github.com/h1neolzr7f/sakurayo-v46-handoff/pull/16) `cursor/legend-art-5030` @ `4c8efe3`。只换 6 张传说。静的奢侈封面，绫枪放下。仍是 draft。额度用完则先不并，不挡打包。
 
-## 现在开：反复测试打回
+## 现在开：模拟器自动打回
 
-提示词 `docs/CURSOR_PROMPT_BUGLOOP.md`。分支 `cursor/bug-loop-5030`。  
-查一类、修一类、新问题先写上轮为何漏。打包等两轮挖空再开。
+提示词 `docs/CURSOR_PROMPT_EMULOOP.md`。分支 `cursor/emu-loop-5030`。  
+打回官是 Playwright 视口 + 有则 Android 模拟器。人只看开工和收工。
