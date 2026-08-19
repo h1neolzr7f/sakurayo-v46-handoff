@@ -1,6 +1,6 @@
-# 《樱夜·尸潮》V4.6.0 交接规格
+# 《樱夜·尸潮》V4.6.1 交接规格
 
-2026-08-14。给下一位 AI / 维护者。先读根目录 [README.md](../README.md)，再读本文和 [AGENTS.md](../AGENTS.md)。二游分期原文在 [PLAN_V46_ERYOU.md](PLAN_V46_ERYOU.md)。升版本见 [MAINTAIN.md](MAINTAIN.md)。
+2026-08-19。给下一位 AI / 维护者。先读根目录 [README.md](../README.md)，再读本文和 [AGENTS.md](../AGENTS.md)。二游分期原文在 [PLAN_V46_ERYOU.md](PLAN_V46_ERYOU.md)。升版本见 [MAINTAIN.md](MAINTAIN.md)。
 
 这不是另做一款原神。局外做成能横着玩的二次元手游大厅，局内继续是离线肉鸽射击。
 
@@ -8,8 +8,8 @@
 
 | 项 | 值 |
 |---|---|
-| 源码版本 | **4.6.0**（未发版，不要擅自升 4.6.1） |
-| Android `versionName` / `versionCode` | 4.6.0 / **61** |
+| 源码版本 | **4.6.1**（未发 APK，不要擅自升 4.6.2） |
+| Android `versionName` / `versionCode` | 4.6.1 / **62** |
 | 公开仓 | https://github.com/h1neolzr7f/sakurayo-zombietide |
 | 已发布 APK | **v4.4.6** |
 | 存档键 | **`sakurayoV3`** |
@@ -27,7 +27,7 @@
 - 触控摇杆、冲刺、主动技能必须可用。
 - 继续 `sakurayoV3`。旧档缺字段自动补齐，禁止清档。
 - 不依赖网络、CDN、外部字体或外部图片。
-- 商店衣装与寻访卡**都不卖永久伤害**。卡只进名册。
+- 商店衣装只改外观和职业倾向，不直接卖永久伤害。寻访卡与结算构筑卡**按星级加伤害**（同卡并星，最高五星）。
 - 不要再给 `update` 加包装层。不要改名 `startGame` / `update` / `draw` / `spawnEnemy` / `showDialogue` 却不改调用点。
 - 不允许恢复「每颗子弹遍历全部敌人」的无界碰撞。敌人、子弹、Boss 弹、召唤物、伤害字、粒子都有上限。Boss 阶段不无限召唤普通怪。
 - Android WebView 锁横屏（`landscape`）。大厅/寻访/战场默认就是横版，不靠窗口先变成横的才切换。竖屏只保留射击操作并提示横持。
@@ -71,7 +71,7 @@
 
 ### 明确不做
 
-- 抽卡加攻击、加生命、加暴击。
+- 商店衣装加攻击、加生命、加暴击。寻访/构筑卡按星级加伤是正规则。
 - 每日任务、邮件、赛季、通行证、广告复活。
 - 联网账号与排行榜。
 - 换引擎，引 Vue / Phaser / 原神素材。
@@ -117,6 +117,8 @@
 ## 7. 寻访与名册
 
 实现：[`src/runtime/sakurayo-lobby.js`](../src/runtime/sakurayo-lobby.js)（`window.SakurayoLobby`）。
+
+局终 `grantBuildCard`：融合 > 转职分支 > 成型基础校 > 角色残件。同卡 `owned` 计数即星级，1–5 星按星乘算卡上伤害。失败电台 `playGoodnight46`。
 
 爆率与价格**不改**：
 
@@ -287,7 +289,7 @@ powershell -File tools/verify.ps1
 - `tests/testimony_smoke.mjs`
 - `tests/gacha_visual.mjs`（会出 932×430 截图到 `tests/artifacts/gacha/`，该目录 gitignore）
 
-改证词或寻访视觉时请单独跑这两项。`browser_smoke.mjs` 断言版本 `"4.6.0"`，主视口 430×932；竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。
+改证词或寻访视觉时请单独跑这两项。`browser_smoke.mjs` 断言版本 `"4.6.1"`，主视口 430×932；竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。
 
 发版（用户明确要求再做）：
 

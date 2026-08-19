@@ -1,5 +1,17 @@
 Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先阅读根目录的 AGENTS.md、README_FIRST.md 和 CODEX_TASK.md，基于 src/index.html 继续开发，不要使用旧版本文件。
 
+## 2026-08-19 结算构筑卡并星与晚安电台
+
+- 用户要求把角色抽卡素材用起来：失败电台播「晚安，小夜/绫/凛音」；局终把本局构筑卡发进仓库；同卡合并 1–5 星。
+- 用户随后明确：卡片可以加伤害，去掉「重复不加 / 卡不卖伤害」的过时设定。
+- 实现：`grantBuildCard` / `resolveBuildCard`；`applyOwnedBonus` 按星级乘算；仓库显星；结算用 `gacha/{id}.webp`。存档仍 `sakurayoV3`。
+
+## 2026-08-19 升补丁号 4.6.1
+
+- 用户要求把最新版本提升一个小级别，方便和 4.6.0 清虫包区分。
+- `VERSION` / `SAKURAYO_GAME_VERSION` / 运行时回退值 / Android `versionName` → 4.6.1；`versionCode` 61 → 62。
+- 存档键仍 `sakurayoV3`。玩法未改。未交 APK、未打 tag。
+
 ## 2026-07-11 自由方向与主神空间
 
 - 用户要求：枪械可自由随方向转动，刀剑只在挥砍扇形内造成伤害；三角色各有独立吐槽彩蛋；新增高难爽发育“主神空间”，奖励点强化仅在该副本跨局保留。

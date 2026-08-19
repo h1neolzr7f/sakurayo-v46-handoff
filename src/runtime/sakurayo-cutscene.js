@@ -1,7 +1,7 @@
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.0";
+  var VERSION = "4.6.1";
   var typing = null;
   var flashTimer = 0;
   var styleInjected = false;
