@@ -30,4 +30,8 @@
 
 ## 传说封面 #16（新开，等人认人）
 
-[#16](https://github.com/h1neolzr7f/sakurayo-v46-handoff/pull/16) `cursor/legend-art-5030` @ `4c8efe3`。只换 6 张传说。静的奢侈封面，绫枪放下。仍是 draft。你点过后再并。
+[#16](https://github.com/h1neolzr7f/sakurayo-v46-handoff/pull/16) `cursor/legend-art-5030` @ `4c8efe3`。只换 6 张传说。静的奢侈封面，绫枪放下。仍是 draft。额度用完则先不并，不挡打包。
+
+## 下一件：打包测试
+
+提示词 `docs/CURSOR_PROMPT_PACKTEST.md`。另开项目。不升 4.6.1，不交密钥，不卸正式包。
