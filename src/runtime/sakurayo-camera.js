@@ -36,11 +36,15 @@
     };
   }
 
-  function targetOf(px, py) {
+  function clampCam(x, y) {
     return {
-      x: (Number(px) || 0) - viewW * 0.5,
-      y: (Number(py) || 0) - viewH * 0.5,
+      x: clamp(x, 0, Math.max(0, worldW - viewW)),
+      y: clamp(y, 0, Math.max(0, worldH - viewH)),
     };
+  }
+
+  function targetOf(px, py) {
+    return clampCam((Number(px) || 0) - viewW * 0.5, (Number(py) || 0) - viewH * 0.5);
   }
 
   function snap(px, py) {
@@ -58,8 +62,9 @@
       return current();
     }
     var k = 1 - Math.exp(-DAMP * dt);
-    camX += (t.x - camX) * k;
-    camY += (t.y - camY) * k;
+    var held = clampCam(camX + (t.x - camX) * k, camY + (t.y - camY) * k);
+    camX = held.x;
+    camY = held.y;
     return current();
   }
 
