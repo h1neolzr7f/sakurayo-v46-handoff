@@ -332,6 +332,7 @@
     "html.landscape46 .wishHero46{left:-2%;width:46%;height:124%;bottom:-8%}" +
     "html.landscape46 .wishTitle46{right:4%;max-width:46%}" +
     "html.landscape46 .wishDock46,html.landscape46 .wishPity46{left:46%}" +
+    "html.landscape46 .wishPity46{bottom:max(240px,calc(env(safe-area-inset-bottom) + 220px));right:12px}" +
     "html.landscape46 #rosterWall46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
     "html.landscape46 #archiveDrawer .archiveDock46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
     "html.landscape46 #stageList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}" +

@@ -95,3 +95,35 @@
 三层：门A 待复跑 / Playwright视口 红（本类） / Android 无 adb。
 
 修完复跑：ops_unit 绿 / emu_loop 26 绿含「摇杆点不误部署」 / ops_smoke 绿。
+
+---
+
+## 轮 7
+
+自动打回：**未过。不要进入下一类。**
+层：Playwright视口
+类：hideTransient 不收 #warning，升级/剧情模态时 Boss 警告仍叠在卡上
+复现：spawnBossNow 后 triggerUpgrade，#level 与 #warning 同时可见
+上一轮为什么没发现：emu_loop 升级项只断言 dialogue/banter hidden，没断言 #warning；子智能体全游戏扫才点到 hideTransient 漏 warning。
+回归：`emu_loop` 升级模态时 #warning 必须 hidden；hideTransient 收 warning
+
+本轮新问题：模态层与场地警告叠字。
+变成哪条回归：emu_loop 升级时 warning hidden。
+
+修完复跑：emu_loop 26 绿（升级/Boss 降临后再升级均断言 warning hidden）。
+
+---
+
+## 轮 8
+
+自动打回：**未过。不要进入下一类。**
+层：Playwright视口
+类：寻访 .wishPity46 bottom:118px 与 .wishDock46 在矮横屏叠字
+复现：932×430 开寻访，保底条与底部抽卡坞重叠数千 px²
+上一轮为什么没发现：emu_loop 只量页签互叠和标题叠页签，没量 pity vs dock。
+回归：`emu_loop` 寻访保底条叠抽卡坞 area≤8
+
+本轮新问题：寻访保底条压抽卡按钮。
+变成哪条回归：emu_loop pityDock。
+
+修完复跑：emu_loop 26 绿（pityDock≤8）。

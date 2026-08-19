@@ -526,6 +526,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function hideTransient(){
     $("#banter").classList.add("hidden");
     $("#toast").classList.remove("show");
+    $("#warning").classList.add("hidden");
     banterBusy=false;toastBusy=false;
     clearTimeout(playBanter.t);clearTimeout(playToast.t);
   }
