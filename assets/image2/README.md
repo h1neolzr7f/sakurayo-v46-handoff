@@ -7,7 +7,8 @@
 - 17 个生成任务、233 个最终 WebP 文件已经写入 `asset_manifest.json`。
 - 17/17 个任务已通过 CLI `--dry-run` 参数检查。
 - 色键抠图、切格、统一画布、透明角检测和覆盖率检测已通过合成图集测试。
-- 正式生成需要本机环境变量 `OPENAI_API_KEY`；脚本不会打印或保存密钥。
+- 正式 Image2 生成需要本机环境变量 `OPENAI_API_KEY`；脚本不会打印或保存密钥。
+- Cursor `GenerateImage` 额度用尽后，开发期单张二次元立绘改走 NovelAI，见 [docs/NAI_PIPELINE.md](../../docs/NAI_PIPELINE.md)。Token 不进仓。
 
 ## 目录
 

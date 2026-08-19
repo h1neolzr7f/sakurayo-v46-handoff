@@ -63,7 +63,7 @@
 
 ### 下一步（按优先级）
 
-1. I2V 绿幕重出三角色站桩（需 infsh login）。现用 `battle.webp` / `live_idle` 静帧 + JS 动。
+1. I2V 绿幕重出三角色站桩（需 infsh login；开发期单张也可走 `tools/nai`）。现用 `battle.webp` / `live_idle` 静帧 + JS 动。
 2. 有独特动作的融合再补 `anim_skill.webp` / `anim_dash.webp`。缺图回退，不要借错融合的图。
 3. 寻访卡扩到 16 以内；`ui/lobby_wide.webp` 去左右黑边。
 4. 全量 `powershell -File tools/verify.ps1`（`browser_smoke` 主视口仍是 430×932）。
@@ -253,6 +253,7 @@ ART_ROOT =
 - 出图：无字、无水印。角色绿幕 `#00ff00`。
 - 新图同时考虑进 `game/art`；源 PNG 在 `assets/image2/source/`（本仓未收录）。
 - 规格见 [IMAGE2_ASSET_SPEC.md](IMAGE2_ASSET_SPEC.md)。
+- Image2 额度用尽后，开发期出图改走 NovelAI：`docs/NAI_PIPELINE.md`。Token 只放 `NOVELAI_TOKEN` 或 `secrets/novelai.token`，不进仓。游戏运行时仍不访问外网。
 - 已入库但未发版的包括：职业/融合闪图、三角色 career/form/fusion 战斗帧、`gacha/`、`ui/lobby_wide.webp`、寻访/名册/档案导航图。
 - 还缺：I2V 绿幕全身站桩、无缝大厅宽背景、部分融合的 skill/dash。
 
@@ -306,7 +307,7 @@ powershell -File android-app/sync-game.ps1
 - `*.apk`、`release/`
 - `tests/artifacts/`
 - `assets/image2/source/`、`processed/`、`previews/`
-- `.env`、`.cursor/`
+- `.env`、`.cursor/`、`secrets/novelai.token`、任何 Persistent API Token
 
 公开仓 `origin` 不要 force-push。本交接快照走 `private` remote。
 

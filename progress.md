@@ -1,5 +1,11 @@
 Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先阅读根目录的 AGENTS.md、README_FIRST.md 和 CODEX_TASK.md，基于 src/index.html 继续开发，不要使用旧版本文件。
 
+## 2026-08-19 NovelAI 开发期生图
+
+- GenerateImage 额度用尽；用户授权本项目使用其 NovelAI 会员直到失效，不再续费生图账号。
+- 落地 `tools/nai/`：本地 token、`check`/`dry-run`/`gen`、三角色绿幕站桩与大厅宽背景 jobs。Token 不进仓、不进聊天。
+- 游戏仍离线，不在运行时访问 NovelAI。
+
 ## 2026-07-11 自由方向与主神空间
 
 - 用户要求：枪械可自由随方向转动，刀剑只在挥砍扇形内造成伤害；三角色各有独立吐槽彩蛋；新增高难爽发育“主神空间”，奖励点强化仅在该副本跨局保留。

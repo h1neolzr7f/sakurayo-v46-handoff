@@ -1,5 +1,11 @@
 # 《樱夜·尸潮》下一版本 CHANGELOG
 
+## NovelAI 开发期生图（源码仍 4.6.0）
+
+- 内置 GenerateImage 额度用尽后，开发期出图改走用户 NovelAI 会员，用到失效为止。
+- 新增 `tools/nai/generate.py`：`check` / `dry-run` / `gen`。Token 只读环境变量或 `secrets/novelai.token`，不进 git。
+- 预设任务：三角色绿幕站桩 + 大厅宽背景。源 PNG 仍 gitignore，游戏运行时不访问 NovelAI。
+
 ## 第一期镜界寻访（源码仍 4.6.0，未下令不升 4.6.1）
 
 - 寻访三页：残片 / 时装 / 武器。价格 160 / 1440。软保 65、硬保 80、碎镜片 Spark 200。
