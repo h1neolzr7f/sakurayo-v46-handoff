@@ -27,6 +27,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.util.Locale;
 
 public final class MainActivity extends Activity {
@@ -56,6 +57,7 @@ public final class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         configureWindow();
+        ensureWebViewCacheDirs();
         webView = createWebView();
 
         FrameLayout root = new FrameLayout(this);
@@ -74,6 +76,13 @@ public final class MainActivity extends Activity {
             getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
                     android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT,
                     this::handleBackRequest);
+        }
+    }
+
+    private void ensureWebViewCacheDirs() {
+        File webViewCache = new File(getCacheDir(), "WebView");
+        if (!new File(webViewCache, "Crashpad").mkdirs() && !new File(webViewCache, "Crashpad").isDirectory()) {
+            Log.w(TAG, "WebView Crashpad cache dir unavailable");
         }
     }
 

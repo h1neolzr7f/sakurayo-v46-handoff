@@ -4863,6 +4863,14 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     banterBusy=false;toastBusy=false;toastQueue.length=0;
     clearTimeout(playBanter.t);clearTimeout(playToast.t);
   }
+  function hideCombatModals46(){
+    ["#dialogue","#event","#level","#paused","#storyBeat44"].forEach((sel)=>{
+      const node=$(sel);
+      if(node) node.classList.add("hidden");
+    });
+    window.SakurayoCutscene?.stopType?.();
+    window.SakurayoCutscene?.dismiss?.();
+  }
   function goodnightText46(){
     const names={sayo:"小夜",aya:"绫",rion:"凛音"};
     return "晚安，"+(names[save.character]||"小夜")+"。";
@@ -4893,8 +4901,6 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     radio.innerHTML="<b>雨宫凛</b><span>"+line+"</span>";
     radio.classList.remove("hidden");
     resultRadio46=true;
-    if($("#banter")) $("#banter").style.zIndex="40";
-    showBanter([["雨宫凛",line]],true);
     return line;
   }
   function showBanter(lines,force=false){
@@ -7186,7 +7192,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function finish(win) {
     if (state === "result") return;
     window.SakurayoCutscene?.stopVictory?.();
-    runWin=win;hideTransient();state="result";$("#hud").classList.add("hidden");
+    runWin=win;hideTransient();hideCombatModals46();state="result";$("#hud").classList.add("hidden");
     const testimony = typeof isTestimonyRun46 === "function" && isTestimonyRun46();
     if (!testimony) { save.kills += P.kills; save.best = Math.max(save.best, runTime); save.runs++; }
     const pay44 = window.SakurayoEconomy
@@ -10832,7 +10838,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   const _endingData36=endingData;endingData=function(){if(isMainGodRun36())return {name:`主神空间 T${selectedMainGodTier36} · 轮回存续`,text:"监察投影被击碎，白色大厅却没有关闭。奖励点和强化被保留，说明这不是一次挑战，而是一份仍在续签的轮回契约。"};return _endingData36();};
   const _spawnBoss36=spawnBoss;spawnBoss=function(){const result=_spawnBoss36();if(isMainGodRun36()&&boss){const mul=1+selectedMainGodTier36*.16;boss.hp*=mul;boss.max=boss.hp;boss.dmg*=1+selectedMainGodTier36*.08;boss.bossRes=boss.bossRes||{};boss.color="#d8a7ff";}return result;};
 
-  function finishMainGod36(win){if(state==="result")return;runWin=win;hideTransient();state="result";$("#hud").classList.add("hidden");const phasePoints=win?0:Math.max(0,Math.min(3,(boss?.phase||1)-1)),points=win?stage().pointReward+Math.min(4,P.eliteKills)+save.mainGod.sideKey*2:phasePoints;save.mainGod.points+=points;save.mainGod.runs++;save.kills+=P.kills;save.best=Math.max(save.best,runTime);save.runs++;if(win){save.mainGod.clears++;save.mainGod.bestTier=Math.max(save.mainGod.bestTier,selectedMainGodTier36);if(selectedMainGodTier36===4)save.mainGod.deepest=Math.max(save.mainGod.deepest||0,stage().depth||1);save.mainGod.unlockedTier=Math.min(4,Math.max(save.mainGod.unlockedTier,selectedMainGodTier36+1));}const ed=endingData(),top=Object.entries(P.damageSources).sort((a,b)=>b[1]-a[1])[0]?.[0]||"shot";save.runHistory.unshift({time:Date.now(),mode:"mainGod",tier:selectedMainGodTier36,depth:stage().depth||0,contract:P.mgContract?.id||null,challenge:P.mgChallenge?.id||null,challengeDone:!!P.mgChallengeDone,points,win,kills:P.kills,level:P.level,fusion:P.fusion,form:P.form,careers:careerSummary(),top,rank:P.plan?.rank||"?",ending:ed.name});save.runHistory=save.runHistory.slice(0,30);const buildReward=takeBuildReward46();persist();$("#ricon").textContent=win?"◈":"☠️";$("#rankBig").textContent=win?(P.plan?.rank||"S"):(runTime>stage().dur*.65?"B":"C");$("#rtitle").textContent=win?(selectedMainGodTier36===4?`无限回廊第 ${stage().depth} 层完成`:"主神试炼完成"):"轮回中断";$("#rsub").textContent=win?`本轮已结算；兑换强化保留，局内构筑清空。`:"失败不会清空既有主神兑换，Boss 阶段提供少量保底点。";$("#rstats").innerHTML=`坚持 <b>${fmt(runTime)}</b><br>击破 <b>${P.kills}</b> · 等级 <b>${P.level}</b><br>职业：<b>${careerSummary()}</b><br>契约：<b>${P.mgContract?.n||"未签署"}</b><br>挑战：<b>${P.mgChallenge?.n||"无"} ${P.mgChallengeDone?"✓":"×"}</b><br>本轮获得奖励点 <b style="color:var(--g)">◈ ${points}</b><br>主神账户余额 <b>◈ ${save.mainGod.points}</b>${buildCardRewardHtml46(buildReward)}`;renderRunReport();$("#result").classList.remove("hidden");sound(win?"win":"over");playGoodnight46(win);}
+  function finishMainGod36(win){if(state==="result")return;runWin=win;hideTransient();hideCombatModals46();state="result";$("#hud").classList.add("hidden");const phasePoints=win?0:Math.max(0,Math.min(3,(boss?.phase||1)-1)),points=win?stage().pointReward+Math.min(4,P.eliteKills)+save.mainGod.sideKey*2:phasePoints;save.mainGod.points+=points;save.mainGod.runs++;save.kills+=P.kills;save.best=Math.max(save.best,runTime);save.runs++;if(win){save.mainGod.clears++;save.mainGod.bestTier=Math.max(save.mainGod.bestTier,selectedMainGodTier36);if(selectedMainGodTier36===4)save.mainGod.deepest=Math.max(save.mainGod.deepest||0,stage().depth||1);save.mainGod.unlockedTier=Math.min(4,Math.max(save.mainGod.unlockedTier,selectedMainGodTier36+1));}const ed=endingData(),top=Object.entries(P.damageSources).sort((a,b)=>b[1]-a[1])[0]?.[0]||"shot";save.runHistory.unshift({time:Date.now(),mode:"mainGod",tier:selectedMainGodTier36,depth:stage().depth||0,contract:P.mgContract?.id||null,challenge:P.mgChallenge?.id||null,challengeDone:!!P.mgChallengeDone,points,win,kills:P.kills,level:P.level,fusion:P.fusion,form:P.form,careers:careerSummary(),top,rank:P.plan?.rank||"?",ending:ed.name});save.runHistory=save.runHistory.slice(0,30);const buildReward=takeBuildReward46();persist();$("#ricon").textContent=win?"◈":"☠️";$("#rankBig").textContent=win?(P.plan?.rank||"S"):(runTime>stage().dur*.65?"B":"C");$("#rtitle").textContent=win?(selectedMainGodTier36===4?`无限回廊第 ${stage().depth} 层完成`:"主神试炼完成"):"轮回中断";$("#rsub").textContent=win?`本轮已结算；兑换强化保留，局内构筑清空。`:"失败不会清空既有主神兑换，Boss 阶段提供少量保底点。";$("#rstats").innerHTML=`坚持 <b>${fmt(runTime)}</b><br>击破 <b>${P.kills}</b> · 等级 <b>${P.level}</b><br>职业：<b>${careerSummary()}</b><br>契约：<b>${P.mgContract?.n||"未签署"}</b><br>挑战：<b>${P.mgChallenge?.n||"无"} ${P.mgChallengeDone?"✓":"×"}</b><br>本轮获得奖励点 <b style="color:var(--g)">◈ ${points}</b><br>主神账户余额 <b>◈ ${save.mainGod.points}</b>${buildCardRewardHtml46(buildReward)}`;renderRunReport();$("#result").classList.remove("hidden");sound(win?"win":"over");playGoodnight46(win);}
   const _finish36=finish;finish=function(win){if(isMainGodRun36())return finishMainGod36(!!win);return _finish36(win);};
   const _damagePlayer36=damagePlayer;damagePlayer=function(amount){return _damagePlayer36(amount*(P.lordRisk||1));};
 
