@@ -100,6 +100,34 @@ async function runViewport(width, height, tag) {
   await page.locator('#gachaTabs46 [data-pool="fashion"]').click();
   await page.locator('#gachaTabs46 [data-pool="weapon"]').click();
   await page.locator('#gachaTabs46 [data-pool="remnant"]').click();
+  const gachaHit = await page.evaluate(() => {
+    function box(el) {
+      const r = el.getBoundingClientRect();
+      return { x: r.x, y: r.y, w: r.width, h: r.height };
+    }
+    function overlap(a, b) {
+      const w = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
+      const h = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y);
+      return w > 1 && h > 1 ? w * h : 0;
+    }
+    const tabs = [...document.querySelectorAll("#gachaTabs46 [data-pool]")];
+    const title = document.querySelector(".wishTitle46 h3");
+    const hits = tabs.map((btn) => {
+      const r = btn.getBoundingClientRect();
+      const el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      return !!(el && (el === btn || btn.contains(el)));
+    });
+    let tabOverlap = 0;
+    let titleOverlap = 0;
+    for (let i = 0; i < tabs.length; i++) {
+      for (let j = i + 1; j < tabs.length; j++) tabOverlap = Math.max(tabOverlap, overlap(box(tabs[i]), box(tabs[j])));
+      if (title) titleOverlap = Math.max(titleOverlap, overlap(box(title), box(tabs[i])));
+    }
+    return { hits, tabOverlap, titleOverlap };
+  });
+  assert.deepEqual(gachaHit.hits, [true, true, true], `${tag} 寻访三页必须点得中`);
+  assert.ok(gachaHit.tabOverlap <= 8, `${tag} 寻访页签叠字 area=${gachaHit.tabOverlap}`);
+  assert.ok(gachaHit.titleOverlap <= 20, `${tag} 寻访标题叠页签 area=${gachaHit.titleOverlap}`);
   await shot(page, `${tag}-gacha.png`);
   await page.locator("#gachaDrawer .close").click();
   await api(page, "openDrawer", "roster");
@@ -110,8 +138,11 @@ async function runViewport(width, height, tag) {
   assert.match(text, /黑羽凛音 · 未署名的刀/);
   assert.equal(text.includes("三角色"), false);
   assert.equal(await page.locator(".chronicleCard46").count(), 13);
+  await page.locator(".chronicleCard46").first().click({ force: true });
   await page.locator('#rosterTabs46 [data-roster="scrap"]').click();
   assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 8);
+  const wallBox = await page.locator("#rosterWall46").boundingBox();
+  assert.ok(wallBox && wallBox.height >= 40, `${tag} 编年点回残件不能空墙`);
   await shot(page, `${tag}-roster.png`);
   await page.locator("#rosterDrawer .close").click();
   await page.locator('[data-open="shop"]').click();
