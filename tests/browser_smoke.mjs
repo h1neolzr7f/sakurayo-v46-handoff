@@ -298,8 +298,9 @@ try {
   assert.match(await page.locator("#rosterDrawer").textContent(), /待寻访/);
   assert.equal(await page.locator("#rosterDrawer").textContent().then((t) => t.includes("星核机甲少女")), false);
   await page.locator('#rosterTabs46 [data-roster="fusion"]').click();
-  assert.match(await page.locator("#rosterDrawer").textContent(), /后续写入/);
-  assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 0);
+  assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 24);
+  assert.match(await page.locator("#rosterDrawer").textContent(), /待寻访/);
+  assert.equal(await page.locator("#rosterDrawer").textContent().then((t) => t.includes("后续写入")), false);
   assert.equal(await page.locator("#rosterDrawer").textContent().then((t) => /星核机甲|血炼剑仙|瘟炼菌海/.test(t)), false);
   await page.locator('#rosterTabs46 [data-roster="fashion"]').click();
   assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 12);
