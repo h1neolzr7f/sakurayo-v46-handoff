@@ -355,6 +355,41 @@ try {
   pass("证词升级 toast 不压 mission");
   await toastCtx.close();
 
+  const modeCtx = await browser.newContext({ viewport: { width: 932, height: 430 }, hasTouch: true });
+  const modePage = await modeCtx.newPage();
+  await waitMenu(modePage);
+  await api(modePage, "openDrawer", "stage");
+  await modePage.locator('#modeBar46 [data-mode="testimony"]').click();
+  await modePage.locator("#stageDrawer .close").click();
+  await modePage.locator("#start").click();
+  if (await modePage.locator("#tutorialDrawer37").isVisible()) await modePage.locator("#tutorialSkip37").click();
+  await api(modePage, "dismissDialogue");
+  await api(modePage, "protectPlayer");
+  await api(modePage, "freezeProgression");
+  await api(modePage, "triggerUpgrade");
+  const testimonyUi = await modePage.evaluate(() => ({
+    levelOpen: !document.querySelector("#level").classList.contains("hidden"),
+    toast: document.querySelector("#toast")?.textContent || "",
+    hud: document.querySelector("#stageHud")?.textContent || "",
+  }));
+  assert.equal(testimonyUi.levelOpen, false, "关卡胶囊选证词后出击不得再弹升级卡");
+  assert.match(testimonyUi.toast + testimonyUi.hud, /证词/);
+  await api(modePage, "backMenu");
+  await api(modePage, "openDrawer", "stage");
+  await modePage.locator('#modeBar46 [data-mode="mainGod"]').click();
+  await modePage.locator("#stageDrawer .close").click();
+  await modePage.locator("#start").click();
+  const mainGodUi = await modePage.evaluate(() => ({
+    menu: !document.querySelector("#menu").classList.contains("hidden"),
+    toast: document.querySelector("#toast")?.textContent || "",
+    playing: JSON.parse(window.render_game_to_text()).mode,
+  }));
+  assert.equal(mainGodUi.menu, true, "主神胶囊未点进入轮回时出击必须留在大厅");
+  assert.notEqual(mainGodUi.playing, "play");
+  assert.match(mainGodUi.toast, /进入轮回/);
+  pass("关卡胶囊出击写入正确模式");
+  await modeCtx.close();
+
   await runViewport(430, 932, "p430");
   await runViewport(932, 430, "l932");
   const thin = await browser.newContext({ viewport: { width: 600, height: 400 }, hasTouch: true });
