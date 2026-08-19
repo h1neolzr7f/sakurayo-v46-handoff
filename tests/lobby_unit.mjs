@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import vm from "node:vm";
@@ -39,6 +40,52 @@ assert.equal(L.FASHION_CARDS.length, 12);
 assert.equal(L.WEAPON_CARDS.length, 12);
 assert.ok(L.FASHION_CARDS.filter((card) => card.legend).map((card) => card.id).join(",").includes("fashion_sayo_crown"));
 assert.ok(L.WEAPON_CARDS.filter((card) => card.legend).map((card) => card.id).join(",").includes("weapon_sayo_final"));
+assert.equal(L.cardOf("fashion_sayo_crown").n, "终夜樱冠");
+assert.equal(L.cardOf("fashion_aya_funeral").n, "零号葬仪");
+assert.equal(L.cardOf("fashion_rion_bride").n, "黄泉花嫁");
+assert.equal(L.cardOf("weapon_sayo_final").n, "夜樱终弹");
+assert.equal(L.cardOf("weapon_aya_mirror").n, "月切·镜反");
+assert.equal(L.cardOf("weapon_rion_burial").n, "黑羽葬");
+function hanziCount(line) {
+  return [...line].filter((ch) => /[\u4e00-\u9fff]/.test(ch)).length;
+}
+assert.ok([...L.FASHION_CARDS, ...L.WEAPON_CARDS].every((card) => Array.isArray(card.lore) && card.lore.length === 4));
+assert.ok([...L.FASHION_CARDS, ...L.WEAPON_CARDS].every((card) => card.lore.every((line) => hanziCount(line) > 8)));
+const collageIds = [
+  "fashion_sayo_plain","fashion_sayo_neon","fashion_sayo_night",
+  "fashion_aya_suit","fashion_aya_coat","fashion_aya_veil",
+  "fashion_rion_keiko","fashion_rion_haori","fashion_rion_bloom",
+  "weapon_sayo_spare","weapon_sayo_petal","weapon_aya_side","weapon_aya_twin",
+  "weapon_rion_wood","weapon_rion_under","weapon_mirror_round","weapon_shard_blade","weapon_radio_bat",
+];
+function gachaArt(id) {
+  return path.join(root, "android-app/app/src/main/assets/game/art/gacha", id + ".webp");
+}
+function artHash(id) {
+  return createHash("sha256").update(fs.readFileSync(gachaArt(id))).digest("hex");
+}
+collageIds.forEach((id) => {
+  assert.equal(fs.existsSync(gachaArt(id)), true, "missing " + id);
+  assert.ok(fs.statSync(gachaArt(id)).size > 8000, id + " too small");
+});
+assert.notEqual(artHash("fashion_sayo_neon"), artHash("weapon_radio_bat"), "霓虹不得再等于电台短棍");
+assert.notEqual(artHash("fashion_rion_keiko"), artHash("weapon_rion_wood"), "稽古不得再等于无铭木刀");
+assert.equal(new Set(collageIds.map(artHash)).size, collageIds.length, "18 张必须互不相同");
+const keepHashes = {
+  fashion_sayo_crown: "b313dd1872cdf4793d138d5c8d9490d8357a9348ace5b3deb3c656f039a1484f",
+  fashion_aya_funeral: "5d07014661d7d90ec4cd6febf944a3b2538c6e5dc5c08e6829ae747cabb9cdea",
+  fashion_rion_bride: "abf79d5ae6e1ce299dda578bf6c88d80580fe85b18f1e3c5c899e3dde28e03f1",
+  weapon_sayo_final: "8f8b58bb150a2253b94e2dca43d0bfe4a2f96ebe5fbfdb8907060632729a7e38",
+  weapon_aya_mirror: "04c2bc41f4d71aa9691735de6e04937488b3fed3715910ff4de03d3f86ff75dc",
+  weapon_rion_burial: "544626968de7ff0f184e186370a26839ffd0908c3c655ed5cdb8771a354b20d5",
+  sayo_echo: "a1f99f31bf5c4c2e8059cde650dc40cd0d9ef97533aabb2c0f3e62f6ce614409",
+  school_shrine: "3f3c6a3ce029e954b916b18cc3d1d55bdfe7283f8a1111d330cb3fc8b6131abc",
+  job_garden: "3970b76d407c313c22b49efacd7ef9b62b2ca7da376f5c0376f877fa15220a6c",
+  fusion_shadowmage: "330ee35b19708ed7a422fdcf50009e019903e200f74f5d48b33e82a80a0061f6",
+};
+Object.entries(keepHashes).forEach(([id, sha]) => {
+  assert.equal(artHash(id), sha, id + " hash changed");
+});
 assert.equal(L.RATES.single, 160);
 assert.equal(L.RATES.ten, 1440);
 assert.equal(L.RATES.SSR, 0.01);
