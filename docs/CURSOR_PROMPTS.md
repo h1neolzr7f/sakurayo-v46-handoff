@@ -2,7 +2,7 @@
 
 用法：同一仓库开三个对话。大脑贴「提示词〇」。A 只开一个对话贴「提示词 A」。B 按切片开多个对话，每个都贴「提示词 B」，只改切片那一行。
 
-卡池一二三期已进 `main`（第三期 `4176014`）。版本仍 4.6.0。下一轮不要再加伤。怎么开见 [AUTORUN_NEXT.md](AUTORUN_NEXT.md)。
+卡池一二三期已进 `main`（第三期 `4176014`）。下一轮三份也已进 `main`（`0af3809`）。版本仍 4.6.0。不要再开第四期加伤。入库记录见 [NEXT_REVIEW.md](NEXT_REVIEW.md)。
 
 - **镜头大地图**（先开）：[CURSOR_PROMPT_CAMERA.md](CURSOR_PROMPT_CAMERA.md)
 - **换 18 张拼卡**：[CURSOR_PROMPT_FASHION.md](CURSOR_PROMPT_FASHION.md)
