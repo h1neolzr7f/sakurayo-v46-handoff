@@ -232,6 +232,7 @@ pity, pitySR, pulls, tenPulls, owned, last, cheatUsed
 ```
 sakurayo-content-runtime.js
 sakurayo-lifecycle.js
+sakurayo-camera.js
 sakurayo-cutscene.js
 sakurayo-economy.js
 sakurayo-lobby.js

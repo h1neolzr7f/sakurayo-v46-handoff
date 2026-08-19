@@ -17,6 +17,8 @@ Invoke-Step "syntax economy" { node --check src/runtime/sakurayo-economy.js }
 Invoke-Step "syntax lobby" { node --check src/runtime/sakurayo-lobby.js }
 Invoke-Step "syntax live" { node --check src/runtime/sakurayo-live.js }
 Invoke-Step "syntax ops" { node --check src/runtime/sakurayo-ops.js }
+Invoke-Step "syntax camera" { node --check src/runtime/sakurayo-camera.js }
+Invoke-Step "camera unit" { node tests/camera_unit.mjs }
 Invoke-Step "lobby unit" { node tests/lobby_unit.mjs }
 Invoke-Step "live unit" { node tests/live_unit.mjs }
 Invoke-Step "ops unit" { node tests/ops_unit.mjs }

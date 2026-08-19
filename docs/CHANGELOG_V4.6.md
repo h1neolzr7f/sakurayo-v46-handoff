@@ -19,6 +19,7 @@
 - C 期玩法骨架：局内 DP + 最多 2 名干员钉地。小夜/绫/凛音互为可部署名单，证词模式关闭。开火走现有 `pushBullet`/`aoe`，`source:"summon"`，不进宠物数组、不卖永久伤害。左下 `#opsDock46`，数字键 1/2 可部署。挂 `combat:after-update`，没有再包 `update`。
 - 横屏才是主界面和主战场：Android 锁 `landscape`。`html.landscape46` 默认就在，大厅/寻访左右分栏不再等窗口先变成横的。竖屏只保留射击操作并提示横持。画布跟 `visualViewport` 铺满。
 - 仿 Live2D 按 Cubism 教程重做：眨眼用 Mean 2.5s ±2s，不再 5.4s 死循环；注视跟指针并阻尼回正；点头/点身各有一段淡入淡出动作。立绘去掉多层 `drop-shadow`/`blur`，抽屉不再整屏 backdrop-filter。`html.landscape46` 按宽高比铺横屏，不单靠 orientation 媒体查询。
+- 局内镜头大地图：世界 4×2 视口（8 屏），角色居中跟随，怪从当前视口外刷。卡池未改。
 
 ## 未做（下一期）
 
