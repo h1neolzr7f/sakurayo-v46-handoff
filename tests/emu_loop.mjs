@@ -48,6 +48,15 @@ async function startRun(page, id) {
   await api(page, "selectCharacter", id);
   await api(page, "start");
   if (await page.locator("#tutorialDrawer37").isVisible()) await page.locator("#tutorialSkip37").click();
+  const talking = await page.evaluate(() => {
+    const dlg = document.querySelector("#dialogue");
+    const dock = document.querySelector("#opsDock46");
+    return {
+      open: !!(dlg && !dlg.classList.contains("hidden")),
+      dockOn: !!(dock && !dock.hidden),
+    };
+  });
+  if (talking.open) assert.equal(talking.dockOn, false, "剧情模态时干员坞必须收起");
   await api(page, "dismissDialogue");
   await api(page, "protectPlayer");
   await api(page, "freezeProgression");
@@ -171,7 +180,18 @@ async function runViewport(width, height, tag) {
 
   for (const id of ["sayo", "aya", "rion"]) {
     await startRun(page, id);
-    await page.evaluate(() => window.advanceTime(10000));
+    if (id === "sayo") {
+      await page.evaluate(() => window.advanceTime(400));
+      const hintDup = await page.evaluate(() => {
+        const toast = document.querySelector("#toast");
+        const mission = document.querySelector("#mission");
+        const t = toast && toast.classList.contains("show") ? String(toast.textContent || "").trim() : "";
+        const m = String(mission?.textContent || "").trim();
+        return { t, same: !!(t && m && m.includes(t)) };
+      });
+      assert.equal(hintDup.same, false, `${tag} 开局 toast 不得复述 mission：${hintDup.t}`);
+    }
+    await page.evaluate((ms) => window.advanceTime(ms), id === "sayo" ? 9600 : 10000);
     const s = await snap(page);
     assert.equal(s.mode, "play", `${tag} ${id} mode`);
     assert.ok(s.counts.enemies > 0, `${tag} ${id} 10秒看不见怪`);
@@ -247,6 +267,18 @@ async function runViewport(width, height, tag) {
 
   await api(page, "spawnBossNow");
   await api(page, "dismissDialogue");
+  await page.evaluate(() => window.advanceTime(50));
+  const ruleOverlap = await page.evaluate(() => {
+    const a = document.querySelector("#bossRule39");
+    const b = document.querySelector("#mission");
+    if (!a || !b || a.classList.contains("hidden")) return 0;
+    const r = a.getBoundingClientRect();
+    const m = b.getBoundingClientRect();
+    const w = Math.min(r.right, m.right) - Math.max(r.left, m.left);
+    const h = Math.min(r.bottom, m.bottom) - Math.max(r.top, m.top);
+    return w > 1 && h > 1 ? w * h : 0;
+  });
+  assert.ok(ruleOverlap <= 8, `${tag} Boss 规则条不得压 mission，重叠 ${ruleOverlap}`);
   await api(page, "triggerUpgrade");
   if ((await snap(page)).mode === "level") {
     assert.equal(await page.locator("#warning").evaluate((n) => n.classList.contains("hidden")), true, `${tag} Boss 警告不得压在升级卡上`);

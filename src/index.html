@@ -2773,7 +2773,6 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       showBanter(["雨宫凛", radio44 || "电台接通。你负责走位，构筑去暂停页看。"], true);
       if (hint44 && !P.banterSeen.has("ground44")) {
         P.banterSeen.add("ground44");
-        toast(hint44);
       }
       last = performance.now();
       scheduleLoop();
@@ -3335,6 +3334,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       let cb = dialogueDone;
       dialogueDone = null;
       cb?.();
+      if (typeof opsPaint46 === "function") opsPaint46();
       return;
     }
     let l = dialogueQueue.shift();
@@ -6617,7 +6617,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   };
   document.body.classList.toggle("noContrast39",!save.settings.contrast);document.body.classList.toggle("richUi39",!save.settings.uiCalm);
   ensureBossRule39();installCalmMenu39();
-  style37.textContent+=`.bossRule39{position:absolute;z-index:16;top:112px;left:50%;transform:translateX(-50%);max-width:min(78vw,410px);padding:7px 12px;border-radius:999px;background:#090716df;border:1px solid #ff72b577;color:#fff;font:800 11px/1.25 system-ui;text-align:center;pointer-events:none}.calmUtility39{display:grid!important;grid-template-columns:1fr!important}.calmUtility39>button:not(#moreButton39){display:none}.calmUtility39.open39{grid-template-columns:repeat(2,1fr)!important}.calmUtility39.open39>#moreButton39{grid-column:1/-1}.calmUtility39.open39>button{display:block!important}.recap39{border-color:#65d9cf55!important;background:#0b1720cc!important}.settingGroup39{display:grid;gap:8px}.richUi39 .calmUtility39{grid-template-columns:repeat(2,1fr)!important}.richUi39 .calmUtility39>button{display:block!important}.noContrast39 .bossRule39{opacity:.86}@media(max-height:720px){.bossRule39{top:96px;font-size:10px;max-width:72vw}}`;
+  style37.textContent+=`.bossRule39{position:absolute;z-index:16;top:138px;left:50%;transform:translateX(-50%);max-width:min(78vw,410px);padding:7px 12px;border-radius:999px;background:#090716df;border:1px solid #ff72b577;color:#fff;font:800 11px/1.25 system-ui;text-align:center;pointer-events:none}.calmUtility39{display:grid!important;grid-template-columns:1fr!important}.calmUtility39>button:not(#moreButton39){display:none}.calmUtility39.open39{grid-template-columns:repeat(2,1fr)!important}.calmUtility39.open39>#moreButton39{grid-column:1/-1}.calmUtility39.open39>button{display:block!important}.recap39{border-color:#65d9cf55!important;background:#0b1720cc!important}.settingGroup39{display:grid;gap:8px}.richUi39 .calmUtility39{grid-template-columns:repeat(2,1fr)!important}.richUi39 .calmUtility39>button{display:block!important}.noContrast39 .bossRule39{opacity:.86}@media(max-height:720px){.bossRule39{top:132px;font-size:10px;max-width:72vw}}`;
 
   /* ================= V4.0 内测轮回：后门、普通商店与纯初始挑战 ================= */
   const BETA40=TEST_MODE||new URLSearchParams(location.search).has("beta"),BASE_STAGE_DUR40=ST.map(s=>s.dur);
@@ -7598,7 +7598,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const dock=opsDock46();
     if(!O||!dock)return null;
     const hudOn=!!$("#hud")&&!$("#hud").classList.contains("hidden");
-    const on=hudOn&&O.enabled(runMode36)&&(state==="play"||state==="dialogue"||state==="paused");
+    const on=hudOn&&O.enabled(runMode36)&&state==="play";
     dock.hidden=!on;
     if(on)O.renderDock(dock,save.character||P.character||"sayo",artUrl);
     return O.snapshot();
