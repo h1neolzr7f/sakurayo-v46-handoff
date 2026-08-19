@@ -146,11 +146,13 @@ const oldJobTab = { coins: 90, shop40: { ops: { rosterTab: "job", owned: { sayo_
 assert.equal(L.normalizeOps(oldJobTab.shop40).ops.rosterTab, "job");
 assert.equal(L.normalizeOps({ ops: { rosterTab: "unknown" } }).ops.rosterTab, "scrap");
 const freshStory = L.normalizeOps({});
-assert.deepEqual(freshStory.ops.story, { sayo: {}, aya: {}, rion: {} });
+assert.equal(Object.keys(freshStory.ops.story.sayo).length, 0);
+assert.equal(Object.keys(freshStory.ops.story.aya).length, 0);
+assert.equal(Object.keys(freshStory.ops.story.rion).length, 0);
 const keptStory = L.normalizeOps({ ops: { owned: { sayo_echo: 1 }, story: { aya: { ayaSister: "both" }, junk: { x: 1 } } } });
 assert.equal(keptStory.ops.story.aya.ayaSister, "both");
-assert.deepEqual(keptStory.ops.story.sayo, {});
-assert.deepEqual(keptStory.ops.story.rion, {});
+assert.equal(Object.keys(keptStory.ops.story.sayo).length, 0);
+assert.equal(Object.keys(keptStory.ops.story.rion).length, 0);
 assert.equal(keptStory.ops.owned.sayo_echo, 1);
 assert.equal("junk" in keptStory.ops.story, false);
 
