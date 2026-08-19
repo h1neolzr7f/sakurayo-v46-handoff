@@ -28,3 +28,6 @@ A/B 每轮追加一行，不准删旧记录。
 | 2026-08-19 | 三期 | 刀3 加成与保底 | resetP 融合 +0.8% 重复不加；upgradeWeight 在 job ×1.5 后再 pair ×1.6。want=SSR 落到融合桶，优先未拥有，禁止残件/转职。lobby_unit：24 张、仓库融合页、分布 1%～8% SSR、硬保是融合、Spark 能点融合。 | static/lobby/live/ops 绿 | — | 刀4清虫 |
 | 2026-08-19 | 三期 | 刀4 清虫 | 门 A 全绿：static / lobby / live / ops / framework / browser 51。无新 P0/P1。未升 4.6.1。未交 APK。 | 门A绿 | — | 停，等人认人 24 张后收工 |
 | 2026-08-19 | 三期 | 认人打回 | 只换 fusion_shadowmage（腰前伸枪、裂镜无第二张脸）和 fusion_necrospore（魂菇从肩上长、刀当杖、嫌恶带倦）。其余 22 张与 0b992ff 同哈希。逻辑/测试未动。 | 目视两张过打回点 | 枪口对镜+裂镜第二张脸；自检写肩菇图是捧菇 | 等人再过这两张，勿合并 |
+| 2026-08-19 | B | 绫/凛音编年 | 编年仍一个页签、三段标题。小夜五条不动。绫三条（签名救援 / 人格拆件 / 碎镜只够一个人），凛音三条（道场失联 / 无名名册 / 活人的道场）。数据在 sakurayo-chronicle.js，未改 lobby.js。 | 文案自检过；等接线验收 | 圣经写「短编年后补」 | 换拼卡勿碰本文件 |
+| 2026-08-19 | B | 编年页签点击 | 包装后整页 innerHTML 会冲掉仓库页签。改成只往 chronicleBox insertAdjacentHTML。 | chronicle/lobby/static/framework 绿；browser_smoke 51 绿 | 首交只测了卡片数没点回残件 | 停，等验收 |
+| 2026-08-19 | B | 编年锁死 4+4 | 按 PR#13 评论改围栏：绫作废的工号四条、凛音未署名的刀四条。旧 3+3 id 删除。顶栏不改三角色。未动 lobby.js 小夜五条。 | chronicle/lobby/live/ops/static 绿；browser_smoke 51 绿 | 首交自拟 3+3 | 停，等再验 |
