@@ -261,3 +261,5 @@
 变成哪条回归：emu_loop 无效融合结算不写 undefined + 五房探针。
 
 修完复跑：static 绿 / emu_loop 37 绿含五房探针与无效融合文案 / 寻访名册商店主神本轮无新 P0/P1。
+
+打包（未升 4.6.1、未交 APK）：`release/樱夜尸潮_V4.6.0_单文件.html` SHA-256 `b509755294730094c266865cbfa4b36999bd3701cd53988133e59f527c24ca8f`，与 Android assets 一致。`release/` gitignore，不进仓。
