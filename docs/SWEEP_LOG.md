@@ -35,3 +35,5 @@ A/B 每轮追加一行，不准删旧记录。
 | 2026-08-19 | 换拼卡 | 刀1 18张图 | 18 张 768×1024 生成图，互不相同；两对已拆。见 docs/FASHION_FACE_CHECK.md。未覆盖旧 8/14/28/24/传说/公共图。 | 自检 18/18 能报出人；两对哈希不同 | 拼卡复用同一张图 | 刀2 四段 |
 | 2026-08-19 | 换拼卡 | 刀2 四段 | 12+12 lore 各 4 句，每句汉字>8；传说只加长不改标题。lobby_unit 加汉字/体积/拆对/传说哈希。 | lobby 绿 | 旧四段多句≤8 | 刀3 门A |
 | 2026-08-19 | 换拼卡 | 刀3 门A | static / lobby / live / ops 绿。framework/browser 本环境无 Playwright，未跑。未升 4.6.1。未交 APK。停，等人认人 18 张。 | 门A 能跑的全绿 | 云端缺 Playwright | 等人认人后收工 |
+| 2026-08-19 | 打包测试 | 刀0–5 | 从 main@0af3809 打测试包。门 A 全绿（static/check/lobby/live/ops/chronicle/camera + framework 8 + browser 52）。壳已同步 Camera/Chronicle/三页寻访。HTML `/tmp/sakurayo-460-test.html` SHA-256 `18ee4eb9…ccfacfc`。门 C 13 绿。无新 P0/P1（未改玩法）。未升 4.6.1。未交 APK。 | 门A/C绿 | 轮1误把教程门和 camX 浮点尘当红，已写入 packtest_gatec | 停，等人收工 |
+| 2026-08-19 | 打包测试 | 实测修 | Chrome 430×932 HTTP 实玩。4×2 每格重画战场图导致左缘拼缝/半屏裂开；竖屏战斗「请横持」压 HUD。改成世界只铺一张图，战斗中藏提示。lifecycle_unit + 门 C 绿。HTML SHA `e25ff5bd…831804717`。未升 4.6.1。 | 门A/C绿 | 门 C 只断言 camX，没采像素/提示层 | 继续给人收工 |
