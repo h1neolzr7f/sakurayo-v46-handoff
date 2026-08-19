@@ -1,6 +1,10 @@
 # V4.6 — 横屏大厅与镜界寻访
 
-当前源码 **4.6.1**。versionCode 62。未交 APK。
+当前源码 **4.6.2**。versionCode 63。
+
+## 4.6.2 — 2026-08-19
+
+证词与演习彻底分账：结算不写 `done` / `unlock` / `endings` / 构筑卡，也不累加 `kills` / `runs` / `best`，不跑 `checkAch()`，局内不点 `lv12` / `flaw` / `phasebreak`。跨章回声按模式分袋。局内存档只在大厅刷新。隐藏关通关标题用完美结局名。`plan` 文案对上稳定度 +8。versionCode 63。存档仍 `sakurayoV3`。
 
 ## 4.6.1 — 2026-08-19
 
