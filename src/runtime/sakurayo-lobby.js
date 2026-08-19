@@ -26,7 +26,7 @@
 
   var DEFAULT_SHOWN = Object.freeze(["sayo_echo", "aya_petal"]);
   var POOL_IDS = Object.freeze(["remnant", "fashion", "weapon"]);
-  var ROSTER_TABS = Object.freeze(["scrap", "school", "fashion", "weapon"]);
+  var ROSTER_TABS = Object.freeze(["scrap", "school", "job", "fusion", "fashion", "weapon"]);
   var RARITY_RANK = Object.freeze(["SSR", "SR", "R", "N"]);
 
   var CARDS = Object.freeze([
@@ -91,6 +91,36 @@
     { id: "school_gene", n: "未归·基因凛音", r: "R", kind: "school", tag: "基础", school: "gene", face: "rion", dmg: 0.003, d: "再生没跑过突变。拥有即基因倾向 ×1.3。", lore: ["我是被改过刀法和血的凛音。再生写在合同里，突变写在肉里。", "实验室的灯和鸟居的灯一起亮。我用刀压住往外长的那只手臂。", "再生追上伤口，没追上镜裂。红晶比皮肤先成为我。", "刀还认得手。手不太认得我。"] },
     { id: "school_summon", n: "未归·召唤凛音", r: "R", kind: "school", tag: "基础", school: "summon", face: "rion", dmg: 0.003, d: "契约反噬。拥有即召唤倾向 ×1.3。", lore: ["我是把影子当部下的凛音。契约纸比刀快，反噬比部下快。", "我在腕上缠满符。刀尖指着该来的东西，它从背后先来。", "契约反咬署名。红线勒进刀柄，影子比我更高。", "符烧完了。部下还在，主人不在。"] },
   ]);
+  var JOB_CARDS = Object.freeze([
+    { id: "job_swarm", n: "未归·蜂群统御", r: "SR", kind: "job", tag: "转职", school: "mech", face: "sayo", dmg: 0.005, d: "无人机成群却不听令。拥有即机械师倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是把蜂群写成姐姐的那一版机械师小夜。无人机比我先学会排队，也比我先学会离开。", "我把步枪焊进指挥频段。每一架都画上樱花，像给妹妹系一条还会断的红绳。", "蜂群选择了镜核的热源。我按召回，屏幕只回一行冷字：这一夜已经无主。", "螺旋桨还在远处响。遥控器烫得握不住，像握着别人的失败。"] },
+    { id: "job_railLord", n: "未归·天穹磁轨", r: "SR", kind: "job", tag: "转职", school: "mech", face: "sayo", dmg: 0.005, d: "轨道比步枪更直也更容易折。拥有即机械师倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是想用磁轨把夜空钉住的机械师小夜。轨道比步枪更直，也比人更容易折在半空。", "我沿着天穹一节一节铺轨，焊到鸟居那么高。无人机当铆钉，人当绝缘体。", "磁轨先吸走弹壳，再吸走准星。轨道自己弯向镜核，把我留在地上。", "铁还在震。我的手已经对不上极性，像对不上自己的名字。"] },
+    { id: "job_hive", n: "未归·万菌母巢", r: "SR", kind: "job", tag: "转职", school: "spore", face: "sayo", dmg: 0.005, d: "孢子认镜子不认姓。拥有即菌群倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是想成为母巢本身的菌群小夜。孢子只认镜子里的热，不认我写在袖口的姓。", "我把菌丝编进步枪握把，让它们跟我一起呼吸。它们发光，像另一层不肯听话的皮肤。", "母巢选择了更热的核。我被当成过期的培养基，从胸口往外被吃空。", "蘑菇还在肩上亮。我的名字已经发酵完了，只剩甜得发苦的气味。"] },
+    { id: "job_garden", n: "未归·尸骸花园", r: "SR", kind: "job", tag: "转职", school: "spore", face: "sayo", dmg: 0.005, d: "花开在别人身上。拥有即菌群倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是把尸体当成花圃的菌群小夜。花开在别人身上，种子却不肯回到我手里。", "我一路种花，从神社石阶开到剑冢门口。步枪当锄，孢子当一场不肯停的雨。", "花园先吞掉脚印，再吞掉园丁。镜核从花心里长出来，比任何一朵都亮。", "花还香。我已经是土，连浇水的手都埋进去了。"] },
+    { id: "job_starIdol", n: "未归·星穹偶像", r: "SR", kind: "job", tag: "转职", school: "magical", face: "sayo", dmg: 0.005, d: "灯比咒语先亮。拥有即魔法少女倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是被写成星穹台上的那一版魔法少女。灯比咒语先亮，人比变身慢了整整一夜。", "我把步枪举成麦克风。冠还在发光，舞台却往下沉，像要把我还回神社。", "星穹塌了一角。应援棒还亮着，变身只走到一只手套，另一只仍是血。", "灯灭以后，妆裂在眼角。没有返场灯，也没有人喊我的名字。"] },
+    { id: "job_miracle", n: "未归·奇迹魔女", r: "SR", kind: "job", tag: "转职", school: "magical", face: "sayo", dmg: 0.005, d: "奇迹写在合同里。拥有即魔法少女倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是还想创造一次奇迹的魔法少女小夜。奇迹写在合同里，失败却先写在冠的金边上。", "我把没转完的变身一次次重念。步枪没有变成权杖，花瓣却学会了只往上飞。", "奇迹先离开身体。冠还烫，咒语停在一半，人已经在往下坠。", "金边还亮着。我已经不值得被许愿，只值得被写成一张没转完的卡。"] },
+    { id: "job_exorcist", n: "未归·祓魔执行官", r: "SR", kind: "job", tag: "转职", school: "shrine", face: "sayo", dmg: 0.005, d: "执行令先于人作废。拥有即巫女倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是神社派来执行祓魔的那一夜小夜。符纸写着执行，镜核却先写好了否决。", "我把封条贴上步枪、贴上鸟居、贴上自己的袖口。外面的备份还在扫地，假装这是普通的夜。", "符烧完了，执行令当众作废。裂口从镜里爬到肩上，朱砂把失败写得很工整。", "我仍举着枪。封条比命令先落地，像先辞职的那一张纸。"] },
+    { id: "job_guardian", n: "未归·八咫守护者", r: "SR", kind: "job", tag: "转职", school: "shrine", face: "sayo", dmg: 0.005, d: "鸟比人先掉下来。拥有即巫女倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是被派去守八咫的那一版巫女。鸟比我先看见裂镜，也比我先从夜色里掉下来。", "我把步枪靠在鸟居上，一夜一夜数那些不回来的翅膀。符灰比羽毛轻，比名字重。", "八咫没有守住核。羽毛烧成符灰，守护者变成被守护过的尸体。", "鸟居还在。我的影子短了一截，像被谁先收走了半只。"] },
+    { id: "job_warSinger", n: "未归·尸潮歌姬", r: "SR", kind: "job", tag: "转职", school: "idol", face: "sayo", dmg: 0.005, d: "观众席站满不该来的人。拥有即歌姬倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是对着尸潮开口的那一版歌姬。观众席站满了不该买票的人，灯却还认我。", "歌比子弹先出门。我把步枪靠在脚边，对着没有活人的灯光把词一句句唱完。", "尸潮跟着节拍靠近。电台替我鞠躬，我跪在花瓣里，声带还在，人不在频率上。", "下一首歌自动连播。没有人喊安可，只有潮声替我鼓掌。"] },
+    { id: "job_healingIdol", n: "未归·治愈偶像", r: "SR", kind: "job", tag: "转职", school: "idol", face: "sayo", dmg: 0.005, d: "歌能止痛不能缝夜。拥有即歌姬倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是被推上台医人的那一版偶像。歌能止痛，不能把裂开的夜重新缝回去。", "我一路唱给倒下的人听。麦克风比步枪先烫手，花比药先落地，像抢着宣布无效。", "治愈先用完自己。电台还在报时，人已经不在这条频率上，只剩回声。", "掌声是空的。药箱里只剩歌词，连一句完整的再见都没有。"] },
+    { id: "job_barrage", n: "未归·弹幕暴君", r: "SR", kind: "job", tag: "转职", school: "gun", face: "aya", dmg: 0.005, d: "弹幕先打空自己的夜。拥有即枪斗倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是把弹幕写成领土的那条枪线。手枪是呼吸，太刀是还没来得及说出口的话。", "我把弹匣数得很干净。花瓣总是提醒我再快一点，我偏要把夜填得更密。", "弹幕先打空自己的夜。近身的爪子摸到领口，刀还在鞘里，像迟到的第二句话。", "套筒后锁。暴君的国土只剩空壳，连一发能认账的弹都没有。"] },
+    { id: "job_sniper", n: "未归·处刑狙击", r: "SR", kind: "job", tag: "转职", school: "gun", face: "aya", dmg: 0.005, d: "最后一发打空。拥有即枪斗倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是被派去处刑镜核的那一枪。距离够远，心跳却比子弹更早到达准星。", "我趴过神社屋顶，也趴过企业天台。手枪守近，太刀守退路，狙击只守这一发。", "最后一发打空。近身已经没有时间，处刑改成被处刑，花瓣盖住准星。", "准星还在。人已经不在那条直线上，只留下一枚没认账的空壳。"] },
+    { id: "job_plagueDoctor", n: "未归·瘟疫医师", r: "SR", kind: "job", tag: "转职", school: "alch", face: "aya", dmg: 0.005, d: "处方反噬署名。拥有即炼金倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是把瘟疫写成处方的炼金绫。面具比脸先成为我，药味比姓名先被人记住。", "手枪看守火候，太刀切开试剂。我把别人的名字熬成能喝的东西，还假装这是治疗。", "处方反噬署名。封条在坩埚里烧成失败的味道，玻璃也沿着我的倒影裂开。", "药还在响。医师已经不值得过滤，只值得被写进下一张作废的单。"] },
+    { id: "job_philosopher", n: "未归·贤者之石", r: "SR", kind: "job", tag: "转职", school: "alch", face: "aya", dmg: 0.005, d: "石头答应永生不答应完整。拥有即炼金倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是还想炼出石头的那一版绫。石头答应永生，却不答应把人炼得完整。", "我把封条当瓶盖，把作废券当配方。手枪守炉，太刀守冷却，像守一座不肯承认的坟。", "石头先炼化了炼金台。人变成渣，核变成更亮的废料，连工号都熔进底。", "炉是冷的。我的名字写在残渣上，比任何一句咒语都清楚。"] },
+    { id: "job_bloodDuke", n: "未归·鲜血公爵", r: "SR", kind: "job", tag: "转职", school: "vamp", face: "aya", dmg: 0.005, d: "最后一口吸空的是自己。拥有即血族倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是把血统写成爵位的血族绫。血不是别人的，是企业拆剩下、又被我饮回去的我。", "手枪守墓园，太刀守喉咙。花谢得比夜快，我喝得比花更快，像赶一份清单。", "最后一瓶写着自己的名字。吸空以后，连扣扳机的力气都退成水色。", "爵冠是空的。泪比血晚到，也比血更不像胜利。"] },
+    { id: "job_batQueen", n: "未归·夜蝠女王", r: "SR", kind: "job", tag: "转职", school: "vamp", face: "aya", dmg: 0.005, d: "蝠群先离开王座。拥有即血族倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是把夜蝠认作宫廷的那一版绫。它们认血，不认我戴歪的那顶王冠。", "我把翅膀编进风衣。手枪是权杖，太刀是还没来得及签署的条约，花瓣是未干的印。", "蝠群先离开王座。镜子比我更像女王，我被留在空的夜里，连一声召回都没有。", "翅膀还在远处响。冠已经掉进坟里，像一枚不肯退回的聘礼。"] },
+    { id: "job_element", n: "未归·元素统御", r: "SR", kind: "job", tag: "转职", school: "mage", face: "aya", dmg: 0.005, d: "元素先统御施法者。拥有即魔法师倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是捏着通行证想统御元素的绫。券是金的，门是假的，火却认认真真地烫手。", "法阵画在水里，手枪还在腰上。我以为火和冰能被念咒排队，像企业里的零件。", "元素先统御了施法者。券面盖了作废，法阵从掌心往外死，墨比血先干。", "VOID 两个字母比我的咒语清楚，也比我的名字更像结局。"] },
+    { id: "job_timeMage", n: "未归·时序魔导师", r: "SR", kind: "job", tag: "转职", school: "mage", face: "aya", dmg: 0.005, d: "倒回去的只有作废戳。拥有即魔法师倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是想把时序倒回去的那一版魔法师。秒针只认规则，不认我想救回的那一夜。", "我把怀表焊进法阵。手枪守这一秒，太刀守上一秒，像把退路切成两段。", "时序先折断了导师。倒回去的只有作废戳，人停在盖戳的那一帧，连眨眼都不被允许。", "表还在走。我已经不在这一格，只剩指针还认得我的工号。"] },
+    { id: "job_shadow", n: "未归·无明影刃", r: "SR", kind: "job", tag: "转职", school: "ninja", face: "aya", dmg: 0.005, d: "影遁出界人没回来。拥有即忍者倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是从镜缝里进出的那条无明影。外面的我负责开枪，里面的我负责把自己删掉。", "分身比本体勤快。我把太刀留给回来的那一格，手枪留给还站着的这一格。", "影遁出了界。分身散成灰，本体没有从裂镜对面走回来，只剩一层还举着枪的皮。", "残影还在扣扳机。刃已经不在这一侧，像把退路留在了别人的夜里。"] },
+    { id: "job_bombNinja", n: "未归·爆符忍军", r: "SR", kind: "job", tag: "转职", school: "ninja", face: "aya", dmg: 0.005, d: "符先炸了归路。拥有即忍者倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是把符纸写成炸药的那一支忍。爆炸比影遁守时，也比回家的路更守时。", "我把爆符贴上袖口、贴上弹匣、贴上要回来的石阶。太刀负责切开还没响的引线。", "符先炸了归路。烟散以后，军旗还在，人没有从对面走回来，只剩纸灰。", "纸灰还烫。署名栏被轰空了，像一张不肯承认失败的军令。"] },
+    { id: "job_swordSaint", n: "未归·万剑仙", r: "SR", kind: "job", tag: "转职", school: "cult", face: "rion", dmg: 0.005, d: "万剑先折在别人坟上。拥有即修仙倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是黑羽家被送去飞升的那一页万剑。飞剑比家谱先出门，也比人更先学会折断。", "剑冢里每一把剑都认识我。我路过那些失败的小夜，没有对任何一把刀鞠躬。", "万剑先折在别人的坟上。刃还在振，飞出去的那一半回不来，像不肯认账的半个名字。", "我握住折断的那截。仙名没有写上，天也没有为此开过一次。"] },
+    { id: "job_thunderLord", n: "未归·雷劫道君", r: "SR", kind: "job", tag: "转职", school: "cult", face: "rion", dmg: 0.005, d: "劫先劈开飞剑。拥有即修仙倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是去接雷劫的那一版修仙凛音。雷只认剑冢里的铁，不认我袖里那张发烫的道号。", "我把长刀举成避雷针。家谱在袖里发烫，飞剑在肩上发白，像提前写出的讣告。", "劫先劈开飞剑。道君的冠掉进坟里，人还站着，天却没有为此打开。", "雷还在响。署名只剩焦黑，连一句道号都写不回去。"] },
+    { id: "job_titan", n: "未归·再生泰坦", r: "SR", kind: "job", tag: "转职", school: "gene", face: "rion", dmg: 0.005, d: "再生没跑过突变。拥有即基因倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是被改成泰坦的那一版基因凛音。再生写在合同里，突变却写进还在跳的肉里。", "实验室的灯和鸟居的灯一起亮。我用长刀压住往外长的那只手臂，像压住另一份遗嘱。", "再生追上伤口，没追上镜裂。红晶比皮肤先成为我，合同上的人已经对不上这张脸。", "刀还认得手。泰坦不太认得我，像认错了该复活的那一具。"] },
+    { id: "job_berserk", n: "未归·超载狂战", r: "SR", kind: "job", tag: "转职", school: "gene", face: "rion", dmg: 0.005, d: "超载先烧掉刹车。拥有即基因倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是把再生拧到超载的狂战。力量先到，名字后碎，像一份写反了的紧急合同。", "我一路砍到剑冢最深处。血比家谱诚实，刀比合同短，连停手的字都没有。", "超载先烧掉刹车。突变追上狂战，人变成还在挥的那一截，连回头的余地都没有。", "刀还在响。我已经停不下来，也没有谁能替我按停。"] },
+    { id: "job_beast", n: "未归·百兽统御", r: "SR", kind: "job", tag: "转职", school: "summon", face: "rion", dmg: 0.005, d: "百兽先统御署名。拥有即召唤倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是把影子当成百兽的召唤凛音。契约纸比刀快，反噬比任何部下都守时。", "我在腕上缠满符。刀尖指着该来的兽，它却从背后先到，像早就读过我的署名。", "百兽先统御了署名。红线勒进刀柄，影子比我更高，主人反而要低头。", "符烧完了。兽还在，主人不在，只剩空的腕和还在跳的线。"] },
+    { id: "job_heroic", n: "未归·英灵契约", r: "SR", kind: "job", tag: "转职", school: "summon", face: "rion", dmg: 0.005, d: "英灵先收下契约。拥有即召唤倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是去签英灵的那一版召唤。英灵认剑冢里的死，不认还站着的这一具凛音。", "我把名字写进契。刀是祭品，血是印章，影子是还没赶到的部下。", "英灵先收下契约。人被写成祭品，影子比我更先成为英雄，连鞠躬都轮不到我。", "契还在腕上发烫。署名已经被收走，像一笔不肯退回的聘金。"] },
+    { id: "job_boneKing", n: "未归·白骨君王", r: "SR", kind: "job", tag: "转职", school: "necro", face: "rion", dmg: 0.005, d: "先称王的是自己的骨头。拥有即死灵倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是看见终章以后还想称王的死灵。先称王的不是我，是自己已经亮起来的骨头。", "魂火从掌心往上爬。刀还在，名字开始透明，像被谁从家谱上轻轻擦掉。", "我把凛音收成可召唤的白骨。契约成立的瞬间，王冠戴在空的颅骨上，很合适。", "火还亮。君王的署名栏空了，只剩一具还想发令的架子。"] },
+    { id: "job_soulHerd", n: "未归·群魂牧者", r: "SR", kind: "job", tag: "转职", school: "necro", face: "rion", dmg: 0.005, d: "群魂先牧走牧者。拥有即死灵倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是去牧群魂的那一版死灵凛音。魂认终章里的火，不认我手里这根还在发抖的牧鞭。", "我把刀当杖，把失败的小夜当成羊。火一路亮到剑冢门口，像一条不肯回头的路。", "群魂先牧走了牧者。人变成燃料，鞭还在空中响，羊群比我更认得方向。", "火还在远处走。我已经不在羊群里，只剩一句没来得及喊停的名字。"] },
+  ]);
 
   var SCRAP_BONUS = Object.freeze({
     sayo_echo: { crit: 0.005 },
@@ -113,9 +143,10 @@
   indexCards(FASHION_CARDS);
   indexCards(WEAPON_CARDS);
   indexCards(SCHOOL_CARDS);
+  indexCards(JOB_CARDS);
 
   function remnantList() {
-    return CARDS.concat(SCHOOL_CARDS);
+    return CARDS.concat(SCHOOL_CARDS, JOB_CARDS);
   }
 
   function cardsForPool(pool) {
@@ -435,7 +466,7 @@
       });
     }
     var pool = incoming.pool === "fashion" || incoming.pool === "weapon" ? incoming.pool : "remnant";
-    var rosterTab = incoming.rosterTab === "school" || incoming.rosterTab === "fashion" || incoming.rosterTab === "weapon" || incoming.rosterTab === "chronicle"
+    var rosterTab = incoming.rosterTab === "school" || incoming.rosterTab === "job" || incoming.rosterTab === "fusion" || incoming.rosterTab === "fashion" || incoming.rosterTab === "weapon" || incoming.rosterTab === "chronicle"
       ? incoming.rosterTab
       : "scrap";
     shop.ops = {
@@ -656,6 +687,10 @@
         return { id: card.id, n: card.n, r: card.r, kind: "school", school: card.school, count: ops.owned[card.id] || 0 };
       }),
       schoolOwned: ownedCount(ops, SCHOOL_CARDS),
+      jobCards: JOB_CARDS.map(function (card) {
+        return { id: card.id, n: card.n, r: card.r, kind: "job", school: card.school, count: ops.owned[card.id] || 0 };
+      }),
+      jobOwned: ownedCount(ops, JOB_CARDS),
       shown: shownIds(ops),
       owned: ops.owned,
       pity: ops.pity,
@@ -1013,6 +1048,8 @@
 
   function rosterList(tab) {
     if (tab === "school") return SCHOOL_CARDS;
+    if (tab === "job") return JOB_CARDS;
+    if (tab === "fusion") return [];
     if (tab === "fashion") return FASHION_CARDS;
     if (tab === "weapon") return WEAPON_CARDS;
     if (tab === "chronicle") return CHRONICLE;
@@ -1039,7 +1076,11 @@
       wall = '<div class="chronicleBox46"><h4>月城小夜 · 未写完的夜</h4>' + CHRONICLE.map(function (item) {
         return '<article class="chronicleCard46" data-chronicle="' + item.id + '"><b>' + item.n + "</b>" + item.lore.map(function (p) { return "<p>" + p + "</p>"; }).join("") + "</article>";
       }).join("") + "</div>";
+    } else if (tab === "fusion") {
+      wall = '<div class="rosterLater46">后续写入</div>';
     } else if (tab === "school" && !SCHOOL_CARDS.length) {
+      wall = '<div class="rosterLater46">后续写入</div>';
+    } else if (tab === "job" && !JOB_CARDS.length) {
       wall = '<div class="rosterLater46">后续写入</div>';
     } else {
       wall = list.map(function (card) {
@@ -1068,11 +1109,13 @@
     }
     host.innerHTML =
       '<div class="rosterStage46"><div class="rosterHead46"><h3>镜界仓库</h3><span>' +
-      (tab === "chronicle" ? "月城小夜 · 未写完的夜" : "已点亮 " + got + " / " + list.length) +
+      (tab === "chronicle" ? "月城小夜 · 未写完的夜" : tab === "fusion" ? "后续写入" : "已点亮 " + got + " / " + list.length) +
       "</span></div>" +
       '<div class="rosterTabs46" id="rosterTabs46">' +
       '<button type="button" data-roster="scrap"' + (tab === "scrap" ? ' class="on"' : "") + ">残件</button>" +
       '<button type="button" data-roster="school"' + (tab === "school" ? ' class="on"' : "") + ">基础</button>" +
+      '<button type="button" data-roster="job"' + (tab === "job" ? ' class="on"' : "") + ">转职</button>" +
+      '<button type="button" data-roster="fusion"' + (tab === "fusion" ? ' class="on"' : "") + ">融合</button>" +
       '<button type="button" data-roster="fashion"' + (tab === "fashion" ? ' class="on"' : "") + ">时装</button>" +
       '<button type="button" data-roster="weapon"' + (tab === "weapon" ? ' class="on"' : "") + ">武器</button>" +
       '<button type="button" data-roster="chronicle"' + (tab === "chronicle" ? ' class="on"' : "") + ">编年</button>" +
@@ -1278,6 +1321,7 @@
     FASHION_CARDS: FASHION_CARDS,
     WEAPON_CARDS: WEAPON_CARDS,
     SCHOOL_CARDS: SCHOOL_CARDS,
+    JOB_CARDS: JOB_CARDS,
     CHRONICLE: CHRONICLE,
     hasSchool: hasSchool,
     POOL_IDS: POOL_IDS,
