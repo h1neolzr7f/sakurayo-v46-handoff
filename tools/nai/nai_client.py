@@ -31,6 +31,13 @@ DEFAULT_NEGATIVE = (
     "multiple views, watermark, text, letters, numbers, speech bubble, ui, "
     "english text, chinese text"
 )
+SFW_NEGATIVE = "nsfw, explicit, nude, nipples, pussy, penis, sex, uncensored"
+NSFW_TAGS = "nsfw, explicit, uncensored"
+MINOR_PROMPT_RE = re.compile(
+    r"\b(loli|shota|child|children|underage|prepubescent|toddler|kid|kids|"
+    r"little girl|little boy|young girl|young boy)\b",
+    re.IGNORECASE,
+)
 GREEN_SCREEN_TAGS = (
     "solid bright green background, chroma key, #00ff00, no shadow, no floor, "
     "no gradient, no scenery"
@@ -239,8 +246,22 @@ def resolve_size(size: str | None = None, width: int | None = None, height: int 
     return pair
 
 
-def compose_prompt(prompt: str, *, greenscreen: bool = False, artist: str | bool | None = True) -> str:
+def compose_negative(negative: str | None = None, *, nsfw: bool = False) -> str:
+    text = " ".join((negative or DEFAULT_NEGATIVE).split())
+    if not nsfw and SFW_NEGATIVE not in text:
+        text = f"{text}, {SFW_NEGATIVE}" if text else SFW_NEGATIVE
+    return text
+
+
+def compose_prompt(prompt: str, *, greenscreen: bool = False, artist: str | bool | None = True, nsfw: bool = False) -> str:
     text = " ".join((prompt or "").split())
+    if nsfw:
+        if MINOR_PROMPT_RE.search(text):
+            raise NaiError("NSFW mode refuses minor-related prompts")
+        if "adult" not in text.lower():
+            text = f"adult, {text}" if text else "adult"
+        if "nsfw" not in text.lower():
+            text = f"{NSFW_TAGS}, {text}" if text else NSFW_TAGS
     artist_text = ""
     if artist is True:
         artist_text = DEFAULT_ARTIST_STRING
@@ -342,14 +363,16 @@ def build_payload(
     character_refs: list[Path] | None = None,
     cr_strength: float = DEFAULT_CR_STRENGTH,
     cr_fidelity: float = DEFAULT_CR_FIDELITY,
+    nsfw: bool = False,
 ) -> dict[str, Any]:
     if n_samples < 1 or n_samples > 4:
         raise NaiError("n_samples must be 1-4")
     if steps < 1 or steps > 50:
         raise NaiError("steps must be 1-50")
-    final_prompt = compose_prompt(prompt, greenscreen=greenscreen, artist=artist)
+    final_prompt = compose_prompt(prompt, greenscreen=greenscreen, artist=artist, nsfw=nsfw)
     if not final_prompt:
         raise NaiError("prompt is empty")
+    final_negative = compose_negative(negative, nsfw=nsfw)
     w, h = resolve_size(size, width, height)
     parameters: dict[str, Any] = {
         "params_version": 3,
@@ -370,7 +393,7 @@ def build_payload(
         "noise_schedule": "karras",
         "legacy_v3_extend": False,
         "legacy_uc": False,
-        "negative_prompt": negative,
+        "negative_prompt": final_negative,
         "seed": int(seed) if seed else 0,
     }
     if is_v4_model(model):
@@ -380,7 +403,7 @@ def build_payload(
             "use_order": True,
         }
         parameters["v4_negative_prompt"] = {
-            "caption": {"base_caption": negative, "char_captions": []},
+            "caption": {"base_caption": final_negative, "char_captions": []},
             "legacy_uc": False,
         }
     attach_character_refs(
@@ -533,6 +556,7 @@ def job_to_payload(job: dict[str, Any]) -> dict[str, Any]:
         character_refs=resolve_ref_paths(job.get("character_refs") or job.get("char_refs")),
         cr_strength=float(job.get("cr_strength") or DEFAULT_CR_STRENGTH),
         cr_fidelity=float(job.get("cr_fidelity") or DEFAULT_CR_FIDELITY),
+        nsfw=bool(job.get("nsfw")),
     )
 
 
@@ -543,6 +567,7 @@ def snapshot_from_compile(
     dest: Path | None = None,
     character_ref_paths: list[str] | None = None,
     resized: bool = False,
+    nsfw: bool = False,
 ) -> dict[str, Any]:
     params = payload["parameters"]
     has_ref = payload_has_reference(payload)
@@ -589,6 +614,7 @@ def snapshot_from_compile(
         "wouldSpendAnlas": not free,
         "resizedToFree": resized,
         "spendReasons": reasons,
+        "nsfw": bool(nsfw),
     }
 
 
@@ -609,6 +635,7 @@ def compile_job(job: dict[str, Any], *, dest: Path | None = None) -> CompileResu
         job_id=job_id,
         dest=out,
         character_ref_paths=ref_paths,
+        nsfw=bool(job.get("nsfw")),
     )
     return CompileResult(
         payload=payload,

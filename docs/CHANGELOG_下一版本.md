@@ -8,6 +8,7 @@
 - 默认锁 Opus 免费档（单张 / ≤28 步 / ≤1024×1024）。云主机若被关免费队列，自动改打 Large 扣 Anlas。
 - 角色任务前置画师串，并用现有 portrait/battle 做 V4.5 Character Reference。
 - 借鉴学长工作室：compile 冻结、Opus 长边/像素免费档、5xx 不自动重试。Agent 写 jobs，不搬本地图库。
+- 三角色任务开启 NSFW：正向补成人标签，负向不再挡 NSFW；大厅仍 SFW。未成年词直接拒绝。
 
 ## 第一期镜界寻访（源码仍 4.6.0，未下令不升 4.6.1）
 

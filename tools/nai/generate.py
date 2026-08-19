@@ -133,12 +133,14 @@ def _iter_compiled(args: argparse.Namespace):
             character_refs=refs,
             cr_strength=args.cr_strength,
             cr_fidelity=args.cr_fidelity,
+            nsfw=bool(args.nsfw),
         )
         snapshot = snapshot_from_compile(
             payload,
             job_id="manual",
             dest=dest,
             character_ref_paths=[str(path) for path in refs],
+            nsfw=bool(args.nsfw),
         )
         yield CompileResult(payload=payload, snapshot=snapshot, dest=dest, job_id="manual")
         return
@@ -154,6 +156,9 @@ def _iter_compiled(args: argparse.Namespace):
     if not out_dir.is_absolute():
         out_dir = CLIENT_ROOT / out_dir
     for job in jobs:
+        if args.nsfw:
+            job = dict(job)
+            job["nsfw"] = True
         dest = Path(job["out"]) if job.get("out") else out_dir / f"{safe_job_id(job['id'])}.png"
         if not dest.is_absolute():
             dest = CLIENT_ROOT / dest
@@ -181,6 +186,7 @@ def build_parser() -> argparse.ArgumentParser:
         p.add_argument("--scale", type=float, default=DEFAULT_SCALE)
         p.add_argument("--seed", type=int, default=0)
         p.add_argument("--greenscreen", action="store_true")
+        p.add_argument("--nsfw", action="store_true", help="Adult prompt tags; omit SFW negatives. Refuses minor terms.")
         p.add_argument("--no-artist", action="store_true", help="Do not prepend the default artist string")
         p.add_argument("--char-ref", action="append", default=[], help="Character reference image path. Repeatable.")
         p.add_argument("--cr-strength", type=float, default=0.65)

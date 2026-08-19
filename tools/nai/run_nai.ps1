@@ -6,6 +6,7 @@ param(
   [switch]$Force,
   [switch]$AllowBatch,
   [switch]$Greenscreen,
+  [switch]$Nsfw,
   [switch]$SpendAnlas
 )
 $ErrorActionPreference = 'Stop'
@@ -20,6 +21,7 @@ if ($Out) { $Args += @('--out', $Out) }
 if ($Force) { $Args += '--force' }
 if ($AllowBatch) { $Args += '--allow-batch' }
 if ($Greenscreen) { $Args += '--greenscreen' }
+if ($Nsfw) { $Args += '--nsfw' }
 if ($SpendAnlas) { $Args += '--spend-anlas' }
 & $Python.Source -I $Script @Args
 if ($LASTEXITCODE -ne 0) { throw "NAI $Command failed" }

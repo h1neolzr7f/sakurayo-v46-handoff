@@ -49,8 +49,8 @@ python tools/nai/generate.py gen --job-id sayo_stand_greenscreen
 
 ```bash
 python tools/nai/generate.py gen \
-  --prompt "1girl, solo, long purple hair, shrine maiden, full body" \
-  --greenscreen --size portrait_large \
+  --prompt "1girl, solo, adult, long purple hair, shrine maiden, full body" \
+  --greenscreen --nsfw --size portrait_large \
   --out assets/image2/source/nai/manual.png
 ```
 
@@ -69,6 +69,8 @@ Cloud Agent / 数据中心 IP 可能被 NovelAI 判定「异常活动」并关�
 接口一律走 `https://image.novelai.net`。
 
 角色图默认前置画师串，并用现有 `portrait.webp` + `battle.webp` 做 V4.5 **Character Reference**（`director_reference_*`，类型 `character`，strength 0.65，fidelity 0.5）。参考图会黑底垫到 1024×1536。带参考图会扣 Anlas。
+
+三角色任务默认 `"nsfw": true`：正向补 `nsfw, explicit, uncensored` 和 `adult`，负向不再挡成人标签。大厅任务保持 SFW。CLI 可用 `--nsfw` 覆盖单次 `--prompt` 或整批 jobs。NSFW 模式会拒绝 `loli` / `shota` / `child` 等未成年词。
 
 ## 默认参数
 

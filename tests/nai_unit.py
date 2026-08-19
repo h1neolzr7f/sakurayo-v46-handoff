@@ -16,11 +16,14 @@ import generate as nai_gen  # noqa: E402
 from nai_client import (  # noqa: E402
     DEFAULT_ARTIST_STRING,
     DEFAULT_NEGATIVE,
+    NSFW_TAGS,
+    SFW_NEGATIVE,
     NaiError,
     assert_free_quota,
     build_payload,
     classify_http_error,
     compile_job,
+    compose_negative,
     compose_prompt,
     encode_character_ref,
     fit_opus_free_size,
@@ -70,7 +73,12 @@ class PayloadTests(unittest.TestCase):
         self.assertIn("chroma key", payload["input"])
         self.assertTrue(payload["input"].startswith("artist:ciloranko"))
         self.assertEqual(payload["input"], payload["parameters"]["v4_prompt"]["caption"]["base_caption"])
-        self.assertEqual(payload["parameters"]["negative_prompt"], DEFAULT_NEGATIVE)
+        self.assertIn(DEFAULT_NEGATIVE, payload["parameters"]["negative_prompt"])
+        self.assertIn(SFW_NEGATIVE, payload["parameters"]["negative_prompt"])
+        self.assertEqual(
+            payload["parameters"]["negative_prompt"],
+            payload["parameters"]["v4_negative_prompt"]["caption"]["base_caption"],
+        )
         self.assertNotIn("Authorization", json.dumps(payload))
 
     def test_v3_skips_v4_blocks(self):
@@ -137,6 +145,13 @@ class JobTests(unittest.TestCase):
         compiled = compile_job(jobs[0])
         self.assertTrue(compiled.snapshot["frozen"])
         self.assertTrue(compiled.snapshot["wouldSpendAnlas"])
+        self.assertTrue(compiled.snapshot["nsfw"])
+        self.assertTrue(jobs[0]["nsfw"])
+        self.assertFalse(jobs[3]["nsfw"])
+        self.assertIn(NSFW_TAGS, payload["input"])
+        self.assertNotIn(SFW_NEGATIVE, payload["parameters"]["negative_prompt"])
+        self.assertIn(SFW_NEGATIVE, lobby["parameters"]["negative_prompt"])
+        self.assertFalse(compile_job(jobs[3]).snapshot["nsfw"])
         self.assertIn("character_reference", compiled.snapshot["spendReasons"])
         dumped = json.dumps(compiled.snapshot)
         self.assertNotIn("iVBORw0KGgo", dumped)
@@ -150,6 +165,16 @@ class JobTests(unittest.TestCase):
 class CliTests(unittest.TestCase):
     def test_dry_run_job(self):
         code = nai_gen.main(["dry-run", "--job-id", "lobby_wide"])
+        self.assertEqual(code, 0)
+
+    def test_compile_nsfw_override(self):
+        jobs = load_jobs(ROOT / "assets" / "nai" / "jobs.jsonl")
+        forced = dict(jobs[3])
+        forced["nsfw"] = True
+        compiled = compile_job(forced)
+        self.assertTrue(compiled.snapshot["nsfw"])
+        self.assertIn(NSFW_TAGS, compiled.payload["input"])
+        code = nai_gen.main(["compile", "--prompt", "1girl, solo, adult", "--nsfw", "--no-artist"])
         self.assertEqual(code, 0)
 
     def test_gen_without_token(self):
@@ -168,6 +193,26 @@ class CliTests(unittest.TestCase):
         once = compose_prompt("1girl, chroma key", greenscreen=True)
         self.assertEqual(once.count("chroma key"), 1)
         self.assertTrue(once.startswith("artist:"))
+
+    def test_nsfw_mode(self):
+        sfw_neg = compose_negative()
+        self.assertIn(SFW_NEGATIVE, sfw_neg)
+        nsfw_neg = compose_negative(nsfw=True)
+        self.assertNotIn(SFW_NEGATIVE, nsfw_neg)
+        nsfw = compose_prompt("1girl, solo", nsfw=True, artist=False)
+        self.assertTrue(nsfw.startswith(NSFW_TAGS))
+        self.assertIn("adult", nsfw)
+        payload = build_payload("1girl, solo, adult", nsfw=True, artist=False)
+        self.assertIn(NSFW_TAGS, payload["input"])
+        self.assertEqual(
+            payload["parameters"]["negative_prompt"],
+            payload["parameters"]["v4_negative_prompt"]["caption"]["base_caption"],
+        )
+        self.assertNotIn(SFW_NEGATIVE, payload["parameters"]["negative_prompt"])
+        with self.assertRaises(NaiError):
+            compose_prompt("1girl, loli", nsfw=True, artist=False)
+        with self.assertRaises(NaiError):
+            build_payload("young girl, child", nsfw=True)
 
     def test_character_ref_canvas(self):
         raw = encode_character_ref(ROOT / "android-app/app/src/main/assets/game/art/characters/sayo/default/portrait.webp")
