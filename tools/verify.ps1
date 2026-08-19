@@ -29,5 +29,6 @@ Invoke-Step "syntax lifecycle" { node --check src/runtime/sakurayo-lifecycle.js 
 Invoke-Step "syntax content-runtime" { node --check src/runtime/sakurayo-content-runtime.js }
 Invoke-Step "framework smoke" { node tests/framework_smoke.mjs }
 Invoke-Step "browser smoke" { node tests/browser_smoke.mjs }
+Invoke-Step "packtest gate C" { node tests/packtest_gatec.mjs }
 
 Write-Host "VERIFY PASS"
