@@ -127,3 +127,41 @@
 变成哪条回归：emu_loop pityDock。
 
 修完复跑：emu_loop 26 绿（pityDock≤8）。
+
+---
+
+## 轮 9
+
+自动打回：**未过。不要进入下一类。**
+层：Playwright视口
+类：开局 toast(hint44) 与 #mission 同一句场地提示叠两层
+复现：回收演习开局数秒，toast 与 mission 都是「鸟居挡弹不挡人…」
+上一轮为什么没发现：全游戏扫已标重复 hint，但当时只修坞/warning/pity，没点开局 toast。
+回归：`emu_loop` 开局 toast 不得复述 mission 首行
+
+本轮新问题：场地提示双显。
+变成哪条回归：emu_loop 开局 toast≠mission。
+
+修完复跑：去掉 startGame toast(hint44)。
+
+---
+
+## 轮 10
+
+自动打回：**未过。不要进入下一类。**
+层：Playwright视口
+类：剧情态 opsPaint 仍显示干员坞，挡住开场对话
+复现：start 后 #dialogue 未关时 #opsDock46 仍在
+上一轮为什么没发现：只测了 play 态坞与摇杆，没在 dismissDialogue 前看坞。
+回归：`emu_loop` 剧情模态时坞 hidden
+
+---
+
+## 轮 11
+
+自动打回：**未过。不要进入下一类。**
+层：Playwright视口
+类：#bossRule39 top:96/112 与 #mission 同带叠字
+复现：Boss 战后规则条与构筑条重叠约 900px²
+上一轮为什么没发现：emu_loop 只断言 phase 数字，不量 bossRule 盒子。
+回归：`emu_loop` bossRule∩mission ≤8
