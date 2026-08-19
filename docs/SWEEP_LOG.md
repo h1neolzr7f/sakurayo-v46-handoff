@@ -35,3 +35,4 @@ A/B 每轮追加一行，不准删旧记录。
 | 2026-08-19 | 换拼卡 | 刀1 18张图 | 18 张 768×1024 生成图，互不相同；两对已拆。见 docs/FASHION_FACE_CHECK.md。未覆盖旧 8/14/28/24/传说/公共图。 | 自检 18/18 能报出人；两对哈希不同 | 拼卡复用同一张图 | 刀2 四段 |
 | 2026-08-19 | 换拼卡 | 刀2 四段 | 12+12 lore 各 4 句，每句汉字>8；传说只加长不改标题。lobby_unit 加汉字/体积/拆对/传说哈希。 | lobby 绿 | 旧四段多句≤8 | 刀3 门A |
 | 2026-08-19 | 换拼卡 | 刀3 门A | static / lobby / live / ops 绿。framework/browser 本环境无 Playwright，未跑。未升 4.6.1。未交 APK。停，等人认人 18 张。 | 门A 能跑的全绿 | 云端缺 Playwright | 等人认人后收工 |
+| 2026-08-19 | emu-loop | 连续2轮全绿 | 从 main@0af3809 开 cursor/emu-loop-5030。轮1修 4×2 战场图按格重铺；轮2修竖屏战斗横持提示压 HUD。轮3/4 三层能跑的全绿、无新 P0/P1。版本仍 4.6.0。本环境无 adb。 | 门A 绿；emu_loop 23；emu_scan 0 P0/P1；browser 52 | 轮1缺 drawImage 计数；轮2用了 offsetParent 误判 fixed 提示 | 停，等人收工 |
