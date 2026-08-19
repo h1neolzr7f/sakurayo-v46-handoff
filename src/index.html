@@ -2302,6 +2302,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     document.documentElement.classList.add("landscape46");
     document.documentElement.classList.toggle("portraitFallback46", view.w < 640);
     document.documentElement.classList.toggle("tallWindow46", portrait && view.w >= 640);
+    document.documentElement.classList.toggle("playing46", !$("#menu") || $("#menu").classList.contains("hidden"));
     let hint = $("#rotateHint46");
     if (!hint) {
       hint = document.createElement("div");
@@ -2772,6 +2773,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     $("#warning").classList.add("hidden");
     $("#hud").classList.remove("hidden");
     $("#stageHud").textContent = stage().short;
+    preferLandscape46();
     showDialogue(openingDialogue(), () => {
       state = "play";
       const radio44 = window.SakurayoLifecycle?.radio?.(lifecycleWorld44(), save.character);
@@ -2793,6 +2795,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       (s) => $(s).classList.add("hidden"),
     );
     $("#menu").classList.remove("hidden");
+    preferLandscape46();
     P.fusion = null;
     setForm(null);
     checkAch();

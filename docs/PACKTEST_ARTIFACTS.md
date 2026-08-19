@@ -8,7 +8,7 @@
 |---|---|
 | 路径 | `/tmp/sakurayo-460-test.html` |
 | 字节 | 1990342 |
-| SHA-256 | `18ee4eb9014eec07f82c0470d24b6c14fd28e4f6b208e751f40446e53ccfacfc` |
+| SHA-256 | `e25ff5bd6ee827f157925107b8ff85e151e7df06abf3f74a0260f6b831804717` |
 | 命令 | `python3 tools/build_game.py --source src/index.html --output /tmp/sakurayo-460-test.html --asset-root android-app/app/src/main/assets/game/art` |
 
 与 Android 壳 `android-app/app/src/main/assets/index.html` 同哈希（同一套内联产物）。含 `SakurayoCamera` / `SakurayoChronicle` / 三页寻访。未把该 HTML 大包 commit 进仓库。
