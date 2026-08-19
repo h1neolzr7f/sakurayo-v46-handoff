@@ -203,6 +203,21 @@
     ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh);
   }
 
+  function photoReady(world) {
+    var photo = world && world.battleBg;
+    return !!(photo && photo.complete && photo.naturalWidth > 0);
+  }
+
+  function drawWorldPhoto(ctx, world) {
+    var W = world.worldW || world.W,
+      H = world.worldH || world.H;
+    if (!photoReady(world) || !W || !H) return false;
+    drawCover(ctx, world.battleBg, W, H);
+    ctx.fillStyle = "rgba(5,4,14,0.26)";
+    ctx.fillRect(0, 0, W, H);
+    return true;
+  }
+
   function drawMirrorEcho(ctx, world) {
     if (!world || world.playerX == null) return;
     var pal = stageProfile(world.stageId, world);
@@ -225,22 +240,23 @@
   function drawGround(ctx, world) {
     if (!ctx || !world) return;
     if (world.camX != null && world.cols > 1 && global.SakurayoCamera && global.SakurayoCamera.visibleChunks) {
+      var photoDone = drawWorldPhoto(ctx, world);
       var tiles = global.SakurayoCamera.visibleChunks();
       var n;
       for (n = 0; n < tiles.length; n++) {
         ctx.save();
         ctx.translate(tiles[n].x, tiles[n].y);
-        drawGroundChunk(ctx, world);
+        drawGroundChunk(ctx, world, photoDone);
         ctx.restore();
       }
       drawMirrorEcho(ctx, world);
       return;
     }
-    drawGroundChunk(ctx, world);
+    drawGroundChunk(ctx, world, false);
     drawMirrorEcho(ctx, world);
   }
 
-  function drawGroundChunk(ctx, world) {
+  function drawGroundChunk(ctx, world, photoDone) {
     var W = world.W,
       H = world.H,
       t = world.runTime || 0,
@@ -253,6 +269,7 @@
       pathL,
       pathR,
       photo = world.battleBg;
+    if (photoDone) return;
     if (photo && photo.complete && photo.naturalWidth > 0) {
       drawCover(ctx, photo, W, H);
       ctx.fillStyle = "rgba(5,4,14,0.26)";

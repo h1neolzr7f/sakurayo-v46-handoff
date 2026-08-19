@@ -906,6 +906,7 @@ try {
 
   await api(page, "backMenu");
   await api(page, "selectCharacter", "sayo");
+  await api(page, "setRunMode46", "story");
   await api(page, "selectStage", 1);
   await api(page, "start");
   await api(page, "dismissDialogue");
