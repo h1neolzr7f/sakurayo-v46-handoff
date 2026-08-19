@@ -616,7 +616,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
     const rows=[
       {id:"kagami",ch:1,lines:[[c,"镜零到底是谁？"],["雨宫凛","公司拿失败的你堆出来的那张脸。它要你留下，当下一份样本。"]]},
       {id:"recycle",ch:2,lines:[[c,"他们还在说回收。"],["雨宫凛","回收就是拷进机器。救援车开走，人没有回家。"]]},
-      {id:"asset",ch:2,lines:[[c,"他们说的资产，到底是什么？"],["雨宫凛","活人写成一份能拷贝的文件。你妹妹不是文件。"]]},
+      {id:"asset",ch:2,when:()=>save.character==="aya",lines:[[c,"他们说的资产，到底是什么？"],["雨宫凛","活人写成一份能拷贝的文件。你妹妹不是文件。"]]},
       {id:"backup",ch:3,lines:[[c,"备份听着像存档。"],["雨宫凛","差不多。差在没人问你想不想被另存一份。那一份也会疼。"]]},
       {id:"predict",ch:4,lines:[[c,"可预测的版本，到底是什么？"],["雨宫凛","简单说，就是变成数字备份。人还走路，下一步已经被写好了。"]]},
       {id:"fusion",when:()=>!!P.fusion,lines:[[c,"融合是把两个职业焊在一起？"],["雨宫凛","对。好用，也更招克制。短板去暂停页看。"]]},
@@ -2554,6 +2554,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
       planClock: 0,
       seenCounters: new Set(),
       lastPlanRank: "B",
+      hiddenArena47: false,
+      hiddenCleared47: false,
+      pendingHidden47: false,
     });
     pets = [];
     setForm(null);
@@ -3300,7 +3303,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
       const lines = [
         { sp: "镜零", tx: fate.script },
         { sp: "小夜", tx: fate.fight },
-        { sp: "雨宫凛", tx: "你问过了。她说想活。" },
+        { sp: "雨宫凛", tx: ({sayo:"你问过了。她说想活。",aya:"你问过了。她说要不要走，自己说。",rion:"你问过了。去留他们自己说。"}[(typeof char35==="function"&&char35().id)||save.character||"sayo"]||"你问过了。她说想活。") },
       ];
       if (fate.reply) lines.push({ sp: fate.reply[0], tx: fate.reply[1] });
       lines.push({ sp: "小夜", tx: "接下来的路，我们自己走。" });
@@ -4563,7 +4566,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
               ],
               [
                 "把名单公开给全城",
-                "稳定度 +8。街上会更乱，人却能被看见。",
+                "稳定度 +4。街上会更乱，人却能被看见。",
                 () => {
                   P.storyFlags.identity = "broadcast";
                   P.publicTruth = 1;
