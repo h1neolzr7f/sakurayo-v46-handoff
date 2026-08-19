@@ -4,7 +4,8 @@
 
 卡池一二三期已进 `main`（第三期 `4176014`）。下一轮三份也已进 `main`（`0af3809`）。版本仍 4.6.0。不要再开第四期加伤。入库记录见 [NEXT_REVIEW.md](NEXT_REVIEW.md)。
 
-- **打包测试修虫**（下一件）：[CURSOR_PROMPT_PACKTEST.md](CURSOR_PROMPT_PACKTEST.md) · [AUTORUN_PACKTEST.md](AUTORUN_PACKTEST.md)
+- **反复测试打回修虫**（现在开）：[CURSOR_PROMPT_BUGLOOP.md](CURSOR_PROMPT_BUGLOOP.md) · [AUTORUN_BUGLOOP.md](AUTORUN_BUGLOOP.md)
+- **打包测试修虫**（两轮挖空后再开）：[CURSOR_PROMPT_PACKTEST.md](CURSOR_PROMPT_PACKTEST.md) · [AUTORUN_PACKTEST.md](AUTORUN_PACKTEST.md)
 - **镜头大地图**（已进 main）：[CURSOR_PROMPT_CAMERA.md](CURSOR_PROMPT_CAMERA.md)
 - **换 18 张拼卡**（已进 main）：[CURSOR_PROMPT_FASHION.md](CURSOR_PROMPT_FASHION.md)
 - **绫 / 凛音编年**（已进 main）：[CURSOR_PROMPT_CHRONICLE.md](CURSOR_PROMPT_CHRONICLE.md)
