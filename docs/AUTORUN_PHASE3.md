@@ -11,8 +11,8 @@
 ## 人只露脸 3 次
 
 1. **开工**：已开。施工 PR https://github.com/h1neolzr7f/sakurayo-v46-handoff/pull/12
-2. **认人**：2026-08-19 打回 `fusion_shadowmage`、`fusion_necrospore`。其余 22 张可留。见 `docs/PHASE3_FACE_REVIEW.md`。
-3. **收工**：两张重画过目视、门 A 仍绿之后，你点合并。不要升 4.6.1。
+2. **认人**：先打回 `fusion_shadowmage`、`fusion_necrospore`。`dae7774` 两张过了。见 `docs/PHASE3_FACE_REVIEW.md`。
+3. **收工**：可以合并。你点合并 #12。不要升 4.6.1。
 
 ## 已锁死（开工后不准改）
 
