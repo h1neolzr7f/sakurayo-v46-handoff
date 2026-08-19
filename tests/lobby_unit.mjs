@@ -92,6 +92,51 @@ assert.equal(forced.results[0].r, "SR");
 assert.ok(["school_shrine", "school_gun", "school_cult"].includes(forced.results[0].id));
 assert.equal(forced.results[0].kind, "school");
 assert.notEqual(forced.results[0].kind, "scrap");
+assert.equal(pitySave.shop40.ops.pity, 0, "残片 SSR 保底降成 SR 后必须清 pity");
+const afterPity = L.pull(pitySave, 1, () => 0.99);
+assert.equal(afterPity.ok, true);
+assert.equal(afterPity.results[0].r, "R");
+
+const remnantPool = [...L.CARDS, ...L.SCHOOL_CARDS];
+assert.equal(L.downgradeRarity("N", remnantPool), "R");
+assert.equal(L.downgradeRarity("R", remnantPool), "R");
+assert.equal(L.downgradeRarity("SR", remnantPool), "SR");
+assert.equal(L.downgradeRarity("SSR", remnantPool), "SR");
+const nMiss = { coins: 20000, shop40: L.normalizeOps({}) };
+const nHit = L.pull(nMiss, 1, () => 0.99);
+assert.equal(nHit.ok, true);
+assert.equal(nHit.results[0].r, "R");
+
+function lcg(seed) {
+  let s = seed >>> 0;
+  return () => {
+    s = (Math.imul(s, 1664525) + 1013904223) >>> 0;
+    return s / 4294967296;
+  };
+}
+function tallyPulls(pool, n, seed) {
+  const save = { coins: n * 160 + 160, shop40: L.normalizeOps({}) };
+  const rng = lcg(seed);
+  const tally = { N: 0, R: 0, SR: 0, SSR: 0 };
+  for (let i = 0; i < n; i++) {
+    const row = L.pull(save, 1, rng, pool);
+    assert.equal(row.ok, true, pool + " pull " + i);
+    tally[row.results[0].r] += 1;
+  }
+  return tally;
+}
+const remnantTally = tallyPulls("remnant", 2000, 0x51c0de);
+assert.ok(remnantTally.R > remnantTally.SR * 3, "残片 R 应远多于 SR: " + JSON.stringify(remnantTally));
+assert.ok(remnantTally.R / 2000 >= 0.55, "残片约六七成应为 R: " + JSON.stringify(remnantTally));
+assert.ok(remnantTally.SR / 2000 >= 0.04 && remnantTally.SR / 2000 <= 0.25, "残片 SR 应在一成左右: " + JSON.stringify(remnantTally));
+assert.equal(remnantTally.SSR, 0);
+assert.ok(remnantTally.SR / 2000 < 0.5, "残片不能再出现过半 SR");
+const fashionTally = tallyPulls("fashion", 2000, 0x51c0de);
+assert.ok(fashionTally.N > fashionTally.SR, "时装 N 应多于 SR: " + JSON.stringify(fashionTally));
+assert.ok(fashionTally.N / 2000 >= 0.5, "时装 N 应保持现有量级: " + JSON.stringify(fashionTally));
+const weaponTally = tallyPulls("weapon", 2000, 0x51c0de);
+assert.ok(weaponTally.N > weaponTally.SR, "武器 N 应多于 SR: " + JSON.stringify(weaponTally));
+assert.ok(weaponTally.N / 2000 >= 0.5, "武器 N 应保持现有量级: " + JSON.stringify(weaponTally));
 
 const fashionSave = { coins: 20000, shop40: L.normalizeOps({}) };
 const fashionPull = L.pull(fashionSave, 1, () => 0.5, "fashion");

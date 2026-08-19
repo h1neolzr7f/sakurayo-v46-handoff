@@ -15,3 +15,4 @@ A/B 每轮追加一行，不准删旧记录。
 | 2026-08-18 | A | 清虫轮1 / 底栏遮挡 | 竖屏角色卡盖住寻访/仓库。nav z-index 8，补 elementFromPoint 回归。 | 门A绿 | 检查点1只改测试没改层级 | 轮2分层 |
 | 2026-08-18 | A | 清虫轮2 / 剧情吐槽分层 | 升级模态时断言 dialogue/banter hidden。transientBlocked 已在。 | 门A绿 | 轮1只看大厅点击 | 轮3回归 |
 | 2026-08-18 | A | 清虫轮3 / 回归 | 再跑门 A+C。无新 P0/P1。见 docs/PHASE1_GATE6.md | 门A/C绿 | 连续两轮无新洞 | 停，等人收工 |
+| 2026-08-19 | A | 残片降级 | 收工打回：残片无 N 时 N 被抬成 SR。downgradeRarity 先降档，走到底取最低档；仅 want=SSR 且无 SSR 才给最高档。want=SSR（硬保/软保）降成 SR 后清 pity，避免卡在 ≥80 后每抽都是 SR。lobby_unit 2000 抽残片 R 远多于 SR。 | 待跑门A | 检查点3接线后没测无 N 池；保底降档后没清 pity | 等人再验收 |

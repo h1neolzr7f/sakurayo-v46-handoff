@@ -500,26 +500,39 @@
     return pool[Math.floor(rng() * pool.length) % pool.length];
   }
 
+  function hasRarity(list, rarity) {
+    var c;
+    for (c = 0; c < list.length; c++) {
+      if (list[c].r === rarity) return true;
+    }
+    return false;
+  }
+
   function highestRarity(list) {
     var i;
     for (i = 0; i < RARITY_RANK.length; i++) {
-      for (var c = 0; c < list.length; c++) {
-        if (list[c].r === RARITY_RANK[i]) return RARITY_RANK[i];
-      }
+      if (hasRarity(list, RARITY_RANK[i])) return RARITY_RANK[i];
+    }
+    return null;
+  }
+
+  function lowestRarity(list) {
+    var i;
+    for (i = RARITY_RANK.length - 1; i >= 0; i--) {
+      if (hasRarity(list, RARITY_RANK[i])) return RARITY_RANK[i];
     }
     return null;
   }
 
   function downgradeRarity(want, list) {
+    if (want === "SSR" && !hasRarity(list, "SSR")) return highestRarity(list);
     var start = RARITY_RANK.indexOf(want);
     if (start < 0) start = 0;
     var i;
     for (i = start; i < RARITY_RANK.length; i++) {
-      for (var c = 0; c < list.length; c++) {
-        if (list[c].r === RARITY_RANK[i]) return RARITY_RANK[i];
-      }
+      if (hasRarity(list, RARITY_RANK[i])) return RARITY_RANK[i];
     }
-    return highestRarity(list);
+    return lowestRarity(list);
   }
 
   function ssrRate(pity) {
@@ -530,19 +543,15 @@
     return Math.min(1, RATES.SSR + step * (1 - RATES.SSR));
   }
 
-  function rollRarity(ops, rng, list) {
-    var want;
-    if (ops.pity + 1 >= RATES.pitySSR) want = "SSR";
-    else if (ops.pitySR + 1 >= RATES.pitySR) want = "SR";
-    else {
-      var ssr = ssrRate(ops.pity);
-      var roll = rng();
-      if (roll < ssr) want = "SSR";
-      else if (roll < ssr + RATES.SR) want = "SR";
-      else if (roll < ssr + RATES.SR + RATES.R) want = "R";
-      else want = "N";
-    }
-    return downgradeRarity(want, list);
+  function rollWant(ops, rng) {
+    if (ops.pity + 1 >= RATES.pitySSR) return "SSR";
+    if (ops.pitySR + 1 >= RATES.pitySR) return "SR";
+    var ssr = ssrRate(ops.pity);
+    var roll = rng();
+    if (roll < ssr) return "SSR";
+    if (roll < ssr + RATES.SR) return "SR";
+    if (roll < ssr + RATES.SR + RATES.R) return "R";
+    return "N";
   }
 
   function poolState(ops, pool) {
@@ -552,12 +561,13 @@
   }
 
   function applyPull(ops, rng, list, shardHost) {
-    var rarity = rollRarity(ops, rng, list);
+    var want = rollWant(ops, rng);
+    var rarity = downgradeRarity(want, list);
     var card = pickOfRarity(rarity, rng, list, ops.owned);
     if (!card) return null;
     ops.pity += 1;
     ops.pitySR += 1;
-    if (card.r === "SSR") {
+    if (card.r === "SSR" || want === "SSR") {
       ops.pity = 0;
       ops.pitySR = 0;
     } else if (card.r === "SR") {
@@ -1292,6 +1302,7 @@
     renderStageModes: renderStageModes,
     dressArchive: dressArchive,
     cardOf: cardOf,
+    downgradeRarity: downgradeRarity,
     cheatToast: CHEAT_TOAST,
   };
 })(typeof window !== "undefined" ? window : globalThis);
