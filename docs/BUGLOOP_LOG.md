@@ -195,3 +195,19 @@
 
 本轮新问题：系统提示压构筑条。
 变成哪条回归：emu_loop 证词 toast 不压 mission。
+
+修完复跑：static 绿 / emu_loop 28 绿含「证词升级 toast 不压 mission」。
+
+---
+
+## 轮 14（全游戏，不限横屏）
+
+自动打回：**未过。不要进入下一类。**
+层：Playwright视口
+类：#modeBar46 只改 pendingMode46，#start→startGame 不写入 runMode36；关卡页点证词/主神胶囊后直接出击仍走 story
+复现：关卡抽屉点「证词模式」→关抽屉→出击→triggerUpgrade 弹出 #level；主神胶囊同路径进普通四章
+上一轮为什么没发现：emu_loop / browser_smoke 的证词都走 setRunMode46（同时写两个变量），从不点胶囊再点大厅出击。HANDOFF §6 写了「真正开局时再写入」但代码没做。
+回归：`emu_loop` 点证词胶囊出击不弹升级卡；主神胶囊未点进入轮回时留在大厅。`lobby_unit` 断言 startGame 同步 pendingMode46
+
+本轮新问题：出击模式胶囊无效。
+变成哪条回归：emu_loop 关卡胶囊出击写入正确模式。

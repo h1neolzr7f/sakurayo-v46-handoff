@@ -18,6 +18,7 @@ assert.match(code, /html\.landscape46 \.wishPity46\{bottom:max\(240px/);
 const indexSrc = fs.readFileSync(path.join(root, "src/index.html"), "utf8");
 assert.equal(indexSrc.includes('hint.textContent = "请横持设备"'), false, "index 不得再创建横持提示");
 assert.equal(indexSrc.includes('toggle("portraitFallback46"'), false, "index 不得再打开竖版回退");
+assert.match(indexSrc, /runMode36=pendingMode46==="testimony"\?"testimony":"story"/, "出击必须把 pendingMode46 写入 runMode36");
 assert.equal(L.version, "4.6.0");
 assert.equal(L.CARDS.length, 8);
 assert.equal(L.CHRONICLE.length, 5);

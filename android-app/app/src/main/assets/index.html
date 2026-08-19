@@ -11758,6 +11758,16 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     };
     const _startGame46=startGame;
     startGame=function(){
+      if(state==="menu"){
+        if(pendingMode46==="mainGod"){
+          if(runMode36!=="mainGod"){
+            toast("请先在主神卡片点「进入轮回」");
+            return;
+          }
+        }else{
+          runMode36=pendingMode46==="testimony"?"testimony":"story";
+        }
+      }
       const result=_startGame46();
       if(runMode36==="testimony"&&$("#stageHud")) $("#stageHud").textContent=`证词 · ${stage().short}`;
       return result;
