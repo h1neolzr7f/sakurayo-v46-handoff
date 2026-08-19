@@ -65,27 +65,38 @@
       world.floor | 0,
       world.W | 0,
       world.H | 0,
+      world.cols | 0,
+      world.rows | 0,
+      world.worldW | 0,
     ].join(":");
   }
 
   function makeObs(world) {
     var W = world.W || 430,
       H = world.H || 932,
+      cols = world.cols > 0 ? world.cols | 0 : 1,
+      rows = world.rows > 0 ? world.rows | 0 : 1,
       id = groundId(world),
       list = [];
-    if (id === "torii") {
-      list.push({ kind: "torii", x: W * 0.22, y: H * 0.36, r: 15, block: "bullet" });
-      list.push({ kind: "torii", x: W * 0.78, y: H * 0.4, r: 15, block: "bullet" });
-      list.push({ kind: "torii", x: W * 0.5, y: H * 0.66, r: 16, block: "bullet" });
-    } else if (id === "neon") {
-      list.push({ kind: "vehicle", x: W * 0.18, y: H * 0.48, w: 52, h: 28, block: "both" });
-      list.push({ kind: "vehicle", x: W * 0.7, y: H * 0.62, w: 58, h: 26, block: "both" });
-    } else if (id === "swords") {
-      list.push({ kind: "sword", x: W * 0.32, y: H * 0.42, r: 72, slow: 0.78, melee: 1.18 });
-      list.push({ kind: "sword", x: W * 0.68, y: H * 0.6, r: 64, slow: 0.78, melee: 1.18 });
-    } else if (id === "mirror") {
-      list.push({ kind: "mirror", x: W * 0.28, y: H * 0.38, w: 10, h: 78, bounce: "x" });
-      list.push({ kind: "mirror", x: W * 0.74, y: H * 0.58, w: 10, h: 72, bounce: "x" });
+    function addChunk(ox, oy) {
+      if (id === "torii") {
+        list.push({ kind: "torii", x: ox + W * 0.22, y: oy + H * 0.36, r: 15, block: "bullet" });
+        list.push({ kind: "torii", x: ox + W * 0.78, y: oy + H * 0.4, r: 15, block: "bullet" });
+        list.push({ kind: "torii", x: ox + W * 0.5, y: oy + H * 0.66, r: 16, block: "bullet" });
+      } else if (id === "neon") {
+        list.push({ kind: "vehicle", x: ox + W * 0.18, y: oy + H * 0.48, w: 52, h: 28, block: "both" });
+        list.push({ kind: "vehicle", x: ox + W * 0.7, y: oy + H * 0.62, w: 58, h: 26, block: "both" });
+      } else if (id === "swords") {
+        list.push({ kind: "sword", x: ox + W * 0.32, y: oy + H * 0.42, r: 72, slow: 0.78, melee: 1.18 });
+        list.push({ kind: "sword", x: ox + W * 0.68, y: oy + H * 0.6, r: 64, slow: 0.78, melee: 1.18 });
+      } else if (id === "mirror") {
+        list.push({ kind: "mirror", x: ox + W * 0.28, y: oy + H * 0.38, w: 10, h: 78, bounce: "x" });
+        list.push({ kind: "mirror", x: ox + W * 0.74, y: oy + H * 0.58, w: 10, h: 72, bounce: "x" });
+      }
+    }
+    var r, c;
+    for (r = 0; r < rows; r++) {
+      for (c = 0; c < cols; c++) addChunk(c * W, r * H);
     }
     return list;
   }
@@ -192,8 +203,44 @@
     ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh);
   }
 
+  function drawMirrorEcho(ctx, world) {
+    if (!world || world.playerX == null) return;
+    var pal = stageProfile(world.stageId, world);
+    if (pal.ground !== "mirror") return;
+    var t = world.runTime || 0;
+    if (t - echoAt > 0.08) {
+      echoAt = t;
+      echo.push(world.playerX, world.playerY);
+      if (echo.length > 12) echo.splice(0, echo.length - 12);
+    }
+    ctx.fillStyle = "rgba(185,146,255,0.16)";
+    var i;
+    for (i = 0; i < echo.length; i += 2) {
+      ctx.beginPath();
+      ctx.ellipse(echo[i], echo[i + 1] + 18, 18, 7, 0, 0, TAU);
+      ctx.fill();
+    }
+  }
+
   function drawGround(ctx, world) {
     if (!ctx || !world) return;
+    if (world.camX != null && world.cols > 1 && global.SakurayoCamera && global.SakurayoCamera.visibleChunks) {
+      var tiles = global.SakurayoCamera.visibleChunks();
+      var n;
+      for (n = 0; n < tiles.length; n++) {
+        ctx.save();
+        ctx.translate(tiles[n].x, tiles[n].y);
+        drawGroundChunk(ctx, world);
+        ctx.restore();
+      }
+      drawMirrorEcho(ctx, world);
+      return;
+    }
+    drawGroundChunk(ctx, world);
+    drawMirrorEcho(ctx, world);
+  }
+
+  function drawGroundChunk(ctx, world) {
     var W = world.W,
       H = world.H,
       t = world.runTime || 0,
@@ -315,19 +362,6 @@
       ctx.lineTo(W * 0.62, H * 0.55);
       ctx.lineTo(W * 0.3, H - 40);
       ctx.stroke();
-      if (world.playerX != null) {
-        if (t - echoAt > 0.08) {
-          echoAt = t;
-          echo.push(world.playerX, world.playerY);
-          if (echo.length > 12) echo.splice(0, echo.length - 12);
-        }
-        ctx.fillStyle = "rgba(185,146,255,0.16)";
-        for (i = 0; i < echo.length; i += 2) {
-          ctx.beginPath();
-          ctx.ellipse(echo[i], echo[i + 1] + 18, 18, 7, 0, 0, TAU);
-          ctx.fill();
-        }
-      }
     }
 
     ctx.fillStyle = pal.accent + "18";
@@ -653,6 +687,10 @@
       earlyFloor: EARLY_FLOOR,
       earlyInterval: EARLY_INTERVAL,
       heroScale: heroVisualScale(world.W),
+      worldW: world.worldW || world.W || 0,
+      worldH: world.worldH || world.H || 0,
+      cols: world.cols || 1,
+      rows: world.rows || 1,
     };
   }
 

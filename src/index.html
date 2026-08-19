@@ -148,6 +148,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 </script>
 <script src="runtime/sakurayo-content-runtime.js"></script>
 <script src="runtime/sakurayo-lifecycle.js"></script>
+<script src="runtime/sakurayo-camera.js"></script>
 <script src="runtime/sakurayo-cutscene.js"></script>
 <script src="runtime/sakurayo-economy.js"></script>
 <script src="runtime/sakurayo-lobby.js"></script>
@@ -585,7 +586,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
   function spawnArenaHazards(kind,count=1){
     const cfg={eye:{r:54,t:1.35,c:'#ff5fae'},emp:{r:68,t:1.55,c:'#69dfff'},sword:{r:42,t:1.1,c:'#b58cff'},mirror:{r:58,t:1.45,c:'#ff82d3'}}[kind];
-    for(let i=0;i<count&&arenaHazards.length<18;i++) arenaHazards.push({kind,x:rnd(45,W-45),y:rnd(100,H-45),r:cfg.r,t:cfg.t,total:cfg.t,c:cfg.c,fired:false,life:.42});
+    const cam=window.SakurayoCamera?window.SakurayoCamera.current():{x:0,y:0};
+    for(let i=0;i<count&&arenaHazards.length<18;i++) arenaHazards.push({kind,x:rnd(cam.x+45,cam.x+W-45),y:rnd(cam.y+100,cam.y+H-45),r:cfg.r,t:cfg.t,total:cfg.t,c:cfg.c,fired:false,life:.42});
   }
   function updateArenaHazards(dt){
     for(const h of arenaHazards){h.t-=dt;if(!h.fired&&h.t<=0){h.fired=true;let d=Math.hypot(P.x-h.x,P.y-h.y);if(d<h.r+P.r){let hit=damagePlayer(stage().id===4?20:15+stage().id*2);if(hit&&h.kind==='emp')P.jam=Math.max(P.jam,3);if(hit&&h.kind==='sword'){P.skill=Math.max(P.skill,1.8);P.dash=Math.max(P.dash,1)}if(hit&&h.kind==='mirror')P.healSupp=Math.max(P.healSupp,3.5);}aoe(h.x,h.y,h.r,0,h.c,true);shake=Math.max(shake,7);}if(h.fired)h.life-=dt;}arenaHazards=arenaHazards.filter(h=>!h.fired||h.life>0);
@@ -2316,11 +2318,20 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function resize() {
     D = Math.min(2, devicePixelRatio || 1);
     const view = viewportSize46();
+    const prev = window.SakurayoCamera ? window.SakurayoCamera.size() : null;
     W = view.w;
     H = view.h;
     cv.width = Math.floor(W * D);
     cv.height = Math.floor(H * D);
     ctx.setTransform(D, 0, 0, D, 0, 0);
+    if (window.SakurayoCamera) {
+      const next = window.SakurayoCamera.configure(W, H);
+      if (P && Number.isFinite(P.x) && prev && prev.worldW && prev.worldH) {
+        P.x *= next.worldW / prev.worldW;
+        P.y *= next.worldH / prev.worldH;
+      }
+      if (P && Number.isFinite(P.x)) window.SakurayoCamera.snap(P.x, P.y);
+    }
     preferLandscape46();
     if (state === "menu") background();
   }
@@ -2333,8 +2344,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const q = save.tal,
       flow = 1 - q.flow * 0.02;
     Object.assign(P, {
-      x: W / 2,
-      y: H / 2,
+      x: (window.SakurayoCamera ? window.SakurayoCamera.size().worldW : W) / 2,
+      y: (window.SakurayoCamera ? window.SakurayoCamera.size().worldH : H) / 2,
       r: 16,
       spd: 220,
       hp: 100 + q.hp * 8,
@@ -2751,6 +2762,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     levelRerolls = 2;
     acc = 0;
     resetP();
+    if (window.SakurayoCamera) window.SakurayoCamera.snap(P.x, P.y);
     state = "dialogue";
     $("#menu").classList.add("hidden");
     $("#result").classList.add("hidden");
@@ -3395,6 +3407,15 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     world.bossBorn = !!bossBorn;
     world.W = W;
     world.H = H;
+    if (window.SakurayoCamera) {
+      const cam = window.SakurayoCamera.current();
+      world.worldW = cam.worldW;
+      world.worldH = cam.worldH;
+      world.camX = cam.x;
+      world.camY = cam.y;
+      world.cols = cam.cols;
+      world.rows = cam.rows;
+    }
     world.quality = quality;
     world.enemyCount = enemies.length;
     world.capE = caps().e;
@@ -3416,21 +3437,24 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (enemies.length >= cap.e) return;
     let s = stage(),
       pad = 65,
-      side = Math.floor(Math.random() * 4),
-      x,
-      y;
-    if (side === 0) {
-      x = rnd(0, W);
-      y = -pad;
-    } else if (side === 1) {
-      x = W + pad;
-      y = rnd(0, H);
-    } else if (side === 2) {
-      x = rnd(0, W);
-      y = H + pad;
-    } else {
-      x = -pad;
-      y = rnd(0, H);
+      spawn = window.SakurayoCamera ? window.SakurayoCamera.spawnOutside(pad) : null,
+      side = spawn ? spawn.side : Math.floor(Math.random() * 4),
+      x = spawn ? spawn.x : 0,
+      y = spawn ? spawn.y : 0;
+    if (!spawn) {
+      if (side === 0) {
+        x = rnd(0, W);
+        y = -pad;
+      } else if (side === 1) {
+        x = W + pad;
+        y = rnd(0, H);
+      } else if (side === 2) {
+        x = rnd(0, W);
+        y = H + pad;
+      } else {
+        x = -pad;
+        y = rnd(0, H);
+      }
     }
     let type = forced || "normal",
       r = Math.random(),
@@ -3540,8 +3564,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         {},
       ][s.id - 1];
     boss = {
-      x: W / 2,
-      y: -70,
+      x: Number.isFinite(P?.x) ? P.x : W / 2,
+      y: (window.SakurayoCamera ? window.SakurayoCamera.current().y : 0) - 70,
       r: 46 + s.id * 3,
       hp,
       max: hp,
@@ -4040,8 +4064,14 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     let dx = joy.dx || P.fx,
       dy = joy.dy || P.fy,
       l = Math.hypot(dx, dy) || 1;
-    P.x = clamp(P.x + (dx / l) * 96, 18, W - 18);
-    P.y = clamp(P.y + (dy / l) * 96, 65, H - 18);
+    if (window.SakurayoCamera) {
+      const next = window.SakurayoCamera.clampPlayer(P.x + (dx / l) * 96, P.y + (dy / l) * 96, PLAYER_GEOMETRY35);
+      P.x = next.x;
+      P.y = next.y;
+    } else {
+      P.x = clamp(P.x + (dx / l) * 96, 18, W - 18);
+      P.y = clamp(P.y + (dy / l) * 96, 65, H - 18);
+    }
     P.inv = 0.42;
     P.dash = P.dashCd;
     if(P.shadowstep||P.shadowBladeFusion){aoe(P.x,P.y,70+(P.shadowstep||0)*8,P.dmg*(.55+(P.shadowstep||0)*.16),"#a890ff",false,{source:"kunai",school:"ninja"});for(const e of grid.near(P.x,P.y,115))if(e.mark>0)damageEnemy(e,P.dmg*(P.shadowBladeFusion?1.4:.65),{source:"blade",school:"cult"});}
@@ -4651,13 +4681,29 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     P.weaponLock=Math.max(0,(P.weaponLock||0)-dt);
     let ground44 = window.SakurayoLifecycle ? window.SakurayoLifecycle.resolvePlayer(P.x, P.y, P.r, lifecycleWorld44()) : {x:P.x,y:P.y,slow:1,melee:1};
     P.groundMelee44 = ground44.melee || 1;
-    P.x = clamp(P.x + mx * P.spd * (ground44.slow || 1) * dt, PLAYER_GEOMETRY35.edgeX, W - PLAYER_GEOMETRY35.edgeX);
-    P.y = clamp(P.y + my * P.spd * (ground44.slow || 1) * dt, PLAYER_GEOMETRY35.edgeTop, H - PLAYER_GEOMETRY35.edgeBottom);
+    if (window.SakurayoCamera) {
+      const next = window.SakurayoCamera.clampPlayer(
+        P.x + mx * P.spd * (ground44.slow || 1) * dt,
+        P.y + my * P.spd * (ground44.slow || 1) * dt,
+        PLAYER_GEOMETRY35,
+      );
+      P.x = next.x;
+      P.y = next.y;
+    } else {
+      P.x = clamp(P.x + mx * P.spd * (ground44.slow || 1) * dt, PLAYER_GEOMETRY35.edgeX, W - PLAYER_GEOMETRY35.edgeX);
+      P.y = clamp(P.y + my * P.spd * (ground44.slow || 1) * dt, PLAYER_GEOMETRY35.edgeTop, H - PLAYER_GEOMETRY35.edgeBottom);
+    }
     if (window.SakurayoLifecycle) {
       ground44 = window.SakurayoLifecycle.resolvePlayer(P.x, P.y, P.r, lifecycleWorld44());
       P.x = ground44.x;
       P.y = ground44.y;
       P.groundMelee44 = ground44.melee || 1;
+    }
+    if (window.SakurayoCamera) {
+      const held = window.SakurayoCamera.clampPlayer(P.x, P.y, PLAYER_GEOMETRY35);
+      P.x = held.x;
+      P.y = held.y;
+      window.SakurayoCamera.follow(P.x, P.y, dt);
     }
     if (P.fire <= 0) shoot();
     if (P.fireball) {
@@ -4911,7 +4957,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }
     bullets = bullets.filter(
       (b) =>
-        b.life > 0 && b.x > -60 && b.x < W + 60 && b.y > -60 && b.y < H + 60,
+        b.life > 0 &&
+        (window.SakurayoCamera
+          ? window.SakurayoCamera.inWorld(b.x, b.y, 60)
+          : b.x > -60 && b.x < W + 60 && b.y > -60 && b.y < H + 60),
     );
     for (const b of ebullets) {
       b.x += b.vx * dt;
@@ -4941,7 +4990,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }
     ebullets = ebullets.filter(
       (b) =>
-        b.life > 0 && b.x > -80 && b.x < W + 80 && b.y > -80 && b.y < H + 80,
+        b.life > 0 &&
+        (window.SakurayoCamera
+          ? window.SakurayoCamera.inWorld(b.x, b.y, 80)
+          : b.x > -80 && b.x < W + 80 && b.y > -80 && b.y < H + 80),
     );
     for (const e of enemies) {
       if (e.dead) continue;
@@ -5119,7 +5171,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     slashes = slashes.filter((s) => s.life > 0);
     enemies = enemies.filter(
       (e) =>
-        !e.dead && e.x > -240 && e.x < W + 240 && e.y > -240 && e.y < H + 240,
+        !e.dead &&
+        (window.SakurayoCamera
+          ? window.SakurayoCamera.inWorld(e.x, e.y, 240)
+          : e.x > -240 && e.x < W + 240 && e.y > -240 && e.y < H + 240),
     );
     updateArenaHazards(dt);
     shake = Math.max(0, shake - 28 * dt);
@@ -5563,7 +5618,12 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   /* ================= RENDER ================= */
   function draw() {
     ctx.save();
-    if (shake) ctx.translate(rnd(-shake / 2, shake / 2), rnd(-shake / 2, shake / 2));
+    ctx.fillStyle = "#05040e";
+    ctx.fillRect(0, 0, W, H);
+    const shakeX = shake ? rnd(-shake / 2, shake / 2) : 0;
+    const shakeY = shake ? rnd(-shake / 2, shake / 2) : 0;
+    if (window.SakurayoCamera) window.SakurayoCamera.apply(ctx, shakeX, shakeY);
+    else if (shake) ctx.translate(shakeX, shakeY);
     background();
     drawArenaHazards();
     gems.forEach(gemDraw);
@@ -5916,7 +5976,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const title=P.outfitRevealTitle||outfitTitle45(layer)||"换装";
     const kind=layer&&layer.kind||(String(layer&&layer.id||"").startsWith("form_")?"form":String(layer&&layer.id||"").startsWith("fusion_")?"fusion":"career");
     const tag=kind==="form"?"飞升换装":kind==="fusion"?"融合换装":"转职换装";
-    const cardW=Math.min(268,W*.7),cardH=162,cx=W*.5,cy=Math.max(118,H*.2),x=cx-cardW/2,y=cy-cardH/2,r=16;
+    const cam=window.SakurayoCamera?window.SakurayoCamera.current():{x:0,y:0},cardW=Math.min(268,W*.7),cardH=162,cx=cam.x+W*.5,cy=cam.y+Math.max(118,H*.2),x=cx-cardW/2,y=cy-cardH/2,r=16;
     ctx.save();
     ctx.globalAlpha=q*.94;
     ctx.beginPath();
@@ -6227,7 +6287,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   const aimInput36={on:false,id:null,x:0,y:0};
   function setAimVector36(x,y,manual=true){let l=Math.hypot(x,y);if(l<.01)return false;P.aimX=x/l;P.aimY=y/l;P.fx=P.aimX;P.fy=P.aimY;P.weaponAngle=Math.atan2(P.aimY,P.aimX);P.manualAim=manual;P.weaponLock=.24;return true;}
   function aimDown36(e){if(state!=="play"||e.target.closest(".act")||e.target===$("#pause"))return;aimInput36.on=true;aimInput36.id=e.pointerId;aimMove36(e);}
-  function aimMove36(e){if(!aimInput36.on||e.pointerId!==aimInput36.id)return;aimInput36.x=e.clientX;aimInput36.y=e.clientY;setAimVector36(e.clientX-P.x,e.clientY-P.y,true);}
+  function aimMove36(e){if(!aimInput36.on||e.pointerId!==aimInput36.id)return;aimInput36.x=e.clientX;aimInput36.y=e.clientY;const aim=window.SakurayoCamera?window.SakurayoCamera.screenToWorld(e.clientX,e.clientY):{x:e.clientX,y:e.clientY};setAimVector36(aim.x-P.x,aim.y-P.y,true);}
   function aimUp36(e){if(e.pointerId!==aimInput36.id)return;aimInput36.on=false;aimInput36.id=null;}
   function facingName36(a=P.weaponAngle||0){const x=Math.cos(a),y=Math.sin(a);return Math.abs(x)>Math.abs(y)?(x>=0?"right":"left"):(y>=0?"down":"up");}
   function angleDelta36(a,b){return Math.atan2(Math.sin(a-b),Math.cos(a-b));}
@@ -6405,7 +6465,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 
   drawArenaHazards=function(){for(const h of arenaHazards){const q=clamp(h.t/h.total,0,1),locked=!h.fired&&q<=.38,pulse=.78+.12*Math.sin(runTime*10);ctx.save();if(h.fired){ctx.globalAlpha=Math.max(0,h.life/.42);ctx.fillStyle=h.c+"66";ctx.strokeStyle="#fff";ctx.lineWidth=6;}else if(locked){ctx.globalAlpha=.92;ctx.fillStyle=h.c+"30";ctx.strokeStyle="#fff";ctx.lineWidth=4;}else{ctx.globalAlpha=.48;ctx.fillStyle=h.c+"16";ctx.strokeStyle=h.c;ctx.lineWidth=2;}ctx.setLineDash(h.fired?[]:locked?[10,4]:[5,7]);ctx.beginPath();ctx.arc(h.x,h.y,h.r*(h.fired?1:pulse),0,TAU);ctx.fill();ctx.stroke();ctx.setLineDash([]);ctx.font=`900 ${locked?16:14}px system-ui`;ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillStyle="#fff";const tag={eye:"凝视",emp:"EMP",sword:"剑阵",mirror:"镜蚀"}[h.kind]||"危险";ctx.fillText(h.fired?"爆发":locked?`${tag} ${(Math.max(0,h.t)).toFixed(1)}s`:tag,h.x,h.y);ctx.restore();}};
   let bossPointerVisible38=false;
-  function drawBossPointer38(){bossPointerVisible38=false;if(!boss||boss.dead||state!=="play")return;const pad=54,inside=boss.x>=pad&&boss.x<=W-pad&&boss.y>=92&&boss.y<=H-pad;if(inside)return;bossPointerVisible38=true;const dx=boss.x-P.x,dy=boss.y-P.y,a=Math.atan2(dy,dx),cx=clamp(P.x+Math.cos(a)*Math.min(W,H)*.38,pad,W-pad),cy=clamp(P.y+Math.sin(a)*Math.min(W,H)*.38,105,H-pad);ctx.save();ctx.translate(cx,cy);ctx.rotate(a);ctx.shadowBlur=14;ctx.shadowColor="#ff4fa5";ctx.fillStyle="#ff69b7";ctx.beginPath();ctx.moveTo(18,0);ctx.lineTo(-10,-10);ctx.lineTo(-5,0);ctx.lineTo(-10,10);ctx.closePath();ctx.fill();ctx.shadowBlur=0;ctx.rotate(-a);ctx.font="900 11px system-ui";ctx.textAlign="center";ctx.fillStyle="#fff";ctx.strokeStyle="#160a22";ctx.lineWidth=4;const label=`BOSS ${Math.round(Math.hypot(dx,dy))}m`;ctx.strokeText(label,0,25);ctx.fillText(label,0,25);ctx.restore();}
+  function drawBossPointer38(){bossPointerVisible38=false;if(!boss||boss.dead||state!=="play")return;const pad=54,cam=window.SakurayoCamera?window.SakurayoCamera.current():{x:0,y:0},inside=window.SakurayoCamera?window.SakurayoCamera.contains(boss.x,boss.y,-pad):(boss.x>=pad&&boss.x<=W-pad&&boss.y>=92&&boss.y<=H-pad);if(inside)return;bossPointerVisible38=true;const dx=boss.x-P.x,dy=boss.y-P.y,a=Math.atan2(dy,dx),cx=clamp(P.x+Math.cos(a)*Math.min(W,H)*.38,cam.x+pad,cam.x+W-pad),cy=clamp(P.y+Math.sin(a)*Math.min(W,H)*.38,cam.y+105,cam.y+H-pad);ctx.save();ctx.translate(cx,cy);ctx.rotate(a);ctx.shadowBlur=14;ctx.shadowColor="#ff4fa5";ctx.fillStyle="#ff69b7";ctx.beginPath();ctx.moveTo(18,0);ctx.lineTo(-10,-10);ctx.lineTo(-5,0);ctx.lineTo(-10,10);ctx.closePath();ctx.fill();ctx.shadowBlur=0;ctx.rotate(-a);ctx.font="900 11px system-ui";ctx.textAlign="center";ctx.fillStyle="#fff";ctx.strokeStyle="#160a22";ctx.lineWidth=4;const label=`BOSS ${Math.round(Math.hypot(dx,dy))}m`;ctx.strokeText(label,0,25);ctx.fillText(label,0,25);ctx.restore();}
   CONTENT41.hook("combat:after-draw",drawBossPointer38,"core.boss-pointer38",20);
   CONTENT41.hook("combat:after-draw",drawOutfitReveal45,"core.outfit-reveal45",25);
 
@@ -6488,7 +6548,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if(!e)return;const sid=stage().id;
     if(isMainGodRun36()){e.rule39="轮回校验：每 7 秒切换抗性";e.ruleClock39=1;}
     else if(sid===1){e.rule39=p===2?"破坏镜卫，解除百目结界":"凝视区爆发前离开标记";}
-    else if(sid===2){e.rule39="站入蓝色安全信道，可快速清除干扰";e.signalX39=rnd(W*.22,W*.78);}
+    else if(sid===2){e.rule39="站入蓝色安全信道，可快速清除干扰";e.signalX39=(window.SakurayoCamera?window.SakurayoCamera.current().x:0)+rnd(W*.22,W*.78);}
     else if(sid===3){e.rule39=p>=3?"优先斩断封灵镜卫，否则技能持续受压":"剑阵预警后横向脱离";}
     else{e.rule39="镜姬会周期适应当前最高伤害来源";e.ruleClock39=1;}
     P.bossRule39=e.rule39;const node=$("#bossRule39");if(node)node.textContent=e.rule39;
@@ -6523,7 +6583,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function drawMechanics39(){
     if(state!=="play")return;
     ctx.save();
-    if(P.signalLane39!=null&&boss&&!boss.dead){ctx.fillStyle=Math.abs(P.x-P.signalLane39)<42?"#55e7ff22":"#55e7ff0e";ctx.fillRect(P.signalLane39-42,72,84,H-90);ctx.strokeStyle="#77efff88";ctx.setLineDash([10,10]);ctx.strokeRect(P.signalLane39-42,72,84,H-90);ctx.setLineDash([]);}
+    if(P.signalLane39!=null&&boss&&!boss.dead){const cam=window.SakurayoCamera?window.SakurayoCamera.current():{x:0,y:0};ctx.fillStyle=Math.abs(P.x-P.signalLane39)<42?"#55e7ff22":"#55e7ff0e";ctx.fillRect(P.signalLane39-42,cam.y+72,84,H-90);ctx.strokeStyle="#77efff88";ctx.setLineDash([10,10]);ctx.strokeRect(P.signalLane39-42,cam.y+72,84,H-90);ctx.setLineDash([]);}
     if(P.dodgeFlash>0){ctx.strokeStyle="#fff4a8";ctx.lineWidth=4;ctx.beginPath();ctx.ellipse(P.x,P.y+14,P.r+9,(P.r+9)*.48,0,0,TAU);ctx.stroke();}
     for(const e of enemies)if(!e.dead&&e.chargeWind39>0){ctx.strokeStyle="#ff925dcc";ctx.lineWidth=3;ctx.setLineDash([7,6]);ctx.beginPath();ctx.moveTo(e.x,e.y);ctx.lineTo(e.x+Math.cos(e.chargeAngle39)*110,e.y+Math.sin(e.chargeAngle39)*110);ctx.stroke();ctx.setLineDash([]);}
     ctx.restore();
@@ -6910,7 +6970,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   CONTENT41.hook("boss:after-spawn",()=>{if(boss){boss.prevPhase412=0;boss.transformFx412=1.1;}},"core.boss-art412",10);
   CONTENT41.hook("boss:before-phase",payload=>{const e=payload?.boss,p=payload?.nextPhase;if(e&&p>e.phase){e.prevPhase412=e.phase;e.transformFx412=1.35;if(!isMainGodRun36())preloadCombatPaths412([`bosses/stage${clamp(stage().id,1,4)}_phase${p}.webp`]);}},"core.boss-art412",10);
   CONTENT41.hook("combat:after-update",payload=>{if(boss?.transformFx412>0)boss.transformFx412=Math.max(0,boss.transformFx412-payload.dt);},"core.boss-art412",10);
-  function drawBossStage412(){if(!boss||boss.dead||state!=="play"||quality<.7)return;const p=boss.phase||1,t=runTime,sid=stage().id;ctx.save();ctx.globalCompositeOperation="screen";ctx.globalAlpha=.05+p*.018;ctx.strokeStyle=sid===2?"#5ceaff":sid===3?"#e4d7ff":"#ff6dbb";ctx.lineWidth=2;if(sid===1){for(let i=0;i<4+p;i++){const x=(i+.5)*W/(4+p);ctx.beginPath();ctx.ellipse(x,88+Math.sin(t+i)*18,18,6,0,0,TAU);ctx.stroke();}}else if(sid===2){for(let y=80;y<H;y+=34+p*2){ctx.beginPath();ctx.moveTo(0,y+Math.sin(t*7+y)*4);ctx.lineTo(W,y);ctx.stroke();}}else if(sid===3){for(let i=0;i<5+p;i++){const x=(i+.5)*W/(5+p),y=74+(i%2)*28;ctx.beginPath();ctx.moveTo(x-9,y-18);ctx.lineTo(x+9,y+18);ctx.stroke();}}else{for(let i=0;i<4+p;i++){const a=t*.08+i*TAU/(4+p),x=W/2+Math.cos(a)*W*.43,y=H/2+Math.sin(a)*H*.42;ctx.strokeRect(x-10,y-16,20,32);}}ctx.restore();}
+  function drawBossStage412(){if(!boss||boss.dead||state!=="play"||quality<.7)return;const p=boss.phase||1,t=runTime,sid=stage().id,cam=window.SakurayoCamera?window.SakurayoCamera.current():{x:0,y:0};ctx.save();ctx.globalCompositeOperation="screen";ctx.globalAlpha=.05+p*.018;ctx.strokeStyle=sid===2?"#5ceaff":sid===3?"#e4d7ff":"#ff6dbb";ctx.lineWidth=2;if(sid===1){for(let i=0;i<4+p;i++){const x=cam.x+(i+.5)*W/(4+p);ctx.beginPath();ctx.ellipse(x,cam.y+88+Math.sin(t+i)*18,18,6,0,0,TAU);ctx.stroke();}}else if(sid===2){for(let y=80;y<H;y+=34+p*2){ctx.beginPath();ctx.moveTo(cam.x,cam.y+y+Math.sin(t*7+y)*4);ctx.lineTo(cam.x+W,cam.y+y);ctx.stroke();}}else if(sid===3){for(let i=0;i<5+p;i++){const x=cam.x+(i+.5)*W/(5+p),y=cam.y+74+(i%2)*28;ctx.beginPath();ctx.moveTo(x-9,y-18);ctx.lineTo(x+9,y+18);ctx.stroke();}}else{for(let i=0;i<4+p;i++){const a=t*.08+i*TAU/(4+p),x=cam.x+W/2+Math.cos(a)*W*.43,y=cam.y+H/2+Math.sin(a)*H*.42;ctx.strokeRect(x-10,y-16,20,32);}}ctx.restore();}
   CONTENT41.hook("combat:after-draw",drawBossStage412,"core.boss-stage412",40);
 
   /* ================= V4.2 MOD KIT LIFECYCLE SEAM ================= */
@@ -6918,7 +6978,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   spawnBoss=function(){CONTENT41.runHooks("boss:before-spawn",{stageId:stage().id,mainGod:isMainGodRun36()});const result=CORE_LIFECYCLE42.spawnBoss();CONTENT41.runHooks("boss:after-spawn",{stageId:stage().id,bossPhase:boss?.phase||0});return result;};
   advanceBossPhase=function(e,p){CONTENT41.runHooks("boss:before-phase",{boss:e,currentPhase:e?.phase||0,nextPhase:p,stageId:stage().id});const result=CORE_LIFECYCLE42.advanceBossPhase(e,p);CONTENT41.runHooks("boss:after-phase",{boss:e,bossPhase:e?.phase||p,stageId:stage().id});return result;};
   update=function(dt){const result=CORE_LIFECYCLE42.update(dt);CONTENT41.runHooks("combat:after-update",{dt,state,bossPhase:boss?.phase||0});return result;};
-  draw=function(){CORE_LIFECYCLE42.draw();CONTENT41.runHooks("combat:after-draw",{state,bossPhase:boss?.phase||0,quality});};
+  draw=function(){CORE_LIFECYCLE42.draw();const after={state,bossPhase:boss?.phase||0,quality};if(window.SakurayoCamera){ctx.save();window.SakurayoCamera.apply(ctx);CONTENT41.runHooks("combat:after-draw",after);ctx.restore();}else CONTENT41.runHooks("combat:after-draw",after);};
 
   function ensureModKitDrawer42(){
     let drawer=$("#modKitDrawer42");if(drawer)return drawer;
@@ -6944,7 +7004,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const finite=(value,fallback=0)=>Number.isFinite(value)?value:fallback;
     const damageSources=P.damageSources||{};
     return {
-      mode:state,runMode:runMode36,stageKey:isMainGodRun36()?stage().key:`story-${selected}`,stageDuration:finite(stage().dur),stage44:window.SakurayoLifecycle?window.SakurayoLifecycle.snapshot(lifecycleWorld44()):null,viewport:{width:W,height:H,coordinates:"origin top-left; +x right; +y down"},stage:selected,runTime:finite(runTime),
+      mode:state,runMode:runMode36,stageKey:isMainGodRun36()?stage().key:`story-${selected}`,stageDuration:finite(stage().dur),stage44:window.SakurayoLifecycle?window.SakurayoLifecycle.snapshot(lifecycleWorld44()):null,viewport:{width:W,height:H,coordinates:"origin top-left; +x right; +y down"},camera:window.SakurayoCamera?window.SakurayoCamera.snapshot():null,stage:selected,runTime:finite(runTime),
       player:{character:P.character||save.character||"sayo",skin:save.skin||"default",outfit:liveOutfitLayer35()?.id||null,careerBranch:careerBranchId35(),outfitFade:finite(P.outfitFade),outfitReveal:finite(P.outfitReveal),outfitTitle:P.outfitRevealTitle||"",animation:state==="play"?charPose35():"idle",portraitMode:"static",direction:facingName36(),aim:{x:finite(P.aimX,P.fx),y:finite(P.aimY,P.fy),angle:finite(P.weaponAngle)},manualAim:!!P.manualAim,x:finite(P.x),y:finite(P.y),radius:finite(P.r),visualSize:PLAYER_GEOMETRY35.visualSize,footOffset:PLAYER_GEOMETRY35.footOffset,hp:finite(P.hp),maxHp:finite(P.maxHp),shield:finite(P.sh),maxShield:finite(P.maxSh),level:finite(P.level),xp:finite(P.xp),nextXp:finite(P.next),attackDamage:finite(P.dmg),attackInterval:finite(P.rate),attackRange:finite(P.range),multishot:finite(P.multi),pierce:finite(P.pierce),skillCooldown:finite(P.skill),dashCooldown:finite(P.dash),shotCount:finite(P.shotCount),meleeChain:finite(P.meleeChain),perfectDodges:finite(P.perfectDodges),initialCore:P.initialCore40||null,initialCoreLevel:finite(P.initialCoreLevel40),noUpgradeChallenge:!!P.noUpgradeChallenge40,upgradeChoices:finite(P.upgradeChoices40),baitLevel:finite(P.baitLevel40),baitSpawns:finite(P.baitSpawns40)},
       counts:{enemies:enemies.filter(e=>!e.dead).length,bullets:bullets.length,enemyBullets:ebullets.length,gems:gems.length,pets:pets.length,      ops:window.SakurayoOps?window.SakurayoOps.snapshot().units.length:0},
       live:window.SakurayoLive?window.SakurayoLive.snapshot():null,
@@ -7075,7 +7135,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       playerGeometry(){return {...PLAYER_GEOMETRY35,radius:PLAYER_GEOMETRY35.collisionRadius};},
       circleCollision(distance,firstRadius,secondRadius){return circlesOverlap35(0,0,Number(firstRadius),Number(distance),0,Number(secondRadius));},
       meleeCollision(distance,slashRadius,enemyRadius){return circlesOverlap35(0,0,Number(slashRadius),Number(distance),0,Number(enemyRadius));},
-      spawnEnemyNear(type="normal",distance=105){if(state!=="play")throw new Error("spawnEnemyNear requires play mode");const before=enemies.length;spawnEnemy(type,false);const enemy=enemies[enemies.length-1];if(!enemy||enemies.length===before)throw new Error("Enemy cap prevented test spawn");enemy.x=clamp(P.x+Number(distance||105),enemy.r,W-enemy.r);enemy.y=P.y;enemy.hp=Math.max(enemy.hp,P.dmg*12);enemy.max=Math.max(enemy.max,enemy.hp);return snapshot35();},
+      spawnEnemyNear(type="normal",distance=105){if(state!=="play")throw new Error("spawnEnemyNear requires play mode");const before=enemies.length;spawnEnemy(type,false);const enemy=enemies[enemies.length-1];if(!enemy||enemies.length===before)throw new Error("Enemy cap prevented test spawn");const bound=window.SakurayoCamera?window.SakurayoCamera.size().worldW:W;enemy.x=clamp(P.x+Number(distance||105),enemy.r,bound-enemy.r);enemy.y=P.y;enemy.hp=Math.max(enemy.hp,P.dmg*12);enemy.max=Math.max(enemy.max,enemy.hp);return snapshot35();},
       dashNow(){if(state!=="play")throw new Error("dashNow requires play mode");P.dash=0;dash();draw();return snapshot35();},
       enemyRoleProbe(type="fast",distance=180,seconds=1){if(state!=="play")throw new Error("enemyRoleProbe requires play mode");spawnEnemy(type,false);const e=enemies[enemies.length-1];e.x=P.x+Number(distance);e.y=P.y;e.roleCd39=0;const steps=Math.max(1,Math.floor(Number(seconds)*60));for(let i=0;i<steps&&state==="play";i++)update(1/60);return {type:e.type,chargeWind:e.chargeWind39||0,roleCooldown:e.roleCd39||0,x:e.x,y:e.y};},
       triggerUpgrade(){if(state!=="play")throw new Error("triggerUpgrade requires play mode");gainXp(P.next);return snapshot35();},
@@ -7088,6 +7148,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       preloadCombatArt412(){preloadCombatPaths412(COMBAT_ART38);return window.__SAKURAYO_COMBAT_ART__.status();},
       enemyRoleVisuals412(){return {...ENEMY_ROLE_VISUALS412};},
       lifecycle44(){return window.SakurayoLifecycle.snapshot(lifecycleWorld44());},
+      camera50(){return window.SakurayoCamera?window.SakurayoCamera.snapshot():null;},
+      spawnFromEdge50(){if(state!=="play")throw new Error("spawnFromEdge50 requires play mode");const before=enemies.length;spawnEnemy("normal",false);const e=enemies[enemies.length-1];if(!e||enemies.length===before)throw new Error("Enemy cap prevented test spawn");return {x:e.x,y:e.y,inside:window.SakurayoCamera.contains(e.x,e.y,0),camera:window.SakurayoCamera.current()};},
       careerProgress44(){return window.SakurayoLifecycle.careerProgress(P.careers||{},P.fusion,P.form,FUSION,SCHOOL,CAREERS);},
       cutscene44(){return window.SakurayoCutscene?window.SakurayoCutscene.snapshot():null;},
       shopAdvice44(){return window.SakurayoEconomy?window.SakurayoEconomy.advice(save.character,save.coins,save.shop40,STARTERS40,ITEMS40,SKINS35):null;},
@@ -7557,7 +7619,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       opsPaint46();
       return r;
     }
-    const r=O.deploy(id,save.character||P.character,P.x,P.y,W,H);
+    const bound=window.SakurayoCamera?window.SakurayoCamera.size():{worldW:W,worldH:H};
+    const r=O.deploy(id,save.character||P.character,P.x,P.y,bound.worldW,bound.worldH);
     if(r.ok)toast(`${name} 已部署`);
     else if(r.reason==="dp")toast("部署点不足");
     else if(r.reason==="full")toast("最多两名干员");
