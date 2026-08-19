@@ -235,6 +235,7 @@ sakurayo-lifecycle.js
 sakurayo-cutscene.js
 sakurayo-economy.js
 sakurayo-lobby.js
+sakurayo-chronicle.js
 sakurayo-live.js
 sakurayo-ops.js
 ```
@@ -265,9 +266,11 @@ ART_ROOT =
 
 ```powershell
 node --check src/runtime/sakurayo-lobby.js
+node --check src/runtime/sakurayo-chronicle.js
 node --check src/runtime/sakurayo-live.js
 node --check src/runtime/sakurayo-ops.js
 node tests/lobby_unit.mjs
+node tests/chronicle_unit.mjs
 node tests/live_unit.mjs
 node tests/ops_unit.mjs
 node tests/ops_smoke.mjs
@@ -279,7 +282,7 @@ node tests/ops_smoke.mjs
 powershell -File tools/verify.ps1
 ```
 
-`verify.ps1` 目前包含：`static_check`、各 runtime 语法、`lobby_unit`、`live_unit`、`ops_unit`、`ops_smoke`、`framework_smoke`、`browser_smoke`。
+`verify.ps1` 目前包含：`static_check`、各 runtime 语法、`lobby_unit`、`chronicle_unit`、`live_unit`、`ops_unit`、`ops_smoke`、`framework_smoke`、`browser_smoke`。
 
 **没有**自动跑：
 

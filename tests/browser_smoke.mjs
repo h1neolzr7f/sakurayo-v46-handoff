@@ -309,7 +309,13 @@ try {
   await page.locator('#rosterTabs46 [data-roster="chronicle"]').click();
   assert.match(await page.locator("#rosterDrawer").textContent(), /第零次死亡/);
   assert.match(await page.locator("#rosterDrawer").textContent(), /镜零之后/);
-  assert.equal(await page.locator(".chronicleCard46").count(), 5);
+  assert.match(await page.locator("#rosterDrawer").textContent(), /月城小夜 · 未写完的夜/);
+  assert.match(await page.locator("#rosterDrawer").textContent(), /神代绫 · 作废的工号/);
+  assert.match(await page.locator("#rosterDrawer").textContent(), /黑羽凛音 · 未署名的刀/);
+  assert.match(await page.locator("#rosterDrawer").textContent(), /工牌还在/);
+  assert.match(await page.locator("#rosterDrawer").textContent(), /无人掀盖/);
+  assert.equal(await page.locator(".chronicleCard46").count(), 13);
+  assert.equal(await page.locator("#rosterWall46 h4").count(), 3);
   await page.locator('#rosterTabs46 [data-roster="scrap"]').click();
   assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 8);
   await shot(page, "01i-roster-wall.png");
