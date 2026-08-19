@@ -312,6 +312,27 @@ try {
   pass("缺字段旧档进主菜单");
   await old.close();
 
+  const resultCtx = await browser.newContext({ viewport: { width: 932, height: 430 }, hasTouch: true });
+  const resultPage = await resultCtx.newPage();
+  await waitMenu(resultPage);
+  await startRun(resultPage, "sayo");
+  await api(resultPage, "seedProgression45", { form: "corrupt_form_id" });
+  await api(resultPage, "finish", true);
+  const resultUi = await resultPage.evaluate(() => ({
+    mode: JSON.parse(window.render_game_to_text()).mode,
+    resultVisible: !document.querySelector("#result").classList.contains("hidden"),
+    menuVisible: !document.querySelector("#menu").classList.contains("hidden"),
+    rstats: document.querySelector("#rstats")?.textContent || "",
+  }));
+  assert.equal(resultUi.mode, "result");
+  assert.equal(resultUi.resultVisible, true, "无效飞升 ID 时结算层必须出现");
+  assert.equal(resultUi.menuVisible, false, "结算软锁不得只剩 canvas");
+  assert.match(resultUi.rstats, /飞升/);
+  await resultPage.locator("#back").click();
+  assert.equal(await resultPage.locator("#menu").isVisible(), true);
+  pass("无效飞升仍弹出结算");
+  await resultCtx.close();
+
   await runViewport(430, 932, "p430");
   await runViewport(932, 430, "l932");
   const thin = await browser.newContext({ viewport: { width: 600, height: 400 }, hasTouch: true });

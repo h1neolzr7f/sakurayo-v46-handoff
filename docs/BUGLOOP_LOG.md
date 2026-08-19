@@ -165,3 +165,17 @@
 复现：Boss 战后规则条与构筑条重叠约 900px²
 上一轮为什么没发现：emu_loop 只断言 phase 数字，不量 bossRule 盒子。
 回归：`emu_loop` bossRule∩mission ≤8
+
+---
+
+## 轮 12（全游戏，不限横屏）
+
+自动打回：**未过。不要进入下一类。**
+层：Playwright视口
+类：finish() 写 #rsub/#rstats 时 `ASC.find(a=>a.id===P.form).n` 无 `?.`，脏飞升 ID 抛错，state 已是 result 但 #result 未打开
+复现：回收演习开局后 `seedProgression45({form:'corrupt_form_id'})` 再 `finish(true)`，mode=result 且 result/menu 都 hidden
+上一轮为什么没发现：轮 9–11 只量 toast/坞/bossRule 叠盒；emu_loop 用 killPlayer 走正常死亡，从不注入非法 P.form。暂停页 2824 已有 `?.`，结算两处漏了。
+回归：`emu_loop` 脏飞升 ID 仍弹出 #result 且能回大厅
+
+本轮新问题：结算软锁。
+变成哪条回归：emu_loop 无效飞升仍弹出结算。
