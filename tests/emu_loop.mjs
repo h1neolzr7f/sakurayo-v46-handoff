@@ -179,6 +179,38 @@ async function runViewport(width, height, tag) {
   assert.equal(await page.evaluate(() => !!document.querySelector("#rotateHint46")), false, `${tag} 战斗中不得再出现横持提示`);
   pass(`${tag} 战斗中无横持提示`);
 
+  const stickGuard = await page.evaluate(([w, h]) => {
+    const x = Math.round(w * 0.2);
+    const y = Math.round(h * 0.82);
+    const el = document.elementFromPoint(x, y);
+    const dock = document.querySelector("#opsDock46");
+    const joy = document.querySelector("#joy");
+    const box = (n) => {
+      if (!n) return null;
+      const r = n.getBoundingClientRect();
+      return { x: r.x, y: r.y, w: r.width, h: r.height };
+    };
+    const a = box(dock);
+    const b = box(joy);
+    let overlap = 0;
+    if (a && b && !dock.hidden) {
+      const ww = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
+      const hh = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y);
+      overlap = ww > 1 && hh > 1 ? ww * hh : 0;
+    }
+    return {
+      onDock: !!(dock && !dock.hidden && el && dock.contains(el)),
+      overlap,
+      units: window.SakurayoOps ? window.SakurayoOps.snapshot().units.length : 0,
+    };
+  }, [width, height]);
+  assert.equal(stickGuard.onDock, false, `${tag} 默认摇杆点不得落在干员坞上`);
+  assert.equal(stickGuard.overlap, 0, `${tag} 干员坞不得压住 #joy，重叠 ${stickGuard.overlap}`);
+  await page.mouse.click(Math.round(width * 0.2), Math.round(height * 0.82));
+  const unitsAfter = await page.evaluate(() => window.SakurayoOps ? window.SakurayoOps.snapshot().units.length : 0);
+  assert.equal(unitsAfter, stickGuard.units, `${tag} 默认摇杆点短触不得误部署干员`);
+  pass(`${tag} 摇杆点不误部署干员`);
+
   const before = await snap(page);
   await holdStick(page, width, height, -140, 0, 12000);
   const edge = await snap(page);

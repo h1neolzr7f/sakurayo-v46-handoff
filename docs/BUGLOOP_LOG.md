@@ -77,3 +77,21 @@
 三层：门A 绿 / Playwright视口 红（本类） / Android 无 adb。
 
 修完复跑：门A 绿（static/lobby/live/ops/chronicle/camera/lifecycle/framework 8/browser 52/ops_smoke/gacha_visual/testimony） / emu_loop 24 绿含「窄横屏仍走横版」 / emu_scan 0 P0/P1 / Android 无 adb。已 sync `android-app/.../assets/index.html`（未交 APK）。
+
+---
+
+## 轮 6（全游戏，不限横屏）
+
+自动打回：**未过。不要进入下一类。**
+层：Playwright视口
+类：横屏 #opsDock46 落到左下 bottom:18px，压住默认摇杆点，短触误部署干员
+复现：932×430 回收演习开局，在 (W×0.2,H×0.82) 单击，DP 减少并部署凛音
+上一轮为什么没发现：emu_loop 摇杆往 #game 派 pointer、冲刺技能 force:true，绕过 elementFromPoint；证词模式坞隐藏，ops_smoke 没点默认摇杆坐标。
+回归：`ops_unit` 禁止 landscape 坞 bottom:18px；`emu_loop` 断言坞与 #joy 不重叠，默认摇杆点短触不增 units
+
+本轮新问题：干员坞吞摇杆触控。
+变成哪条回归：ops_unit landscape bottom + emu_loop 摇杆点不部署。
+
+三层：门A 待复跑 / Playwright视口 红（本类） / Android 无 adb。
+
+修完复跑：ops_unit 绿 / emu_loop 26 绿含「摇杆点不误部署」 / ops_smoke 绿。

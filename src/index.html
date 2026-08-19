@@ -5765,6 +5765,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (
       state !== "play" ||
       e.target.closest(".act") ||
+      e.target.closest("#opsDock46") ||
       e.target === $("#pause")
     )
       return;
