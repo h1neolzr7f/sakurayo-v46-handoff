@@ -333,6 +333,28 @@ try {
   pass("无效飞升仍弹出结算");
   await resultCtx.close();
 
+  const toastCtx = await browser.newContext({ viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true });
+  const toastPage = await toastCtx.newPage();
+  await waitMenu(toastPage);
+  await api(toastPage, "setRunMode46", "testimony");
+  await startRun(toastPage, "sayo");
+  await api(toastPage, "triggerUpgrade");
+  await toastPage.evaluate(() => window.advanceTime(250));
+  const toastOverlap = await toastPage.evaluate(() => {
+    const a = document.querySelector("#toast");
+    const b = document.querySelector("#mission");
+    if (!a || !b || !a.classList.contains("show")) return { overlap: 0, shown: false };
+    const r = a.getBoundingClientRect();
+    const m = b.getBoundingClientRect();
+    const w = Math.min(r.right, m.right) - Math.max(r.left, m.left);
+    const h = Math.min(r.bottom, m.bottom) - Math.max(r.top, m.top);
+    return { overlap: w > 1 && h > 1 ? w * h : 0, shown: true, toast: a.textContent || "" };
+  });
+  assert.equal(toastOverlap.shown, true, "证词升级应弹出 toast");
+  assert.ok(toastOverlap.overlap <= 8, `证词 toast 不得压 mission，重叠 ${toastOverlap.overlap}`);
+  pass("证词升级 toast 不压 mission");
+  await toastCtx.close();
+
   await runViewport(430, 932, "p430");
   await runViewport(932, 430, "l932");
   const thin = await browser.newContext({ viewport: { width: 600, height: 400 }, hasTouch: true });
