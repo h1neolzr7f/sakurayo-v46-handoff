@@ -259,3 +259,5 @@
 
 本轮新问题：结算融合脏 ID 写 undefined。
 变成哪条回归：emu_loop 无效融合结算不写 undefined + 五房探针。
+
+修完复跑：static 绿 / emu_loop 37 绿含五房探针与无效融合文案 / 寻访名册商店主神本轮无新 P0/P1。
