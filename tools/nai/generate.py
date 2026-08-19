@@ -22,8 +22,11 @@ from nai_client import (  # noqa: E402
     job_to_payload,
     load_jobs,
     load_token,
+    payload_has_reference,
+    resolve_ref_paths,
     safe_job_id,
     sleep_between,
+    with_paid_size,
     write_pngs,
 )
 
@@ -61,11 +64,15 @@ def cmd_dry_run(args: argparse.Namespace) -> int:
             "height": payload["parameters"]["height"],
             "steps": payload["parameters"]["steps"],
             "sampler": payload["parameters"]["sampler"],
+            "artist": payload["input"].startswith("artist:"),
+            "characterRefCount": len(payload["parameters"].get("director_reference_images") or []),
+            "characterRefType": "character" if payload_has_reference(payload) else None,
             "freeQuota": is_free_quota(
                 payload["parameters"]["width"],
                 payload["parameters"]["height"],
                 payload["parameters"]["steps"],
                 payload["parameters"]["n_samples"],
+                has_reference=payload_has_reference(payload),
             ),
         }, ensure_ascii=False, indent=2))
     return 0
@@ -93,15 +100,7 @@ def cmd_gen(args: argparse.Namespace) -> int:
             blocked = "Free generations are unavailable" in str(exc)
             if not blocked or args.no_fallback_paid:
                 raise
-            paid_size = "portrait_large" if payload["parameters"]["height"] >= payload["parameters"]["width"] else "landscape_wide"
-            payload = build_payload(
-                payload["input"],
-                model=payload["model"],
-                size=paid_size,
-                steps=int(payload["parameters"]["steps"]),
-                scale=float(payload["parameters"]["scale"]),
-                seed=int(payload["parameters"]["seed"] or 0),
-            )
+            payload = with_paid_size(payload)
             _print(f"FREE_BLOCKED, retry paid {payload['parameters']['width']}x{payload['parameters']['height']}")
             images = generate_image(token, payload)
         written.extend(write_pngs(images, dest))
@@ -131,6 +130,10 @@ def _iter_targets(args: argparse.Namespace):
             scale=args.scale,
             seed=args.seed,
             greenscreen=args.greenscreen,
+            artist=False if args.no_artist else True,
+            character_refs=resolve_ref_paths(args.char_ref or []),
+            cr_strength=args.cr_strength,
+            cr_fidelity=args.cr_fidelity,
         ), dest
         return
     jobs_path = Path(args.jobs) if args.jobs else DEFAULT_JOBS
@@ -172,6 +175,10 @@ def build_parser() -> argparse.ArgumentParser:
         p.add_argument("--scale", type=float, default=6.0)
         p.add_argument("--seed", type=int, default=0)
         p.add_argument("--greenscreen", action="store_true")
+        p.add_argument("--no-artist", action="store_true", help="Do not prepend the default artist string")
+        p.add_argument("--char-ref", action="append", default=[], help="Character reference image path. Repeatable.")
+        p.add_argument("--cr-strength", type=float, default=0.65)
+        p.add_argument("--cr-fidelity", type=float, default=0.5)
 
     dry = sub.add_parser("dry-run", help="Print payload only, no network")
     add_common(dry)

@@ -6,6 +6,7 @@
 - 新增 `tools/nai/generate.py`：`check` / `dry-run` / `gen`。Token 只读环境变量或 `secrets/novelai.token`，不进 git。
 - 预设任务：三角色绿幕站桩 + 大厅宽背景。源 PNG 仍 gitignore，游戏运行时不访问 NovelAI。
 - 默认锁 Opus 免费档（单张 / ≤28 步 / ≤1024×1024）。云主机若被关免费队列，自动改打 Large 扣 Anlas。
+- 角色任务前置画师串，并用现有 portrait/battle 做 V4.5 Character Reference。
 
 ## 第一期镜界寻访（源码仍 4.6.0，未下令不升 4.6.1）
 

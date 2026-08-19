@@ -32,6 +32,13 @@ GREEN_SCREEN_TAGS = (
     "solid bright green background, chroma key, #00ff00, no shadow, no floor, "
     "no gradient, no scenery"
 )
+DEFAULT_ARTIST_STRING = (
+    "artist:ciloranko, artist:sho (sho l tw), artist:qhi, artist:reoen, "
+    "artist:onineko, artist:wada arco, year 2024"
+)
+CR_CANVAS = (1024, 1536)
+DEFAULT_CR_STRENGTH = 0.65
+DEFAULT_CR_FIDELITY = 0.5
 
 SIZE_PRESETS = {
     "small": (512, 768),
@@ -99,8 +106,15 @@ def load_token(explicit: str | None = None, search_files: tuple[Path, ...] | Non
     )
 
 
-def is_free_quota(width: int, height: int, steps: int = 28, n_samples: int = 1) -> bool:
+def is_free_quota(width: int, height: int, steps: int = 28, n_samples: int = 1, *, has_reference: bool = False) -> bool:
+    if has_reference:
+        return False
     return n_samples == 1 and steps <= FREE_MAX_STEPS and width * height <= FREE_MAX_PIXELS
+
+
+def payload_has_reference(payload: dict[str, Any]) -> bool:
+    params = payload.get("parameters") or {}
+    return bool(params.get("director_reference_images"))
 
 
 def assert_free_quota(payload: dict[str, Any], *, spend_anlas: bool = False) -> None:
@@ -109,13 +123,13 @@ def assert_free_quota(payload: dict[str, Any], *, spend_anlas: bool = False) -> 
     height = int(params["height"])
     steps = int(params["steps"])
     n_samples = int(params["n_samples"])
-    if is_free_quota(width, height, steps, n_samples):
+    if is_free_quota(width, height, steps, n_samples, has_reference=payload_has_reference(payload)):
         return
     if spend_anlas:
         return
     raise NaiError(
-        f"{width}x{height} steps={steps} n={n_samples} would spend Anlas. "
-        "Opus free quota is 1 image, <=28 steps, <=1024x1024. "
+        f"{width}x{height} steps={steps} n={n_samples} refs={int(payload_has_reference(payload))} "
+        "would spend Anlas. Opus free quota is 1 image, <=28 steps, <=1024x1024, no reference. "
         "Use a small/normal preset, or pass --spend-anlas."
     )
 
@@ -136,8 +150,15 @@ def resolve_size(size: str | None = None, width: int | None = None, height: int 
     return pair
 
 
-def compose_prompt(prompt: str, *, greenscreen: bool = False) -> str:
+def compose_prompt(prompt: str, *, greenscreen: bool = False, artist: str | bool | None = True) -> str:
     text = " ".join((prompt or "").split())
+    artist_text = ""
+    if artist is True:
+        artist_text = DEFAULT_ARTIST_STRING
+    elif isinstance(artist, str) and artist.strip() and artist.strip().lower() not in {"0", "false", "off", "none"}:
+        artist_text = " ".join(artist.split())
+    if artist_text and artist_text not in text:
+        text = f"{artist_text}, {text}" if text else artist_text
     if greenscreen and "chroma key" not in text.lower() and "#00ff00" not in text:
         text = f"{text}, {GREEN_SCREEN_TAGS}" if text else GREEN_SCREEN_TAGS
     return text
@@ -146,6 +167,72 @@ def compose_prompt(prompt: str, *, greenscreen: bool = False) -> str:
 def is_v4_model(model: str) -> bool:
     name = (model or "").lower()
     return "nai-diffusion-4" in name or name.startswith("nai-diffusion-4")
+
+
+def encode_character_ref(path: Path, canvas: tuple[int, int] = CR_CANVAS) -> str:
+    try:
+        from PIL import Image
+    except ImportError as exc:
+        raise NaiError("Character reference needs Pillow. pip install pillow") from exc
+    if not path.is_file():
+        raise NaiError(f"Character reference not found: {path}")
+    source = Image.open(path).convert("RGBA")
+    opaque = Image.new("RGBA", source.size, (0, 0, 0, 255))
+    opaque.alpha_composite(source)
+    rgb = opaque.convert("RGB")
+    target_w, target_h = canvas
+    scale = min(target_w / rgb.width, target_h / rgb.height)
+    new_w = max(1, int(rgb.width * scale))
+    new_h = max(1, int(rgb.height * scale))
+    rgb = rgb.resize((new_w, new_h), Image.Resampling.LANCZOS)
+    canvas_im = Image.new("RGB", canvas, (0, 0, 0))
+    canvas_im.paste(rgb, ((target_w - new_w) // 2, (target_h - new_h) // 2))
+    buf = io.BytesIO()
+    canvas_im.save(buf, format="PNG")
+    return base64.b64encode(buf.getvalue()).decode("ascii")
+
+
+def attach_character_refs(
+    parameters: dict[str, Any],
+    paths: list[Path],
+    *,
+    strength: float = DEFAULT_CR_STRENGTH,
+    fidelity: float = DEFAULT_CR_FIDELITY,
+) -> None:
+    if not paths:
+        return
+    if strength < 0 or strength > 1 or fidelity < 0 or fidelity > 1:
+        raise NaiError("Character reference strength/fidelity must be 0-1")
+    images = [encode_character_ref(path) for path in paths]
+    parameters["director_reference_images"] = images
+    parameters["director_reference_descriptions"] = [
+        {"caption": {"base_caption": "character", "char_captions": []}, "legacy_uc": False}
+        for _ in images
+    ]
+    parameters["director_reference_strength_values"] = [float(strength)] * len(images)
+    parameters["director_reference_secondary_strength_values"] = [1.0 - float(fidelity)] * len(images)
+    parameters["director_reference_information_extracted"] = [1.0] * len(images)
+
+
+def resolve_ref_paths(raw_paths: list[str] | None) -> list[Path]:
+    paths: list[Path] = []
+    for item in raw_paths or []:
+        path = Path(item)
+        if not path.is_absolute():
+            path = ROOT / path
+        paths.append(path)
+    return paths
+
+
+def with_paid_size(payload: dict[str, Any]) -> dict[str, Any]:
+    paid = dict(payload)
+    params = dict(payload["parameters"])
+    if int(params["height"]) >= int(params["width"]):
+        params["width"], params["height"] = SIZE_PRESETS["portrait_large"]
+    else:
+        params["width"], params["height"] = SIZE_PRESETS["landscape_wide"]
+    paid["parameters"] = params
+    return paid
 
 
 def build_payload(
@@ -162,12 +249,16 @@ def build_payload(
     seed: int = 0,
     greenscreen: bool = False,
     n_samples: int = 1,
+    artist: str | bool | None = True,
+    character_refs: list[Path] | None = None,
+    cr_strength: float = DEFAULT_CR_STRENGTH,
+    cr_fidelity: float = DEFAULT_CR_FIDELITY,
 ) -> dict[str, Any]:
     if n_samples < 1 or n_samples > 4:
         raise NaiError("n_samples must be 1-4")
     if steps < 1 or steps > 50:
         raise NaiError("steps must be 1-50")
-    final_prompt = compose_prompt(prompt, greenscreen=greenscreen)
+    final_prompt = compose_prompt(prompt, greenscreen=greenscreen, artist=artist)
     if not final_prompt:
         raise NaiError("prompt is empty")
     w, h = resolve_size(size, width, height)
@@ -203,6 +294,12 @@ def build_payload(
             "caption": {"base_caption": negative, "char_captions": []},
             "legacy_uc": False,
         }
+    attach_character_refs(
+        parameters,
+        list(character_refs or []),
+        strength=cr_strength,
+        fidelity=cr_fidelity,
+    )
     return {
         "input": final_prompt,
         "model": model,
@@ -318,6 +415,7 @@ def load_jobs(path: Path) -> list[dict[str, Any]]:
 
 
 def job_to_payload(job: dict[str, Any]) -> dict[str, Any]:
+    artist = job.get("artist", True)
     return build_payload(
         job["prompt"],
         model=job.get("model") or DEFAULT_MODEL,
@@ -331,6 +429,10 @@ def job_to_payload(job: dict[str, Any]) -> dict[str, Any]:
         seed=int(job.get("seed") or 0),
         greenscreen=bool(job.get("greenscreen")),
         n_samples=int(job.get("n_samples") or 1),
+        artist=artist,
+        character_refs=resolve_ref_paths(job.get("character_refs") or job.get("char_refs")),
+        cr_strength=float(job.get("cr_strength") or DEFAULT_CR_STRENGTH),
+        cr_fidelity=float(job.get("cr_fidelity") or DEFAULT_CR_FIDELITY),
     )
 
 

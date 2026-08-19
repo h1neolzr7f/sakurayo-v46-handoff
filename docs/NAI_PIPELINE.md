@@ -56,6 +56,8 @@ Cloud Agent / 数据中心 IP 可能被 NovelAI 判定「异常活动」并关�
 
 接口一律走 `https://image.novelai.net`。
 
+角色图默认前置画师串，并用现有 `portrait.webp` + `battle.webp` 做 V4.5 **Character Reference**（`director_reference_*`，类型 `character`，strength 0.65，fidelity 0.5）。参考图会黑底垫到 1024×1536。带参考图会扣 Anlas。
+
 ## 默认参数
 
 | 项 | 值 |

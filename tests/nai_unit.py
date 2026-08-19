@@ -14,16 +14,19 @@ sys.path.insert(0, str(ROOT / "tools" / "nai"))
 
 import generate as nai_gen  # noqa: E402
 from nai_client import (  # noqa: E402
+    DEFAULT_ARTIST_STRING,
     DEFAULT_NEGATIVE,
     NaiError,
     assert_free_quota,
     build_payload,
     compose_prompt,
+    encode_character_ref,
     is_free_quota,
     is_v4_model,
     job_to_payload,
     load_jobs,
     load_token,
+    payload_has_reference,
     redact,
     resolve_size,
     safe_job_id,
@@ -58,6 +61,7 @@ class PayloadTests(unittest.TestCase):
         self.assertEqual(payload["model"], "nai-diffusion-4-5-full")
         self.assertTrue(is_v4_model(payload["model"]))
         self.assertIn("chroma key", payload["input"])
+        self.assertTrue(payload["input"].startswith("artist:ciloranko"))
         self.assertEqual(payload["input"], payload["parameters"]["v4_prompt"]["caption"]["base_caption"])
         self.assertEqual(payload["parameters"]["negative_prompt"], DEFAULT_NEGATIVE)
         self.assertNotIn("Authorization", json.dumps(payload))
@@ -70,7 +74,7 @@ class PayloadTests(unittest.TestCase):
 
     def test_empty_prompt(self):
         with self.assertRaises(NaiError):
-            build_payload("   ")
+            build_payload("   ", artist=False)
 
 
 class TokenTests(unittest.TestCase):
@@ -112,8 +116,16 @@ class JobTests(unittest.TestCase):
         ])
         payload = job_to_payload(jobs[0])
         self.assertIn("#00ff00", payload["input"])
+        self.assertIn(DEFAULT_ARTIST_STRING.split(",")[0], payload["input"])
         self.assertEqual(payload["parameters"]["width"], 832)
-        assert_free_quota(payload)
+        self.assertTrue(payload_has_reference(payload))
+        self.assertEqual(len(payload["parameters"]["director_reference_images"]), 2)
+        self.assertEqual(payload["parameters"]["director_reference_descriptions"][0]["caption"]["base_caption"], "character")
+        with self.assertRaises(NaiError):
+            assert_free_quota(payload)
+        lobby = job_to_payload(jobs[3])
+        self.assertFalse(payload_has_reference(lobby))
+        assert_free_quota(lobby)
         self.assertTrue(jobs[3]["out"].endswith("lobby_wide.png"))
 
     def test_safe_id(self):
@@ -142,6 +154,12 @@ class CliTests(unittest.TestCase):
     def test_compose_prompt_idempotent(self):
         once = compose_prompt("1girl, chroma key", greenscreen=True)
         self.assertEqual(once.count("chroma key"), 1)
+        self.assertTrue(once.startswith("artist:"))
+
+    def test_character_ref_canvas(self):
+        raw = encode_character_ref(ROOT / "android-app/app/src/main/assets/game/art/characters/sayo/default/portrait.webp")
+        self.assertGreater(len(raw), 100)
+        self.assertNotIn("\n", raw)
 
 
 if __name__ == "__main__":
