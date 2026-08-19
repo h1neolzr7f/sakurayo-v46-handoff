@@ -211,3 +211,19 @@
 
 本轮新问题：出击模式胶囊无效。
 变成哪条回归：emu_loop 关卡胶囊出击写入正确模式。
+
+修完复跑：lobby_unit 绿 / emu_loop 29 绿含「关卡胶囊出击写入正确模式」。
+
+---
+
+## 轮 15（全游戏，不限横屏）
+
+自动打回：**未过。不要进入下一类。**
+层：Playwright视口
+类：transientBlocked 含 menu，大厅 toast 只入队不播放；startGame 不清 toastQueue，局内下一次 toast 先弹出「出击角色：…」
+复现：大厅换绫，#toast 无 show；出击后 triggerUpgrade 选卡，战斗中冒出「出击角色：神代绫」
+上一轮为什么没发现：轮 13–14 只量战斗态 toast 与 mission/模式胶囊；emu_loop 从不在大厅断言 #toast.show，换角/寻访只看抽屉开关。
+回归：`emu_loop` 大厅换角 toast 可见，开局后不得再冒出击角色。`lobby_unit` 禁止 transientBlocked 含 menu
+
+本轮新问题：大厅提示被吞、漏进战斗。
+变成哪条回归：emu_loop 大厅 toast 可见且不漏进战斗。

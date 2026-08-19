@@ -34,7 +34,7 @@
   top:max(136px,calc(env(safe-area-inset-top) + 124px))!important;
   bottom:auto!important;
   transform:translateX(-50%)!important;
-  z-index:11!important;
+  z-index:25!important;
   width:max-content!important;
   max-width:84vw!important;
   white-space:normal!important;
@@ -4702,12 +4702,12 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     warSinger:["小夜","尸潮歌姬成型。副歌一响，僵尸负责倒下。"],healingIdol:["凛","治愈偶像进阶。","小夜","终于有观众看完演出后生命值会上升。"],
     boneKing:["小夜","白骨君王成型。王座先免了，我不想知道材料来源。"],soulHerd:["小夜","群魂牧者进阶。请亡魂排队，不要挤占弹幕通道。"],
   };
-  function transientBlocked(){return ["dialogue","event","level","pause","result","menu"].includes(state) || !$("#warning").classList.contains("hidden") || (P.outfitReveal||0)>0.18;}
+  function transientBlocked(){return ["dialogue","event","level","pause","result"].includes(state) || !$("#warning").classList.contains("hidden") || (P.outfitReveal||0)>0.18;}
   function hideTransient(){
     $("#banter").classList.add("hidden");
     $("#toast").classList.remove("show");
     $("#warning").classList.add("hidden");
-    banterBusy=false;toastBusy=false;
+    banterBusy=false;toastBusy=false;toastQueue.length=0;
     clearTimeout(playBanter.t);clearTimeout(playToast.t);
   }
   function showBanter(lines,force=false){
@@ -6919,6 +6919,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     banterQueue = [];
     banterBusy = false;
     banterTick = 0;
+    toastQueue = [];
+    toastBusy = false;
     enemies = [];
     gems = [];
     parts = [];
