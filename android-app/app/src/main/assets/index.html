@@ -11247,7 +11247,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
         }
         throw new Error(`Unknown outfit kind: ${kind}`);
       },
-      selectStage(id){const value=Number(id);if(!ST.some(s=>s.id===value))throw new Error(`Unknown stage: ${id}`);runMode36="story";selected=value;menuUpdate();return snapshot35();},
+      selectStage(id){const value=Number(id);if(!ST.some(s=>s.id===value))throw new Error(`Unknown stage: ${id}`);runMode36="story";pendingMode46="story";selected=value;menuUpdate();return snapshot35();},
       setRunMode46(mode){if(!["story","testimony","mainGod"].includes(mode))throw new Error(`Unknown mode: ${mode}`);runMode36=mode;pendingMode46=mode;menuUpdate();return snapshot35();},
       unlockMainGod(){if(!save.done.includes(4))save.done.push(4);save.unlock=Math.max(save.unlock,4);persist();return snapshot35();},
       selectMainGodTier(tier=1){const value=clamp(Math.floor(Number(tier)||1),1,4);runMode36="mainGod";selectedMainGodTier36=value;save.mainGod.unlockedTier=Math.max(save.mainGod.unlockedTier,value);menuUpdate();return snapshot35();},
