@@ -35,7 +35,7 @@ I2V 绿幕站桩、融合 skill/dash、寻访卡扩到 16、全量 verify、再�
 
 - 再包 `update`
 - 改存档键或清档
-- 抽卡/商店卖永久伤害
+- 商店衣装直接卖永久伤害（寻访/构筑卡按星级加伤是正规则）
 - 改名 `startGame` / `update` / `draw` / `spawnEnemy` / `showDialogue` 却不改调用点
 - 提交 `keystore.properties`、`local.properties`、APK、`assets/image2/source/`
 - 卸掉模拟器上签名对不上的旧正式包（会清档）
