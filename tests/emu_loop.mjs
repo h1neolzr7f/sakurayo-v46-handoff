@@ -379,6 +379,10 @@ try {
   await modePage.locator('#modeBar46 [data-mode="mainGod"]').click();
   await modePage.locator("#stageDrawer .close").click();
   await modePage.locator("#start").click();
+  await modePage.waitForFunction(() => {
+    const toast = document.querySelector("#toast");
+    return !!(toast && toast.classList.contains("show") && /进入轮回/.test(toast.textContent || ""));
+  }, null, { timeout: 3000 });
   const mainGodUi = await modePage.evaluate(() => ({
     menu: !document.querySelector("#menu").classList.contains("hidden"),
     toast: document.querySelector("#toast")?.textContent || "",
