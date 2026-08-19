@@ -11,6 +11,7 @@ import time
 import urllib.error
 import urllib.request
 import zipfile
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -21,7 +22,9 @@ USER_API = "https://image.novelai.net"
 DEFAULT_MODEL = "nai-diffusion-4-5-full"
 FREE_MAX_PIXELS = 1024 * 1024
 FREE_MAX_STEPS = 28
+FREE_MAX_LONG_EDGE = 1216
 DEFAULT_SAMPLER = "k_euler_ancestral"
+DEFAULT_SCALE = 5.0
 DEFAULT_NEGATIVE = (
     "blurry, lowres, error, film grain, scan artifacts, worst quality, bad quality, "
     "jpeg artifacts, very displeasing, chromatic aberration, logo, dated, signature, "
@@ -69,6 +72,32 @@ class NaiError(RuntimeError):
     pass
 
 
+class NaiHttpError(NaiError):
+    def __init__(
+        self,
+        message: str,
+        *,
+        status: int | None = None,
+        retry_safe: bool = False,
+        billing_uncertain: bool = False,
+        free_blocked: bool = False,
+    ) -> None:
+        super().__init__(message)
+        self.status = status
+        self.retry_safe = retry_safe
+        self.billing_uncertain = billing_uncertain
+        self.free_blocked = free_blocked
+
+
+@dataclass
+class CompileResult:
+    payload: dict[str, Any]
+    snapshot: dict[str, Any]
+    dest: Path
+    job_id: str = ""
+    character_ref_paths: list[str] = field(default_factory=list)
+
+
 def redact(text: str, token: str | None) -> str:
     if not token or not text:
         return text
@@ -106,10 +135,63 @@ def load_token(explicit: str | None = None, search_files: tuple[Path, ...] | Non
     )
 
 
-def is_free_quota(width: int, height: int, steps: int = 28, n_samples: int = 1, *, has_reference: bool = False) -> bool:
-    if has_reference:
+def is_free_quota(
+    width: int,
+    height: int,
+    steps: int = 28,
+    n_samples: int = 1,
+    *,
+    has_reference: bool = False,
+    smea: bool = False,
+) -> bool:
+    if has_reference or smea:
         return False
-    return n_samples == 1 and steps <= FREE_MAX_STEPS and width * height <= FREE_MAX_PIXELS
+    return (
+        n_samples == 1
+        and steps <= FREE_MAX_STEPS
+        and max(width, height) <= FREE_MAX_LONG_EDGE
+        and width * height <= FREE_MAX_PIXELS
+    )
+
+
+def payload_smea(payload: dict[str, Any]) -> bool:
+    params = payload.get("parameters") or {}
+    return bool(params.get("autoSmea") or params.get("sm") or params.get("sm_dyn"))
+
+
+def classify_http_error(status: int, body: str) -> NaiHttpError:
+    text = body[:400]
+    message = f"NAI HTTP {status}: {text}"
+    lowered = text.lower()
+    if status == 429:
+        return NaiHttpError(message, status=status, retry_safe=True)
+    if status >= 500:
+        return NaiHttpError(message, status=status, retry_safe=False, billing_uncertain=True)
+    if "free generations are unavailable" in lowered:
+        return NaiHttpError(message, status=status, retry_safe=True, free_blocked=True)
+    if status in (401, 403):
+        return NaiHttpError(message, status=status, retry_safe=False)
+    return NaiHttpError(message, status=status, retry_safe=status < 500)
+
+
+def fit_opus_free_size(width: int, height: int) -> tuple[int, int, bool]:
+    if width <= 0 or height <= 0:
+        return 832, 1216, True
+    long_edge = max(width, height)
+    pixel_count = width * height
+    if long_edge <= FREE_MAX_LONG_EDGE and pixel_count <= FREE_MAX_PIXELS:
+        return width, height, False
+    scale = min(FREE_MAX_LONG_EDGE / long_edge, (FREE_MAX_PIXELS / pixel_count) ** 0.5)
+    new_width = max(64, int(width * scale // 64) * 64)
+    new_height = max(64, int(height * scale // 64) * 64)
+    while new_width * new_height > FREE_MAX_PIXELS:
+        if new_width >= new_height and new_width > 64:
+            new_width -= 64
+        elif new_height > 64:
+            new_height -= 64
+        else:
+            break
+    return new_width, new_height, True
 
 
 def payload_has_reference(payload: dict[str, Any]) -> bool:
@@ -123,7 +205,14 @@ def assert_free_quota(payload: dict[str, Any], *, spend_anlas: bool = False) -> 
     height = int(params["height"])
     steps = int(params["steps"])
     n_samples = int(params["n_samples"])
-    if is_free_quota(width, height, steps, n_samples, has_reference=payload_has_reference(payload)):
+    if is_free_quota(
+        width,
+        height,
+        steps,
+        n_samples,
+        has_reference=payload_has_reference(payload),
+        smea=payload_smea(payload),
+    ):
         return
     if spend_anlas:
         return
@@ -244,7 +333,7 @@ def build_payload(
     height: int | None = None,
     negative: str = DEFAULT_NEGATIVE,
     steps: int = 28,
-    scale: float = 6.0,
+    scale: float = DEFAULT_SCALE,
     sampler: str = DEFAULT_SAMPLER,
     seed: int = 0,
     greenscreen: bool = False,
@@ -322,9 +411,20 @@ def _request(url: str, token: str, *, data: bytes | None = None, accept: str = "
             return resp.read()
     except urllib.error.HTTPError as exc:
         body = exc.read().decode("utf-8", errors="replace")
-        raise NaiError(redact(f"NAI HTTP {exc.code}: {body[:400]}", token)) from None
+        raise classify_http_error(exc.code, redact(body, token)) from None
+    except TimeoutError as exc:
+        raise NaiHttpError(
+            f"NAI request timed out after send: {exc}",
+            retry_safe=False,
+            billing_uncertain=True,
+        ) from exc
     except urllib.error.URLError as exc:
-        raise NaiError(f"NAI network error: {exc.reason}") from None
+        reason = str(exc.reason)
+        raise NaiHttpError(
+            f"NAI network error: {reason}",
+            retry_safe=True,
+            billing_uncertain=False,
+        ) from None
 
 
 def check_subscription(token: str) -> dict[str, Any]:
@@ -424,7 +524,7 @@ def job_to_payload(job: dict[str, Any]) -> dict[str, Any]:
         height=job.get("height"),
         negative=job.get("negative") or DEFAULT_NEGATIVE,
         steps=int(job.get("steps") or 28),
-        scale=float(job.get("scale") or 6.0),
+        scale=float(job.get("scale") or DEFAULT_SCALE),
         sampler=job.get("sampler") or DEFAULT_SAMPLER,
         seed=int(job.get("seed") or 0),
         greenscreen=bool(job.get("greenscreen")),
@@ -433,6 +533,89 @@ def job_to_payload(job: dict[str, Any]) -> dict[str, Any]:
         character_refs=resolve_ref_paths(job.get("character_refs") or job.get("char_refs")),
         cr_strength=float(job.get("cr_strength") or DEFAULT_CR_STRENGTH),
         cr_fidelity=float(job.get("cr_fidelity") or DEFAULT_CR_FIDELITY),
+    )
+
+
+def snapshot_from_compile(
+    payload: dict[str, Any],
+    *,
+    job_id: str = "",
+    dest: Path | None = None,
+    character_ref_paths: list[str] | None = None,
+    resized: bool = False,
+) -> dict[str, Any]:
+    params = payload["parameters"]
+    has_ref = payload_has_reference(payload)
+    smea = payload_smea(payload)
+    free = is_free_quota(
+        int(params["width"]),
+        int(params["height"]),
+        int(params["steps"]),
+        int(params["n_samples"]),
+        has_reference=has_ref,
+        smea=smea,
+    )
+    reasons: list[str] = []
+    if has_ref:
+        reasons.append("character_reference")
+    if smea:
+        reasons.append("smea")
+    if int(params["steps"]) > FREE_MAX_STEPS:
+        reasons.append("steps")
+    if max(int(params["width"]), int(params["height"])) > FREE_MAX_LONG_EDGE:
+        reasons.append("long_edge")
+    if int(params["width"]) * int(params["height"]) > FREE_MAX_PIXELS:
+        reasons.append("pixels")
+    if int(params["n_samples"]) != 1:
+        reasons.append("n_samples")
+    return {
+        "id": job_id,
+        "out": str(dest) if dest else "",
+        "frozen": True,
+        "model": payload["model"],
+        "action": payload["action"],
+        "input": payload["input"],
+        "width": params["width"],
+        "height": params["height"],
+        "steps": params["steps"],
+        "scale": params["scale"],
+        "sampler": params["sampler"],
+        "seed": params.get("seed", 0),
+        "artist": payload["input"].startswith("artist:"),
+        "characterRefCount": len(params.get("director_reference_images") or []),
+        "characterRefType": "character" if has_ref else None,
+        "characterRefPaths": list(character_ref_paths or []),
+        "freeEligible": free,
+        "wouldSpendAnlas": not free,
+        "resizedToFree": resized,
+        "spendReasons": reasons,
+    }
+
+
+def compile_job(job: dict[str, Any], *, dest: Path | None = None) -> CompileResult:
+    payload = job_to_payload(job)
+    ref_paths = [str(path) for path in resolve_ref_paths(job.get("character_refs") or job.get("char_refs"))]
+    job_id = str(job.get("id") or "")
+    if dest is not None:
+        out = dest
+    elif job.get("out"):
+        out = Path(job["out"])
+        if not out.is_absolute():
+            out = ROOT / out
+    else:
+        out = ROOT / "assets" / "image2" / "source" / "nai" / f"{safe_job_id(job_id) or 'manual'}.png"
+    snapshot = snapshot_from_compile(
+        payload,
+        job_id=job_id,
+        dest=out,
+        character_ref_paths=ref_paths,
+    )
+    return CompileResult(
+        payload=payload,
+        snapshot=snapshot,
+        dest=out,
+        job_id=job_id,
+        character_ref_paths=ref_paths,
     )
 
 

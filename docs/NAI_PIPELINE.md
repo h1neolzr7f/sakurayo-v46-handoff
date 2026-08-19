@@ -2,6 +2,15 @@
 
 Cursor 内置 `GenerateImage` 额度用尽后，本项目用用户的 NovelAI 会员出图，用到会员失效为止。游戏发布包仍然离线，不在运行时访问 NovelAI。
 
+借鉴 [Nai学长工作室开发版](https://github.com/h1neolzr7f/NaiXueZhang-Studio-Dev) 的编译思路，但只留 Agent 能用的薄层：大模型写 jobs，脚本只负责冻结参数、免费档判断和一次发送。不搬图库、换角 UI、多 Token 调度、Pixiv。
+
+```text
+大模型写 jobs.jsonl（画师串 / 角色参考路径 / 提示词）
+  → compile 冻结快照（不打网、不扣点）
+  → 人看 spendReasons
+  → gen 只发送冻结体；5xx / 超时不自动重试
+```
+
 ## 安全
 
 - Token 只放本机：`NOVELAI_TOKEN` 或 `secrets/novelai.token`。
@@ -21,11 +30,14 @@ python tools/nai/generate.py check
 powershell -File tools/nai/run_nai.ps1 -Command check
 ```
 
-只看将要发出的参数：
+先冻结、再出图：
 
 ```bash
-python tools/nai/generate.py dry-run --job-id sayo_stand_greenscreen
+python tools/nai/generate.py compile --job-id sayo_stand_greenscreen
+python tools/nai/generate.py gen --job-id sayo_stand_greenscreen
 ```
+
+`dry-run` 是 `compile` 的别名。快照里只有路径和参数，没有参考图 base64。`5xx` 或发送后超时视为扣费未知，禁止自动再打。免费队列 403 才允许一次 Large 补打。
 
 出一张图：
 

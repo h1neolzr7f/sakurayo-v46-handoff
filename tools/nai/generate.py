@@ -12,20 +12,22 @@ if str(Path(__file__).resolve().parent) not in sys.path:
 
 from nai_client import (  # noqa: E402
     DEFAULT_MODEL,
+    DEFAULT_SCALE,
+    CompileResult,
     NaiError,
+    NaiHttpError,
     ROOT as CLIENT_ROOT,
     assert_free_quota,
     build_payload,
     check_subscription,
+    compile_job,
     generate_image,
-    is_free_quota,
-    job_to_payload,
     load_jobs,
     load_token,
-    payload_has_reference,
     resolve_ref_paths,
     safe_job_id,
     sleep_between,
+    snapshot_from_compile,
     with_paid_size,
     write_pngs,
 )
@@ -47,40 +49,22 @@ def cmd_check(_: argparse.Namespace) -> int:
     _print(f"  grace: {info['isGracePeriod']}")
     _print(f"  anlasLeft: {info['fixedTrainingStepsLeft']}")
     _print(f"  purchasedAnlas: {info['purchasedTrainingSteps']}")
-    _print("  freeQuota: 1 image, <=28 steps, <=1024x1024 (Opus normal/small)")
+    _print("  freeQuota: 1 image, <=28 steps, long-edge<=1216, <=1024x1024, no reference")
     if not info["active"]:
         raise NaiError("NovelAI subscription is not active")
     return 0
 
 
-def cmd_dry_run(args: argparse.Namespace) -> int:
-    for payload, dest in _iter_targets(args):
-        _print(f"DRY {dest}")
-        _print(json.dumps({
-            "model": payload["model"],
-            "action": payload["action"],
-            "input": payload["input"],
-            "width": payload["parameters"]["width"],
-            "height": payload["parameters"]["height"],
-            "steps": payload["parameters"]["steps"],
-            "sampler": payload["parameters"]["sampler"],
-            "artist": payload["input"].startswith("artist:"),
-            "characterRefCount": len(payload["parameters"].get("director_reference_images") or []),
-            "characterRefType": "character" if payload_has_reference(payload) else None,
-            "freeQuota": is_free_quota(
-                payload["parameters"]["width"],
-                payload["parameters"]["height"],
-                payload["parameters"]["steps"],
-                payload["parameters"]["n_samples"],
-                has_reference=payload_has_reference(payload),
-            ),
-        }, ensure_ascii=False, indent=2))
+def cmd_compile(args: argparse.Namespace) -> int:
+    for compiled in _iter_compiled(args):
+        _print(f"COMPILE {compiled.dest}")
+        _print(json.dumps(compiled.snapshot, ensure_ascii=False, indent=2))
     return 0
 
 
 def cmd_gen(args: argparse.Namespace) -> int:
     token = load_token()
-    targets = list(_iter_targets(args))
+    targets = list(_iter_compiled(args))
     if len(targets) > 4 and not args.allow_batch:
         raise NaiError(
             f"{len(targets)} images requested. NovelAI ToS requires human-initiated "
@@ -88,21 +72,35 @@ def cmd_gen(args: argparse.Namespace) -> int:
             "for a deliberate, limited batch."
         )
     written: list[Path] = []
-    for index, (payload, dest) in enumerate(targets):
+    for index, compiled in enumerate(targets):
+        dest = compiled.dest
+        payload = compiled.payload
         if dest.exists() and not args.force:
             _print(f"SKIP existing {dest}")
             continue
         assert_free_quota(payload, spend_anlas=args.spend_anlas)
-        _print(f"GEN {dest} [{payload['model']} {payload['parameters']['width']}x{payload['parameters']['height']}]")
+        _print(f"GEN {dest} [{compiled.snapshot['model']} {compiled.snapshot['width']}x{compiled.snapshot['height']}]")
+        _print(f"FROZEN spend={compiled.snapshot['wouldSpendAnlas']} reasons={compiled.snapshot['spendReasons']}")
         try:
             images = generate_image(token, payload)
-        except NaiError as exc:
-            blocked = "Free generations are unavailable" in str(exc)
-            if not blocked or args.no_fallback_paid:
+        except NaiHttpError as exc:
+            if exc.billing_uncertain:
+                raise NaiError(
+                    f"{exc} Already sent; do not retry automatically (billing uncertain)."
+                ) from exc
+            if exc.free_blocked and not args.no_fallback_paid:
+                payload = with_paid_size(payload)
+                _print(f"FREE_BLOCKED, one paid retry {payload['parameters']['width']}x{payload['parameters']['height']}")
+                try:
+                    images = generate_image(token, payload)
+                except NaiHttpError as paid_exc:
+                    if paid_exc.billing_uncertain:
+                        raise NaiError(
+                            f"{paid_exc} Paid retry already sent; do not retry automatically."
+                        ) from paid_exc
+                    raise
+            else:
                 raise
-            payload = with_paid_size(payload)
-            _print(f"FREE_BLOCKED, retry paid {payload['parameters']['width']}x{payload['parameters']['height']}")
-            images = generate_image(token, payload)
         written.extend(write_pngs(images, dest))
         if index < len(targets) - 1:
             sleep_between(args.delay)
@@ -115,12 +113,13 @@ def cmd_gen(args: argparse.Namespace) -> int:
     return 0
 
 
-def _iter_targets(args: argparse.Namespace):
+def _iter_compiled(args: argparse.Namespace):
     if args.prompt:
         dest = Path(args.out) if args.out else DEFAULT_OUT_DIR / "manual.png"
         if not dest.is_absolute():
             dest = CLIENT_ROOT / dest
-        yield build_payload(
+        refs = resolve_ref_paths(args.char_ref or [])
+        payload = build_payload(
             args.prompt,
             model=args.model,
             size=args.size,
@@ -131,10 +130,17 @@ def _iter_targets(args: argparse.Namespace):
             seed=args.seed,
             greenscreen=args.greenscreen,
             artist=False if args.no_artist else True,
-            character_refs=resolve_ref_paths(args.char_ref or []),
+            character_refs=refs,
             cr_strength=args.cr_strength,
             cr_fidelity=args.cr_fidelity,
-        ), dest
+        )
+        snapshot = snapshot_from_compile(
+            payload,
+            job_id="manual",
+            dest=dest,
+            character_ref_paths=[str(path) for path in refs],
+        )
+        yield CompileResult(payload=payload, snapshot=snapshot, dest=dest, job_id="manual")
         return
     jobs_path = Path(args.jobs) if args.jobs else DEFAULT_JOBS
     if not jobs_path.is_absolute():
@@ -151,7 +157,7 @@ def _iter_targets(args: argparse.Namespace):
         dest = Path(job["out"]) if job.get("out") else out_dir / f"{safe_job_id(job['id'])}.png"
         if not dest.is_absolute():
             dest = CLIENT_ROOT / dest
-        yield job_to_payload(job), dest
+        yield compile_job(job, dest=dest)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -172,7 +178,7 @@ def build_parser() -> argparse.ArgumentParser:
         p.add_argument("--width", type=int)
         p.add_argument("--height", type=int)
         p.add_argument("--steps", type=int, default=28)
-        p.add_argument("--scale", type=float, default=6.0)
+        p.add_argument("--scale", type=float, default=DEFAULT_SCALE)
         p.add_argument("--seed", type=int, default=0)
         p.add_argument("--greenscreen", action="store_true")
         p.add_argument("--no-artist", action="store_true", help="Do not prepend the default artist string")
@@ -180,16 +186,20 @@ def build_parser() -> argparse.ArgumentParser:
         p.add_argument("--cr-strength", type=float, default=0.65)
         p.add_argument("--cr-fidelity", type=float, default=0.5)
 
-    dry = sub.add_parser("dry-run", help="Print payload only, no network")
-    add_common(dry)
-    dry.set_defaults(func=cmd_dry_run)
+    compile_cmd = sub.add_parser("compile", help="Freeze job into a snapshot. No network, no Anlas.")
+    add_common(compile_cmd)
+    compile_cmd.set_defaults(func=cmd_compile)
 
-    gen = sub.add_parser("gen", help="Generate one image or a limited batch")
+    dry = sub.add_parser("dry-run", help="Alias of compile")
+    add_common(dry)
+    dry.set_defaults(func=cmd_compile)
+
+    gen = sub.add_parser("gen", help="Send a frozen snapshot. 5xx is never auto-retried.")
     add_common(gen)
     gen.add_argument("--force", action="store_true")
     gen.add_argument("--allow-batch", action="store_true")
-    gen.add_argument("--spend-anlas", action="store_true", help="Allow Large sizes that cost Anlas")
-    gen.add_argument("--no-fallback-paid", action="store_true", help="Do not retry Large/Anlas after a free-queue 403")
+    gen.add_argument("--spend-anlas", action="store_true", help="Allow sizes/refs that cost Anlas")
+    gen.add_argument("--no-fallback-paid", action="store_true", help="Do not retry Large after a free-queue 403")
     gen.add_argument("--delay", type=float, default=1.5)
     gen.set_defaults(func=cmd_gen)
     return parser

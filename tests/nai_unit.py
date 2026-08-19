@@ -19,8 +19,11 @@ from nai_client import (  # noqa: E402
     NaiError,
     assert_free_quota,
     build_payload,
+    classify_http_error,
+    compile_job,
     compose_prompt,
     encode_character_ref,
+    fit_opus_free_size,
     is_free_quota,
     is_v4_model,
     job_to_payload,
@@ -40,6 +43,10 @@ class SizeTests(unittest.TestCase):
         self.assertEqual(resolve_size("landscape"), (1216, 832))
         self.assertTrue(is_free_quota(832, 1216, 28, 1))
         self.assertFalse(is_free_quota(1024, 1536, 28, 1))
+        fitted_w, fitted_h, resized = fit_opus_free_size(1024, 1536)
+        self.assertTrue(resized)
+        self.assertTrue(is_free_quota(fitted_w, fitted_h, 28, 1))
+        self.assertFalse(is_free_quota(832, 1216, 28, 1, has_reference=True))
         cheap = build_payload("1girl", size="portrait")
         assert_free_quota(cheap)
         costly = build_payload("1girl", size="portrait_large")
@@ -127,6 +134,12 @@ class JobTests(unittest.TestCase):
         self.assertFalse(payload_has_reference(lobby))
         assert_free_quota(lobby)
         self.assertTrue(jobs[3]["out"].endswith("lobby_wide.png"))
+        compiled = compile_job(jobs[0])
+        self.assertTrue(compiled.snapshot["frozen"])
+        self.assertTrue(compiled.snapshot["wouldSpendAnlas"])
+        self.assertIn("character_reference", compiled.snapshot["spendReasons"])
+        dumped = json.dumps(compiled.snapshot)
+        self.assertNotIn("iVBORw0KGgo", dumped)
 
     def test_safe_id(self):
         self.assertEqual(safe_job_id("sayo stand!!"), "sayo_stand")
@@ -160,6 +173,17 @@ class CliTests(unittest.TestCase):
         raw = encode_character_ref(ROOT / "android-app/app/src/main/assets/game/art/characters/sayo/default/portrait.webp")
         self.assertGreater(len(raw), 100)
         self.assertNotIn("\n", raw)
+
+    def test_http_error_policy(self):
+        server = classify_http_error(500, "boom")
+        self.assertTrue(server.billing_uncertain)
+        self.assertFalse(server.retry_safe)
+        blocked = classify_http_error(403, "Your account has been restricted. Free generations are unavailable.")
+        self.assertTrue(blocked.free_blocked)
+        self.assertTrue(blocked.retry_safe)
+        limited = classify_http_error(429, "slow down")
+        self.assertTrue(limited.retry_safe)
+        self.assertFalse(limited.billing_uncertain)
 
 
 if __name__ == "__main__":
