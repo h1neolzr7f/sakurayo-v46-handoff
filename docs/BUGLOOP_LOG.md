@@ -49,3 +49,13 @@
 这一轮怎么查到的：加 `tests/emu_scan.mjs`，在 430×932 / 932×430 / 2400×1080 量寻访页签与标题重叠、elementFromPoint 能否点中、编年卡片点完再回残件墙高与 8 格、子弹循环仍 `grid.near`、走到 `player.x<160` 才断言 `camX≈0`。2400 视口世界宽 9600，12 秒走不到左边，不能当成镜头半屏空白。`emu_loop` 补上寻访叠字与编年点回空墙断言。
 
 三层：门A 绿（static/lobby/live/ops/chronicle/camera/lifecycle/framework 8/browser 52/ops_smoke/gacha_visual/testimony） / Playwright视口 绿（emu_loop 23 + emu_scan 0 P0/P1） / Android 无 adb。
+
+---
+
+## 轮 4
+
+三层能跑的全绿，无新 P0/P1。未改代码。连续第 2 轮全绿，写入 `docs/SWEEP_LOG.md` 后停。
+
+这一轮怎么查到的：复跑门 A + `emu_loop` + `emu_scan`（含 2400×1080 走到左缘、编年点回、寻访叠字、`grid.near`）。`adb devices` 仍无设备。
+
+三层：门A 绿 / Playwright视口 绿 / Android 无 adb。
