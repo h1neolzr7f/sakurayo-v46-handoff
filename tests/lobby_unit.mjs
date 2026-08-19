@@ -133,12 +133,26 @@ function tallyPulls(pool, n, seed) {
   }
   return tally;
 }
-const remnantTally = tallyPulls("remnant", 2000, 0x51c0de);
+function tallyRemnantJobs(n, seed) {
+  const save = { coins: n * 160 + 160, shop40: L.normalizeOps({}) };
+  const rng = lcg(seed);
+  const tally = { N: 0, R: 0, SR: 0, SSR: 0 };
+  const jobs = new Set();
+  for (let i = 0; i < n; i++) {
+    const row = L.pull(save, 1, rng, "remnant");
+    tally[row.results[0].r] += 1;
+    if (String(row.results[0].id).startsWith("job_")) jobs.add(row.results[0].id);
+  }
+  return { tally, jobs };
+}
+const remnantPack = tallyRemnantJobs(2000, 0x51c0de);
+const remnantTally = remnantPack.tally;
 assert.ok(remnantTally.R > remnantTally.SR * 3, "残片 R 应远多于 SR: " + JSON.stringify(remnantTally));
 assert.ok(remnantTally.R / 2000 >= 0.55, "残片约六七成应为 R: " + JSON.stringify(remnantTally));
 assert.ok(remnantTally.SR / 2000 >= 0.04 && remnantTally.SR / 2000 <= 0.25, "残片 SR 应在一成左右: " + JSON.stringify(remnantTally));
 assert.equal(remnantTally.SSR, 0);
 assert.ok(remnantTally.SR / 2000 < 0.5, "残片不能再出现过半 SR");
+assert.ok(remnantPack.jobs.size >= 10, "2000 抽至少 10 个不同 job_*: " + remnantPack.jobs.size);
 const fashionTally = tallyPulls("fashion", 2000, 0x51c0de);
 assert.ok(fashionTally.N > fashionTally.SR, "时装 N 应多于 SR: " + JSON.stringify(fashionTally));
 assert.ok(fashionTally.N / 2000 >= 0.5, "时装 N 应保持现有量级: " + JSON.stringify(fashionTally));
@@ -155,6 +169,9 @@ assert.ok(fashionPull.results[0].id.startsWith("fashion_"));
 const scrapSpark = L.spark({ coins: 0, shop40: L.normalizeOps({}) }, "remnant", "sayo_echo");
 assert.equal(scrapSpark.ok, false);
 assert.equal(scrapSpark.reason, "scrap");
+const jobSpark = L.spark({ coins: 0, shop40: L.normalizeOps({ ops: { shards: 200 } }) }, "remnant", "job_swarm");
+assert.equal(jobSpark.ok, false);
+assert.equal(jobSpark.reason, "rarity");
 fashionSave.shop40.ops.fashion.shards = 200;
 const sparked = L.spark(fashionSave, "fashion", "fashion_sayo_crown");
 assert.equal(sparked.ok, true);
@@ -203,6 +220,23 @@ L.applyOwnedBonus(schoolP14, schoolSave);
 const fourteenMul = L.SCHOOL_CARDS.reduce((m, card) => m * (1 + card.dmg), 1) * 1.02 * 1.03;
 assert.ok(Math.abs(schoolP14.dmg - 20 * fourteenMul) < 1e-6);
 assert.equal(L.snapshot(schoolSave).schoolOwned, 14);
+
+const jobP = { dmg: 20 };
+const jobSave = { shop40: L.normalizeOps({}) };
+jobSave.shop40.ops.owned.job_swarm = 1;
+jobSave.shop40.ops.owned.job_railLord = 2;
+L.applyOwnedBonus(jobP, jobSave);
+assert.ok(Math.abs(jobP.dmg - 20 * 1.005 * 1.005) < 1e-6, "每张转职 +0.5%，重复不加");
+assert.equal(L.hasJob(jobSave, "mech"), true);
+assert.equal(L.hasJob(jobSave, "spore"), false);
+assert.equal(L.hasJob({ shop40: L.normalizeOps({}) }, "mech"), false);
+const jobP2 = { dmg: 20 };
+jobSave.shop40.ops.owned.job_swarm = 9;
+L.applyOwnedBonus(jobP2, jobSave);
+assert.ok(Math.abs(jobP2.dmg - 20 * 1.005 * 1.005) < 1e-6, "同一张转职重复不叠伤");
+assert.equal(L.JOB_CARDS.length, 28);
+assert.ok(L.JOB_CARDS.every((card) => card.id.startsWith("job_") && card.r === "SR" && card.kind === "job" && card.dmg === 0.005));
+assert.equal(L.snapshot(jobSave).jobOwned, 2);
 
 const shardSave = { coins: 20000, shop40: L.normalizeOps({}) };
 L.CARDS.forEach((card) => { shardSave.shop40.ops.owned[card.id] = 1; });

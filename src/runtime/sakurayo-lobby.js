@@ -520,13 +520,34 @@
     return !!(feq && feq.school === id && (shop.ops.fashion.owned[feq.id] || 0) > 0);
   }
 
-  function pickOfRarity(rarity, rng, list, owned) {
+  function hasJob(save, school) {
+    var shop = normalizeOps((save && save.shop40) || {});
+    var id = String(school || "");
+    if (!id) return false;
+    return JOB_CARDS.some(function (card) {
+      return card.school === id && (shop.ops.owned[card.id] || 0) > 0;
+    });
+  }
+
+  function preferSsrFulfill(card) {
+    if (!card || card.kind === "scrap") return false;
+    if (card.kind === "job") return true;
+    return card.kind === "school" && (card.school === "shrine" || card.school === "gun" || card.school === "cult");
+  }
+
+  function pickOfRarity(rarity, rng, list, owned, want) {
     var grouped = groupByRarity(list || CARDS);
     var pool = grouped[rarity] && grouped[rarity].length ? grouped[rarity] : grouped.R.length ? grouped.R : grouped.N;
     if (!pool || !pool.length) return null;
-    if (owned && rarity === "SSR") {
-      var fresh = pool.filter(function (card) { return (owned[card.id] || 0) < 1; });
-      if (fresh.length) pool = fresh;
+    if (owned && (rarity === "SSR" || want === "SSR")) {
+      var prefer = pool.filter(function (card) {
+        return (owned[card.id] || 0) < 1 && preferSsrFulfill(card);
+      });
+      if (prefer.length) pool = prefer;
+      else {
+        var noScrap = pool.filter(function (card) { return card.kind !== "scrap"; });
+        if (noScrap.length) pool = noScrap;
+      }
     }
     return pool[Math.floor(rng() * pool.length) % pool.length];
   }
@@ -594,7 +615,7 @@
   function applyPull(ops, rng, list, shardHost) {
     var want = rollWant(ops, rng);
     var rarity = downgradeRarity(want, list);
-    var card = pickOfRarity(rarity, rng, list, ops.owned);
+    var card = pickOfRarity(rarity, rng, list, ops.owned, want);
     if (!card) return null;
     ops.pity += 1;
     ops.pitySR += 1;
@@ -740,6 +761,10 @@
     });
     if (schoolN >= 7) player.dmg = (player.dmg || 0) * 1.02;
     if (schoolN >= 14) player.dmg = (player.dmg || 0) * 1.03;
+    JOB_CARDS.forEach(function (card) {
+      if ((owned[card.id] || 0) < 1) return;
+      if (card.dmg) player.dmg = (player.dmg || 0) * (1 + card.dmg);
+    });
     var fashion = shop.ops.fashion || {};
     var fcard = cardOf(fashion.equipped);
     if (fcard && (fashion.owned[fcard.id] || 0) > 0) {
@@ -1324,6 +1349,7 @@
     JOB_CARDS: JOB_CARDS,
     CHRONICLE: CHRONICLE,
     hasSchool: hasSchool,
+    hasJob: hasJob,
     POOL_IDS: POOL_IDS,
     ROSTER_TABS: ROSTER_TABS,
     SCRAP_BONUS: SCRAP_BONUS,
