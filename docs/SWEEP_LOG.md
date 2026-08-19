@@ -20,3 +20,4 @@ A/B 每轮追加一行，不准删旧记录。
 | 2026-08-19 | 二期 | 刀3 加成与保底 | resetP 转职 +0.5% 重复不加；upgradeWeight 基础 ×1.3 后再 ×1.5；want=SSR 的 SR 桶优先未拥有 job/shrine/gun/cult，禁止残件。lobby_unit：28 张、仓库转职页、分布、硬保不是残件、2000 抽 ≥10 个 job_*。 | static/lobby/live/ops/framework 绿 | — | 刀4清虫 |
 | 2026-08-19 | 二期 | 刀4 清虫 | 门 A 脚本绿。browser_smoke 核心寻访/仓库/三角色/升级/Boss/结算绿；末尾孤证试炼点 #skill 超时与刀 0 基线相同，本轮未改战斗。无新 P0/P1。未升 4.6.1。 | 门A绿 | 基线已有 #skill 不可见 | 停，等人收工 |
 | 2026-08-19 | 二期 | 绫枪姿复检 | 十张绫封面过目视。禁 `aya_petal` 竖举脸边/朝天。整张重画 plagueDoctor / element / bombNinja；barrage / timeMage 一并换构图。sniper / philosopher / bloodDuke / batQueen / shadow 可留。未动旧 8/14/传说/公共图。 | 目视 10/10 枪不贴脸 | 首轮抄默认举枪 | 停，等人收工 |
+| 2026-08-19 | 二期 | 表情复检 | 28 张过目视。禁全员抿嘴杀气。可留 hive / warSinger / healingIdol / bloodDuke / beast / heroic / boneKing。其余 21 张整张重画，情绪按 lore 拆开。绫仍禁举枪贴脸。未动旧 8/14/传说/公共图。 | 目视 28/28 能报出不同情绪 | 上轮只修枪姿没拆表情 | 停，等人收工 |
