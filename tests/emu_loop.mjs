@@ -418,7 +418,7 @@ try {
   await waitMenu(mainGodPillPage);
   await api(mainGodPillPage, "openDrawer", "stage");
   await mainGodPillPage.locator('#modeBar46 [data-mode="mainGod"]').click();
-  await mainGodPillPage.locator('.stageCard[data-stage-id="1"] button').click();
+  await mainGodPillPage.locator('.stageCard[data-stage-id="1"] button:not(.exploreEntry41)').click();
   const pillGuard = await mainGodPillPage.evaluate(() => ({
     drawer: !document.querySelector("#stageDrawer").classList.contains("hidden"),
     toast: document.querySelector("#toast")?.textContent || "",
