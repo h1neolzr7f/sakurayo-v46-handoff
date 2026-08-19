@@ -45,6 +45,6 @@ head：先 `0b992ff`，认人打回后 `dae7774`。基线 `origin/main` @ `06571
 
 凛音 7：bloodsword 折剑+空冠；chimera 看见嵌臂；corpseimmortal 人淡、剑留、冠弃；shikigami 百鬼先朝镜核鞠躬；bloodbeast 红线勒、兽喝署名；elementalbeast 三兽喷向自己、鞭在地上；soulgun 骨马+魂灯（刀举过顶偏英雄骑姿，仍认得出亡骨枪骑，本轮不打回）。
 
-## 施工怎么改
+## 施工怎么改（已完成）
 
-只换 `fusion_shadowmage.webp` 和 `fusion_necrospore.webp`。写进施工 `SWEEP_LOG`。其余 22 张哈希必须与 `0b992ff` 相同。逻辑和测试不要再改。
+`dae7774` 只换了这两张。其余 22 张哈希与 `0b992ff` 相同。逻辑和测试未再改。可以合并。
