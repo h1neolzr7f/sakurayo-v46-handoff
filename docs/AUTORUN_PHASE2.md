@@ -4,9 +4,9 @@
 
 ## 基线
 
-- `origin/main` @ `491e548`（第一期已合并）
-- 新分支 `cursor/phase2-promos-5030`
-- 版本仍 **4.6.0**，存档键仍 `sakurayoV3`
+- 开工基线曾是 `origin/main` @ `491e548`（第一期）
+- 施工分支 `cursor/phase2-promos-5030` 已并进 `main`
+- 合并提交 **`0657136`**。版本仍 **4.6.0**，存档键仍 `sakurayoV3`
 
 ## 人只露脸 3 次
 
@@ -16,7 +16,7 @@
 
 ## 验收状态（2026-08-19）
 
-PR #11 @ `fcb9279`：**收工**。`job_garden` 笑裂带一滴泪已过。可以点合并。见 `docs/PHASE2_ACCEPT.md`。
+PR #11 已 merge commit 进 `main`（`0657136`）。`job_garden` 笑裂带一滴泪已过。见 `docs/PHASE2_ACCEPT.md`。第三期另开。
 
 ## 已锁死（开工后不准改）
 

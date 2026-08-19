@@ -2,12 +2,13 @@
 
 用法：同一仓库开三个对话。大脑贴「提示词〇」。A 只开一个对话贴「提示词 A」。B 按切片开多个对话，每个都贴「提示词 B」，只改切片那一行。
 
-第一期已验收并进入 `main`（`491e548`）。
+第一期已进 `main`（`491e548`）。第二期 28 转职已 merge commit 进 `main`（`0657136`，PR #11）。版本仍 4.6.0。
 
 - 严重度 P2（换拼卡，可不做）：[CURSOR_PROMPT_P2.md](CURSOR_PROMPT_P2.md)
-- **第二期 28 转职**（下一个主项目）：[CURSOR_PROMPT_PHASE2.md](CURSOR_PROMPT_PHASE2.md) · [AUTORUN_PHASE2.md](AUTORUN_PHASE2.md)
+- 第二期 28 转职（已完成）：[CURSOR_PROMPT_PHASE2.md](CURSOR_PROMPT_PHASE2.md) · [AUTORUN_PHASE2.md](AUTORUN_PHASE2.md) · [PHASE2_ACCEPT.md](PHASE2_ACCEPT.md)
+- 下一主项目：第三期 24 融合。提示词未写。基线 `origin/main` @ `0657136`。
 
-P2 ≠ 第二期。第二期提示词单独贴，不要和第一期 / P2 混用。
+P2 ≠ 第二期。不要把严重度 P2 提示词当第三期用。
 
 下面三段都是自洽的，不依赖再去翻别的文档。仍建议把本文件和 `docs/SWEEP_LOG.md` 留在仓库里当进度。
 

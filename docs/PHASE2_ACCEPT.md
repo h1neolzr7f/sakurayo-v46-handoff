@@ -2,7 +2,9 @@
 
 2026-08-19。对照 `docs/CURSOR_PROMPT_PHASE2.md` 11 条。施工 PR：https://github.com/h1neolzr7f/sakurayo-v46-handoff/pull/11。
 
-**结论：收工。可以合并 PR #11 @ `fcb9279`。** 不要升 4.6.1，不要交 APK。
+**结论：已进 `main`。** 合并提交 `0657136864aad2aa953ba59480146e5f231cf9e5`（PR #11，merge commit）。版本仍 **4.6.0**。没有交 APK，也没有动密钥。
+
+并之前先改掉正文「未收工、不要合并」，再标 ready，再 merge commit。head 仍是 `fcb9279`。
 
 - `8193eed`：打回 `job_garden`（围裙跪泥纯哭，和 `hive` 叠泪）。
 - `fcb9279`：只改 `job_garden.webp` + 施工 `SWEEP_LOG`。新图笑裂（嘴角上扬、露出一点上齿），泪只留左脸一滴；步枪当锄、炼金围裙、尸花里镜核还在。其余 27 张 webp、lobby/index/测试、旧 8/14/传说/公共图哈希与 `8193eed` 相同。
@@ -61,4 +63,4 @@
 
 ## 下一件
 
-人点合并 PR #11。不要升 4.6.1。第三期 24 融合另开，不要塞进本 PR。
+第三期 24 融合另开，基线 `origin/main` @ `0657136`。不要升 4.6.1。镜头大地图仍另做。
