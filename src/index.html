@@ -7148,6 +7148,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       enemyRoleVisuals412(){return {...ENEMY_ROLE_VISUALS412};},
       lifecycle44(){return window.SakurayoLifecycle.snapshot(lifecycleWorld44());},
       camera50(){return window.SakurayoCamera?window.SakurayoCamera.snapshot():null;},
+      spawnFromEdge50(){if(state!=="play")throw new Error("spawnFromEdge50 requires play mode");const before=enemies.length;spawnEnemy("normal",false);const e=enemies[enemies.length-1];if(!e||enemies.length===before)throw new Error("Enemy cap prevented test spawn");return {x:e.x,y:e.y,inside:window.SakurayoCamera.contains(e.x,e.y,0),camera:window.SakurayoCamera.current()};},
       careerProgress44(){return window.SakurayoLifecycle.careerProgress(P.careers||{},P.fusion,P.form,FUSION,SCHOOL,CAREERS);},
       cutscene44(){return window.SakurayoCutscene?window.SakurayoCutscene.snapshot():null;},
       shopAdvice44(){return window.SakurayoEconomy?window.SakurayoEconomy.advice(save.character,save.coins,save.shop40,STARTERS40,ITEMS40,SKINS35):null;},
