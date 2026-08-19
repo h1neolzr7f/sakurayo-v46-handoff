@@ -106,14 +106,29 @@
     return "<h4>" + title + "</h4>" + list.map(cardHtml).join("");
   }
 
+  function extraHtml() {
+    return sectionHtml(AYA_TITLE, CHRONICLE_AYA) + sectionHtml(RION_TITLE, CHRONICLE_RION);
+  }
+
+  function retitleHead(host) {
+    var span = host.querySelector && host.querySelector(".rosterHead46 span");
+    if (span && span.textContent === SAYO_TITLE) span.textContent = HEAD_TITLE;
+  }
+
   function paintSides(host) {
     if (!host) return false;
     var html = String(host.innerHTML || "");
-    if (html.indexOf("chronicleBox46") < 0) return false;
-    if (html.indexOf(SAYO_TITLE) < 0) return false;
+    if (html.indexOf("chronicleBox46") < 0 || html.indexOf(SAYO_TITLE) < 0) return false;
     if (html.indexOf('data-roster="chronicle"') < 0) return false;
-    if (html.indexOf("data-chronicle-sides") >= 0) return true;
-    var extra = sectionHtml(AYA_TITLE, CHRONICLE_AYA) + sectionHtml(RION_TITLE, CHRONICLE_RION);
+    if (html.indexOf("data-chronicle-sides") >= 0 || html.indexOf('data-chronicle="ch_aya_sign"') >= 0) return true;
+    var extra = extraHtml();
+    var box = host.querySelector && host.querySelector(".chronicleBox46");
+    if (box && typeof box.insertAdjacentHTML === "function") {
+      box.setAttribute("data-chronicle-sides", "1");
+      box.insertAdjacentHTML("beforeend", extra);
+      retitleHead(host);
+      return true;
+    }
     html = html.replace(
       /(<div class="rosterHead46"><h3>镜界仓库<\/h3><span>)月城小夜 · 未写完的夜(<\/span>)/,
       "$1" + HEAD_TITLE + "$2"
