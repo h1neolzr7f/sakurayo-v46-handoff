@@ -243,3 +243,19 @@
 
 本轮新问题：主神胶囊被章节按钮打回 story。
 变成哪条回归：emu_loop 主神胶囊下点章节不改回 story。
+
+修完复跑：emu_loop 32 绿 / browser_smoke 52 / ops_smoke 绿。
+
+---
+
+## 轮 17（五房全查：寻访 / 名册 / 商店 / 主神 / 结算）
+
+自动打回：**未过。不要进入下一类。**
+层：Playwright视口
+类：finish() 融合名 `P.fusion?fusionData()?.n:"未融合"`，脏 fusion id 把字面 `undefined` 写进 #rsub/#rstats
+复现：`seedProgression45({fusion:'invalid_fusion_xyz'})` 再 `finish(true)`，结算可见但文案「融合：undefined」
+上一轮为什么没发现：轮 12 只补了 ASC.find 飞升 `?.`，融合支路仍用 truthy P.fusion 直接取 `.n`；五房扫结算才注入非法 fusion。寻访/名册/商店/主神本轮实测无新 P0/P1。
+回归：`emu_loop` 无效融合结算不得出现 undefined；并加寻访 0 币、名册六页、商店四页、主神开局+结算探针
+
+本轮新问题：结算融合脏 ID 写 undefined。
+变成哪条回归：emu_loop 无效融合结算不写 undefined + 五房探针。

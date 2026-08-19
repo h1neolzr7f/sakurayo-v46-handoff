@@ -2814,8 +2814,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     checkAch(); persist();
     $("#ricon").textContent=win?"🌸":"☠️"; $("#rankBig").textContent=win?(P.damageTaken===0?"S":P.plan?.rank||"A"):(runTime>stage().dur*.65?"B":"C");
     $("#rtitle").textContent=win?"镜界节点已净化":"防线失守";
-    $("#rsub").textContent=win?`${stage().short} 已封回证词。${stage().boss} 不再开口。${P.fusion?`「${fusionData()?.n}」`:"未融合"} / ${P.form?ASC.find(a=>a.id===P.form)?.n||P.form:"未飞升"}`:`${stage().short}被尸潮吞没。${window.SakurayoLifecycle?.hint?.(lifecycleWorld44())||"下次可以在暂停页看清短板，再决定补什么。"} ${runCoach45(false)}`;
-    $("#rstats").innerHTML=`坚持 <b>${fmt(runTime)}</b><br>击破 <b>${P.kills}</b> · 精英 <b>${P.eliteKills}</b> · 等级 <b>${P.level}</b><br>职业：<b>${careerSummary()}</b><br>融合：<b>${P.fusion?fusionData()?.n:"未融合"}</b><br>飞升：<b>${P.form?ASC.find(a=>a.id===P.form)?.n||P.form:"未飞升"}</b><br>获得樱花币 <b style="color:var(--g)">🌸 ${reward}</b>${pay44&&window.SakurayoEconomy?window.SakurayoEconomy.rewardHtml(pay44):""}`;
+    $("#rsub").textContent=win?`${stage().short} 已封回证词。${stage().boss} 不再开口。${P.fusion?`「${fusionData()?.n||P.fusion}」`:"未融合"} / ${P.form?ASC.find(a=>a.id===P.form)?.n||P.form:"未飞升"}`:`${stage().short}被尸潮吞没。${window.SakurayoLifecycle?.hint?.(lifecycleWorld44())||"下次可以在暂停页看清短板，再决定补什么。"} ${runCoach45(false)}`;
+    $("#rstats").innerHTML=`坚持 <b>${fmt(runTime)}</b><br>击破 <b>${P.kills}</b> · 精英 <b>${P.eliteKills}</b> · 等级 <b>${P.level}</b><br>职业：<b>${careerSummary()}</b><br>融合：<b>${P.fusion?fusionData()?.n||P.fusion:"未融合"}</b><br>飞升：<b>${P.form?ASC.find(a=>a.id===P.form)?.n||P.form:"未飞升"}</b><br>获得樱花币 <b style="color:var(--g)">🌸 ${reward}</b>${pay44&&window.SakurayoEconomy?window.SakurayoEconomy.rewardHtml(pay44):""}`;
     renderRunReport(); $("#result").classList.remove("hidden"); sound(win?"win":"over");
   }
   function pauseGame() {

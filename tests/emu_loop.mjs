@@ -316,21 +316,25 @@ try {
   const resultPage = await resultCtx.newPage();
   await waitMenu(resultPage);
   await startRun(resultPage, "sayo");
-  await api(resultPage, "seedProgression45", { form: "corrupt_form_id" });
+  await api(resultPage, "seedProgression45", { form: "corrupt_form_id", fusion: "invalid_fusion_xyz" });
   await api(resultPage, "finish", true);
   const resultUi = await resultPage.evaluate(() => ({
     mode: JSON.parse(window.render_game_to_text()).mode,
     resultVisible: !document.querySelector("#result").classList.contains("hidden"),
     menuVisible: !document.querySelector("#menu").classList.contains("hidden"),
     rstats: document.querySelector("#rstats")?.textContent || "",
+    rsub: document.querySelector("#rsub")?.textContent || "",
   }));
   assert.equal(resultUi.mode, "result");
   assert.equal(resultUi.resultVisible, true, "无效飞升 ID 时结算层必须出现");
   assert.equal(resultUi.menuVisible, false, "结算软锁不得只剩 canvas");
   assert.match(resultUi.rstats, /飞升/);
+  assert.equal(resultUi.rstats.includes("undefined"), false, "无效融合不得写成 undefined");
+  assert.equal(resultUi.rsub.includes("undefined"), false, "结算副标题不得出现 undefined");
   await resultPage.locator("#back").click();
   assert.equal(await resultPage.locator("#menu").isVisible(), true);
   pass("无效飞升仍弹出结算");
+  pass("无效融合结算不写 undefined");
   await resultCtx.close();
 
   const toastCtx = await browser.newContext({ viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true });
@@ -429,6 +433,65 @@ try {
   assert.equal(/已选择/.test(pillGuard.toast), false, "主神胶囊下点章节不得写成已选择普通关");
   pass("主神胶囊下点章节不改回 story");
   await mainGodPillCtx.close();
+
+  const roomsCtx = await browser.newContext({ viewport: { width: 932, height: 430 }, hasTouch: true });
+  const roomsPage = await roomsCtx.newPage();
+  await waitMenu(roomsPage);
+  await api(roomsPage, "openDrawer", "gacha");
+  await roomsPage.locator("#gachaPull1").click();
+  await roomsPage.waitForFunction(() => {
+    const t = document.querySelector("#toast");
+    return !!(t && t.classList.contains("show") && /樱花币不足/.test(t.textContent || ""));
+  }, null, { timeout: 2000 });
+  assert.equal(await roomsPage.locator("#gachaReveal46").count(), 0, "0 币单抽不得开揭示层");
+  pass("寻访 0 币单抽有不足提示");
+  await roomsPage.locator("#gachaDrawer .close").click();
+
+  await api(roomsPage, "openDrawer", "roster");
+  for (const tab of ["scrap", "school", "job", "fusion", "fashion", "weapon"]) {
+    await roomsPage.locator(`#rosterTabs46 [data-roster="${tab}"]`).click();
+  }
+  await roomsPage.locator('#rosterTabs46 [data-roster="scrap"]').click();
+  assert.equal(await roomsPage.locator("#rosterWall46 .rosterSlot46").count(), 8);
+  pass("名册六页可切且残件 8 格");
+  await roomsPage.locator("#rosterDrawer .close").click();
+
+  await roomsPage.locator('[data-open="shop"]').click();
+  for (const shop of ["skins", "starters", "items", "talismans"]) {
+    await roomsPage.locator(`.shopTabs40 [data-shop="${shop}"]`).click();
+    const shown = await roomsPage.evaluate((id) => {
+      const g = document.querySelector(`[data-shop-group="${id}"]`);
+      return !!(g && getComputedStyle(g).display !== "none");
+    }, shop);
+    assert.equal(shown, true, `商店页 ${shop} 必须显示`);
+  }
+  pass("商店四页可切换");
+  await roomsPage.locator("#shopDrawer .close").click();
+
+  await api(roomsPage, "unlockMainGod");
+  await api(roomsPage, "selectMainGodTier", 1);
+  await startRun(roomsPage, "sayo");
+  await roomsPage.evaluate(() => window.advanceTime(400));
+  const mg = await roomsPage.evaluate(() => ({
+    mode: JSON.parse(window.render_game_to_text()).mode,
+    title: document.querySelector("#eventTitle")?.textContent || "",
+    mission: document.querySelector("#mission")?.textContent || "",
+  }));
+  assert.ok(["event", "play", "dialogue"].includes(mg.mode), `主神开局 mode=${mg.mode}`);
+  assert.match(`${mg.title}${mg.mission}`, /契约|轮回|主神|T1/);
+  await api(roomsPage, "finish", false);
+  const mgResult = await roomsPage.evaluate(() => ({
+    visible: !document.querySelector("#result").classList.contains("hidden"),
+    title: document.querySelector("#rtitle")?.textContent || "",
+    rstats: document.querySelector("#rstats")?.textContent || "",
+  }));
+  assert.equal(mgResult.visible, true);
+  assert.match(mgResult.title, /轮回|主神|试炼/);
+  assert.equal(mgResult.rstats.includes("undefined"), false);
+  pass("主神可进入且结算可关");
+  await roomsPage.locator("#back").click();
+  assert.equal(await roomsPage.locator("#menu").isVisible(), true);
+  await roomsCtx.close();
 
   await runViewport(430, 932, "p430");
   await runViewport(932, 430, "l932");
