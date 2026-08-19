@@ -329,7 +329,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
     mainGod: { points: 0, unlockedTier: 1, bestTier: 0, clears: 0, runs: 0, deepest: 0, contracts: {}, challenges: {}, power: 0, vitality: 0, tempo: 0, resonance: 0, fortune: 0, regenBlood: 0, psiLink: 0, gunBlade: 0, mageCircuit: 0, summonPage: 0, spaceRing: 0, rebirthDoll: 0, sideKey: 0, cursedHeart: 0 },
   };
   const FORBIDDEN_SAVE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
-  const ALLOWED_SAVE_KEYS = ["coins","unlock","done","kills","bosses","best","runs","tal","ach","claim","story","forms","fusions","endings","runHistory","banter","tutorialDone","settings","character","skin","ownedSkins","mainGod","storyChoices38","storySeen38","shop40","balance40","hiddenStory40","pendingLoneStory40","extensions"];
+  const ALLOWED_SAVE_KEYS = ["coins","unlock","done","kills","bosses","best","runs","tal","ach","claim","story","forms","fusions","endings","runHistory","banter","tutorialDone","settings","character","skin","ownedSkins","mainGod","storyChoices38","storySeen38","shop40","balance40","hiddenStory40","pendingLoneStory40","hiddenPerfect47","extensions"];
   function isPlainObject(value) {
     return !!value && typeof value === "object" && !Array.isArray(value);
   }
@@ -3252,7 +3252,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
     let ed=endingData(),
       last=`【${ed.name}】${ed.text}`;
     const fate = typeof storyFate47 === "function" ? storyFate47() : null;
-    if (fate) {
+    const gate = typeof hiddenRouteStatus47 === "function" ? hiddenRouteStatus47() : null;
+    if (fate && P.hiddenCleared47) {
       const lines = [
         { sp: "镜零", tx: fate.script },
         { sp: "小夜", tx: fate.fight },
@@ -3260,6 +3261,15 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
       ];
       if (fate.reply) lines.push({ sp: fate.reply[0], tx: fate.reply[1] });
       lines.push({ sp: "小夜", tx: "接下来的路，我们自己走。" });
+      lines.push({ sp: "旁白", tx: last });
+      return lines;
+    }
+    if (fate) {
+      const lines = [
+        { sp: "镜零", tx: fate.script },
+        { sp: "小夜", tx: "剧本演到这里就停了。" },
+        { sp: "雨宫凛", tx: gate && gate.ready ? "写定的结局先收下。你口袋里还有它没看见的那几页。" : "这一页写死了。今晚就这样。" },
+      ];
       lines.push({ sp: "旁白", tx: last });
       return lines;
     }
@@ -3300,23 +3310,23 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
         1: "我进了门。里面还有我要带出去的人。",
         2: "名单上写着我已经死了。我还在划下一行。",
         3: "我问过镜子里的她。她还没回答，我先不停手。",
-        4: "剧本写我进墓碑。我把那一页撕了。",
+        4: "剧本写我进墓碑。今晚它先写完了。",
       },
       aya: {
         1: "门还认我。我是来带妹妹走的。",
         2: "她自己说过要不要被救。我听完了。",
         3: "那天的记录我会带回去。包括我签过的那一笔。",
-        4: "门后只够走一个人。我把门拆了。",
+        4: "门后只够走一个人。剧本先按这句话演完。",
       },
       rion: {
         1: "招式像，呼吸不对。我还是进去了。",
         2: "我叫出了她的名字。留下还是走，她自己说。",
         3: "师父的最后一式可以没有。人还在，剑才在。",
-        4: "黄泉流要用假人续。我偏让活人自己选。",
+        4: "黄泉流用假人续着。道场先空了。",
       },
     };
     const fate = typeof storyFate47 === "function" ? storyFate47() : null;
-    const line = chap === 4 && fate ? fate.fight : (voice[c.id] || voice.sayo)[chap];
+    const line = chap === 4 && P.hiddenCleared47 && fate ? fate.fight : (voice[c.id] || voice.sayo)[chap];
     if (mg) {
       return [
         { kicker: s.no, title: "监察投影碎裂", line: "白色回廊第一次安静下来。", bg: cover, portrait: "", hold: 2000 },
@@ -3324,13 +3334,13 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
       ];
     }
     const last = chap === 4
-      ? { kicker: endingData().name, title: "不在表上的结局", line: endingData().text, bg: map, portrait, hold: 2800 }
+      ? { kicker: endingData().name, title: P.hiddenCleared47 ? "不在表上的结局" : "写定的结局", line: endingData().text, bg: map, portrait, hold: 2800 }
       : { kicker: c.short, title: s.short, line, bg: map, portrait, hold: 2400 };
     const cg = artUrl(`stages/stage_${chap}/cg.webp`);
     const extra = chap === 4 && typeof equippedLegendLine47 === "function" ? equippedLegendLine47() : "";
     const beats = [
-      { kicker: `${s.no} · ${s.short}`, title: `${s.boss} 倒下`, line: chap === 4 ? "剧本写你会倒在这里。你还站着。" : "它倒下了。你还站着。", bg: map, portrait: "", hold: 2000 },
-      { kicker: c.short, title: chap === 4 ? "撕开那一页" : s.name, line, bg: cg, portrait: "", hold: 2600 },
+      { kicker: `${s.no} · ${s.short}`, title: P.hiddenArena47 || P.hiddenCleared47 ? "未写完的那一页" : `${s.boss} 倒下`, line: chap === 4 ? (P.hiddenCleared47 ? "剧本写你会倒在这里。你还站着。" : "剧本演到这里就停了。") : "它倒下了。你还站着。", bg: map, portrait: "", hold: 2000 },
+      { kicker: c.short, title: chap === 4 ? (P.hiddenCleared47 ? "撕开那一页" : "写死的结尾") : s.name, line, bg: cg, portrait: "", hold: 2600 },
       last,
     ];
     if (extra) beats.push({ kicker: c.short, title: "你带着的那一件", line: extra, bg: map, portrait, hold: 2200 });
@@ -6632,21 +6642,122 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
   };
   const _bossPhase38=bossPhaseDialogue;
   bossPhaseDialogue=function(p){if(isMainGodRun36())return _bossPhase38(p);const id=save.character||"sayo",i=clamp(p-2,0,2),line=PHASE38[id]?.[i];if(!line)return _bossPhase38(p);const bossLine=stage().id===4?PHASE_BOSS38[id]?.[i]:`阶段 ${p}。你刚才最依赖的东西，我学会了。现在用它打你。`;return [{sp:stage().boss,tx:bossLine},{sp:char35().short,tx:line}];};
+  const HIDDEN_PATH47={
+    sayo:[["mercy","seal"],["rin","real"],["scientist","save"],["identity","broadcast"],["failed","inherit"],["grave","sister"],["offer","self"],["self","copy"]],
+    aya:[["ayaSignal","trace"],["ayaOrder","restore"],["ayaDoor","burn"],["ayaSister","both"],["ayaBlade","expose"],["ayaMemory","release"],["ayaTruth","public"],["ayaFinal","free"]],
+    rion:[["rionTrail","follow"],["rionNames","record"],["rionModel","destroy"],["rionScroll","share"],["rionLedger","names"],["rionHeir","people"],["rionMaster","remember"],["rionFinal","choice"]]
+  };
+  function hiddenFlags47(){return {...(typeof storyMemory38==="function"?storyMemory38():{}),...(P.storyFlags||{})};}
+  function hiddenRouteStatus47(){
+    const id=save.character||"sayo",path=HIDDEN_PATH47[id]||HIDDEN_PATH47.sayo,f=hiddenFlags47();
+    const missing=path.filter(([k,v])=>f[k]!==v).map(([k])=>k);
+    const chapters=[1,2,3].every(n=>(save.done||[]).includes(n));
+    const witness=id==="sayo"?f.identity==="broadcast"&&f.rin==="real":id==="aya"?f.ayaSister==="both"&&f.ayaTruth==="public":f.rionNames==="record"&&f.rionHeir==="people";
+    return {ready:missing.length===0&&chapters&&witness,missing,clues:{chapters,path:missing.length===0,witness},cleared:!!P.hiddenCleared47};
+  }
   function storyFate47(){
-    const id=save.character||"sayo",f={...(typeof storyMemory38==="function"?storyMemory38():{}),...(P.storyFlags||{})};
-    if(id==="aya"){
-      const steal=f.ayaSister==="choice"||f.ayaFinal==="free";
-      return {script:"结局写死了：门后只够走一个人。用妹妹换你的清白，或者你留下、她变成文件。",fight:"用她换清白？不换。题我拆了。",steal,reply:steal?["妹妹频道","姐姐。门开了。这一次，我说要不要走。"]:["妹妹频道","姐姐，我还在听。别把我重新写成办完。"]};
-    }
-    if(id==="rion"){
-      const steal=f.rionNames==="keep"||f.rionFinal==="choice";
-      return {script:"结局写死了：你上传动作，假人替同门继续挥剑。黄泉流续着，道场是空的。",fight:"影像不是剑士。名字还给他们。去留他们自己说。",steal,reply:steal?["同门残响","我们还在。这一剑，有人愿意负责。"]:["同门残响","演完了。我们自己走。"]};
-    }
-    const steal=f.grave==="sister"||f.self==="copy"||f.offer==="self";
+    const id=save.character||"sayo",steal=!!P.hiddenCleared47;
+    if(id==="aya")return {script:"结局写死了：门后只够走一个人。用妹妹换你的清白，或者你留下、她变成文件。",fight:"用她换清白？不换。题我拆了。",steal,reply:steal?["妹妹频道","姐姐。门开了。这一次，我说要不要走。"]:["妹妹频道","姐姐，我还在听。别把我重新写成办完。"]};
+    if(id==="rion")return {script:"结局写死了：你上传动作，假人替同门继续挥剑。黄泉流续着，道场是空的。",fight:"影像不是剑士。名字还给他们。去留他们自己说。",steal,reply:steal?["同门残响","我们还在。这一剑，有人愿意负责。"]:["同门残响","演完了。我们自己走。"]};
     return {script:"结局写死了：你走进第三百一十八座墓。城变成数字备份。镜子里的她继续当失败样本。",fight:"我问过她想不想活。她说想。那一页我就撕了。",steal,reply:steal?["镜零","那一页……被撕了？那我还算不算失败的你。"]:["雨宫凛","墓碑还空着。今晚先不刻。"]};
   }
   const _endingStory38=endingData;
-  endingData=function(){if(isMainGodRun36())return _endingStory38();if(stage().id!==4)return _endingStory38();const id=save.character||"sayo",f={...storyMemory38(),...(P.storyFlags||{})};if(id==="sayo"){if(f.grave==="sister"||f.self==="copy")return {name:"双生存续线 · 不是唯一也是真的",text:"剧本写的是只留一个小夜。她把那一页撕了。镜零第一次用自己的名字回答想不想活。城里从此有两个都不必证明自己的人。"};return {name:"证词开放线 · 让死者重新拥有姓名",text:"剧本写的是她走进第三百一十八座墓。她把三百一十七次失败还原成证词。没有系统能再用“原本”决定谁有资格活。"};}if(id==="aya"){if(f.ayaSister==="choice"||f.ayaFinal==="free")return {name:"姐妹归还线 · 救援必须可以拒绝",text:"剧本写的是门后只走一个人。她把题拆了。妹妹的苏醒权还回去——哪怕她没有立刻醒来。"};return {name:"共同证词线 · 责任不是自我删除",text:"剧本写的是用妹妹换清白。她带着签名和残缺频道走出来。责任成了追查的起点，不是替罪的终点。"};}if(f.rionNames==="keep"||f.rionFinal==="choice")return {name:"黄泉活人道场线 · 传统允许被改写",text:"剧本写的是用复制品续黄泉流。她把姓名和去留权还给每一个人。新道场只认愿意为自己的剑负责的人。"};return {name:"黄泉送还线 · 最后一场稽古",text:"剧本写的是她空着手离开、假人替她练到世界尽头。亡者演完最后一场，自己走了。空道场里她写下新的起手式：先问名字，再问来意。"};};
+  endingData=function(){
+    if(isMainGodRun36())return _endingStory38();
+    if(stage().id!==4)return _endingStory38();
+    const id=save.character||"sayo";
+    if(P.hiddenCleared47){
+      if(id==="aya")return {name:"姐妹归还线 · 救援必须可以拒绝",text:"剧本写的是门后只走一个人。她把题拆了。妹妹的苏醒权还回去——哪怕她没有立刻醒来。"};
+      if(id==="rion")return {name:"黄泉活人道场线 · 传统允许被改写",text:"剧本写的是用复制品续黄泉流。她把姓名和去留权还给每一个人。新道场只认愿意为自己的剑负责的人。"};
+      return {name:"双生存续线 · 不是唯一也是真的",text:"剧本写的是只留一个小夜。她把那一页撕了。镜零第一次用自己的名字回答想不想活。城里从此有两个都不必证明自己的人。"};
+    }
+    if(id==="aya")return {name:"门后一人 · 写定的结局",text:"门后只够走一个人。绫带走了签名，妹妹仍被收成文件。这是镜核写好的结尾。"};
+    if(id==="rion")return {name:"空道场 · 写定的结局",text:"假人替同门继续挥剑。黄泉流续着，道场是空的。凛音按剧本空着手离开。"};
+    return {name:"第三百一十八座墓 · 写定的结局",text:"小夜走进第三百一十八座墓。全城变成数字备份。镜子里的她继续当失败样本。"};
+  };
+  function enterHiddenArena47(){
+    P.pendingHidden47=false;
+    P.hiddenArena47=true;
+    bullets=[];ebullets=[];enemies=[];gems=[];parts=[];texts=[];slashes=[];arenaHazards=[];
+    boss=null;bossBorn=false;spawnClock=999;
+    P.inv=Math.max(P.inv||0,2.4);
+    P.hp=Math.min(P.maxHp,Math.max(P.hp,P.maxHp*.42)+P.maxHp*.18);
+    hideTransient();
+    $("#hud").classList.remove("hidden");
+    if($("#stageHud"))$("#stageHud").textContent="隐藏关 · 未写完的页";
+    toast("隐藏关开启：未写完的那一页");
+    state="play";
+    last=performance.now();
+    spawnBoss();
+    scheduleLoop();
+  }
+  const _bossDefeated47=bossDefeated;
+  bossDefeated=function(){
+    if(typeof isMainGodRun36==="function"&&isMainGodRun36())return _bossDefeated47();
+    if(P.hiddenArena47){P.hiddenCleared47=true;P.hiddenArena47=false;return _bossDefeated47();}
+    if(selected===4&&hiddenRouteStatus47().ready){
+      P.pendingHidden47=true;
+      ebullets=[];hideTransient();$("#hud").classList.add("hidden");state="dialogue";
+      const talk=()=>showDialogue(endingDialogue(),()=>enterHiddenArena47(),"ending");
+      const profile=window.SakurayoLifecycle?.stageProfile?.(selected,{mainGod:false});
+      window.SakurayoCutscene?.flashPhase?.(4);
+      if(!window.SakurayoCutscene?.playVictory){talk();return;}
+      window.SakurayoCutscene.playVictory({testMode:TEST_MODE,ground:profile?.ground||"mirror",beats:victoryBeats44(),onDone:talk});
+      return;
+    }
+    return _bossDefeated47();
+  };
+  const _spawnBoss47=spawnBoss;
+  spawnBoss=function(){
+    const result=_spawnBoss47();
+    if(P.hiddenArena47&&boss){
+      boss.hp=Math.round(boss.hp*1.55);
+      boss.max=boss.hp;
+      boss.dmg*=1.22;
+      boss.spd+=8;
+      boss.shot*=.82;
+      boss.hidden47=true;
+      $("#warning").textContent="隐藏关 · 未写完的那一页";
+      $("#warning").classList.remove("hidden");
+      setTimeout(()=>$("#warning").classList.add("hidden"),2400);
+    }
+    return result;
+  };
+  const _spawnBossAdds47=spawnBossAdds;
+  spawnBossAdds=function(type,count,guard=false){return _spawnBossAdds47(type,P.hiddenArena47?Math.min(count,2):count,guard);};
+  const _bossTalk47=bossDialogue;
+  bossDialogue=function(){
+    if(P.hiddenArena47&&!(typeof isMainGodRun36==="function"&&isMainGodRun36()))return [{sp:"镜零",tx:"剧本已经演完。你不该还站着。"},{sp:"小夜",tx:"那一页我没收。"}];
+    return _bossTalk47();
+  };
+  const _openingHidden47=openingDialogue;
+  openingDialogue=function(){
+    const base=_openingHidden47();
+    if((typeof isMainGodRun36==="function"&&isMainGodRun36())||selected!==4)return base;
+    const st=hiddenRouteStatus47();
+    if(st.ready)return [{sp:"雨宫凛",tx:"你口袋里的那几页，它还没看见。先把这出演完。"},...base];
+    if(st.missing.length&&st.missing.length<=2)return [{sp:"雨宫凛",tx:"还差一两页。缺的那些，它最爱拿来写结局。"},...base];
+    return base;
+  };
+  const _commitHidden47=commitStory38;
+  commitStory38=function(){
+    const before={...storyMemory38()};
+    const result=_commitHidden47();
+    const after=hiddenFlags47(),id=save.character||"sayo";
+    const just=(HIDDEN_PATH47[id]||[]).find(([k,v])=>before[k]!==v&&after[k]===v);
+    if(just)showBanter([["雨宫凛","这一页先收着。别急着给它看。"]],true);
+    return result;
+  };
+  const _finishHidden47=finish;
+  finish=function(win){
+    if(win&&P.hiddenCleared47){
+      save.hiddenPerfect47=save.hiddenPerfect47&&typeof save.hiddenPerfect47==="object"?save.hiddenPerfect47:{};
+      save.hiddenPerfect47[save.character]=true;
+      save.ach.hiddenpage=true;
+    }
+    return _finishHidden47(win);
+  };
+  ACH.hiddenpage={n:"未写完的那一页",i:"📜",d:"四章线索走完、先收下写定的结局，再打进隐藏关抢回完美结局",r:320,c:()=>!!save.ach.hiddenpage};
 
   function persistEventButtons38(){document.querySelectorAll("#eventChoices .eventChoice").forEach(b=>{if(b.dataset.persist38)return;b.dataset.persist38="1";b.addEventListener("click",()=>queueMicrotask(commitStory38));});}
   const _renderCharacterChoices38=renderCharacterEventChoices35;
@@ -6820,8 +6931,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
   save.shop40.lastTab=["skins","starters","items","talismans","extensions"].includes(save.shop40.lastTab)?save.shop40.lastTab:"skins";
   save.balance40=save.balance40&&typeof save.balance40==="object"?save.balance40:{samples:[],betaSessions:0};
   save.hiddenStory40=save.hiddenStory40&&typeof save.hiddenStory40==="object"?save.hiddenStory40:{};
+  save.hiddenPerfect47=save.hiddenPerfect47&&typeof save.hiddenPerfect47==="object"?save.hiddenPerfect47:{};
   const _validateSave40=validateSave39;
-  validateSave39=function(raw){const clean=_validateSave40(raw),incoming=clean.shop40||{},starter=incoming.starter||{},items=incoming.items||{};clean.shop40={...SHOP_DEF40,...incoming,starter:{...SHOP_DEF40.starter,...starter},items:{...SHOP_DEF40.items,...items}};if(window.SakurayoLobby)clean.shop40=window.SakurayoLobby.normalizeOps(clean.shop40);for(const id of Object.keys(STARTERS40))clean.shop40.starter[id]=clamp(Math.floor(Number(clean.shop40.starter[id])||0),0,5);for(const [id,u] of Object.entries(ITEMS40))clean.shop40.items[id]=clamp(Math.floor(Number(clean.shop40.items[id])||0),0,u.max);clean.shop40.equippedStarter=STARTERS40[clean.shop40.equippedStarter]?clean.shop40.equippedStarter:null;clean.shop40.equippedWeapon=["ammo","whetstone","mirror"].includes(clean.shop40.equippedWeapon)?clean.shop40.equippedWeapon:null;clean.shop40.ownedTalismans=Array.isArray(clean.shop40.ownedTalismans)?clean.shop40.ownedTalismans.filter(id=>TALISMAN_SCHOOLS40.includes(id)):[];clean.shop40.bannedSchools=Array.isArray(clean.shop40.bannedSchools)?clean.shop40.bannedSchools.filter(id=>clean.shop40.ownedTalismans.includes(id)).slice(0,2):[];clean.balance40=clean.balance40&&typeof clean.balance40==="object"?clean.balance40:{samples:[],betaSessions:0};clean.balance40.samples=Array.isArray(clean.balance40.samples)?clean.balance40.samples.slice(0,80):[];clean.hiddenStory40=clean.hiddenStory40&&typeof clean.hiddenStory40==="object"&&!Array.isArray(clean.hiddenStory40)?clean.hiddenStory40:{};clean.storySeen38=clean.storySeen38&&typeof clean.storySeen38==="object"&&!Array.isArray(clean.storySeen38)?clean.storySeen38:{};clean.pendingLoneStory40=["sayo","aya","rion"].includes(clean.pendingLoneStory40)?clean.pendingLoneStory40:null;if(clean.extensions&&typeof clean.extensions==="object"&&!Array.isArray(clean.extensions)){const ext={};for(const id of Object.keys(clean.extensions)){if(FORBIDDEN_SAVE_KEYS.has(id)||!/^[a-z0-9][a-z0-9._-]{2,63}$/.test(id))continue;const entry=clean.extensions[id];if(entry&&typeof entry==="object"&&!Array.isArray(entry))ext[id]=entry;}clean.extensions=ext;}return pickAllowedSave(clean);};
+  validateSave39=function(raw){const clean=_validateSave40(raw),incoming=clean.shop40||{},starter=incoming.starter||{},items=incoming.items||{};clean.shop40={...SHOP_DEF40,...incoming,starter:{...SHOP_DEF40.starter,...starter},items:{...SHOP_DEF40.items,...items}};if(window.SakurayoLobby)clean.shop40=window.SakurayoLobby.normalizeOps(clean.shop40);for(const id of Object.keys(STARTERS40))clean.shop40.starter[id]=clamp(Math.floor(Number(clean.shop40.starter[id])||0),0,5);for(const [id,u] of Object.entries(ITEMS40))clean.shop40.items[id]=clamp(Math.floor(Number(clean.shop40.items[id])||0),0,u.max);clean.shop40.equippedStarter=STARTERS40[clean.shop40.equippedStarter]?clean.shop40.equippedStarter:null;clean.shop40.equippedWeapon=["ammo","whetstone","mirror"].includes(clean.shop40.equippedWeapon)?clean.shop40.equippedWeapon:null;clean.shop40.ownedTalismans=Array.isArray(clean.shop40.ownedTalismans)?clean.shop40.ownedTalismans.filter(id=>TALISMAN_SCHOOLS40.includes(id)):[];clean.shop40.bannedSchools=Array.isArray(clean.shop40.bannedSchools)?clean.shop40.bannedSchools.filter(id=>clean.shop40.ownedTalismans.includes(id)).slice(0,2):[];clean.balance40=clean.balance40&&typeof clean.balance40==="object"?clean.balance40:{samples:[],betaSessions:0};clean.balance40.samples=Array.isArray(clean.balance40.samples)?clean.balance40.samples.slice(0,80):[];clean.hiddenStory40=clean.hiddenStory40&&typeof clean.hiddenStory40==="object"&&!Array.isArray(clean.hiddenStory40)?clean.hiddenStory40:{};clean.hiddenPerfect47=clean.hiddenPerfect47&&typeof clean.hiddenPerfect47==="object"&&!Array.isArray(clean.hiddenPerfect47)?clean.hiddenPerfect47:{};clean.storySeen38=clean.storySeen38&&typeof clean.storySeen38==="object"&&!Array.isArray(clean.storySeen38)?clean.storySeen38:{};clean.pendingLoneStory40=["sayo","aya","rion"].includes(clean.pendingLoneStory40)?clean.pendingLoneStory40:null;if(clean.extensions&&typeof clean.extensions==="object"&&!Array.isArray(clean.extensions)){const ext={};for(const id of Object.keys(clean.extensions)){if(FORBIDDEN_SAVE_KEYS.has(id)||!/^[a-z0-9][a-z0-9._-]{2,63}$/.test(id))continue;const entry=clean.extensions[id];if(entry&&typeof entry==="object"&&!Array.isArray(entry))ext[id]=entry;}clean.extensions=ext;}return pickAllowedSave(clean);};
 
   const STARTERS40={
     assault:{n:"夜樱火控核心",i:"🎯",d:"伤害、射速与暴击同步成长。适合纯初始挑战。",apply:(lv,m)=>{P.dmg*=1+.12*lv*m;P.rate/=1+.03*lv*m;P.crit+=.012*lv*m;}},
@@ -6886,7 +6998,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
   const _opening40=openingDialogue;
   openingDialogue=function(){const base=_opening40();if(save.pendingLoneStory40===save.character){save.pendingLoneStory40=null;persist();return [{sp:"镜界残响",tx:LONE_STORY40[save.character]},{sp:char35().short,tx:save.character==="sayo"?"上次没有升级选项，这次也别指望我按推荐答案活。":save.character==="aya"?"后门、补给、推荐路线都关掉。现在才算我自己的任务。":"借来的强大已经归还。现在继续练自己的第一式。"},...base];}return base;};
   const _renderStory40=renderStory;
-  renderStory=function(){const result=_renderStory40();const box=$("#storyList");for(const [id,text] of Object.entries(LONE_STORY40)){if(!save.hiddenStory40[id])continue;const c=CHARACTERS35[id],d=document.createElement("div");d.className="storyCard open hiddenStory40";d.innerHTML=`<div class="storyIcon">🕯️</div><div><h3>${c.name}隐藏档案 · 孤证</h3><p>${text}</p></div>`;box.appendChild(d);}return result;};
+  renderStory=function(){const result=_renderStory40();const box=$("#storyList");for(const [id,text] of Object.entries(LONE_STORY40)){if(!save.hiddenStory40[id])continue;const c=CHARACTERS35[id],d=document.createElement("div");d.className="storyCard open hiddenStory40";d.innerHTML=`<div class="storyIcon">🕯️</div><div><h3>${c.name}隐藏档案 · 孤证</h3><p>${text}</p></div>`;box.appendChild(d);}const perfect={sayo:"剧本写她进墓碑。她把那一页撕了。",aya:"剧本写门后只走一个人。她把题拆了。",rion:"剧本写假人续黄泉流。她把去留还给活人。"};for(const [id,text] of Object.entries(perfect)){if(!save.hiddenPerfect47||!save.hiddenPerfect47[id])continue;const c=CHARACTERS35[id],d=document.createElement("div");d.className="storyCard open hiddenStory40";d.innerHTML=`<div class="storyIcon">📜</div><div><h3>${c.name}隐藏档案 · 未写完的那一页</h3><p>${text}</p></div>`;box.appendChild(d);}return result;};
 
   function buyStarter40(id){const u=STARTERS40[id],lv=save.shop40.starter[id]||0,cost=starterCost40(id);if(!u||lv>=5||save.coins<cost)return false;save.coins-=cost;save.shop40.starter[id]=lv+1;if(!save.shop40.equippedStarter)save.shop40.equippedStarter=id;persist();renderShop35();toast(`${u.n} 提升至 Lv.${lv+1}`);return true;}
   function buyItem40(id){const u=ITEMS40[id],lv=save.shop40.items[id]||0,cost=itemCost40(id);if(!u||lv>=u.max||save.coins<cost)return false;save.coins-=cost;save.shop40.items[id]=lv+1;if(id==="bait")save.shop40.baitEquipped=true;else if(!save.shop40.equippedWeapon)save.shop40.equippedWeapon=id;persist();renderShop35();toast(`购入：${u.n}`);return true;}
@@ -7349,6 +7461,18 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
       openCharacterEvent(index=0){if(state!=="play")throw new Error("openCharacterEvent requires play mode");eventIndex=Math.max(0,Number(index)||0);midEvent();return {title:$("#eventTitle")?.textContent||"",text:$("#eventText")?.textContent||"",choices:[...document.querySelectorAll("#eventChoices .eventChoice")].map(node=>node.querySelector("b")?.textContent||node.textContent)};},
       chooseEvent(index=0){const choices=[...document.querySelectorAll("#eventChoices .eventChoice")],choice=choices[Number(index)];if(!choice)throw new Error(`Missing event choice ${index}`);choice.click();return {snapshot:snapshot35(),storyFlags:{...(P.storyFlags||{})}};},
       setStoryFlag(name,value){P.storyFlags[name]=value;return {...P.storyFlags};},
+      hiddenRoute47(){return hiddenRouteStatus47();},
+      seedHiddenRoute47(){
+        const id=save.character||"sayo",path=HIDDEN_PATH47[id]||HIDDEN_PATH47.sayo;
+        save.done=Array.from(new Set([...(save.done||[]),1,2,3]));
+        P.storyFlags=P.storyFlags||{};
+        const mem=storyMemory38();
+        for(const [k,v] of path){P.storyFlags[k]=v;mem[k]=v;}
+        persist();
+        return hiddenRouteStatus47();
+      },
+      setHiddenCleared47(on=true){P.hiddenCleared47=!!on;return endingData();},
+      enterHiddenArena47(){enterHiddenArena47();return snapshot35();},
       endingPreview(){return endingData();},
       directorProbe(time,score=75){const oldTime=runTime,oldPlan=P.plan;runTime=Math.max(0,Number(time)||0);P.plan={score:Number(score),rank:"B"};const result={time:runTime,score:Number(score),intensity:directorIntensity(),factor:planFactor()};runTime=oldTime;P.plan=oldPlan;return result;},
       defeatBoss(){if(!boss||boss.dead)throw new Error("Boss is not active");boss.phase=4;boss.guard=0;boss.hp=1;damageEnemy(boss,boss.max*20,{source:"skill",school:"base"});return snapshot35();},
