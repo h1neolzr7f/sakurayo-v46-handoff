@@ -105,7 +105,7 @@
 pity, pitySR, pulls, tenPulls, owned, last, cheatUsed
 ```
 
-证词模式若需要进度，另加 `shop40.ops.story` 或现有剧情字段，禁止新 top-level key。
+证词进度写在 `shop40.ops.story`。隐藏门闩只读 `storyChoices38`。禁止新 top-level key。
 
 ## 7. 美术清单
 

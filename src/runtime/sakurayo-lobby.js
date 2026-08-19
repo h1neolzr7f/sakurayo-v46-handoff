@@ -512,6 +512,22 @@
     };
   }
 
+  function normalizeStory(raw) {
+    var out = { sayo: {}, aya: {}, rion: {} };
+    var incoming = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+    ["sayo", "aya", "rion"].forEach(function (id) {
+      var src = incoming[id] && typeof incoming[id] === "object" && !Array.isArray(incoming[id]) ? incoming[id] : {};
+      Object.keys(src).forEach(function (key) {
+        var value = src[key];
+        if (typeof key !== "string" || !/^[A-Za-z][A-Za-z0-9]{0,31}$/.test(key)) return;
+        if (typeof value !== "string" || value.length < 1 || value.length > 32) return;
+        if (!/^[A-Za-z][A-Za-z0-9]{0,31}$/.test(value)) return;
+        out[id][key] = value;
+      });
+    });
+    return out;
+  }
+
   function normalizeOps(shop40) {
     var shop = shop40 && typeof shop40 === "object" && !Array.isArray(shop40) ? shop40 : {};
     var incoming = shop.ops && typeof shop.ops === "object" && !Array.isArray(shop.ops) ? shop.ops : {};
@@ -544,6 +560,7 @@
       rosterTab: rosterTab,
       fashion: normalizePool(incoming.fashion, FASHION_CARDS),
       weapon: normalizePool(incoming.weapon, WEAPON_CARDS),
+      story: normalizeStory(incoming.story),
     };
     return shop;
   }
@@ -797,6 +814,7 @@
       shards: ops.shards,
       fashion: ops.fashion,
       weapon: ops.weapon,
+      story: ops.story,
       coins: clampInt(save && save.coins, 0, 99999999),
       cheatUsed: !!ops.cheatUsed,
     };
