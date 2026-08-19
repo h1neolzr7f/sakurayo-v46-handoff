@@ -10,9 +10,9 @@
 
 ## 人只露脸 3 次
 
-1. **开工**：把 `CURSOR_PROMPT_PHASE3.md` 围栏全文贴进新项目。
-2. **认人**：24 张 `fusion_*.webp`。回「过 / 哪几张重画」。超过 24h 按自检继续。重点：主脸对不对、有没有双人拼脸、绫枪是否贴脸、情绪是否同一张杀气。
-3. **收工**：门 A 绿、残片仍 R 多于 SR、SSR 不再是 0 也不过半、硬保是融合。你点合并。不要升 4.6.1。
+1. **开工**：已开。施工 PR https://github.com/h1neolzr7f/sakurayo-v46-handoff/pull/12
+2. **认人**：2026-08-19 打回 `fusion_shadowmage`、`fusion_necrospore`。其余 22 张可留。见 `docs/PHASE3_FACE_REVIEW.md`。
+3. **收工**：两张重画过目视、门 A 仍绿之后，你点合并。不要升 4.6.1。
 
 ## 已锁死（开工后不准改）
 
