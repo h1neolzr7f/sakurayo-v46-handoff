@@ -4,7 +4,7 @@
 
 当前开发仓：`h1neolzr7f/sakurayo-v46-handoff`  
 公开玩家仓：`h1neolzr7f/sakurayo-zombietide`  
-当前源码版本：**4.6.1，未发 APK。不要开工就随意改版本号。**
+当前源码版本：**4.6.2。** 存档键仍 `sakurayoV3`。
 
 ## 1. 唯一总目标：效果优先
 

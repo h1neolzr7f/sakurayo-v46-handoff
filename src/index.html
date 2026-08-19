@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" name="viewport"/>
 <meta content="#090714" name="theme-color"/>
-<title>樱夜·尸潮：Mod Kit V4.6.1</title>
+<title>樱夜·尸潮：Mod Kit V4.6.2</title>
 <style>
 :root{--p:#ff58a7;--p2:#ffb4d5;--c:#56ddff;--g:#ffd36b;--bg:#080713;--panel:rgba(18,14,39,.96);--line:rgba(170,220,255,.24);--mut:#cfc4df;--red:#ff4e72}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:#fff;font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;touch-action:none}button{border:0;color:inherit;font:inherit}button:active{transform:scale(.985)}canvas{position:fixed;inset:0;width:100%;height:100%}.hidden{display:none!important}.screen{position:fixed;inset:0;z-index:10}
@@ -113,7 +113,7 @@
 <div class="overlay hidden" id="result"><div class="modal"><div class="resultIcon" id="ricon">🌸</div><div class="rankBig" id="rankBig"></div><h2 id="rtitle"></h2><p class="sub" id="rsub"></p><div class="stats" id="rstats"></div><div class="endingTag" id="endingTag">结局演算中</div><div class="report" id="damageReport"></div><div class="routeNote" id="routeNote"></div><div class="actions"><button class="primary" id="again">再次迎击</button><button class="secondary" id="back">返回主界面</button></div></div></div>
 <div class="warn hidden" id="warning"></div><div id="toast"></div>
 <script>
-window.SAKURAYO_GAME_VERSION = "4.6.1";
+window.SAKURAYO_GAME_VERSION = "4.6.2";
 (() => {
   "use strict";
   const enabled = /(?:\?|&)(?:debug|test)=1(?:&|$)/.test(location.search || "");
@@ -2871,8 +2871,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
     if (state === "result") return;
     window.SakurayoCutscene?.stopVictory?.();
     runWin=win;hideTransient();state="result";$("#hud").classList.add("hidden");
-    save.kills += P.kills; save.best = Math.max(save.best, runTime); save.runs++;
     const testimony = typeof isTestimonyRun46 === "function" && isTestimonyRun46();
+    if (!testimony) { save.kills += P.kills; save.best = Math.max(save.best, runTime); save.runs++; }
     const pay44 = window.SakurayoEconomy
       ? window.SakurayoEconomy.rewardParts(P.kills, P.level, P.eliteKills, win, stage().reward, testimony || save.done.includes(selected))
       : null;
@@ -2884,7 +2884,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
     let top=Object.entries(P.damageSources).sort((a,b)=>b[1]-a[1])[0]?.[0]||"shot";
     save.runHistory.unshift({time:Date.now(),mode:testimony?"testimony":"story",stage:selected,character:save.character,skin:save.skin,duration:runTime,win,kills:P.kills,eliteKills:P.eliteKills,level:P.level,fusion:P.fusion,form:P.form,careers:careerSummary(),top,damageSources:{...P.damageSources},damageTaken:P.damageTaken,phaseTimes:[...P.phaseTimes],rank:P.plan?.rank||"?",ending:testimony?null:ed.name}); save.runHistory=save.runHistory.slice(0,30);
     const buildReward=testimony?null:takeBuildReward46();
-    checkAch(); persist();
+    if(!testimony) checkAch(); persist();
     $("#ricon").textContent=win?"🌸":"☠️"; $("#rankBig").textContent=win?(P.damageTaken===0?"S":P.plan?.rank||"A"):(runTime>stage().dur*.65?"B":"C");
     $("#rtitle").textContent=win?(testimony?"证词已记下":"镜界节点已净化"):"防线失守";
     $("#rsub").textContent=win?(testimony?`${stage().short} 的证词收进档案。演习进度不变。`:`${stage().short} 已封回证词。${stage().boss} 不再开口。${P.fusion?`「${fusionData()?.n||P.fusion}」`:"未融合"} / ${P.form?ASC.find(a=>a.id===P.form)?.n||P.form:"未飞升"}`):`${stage().short}被尸潮吞没。${window.SakurayoLifecycle?.hint?.(lifecycleWorld44())||"下次可以在暂停页看清短板，再决定补什么。"} ${runCoach45(false)}`;
@@ -3129,7 +3129,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
     e.special = 0.65;
     e.spd += p * 3;
     e.dmg *= 1.07;
-    if (p === 4) save.ach.phasebreak = true;
+    if (p === 4 && !(typeof isTestimonyRun46 === "function" && isTestimonyRun46())) save.ach.phasebreak = true;
     let sid = stage().id;
     if (sid === 1) {
       spawnArenaHazards("eye",p+1);
@@ -4202,7 +4202,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
       P.level++;
       fxStamp("levelup", P.x, P.y, { size: 78, life: 0.7 });
       P.next = Math.floor(P.next * 1.24 + 5);
-      if (P.level >= 12) save.ach.lv12 = true;
+      if (P.level >= 12 && !(typeof isTestimonyRun46 === "function" && isTestimonyRun46())) save.ach.lv12 = true;
       updateCareerFormation();
       openLevel();
     }
@@ -4769,7 +4769,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
     if (P.comboClock <= 0) P.combo = 0;
     P.encoreTimer=Math.max(0,(P.encoreTimer||0)-dt);
     for(const e of enemies)if(e.mark)e.mark=Math.max(0,e.mark-dt);
-    if (P.safe >= 35) save.ach.flaw = true;
+    if (P.safe >= 35 && !(typeof isTestimonyRun46 === "function" && isTestimonyRun46())) save.ach.flaw = true;
     if(P.hp/P.maxHp<.23&&!P.banterSeen.has("lowhp")){P.banterSeen.add("lowhp");showBanter([["凛","生命信号进入红区。"],["小夜","我看见了。血条红得比我的发带还抢镜。"]],true);}
     if(P.combo>=80&&!P.banterSeen.has("combo80")){P.banterSeen.add("combo80");showBanter(["小夜","八十连击。它们排队送经验的纪律性值得表扬。"]);}
     if(P.plan?.rank==="D"&&!P.banterSeen.has("rankD")){P.banterSeen.add("rankD");showBanter([["凛","构筑稳定度 D。你到底在学几个职业？"],["小夜","目前像是十个兼职，没有一个交社保。"]],true);}
@@ -7086,7 +7086,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
   const _menuUpdate39=menuUpdate;
   menuUpdate=function(){const result=_menuUpdate39();installCalmMenu39();return result;};
   const _runAnalytics39=runAnalytics37;
-  runAnalytics37=function(){return {..._runAnalytics39(),version:"4.6.1"};};
+  runAnalytics37=function(){return {..._runAnalytics39(),version:"4.6.2"};};
 
   function drawMechanics39(){
     if(state!=="play")return;
@@ -7200,7 +7200,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
     aya:"绫关闭所有企业补给协议，只用开局装备完成追缉。妹妹频道第一次没有给出导航，只说了一句：这次是你自己选的路。",
     rion:"凛音没有继承剑冢中的任何招式。终战结束后，师父的残响承认：没有借来的记忆，她仍然是黄泉流的下一任剑主。"
   };
-  function recordBalance40(win){if(isMainGodRun36())return;const sample={time:Date.now(),stage:selected,character:save.character,starter:P.initialCore40||null,starterLevel:P.initialCoreLevel40||0,bait:P.baitLevel40||0,noUpgrade:!!P.noUpgradeChallenge40,upgradeChoices:P.upgradeChoices40||0,win:!!win,kills:P.kills,level:P.level,duration:runTime,damageTaken:Math.round(P.damageTaken),perfectDodges:P.perfectDodges||0,rank:P.plan?.rank||"?"};save.balance40.samples.unshift(sample);save.balance40.samples=save.balance40.samples.slice(0,80);const run=save.runHistory?.[0];if(run&&Math.abs(Date.now()-run.time)<5000)Object.assign(run,{starter:sample.starter,starterLevel:sample.starterLevel,bait:sample.bait,noUpgrade:sample.noUpgrade,upgradeChoices:sample.upgradeChoices,perfectDodges:sample.perfectDodges});}
+  function recordBalance40(win){if(isMainGodRun36()||(typeof isTestimonyRun46==="function"&&isTestimonyRun46()))return;const sample={time:Date.now(),stage:selected,character:save.character,starter:P.initialCore40||null,starterLevel:P.initialCoreLevel40||0,bait:P.baitLevel40||0,noUpgrade:!!P.noUpgradeChallenge40,upgradeChoices:P.upgradeChoices40||0,win:!!win,kills:P.kills,level:P.level,duration:runTime,damageTaken:Math.round(P.damageTaken),perfectDodges:P.perfectDodges||0,rank:P.plan?.rank||"?"};save.balance40.samples.unshift(sample);save.balance40.samples=save.balance40.samples.slice(0,80);const run=save.runHistory?.[0];if(run&&Math.abs(Date.now()-run.time)<5000)Object.assign(run,{starter:sample.starter,starterLevel:sample.starterLevel,bait:sample.bait,noUpgrade:sample.noUpgrade,upgradeChoices:sample.upgradeChoices,perfectDodges:sample.perfectDodges});}
   const _finish40=finish;
   finish=function(win){const lone=!!win&&!isMainGodRun36()&&!(typeof isTestimonyRun46==="function"&&isTestimonyRun46())&&selected===4&&P.noUpgradeChallenge40&&(P.upgradeChoices40||0)===0&&P.damageTaken<=.01&&(P.initialCoreLevel40||0)>0;if(lone){save.ach.loneproof=true;save.hiddenStory40[save.character]=true;save.pendingLoneStory40=save.character;}const result=_finish40(win);recordBalance40(win);if(lone){$("#rtitle").textContent="隐藏结局 · 孤证者";$("#rsub").textContent=LONE_STORY40[save.character];toast("隐藏成就：孤证者");}persist();return result;};
   const _opening40=openingDialogue;
@@ -7247,7 +7247,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
   renderChoices=function(){const result=_renderChoices40();document.querySelectorAll("#choices .choice").forEach(card=>{const u=U.find(x=>x.id===card.dataset.upgradeId);if(!u?.conflict40)return;card.classList.add("conflictChoice40");const p=card.querySelector("p");if(p)p.insertAdjacentHTML("beforeend",'<strong class="conflictWarn40">高风险冲突：收益与削弱同时生效，可能让构筑失控。</strong>');});return result;};
 
   style37.textContent+=`.shopTabs40{margin:0 0 10px}.shopGroup40{display:grid;gap:9px}.shopItem40{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:11px;border-radius:14px;background:#100c20e8;border:1px solid #ffffff18;margin-bottom:9px}.shopItem40 h3{margin:0 0 4px;font-size:14px}.shopItem40 p{margin:0;color:#c7bfd2;font-size:11px;line-height:1.45}.shopItem40 button,.shopUpgrade40,.challengeToggle40,.betaActions40 button,.betaDrawer40>[class] button[data-beta="refresh"],.betaDrawer40 .dbody>button[data-beta="refresh"]{padding:9px;border-radius:10px;border:1px solid #8463aa;background:#261b3d;color:#fff}.shopIcon40{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:#27183d;font-size:24px}.shopUpgrade40{grid-column:3;margin-top:-6px}.challengeToggle40{width:100%;margin-bottom:10px;border-color:#ffd36b;color:#ffe69b;background:#35251d}.conflictChoice40{border-color:#ff6f7e!important;background:linear-gradient(145deg,#2a101be8,#160d22e8)!important}.conflictWarn40{display:block;margin-top:6px;color:#ff8793}.betaGrid40{display:grid;grid-template-columns:1fr 1fr;gap:8px}.betaGrid40 label{display:grid;gap:5px;font-size:11px}.betaGrid40 select{padding:9px;border-radius:9px;background:#141025;color:#fff;border:1px solid #70558c}.betaActions40{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}.betaDrawer40 textarea{width:100%;height:230px;background:#080713;color:#bdf4de;border:1px solid #6b548b;border-radius:10px;padding:9px;font:10px/1.4 ui-monospace,monospace}.betaDrawer40 .dbody>button[data-beta="refresh"]{width:100%;margin-top:8px}.hiddenStory40{border-color:#ffe6a455!important}.utilityButtons37.open39>#betaButton40{display:block!important}`;
-  document.title="樱夜·尸潮：Mod Kit V4.6.1";
+  document.title="樱夜·尸潮：Mod Kit V4.6.2";
 
   /* ================= V4.0 融合扩展：24种跨职业机制 ================= */
   const FUSION_ICON_ALIAS41={elementalbeast:"chimera",plagueidol:"plagueforge",soulgun:"gunshrine",nanoninja:"shadowmage",fleshshrine:"corpseimmortal",bloodmage:"bloodstar"};

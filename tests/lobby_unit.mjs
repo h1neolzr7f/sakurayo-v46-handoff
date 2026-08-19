@@ -29,12 +29,14 @@ assert.equal(indexSrc.includes("现实锚定线 · 全城证词"), false, "底�
 assert.equal(indexSrc.includes("压强下降"), false, "抉择文案不得再写压强下降");
 assert.match(indexSrc, /构筑稳定度 \+8/, "plan 效果文案要对上 +8 稳定度");
 assert.match(indexSrc, /testimony \|\| save\.done\.includes\(selected\)/, "证词结算不得当演习首通");
+assert.match(indexSrc, /if \(!testimony\) \{ save\.kills \+= P\.kills/, "证词不得累加演习击杀/局数");
+assert.match(indexSrc, /if\(!testimony\) checkAch\(\)/, "证词结算不得解锁战役成就");
 assert.match(indexSrc, /mode:testimony\?"testimony":"story"/, "证词战绩要单独记 mode");
 assert.match(indexSrc, /function storyChoiceBag47/, "跨章回声要按证词/演习分袋");
 assert.match(indexSrc, /if \(state === "menu"\) menuUpdate\(\);/, "局内存档不得刷新大厅");
 assert.match(indexSrc, /P\.publicTruth \|\| P\.storyFlags\?\.identity === "broadcast"/, "公开名单要提高精英刷率");
 assert.equal(indexSrc.includes('["dialogue","event","level","pause","result","menu"]'), false, "大厅 toast 不得被 menu 态挡死");
-assert.equal(L.version, "4.6.1");
+assert.equal(L.version, "4.6.2");
 assert.equal(L.CARDS.length, 8);
 assert.equal(L.CHRONICLE.length, 5);
 assert.equal(L.CHRONICLE[0].n, "第零次死亡");

@@ -1,5 +1,12 @@
 Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先阅读根目录的 AGENTS.md、README_FIRST.md 和 CODEX_TASK.md，基于 src/index.html 继续开发，不要使用旧版本文件。
 
+## 2026-08-19 升补丁号 4.6.2
+
+- 用户要求再检查漏洞后升 4.6.2 并交付 APK。
+- 证词结算不再累加演习击杀/局数/最佳时长，不跑战役成就；局内不点 `lv12` / `flaw` / `phasebreak`。
+- `VERSION` / `SAKURAYO_GAME_VERSION` / 运行时回退值 / Android `versionName` → 4.6.2；`versionCode` 62 → 63。
+- 存档键仍 `sakurayoV3`。
+
 ## 2026-08-19 局内剧情按三层人味重写
 
 - 用户认可库洛三层写法：先对准真实情绪，再补因果，内核留到终章和仓库。不要开服谜语，也不要开场论文。

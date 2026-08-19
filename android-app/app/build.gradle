@@ -14,8 +14,8 @@ android {
         applicationId "com.sakurayo.zombietide"
         minSdk 23
         targetSdk 36
-        versionCode 62
-        versionName "4.6.1"
+        versionCode 63
+        versionName "4.6.2"
     }
 
     signingConfigs {
