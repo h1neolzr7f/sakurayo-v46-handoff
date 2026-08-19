@@ -16,7 +16,7 @@
 
 ## 验收状态（2026-08-19）
 
-PR #11 @ `8193eed`：**未收工**。打回 `job_garden`。其余 27 张与逻辑见 `docs/PHASE2_ACCEPT.md`。
+PR #11 @ `fcb9279`：**收工**。`job_garden` 笑裂带一滴泪已过。可以点合并。见 `docs/PHASE2_ACCEPT.md`。
 
 ## 已锁死（开工后不准改）
 
