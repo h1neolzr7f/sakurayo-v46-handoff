@@ -20,7 +20,7 @@ assert.equal(indexSrc.includes('hint.textContent = "请横持设备"'), false, "
 assert.equal(indexSrc.includes('toggle("portraitFallback46"'), false, "index 不得再打开竖版回退");
 assert.match(indexSrc, /runMode36=pendingMode46==="testimony"\?"testimony":"story"/, "出击必须把 pendingMode46 写入 runMode36");
 assert.equal(indexSrc.includes('["dialogue","event","level","pause","result","menu"]'), false, "大厅 toast 不得被 menu 态挡死");
-assert.equal(L.version, "4.6.0");
+assert.equal(L.version, "4.6.1");
 assert.equal(L.CARDS.length, 8);
 assert.equal(L.CHRONICLE.length, 5);
 assert.equal(L.CHRONICLE[0].n, "第零次死亡");
