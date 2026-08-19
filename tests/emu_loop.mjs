@@ -124,6 +124,8 @@ async function runViewport(width, height, tag) {
     }
     const tabs = [...document.querySelectorAll("#gachaTabs46 [data-pool]")];
     const title = document.querySelector(".wishTitle46 h3");
+    const pity = document.querySelector(".wishPity46");
+    const dock = document.querySelector(".wishDock46");
     const hits = tabs.map((btn) => {
       const r = btn.getBoundingClientRect();
       const el = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
@@ -135,11 +137,13 @@ async function runViewport(width, height, tag) {
       for (let j = i + 1; j < tabs.length; j++) tabOverlap = Math.max(tabOverlap, overlap(box(tabs[i]), box(tabs[j])));
       if (title) titleOverlap = Math.max(titleOverlap, overlap(box(title), box(tabs[i])));
     }
-    return { hits, tabOverlap, titleOverlap };
+    const pityDock = pity && dock ? overlap(box(pity), box(dock)) : 0;
+    return { hits, tabOverlap, titleOverlap, pityDock };
   });
   assert.deepEqual(gachaHit.hits, [true, true, true], `${tag} 寻访三页必须点得中`);
   assert.ok(gachaHit.tabOverlap <= 8, `${tag} 寻访页签叠字 area=${gachaHit.tabOverlap}`);
   assert.ok(gachaHit.titleOverlap <= 20, `${tag} 寻访标题叠页签 area=${gachaHit.titleOverlap}`);
+  assert.ok(gachaHit.pityDock <= 8, `${tag} 寻访保底条叠抽卡坞 area=${gachaHit.pityDock}`);
   await shot(page, `${tag}-gacha.png`);
   await page.locator("#gachaDrawer .close").click();
   await api(page, "openDrawer", "roster");
@@ -234,6 +238,7 @@ async function runViewport(width, height, tag) {
   if ((await snap(page)).mode === "level") {
     assert.equal(await page.locator("#dialogue").evaluate((n) => n.classList.contains("hidden")), true);
     assert.equal(await page.locator("#banter").evaluate((n) => n.classList.contains("hidden")), true);
+    assert.equal(await page.locator("#warning").evaluate((n) => n.classList.contains("hidden")), true, `${tag} 升级时 warning 必须收起`);
     await api(page, "chooseUpgrade", 0);
     await page.evaluate(() => window.advanceTime(300));
     assert.equal((await snap(page)).mode, "play");
@@ -242,6 +247,12 @@ async function runViewport(width, height, tag) {
 
   await api(page, "spawnBossNow");
   await api(page, "dismissDialogue");
+  await api(page, "triggerUpgrade");
+  if ((await snap(page)).mode === "level") {
+    assert.equal(await page.locator("#warning").evaluate((n) => n.classList.contains("hidden")), true, `${tag} Boss 警告不得压在升级卡上`);
+    await api(page, "chooseUpgrade", 0);
+    await page.evaluate(() => window.advanceTime(300));
+  }
   for (const [ratio, phase] of [[0.75, 2], [0.5, 3], [0.25, 4]]) {
     await api(page, "setBossHpRatio", ratio);
     await page.evaluate(() => window.advanceTime(17));
