@@ -497,7 +497,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
     "在空碑上写下“姐姐”":[["镜零","姐姐这个词，不在我的名单里。"],["小夜","那我就写上。她叫我的时候，用的就是这个。"]],
     "假装接受并植入病毒":[["凛","你给最终协议塞了病毒？"],["小夜","礼尚往来。它往我脑子里塞升级树，我往它脑子里塞弹窗。"]],
     "当面拒绝":[["镜零","拒绝最优解，不理性。"],["小夜","你的最优解没问过我愿不愿意。这才不及格。"]],
-    "提出交换：只复制我":[["凛","这不是交换，是把自己当诱饵。"],["小夜","放心，我这种构筑复制过去，它可能先被技能冲突气死。"]],
+    "提出交换：只复制我":[["凛","这不是交换，是把自己当诱饵。"],["小夜","至少这份结局里，她不用进墓碑。"]],
     "承认自己是备份":[["小夜","备份是什么？另存一份我吗？"],["雨宫凛","对。数字拷贝。会疼，也会想回家。"],["小夜","那我就当这个会疼的拷贝，再打一遍。"]],
     "坚持自己就是小夜":[["镜零","你没有证据。"],["小夜","我还在走路。这就够了。"]],
     "名字不重要，选择才重要":[["凛","这句话听起来很帅。"],["小夜","因为我暂时想不出更严谨的哲学论证。"]],
@@ -2946,7 +2946,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
           { sp: "雨宫凛", tx: "那就先问她。" },
         ],
         4: [
-          { sp: "镜零", tx: "我由三百一十七个失败的你练成。你是下一个。留下，尸潮可以停。全城会活成可预测的版本。" },
+          { sp: "镜零", tx: "结局已经写好了。你留下，尸潮停。全城变成可预测的版本。第三百一十八座墓碑，刻的就是今晚。" },
           { sp: "小夜", tx: "可预测的版本是什么？" },
           { sp: "雨宫凛", tx: "简单说，就是变成数字备份。人还走路，下一步已经被写好了。" },
           { sp: "小夜", tx: "像我不等于你能替她做决定。我想问她，想不想留下。" },
@@ -3104,12 +3104,12 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
             { sp: "小夜", tx: "你只是保存了失败，却没有活过其中任何一次。" },
           ],
           4: [
-            { sp: "镜零", tx: "三相协议归零。删除“巫女小夜”。" },
+            { sp: "镜零", tx: "停下。这页之后没有更好的结局。删除“巫女小夜”。" },
             {
               sp: "小夜",
               tx: P.form
-                ? `我付出的代价由我定义。你没有资格替我结算。`
-                : "没有飞升也一样。我不是协议的产物。",
+                ? "剧本写我进墓碑。代价我自己认，结局不按这页演。"
+                : "剧本写我进墓碑。我偏不按这页演。",
             },
           ],
         },
@@ -3249,8 +3249,20 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
         { sp: "镜零", tx: "损失在允许范围内。你只是在替我筛谁更有用。" },
         { sp: "小夜", tx: "继续看。下一站，我顺着信号找你。" },
       ];
-    let ed=endingData(), hidden=P.storyFlags.grave==="sister"&&P.storyFlags.offer==="self",
+    let ed=endingData(),
       last=`【${ed.name}】${ed.text}`;
+    const fate = typeof storyFate47 === "function" ? storyFate47() : null;
+    if (fate) {
+      const lines = [
+        { sp: "镜零", tx: fate.script },
+        { sp: "小夜", tx: fate.fight },
+        { sp: "雨宫凛", tx: "这份结局原本不在表上。是你们抢回来的。" },
+      ];
+      if (fate.reply) lines.push({ sp: fate.reply[0], tx: fate.reply[1] });
+      lines.push({ sp: "小夜", tx: "接下来的路，我们自己走。" });
+      lines.push({ sp: "旁白", tx: last });
+      return lines;
+    }
     return [
       { sp: "镜零", tx: "互相冲突的力量，你都留下了。为什么？" },
       {
@@ -3288,22 +3300,23 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
         1: "我进了门。里面还有我要带出去的人。",
         2: "名单上写着我已经死了。我还在划下一行。",
         3: "我问过镜子里的她。她还没回答，我先不停手。",
-        4: "镜碎了。活下来的这个我，继续选。",
+        4: "剧本写我进墓碑。我把那一页撕了。",
       },
       aya: {
         1: "门还认我。我是来带妹妹走的。",
         2: "她自己说过要不要被救。我听完了。",
         3: "那天的记录我会带回去。包括我签过的那一笔。",
-        4: "清白不换人。我把她带回去。",
+        4: "门后只够走一个人。我把门拆了。",
       },
       rion: {
         1: "招式像，呼吸不对。我还是进去了。",
         2: "我叫出了她的名字。留下还是走，她自己说。",
         3: "师父的最后一式可以没有。人还在，剑才在。",
-        4: "镜碎了。道场还给还想握剑的人。",
+        4: "黄泉流要用假人续。我偏让活人自己选。",
       },
     };
-    const line = (voice[c.id] || voice.sayo)[chap];
+    const fate = typeof storyFate47 === "function" ? storyFate47() : null;
+    const line = chap === 4 && fate ? fate.fight : (voice[c.id] || voice.sayo)[chap];
     if (mg) {
       return [
         { kicker: s.no, title: "监察投影碎裂", line: "白色回廊第一次安静下来。", bg: cover, portrait: "", hold: 2000 },
@@ -3311,13 +3324,13 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
       ];
     }
     const last = chap === 4
-      ? { kicker: endingData().name, title: "镜碎了", line: endingData().text, bg: map, portrait, hold: 2600 }
+      ? { kicker: endingData().name, title: "不在表上的结局", line: endingData().text, bg: map, portrait, hold: 2800 }
       : { kicker: c.short, title: s.short, line, bg: map, portrait, hold: 2400 };
     const cg = artUrl(`stages/stage_${chap}/cg.webp`);
     const extra = chap === 4 && typeof equippedLegendLine47 === "function" ? equippedLegendLine47() : "";
     const beats = [
-      { kicker: `${s.no} · ${s.short}`, title: `${s.boss} 倒下`, line: "它倒下了。你还站着。", bg: map, portrait: "", hold: 1900 },
-      { kicker: c.short, title: s.name, line, bg: cg, portrait: "", hold: 2600 },
+      { kicker: `${s.no} · ${s.short}`, title: `${s.boss} 倒下`, line: chap === 4 ? "剧本写你会倒在这里。你还站着。" : "它倒下了。你还站着。", bg: map, portrait: "", hold: 2000 },
+      { kicker: c.short, title: chap === 4 ? "撕开那一页" : s.name, line, bg: cg, portrait: "", hold: 2600 },
       last,
     ];
     if (extra) beats.push({ kicker: c.short, title: "你带着的那一件", line: extra, bg: map, portrait, hold: 2200 });
@@ -4544,7 +4557,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
             i: "🕯️",
             card: "sayo_echo",
             t: "三百一十七座墓碑",
-            x: "三百一十七座墓碑，每座都刻着小夜。最后一座没有日期，写着镜零。镜子里也有一张脸。她就在那儿看着你。",
+            x: "三百一十七座墓碑，每座都刻着小夜。最后一座没有日期，写着镜零。剧本写的是：今晚你补上日期。镜子里也有一张脸。她就在那儿看着你。",
             o: [
               [
                 "刻上今天的日期",
@@ -4580,7 +4593,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
             i: "🧩",
             card: "cherry_crown",
             t: "镜像构筑提案",
-            x: "镜零说可以停尸潮。条件是复制你的力量，让全城都变成可预测的版本。可预测，就是变成数字备份：人还走路，下一步已经被写好了。城会安静。人会不像自己。",
+            x: "镜零把结局摊开：你留下当备份，尸潮停，全城变数字。第三百一十八座墓碑已经备好。它说这是唯一写得通的结尾。",
             o: [
               [
                 "假装接受并植入病毒",
@@ -4616,7 +4629,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
             i: "🌸",
             card: "sayo_echo",
             t: "最后一段人类记忆",
-            x: "三年前的小夜反复说同一句话：“凛，如果醒来的那个不是我，也请把她当作妹妹。”镜子里的人在听。你要怎么认她。",
+            x: "三年前的小夜反复说同一句话：“凛，如果醒来的那个不是我，也请把她当作妹妹。”镜子里的人在听。剧本写的是只认一个。你要怎么认她。",
             o: [
               [
                 "承认自己是备份",
@@ -6137,7 +6150,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
       "3:0":{t:"被出售的月切",x:"有人把妹妹的居合拆开卖。你要整段夺回来，还是先让全城看见这东西是从谁身上拆的。",card:"weapon_aya_mirror",o:[["夺回完整模型","强化技能循环","ayaBlade","recover","skill"],["公开模型来源","提高稳定度并保留证据","ayaBlade","expose","plan"]]},
       "3:1":{t:"妹妹的刀鞘",x:"刀鞘插在剑冢里。里面是她拒绝被收走之前的十七秒。带走，你记得她怎么选。留下，你尊重她最后的意愿。",card:"aya_petal",o:[["带走记忆","回复生命并记录妹妹选择","ayaMemory","carry","heal"],["让她留在剑冢","获得护盾并尊重最后意愿","ayaMemory","release","shield"]]},
       "4:0":{t:"主管签名",x:"最后一页上有高层的名字，也有你当年的指纹。公开，你一起承担责任。先追主谋，证据先藏着。",card:"fashion_aya_funeral",o:[["公开全部签名","降低构筑压强，承担责任","ayaTruth","public","plan"],["先锁定主谋","提高伤害，保留未公开证据","ayaTruth","hunt","atk"]]},
-      "4:1":{t:"最后一份事故报告",x:"镜核说可以还妹妹。条件是它继续握着所有被收走的人。门后只够走一个人。你要放人，还是先把证据带出去。",card:"fashion_aya_funeral",o:[["解除全部人格产权","建立姐妹归还结局","ayaFinal","free","def"],["复制证据后摧毁协议","建立全城罪证结局","ayaFinal","expose","crit"]]}
+      "4:1":{t:"最后一份事故报告",x:"镜核把结局写死了：可以还妹妹，条件是它继续握着所有被收走的人。门后只够走一个人。你要拆掉这道题，还是按它写的选。",card:"fashion_aya_funeral",o:[["解除全部人格产权","建立姐妹归还结局","ayaFinal","free","def"],["复制证据后摧毁协议","建立全城罪证结局","ayaFinal","expose","crit"]]}
     },
     rion:{
       "1:0":{t:"会走路的黄泉流",x:"鸟居下的尸潮走出师父的起手式。招式像。呼吸不对。有人会了动作，人却不在了。你要顺着破绽找他，还是先砍断这套被偷走的剑。",card:"rion_edge",o:[["沿破绽追踪师父","提高移动与追击能力","rionTrail","follow","speed"],["斩断被盗模型","提高伤害，不再追踪该信号","rionTrail","cut","atk"]]},
@@ -6147,7 +6160,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
       "3:0":{t:"剑冢名册",x:"名册只记动作编号，没有一位同门的姓名。你先把名字补回去，还是先砍断还在驱动他们的核心。",card:"fashion_rion_bloom",o:[["逐一补回姓名","获得护盾并建立道场名册","rionLedger","names","shield"],["先斩断控制核心","提高伤害，稍后再收殓","rionLedger","core","atk"]]},
       "3:1":{t:"无名剑主的试问",x:"系统只认动作。你站在剑里，一个个报出失踪同门的名字。你用名字继承，还是用这一战证明。",card:"fashion_rion_haori",o:[["以名字继承","提高减伤，拒绝纯数据继承","rionHeir","people","def"],["以实战证明","提高暴击，完成剑主试炼","rionHeir","duel","crit"]]},
       "4:0":{t:"师父的战斗模型",x:"镜子里的师父还在练。他已经忘了为什么挥剑。你要叫醒他，还是让这一课停在这里。",card:"weapon_rion_burial",o:[["唤回道场记忆","回复生命并保存人格","rionMaster","remember","heal"],["结束永恒训练","提高技能威力并让师父安息","rionMaster","rest","skill"]]},
-      "4:1":{t:"活人的道场",x:"镜核愿意还剑术。条件是留下所有被收走的人。后面站满了等你点头的同门。让他们自己选，还是先把人放走。",card:"fashion_rion_bride",o:[["让同门自行选择","建立活人道场结局","rionFinal","choice","def"],["释放全部人格","建立黄泉送还结局","rionFinal","release","speed"]]}
+      "4:1":{t:"活人的道场",x:"镜核把结局写死了：还你剑术，留下所有被收走的人。黄泉流会续，道场是空的。后面站满了等你点头的同门。",card:"fashion_rion_bride",o:[["让同门自行选择","建立活人道场结局","rionFinal","choice","def"],["释放全部人格","建立黄泉送还结局","rionFinal","release","speed"]]}
     }
   };
   function applyCharacterEventEffect35(effect){if(effect==="range")P.range*=1.07;else if(effect==="shield"){P.maxSh+=18;P.sh=P.maxSh;}else if(effect==="crit")P.crit+=.035;else if(effect==="heal")P.hp=Math.min(P.maxHp,P.hp+P.maxHp*.22);else if(effect==="skill")P.skillCd*=.92;else if(effect==="def")P.damageReduce+=.04;else if(effect==="speed")P.spd*=1.05;else if(effect==="atk")P.dmg*=1.07;else if(effect==="plan")P.storyStability=(P.storyStability||0)+8;}
@@ -6589,33 +6602,51 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
       1:[["雨宫凛","停一下。神社里的尸体都在看你。里面有你放不下的人，对不对？"],["小夜","对。我进去。"],["镜零","欢迎回来。留下就行。"],["小夜","我不是来留下的。我来把还在里面的人带出去。"]],
       2:[["雨宫凛","救援车开走了。人没有回家。公司管这个叫回收——嘴上说救人，其实是把人拷进机器。"],["小夜","车窗上那张名单，第一行写着我的名字。日期是三年前。"],["镜零","你已经登记完成了。"],["小夜","表格写完，不代表我同意被写完。"]],
       3:[["无名剑主","这些墓碑都刻着小夜。你不是第一个走进来的。"],["雨宫凛","镜子里也有一张脸。别急着证明谁是真的。先问她想不想活。"],["小夜","我看见她了。"],["雨宫凛","那就先问她。"]],
-      4:[["镜零","我由三百一十七个失败的你练成。你是下一个。留下，尸潮可以停。全城会活成可预测的版本。"],["小夜","可预测的版本是什么？"],["雨宫凛","简单说，就是变成数字备份。人还走路，下一步已经被写好了。"],["小夜","像我不等于你能替她做决定。我想问她，想不想留下。"]]
+      4:[["镜零","结局已经写好了。你留下，尸潮停。全城变成可预测的版本。第三百一十八座墓碑，刻的就是今晚。"],["小夜","可预测的版本是什么？"],["雨宫凛","简单说，就是变成数字备份。人还走路，下一步已经被写好了。"],["小夜","像我不等于你能替她做决定。我想问她，想不想留下。"]]
     },
     aya:{
       1:[["雨宫凛","门还认你。灯笼下的尸潮也认。"],["神代绫","别叫主管。我是来带妹妹走的。"],["镜零","你按过救援。那次上传，算你签的。"],["神代绫","我按的是救人。你们写成了办完。今晚我把她带回去。"]],
       2:[["妹妹频道","姐姐，别再替我按确认。"],["神代绫","我听见了。救我，和杀了我，两个都像你。这次你自己说。"],["镜零","拒绝修复，等于放弃资产。"],["神代绫","资产是什么意思？"],["雨宫凛","他们把活人写成一份可以拷贝的文件。"],["神代绫","她是我妹妹。不是文件。"]],
       3:[["雨宫凛","日志公开，你的名字也会在第一页。"],["神代绫","那就写上。我不要一份只挑我无罪的记录。"],["妹妹频道","姐姐，我不需要你无罪。我需要那天没有被删掉。"],["神代绫","好。包括我签过的那一笔。"]],
-      4:[["镜零","把妹妹交给我，我删你的签名。门后只够走一个人。"],["神代绫","用她换我的清白？不换。"],["雨宫凛","门只送得出一份人格，一份档案。"],["神代绫","人格就是还在说话的那个人吧。"],["雨宫凛","对。他们把她收成文件。"],["神代绫","那就把这道题拆掉。我来带她走。"]]
+      4:[["镜零","把妹妹交给我，我删你的签名。门后只够走一个人。这页写死了。"],["神代绫","用她换我的清白？不换。"],["雨宫凛","门只送得出一份人格，一份档案。剧本写的是你二选一。"],["神代绫","人格就是还在说话的那个人吧。"],["雨宫凛","对。他们把她收成文件。"],["神代绫","那就把这道题拆掉。我来带她走。"]]
     },
     rion:{
       1:[["雨宫凛","鸟居下那些尸体，走的是你师父的起手式。"],["黑羽凛音","招式像。呼吸不对。有人会了动作，人却不在了。"],["镜零","剑术已经备份。原继承人可以离开。"],["黑羽凛音","备份是把剑存进机器里吗？"],["雨宫凛","对。动作有了，呼吸没有。"],["黑羽凛音","我留下。听完最后一课。假人我不收。"]],
       2:[["同门残响","凛音，叫出我的名字。我快忘了自己为什么握剑。"],["黑羽凛音","我记得你。留下还是走，你自己说。"],["镜零","记得就能复现。复现就是继承。"],["黑羽凛音","复现是做出一个假人吗？"],["雨宫凛","会挥剑，会叫你名字。呼吸不对。"],["黑羽凛音","记得一个人，不等于我有权替她继续活。"]],
       3:[["无名剑主","收下全部记忆，黄泉流就不会断。"],["黑羽凛音","断就断。流派若要吞掉弟子的名字才能续，它早该停。"],["雨宫凛","你可能再也学不到师父最后一式。"],["黑羽凛音","那就由我写下一式。人还在，剑才在。"]],
-      4:[["镜零","上传你的动作，死去的师兄都可以再挥剑。"],["黑羽凛音","挥剑的影像不是剑士。让他们自己选醒来还是睡。"],["同门残响","若我们都离开，黄泉流还在吗？"],["黑羽凛音","在。只要它不再把人困在过去。"]]
+      4:[["镜零","上传你的动作，死去的师兄都可以再挥剑。黄泉流会续。你空着手离开。这是最好的结局。"],["黑羽凛音","挥剑的影像不是剑士。让他们自己选醒来还是睡。"],["同门残响","若我们都离开，黄泉流还在吗？"],["黑羽凛音","在。只要它不再把人困在过去。"]]
     }
   };
   function consequence38(id,stageId){const f=save.storyChoices38[id]||{},lines=[];if(stageId>1&&Object.keys(f).length){if(id==="sayo")lines.push({sp:"雨宫凛",tx:f.identity==="broadcast"?"你把名单公开了。城外的人已经看见，这些人存在过。":"上一章你选过了。今晚它拿你的答案来问你。"});if(id==="aya")lines.push({sp:"妹妹频道",tx:f.ayaSister==="choice"?"谢谢你把选择还给我。现在，别替我害怕。":"姐姐，我还记得你说过的话。别在最难的时候收回去。"});if(id==="rion")lines.push({sp:"同门残响",tx:f.rionNames==="keep"?"我们的名字还在。能被记住，却不必被占有。":"你的决定传到了剑冢。有人赞同，也有人等着向你问剑。"});}return lines;}
   const _openingStory38=openingDialogue;
   openingDialogue=function(){if(isMainGodRun36())return _openingStory38();const id=save.character||"sayo",raw=STORY_OPENING38[id]?.[selected];if(!raw)return _openingStory38();return [...consequence38(id,selected),...raw.map(([sp,tx])=>({sp,tx}))];};
   const PHASE38={
-    sayo:["你在学我害怕。被看见以后，它就不只属于你。","三百一十七次失败不是王冠。是三百一十七个没人问过想不想活的人。","碎镜碎了。打碎它之后，我们谈谁想留下。"],
-    aya:["权限、签名、责任，我一个都不删。先放下你藏在后面的枪。","你拿妹妹的声音诱我选。她不是我的弱点。她有权拒绝我。","把最后那一页交出来。我会签。这次签的是停你。"],
-    rion:["你会所有人的招式。没有一个人愿意为这一剑负责。","记得一个人，不等于你握住了原来的剑。","黄泉流最后一式不是斩杀。是让被困的人自己回去。"]
+    sayo:["你在学我害怕。被看见以后，它就不只属于你。","三百一十七次失败不是王冠。是三百一十七个没人问过想不想活的人。","剧本写我进第三百一十八座墓。我偏不按这页演。"],
+    aya:["权限、签名、责任，我一个都不删。先放下你藏在后面的枪。","你拿妹妹的声音诱我选。她不是我的弱点。她有权拒绝我。","门后只够走一个人？那就把门拆了。"],
+    rion:["你会所有人的招式。没有一个人愿意为这一剑负责。","记得一个人，不等于你握住了原来的剑。","黄泉流若只能用假人续，它今晚就该断在我手里。"]
+  };
+  const PHASE_BOSS38={
+    sayo:["结局已经写好。你留下，城就活。","第三百一十八座墓碑等着刻你的名字。","停下。这页之后没有更好的结局。"],
+    aya:["结局已经写好。门后只够走一个人。","用她换你的清白，或者你留下、她变成文件。","停下。这页之后没有更好的结局。"],
+    rion:["结局已经写好。假人会替他们继续挥剑。","黄泉流会续。道场是空的。你空着手离开。","停下。这页之后没有更好的结局。"]
   };
   const _bossPhase38=bossPhaseDialogue;
-  bossPhaseDialogue=function(p){if(isMainGodRun36())return _bossPhase38(p);const id=save.character||"sayo",line=PHASE38[id]?.[clamp(p-2,0,2)];if(!line)return _bossPhase38(p);return [{sp:stage().boss,tx:`阶段 ${p}。你刚才最依赖的东西，我学会了。现在用它打你。`},{sp:char35().short,tx:line}];};
+  bossPhaseDialogue=function(p){if(isMainGodRun36())return _bossPhase38(p);const id=save.character||"sayo",i=clamp(p-2,0,2),line=PHASE38[id]?.[i];if(!line)return _bossPhase38(p);const bossLine=stage().id===4?PHASE_BOSS38[id]?.[i]:`阶段 ${p}。你刚才最依赖的东西，我学会了。现在用它打你。`;return [{sp:stage().boss,tx:bossLine},{sp:char35().short,tx:line}];};
+  function storyFate47(){
+    const id=save.character||"sayo",f={...(typeof storyMemory38==="function"?storyMemory38():{}),...(P.storyFlags||{})};
+    if(id==="aya"){
+      const steal=f.ayaSister==="choice"||f.ayaFinal==="free";
+      return {script:"结局写死了：门后只够走一个人。用妹妹换你的清白，或者你留下、她变成文件。",fight:"用她换清白？不换。题我拆了。",steal,reply:steal?["妹妹频道","姐姐。门开了。这一次，我说要不要走。"]:["妹妹频道","姐姐，我还在听。别把我重新写成办完。"]};
+    }
+    if(id==="rion"){
+      const steal=f.rionNames==="keep"||f.rionFinal==="choice";
+      return {script:"结局写死了：你上传动作，假人替同门继续挥剑。黄泉流续着，道场是空的。",fight:"影像不是剑士。名字还给他们。去留他们自己说。",steal,reply:steal?["同门残响","我们还在。这一剑，有人愿意负责。"]:["同门残响","演完了。我们自己走。"]};
+    }
+    const steal=f.grave==="sister"||f.self==="copy"||f.offer==="self";
+    return {script:"结局写死了：你走进第三百一十八座墓。城变成数字备份。镜子里的她继续当失败样本。",fight:"我问过她想不想活。她说想。那一页我就撕了。",steal,reply:steal?["镜零","那一页……被撕了？那我还算不算失败的你。"]:["雨宫凛","墓碑还空着。今晚先不刻。"]};
+  }
   const _endingStory38=endingData;
-  endingData=function(){if(isMainGodRun36())return _endingStory38();if(stage().id!==4)return _endingStory38();const id=save.character||"sayo",f={...storyMemory38(),...(P.storyFlags||{})};if(id==="sayo"){if(f.grave==="sister"||f.self==="copy")return {name:"双生存续线 · 不是唯一也是真的",text:"小夜没有争夺原本的名额。她切断人格资产协议，让镜零第一次以自己的名字回答是否愿意醒来。城市里多了两个都不完整、也都不必证明自己的小夜。"};return {name:"证词开放线 · 让死者重新拥有姓名",text:"小夜把三百一十七次失败从训练数据还原为证词。她仍不知道自己是不是原本，但从此没有系统能用“原本”决定谁有资格活。"};}if(id==="aya"){if(f.ayaSister==="choice"||f.ayaFinal==="free")return {name:"姐妹归还线 · 救援必须可以拒绝",text:"绫公开自己的签名和完整事故链，同时把苏醒权交还妹妹。妹妹最终没有立刻醒来——而绫第一次把等待也当成一种尊重。"};return {name:"共同证词线 · 责任不是自我删除",text:"绫没有换取无罪。她带着妹妹残缺的频道和自己的签名回到现实，让责任成为追查主谋的起点，而不是企业指定的替罪终点。"};}if(f.rionNames==="keep"||f.rionFinal==="choice")return {name:"黄泉活人道场线 · 传统允许被改写",text:"凛音归还每位同门的姓名与去留权。新黄泉流不再以血统、模型或完整记忆认定继承，只要求每一剑都有人愿意负责。"};return {name:"黄泉送还线 · 最后一场稽古",text:"亡者完成最后一次演武后离开镜核。凛音没有复制师父的最后一式，而是在空道场里写下新的起手式：先问名字，再问来意。"};};
+  endingData=function(){if(isMainGodRun36())return _endingStory38();if(stage().id!==4)return _endingStory38();const id=save.character||"sayo",f={...storyMemory38(),...(P.storyFlags||{})};if(id==="sayo"){if(f.grave==="sister"||f.self==="copy")return {name:"双生存续线 · 不是唯一也是真的",text:"剧本写的是只留一个小夜。她把那一页撕了。镜零第一次用自己的名字回答想不想活。城里从此有两个都不必证明自己的人。"};return {name:"证词开放线 · 让死者重新拥有姓名",text:"剧本写的是她走进第三百一十八座墓。她把三百一十七次失败还原成证词。没有系统能再用“原本”决定谁有资格活。"};}if(id==="aya"){if(f.ayaSister==="choice"||f.ayaFinal==="free")return {name:"姐妹归还线 · 救援必须可以拒绝",text:"剧本写的是门后只走一个人。她把题拆了。妹妹的苏醒权还回去——哪怕她没有立刻醒来。"};return {name:"共同证词线 · 责任不是自我删除",text:"剧本写的是用妹妹换清白。她带着签名和残缺频道走出来。责任成了追查的起点，不是替罪的终点。"};}if(f.rionNames==="keep"||f.rionFinal==="choice")return {name:"黄泉活人道场线 · 传统允许被改写",text:"剧本写的是用复制品续黄泉流。她把姓名和去留权还给每一个人。新道场只认愿意为自己的剑负责的人。"};return {name:"黄泉送还线 · 最后一场稽古",text:"剧本写的是她空着手离开、假人替她练到世界尽头。亡者演完最后一场，自己走了。空道场里她写下新的起手式：先问名字，再问来意。"};};
 
   function persistEventButtons38(){document.querySelectorAll("#eventChoices .eventChoice").forEach(b=>{if(b.dataset.persist38)return;b.dataset.persist38="1";b.addEventListener("click",()=>queueMicrotask(commitStory38));});}
   const _renderCharacterChoices38=renderCharacterEventChoices35;
