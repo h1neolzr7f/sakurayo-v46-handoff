@@ -384,7 +384,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
       const quota = error && (error.name === "QuotaExceededError" || error.code === 22);
       toast(quota ? "存档空间已满，进度未能写入" : "存档写入失败，请导出备份");
     }
-    menuUpdate();
+    if (state === "menu") menuUpdate();
   };
 
 
@@ -633,14 +633,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
     return false;
   }
   function endingData(){
-    let f=P.storyFlags||{},name="未完成的夜",text="小夜切断了一个节点，但镜界仍在城市深处呼吸。";
-    if(stage().id===4&&f.grave==='sister'&&f.offer==='self'){name="镜后妹妹线 · 两个小夜";text="小夜没有删除镜零，而是把她从协议中剥离。城市第一次拥有两个都拒绝被定义的小夜。";}
-    else if(stage().id===4&&f.rin==='real'&&f.identity==='broadcast'){name="现实锚定线 · 全城证词";text="死亡名单被公开，零号企业失去了垄断记忆的权力。凛在现实世界等到了小夜的回信。";}
-    else if(stage().id===4&&f.rin==='mirror'&&f.self==='copy'){name="镜中共存线 · 备份也是本人";text="小夜承认自己可能是备份，并选择在镜界中保护那些没有肉体的人格。";}
-    else if(stage().id===4&&!P.form&&!P.fusion){name="纯人类线 · 拒绝协议";text="没有飞升、没有融合，小夜以仍会受伤的身体击碎镜核，证明强大不是唯一答案。";}
-    else if(stage().id===4&&P.form&&P.fusion){name="融合飞升线 · 第四种答案";text="职业、血肉与灵能的边界被重新书写。小夜成为协议无法归类的第四种生命。";}
-    else if(stage().id===4){name="镜界余生线 · 活下来的版本";text="镜核破碎后，小夜仍无法证明自己是否是原本。但她决定让活下来的版本继续选择。";}
-    return {name,text};
+    return {name:"未完成的夜",text:"小夜切断了一个节点，但镜界仍在城市深处呼吸。"};
   }
   function runCoach45(win){
     const a=P.plan||refreshPlan();
@@ -2879,21 +2872,22 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
     window.SakurayoCutscene?.stopVictory?.();
     runWin=win;hideTransient();state="result";$("#hud").classList.add("hidden");
     save.kills += P.kills; save.best = Math.max(save.best, runTime); save.runs++;
+    const testimony = typeof isTestimonyRun46 === "function" && isTestimonyRun46();
     const pay44 = window.SakurayoEconomy
-      ? window.SakurayoEconomy.rewardParts(P.kills, P.level, P.eliteKills, win, stage().reward, save.done.includes(selected))
+      ? window.SakurayoEconomy.rewardParts(P.kills, P.level, P.eliteKills, win, stage().reward, testimony || save.done.includes(selected))
       : null;
-    let reward = pay44 ? pay44.total : Math.floor(P.kills*.32 + P.level*3 + P.eliteKills*4) + (win ? stage().reward : 0);
+    let reward = pay44 ? pay44.total : Math.floor(P.kills*.32 + P.level*3 + P.eliteKills*4) + (win ? (testimony ? 0 : stage().reward) : 0);
     save.coins += reward;
-    if (win) { save.bosses++; if(!save.done.includes(selected))save.done.push(selected); save.unlock=Math.max(save.unlock,Math.min(ST.length,selected+1)); if(!save.story.includes(stage().story))save.story.push(stage().story); }
-    if(P.form&&!save.forms.includes(P.form))save.forms.push(P.form);
-    let ed=endingData(); if(win&&selected===4&&!save.endings.includes(ed.name))save.endings.push(ed.name);
+    if (win && !testimony) { save.bosses++; if(!save.done.includes(selected))save.done.push(selected); save.unlock=Math.max(save.unlock,Math.min(ST.length,selected+1)); if(!save.story.includes(stage().story))save.story.push(stage().story); }
+    if(!testimony&&P.form&&!save.forms.includes(P.form))save.forms.push(P.form);
+    let ed=endingData(); if(win&&!testimony&&selected===4&&!save.endings.includes(ed.name))save.endings.push(ed.name);
     let top=Object.entries(P.damageSources).sort((a,b)=>b[1]-a[1])[0]?.[0]||"shot";
-    save.runHistory.unshift({time:Date.now(),mode:"story",stage:selected,character:save.character,skin:save.skin,duration:runTime,win,kills:P.kills,eliteKills:P.eliteKills,level:P.level,fusion:P.fusion,form:P.form,careers:careerSummary(),top,damageSources:{...P.damageSources},damageTaken:P.damageTaken,phaseTimes:[...P.phaseTimes],rank:P.plan?.rank||"?",ending:ed.name}); save.runHistory=save.runHistory.slice(0,30);
-    const buildReward=takeBuildReward46();
+    save.runHistory.unshift({time:Date.now(),mode:testimony?"testimony":"story",stage:selected,character:save.character,skin:save.skin,duration:runTime,win,kills:P.kills,eliteKills:P.eliteKills,level:P.level,fusion:P.fusion,form:P.form,careers:careerSummary(),top,damageSources:{...P.damageSources},damageTaken:P.damageTaken,phaseTimes:[...P.phaseTimes],rank:P.plan?.rank||"?",ending:testimony?null:ed.name}); save.runHistory=save.runHistory.slice(0,30);
+    const buildReward=testimony?null:takeBuildReward46();
     checkAch(); persist();
     $("#ricon").textContent=win?"🌸":"☠️"; $("#rankBig").textContent=win?(P.damageTaken===0?"S":P.plan?.rank||"A"):(runTime>stage().dur*.65?"B":"C");
-    $("#rtitle").textContent=win?"镜界节点已净化":"防线失守";
-    $("#rsub").textContent=win?`${stage().short} 已封回证词。${stage().boss} 不再开口。${P.fusion?`「${fusionData()?.n||P.fusion}」`:"未融合"} / ${P.form?ASC.find(a=>a.id===P.form)?.n||P.form:"未飞升"}`:`${stage().short}被尸潮吞没。${window.SakurayoLifecycle?.hint?.(lifecycleWorld44())||"下次可以在暂停页看清短板，再决定补什么。"} ${runCoach45(false)}`;
+    $("#rtitle").textContent=win?(testimony?"证词已记下":"镜界节点已净化"):"防线失守";
+    $("#rsub").textContent=win?(testimony?`${stage().short} 的证词收进档案。演习进度不变。`:`${stage().short} 已封回证词。${stage().boss} 不再开口。${P.fusion?`「${fusionData()?.n||P.fusion}」`:"未融合"} / ${P.form?ASC.find(a=>a.id===P.form)?.n||P.form:"未飞升"}`):`${stage().short}被尸潮吞没。${window.SakurayoLifecycle?.hint?.(lifecycleWorld44())||"下次可以在暂停页看清短板，再决定补什么。"} ${runCoach45(false)}`;
     $("#rstats").innerHTML=`坚持 <b>${fmt(runTime)}</b><br>击破 <b>${P.kills}</b> · 精英 <b>${P.eliteKills}</b> · 等级 <b>${P.level}</b><br>职业：<b>${careerSummary()}</b><br>融合：<b>${P.fusion?fusionData()?.n||P.fusion:"未融合"}</b><br>飞升：<b>${P.form?ASC.find(a=>a.id===P.form)?.n||P.form:"未飞升"}</b><br>获得樱花币 <b style="color:var(--g)">🌸 ${reward}</b>${pay44&&window.SakurayoEconomy?window.SakurayoEconomy.rewardHtml(pay44):""}${buildCardRewardHtml46(buildReward)}`;
     renderRunReport(); $("#result").classList.remove("hidden"); sound(win?"win":"over");
     playGoodnight46(win);
@@ -4098,6 +4092,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
     return true;
   }
   function aoe(x, y, r, dmg, color = "#ff72b5", push = false, opt = {}) {
+    if (slashes.length >= 24) slashes.shift();
     slashes.push({ x, y, max: r, life: 0.32, total: 0.32, color });
     for (const e of grid.near(x, y, r + 55)) {
       if (e.dead) continue;
@@ -6253,16 +6248,16 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
       "1:1":{t:"未送达的撤离令",x:"门还认你。当年的撤离令被标成已完成。实际没有人离开。公司把救人写成了办完。",card:"fashion_aya_suit",o:[["恢复原始记录","暴击提高。罪证留下，包括你自己的。","ayaOrder","restore","crit"],["先救仍在线的人格","回复生命。名单以后再对。","ayaOrder","rescue","heal"]]},
       "2:0":{t:"安全主管的后门",x:"停尸车后面的服务器还认你的旧钥匙。打开，你能更快救人，公司也会跟着来。烧掉，你就不再用那张工牌。",card:"fashion_aya_coat",o:[["打开后门","技能冷却缩短。企业开始追踪。","ayaDoor","open","skill"],["烧毁主管密钥","减伤提高。旧工牌不再用。","ayaDoor","burn","def"]]},
       "2:1":{t:"镜中的妹妹",x:"两块车窗里，两个声音都说自己是妹妹。一个喊救我，一个喊杀了我。你都听，还是只留你能核对的那一个。",card:"aya_petal",o:[["保留两个频道","移速提高。认错人的风险你自己担。","ayaSister","both","speed"],["只信校验通过的频道","伤害提高。另一份先关掉。","ayaSister","verified","atk"]]},
-      "3:0":{t:"被出售的月切",x:"有人把妹妹的居合拆开卖。你要整段夺回来，还是先让全城看见这东西是从谁身上拆的。",card:"weapon_aya_mirror",o:[["夺回完整模型","技能循环更快。刀先回到你手里。","ayaBlade","recover","skill"],["公开模型来源","稳定度提高。全城先看见来源。","ayaBlade","expose","plan"]]},
+      "3:0":{t:"被出售的月切",x:"有人把妹妹的居合拆开卖。你要整段夺回来，还是先让全城看见这东西是从谁身上拆的。",card:"weapon_aya_mirror",o:[["夺回完整模型","技能循环更快。刀先回到你手里。","ayaBlade","recover","skill"],["公开模型来源","构筑稳定度 +8。全城先看见来源。","ayaBlade","expose","plan"]]},
       "3:1":{t:"妹妹的刀鞘",x:"刀鞘插在剑冢里。里面是她拒绝被收走之前的十七秒。带走，你记得她怎么选。留下，你尊重她最后的意愿。",card:"aya_petal",o:[["带走记忆","回复生命。十七秒你带着走。","ayaMemory","carry","heal"],["让她留在剑冢","获得护盾。十七秒留给她。","ayaMemory","release","shield"]]},
-      "4:0":{t:"主管签名",x:"最后一页上有高层的名字，也有你当年的指纹。公开，你一起承担责任。先追主谋，证据先藏着。",card:"fashion_aya_funeral",o:[["公开全部签名","压强下降。你的名字也在第一页。","ayaTruth","public","plan"],["先锁定主谋","伤害提高。证据先藏着。","ayaTruth","hunt","atk"]]},
+      "4:0":{t:"主管签名",x:"最后一页上有高层的名字，也有你当年的指纹。公开，你一起承担责任。先追主谋，证据先藏着。",card:"fashion_aya_funeral",o:[["公开全部签名","构筑稳定度 +8。你的名字也在第一页。","ayaTruth","public","plan"],["先锁定主谋","伤害提高。证据先藏着。","ayaTruth","hunt","atk"]]},
       "4:1":{t:"最后一份事故报告",x:"它可以还妹妹，条件是继续握着所有被收走的人。门后只够走一个人。你要拆掉这道题，还是按它给的条件选。",card:"fashion_aya_funeral",o:[["解除全部人格产权","减伤提高。门后不必只走一个人。","ayaFinal","free","def"],["复制证据后摧毁协议","暴击提高。证据留下，人先不管。","ayaFinal","expose","crit"]]}
     },
     rion:{
       "1:0":{t:"会走路的黄泉流",x:"鸟居下的尸潮走出师父的起手式。招式像。呼吸不对。有人会了动作，人却不在了。你要顺着破绽找他，还是先砍断这套被偷走的剑。",card:"rion_edge",o:[["沿破绽追踪师父","移速提高。你顺着呼吸找。","rionTrail","follow","speed"],["斩断被盗模型","伤害提高。这套剑先停。","rionTrail","cut","atk"]]},
       "1:1":{t:"无名同门",x:"一具尸体交手前，做了只有道场弟子知道的礼。她还记得自己是谁。你记下她的名字，还是让她以剑士的身份退场。",card:"rion_edge",o:[["记下她的名字","减伤提高。名字留下。","rionNames","record","def"],["让她以剑士身份退场","回复生命。礼收到了，走吧。","rionNames","honor","heal"]]},
       "2:0":{t:"被出售的招式",x:"雨街的屏幕按命中率给师门招式标价。有人把师父的剑当商品卖。你要拆掉货架，还是顺着买家找回去。",card:"weapon_rion_wood",o:[["销毁交易库","暴击提高。招式先不卖。","rionModel","destroy","crit"],["反向追踪买家","射程提高。你顺着买家找。","rionModel","trace","range"]]},
-      "2:1":{t:"剑招拍卖会",x:"最后一式被拆成二十七个付费动作，贴在湿掉的霓虹上。你要整本夺回来，还是先交给还活着的人。",card:"rion_edge",o:[["夺回完整剑谱","技能冷却缩短。整本先在你手里。","rionScroll","recover","skill"],["把剑谱公开给幸存者","压强下降。剑谱给还活着的人。","rionScroll","share","plan"]]},
+      "2:1":{t:"剑招拍卖会",x:"最后一式被拆成二十七个付费动作，贴在湿掉的霓虹上。你要整本夺回来，还是先交给还活着的人。",card:"rion_edge",o:[["夺回完整剑谱","技能冷却缩短。整本先在你手里。","rionScroll","recover","skill"],["把剑谱公开给幸存者","构筑稳定度 +8。剑谱给还活着的人。","rionScroll","share","plan"]]},
       "3:0":{t:"剑冢名册",x:"名册只记动作编号，没有一位同门的姓名。你先把名字补回去，还是先砍断还在驱动他们的核心。",card:"fashion_rion_bloom",o:[["逐一补回姓名","获得护盾。名册先写名字。","rionLedger","names","shield"],["先斩断控制核心","伤害提高。名字稍后收。","rionLedger","core","atk"]]},
       "3:1":{t:"无名剑主的试问",x:"系统只认动作。你站在剑里，一个个报出失踪同门的名字。你用名字继承，还是用这一战证明。",card:"fashion_rion_haori",o:[["以名字继承","减伤提高。你用名字接，不是用动作。","rionHeir","people","def"],["以实战证明","暴击提高。这一战算你的。","rionHeir","duel","crit"]]},
       "4:0":{t:"师父的战斗模型",x:"镜子里的师父还在练。他已经忘了为什么挥剑。你要叫醒他，还是让这一课停在这里。",card:"weapon_rion_burial",o:[["唤回道场记忆","回复生命。先问他还记不记得为什么。","rionMaster","remember","heal"],["结束永恒训练","技能威力提高。这一课停在这里。","rionMaster","rest","skill"]]},
@@ -6472,7 +6467,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
   function facingName36(a=P.weaponAngle||0){const x=Math.cos(a),y=Math.sin(a);return Math.abs(x)>Math.abs(y)?(x>=0?"right":"left"):(y>=0?"down":"up");}
   function angleDelta36(a,b){return Math.atan2(Math.sin(a-b),Math.cos(a-b));}
   function directionalHit36(distance,enemyRadius,radius,angleOffset,halfArc){if(distance>=radius+enemyRadius)return false;const edge=distance>enemyRadius?Math.asin(clamp(enemyRadius/distance,0,1)):Math.PI;return Math.abs(angleDelta36(angleOffset,0))<=halfArc+edge;}
-  function directionalSlash36(radius,dmg,big=false,angle=P.weaponAngle||Math.atan2(P.fy,P.fx),halfArc=big?1.66:1.05){fxStamp("slash",P.x,P.y,{size:Math.max(48,radius*.42),life:.28,rot:angle});const color=char35().id==="rion"?"#ff526f":"#7db8ff";slashes.push({x:P.x,y:P.y,max:radius,life:.32,total:.32,color,dir:angle,arc:halfArc*2});for(const e of grid.near(P.x,P.y,radius+55)){if(e.dead)continue;const dx=e.x-P.x,dy=e.y-P.y,d=Math.hypot(dx,dy),off=angleDelta36(Math.atan2(dy,dx),angle);if(directionalHit36(d,e.r,radius,off,halfArc))damageEnemy(e,dmg*(P.bladePower||1),{source:"blade",school:char35().id==="aya"?"ninja":"cult"});}particles(P.x+Math.cos(angle)*radius*.55,P.y+Math.sin(angle)*radius*.55,18,color);P.inv=Math.max(P.inv,big?.16:.07);return true;}
+  function directionalSlash36(radius,dmg,big=false,angle=P.weaponAngle||Math.atan2(P.fy,P.fx),halfArc=big?1.66:1.05){fxStamp("slash",P.x,P.y,{size:Math.max(48,radius*.42),life:.28,rot:angle});const color=char35().id==="rion"?"#ff526f":"#7db8ff";if(slashes.length>=24)slashes.shift();slashes.push({x:P.x,y:P.y,max:radius,life:.32,total:.32,color,dir:angle,arc:halfArc*2});for(const e of grid.near(P.x,P.y,radius+55)){if(e.dead)continue;const dx=e.x-P.x,dy=e.y-P.y,d=Math.hypot(dx,dy),off=angleDelta36(Math.atan2(dy,dx),angle);if(directionalHit36(d,e.r,radius,off,halfArc))damageEnemy(e,dmg*(P.bladePower||1),{source:"blade",school:char35().id==="aya"?"ninja":"cult"});}particles(P.x+Math.cos(angle)*radius*.55,P.y+Math.sin(angle)*radius*.55,18,color);P.inv=Math.max(P.inv,big?.16:.07);return true;}
   slash35=function(radius,dmg,big=false){return directionalSlash36(radius,dmg,big);};
 
   function gunShot36(angle,c){const origin=playerMuzzle35(angle);fxStamp("muzzle",origin.x,origin.y,{size:c.id==="sayo"?34:28,life:.14,rot:angle});P.fx=P.aimX=Math.cos(angle);P.fy=P.aimY=Math.sin(angle);P.weaponAngle=angle;P.weaponLock=.22;P.shotCount++;const rail=P.rail&&P.shotCount%9===0,count=P.multi,spread=.115;for(let i=0;i<count;i++){const q=angle+(i-(count-1)/2)*spread;pushBullet({x:origin.x,y:origin.y,vx:Math.cos(q)*P.bSpeed,vy:Math.sin(q)*P.bSpeed,r:rail?7:4,life:P.range/P.bSpeed,dmg:P.dmg*(rail?2.6:1),pierce:P.pierce+(rail?6:0),rail,source:rail?"tech":"shot",school:rail?"mech":"gun",bioSplit:!!P.bioGun,hit:new Set(),acid:P.acid});}
@@ -6727,8 +6722,15 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
       4:[["镜零","上传你的动作，死去的师兄都可以再挥剑。黄泉流会续。你空着手离开。这是最好的结局。"],["黑羽凛音","挥剑的影像不是剑士。让他们自己选醒来还是睡。"],["同门残响","若我们都离开，黄泉流还在吗？"],["黑羽凛音","在。只要它不再把人困在过去。"]]
     }
   };
+  function storyChoiceBag47(id){
+    if(typeof isTestimonyRun46==="function"&&isTestimonyRun46()){
+      const story=typeof ensureStoryOps47==="function"?ensureStoryOps47():{};
+      return story[id]||{};
+    }
+    return (save.storyChoices38&&save.storyChoices38[id])||{};
+  }
   function consequence38(id,stageId){
-    const f=save.storyChoices38[id]||{},lines=[];
+    const f=storyChoiceBag47(id),lines=[];
     if(stageId<=1||!Object.keys(f).length)return lines;
     if(id==="sayo"){
       if(stageId===2){
@@ -6930,12 +6932,18 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
   };
   const _finishHidden47=finish;
   finish=function(win){
-    if(win&&P.hiddenCleared47){
+    if(win&&P.hiddenCleared47&&!(typeof isTestimonyRun46==="function"&&isTestimonyRun46())){
       save.hiddenPerfect47=save.hiddenPerfect47&&typeof save.hiddenPerfect47==="object"?save.hiddenPerfect47:{};
       save.hiddenPerfect47[save.character]=true;
       save.ach.hiddenpage=true;
     }
-    return _finishHidden47(win);
+    const result=_finishHidden47(win);
+    if(win&&P.hiddenCleared47&&!(typeof isTestimonyRun46==="function"&&isTestimonyRun46())){
+      const ed=endingData();
+      $("#rtitle").textContent=ed.name;
+      $("#rsub").textContent=ed.text;
+    }
+    return result;
   };
   ACH.hiddenpage={n:"未写完的那一页",i:"📜",d:"四章线索走完、先收下写定的结局，再打进隐藏关抢回完美结局",r:320,c:()=>!!save.ach.hiddenpage};
 
@@ -7019,7 +7027,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
         e.chargeWind39=e.type==="fast"?.36:.64;e.chargeAngle39=Math.atan2(dy,dx);e.roleCd39=e.type==="fast"?3.1:4.5;
       }
       if(e.chargeWind39>0){const before=e.chargeWind39;e.chargeWind39-=dt;if(before>0&&e.chargeWind39<=0){const leap=e.type==="fast"?116:82;e.x+=Math.cos(e.chargeAngle39)*leap;e.y+=Math.sin(e.chargeAngle39)*leap;e.touch=0;particles(e.x,e.y,e.type==="fast"?8:12,"#ff9a62");}}
-      if(e.type==="purifier"&&e.roleCd39<=0){e.roleCd39=2.8;let healed=0;for(const n of grid.near(e.x,e.y,125)){if(n===e||n.dead)continue;const gain=Math.max(2,n.max*.025);n.hp=Math.min(n.max,n.hp+gain);healed++;}if(healed){slashes.push({x:e.x,y:e.y,max:118,life:.3,total:.3,color:"#83ffc4"});}}
+      if(e.type==="purifier"&&e.roleCd39<=0){e.roleCd39=2.8;let healed=0;for(const n of grid.near(e.x,e.y,125)){if(n===e||n.dead)continue;const gain=Math.max(2,n.max*.025);n.hp=Math.min(n.max,n.hp+gain);healed++;}if(healed){if(slashes.length>=24)slashes.shift();slashes.push({x:e.x,y:e.y,max:118,life:.3,total:.3,color:"#83ffc4"});}}
       if(e.type==="shield"&&boss&&!boss.dead&&dist>120){const a=Math.atan2(P.y-boss.y,P.x-boss.x);e.x+=(boss.x+Math.cos(a)*72-e.x)*dt*.65;e.y+=(boss.y+Math.sin(a)*72-e.y)*dt*.65;}
     }
   }
@@ -7194,7 +7202,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.1";
   };
   function recordBalance40(win){if(isMainGodRun36())return;const sample={time:Date.now(),stage:selected,character:save.character,starter:P.initialCore40||null,starterLevel:P.initialCoreLevel40||0,bait:P.baitLevel40||0,noUpgrade:!!P.noUpgradeChallenge40,upgradeChoices:P.upgradeChoices40||0,win:!!win,kills:P.kills,level:P.level,duration:runTime,damageTaken:Math.round(P.damageTaken),perfectDodges:P.perfectDodges||0,rank:P.plan?.rank||"?"};save.balance40.samples.unshift(sample);save.balance40.samples=save.balance40.samples.slice(0,80);const run=save.runHistory?.[0];if(run&&Math.abs(Date.now()-run.time)<5000)Object.assign(run,{starter:sample.starter,starterLevel:sample.starterLevel,bait:sample.bait,noUpgrade:sample.noUpgrade,upgradeChoices:sample.upgradeChoices,perfectDodges:sample.perfectDodges});}
   const _finish40=finish;
-  finish=function(win){const lone=!!win&&!isMainGodRun36()&&selected===4&&P.noUpgradeChallenge40&&(P.upgradeChoices40||0)===0&&P.damageTaken<=.01&&(P.initialCoreLevel40||0)>0;if(lone){save.ach.loneproof=true;save.hiddenStory40[save.character]=true;save.pendingLoneStory40=save.character;}const result=_finish40(win);recordBalance40(win);if(lone){$("#rtitle").textContent="隐藏结局 · 孤证者";$("#rsub").textContent=LONE_STORY40[save.character];toast("隐藏成就：孤证者");}persist();return result;};
+  finish=function(win){const lone=!!win&&!isMainGodRun36()&&!(typeof isTestimonyRun46==="function"&&isTestimonyRun46())&&selected===4&&P.noUpgradeChallenge40&&(P.upgradeChoices40||0)===0&&P.damageTaken<=.01&&(P.initialCoreLevel40||0)>0;if(lone){save.ach.loneproof=true;save.hiddenStory40[save.character]=true;save.pendingLoneStory40=save.character;}const result=_finish40(win);recordBalance40(win);if(lone){$("#rtitle").textContent="隐藏结局 · 孤证者";$("#rsub").textContent=LONE_STORY40[save.character];toast("隐藏成就：孤证者");}persist();return result;};
   const _opening40=openingDialogue;
   openingDialogue=function(){const base=_opening40();if(save.pendingLoneStory40===save.character){save.pendingLoneStory40=null;persist();return [{sp:"镜界残响",tx:LONE_STORY40[save.character]},{sp:char35().short,tx:save.character==="sayo"?"上次没有升级选项，这次也别指望我按推荐答案活。":save.character==="aya"?"后门、补给、推荐路线都关掉。现在才算我自己的任务。":"借来的强大已经归还。现在继续练自己的第一式。"},...base];}return base;};
   const _renderStory40=renderStory;

@@ -24,6 +24,14 @@ assert.match(indexSrc, /这些你都做了。终章会先把最坏的演完。/,
 assert.equal(indexSrc.includes('if($("#storyRecap39"))return'), false, "换角色必须刷新剧情回顾");
 assert.equal(indexSrc.includes("姐妹归还线 · 无人属于企业"), false, "不得再叠绫的旧终章名");
 assert.equal(indexSrc.includes("黄泉继承线 · 活人的道场"), false, "不得再叠凛音的旧终章名");
+assert.equal(indexSrc.includes("镜后妹妹线 · 两个小夜"), false, "底层 endingData 不得再留旧终章名");
+assert.equal(indexSrc.includes("现实锚定线 · 全城证词"), false, "底层 endingData 不得再留现实锚定线");
+assert.equal(indexSrc.includes("压强下降"), false, "抉择文案不得再写压强下降");
+assert.match(indexSrc, /构筑稳定度 \+8/, "plan 效果文案要对上 +8 稳定度");
+assert.match(indexSrc, /testimony \|\| save\.done\.includes\(selected\)/, "证词结算不得当演习首通");
+assert.match(indexSrc, /mode:testimony\?"testimony":"story"/, "证词战绩要单独记 mode");
+assert.match(indexSrc, /function storyChoiceBag47/, "跨章回声要按证词/演习分袋");
+assert.match(indexSrc, /if \(state === "menu"\) menuUpdate\(\);/, "局内存档不得刷新大厅");
 assert.match(indexSrc, /P\.publicTruth \|\| P\.storyFlags\?\.identity === "broadcast"/, "公开名单要提高精英刷率");
 assert.equal(indexSrc.includes('["dialogue","event","level","pause","result","menu"]'), false, "大厅 toast 不得被 menu 态挡死");
 assert.equal(L.version, "4.6.1");
