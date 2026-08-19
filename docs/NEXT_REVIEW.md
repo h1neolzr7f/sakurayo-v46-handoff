@@ -6,7 +6,7 @@
 |---|---|---|---|
 | 镜头 | [#14](https://github.com/h1neolzr7f/sakurayo-v46-handoff/pull/14) `cursor/camera-world-7db2` | `566697d` | **未过。** 4×2 和视口外刷怪有了，镜头没夹在世界边。不要合并。 |
 | 换拼卡 | [#15](https://github.com/h1neolzr7f/sakurayo-v46-handoff/pull/15) `cursor/fashion-art-5030` | `ca1ee17` | **逻辑过，认人抽查可留。** 仍是 draft。你点过后再并。 |
-| 编年 | [#13](https://github.com/h1neolzr7f/sakurayo-v46-handoff/pull/13) `cursor/chronicle-sides-5030` | `36a93bd` | **功能过，锁死表没按。** 他们做的是 3+3 和另一套标题。你定：收下，或打回改成 4+4。 |
+| 编年 | [#13](https://github.com/h1neolzr7f/sakurayo-v46-handoff/pull/13) `cursor/chronicle-sides-5030` | `36a93bd` | **功能过，锁死表没按。** 已在 PR 打回：改成 4+4 锁死 id/标题。 |
 
 版本都还是 4.6.0。卡池数字没被动。lobby 和镜头两份没抢同一文件。
 
@@ -27,3 +27,5 @@
 一个页签、三段、小夜五条未改 `sakurayo-lobby.js`、不进池。另文件包装 `renderRoster`，避免和换拼卡抢 lobby。
 
 他们按自己写的提示词做了 **绫 3 / 凛音 3**，标题是「未结案的夜 / 未收剑的夜」。指挥官围栏锁的是 **4+4** 和「作废的工号 / 未署名的刀」那 8 个 id。正文能对上零号企业、剑冢，不是另起宇宙。
+
+2026-08-19 已把上表直接写进三份施工 PR 评论，不再等人转述。
