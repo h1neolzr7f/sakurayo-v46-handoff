@@ -265,6 +265,37 @@ assert.equal(L.JOB_CARDS.length, 28);
 assert.ok(L.JOB_CARDS.every((card) => card.id.startsWith("job_") && card.r === "SR" && card.kind === "job" && card.dmg === 0.005));
 assert.equal(L.snapshot(jobSave).jobOwned, 2);
 
+const fusionP = { dmg: 20 };
+const fusionSave = { shop40: L.normalizeOps({}) };
+fusionSave.shop40.ops.owned.fusion_magitech = 1;
+fusionSave.shop40.ops.owned.fusion_gunshrine = 2;
+L.applyOwnedBonus(fusionP, fusionSave);
+assert.ok(Math.abs(fusionP.dmg - 20 * 1.008 * 1.008) < 1e-6, "每张融合 +0.8%，重复不加");
+assert.equal(L.hasFusion(fusionSave, "mech"), true);
+assert.equal(L.hasFusion(fusionSave, "magical"), true);
+assert.equal(L.hasFusion(fusionSave, "shrine"), true);
+assert.equal(L.hasFusion(fusionSave, "gun"), true);
+assert.equal(L.hasFusion(fusionSave, "spore"), false);
+assert.equal(L.hasFusion({ shop40: L.normalizeOps({}) }, "mech"), false);
+const fusionP2 = { dmg: 20 };
+fusionSave.shop40.ops.owned.fusion_magitech = 9;
+L.applyOwnedBonus(fusionP2, fusionSave);
+assert.ok(Math.abs(fusionP2.dmg - 20 * 1.008 * 1.008) < 1e-6, "同一张融合重复不叠伤");
+assert.equal(L.snapshot(fusionSave).fusionOwned, 2);
+assert.match(fs.readFileSync(path.join(root, "src/index.html"), "utf8"), /hasFusion\(save,school\)\)w\*=1\.6/);
+assert.doesNotMatch(fs.readFileSync(path.join(root, "src/index.html"), "utf8"), /12\/24|融合套装/);
+
+const preferSave = { coins: 20000, shop40: L.normalizeOps({}) };
+L.FUSION_CARDS.forEach((card) => {
+  if (card.id !== "fusion_soulgun") preferSave.shop40.ops.owned[card.id] = 1;
+});
+preferSave.shop40.ops.pity = 79;
+const preferHit = L.pull(preferSave, 1, () => 0.999);
+assert.equal(preferHit.results[0].kind, "fusion");
+assert.equal(preferHit.results[0].r, "SSR");
+assert.equal(preferHit.results[0].id, "fusion_soulgun", "硬保优先还没拥有的融合");
+assert.equal(preferSave.shop40.ops.pity, 0);
+
 const shardSave = { coins: 20000, shop40: L.normalizeOps({}) };
 L.CARDS.forEach((card) => { shardSave.shop40.ops.owned[card.id] = 1; });
 L.SCHOOL_CARDS.forEach((card) => { shardSave.shop40.ops.owned[card.id] = 1; });

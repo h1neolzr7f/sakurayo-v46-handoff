@@ -556,8 +556,18 @@
     });
   }
 
+  function hasFusion(save, school) {
+    var shop = normalizeOps((save && save.shop40) || {});
+    var id = String(school || "");
+    if (!id) return false;
+    return FUSION_CARDS.some(function (card) {
+      return (card.pair || []).indexOf(id) >= 0 && (shop.ops.owned[card.id] || 0) > 0;
+    });
+  }
+
   function preferSsrFulfill(card) {
     if (!card || card.kind === "scrap") return false;
+    if (card.kind === "fusion") return true;
     if (card.kind === "job") return true;
     return card.kind === "school" && (card.school === "shrine" || card.school === "gun" || card.school === "cult");
   }
@@ -793,6 +803,10 @@
     if (schoolN >= 7) player.dmg = (player.dmg || 0) * 1.02;
     if (schoolN >= 14) player.dmg = (player.dmg || 0) * 1.03;
     JOB_CARDS.forEach(function (card) {
+      if ((owned[card.id] || 0) < 1) return;
+      if (card.dmg) player.dmg = (player.dmg || 0) * (1 + card.dmg);
+    });
+    FUSION_CARDS.forEach(function (card) {
       if ((owned[card.id] || 0) < 1) return;
       if (card.dmg) player.dmg = (player.dmg || 0) * (1 + card.dmg);
     });
@@ -1382,6 +1396,7 @@
     CHRONICLE: CHRONICLE,
     hasSchool: hasSchool,
     hasJob: hasJob,
+    hasFusion: hasFusion,
     POOL_IDS: POOL_IDS,
     ROSTER_TABS: ROSTER_TABS,
     SCRAP_BONUS: SCRAP_BONUS,
