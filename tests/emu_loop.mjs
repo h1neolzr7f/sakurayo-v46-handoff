@@ -390,6 +390,29 @@ try {
   pass("关卡胶囊出击写入正确模式");
   await modeCtx.close();
 
+  const lobbyToastCtx = await browser.newContext({ viewport: { width: 932, height: 430 }, hasTouch: true });
+  const lobbyToastPage = await lobbyToastCtx.newPage();
+  await waitMenu(lobbyToastPage);
+  await lobbyToastPage.locator('.charCard[data-character="aya"]').click();
+  await lobbyToastPage.waitForFunction(() => {
+    const t = document.querySelector("#toast");
+    return !!(t && t.classList.contains("show") && /出击角色/.test(t.textContent || ""));
+  }, null, { timeout: 2000 });
+  pass("大厅换角 toast 可见");
+  await startRun(lobbyToastPage, "sayo");
+  await api(lobbyToastPage, "triggerUpgrade");
+  if ((await snap(lobbyToastPage)).mode === "level") {
+    await api(lobbyToastPage, "chooseUpgrade", 0);
+    await lobbyToastPage.evaluate(() => window.advanceTime(400));
+  }
+  const leaked = await lobbyToastPage.evaluate(() => {
+    const t = document.querySelector("#toast");
+    return !!(t && t.classList.contains("show") && /出击角色/.test(t.textContent || ""));
+  });
+  assert.equal(leaked, false, "大厅 toast 不得漏进战斗");
+  pass("大厅 toast 不漏进战斗");
+  await lobbyToastCtx.close();
+
   await runViewport(430, 932, "p430");
   await runViewport(932, 430, "l932");
   const thin = await browser.newContext({ viewport: { width: 600, height: 400 }, hasTouch: true });
