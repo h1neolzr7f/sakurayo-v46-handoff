@@ -14,6 +14,10 @@
     SSR: 0.01,
     pitySSR: 80,
     pitySR: 10,
+    softPity: 65,
+    spark: 200,
+    shardPull: 1,
+    shardDupe: 8,
     single: 160,
     ten: 1440,
     cheat: 9999,
@@ -21,27 +25,114 @@
   });
 
   var DEFAULT_SHOWN = Object.freeze(["sayo_echo", "aya_petal"]);
+  var POOL_IDS = Object.freeze(["remnant", "fashion", "weapon"]);
+  var ROSTER_TABS = Object.freeze(["scrap", "school", "fashion", "weapon"]);
+  var RARITY_RANK = Object.freeze(["SSR", "SR", "R", "N"]);
 
   var CARDS = Object.freeze([
-    { id: "sayo_echo", n: "小夜·镜中残影", r: "N", tag: "证词残页", d: "回收演习里裁下的半张立绘。只进名册，不改枪口。" },
-    { id: "aya_petal", n: "绫·花瓣证词", r: "N", tag: "证词残页", d: "居合前落下的花瓣拓本。收藏用，不加伤害。" },
-    { id: "rion_edge", n: "凛音·刀光残页", r: "R", tag: "道场残简", d: "黄泉流未署名的一页。墙上的光，不是刀锋。" },
-    { id: "night_radio", n: "夜话电台贴纸", r: "R", tag: "夜话残响", d: "吐槽电台的备用台标。贴在名册上，不进战斗。" },
-    { id: "shrine_seal", n: "神社封条拓本", r: "R", tag: "鸟居拓本", d: "第一章鸟居下揭下的封条影。只作收藏。" },
-    { id: "void_ticket", n: "主神回收券影", r: "SR", tag: "主神残券", d: "虚空圣所的作废回收券。不能兑换属性。" },
-    { id: "cherry_crown", n: "樱冠残片", r: "SR", tag: "樱冠残片", d: "镜界冠冕裂开后的一片。好看，不卖伤害。" },
-    { id: "last_witness", n: "终章证人立绘", r: "SSR", tag: "终章证人", d: "碎镜后面那个人终于肯露面。这是收藏，不是数值。" },
+    { id: "sayo_echo", n: "小夜·镜中残影", r: "R", kind: "scrap", tag: "残件", d: "半张立绘还卡在裂镜里。拥有即暴击 +0.5%，重复不加。", lore: ["我是卡在镜里的那一半。神社里走着的小夜可能是备份，我才是三年前实验里先碎的那张脸。", "每次有人摸到镜核，我都会被重新对焦一次。步枪还在，樱花还在，名字却越来越薄。", "镜面先裂，立绘后裂。我伸出手去够外面的她，只够到自己的倒影。", "半张脸还在笑。另外半张，已经不属于任何人。"] },
+    { id: "aya_petal", n: "绫·花瓣残件", r: "R", kind: "scrap", tag: "残件", d: "居合前落下的花瓣。拥有即移速 +0.5%，重复不加。", lore: ["我是居合前掉下来的那一片。零号企业拆人格的时候，把「犹豫」单独装进这片花里。", "手枪先响，太刀后出。花瓣总是抢在刀光前面落地，像在提醒我：再快一点。", "弹打空的那个呼吸，刀还在鞘里。花已经谢了，人还站着，像没接到自己的指令。", "花瓣盖住准星。我看不见她，她也没回头。"] },
+    { id: "rion_edge", n: "凛音·刀光残件", r: "R", kind: "scrap", tag: "残件", d: "黄泉流未署名的一页刀光。拥有即刀伤 +1%，重复不加。", lore: ["我是黄泉流没来得及署名的一页。黑羽家谱把活着的凛音写在正面，把我写在刀背上。", "剑冢里每把剑都认识我。我走过那些失败的小夜，没有对任何一把刀鞠躬。", "刀光先到，名字后到。折断的不是刃，是那句「我会回来」。", "刀还在响。署名栏是空的。"] },
+    { id: "night_radio", n: "夜话电台残件", r: "R", kind: "scrap", tag: "残件", d: "吐槽电台还在响。拥有即技能冷却 -0.5%，重复不加。", lore: ["我不是人。我是小夜死过以后，还在播的那台夜话。吐槽还在，主播已经换过好几版备份。", "从神社到剑冢，频率没变。谁路过都听得见冷笑话，听不见心跳。", "电台以为自己还在救人。其实只是把失败循环到下一小时。", "电流沙沙响。报时之后，没有下一位来宾。"] },
+    { id: "shrine_seal", n: "神社封条残件", r: "R", kind: "scrap", tag: "残件", d: "鸟居下揭下的封条影。拥有即减伤 +0.4%，重复不加。", lore: ["我是从鸟居上揭下来的一道封。写着小夜的名字，墨却先于人干透。", "神社拿我挡镜核，炼金台拿我当坩埚盖。谁都需要一张能骗人的纸。", "符纸烧完了，镜核还在转。名字被火吃掉，裂口比以前更亮。", "灰落在石阶上。下一张封条已经写好，还是同一个字。"] },
+    { id: "void_ticket", n: "主神作废券", r: "R", kind: "scrap", tag: "残件", d: "虚空圣所的作废回收券。拥有即开局护盾 +4，重复不加。", lore: ["我是一张已经作废的回收券。主神空间发过我，又当众盖了戳：此路不算数。", "绫把我捏在指缝里进过圣所。小夜把我夹进档案。谁都以为这是通行证。", "盖戳的不是敌人，是规则本身。券面还亮着，门已经从里面锁死。", "作废两个字比金箔更清楚。没有退款。"] },
+    { id: "cherry_crown", n: "樱冠残片", r: "R", kind: "scrap", tag: "残件", d: "镜界冠冕裂开后的一片。拥有即全伤害 +0.8%，重复不加。", lore: ["我是镜界冠冕裂开后的一片。曾经想把小夜加成完整的那一夜，只加成了碎片。", "戴上会发光，摘下会出血。魔法少女那条线最爱我，也最先被我划伤额头。", "冠还亮着，变身只走到一半。花瓣向上飞，人往下坠。", "金边还烫。头已经空了。"] },
+    { id: "last_witness", n: "碎镜后的人", r: "R", kind: "scrap", tag: "残件", d: "碎镜后面那个人不是三女之一。拥有即生命 +1%，重复不加。", lore: ["他不是小夜，不是绫，也不是凛音。碎镜后面只站着一个还肯作证的人。", "他看着三年前的实验收场，看着备份醒来，看着剑冢一把一把插满。他没有伸手。", "证人活得比主角久。这不是胜利，是他没有被写成卡的资格。", "他仍站在镜后。下一次有人醒来，他还是那张脸。"] },
   ]);
 
-  var CARD_MAP = Object.create(null);
-  CARDS.forEach(function (card) {
-    CARD_MAP[card.id] = card;
+  var FASHION_CARDS = Object.freeze([
+    { id: "fashion_sayo_plain", n: "未归·常服小夜", r: "N", kind: "fashion", face: "sayo", d: "还没写成夜的那身常服。", lore: ["我是还没被写成夜的小夜。", "外套是白的，枪是旧的。", "常服最容易被当成活人。", "袖口已经起线。"] },
+    { id: "fashion_sayo_neon", n: "未归·霓虹小夜", r: "R", kind: "fashion", face: "sayo", d: "灯比人先亮。", lore: ["霓虹先认出我，人群没有。", "电台在脚边响。", "粉色光把伤口照得很清楚。", "灯灭的时候我还在。"] },
+    { id: "fashion_sayo_night", n: "未归·夜巡小夜", r: "SR", kind: "fashion", face: "sayo", school: "shrine", d: "夜巡没有终点。", lore: ["我沿着鸟居走了一整夜。", "冠的碎片在口袋里发烫。", "没有人交接下一班。", "月亮先下班。"] },
+    { id: "fashion_aya_suit", n: "未归·制服绫", r: "N", kind: "fashion", face: "aya", d: "企业还承认这套制服。", lore: ["制服比我更像绫。", "蓝领带是唯一没被拆的零件。", "手枪藏在文件袋里。", "工牌已经作废。"] },
+    { id: "fashion_aya_coat", n: "未归·风衣绫", r: "R", kind: "fashion", face: "aya", d: "风衣盖不住作废券。", lore: ["风衣够长，盖不住券上的戳。", "夜风比刀快。", "我把通行证揣进内袋。", "门还是关着。"] },
+    { id: "fashion_aya_veil", n: "未归·面纱绫", r: "SR", kind: "fashion", face: "aya", school: "gun", d: "面纱遮不住准星。", lore: ["面纱是给葬礼准备的。", "我从纱后看见准星。", "花瓣粘在纱上，像没擦干净的妆。", "揭开也没有另一张脸。"] },
+    { id: "fashion_rion_keiko", n: "未归·稽古凛音", r: "N", kind: "fashion", face: "rion", d: "木刀也要鞠躬。", lore: ["稽古场只剩下我一个人。", "木刀比家谱诚实。", "我还是先鞠躬再出招。", "没有人喊停。"] },
+    { id: "fashion_rion_haori", n: "未归·羽织凛音", r: "R", kind: "fashion", face: "rion", d: "羽织盖住未署名的刀。", lore: ["羽织是黑羽家的夜。", "我把刀光藏进袖里。", "家纹比心跳清楚。", "袖口有没写完的名。"] },
+    { id: "fashion_rion_bloom", n: "未归·花葬凛音", r: "SR", kind: "fashion", face: "rion", school: "cult", d: "花开在剑冢上。", lore: ["花不是开给活人的。", "我把花放在折断的飞剑旁。", "红比黑先谢。", "没有宾客。"] },
+    { id: "fashion_sayo_crown", n: "终夜樱冠", r: "SSR", kind: "fashion", face: "sayo", school: "shrine", legend: true, d: "冠亮着，夜已经结束。", lore: ["这是最后一顶还给小夜的冠。", "金边裂开以后还在发光。", "我把它戴上，像把失败戴正。", "冠比头骨持久。"] },
+    { id: "fashion_aya_funeral", n: "零号葬仪", r: "SSR", kind: "fashion", face: "aya", school: "gun", legend: true, d: "企业为零件举行葬礼。", lore: ["零号企业给拆开的人格开葬仪。", "白花不是安慰，是清单。", "我穿着黑大衣去领自己的那一份。", "没有遗像，只有工号。"] },
+    { id: "fashion_rion_bride", n: "黄泉花嫁", r: "SSR", kind: "fashion", face: "rion", school: "cult", legend: true, d: "嫁妆是一把葬刀。", lore: ["黄泉不收活人的聘礼。", "红盖头下面还是凛音。", "刀比誓词先落地。", "没有人来掀盖头。"] },
+  ]);
+  var WEAPON_CARDS = Object.freeze([
+    { id: "weapon_sayo_spare", n: "备用夜樱弹", r: "N", kind: "weapon", face: "sayo", d: "备用弹也不够打穿镜核。", lore: ["备用弹匣写着小夜。", "我数过，还是不够。", "樱花印在弹壳上。", "最后一发留给没回来的人。"] },
+    { id: "weapon_sayo_petal", n: "花瓣弹匣", r: "R", kind: "weapon", face: "sayo", d: "花比子弹先落地。", lore: ["弹匣里落下花瓣。", "我还是推弹上膛。", "花不会飞向镜核。", "空仓响了一下。"] },
+    { id: "weapon_aya_side", n: "侧持短铳", r: "N", kind: "weapon", face: "aya", d: "侧持是为了留出拔刀的手。", lore: ["短铳在右侧。", "左侧留给太刀。", "这一次刀没出鞘。", "铳先空。"] },
+    { id: "weapon_aya_twin", n: "双持月切", r: "R", kind: "weapon", face: "aya", d: "两把都来不及。", lore: ["我试过两把一起。", "准星和刀锋互相抢。", "花瓣落在两只手上。", "都没砍到该砍的人。"] },
+    { id: "weapon_rion_wood", n: "无铭木刀", r: "N", kind: "weapon", face: "rion", d: "木刀也会折。", lore: ["木刀没有署名。", "稽古场的夜特别长。", "它先于飞剑折断。", "木屑比血轻。"] },
+    { id: "weapon_rion_under", n: "鞘中黑羽", r: "R", kind: "weapon", face: "rion", d: "刀还在鞘里。", lore: ["黑羽藏在鞘中。", "我以为不出刃就能少折一把。", "鞘先裂。", "里面是空的。"] },
+    { id: "weapon_mirror_round", n: "圆镜盾刃", r: "SR", kind: "weapon", face: "aya", any: true, d: "圆镜能挡一次。", lore: ["圆镜不是给谁单独用的。", "它照见三张脸，哪张都不全。", "挡完就裂。", "裂片还亮。"] },
+    { id: "weapon_shard_blade", n: "裂镜片刃", r: "SR", kind: "weapon", face: "sayo", any: true, d: "片刃从镜里长出来。", lore: ["这把刀没有锻造。", "它是镜碎以后自己站起来的。", "谁拿都会被划到。", "刃比人薄。"] },
+    { id: "weapon_radio_bat", n: "电台短棍", r: "SR", kind: "weapon", face: "sayo", any: true, d: "还在播的那根天线。", lore: ["电台被拧下来当短棍。", "电流还在笑。", "打到的人听得见夜话。", "电池先死。"] },
+    { id: "weapon_sayo_final", n: "夜樱终弹", r: "SSR", kind: "weapon", face: "sayo", legend: true, d: "只剩最后一发。", lore: ["终弹是写给小夜的。", "步枪比人更知道这是最后一次。", "樱花开在空仓上。", "打出去就没有下一夜。"] },
+    { id: "weapon_aya_mirror", n: "月切·镜反", r: "SSR", kind: "weapon", face: "aya", legend: true, d: "刀刃是碎掉的镜子。", lore: ["月切反的是镜，不是月。", "我从刃里看见自己出鞘太慢。", "手枪还在另一只手。", "反出去的是空弹壳。"] },
+    { id: "weapon_rion_burial", n: "黑羽葬", r: "SSR", kind: "weapon", face: "rion", legend: true, d: "这把刀是墓碑。", lore: ["黑羽葬插在剑冢最深处。", "它比飞剑更像结局。", "我握住它，像握住自己的坟。", "没有人来上香。"] },
+  ]);
+  var CHRONICLE = Object.freeze([
+    { id: "ch_zero_death", n: "第零次死亡", lore: ["三年前我就死在镜界实验里。神社扫地的那个人，可能只是备份。", "他们把我的名字写回名册，像把打翻的水倒回杯里。水已经不是原来那杯。", "我记得冷，记得镜核亮起来，不记得谁把我从名册上擦掉。", "如果现在的我是备份，那第一夜的我，还欠一句再见。"] },
+    { id: "ch_hundred_eyes", n: "百目共视", lore: ["百目不是监视器。是很多双已经死过的眼睛，叠在同一副眼眶里。", "每次有人走进镜核，那些眼睛就替我再看一次。看到的都是同一条死路。", "绫说企业管这叫采集。凛音说黄泉流早写过。我只觉得眼睛不够用。", "共视结束的时候，没有人眨眼。"] },
+    { id: "ch_zero_corp", n: "零号企业", lore: ["绫的企业不生产枪，生产可替换的人。我是被拆借过的零件之一。", "他们把「会怕」单独装进一间实验室，把「还会回来」装进另一间。", "巫女那一夜不是这条线。这条线没有符，只有工号和作废券。", "拆完以后，他们说还可以再组装一个小夜。价格另议。"] },
+    { id: "ch_sword_mound", n: "失败者剑冢", lore: ["剑冢里每一把剑都是一条没走到核心的我。所有小夜都来过，没人留下脚印。", "我数过，数到后来不敢数。刀柄上的名字有的是我，有的快要不是。", "凛音从旁边走过，没有鞠躬。她认得这些刀，比我更认得。", "核心还在最里面。我们都走到过门口，门上没有锁，只有上一夜的我。"] },
+    { id: "ch_after_zero", n: "镜零之后", lore: ["镜零是失败的小夜训练出来的。训练的不是胜利，是怎么把下一夜送回去。", "碎镜以后又醒来一个我。她问这是第几次。我没有数字可以给她。", "电台还在播，封条还在写同一个字。备份和原件已经吵不清楚。", "如果还有下一夜，让她别再把我写成一张完整的卡。"] },
+  ]);
+  var SCHOOL_CARDS = Object.freeze([
+    { id: "school_shrine", n: "未归·巫女小夜", r: "SR", kind: "school", tag: "基础", school: "shrine", face: "sayo", dmg: 0.006, d: "符没封住镜核。拥有即巫女倾向 ×1.3。", lore: ["我是神社那一夜的小夜。符纸写着我的名字，镜核比名字先亮。", "我把封条一层层贴上步枪，贴上鸟居，贴上自己的袖口。外面的备份还在扫地。", "符烧完了，镜核还在转。裂口从镜里爬到我肩上，朱砂写成失败。", "我仍举着枪。封条先落地。"] },
+    { id: "school_idol", n: "未归·歌姬小夜", r: "R", kind: "school", tag: "基础", school: "idol", face: "sayo", dmg: 0.003, d: "电台还在响人已不在。拥有即歌姬倾向 ×1.3。", lore: ["我是被推进舞台的那一版小夜。观众席是空的，只有电台还在报时。", "歌比子弹先出门。我把步枪靠在脚边，对着没有人的灯光把词唱完。", "声带还在，人已经不在频率上。电台替我鞠躬，我跪在花瓣里。", "下一首歌自动连播。没有返场。"] },
+    { id: "school_magical", n: "未归·魔法少女小夜", r: "R", kind: "school", tag: "基础", school: "magical", face: "sayo", dmg: 0.003, d: "冠亮着变身没转好。拥有即魔法少女倾向 ×1.3。", lore: ["我是想把完整的一夜戴在头上的小夜。冠比我先发光。", "变身只走到一只手套。其余的我还是神社那件外套，步枪没有变成权杖。", "冠还亮，身体没转完。花瓣往上飞，我往下坠，妆裂在眼角。", "金边还烫。咒语停在一半。"] },
+    { id: "school_mech", n: "未归·机械师小夜", r: "R", kind: "school", tag: "基础", school: "mech", face: "sayo", dmg: 0.003, d: "无人机先死步枪还在。拥有即机械师倾向 ×1.3。", lore: ["我是把无人机当姐姐的那一版。它先看见镜核，也先掉下来。", "油污和樱花一起沾在白外套上。我修它的镜头，比修自己的准星勤快。", "螺旋桨停转的时候，步枪还在我手里。火花比求救声响。", "屏幕黑了。我还握着没坏的那一边。"] },
+    { id: "school_spore", n: "未归·菌群小夜", r: "R", kind: "school", tag: "基础", school: "spore", face: "sayo", dmg: 0.003, d: "菌海不认主人。拥有即菌群倾向 ×1.3。", lore: ["我是把菌海认作姐妹的小夜。它们发光，却不听我的姓。", "孢子爬上步枪和脸颊，像另一层妆。我伸手，菌丝绕开我，去找更热的东西。", "菌海选择了镜核，没有选择主人。我变成它们路过的一截木头。", "蘑菇还亮。我的手是空的。"] },
+    { id: "school_gun", n: "未归·枪斗绫", r: "SR", kind: "school", tag: "基础", school: "gun", face: "aya", dmg: 0.006, d: "弹打空近身刀没来得及。拥有即枪斗倾向 ×1.3。", lore: ["我是零号企业最锋利的那条枪线。手枪是呼吸，太刀是没来得及说的话。", "我把弹匣数得很干净。花瓣总是提醒我再快一点，我偏要再稳一点。", "最后一发打空，刀还在鞘里。近身的爪子已经摸到领口。", "套筒后锁。刀柄是凉的。"] },
+    { id: "school_mage", n: "未归·魔法师绫", r: "R", kind: "school", tag: "基础", school: "mage", face: "aya", dmg: 0.003, d: "主神券作废。拥有即魔法师倾向 ×1.3。", lore: ["我是捏着通行证进圣所的绫。券是金的，门是假的。", "法阵画在水里，手枪还在腰上。我以为规则能被念咒改写。", "券面盖了作废。墨从掌心滴进法阵，法阵先死。", "VOID 两个字母比我的名字清楚。"] },
+    { id: "school_alch", n: "未归·炼金绫", r: "R", kind: "school", tag: "基础", school: "alch", face: "aya", dmg: 0.003, d: "封条当坩埚盖。拥有即炼金倾向 ×1.3。", lore: ["我是把神社封条当瓶盖的绫。朱印能骗人，骗不了沸腾。", "手枪看守火候，太刀切开试剂。我把别人的名字熬成能喝的东西。", "盖子先着。封条在坩埚里烧成失败的味道，玻璃也裂了。", "药还在响。人已经不值得过滤。"] },
+    { id: "school_ninja", n: "未归·忍者绫", r: "R", kind: "school", tag: "基础", school: "ninja", face: "aya", dmg: 0.003, d: "影遁出界人没回来。拥有即忍者倾向 ×1.3。", lore: ["我是从镜缝里进出的那条影。外面的我负责开枪，里面的我负责消失。", "分身比本体勤快。我把太刀留给回来的那一格，手枪留给还在的这一格。", "影遁出了界。分身散掉，本体没有从裂镜对面走回来。", "残影还举着枪。人已经不在这一侧。"] },
+    { id: "school_vamp", n: "未归·血族绫", r: "R", kind: "school", tag: "基础", school: "vamp", face: "aya", dmg: 0.003, d: "最后一口吸空的是自己。拥有即血族倾向 ×1.3。", lore: ["我是把活下去做成饮品的绫。血不是别人的，是企业拆剩下的我。", "手枪守墓园，太刀守喉咙。花谢得比夜快，我喝得比花快。", "最后一瓶写着自己的名字。吸空以后，连开枪的力气都退色。", "瓶是空的。泪比血晚到。"] },
+    { id: "school_cult", n: "未归·修仙凛音", r: "SR", kind: "school", tag: "基础", school: "cult", face: "rion", dmg: 0.006, d: "飞剑折在剑冢。拥有即修仙倾向 ×1.3。", lore: ["我是黑羽家被送去飞升的那一页。飞剑比家谱先出门。", "剑冢里每把剑都认识我。我路过那些失败的小夜，没有对任何一把鞠躬。", "飞剑折在别人的坟上。刃还在振，飞的那一半回不来。", "我握住折断的那截。天没有开。"] },
+    { id: "school_necro", n: "未归·死灵凛音", r: "R", kind: "school", tag: "基础", school: "necro", face: "rion", dmg: 0.003, d: "看见终章把自己收成魂火。拥有即死灵倾向 ×1.3。", lore: ["我是看见终章以后还想收尸的凛音。先收下的是自己。", "魂火从掌心往上爬。刀还在，名字开始透明。", "我把凛音当成可召唤物。契约成立的瞬间，人变成燃料。", "火还亮。署名栏空了。"] },
+    { id: "school_gene", n: "未归·基因凛音", r: "R", kind: "school", tag: "基础", school: "gene", face: "rion", dmg: 0.003, d: "再生没跑过突变。拥有即基因倾向 ×1.3。", lore: ["我是被改过刀法和血的凛音。再生写在合同里，突变写在肉里。", "实验室的灯和鸟居的灯一起亮。我用刀压住往外长的那只手臂。", "再生追上伤口，没追上镜裂。红晶比皮肤先成为我。", "刀还认得手。手不太认得我。"] },
+    { id: "school_summon", n: "未归·召唤凛音", r: "R", kind: "school", tag: "基础", school: "summon", face: "rion", dmg: 0.003, d: "契约反噬。拥有即召唤倾向 ×1.3。", lore: ["我是把影子当部下的凛音。契约纸比刀快，反噬比部下快。", "我在腕上缠满符。刀尖指着该来的东西，它从背后先来。", "契约反咬署名。红线勒进刀柄，影子比我更高。", "符烧完了。部下还在，主人不在。"] },
+  ]);
+
+  var SCRAP_BONUS = Object.freeze({
+    sayo_echo: { crit: 0.005 },
+    aya_petal: { spd: 0.005 },
+    rion_edge: { blade: 0.01 },
+    night_radio: { skillCd: 0.005 },
+    shrine_seal: { reduce: 0.004 },
+    void_ticket: { shield: 4 },
+    cherry_crown: { dmg: 0.008 },
+    last_witness: { hp: 0.01 },
   });
 
-  var BY_RARITY = { N: [], R: [], SR: [], SSR: [] };
-  CARDS.forEach(function (card) {
-    BY_RARITY[card.r].push(card);
-  });
+  var CARD_MAP = Object.create(null);
+  function indexCards(list) {
+    list.forEach(function (card) {
+      CARD_MAP[card.id] = card;
+    });
+  }
+  indexCards(CARDS);
+  indexCards(FASHION_CARDS);
+  indexCards(WEAPON_CARDS);
+  indexCards(SCHOOL_CARDS);
+
+  function remnantList() {
+    return CARDS.concat(SCHOOL_CARDS);
+  }
+
+  function cardsForPool(pool) {
+    if (pool === "fashion") return FASHION_CARDS;
+    if (pool === "weapon") return WEAPON_CARDS;
+    return remnantList();
+  }
+
+  function groupByRarity(list) {
+    var out = { N: [], R: [], SR: [], SSR: [] };
+    list.forEach(function (card) {
+      if (out[card.r]) out[card.r].push(card);
+    });
+    return out;
+  }
+
+  var BY_RARITY = groupByRarity(CARDS);
 
   var LOBBY_CSS =
     "html,body{width:100%;height:100%;overscroll-behavior:none}" +
@@ -64,7 +155,7 @@
     ".wishHero46{position:absolute;z-index:2;left:-4%;bottom:-6%;width:58%;height:118%;object-fit:contain;object-position:left bottom;background:transparent!important;pointer-events:none;-webkit-mask-image:linear-gradient(to top,transparent 0%,#000 12%,#000 100%);mask-image:linear-gradient(to top,transparent 0%,#000 12%,#000 100%)}" +
     ".wishPetals46{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden}" +
     ".wishPetals46 i{position:absolute;top:-12%;width:7px;height:9px;border-radius:0 70% 0 70%;background:#ff9bcc99;box-shadow:0 0 8px #ff9bcc66;animation:petalFall46 11s linear infinite}" +
-    ".wishTitle46{position:absolute;z-index:4;top:max(14px,calc(env(safe-area-inset-top) + 6px));right:16px;left:auto;text-align:right;max-width:58%;pointer-events:none}" +
+    ".wishTitle46{position:absolute;z-index:4;top:max(52px,calc(env(safe-area-inset-top) + 44px));right:16px;left:auto;text-align:right;max-width:58%;pointer-events:none}" +
     ".wishTitle46 h3{margin:0;font-size:clamp(26px,5.6vw,40px);letter-spacing:.28em;color:#fff7fb;text-shadow:0 0 22px #ff9bcc99,0 4px 18px #05020d}" +
     ".wishTitle46 p{margin:6px 0 0;color:#ffe7a3;font-size:11px;letter-spacing:.18em;text-shadow:0 2px 10px #05020d}" +
     ".wishPity46{position:absolute;z-index:4;left:12px;right:12px;bottom:118px;padding:8px 10px;border-radius:14px;background:#0b0818cc;border:1px solid #ffe6a333}" +
@@ -75,12 +166,31 @@
     ".pityRail46 i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ffe08a,#ffd36b 70%,#fff4c4);box-shadow:0 0 12px #ffd36b}" +
     ".pityRow46.sr .pityRail46 i{background:linear-gradient(90deg,#c18cff,#9c8cff)}" +
     ".wishDock46{position:absolute;z-index:5;left:0;right:0;bottom:0;padding:10px 12px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#06041000,#060410ee 34%,#060410)}" +
+    ".wishTabs46{position:absolute;z-index:6;top:max(14px,calc(env(safe-area-inset-top) + 6px));left:12px;display:flex;gap:6px}" +
+    ".wishTabs46 button{min-height:32px;padding:0 12px;border-radius:999px;border:1px solid #ffe6a355;background:#0b0818cc;color:#ffe7a3;font:800 11px/1 system-ui;letter-spacing:.12em}" +
+    ".wishTabs46 button.on{background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;border-color:#ffe6a3aa}" +
     ".wishPills46{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px}" +
     ".wishPills46 b{padding:4px 10px;border-radius:999px;background:#0b0818cc;border:1px solid #ffe6a355;color:#ffe7a3;font-size:10px;letter-spacing:.1em}" +
+    ".rosterTabs46{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}" +
+    ".rosterTabs46 button{min-height:32px;padding:0 12px;border-radius:999px;border:1px solid #ffe6a355;background:#0b0818cc;color:#ffe7a3;font:800 11px/1 system-ui;letter-spacing:.12em}" +
+    ".rosterTabs46 button.on{background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;border-color:#ffe6a3aa}" +
+    ".rosterLater46{min-height:180px;display:grid;place-items:center;border:1px dashed #ffe6a344;border-radius:16px;color:#bfb1d3;letter-spacing:.2em;font:800 13px/1.4 system-ui}" +
+    ".revealCard46.r-LEGEND .revealFace46{border-color:#ffe6a3;box-shadow:0 0 26px #ffd36baa}" +
+    ".revealLegend46{position:absolute;z-index:4;left:7px;bottom:36px;padding:3px 7px;border-radius:6px;background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;font:800 9px/1 system-ui;letter-spacing:.14em}" +
     ".gachaActions46{display:grid;grid-template-columns:1fr 1fr;gap:10px}" +
     ".gachaActions46 button{min-height:54px;border-radius:16px;border:1px solid #ff9bcc66;color:#fff;font:800 15px/1.1 system-ui;letter-spacing:.14em;box-shadow:0 10px 24px #05020d66}" +
     ".gachaActions46 button small{display:block;margin-top:3px;font:700 10px/1 system-ui;letter-spacing:.08em;opacity:.88}" +
     ".gachaActions46 button.poor{opacity:.42}" +
+    ".wishSpark46{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}" +
+    ".wishSpark46 button{min-height:28px;padding:0 8px;border-radius:999px;border:1px solid #ffe6a355;background:#0b0818cc;color:#ffe7a3;font:800 10px/1 system-ui}" +
+    ".wishSpark46 button.poor{opacity:.42}" +
+    ".rosterEquip46{margin-top:8px;min-height:36px;padding:0 12px;border-radius:10px;border:1px solid #ffe6a366;background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;font:800 12px/1 system-ui}" +
+    ".chronicleBox46{display:grid;gap:10px}" +
+    ".chronicleCard46{padding:12px;border-radius:14px;border:1px solid #ffe6a344;background:#0b0818cc;color:#fff7fb;text-align:left}" +
+    ".chronicleCard46 b{display:block;margin:0 0 6px;color:#ffe7a3;letter-spacing:.14em}" +
+    ".chronicleCard46 p{margin:0 0 6px;color:#f4eaf4;font-size:12px;line-height:1.55}" +
+    ".homeNav46{position:relative;z-index:8}" +
+    "#menu.homeDock46 .nav{position:relative;z-index:8}" +
     "#gachaPull1{background:linear-gradient(180deg,#ff86cc,#ff3d9a 58%,#b02078);border-color:#ffb6d888}" +
     "#gachaPull10{background:linear-gradient(180deg,#ffe08a,#f0c14a 42%,#d8892b);border-color:#ffe6a3aa;color:#2a1608}" +
     "#gachaReveal46{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(44px,env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom));background:radial-gradient(circle at 50% 40%,#4a2878ee,#12081cf6 68%)}" +
@@ -282,20 +392,40 @@
     return n;
   }
 
-  function emptyOwned() {
+  function emptyOwned(list) {
     var owned = {};
-    CARDS.forEach(function (card) {
+    (list || CARDS).forEach(function (card) {
       owned[card.id] = 0;
     });
     return owned;
   }
 
+  function normalizePool(raw, list) {
+    var incoming = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+    var owned = emptyOwned(list);
+    var rawOwned = incoming.owned && typeof incoming.owned === "object" && !Array.isArray(incoming.owned) ? incoming.owned : {};
+    list.forEach(function (card) {
+      owned[card.id] = clampInt(rawOwned[card.id], 0, 9999);
+    });
+    return {
+      pity: clampInt(incoming.pity, 0, RATES.pitySSR),
+      pitySR: clampInt(incoming.pitySR, 0, RATES.pitySR),
+      pulls: clampInt(incoming.pulls, 0, 999999),
+      tenPulls: clampInt(incoming.tenPulls, 0, 999999),
+      owned: owned,
+      last: Array.isArray(incoming.last) ? incoming.last.slice(0, 20) : [],
+      equipped: typeof incoming.equipped === "string" ? incoming.equipped : "",
+      shards: clampInt(incoming.shards, 0, 999999),
+    };
+  }
+
   function normalizeOps(shop40) {
     var shop = shop40 && typeof shop40 === "object" && !Array.isArray(shop40) ? shop40 : {};
     var incoming = shop.ops && typeof shop.ops === "object" && !Array.isArray(shop.ops) ? shop.ops : {};
-    var owned = emptyOwned();
+    var catalog = remnantList();
+    var owned = emptyOwned(catalog);
     var rawOwned = incoming.owned && typeof incoming.owned === "object" && !Array.isArray(incoming.owned) ? incoming.owned : {};
-    CARDS.forEach(function (card) {
+    catalog.forEach(function (card) {
       owned[card.id] = clampInt(rawOwned[card.id], 0, 9999);
     });
     var seeded = Object.keys(rawOwned).length === 0;
@@ -304,6 +434,10 @@
         if (owned[id] < 1) owned[id] = 1;
       });
     }
+    var pool = incoming.pool === "fashion" || incoming.pool === "weapon" ? incoming.pool : "remnant";
+    var rosterTab = incoming.rosterTab === "school" || incoming.rosterTab === "fashion" || incoming.rosterTab === "weapon" || incoming.rosterTab === "chronicle"
+      ? incoming.rosterTab
+      : "scrap";
     shop.ops = {
       pity: clampInt(incoming.pity, 0, RATES.pitySSR),
       pitySR: clampInt(incoming.pitySR, 0, RATES.pitySR),
@@ -312,6 +446,11 @@
       owned: owned,
       last: Array.isArray(incoming.last) ? incoming.last.slice(0, 20) : [],
       cheatUsed: incoming.cheatUsed ? 1 : 0,
+      shards: clampInt(incoming.shards, 0, 999999),
+      pool: pool,
+      rosterTab: rosterTab,
+      fashion: normalizePool(incoming.fashion, FASHION_CARDS),
+      weapon: normalizePool(incoming.weapon, WEAPON_CARDS),
     };
     return shop;
   }
@@ -325,33 +464,110 @@
     DEFAULT_SHOWN.forEach(function (id) {
       if (out.indexOf(id) < 0) out.push(id);
     });
-    CARDS.forEach(function (card) {
+    remnantList().forEach(function (card) {
       if ((ops.owned[card.id] || 0) > 0 && out.indexOf(card.id) < 0) out.push(card.id);
     });
     return out;
   }
 
-  function pickOfRarity(rarity, rng) {
-    var pool = BY_RARITY[rarity] || BY_RARITY.N;
+  function ownedCount(ops, list) {
+    var n = 0;
+    (list || []).forEach(function (card) {
+      if ((ops.owned[card.id] || 0) > 0) n += 1;
+    });
+    return n;
+  }
+
+  function hasSchool(save, school) {
+    var shop = normalizeOps((save && save.shop40) || {});
+    var id = String(school || "");
+    if (!id) return false;
+    if (SCHOOL_CARDS.some(function (card) {
+      return card.school === id && (shop.ops.owned[card.id] || 0) > 0;
+    })) return true;
+    var feq = cardOf(shop.ops.fashion && shop.ops.fashion.equipped);
+    return !!(feq && feq.school === id && (shop.ops.fashion.owned[feq.id] || 0) > 0);
+  }
+
+  function pickOfRarity(rarity, rng, list, owned) {
+    var grouped = groupByRarity(list || CARDS);
+    var pool = grouped[rarity] && grouped[rarity].length ? grouped[rarity] : grouped.R.length ? grouped.R : grouped.N;
+    if (!pool || !pool.length) return null;
+    if (owned && rarity === "SSR") {
+      var fresh = pool.filter(function (card) { return (owned[card.id] || 0) < 1; });
+      if (fresh.length) pool = fresh;
+    }
     return pool[Math.floor(rng() * pool.length) % pool.length];
   }
 
-  function rollRarity(ops, rng) {
+  function hasRarity(list, rarity) {
+    var c;
+    for (c = 0; c < list.length; c++) {
+      if (list[c].r === rarity) return true;
+    }
+    return false;
+  }
+
+  function highestRarity(list) {
+    var i;
+    for (i = 0; i < RARITY_RANK.length; i++) {
+      if (hasRarity(list, RARITY_RANK[i])) return RARITY_RANK[i];
+    }
+    return null;
+  }
+
+  function lowestRarity(list) {
+    var i;
+    for (i = RARITY_RANK.length - 1; i >= 0; i--) {
+      if (hasRarity(list, RARITY_RANK[i])) return RARITY_RANK[i];
+    }
+    return null;
+  }
+
+  function downgradeRarity(want, list) {
+    if (want === "SSR" && !hasRarity(list, "SSR")) return highestRarity(list);
+    var start = RARITY_RANK.indexOf(want);
+    if (start < 0) start = 0;
+    var i;
+    for (i = start; i < RARITY_RANK.length; i++) {
+      if (hasRarity(list, RARITY_RANK[i])) return RARITY_RANK[i];
+    }
+    return lowestRarity(list);
+  }
+
+  function ssrRate(pity) {
+    if (pity + 1 >= RATES.pitySSR) return 1;
+    if (pity + 1 < RATES.softPity) return RATES.SSR;
+    var span = RATES.pitySSR - RATES.softPity;
+    var step = (pity + 1 - RATES.softPity) / span;
+    return Math.min(1, RATES.SSR + step * (1 - RATES.SSR));
+  }
+
+  function rollWant(ops, rng) {
     if (ops.pity + 1 >= RATES.pitySSR) return "SSR";
     if (ops.pitySR + 1 >= RATES.pitySR) return "SR";
+    var ssr = ssrRate(ops.pity);
     var roll = rng();
-    if (roll < RATES.SSR) return "SSR";
-    if (roll < RATES.SSR + RATES.SR) return "SR";
-    if (roll < RATES.SSR + RATES.SR + RATES.R) return "R";
+    if (roll < ssr) return "SSR";
+    if (roll < ssr + RATES.SR) return "SR";
+    if (roll < ssr + RATES.SR + RATES.R) return "R";
     return "N";
   }
 
-  function applyPull(ops, rng) {
-    var rarity = rollRarity(ops, rng);
-    var card = pickOfRarity(rarity, rng);
+  function poolState(ops, pool) {
+    if (pool === "fashion") return ops.fashion;
+    if (pool === "weapon") return ops.weapon;
+    return ops;
+  }
+
+  function applyPull(ops, rng, list, shardHost) {
+    var want = rollWant(ops, rng);
+    var rarity = downgradeRarity(want, list);
+    var card = pickOfRarity(rarity, rng, list, ops.owned);
+    if (!card) return null;
     ops.pity += 1;
     ops.pitySR += 1;
-    if (card.r === "SSR") {
+    if (card.r === "SSR" || want === "SSR") {
       ops.pity = 0;
       ops.pitySR = 0;
     } else if (card.r === "SR") {
@@ -360,33 +576,48 @@
     var prev = ops.owned[card.id] || 0;
     ops.owned[card.id] = clampInt(prev + 1, 0, 9999);
     ops.pulls += 1;
-    return { id: card.id, r: card.r, n: card.n, pity: ops.pity, isNew: prev === 0 };
+    shardHost.shards = clampInt((shardHost.shards || 0) + RATES.shardPull, 0, 999999);
+    if (prev > 0) shardHost.shards = clampInt(shardHost.shards + RATES.shardDupe, 0, 999999);
+    return { id: card.id, r: card.r, n: card.n, pity: ops.pity, isNew: prev === 0, kind: card.kind || "", legend: !!card.legend };
   }
 
-  function pull(save, count, rng) {
+  function pull(save, count, rng, poolId) {
     var n = count === 10 ? 10 : 1;
     var cost = n === 10 ? RATES.ten : RATES.single;
     if (!save || typeof save !== "object") return { ok: false, reason: "save", results: [] };
     save.shop40 = normalizeOps(save.shop40 || {});
+    var pool = poolId || save.shop40.ops.pool || "remnant";
+    if (POOL_IDS.indexOf(pool) < 0) pool = "remnant";
+    var list = cardsForPool(pool);
     var coins = clampInt(save.coins, 0, 99999999);
+    if (!list.length) {
+      return { ok: false, reason: "empty", results: [], coins: coins, pool: pool, pity: save.shop40.ops.pity, pitySR: save.shop40.ops.pitySR, owned: save.shop40.ops.owned };
+    }
     if (coins < cost) {
-      return { ok: false, reason: "coins", results: [], coins: coins, pity: save.shop40.ops.pity, pitySR: save.shop40.ops.pitySR, owned: save.shop40.ops.owned };
+      return { ok: false, reason: "coins", results: [], coins: coins, pool: pool, pity: save.shop40.ops.pity, pitySR: save.shop40.ops.pitySR, owned: save.shop40.ops.owned };
     }
     var rand = typeof rng === "function" ? rng : Math.random;
+    var state = poolState(save.shop40.ops, pool);
+    var shardHost = pool === "remnant" ? save.shop40.ops : state;
     var results = [];
-    for (var i = 0; i < n; i++) results.push(applyPull(save.shop40.ops, rand));
-    if (n === 10) save.shop40.ops.tenPulls += 1;
-    save.shop40.ops.last = results.slice();
+    for (var i = 0; i < n; i++) {
+      var row = applyPull(state, rand, list, shardHost);
+      if (row) results.push(row);
+    }
+    if (n === 10) state.tenPulls += 1;
+    state.last = results.slice();
     save.coins = coins - cost;
     return {
       ok: true,
       results: results,
       coins: save.coins,
+      pool: pool,
       pity: save.shop40.ops.pity,
       pitySR: save.shop40.ops.pitySR,
       owned: save.shop40.ops.owned,
       pulls: save.shop40.ops.pulls,
       tenPulls: save.shop40.ops.tenPulls,
+      shards: save.shop40.ops.shards,
     };
   }
 
@@ -414,21 +645,132 @@
     return {
       version: VERSION,
       rates: RATES,
+      pages: POOL_IDS.slice(),
+      rosterTabs: ROSTER_TABS.slice(),
+      pool: ops.pool,
+      rosterTab: ops.rosterTab,
       cards: CARDS.map(function (card) {
-        return { id: card.id, n: card.n, r: card.r, count: ops.owned[card.id] || 0 };
+        return { id: card.id, n: card.n, r: card.r, kind: card.kind || "scrap", count: ops.owned[card.id] || 0 };
       }),
+      schoolCards: SCHOOL_CARDS.map(function (card) {
+        return { id: card.id, n: card.n, r: card.r, kind: "school", school: card.school, count: ops.owned[card.id] || 0 };
+      }),
+      schoolOwned: ownedCount(ops, SCHOOL_CARDS),
       shown: shownIds(ops),
       owned: ops.owned,
       pity: ops.pity,
       pitySR: ops.pitySR,
       pulls: ops.pulls,
       tenPulls: ops.tenPulls,
+      shards: ops.shards,
+      fashion: ops.fashion,
+      weapon: ops.weapon,
       coins: clampInt(save && save.coins, 0, 99999999),
       cheatUsed: !!ops.cheatUsed,
     };
   }
 
-  function rarityLabel(r) {
+  function applyOwnedBonus(player, save) {
+    if (!player || typeof player !== "object") return player;
+    var shop = normalizeOps((save && save.shop40) || {});
+    var owned = shop.ops.owned || {};
+    var cid = (save && save.character) || player.character || "";
+    CARDS.forEach(function (card) {
+      if ((owned[card.id] || 0) < 1) return;
+      var bonus = SCRAP_BONUS[card.id];
+      if (!bonus) return;
+      if (bonus.crit) player.crit = (player.crit || 0) + bonus.crit;
+      if (bonus.spd) player.spd = (player.spd || 0) * (1 + bonus.spd);
+      if (bonus.blade) {
+        player.bladePower = (player.bladePower || 1) * (1 + bonus.blade);
+        if (cid === "rion") player.dmg = (player.dmg || 0) * (1 + bonus.blade);
+      }
+      if (bonus.skillCd) player.skillCd = (player.skillCd || 0) * (1 - bonus.skillCd);
+      if (bonus.reduce) player.damageReduce = (player.damageReduce || 0) + bonus.reduce;
+      if (bonus.shield) {
+        player.maxSh = (player.maxSh || 0) + bonus.shield;
+        player.sh = (player.sh || 0) + bonus.shield;
+      }
+      if (bonus.dmg) player.dmg = (player.dmg || 0) * (1 + bonus.dmg);
+      if (bonus.hp) {
+        player.maxHp = (player.maxHp || 0) * (1 + bonus.hp);
+        player.hp = player.maxHp;
+      }
+    });
+    var schoolN = 0;
+    SCHOOL_CARDS.forEach(function (card) {
+      if ((owned[card.id] || 0) < 1) return;
+      schoolN += 1;
+      if (card.dmg) player.dmg = (player.dmg || 0) * (1 + card.dmg);
+    });
+    if (schoolN >= 7) player.dmg = (player.dmg || 0) * 1.02;
+    if (schoolN >= 14) player.dmg = (player.dmg || 0) * 1.03;
+    var fashion = shop.ops.fashion || {};
+    var fcard = cardOf(fashion.equipped);
+    if (fcard && (fashion.owned[fcard.id] || 0) > 0) {
+      var fmul = fcard.legend || fcard.r === "SSR" ? 0.08 : fcard.r === "SR" ? 0.04 : fcard.r === "R" ? 0.02 : 0.01;
+      player.dmg = (player.dmg || 0) * (1 + fmul);
+    }
+    var weapon = shop.ops.weapon || {};
+    var wcard = cardOf(weapon.equipped);
+    if (wcard && (weapon.owned[wcard.id] || 0) > 0) {
+      var wmul = wcard.legend || wcard.r === "SSR" ? 0.14 : wcard.r === "SR" ? 0.08 : wcard.r === "R" ? 0.04 : 0.02;
+      if (wcard.face && wcard.face !== cid && !wcard.any) wmul *= 0.5;
+      player.dmg = (player.dmg || 0) * (1 + wmul);
+    }
+    return player;
+  }
+
+  function setPool(save, pool) {
+    save = save || {};
+    save.shop40 = normalizeOps(save.shop40 || {});
+    save.shop40.ops.pool = pool === "fashion" || pool === "weapon" ? pool : "remnant";
+    return save.shop40.ops.pool;
+  }
+
+  function setRosterTab(save, tab) {
+    save = save || {};
+    save.shop40 = normalizeOps(save.shop40 || {});
+    save.shop40.ops.rosterTab = ROSTER_TABS.indexOf(tab) >= 0 || tab === "chronicle" ? tab : "scrap";
+    return save.shop40.ops.rosterTab;
+  }
+
+  function spark(save, poolId, cardId) {
+    if (!save || typeof save !== "object") return { ok: false, reason: "save" };
+    save.shop40 = normalizeOps(save.shop40 || {});
+    var pool = poolId || save.shop40.ops.pool || "remnant";
+    if (POOL_IDS.indexOf(pool) < 0) pool = "remnant";
+    var list = cardsForPool(pool);
+    var card = null;
+    list.forEach(function (item) { if (item.id === cardId) card = item; });
+    if (!card) return { ok: false, reason: "card", pool: pool };
+    if (card.kind === "scrap") return { ok: false, reason: "scrap", pool: pool };
+    if (!card.legend && card.r !== "SSR") return { ok: false, reason: "rarity", pool: pool };
+    var state = poolState(save.shop40.ops, pool);
+    var shardHost = pool === "remnant" ? save.shop40.ops : state;
+    if ((shardHost.shards || 0) < RATES.spark) return { ok: false, reason: "shards", pool: pool, shards: shardHost.shards || 0 };
+    if ((state.owned[card.id] || 0) > 0) return { ok: false, reason: "owned", pool: pool };
+    state.owned[card.id] = 1;
+    shardHost.shards = clampInt((shardHost.shards || 0) - RATES.spark, 0, 999999);
+    return { ok: true, id: card.id, n: card.n, r: card.r, legend: !!card.legend, pool: pool, shards: shardHost.shards };
+  }
+
+  function equip(save, poolId, cardId) {
+    if (!save || typeof save !== "object") return { ok: false, reason: "save" };
+    save.shop40 = normalizeOps(save.shop40 || {});
+    var pool = poolId === "weapon" ? "weapon" : "fashion";
+    var state = poolState(save.shop40.ops, pool);
+    if (cardId) {
+      if ((state.owned[cardId] || 0) < 1) return { ok: false, reason: "owned", pool: pool };
+      var card = cardOf(cardId);
+      if (!card || card.kind !== pool) return { ok: false, reason: "card", pool: pool };
+    }
+    state.equipped = cardId || "";
+    return { ok: true, pool: pool, equipped: state.equipped };
+  }
+
+  function rarityLabel(r, legend) {
+    if (legend || r === "LEGEND") return "传说";
     return r === "SSR" ? "证人" : r === "SR" ? "稀有" : r === "R" ? "精良" : "常见";
   }
 
@@ -499,10 +841,20 @@
     if (!host) return snapshot(save);
     var info = snapshot(save);
     var hero = liveChar(save, handlers);
-    var ssrLeft = Math.max(0, RATES.pitySSR - info.pity);
-    var srLeft = Math.max(0, RATES.pitySR - info.pitySR);
-    var ssrPct = Math.max(0, Math.min(100, Math.round((info.pity / RATES.pitySSR) * 100)));
-    var srPct = Math.max(0, Math.min(100, Math.round((info.pitySR / RATES.pitySR) * 100)));
+    var pool = info.pool || "remnant";
+    var state = pool === "fashion" ? info.fashion : pool === "weapon" ? info.weapon : info;
+    var pity = state.pity || 0;
+    var pitySR = state.pitySR || 0;
+    var pulls = state.pulls || 0;
+    var shards = pool === "remnant" ? info.shards : state.shards || 0;
+    var ssrLeft = Math.max(0, RATES.pitySSR - pity);
+    var srLeft = Math.max(0, RATES.pitySR - pitySR);
+    var ssrPct = Math.max(0, Math.min(100, Math.round((pity / RATES.pitySSR) * 100)));
+    var srPct = Math.max(0, Math.min(100, Math.round((pitySR / RATES.pitySR) * 100)));
+    var empty = !cardsForPool(pool).length;
+    var poor1 = info.coins < RATES.single || empty;
+    var poor10 = info.coins < RATES.ten || empty;
+    var sub = pool === "fashion" ? "时装装备才吃满" : pool === "weapon" ? "武器装备才吃满" : "残片进仓库 · 拥有即加成";
     host.innerHTML =
       '<div class="wishStage46">' +
       '<img class="wishBanner46" data-art alt="" src="' +
@@ -514,7 +866,14 @@
       '<div class="wishPetals46">' +
       petalMarks() +
       "</div>" +
-      '<div class="wishTitle46"><h3>镜界寻访</h3><p>只进名册 · 不改枪口</p></div>' +
+      '<div class="wishTabs46" id="gachaTabs46">' +
+      '<button type="button" data-pool="remnant"' + (pool === "remnant" ? ' class="on"' : "") + ">残片</button>" +
+      '<button type="button" data-pool="fashion"' + (pool === "fashion" ? ' class="on"' : "") + ">时装</button>" +
+      '<button type="button" data-pool="weapon"' + (pool === "weapon" ? ' class="on"' : "") + ">武器</button>" +
+      "</div>" +
+      '<div class="wishTitle46"><h3>镜界寻访</h3><p>' +
+      sub +
+      "</p></div>" +
       '<div class="wishPity46"><div class="pityRow46"><span>距证人保底还有 ' +
       ssrLeft +
       ' 抽</span><div class="pityRail46"><i style="width:' +
@@ -527,23 +886,83 @@
       '<div class="wishDock46"><div class="wishPills46"><b>樱花币 ' +
       info.coins +
       "</b><b>寻访 " +
-      info.pulls +
+      pulls +
+      "</b><b>软保 " +
+      RATES.softPity +
+      "</b><b>碎镜片 " +
+      shards +
+      " / " +
+      RATES.spark +
       "</b></div>" +
       '<div class="gachaActions46"><button type="button" id="gachaPull1"' +
-      (info.coins < RATES.single ? ' class="poor"' : "") +
+      (poor1 ? ' class="poor"' : "") +
       ">单次寻访<small>" +
       RATES.single +
       '</small></button><button type="button" id="gachaPull10"' +
-      (info.coins < RATES.ten ? ' class="poor"' : "") +
+      (poor10 ? ' class="poor"' : "") +
       ">十连寻访<small>" +
       RATES.ten +
-      "</small></button></div></div></div>";
+      "</small></button></div>" +
+      sparkRow(pool, state, shards) +
+      "</div></div>";
     hideBrokenArt(host);
+    var tabs = host.querySelectorAll("#gachaTabs46 [data-pool]");
+    for (var t = 0; t < tabs.length; t++) {
+      tabs[t].onclick = function () {
+        var next = this.getAttribute("data-pool");
+        setPool(save, next);
+        if (handlers && typeof handlers.setPool === "function") handlers.setPool(next);
+        else renderGacha(host, save, handlers);
+      };
+    }
     var one = host.querySelector("#gachaPull1");
     var ten = host.querySelector("#gachaPull10");
     if (one) one.onclick = function () { (handlers && handlers.pull ? handlers.pull : function () {})(1); };
     if (ten) ten.onclick = function () { (handlers && handlers.pull ? handlers.pull : function () {})(10); };
+    var sparks = host.querySelectorAll("[data-spark]");
+    for (var s = 0; s < sparks.length; s++) {
+      sparks[s].onclick = function () {
+        var id = this.getAttribute("data-spark");
+        if (handlers && typeof handlers.spark === "function") handlers.spark(id);
+        else {
+          spark(save, pool, id);
+          renderGacha(host, save, handlers);
+        }
+      };
+    }
     return info;
+  }
+
+  function sparkRow(pool, state, shards) {
+    var missing = cardsForPool(pool).filter(function (card) {
+      return (card.legend || card.r === "SSR") && card.kind !== "scrap" && (state.owned[card.id] || 0) < 1;
+    });
+    if (!missing.length) return "";
+    var poor = (shards || 0) < RATES.spark;
+    return (
+      '<div class="wishSpark46">' +
+      missing
+        .map(function (card) {
+          return (
+            '<button type="button" data-spark="' +
+            card.id +
+            '"' +
+            (poor ? ' class="poor"' : "") +
+            ">Spark " +
+            card.n +
+            "</button>"
+          );
+        })
+        .join("") +
+      "</div>"
+    );
+  }
+
+  function loreText(card) {
+    if (card && Array.isArray(card.lore) && card.lore.length) {
+      return card.lore.join(" ");
+    }
+    return (card && card.d) || "";
   }
 
   function closeRosterPeek() {
@@ -552,13 +971,14 @@
     if (peek && peek.parentNode) peek.parentNode.removeChild(peek);
   }
 
-  function showRosterPeek(card, locked, count, handlers) {
+  function showRosterPeek(card, locked, count, handlers, tab) {
     if (!global.document) return;
     var drawer = global.document.getElementById("rosterDrawer");
     if (!drawer) return;
     closeRosterPeek();
     var overlay = global.document.createElement("div");
     overlay.id = "rosterPeek46";
+    var canEquip = !locked && (tab === "fashion" || tab === "weapon");
     overlay.innerHTML =
       '<div class="rosterPeekCard46' +
       (locked ? " lock" : "") +
@@ -567,60 +987,117 @@
       '"><div><b>' +
       (locked ? "未回收" : card.n) +
       "</b><em>" +
-      rarityLabel(card.r) +
+      rarityLabel(card.r, card.legend) +
+      (card.legend ? " · 传说" : "") +
       (locked ? "" : " · ×" + count) +
       "</em><p>" +
-      (locked ? "尚未回收。寻访点亮后才会露出立绘。" : card.d) +
-      "</p></div></div>";
+      (locked ? "尚未回收。寻访点亮后才会露出立绘。" : loreText(card)) +
+      "</p>" +
+      (canEquip ? '<button type="button" class="rosterEquip46" data-equip="' + card.id + '">装备</button>' : "") +
+      "</div></div>";
     overlay.onclick = function () {
       closeRosterPeek();
     };
+    var eq = overlay.querySelector("[data-equip]");
+    if (eq) {
+      eq.onclick = function (ev) {
+        if (ev && ev.stopPropagation) ev.stopPropagation();
+        if (handlers && typeof handlers.equip === "function") handlers.equip(tab, card.id);
+        else equip(handlers && handlers.save, tab, card.id);
+        closeRosterPeek();
+      };
+    }
     drawer.appendChild(overlay);
     hideBrokenArt(overlay);
+  }
+
+  function rosterList(tab) {
+    if (tab === "school") return SCHOOL_CARDS;
+    if (tab === "fashion") return FASHION_CARDS;
+    if (tab === "weapon") return WEAPON_CARDS;
+    if (tab === "chronicle") return CHRONICLE;
+    return CARDS;
+  }
+
+  function rosterOwned(info, tab) {
+    if (tab === "fashion") return (info.fashion && info.fashion.owned) || {};
+    if (tab === "weapon") return (info.weapon && info.weapon.owned) || {};
+    return info.owned || {};
   }
 
   function renderRoster(host, save, handlers) {
     injectStyle();
     if (!host) return snapshot(save);
     var info = snapshot(save);
-    var got = info.shown.length;
-    host.innerHTML =
-      '<div class="rosterStage46"><div class="rosterHead46"><h3>证词名册</h3><span>已点亮 ' +
-      got +
-      " / 8</span></div><div id=\"rosterWall46\">" +
-      CARDS.map(function (card) {
-        var count = info.owned[card.id] || 0;
+    var tab = info.rosterTab || "scrap";
+    var list = rosterList(tab);
+    var ownedMap = rosterOwned(info, tab);
+    var got = 0;
+    list.forEach(function (card) { if ((ownedMap[card.id] || 0) > 0) got += 1; });
+    var wall = "";
+    if (tab === "chronicle") {
+      wall = '<div class="chronicleBox46"><h4>月城小夜 · 未写完的夜</h4>' + CHRONICLE.map(function (item) {
+        return '<article class="chronicleCard46" data-chronicle="' + item.id + '"><b>' + item.n + "</b>" + item.lore.map(function (p) { return "<p>" + p + "</p>"; }).join("") + "</article>";
+      }).join("") + "</div>";
+    } else if (tab === "school" && !SCHOOL_CARDS.length) {
+      wall = '<div class="rosterLater46">后续写入</div>';
+    } else {
+      wall = list.map(function (card) {
+        var count = ownedMap[card.id] || 0;
         var locked = count < 1 && DEFAULT_SHOWN.indexOf(card.id) < 0;
+        var mark = card.legend ? "LEGEND" : card.r;
         return (
           '<button type="button" class="rosterSlot46 r-' +
-          card.r +
+          mark +
           (locked ? " lock" : "") +
           '" data-card="' +
           card.id +
           '"><div class="rosterArt46"><img data-art alt="" src="' +
           artSrc(handlers, locked ? "gacha/card_back.webp" : "gacha/" + card.id + ".webp") +
           '"><i>' +
-          card.r +
+          (card.legend ? "传说" : card.r) +
           "</i>" +
           (locked ? '<em class="rosterVeil46">未回收</em>' : "") +
           "</div><b>" +
           (locked ? "待寻访" : card.n) +
           "</b><small>" +
-          (locked ? rarityLabel(card.r) : "×" + count) +
+          (locked ? rarityLabel(card.r, card.legend) : "×" + count) +
           "</small></button>"
         );
-      }).join("") +
+      }).join("");
+    }
+    host.innerHTML =
+      '<div class="rosterStage46"><div class="rosterHead46"><h3>镜界仓库</h3><span>' +
+      (tab === "chronicle" ? "月城小夜 · 未写完的夜" : "已点亮 " + got + " / " + list.length) +
+      "</span></div>" +
+      '<div class="rosterTabs46" id="rosterTabs46">' +
+      '<button type="button" data-roster="scrap"' + (tab === "scrap" ? ' class="on"' : "") + ">残件</button>" +
+      '<button type="button" data-roster="school"' + (tab === "school" ? ' class="on"' : "") + ">基础</button>" +
+      '<button type="button" data-roster="fashion"' + (tab === "fashion" ? ' class="on"' : "") + ">时装</button>" +
+      '<button type="button" data-roster="weapon"' + (tab === "weapon" ? ' class="on"' : "") + ">武器</button>" +
+      '<button type="button" data-roster="chronicle"' + (tab === "chronicle" ? ' class="on"' : "") + ">编年</button>" +
+      "</div><div id=\"rosterWall46\">" +
+      wall +
       "</div></div>";
     hideBrokenArt(host);
+    var tabs = host.querySelectorAll("#rosterTabs46 [data-roster]");
+    for (var t = 0; t < tabs.length; t++) {
+      tabs[t].onclick = function () {
+        var next = this.getAttribute("data-roster");
+        setRosterTab(save, next);
+        if (handlers && typeof handlers.setRosterTab === "function") handlers.setRosterTab(next);
+        else renderRoster(host, save, handlers);
+      };
+    }
     var slots = host.querySelectorAll(".rosterSlot46");
     for (var i = 0; i < slots.length; i++) {
       (function (node) {
         node.onclick = function () {
           var card = cardOf(node.getAttribute("data-card"));
           if (!card) return;
-          var count = info.owned[card.id] || 0;
+          var count = ownedMap[card.id] || 0;
           var locked = count < 1 && DEFAULT_SHOWN.indexOf(card.id) < 0;
-          showRosterPeek(card, locked, count, handlers);
+          showRosterPeek(card, locked, count, handlers, tab);
         };
       })(slots[i]);
     }
@@ -663,6 +1140,7 @@
             '"><span class="revealGem46">' +
             rarity +
             "</span>" +
+            (card.legend || rarity === "LEGEND" ? '<span class="revealLegend46">传说</span>' : "") +
             (isNew ? '<span class="revealNew46">NEW</span>' : "") +
             "<b>" +
             (card.n || item.n || "") +
@@ -797,6 +1275,14 @@
     version: VERSION,
     RATES: RATES,
     CARDS: CARDS,
+    FASHION_CARDS: FASHION_CARDS,
+    WEAPON_CARDS: WEAPON_CARDS,
+    SCHOOL_CARDS: SCHOOL_CARDS,
+    CHRONICLE: CHRONICLE,
+    hasSchool: hasSchool,
+    POOL_IDS: POOL_IDS,
+    ROSTER_TABS: ROSTER_TABS,
+    SCRAP_BONUS: SCRAP_BONUS,
     DEFAULT_SHOWN: DEFAULT_SHOWN,
     injectStyle: injectStyle,
     normalizeOps: normalizeOps,
@@ -804,6 +1290,11 @@
     pull: pull,
     grantCheat: grantCheat,
     portraitTap: portraitTap,
+    applyOwnedBonus: applyOwnedBonus,
+    setPool: setPool,
+    setRosterTab: setRosterTab,
+    spark: spark,
+    equip: equip,
     renderGacha: renderGacha,
     renderRoster: renderRoster,
     showReveal: showReveal,
@@ -811,6 +1302,7 @@
     renderStageModes: renderStageModes,
     dressArchive: dressArchive,
     cardOf: cardOf,
+    downgradeRarity: downgradeRarity,
     cheatToast: CHEAT_TOAST,
   };
 })(typeof window !== "undefined" ? window : globalThis);
