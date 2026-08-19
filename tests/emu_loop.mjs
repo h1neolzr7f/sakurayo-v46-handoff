@@ -413,6 +413,23 @@ try {
   pass("大厅 toast 不漏进战斗");
   await lobbyToastCtx.close();
 
+  const mainGodPillCtx = await browser.newContext({ viewport: { width: 932, height: 430 }, hasTouch: true });
+  const mainGodPillPage = await mainGodPillCtx.newPage();
+  await waitMenu(mainGodPillPage);
+  await api(mainGodPillPage, "openDrawer", "stage");
+  await mainGodPillPage.locator('#modeBar46 [data-mode="mainGod"]').click();
+  await mainGodPillPage.locator('.stageCard[data-stage-id="1"] button').click();
+  const pillGuard = await mainGodPillPage.evaluate(() => ({
+    drawer: !document.querySelector("#stageDrawer").classList.contains("hidden"),
+    toast: document.querySelector("#toast")?.textContent || "",
+    modeOn: document.querySelector('#modeBar46 [data-mode="mainGod"]')?.classList.contains("on") || false,
+  }));
+  assert.equal(pillGuard.drawer, true, "主神胶囊下点章节不得关抽屉改成 story");
+  assert.equal(pillGuard.modeOn, true, "主神胶囊必须保持选中");
+  assert.equal(/已选择/.test(pillGuard.toast), false, "主神胶囊下点章节不得写成已选择普通关");
+  pass("主神胶囊下点章节不改回 story");
+  await mainGodPillCtx.close();
+
   await runViewport(430, 932, "p430");
   await runViewport(932, 430, "l932");
   const thin = await browser.newContext({ viewport: { width: 600, height: 400 }, hasTouch: true });

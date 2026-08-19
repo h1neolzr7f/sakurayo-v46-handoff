@@ -7516,6 +7516,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       if(!btn||btn.disabled)return;
       const id=Number(card.dataset.stageId);
       btn.onclick=()=>{
+        if(pendingMode46==="mainGod"){
+          $("#stageList .mainGodCard36")?.scrollIntoView({block:"nearest"});
+          return;
+        }
         const s=ST.find(x=>x.id===id);
         runMode36=pendingMode46==="testimony"?"testimony":"story";
         selected=id;
