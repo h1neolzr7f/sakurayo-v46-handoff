@@ -27,3 +27,7 @@
 - `sync-game.ps1` 把新大厅写进 Android 壳
 - 根 `CHANGELOG.md` 补第二期 / 第三期 / 这一轮
 - 升 4.6.1、交密钥、打正式包（公开仓仍是 v4.4.6）
+
+## 传说封面 #16（新开，等人认人）
+
+[#16](https://github.com/h1neolzr7f/sakurayo-v46-handoff/pull/16) `cursor/legend-art-5030` @ `4c8efe3`。只换 6 张传说。静的奢侈封面，绫枪放下。仍是 draft。你点过后再并。
