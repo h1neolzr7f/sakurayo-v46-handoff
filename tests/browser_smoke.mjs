@@ -459,6 +459,16 @@ try {
     pass(`${id} 开局、敌人、自动攻击`);
 
     if (id === "sayo") {
+      const cam = snapshot.camera;
+      assert.ok(cam, "缺少镜头快照");
+      assert.equal(cam.cols, 4);
+      assert.equal(cam.rows, 2);
+      assert.equal(cam.screens, 8);
+      assert.ok(Math.abs(snapshot.player.x - cam.worldW / 2) < 160, "开局角色应在 4×2 世界中心附近");
+      assert.ok(Math.abs(cam.camX + cam.viewW / 2 - snapshot.player.x) < 60, "镜头应居中跟随角色");
+      const edge = await api(page, "spawnFromEdge50");
+      assert.equal(edge.inside, false, "普通刷怪应出现在当前视口外");
+      pass("镜头 4×2 世界且角色居中");
       const beforeMove = snapshot.player.x;
       await page.evaluate(() => {
         const canvas = document.querySelector("#game");
