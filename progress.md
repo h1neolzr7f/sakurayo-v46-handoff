@@ -1,5 +1,11 @@
 Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先阅读根目录的 AGENTS.md、README_FIRST.md 和 CODEX_TASK.md，基于 src/index.html 继续开发，不要使用旧版本文件。
 
+## 2026-08-19 升补丁号 4.6.1
+
+- 用户要求把最新版本提升一个小级别，方便和 4.6.0 清虫包区分。
+- `VERSION` / `SAKURAYO_GAME_VERSION` / 运行时回退值 / Android `versionName` → 4.6.1；`versionCode` 61 → 62。
+- 存档键仍 `sakurayoV3`。玩法未改。未交 APK、未打 tag。
+
 ## 2026-07-11 自由方向与主神空间
 
 - 用户要求：枪械可自由随方向转动，刀剑只在挥砍扇形内造成伤害；三角色各有独立吐槽彩蛋；新增高难爽发育“主神空间”，奖励点强化仅在该副本跨局保留。

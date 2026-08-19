@@ -1,7 +1,7 @@
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.0";
+  var VERSION = "4.6.1";
   var portraitTaps = 0;
   var portraitStamp = 0;
   var TAP_WINDOW = 1200;

@@ -1,6 +1,6 @@
 # 接手检查清单
 
-当前：**V4.6.0 源码，未发版。** 公开玩家仓是 https://github.com/h1neolzr7f/sakurayo-zombietide ，已发布 APK 仍是 v4.4.6。
+当前：**V4.6.1 源码，未发 APK。** 公开玩家仓是 https://github.com/h1neolzr7f/sakurayo-zombietide ，已发布 APK 仍是 v4.4.6。
 
 按这个顺序读：
 
