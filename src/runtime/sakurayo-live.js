@@ -40,8 +40,6 @@
     "html.landscape46 .nav,html.landscape46 .homeNav46{grid-template-columns:repeat(5,minmax(0,1fr))!important}" +
     "html.landscape46 .heroHead46{left:22%;width:18%;top:8%;height:26%}" +
     "html.landscape46 .heroLive46 .heroTap46{left:18%;width:28%;top:34%;bottom:14%}" +
-    "html.portraitFallback46 #rotateHint46,html.tallWindow46 #rotateHint46{display:block}" +
-    "html.playing46 #rotateHint46{display:none!important}" +
     "@media(orientation:landscape){.heroHead46{left:18%;width:16%;top:10%;height:28%}.heroLive46 .heroTap46{left:14%;width:22%;top:36%;bottom:12%}}" +
     "@media(prefers-reduced-motion:reduce){.heroLive46.livePuppet46 .heroLiveSway46,.heroLive46.livePuppet46 .heroLivePhys46,.heroLive46.livePuppet46 .heroLiveBreath46,.heroLive46.livePuppet46 .heroLiveLook46{transform:none!important}}";
 
