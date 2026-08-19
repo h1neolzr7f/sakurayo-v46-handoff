@@ -121,6 +121,32 @@
     { id: "job_boneKing", n: "未归·白骨君王", r: "SR", kind: "job", tag: "转职", school: "necro", face: "rion", dmg: 0.005, d: "先称王的是自己的骨头。拥有即死灵倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是看见终章以后还想称王的死灵。先称王的不是我，是自己已经亮起来的骨头。", "魂火从掌心往上爬。刀还在，名字开始透明，像被谁从家谱上轻轻擦掉。", "我把凛音收成可召唤的白骨。契约成立的瞬间，王冠戴在空的颅骨上，很合适。", "火还亮。君王的署名栏空了，只剩一具还想发令的架子。"] },
     { id: "job_soulHerd", n: "未归·群魂牧者", r: "SR", kind: "job", tag: "转职", school: "necro", face: "rion", dmg: 0.005, d: "群魂先牧走牧者。拥有即死灵倾向 ×1.5，全伤害 +0.5%，重复不加。", lore: ["我是去牧群魂的那一版死灵凛音。魂认终章里的火，不认我手里这根还在发抖的牧鞭。", "我把刀当杖，把失败的小夜当成羊。火一路亮到剑冢门口，像一条不肯回头的路。", "群魂先牧走了牧者。人变成燃料，鞭还在空中响，羊群比我更认得方向。", "火还在远处走。我已经不在羊群里，只剩一句没来得及喊停的名字。"] },
   ]);
+  var FUSION_CARDS = Object.freeze([
+    { id: "fusion_magitech", n: "未归·星核机甲少女", r: "SSR", kind: "fusion", tag: "融合", pair: ["mech", "magical"], face: "sayo", dmg: 0.008, d: "机甲裂开仍是小夜。拥有即机械师与魔法少女倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是把星核焊进机甲胸口的那一版小夜。无人机当姐姐，冠却还想把我写成魔法少女。", "我一路用步枪当遥控器。星冠戴上以后，机甲仍裂着，露出里面还是神社那件白外套。", "机甲先裂开。无人机去追星核的热，冠还亮，人已经从缝里掉出来。", "遥控器烫手。我还是小夜，只是再也拼不回完整的一夜。"] },
+    { id: "fusion_gunshrine", n: "未归·祓魔枪巫女", r: "SSR", kind: "fusion", tag: "融合", pair: ["gun", "shrine"], face: "sayo", dmg: 0.008, d: "步枪写符，符烧完。拥有即枪斗与巫女倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是把符纸写进弹匣的那一夜巫女。步枪是鸟居，符是还没干的朱砂。", "我把封条一层层贴上枪管，贴上准星，贴上自己的袖口。外面的备份还在扫地。", "符烧完了。祓魔波停在半空，镜核比名字先亮，朱砂把失败写得很工整。", "我仍举着空枪。封条比弹壳先落地。"] },
+    { id: "fusion_bloodstar", n: "未归·血月魔法少女", r: "SSR", kind: "fusion", tag: "融合", pair: ["vamp", "magical"], face: "sayo", dmg: 0.008, d: "冠还亮，血从变身缝里漏。拥有即血族与魔法少女倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是想在血月下变身的那一版小夜。冠比我先发光，血却比咒语先出门。", "变身只走到一只手套。其余的我还是神社外套，步枪没有变成权杖，花瓣沾着自己的血。", "冠还亮着，变身缝却裂开。血从缝里漏出来，像另一层不肯干的妆。", "金边还烫。咒语停在一半，人已经空了。"] },
+    { id: "fusion_bloodmech", n: "未归·血械猎姬", r: "SSR", kind: "fusion", tag: "融合", pair: ["vamp", "mech"], face: "sayo", dmg: 0.008, d: "无人机喝血，遥控器烫手。拥有即血族与机械师倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是把无人机养成猎犬的血械小夜。它们认血，不认我按下去的召回。", "我把樱花焊在机翼上。步枪当鞭，遥控器当项圈，一路把它们喂到镜核门口。", "无人机先喝空了补给，再回头喝署名。遥控器烫得握不住，像握着别人的喉咙。", "螺旋桨还在远处响。猎姬已经没有可召回的夜。"] },
+    { id: "fusion_idolgun", n: "未归·枪火偶像", r: "SSR", kind: "fusion", tag: "融合", pair: ["idol", "gun"], face: "sayo", dmg: 0.008, d: "麦和步枪抢同一只手。拥有即歌姬与枪斗倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是被推进舞台还要开枪的那一版小夜。麦克风和步枪抢同一只手，节拍比准星更凶。", "歌比子弹先出门。我把步枪举成麦，对着空的灯把词唱完，又把弹匣唱空。", "麦和枪一起掉下去。高连击的安可没有来，只有空仓的回声在鞠躬。", "下一首歌自动连播。我已经不在频率上。"] },
+    { id: "fusion_thunderpriest", n: "未归·雷火天师", r: "SSR", kind: "fusion", tag: "融合", pair: ["mage", "shrine"], face: "sayo", dmg: 0.008, d: "符接雷，人被天罚先劈。拥有即魔法师与巫女倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是去接天罚的那一版巫女。符纸写着雷，天却只认我袖里发烫的名字。", "我把符接在步枪上，像把鸟居举成避雷针。朱砂比咒语先亮，也比人更先焦。", "雷先劈开了施法的人。符烧成灰，天罚落在肩上，镜核反而更亮。", "雷还在响。我已经不值得被写成天师，只值得被写成焦黑的一张纸。"] },
+    { id: "fusion_plagueidol", n: "未归·瘟律歌姬", r: "SSR", kind: "fusion", tag: "融合", pair: ["alch", "idol"], face: "sayo", dmg: 0.008, d: "节拍带腐蚀，观众席在溶。拥有即炼金与歌姬倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是对着腐蚀开口的那一版歌姬。节拍能带动观众，也能把观众席炼化。", "我一路把酸液写进歌词。麦克风比坩埚先烫手，花比药先落地，像抢着宣布无效。", "观众席先溶掉。尸潮还在打拍子，人已经跪在还冒泡的花瓣里。", "掌声是空的。歌还在连播，连一句完整的安可都没有。"] },
+    { id: "fusion_railsword", n: "未归·磁轨剑阵", r: "SSR", kind: "fusion", tag: "融合", pair: ["mech", "cult"], face: "sayo", dmg: 0.008, d: "飞剑当铆钉，轨道自己弯。拥有即机械师与修仙倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是想用磁轨钉住飞剑的那一版小夜。轨道比刃更直，也比人更容易弯向镜核。", "我把飞剑当成铆钉一节节焊上天穹。步枪当绝缘体，人当还没熔的垫片。", "轨道自己弯了。飞剑先吸走弹壳，再吸走准星，把我留在地上。", "铁还在震。我的手已经对不上极性，像对不上自己的姓。"] },
+    { id: "fusion_flowerplague", n: "未归·花疫魔女", r: "SSR", kind: "fusion", tag: "融合", pair: ["magical", "spore"], face: "sayo", dmg: 0.008, d: "花弹开在别人身上。拥有即魔法少女与菌群倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是把花弹认作奇迹的魔法少女。花开在别人身上，种子却不肯回到我手里。", "我一路把孢子编进没转完的变身。冠还亮，步枪当花茎，菌丝当另一层裙摆。", "花弹先开在路过的人身上。花园吞掉脚印，再吞掉园丁，镜核从花心里长出来。", "花还香。我已经是土，连浇水的手都埋进去了。"] },
+    { id: "fusion_fleshshrine", n: "未归·生体御神子", r: "SSR", kind: "fusion", tag: "融合", pair: ["gene", "shrine"], face: "sayo", dmg: 0.008, d: "符刻进肉，结界是血。拥有即基因与巫女倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是把符刻进肉里的那一版巫女。结界答应护身，却只答应用血来画边。", "我把朱砂写进再生的缝。步枪靠在鸟居上，皮肤自己长成符纸，像一件不肯脱的祭服。", "结界先变成血。符还在肉里亮，人已经被自己的护身勒住，连呼吸都要盖章。", "鸟居还在。我的影子短了一截，像被谁先收走了半只。"] },
+    { id: "fusion_shadowmage", n: "未归·影法魔女", r: "SSR", kind: "fusion", tag: "融合", pair: ["ninja", "mage"], face: "aya", dmg: 0.008, d: "残影带火冰，本体没回来。拥有即忍者与魔法师倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是从镜缝里施法的那条影。外面的我负责开枪，里面的我负责把火和冰留下来。", "分身比本体勤快。苦无随机沾上元素，太刀留给回来的那一格，手枪留给还站着的这一格。", "残影还在喷火喷冰。本体没有从裂镜对面走回来，只剩一层还举着枪的皮。", "法阵还在这一侧亮。人已经不在这一侧。"] },
+    { id: "fusion_bloodmage", n: "未归·血焰术士", r: "SSR", kind: "fusion", tag: "融合", pair: ["vamp", "mage"], face: "aya", dmg: 0.008, d: "法阵喝自己的血。拥有即血族与魔法师倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是把法阵养成嘴的血焰绫。券是金的，门是假的，阵却认认真真地喝。", "我把血契画进水里。手枪还在腰上，太刀守冷却，像守一座不肯承认的炉。", "法阵先喝空了施法的人。券面盖了作废，墨从掌心滴进去，比血先干。", "VOID 两个字母比咒语清楚，也比我的工号更像结局。"] },
+    { id: "fusion_nanoninja", n: "未归·纳米机忍", r: "SSR", kind: "fusion", tag: "融合", pair: ["mech", "ninja"], face: "aya", dmg: 0.008, d: "无人机抄影遁，人留在镜缝。拥有即机械师与忍者倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是让无人机去抄影遁的那一支忍。光学诱饵比人守时，归路却不守时。", "我把苦无焊进螺旋桨。冲刺留下斩击，机翼留下残影，像把回家的路复印了无数张。", "无人机先走进镜缝。人留在这一侧，诱饵散成灰，召回键只回一行冷字。", "屏幕黑了。影还在飞，署名已经不在这一格。"] },
+    { id: "fusion_shadowblade", n: "未归·御剑影忍", r: "SSR", kind: "fusion", tag: "融合", pair: ["ninja", "cult"], face: "aya", dmg: 0.008, d: "飞剑斩过，影没归鞘。拥有即忍者与修仙倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是把飞剑写成影的那一支忍。刃比人先出门，鞘却等不到回来的那一格。", "我把影遁焊进剑阵。太刀负责切开标记，手枪留给还站着的这一侧。", "飞剑斩过镜核。影没有归鞘，人停在出鞘的那一帧，连眨眼都不被允许。", "刃还在振。鞘是空的，像一句不肯认账的退路。"] },
+    { id: "fusion_plagueforge", n: "未归·瘟炼菌海", r: "SSR", kind: "fusion", tag: "融合", pair: ["alch", "spore"], face: "aya", dmg: 0.008, d: "坩埚里的菌不认署名。拥有即炼金与菌群倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是把菌海熬进坩埚的炼金绫。它们发光，却不认我写在瓶盖上的工号。", "手枪看守火候，太刀切开试剂。我把神社封条当瓶盖，把孢子当一场不肯停的雨。", "坩埚里的菌先选择了镜核。盖子着了，人变成过期的培养基，从胸口往外被吃空。", "药还在响。署名已经发酵完了，只剩甜得发苦的气味。"] },
+    { id: "fusion_biogun", n: "未归·活体弹仓", r: "SSR", kind: "fusion", tag: "融合", pair: ["gene", "gun"], face: "aya", dmg: 0.008, d: "弹匣长肉，枪口朝前。拥有即基因与枪斗倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是把弹匣养成活物的枪线。它们会呼吸，也会在上膛的时候咬手。", "我把再生写进弹壳。手枪朝前，太刀守退路，花瓣总是提醒我再快一点。", "弹匣先长出了自己的牙。枪口还朝前，人已经被后坐力按在墙上，近身的爪子摸到领口。", "套筒后锁。活弹还在跳，处刑改成被处刑。"] },
+    { id: "fusion_bloodsword", n: "未归·血炼剑仙", r: "SSR", kind: "fusion", tag: "融合", pair: ["vamp", "cult"], face: "rion", dmg: 0.008, d: "飞剑以血为炉，冠空。拥有即血族与修仙倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是把血当成炉火的那一页飞升。飞剑比家谱先出门，冠却先空了。", "剑冢里每一把剑都认识我。我路过那些失败的小夜，没有对任何一把刀鞠躬。", "飞剑以我的血为炉。刃还在振，飞出去的那一半回不来，冠掉进坟里。", "我握住折断的那截。仙名没有写上，天也没有为此开过一次。"] },
+    { id: "fusion_chimera", n: "未归·元素嵌合体", r: "SSR", kind: "fusion", tag: "融合", pair: ["gene", "mage"], face: "rion", dmg: 0.008, d: "看见自己手臂的法阵。拥有即基因与魔法师倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是被嵌进元素的那一版凛音。火、冰、雷写在肉里，合同上的人已经对不上这张脸。", "我用长刀压住往外长的那只手臂。法阵从皮肤下亮起来，像另一份不肯签字的遗嘱。", "我看见自己手臂上的法阵先活了。元素统御了施法者，人变成还在发光的嵌件。", "刀还认得手。嵌合体不太认得我。"] },
+    { id: "fusion_corpseimmortal", n: "未归·尸解剑仙", r: "SSR", kind: "fusion", tag: "融合", pair: ["gene", "cult"], face: "rion", dmg: 0.008, d: "肉身先走，剑还在振。拥有即基因与修仙倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是去尸解的那一版修仙。合同写着飞升，肉身却先一步离开。", "我把再生焊进飞剑。长刀还在振，家谱在袖里发烫，像提前写出的讣告。", "肉身先走了。剑还插在剑冢里振，冠掉进水里，人已经不在这具该飞升的壳里。", "刃还在响。署名只剩焦黑，连一句道号都写不回去。"] },
+    { id: "fusion_shikigami", n: "未归·百鬼阴阳师", r: "SSR", kind: "fusion", tag: "融合", pair: ["summon", "shrine"], face: "rion", dmg: 0.008, d: "百鬼比主人先鞠躬。拥有即召唤与巫女倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是去召百鬼的那一版阴阳。它们认鸟居上的符，不认还站着的这一具凛音。", "我把灵兽写进符纸。长刀是祭品，血是印章，影子是还没赶到的部下。", "百鬼先鞠躬。鞠躬的对象不是我，是镜核。主人反而要低头。", "符烧完了。鬼还在，主人不在，只剩空的腕和还在跳的线。"] },
+    { id: "fusion_necrospore", n: "未归·菌尸冥主", r: "SSR", kind: "fusion", tag: "融合", pair: ["necro", "spore"], face: "rion", dmg: 0.008, d: "魂菇从自己肩上长。拥有即死灵与菌群倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是看见终章以后还想种魂菇的凛音。菇认镜子里的热，不认我手里这根发抖的刀。", "我把拘魂灯插进菌海。刀当杖，失败的小夜当成培养基，火一路亮到剑冢门口。", "魂菇先从我自己肩上长出来。人变成燃料，羊群比我更认得方向。", "火还在远处走。我已经不在羊群里，只剩一句没来得及喊停的名字。"] },
+    { id: "fusion_bloodbeast", n: "未归·血契兽王", r: "SSR", kind: "fusion", tag: "融合", pair: ["summon", "vamp"], face: "rion", dmg: 0.008, d: "兽群喝的是署名。拥有即召唤与血族倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是把影子当成兽群的血契。它们认血，不认我腕上那圈发烫的红线。", "我把名字写进契。刀是祭品，血是印章，部下是还没赶到的坟。", "兽群先喝空了署名。红线勒进刀柄，影子比我更高，主人反而要低头。", "契还在腕上发烫。署名已经被饮尽，像一笔不肯退回的聘金。"] },
+    { id: "fusion_elementalbeast", n: "未归·元素御兽使", r: "SSR", kind: "fusion", tag: "融合", pair: ["summon", "mage"], face: "rion", dmg: 0.008, d: "使魔喷元素，鞭先断。拥有即召唤与魔法师倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是让使魔轮流喷火霜雷的那一版召唤。兽潮比咒语守时，鞭却先断。", "我把元素写进契约。长刀当鞭，灵兽当还没排队的灾，像把退路切成三段。", "使魔先喷向了持鞭的人。火、冰、雷认阵，不认我，鞭在空中先裂开。", "兽潮还在远处走。我已经没有下一记能抽下去的夜。"] },
+    { id: "fusion_soulgun", n: "未归·亡骨枪骑", r: "SSR", kind: "fusion", tag: "融合", pair: ["necro", "gun"], face: "rion", dmg: 0.008, d: "弹匣收魂，刀当马鞭。拥有即死灵与枪斗倾向 ×1.6，全伤害 +0.8%，重复不加。", lore: ["我是把魂火装进弹匣的枪骑。刀当马鞭，枪当还没写完的家谱。", "我一路把失败的小夜收成弹药。长刀抽在空鞍上，魂灯在弹壳里亮，像一队不肯下葬的马。", "弹匣先收下了牧者。贯穿的亡魂弹打出去，人停在马上，已经没有可勒的缰。", "刀还在响。马是空的，魂已经不认这个骑手。"] },
+  ]);
 
   var SCRAP_BONUS = Object.freeze({
     sayo_echo: { crit: 0.005 },
@@ -142,11 +168,12 @@
   indexCards(CARDS);
   indexCards(FASHION_CARDS);
   indexCards(WEAPON_CARDS);
-  indexCards(SCHOOL_CARDS);
-  indexCards(JOB_CARDS);
+    indexCards(SCHOOL_CARDS);
+    indexCards(JOB_CARDS);
+    indexCards(FUSION_CARDS);
 
   function remnantList() {
-    return CARDS.concat(SCHOOL_CARDS, JOB_CARDS);
+    return CARDS.concat(SCHOOL_CARDS, JOB_CARDS, FUSION_CARDS);
   }
 
   function cardsForPool(pool) {
@@ -212,7 +239,7 @@
     ".gachaActions46 button{min-height:54px;border-radius:16px;border:1px solid #ff9bcc66;color:#fff;font:800 15px/1.1 system-ui;letter-spacing:.14em;box-shadow:0 10px 24px #05020d66}" +
     ".gachaActions46 button small{display:block;margin-top:3px;font:700 10px/1 system-ui;letter-spacing:.08em;opacity:.88}" +
     ".gachaActions46 button.poor{opacity:.42}" +
-    ".wishSpark46{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}" +
+    ".wishSpark46{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;max-height:72px;overflow:auto}" +
     ".wishSpark46 button{min-height:28px;padding:0 8px;border-radius:999px;border:1px solid #ffe6a355;background:#0b0818cc;color:#ffe7a3;font:800 10px/1 system-ui}" +
     ".wishSpark46 button.poor{opacity:.42}" +
     ".rosterEquip46{margin-top:8px;min-height:36px;padding:0 12px;border-radius:10px;border:1px solid #ffe6a366;background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;font:800 12px/1 system-ui}" +
@@ -712,6 +739,10 @@
         return { id: card.id, n: card.n, r: card.r, kind: "job", school: card.school, count: ops.owned[card.id] || 0 };
       }),
       jobOwned: ownedCount(ops, JOB_CARDS),
+      fusionCards: FUSION_CARDS.map(function (card) {
+        return { id: card.id, n: card.n, r: card.r, kind: "fusion", pair: (card.pair || []).slice(), count: ops.owned[card.id] || 0 };
+      }),
+      fusionOwned: ownedCount(ops, FUSION_CARDS),
       shown: shownIds(ops),
       owned: ops.owned,
       pity: ops.pity,
@@ -1074,7 +1105,7 @@
   function rosterList(tab) {
     if (tab === "school") return SCHOOL_CARDS;
     if (tab === "job") return JOB_CARDS;
-    if (tab === "fusion") return [];
+    if (tab === "fusion") return FUSION_CARDS;
     if (tab === "fashion") return FASHION_CARDS;
     if (tab === "weapon") return WEAPON_CARDS;
     if (tab === "chronicle") return CHRONICLE;
@@ -1101,7 +1132,7 @@
       wall = '<div class="chronicleBox46"><h4>月城小夜 · 未写完的夜</h4>' + CHRONICLE.map(function (item) {
         return '<article class="chronicleCard46" data-chronicle="' + item.id + '"><b>' + item.n + "</b>" + item.lore.map(function (p) { return "<p>" + p + "</p>"; }).join("") + "</article>";
       }).join("") + "</div>";
-    } else if (tab === "fusion") {
+    } else if (tab === "fusion" && !FUSION_CARDS.length) {
       wall = '<div class="rosterLater46">后续写入</div>';
     } else if (tab === "school" && !SCHOOL_CARDS.length) {
       wall = '<div class="rosterLater46">后续写入</div>';
@@ -1134,7 +1165,7 @@
     }
     host.innerHTML =
       '<div class="rosterStage46"><div class="rosterHead46"><h3>镜界仓库</h3><span>' +
-      (tab === "chronicle" ? "月城小夜 · 未写完的夜" : tab === "fusion" ? "后续写入" : "已点亮 " + got + " / " + list.length) +
+      (tab === "chronicle" ? "月城小夜 · 未写完的夜" : "已点亮 " + got + " / " + list.length) +
       "</span></div>" +
       '<div class="rosterTabs46" id="rosterTabs46">' +
       '<button type="button" data-roster="scrap"' + (tab === "scrap" ? ' class="on"' : "") + ">残件</button>" +
@@ -1347,6 +1378,7 @@
     WEAPON_CARDS: WEAPON_CARDS,
     SCHOOL_CARDS: SCHOOL_CARDS,
     JOB_CARDS: JOB_CARDS,
+    FUSION_CARDS: FUSION_CARDS,
     CHRONICLE: CHRONICLE,
     hasSchool: hasSchool,
     hasJob: hasJob,
