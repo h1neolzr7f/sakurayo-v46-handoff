@@ -11695,6 +11695,10 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       if(!btn||btn.disabled)return;
       const id=Number(card.dataset.stageId);
       btn.onclick=()=>{
+        if(pendingMode46==="mainGod"){
+          $("#stageList .mainGodCard36")?.scrollIntoView({block:"nearest"});
+          return;
+        }
         const s=ST.find(x=>x.id===id);
         runMode36=pendingMode46==="testimony"?"testimony":"story";
         selected=id;
