@@ -1,10 +1,14 @@
 # V4.6 — 横屏大厅与镜界寻访
 
-当前源码 **4.6.2**。versionCode 63。
+当前源码 **4.6.2**。versionCode 63。Debug APK 已打。
 
 ## 4.6.2 — 2026-08-19
 
 证词与演习彻底分账：结算不写 `done` / `unlock` / `endings` / 构筑卡，也不累加 `kills` / `runs` / `best`，不跑 `checkAch()`，局内不点 `lv12` / `flaw` / `phasebreak`。跨章回声按模式分袋。局内存档只在大厅刷新。隐藏关通关标题用完美结局名。`plan` 文案对上稳定度 +8。versionCode 63。存档仍 `sakurayoV3`。
+
+- 离线/Android 单文件 SHA-256：`b873d8d712cfddad93c242aa68a666838bd6c1238dd9a1b5c3375e962b924390`
+- Debug APK SHA-256：`e96a16323b2234f2c781d3e2c099114d7c56f04662d97abc35224e65b9364376`
+- 包名 `com.sakurayo.zombietide`，versionName 4.6.2 / versionCode 63。无正式证书（本环境无 `keystore.properties`），debug 签名。不要卸旧正式包覆盖。
 
 ## 4.6.1 — 2026-08-19
 
