@@ -21,6 +21,21 @@
 - 仿 Live2D 按 Cubism 教程重做：眨眼用 Mean 2.5s ±2s，不再 5.4s 死循环；注视跟指针并阻尼回正；点头/点身各有一段淡入淡出动作。立绘去掉多层 `drop-shadow`/`blur`，抽屉不再整屏 backdrop-filter。`html.landscape46` 按宽高比铺横屏，不单靠 orientation 媒体查询。
 - 局内镜头大地图：世界 4×2 视口（8 屏），角色居中跟随，怪从当前视口外刷。卡池未改。
 
-## 未做（下一期）
+## 清虫修复（源码仍 4.6.0，未升 4.6.1，未交 APK）
 
-- 用 I2V 绿幕重出三角色站桩（本机未装 infsh）
+2026-08-19。`sakurayoV3` 只补字段。门 A + `emu_loop` 37 绿。
+
+- 结算：脏飞升/融合 ID 不再抛错或写出 `undefined`，`#result` 必出。
+- 大厅出击写入关卡胶囊模式；主神须点「进入轮回」；主神胶囊下点章节不再打回 story。
+- 大厅 toast 可见，开局清空队列，不再漏进战斗。
+- 战斗 toast 不再压 `#mission`；模态收 `#warning`；干员坞抬离摇杆；寻访 pity 抬离抽卡坞。
+- 开局不再复述 mission；剧情态藏坞；Boss 规则条让开构筑条。
+- 4×2 战场图一帧只铺一张；删竖版回退与横持提示。
+
+### 发布包
+
+- 单文件：`release/樱夜尸潮_V4.6.0_单文件.html`（gitignore，不进 git）
+- 与 `android-app/app/src/main/assets/index.html` 同哈希
+- SHA-256：`b509755294730094c266865cbfa4b36999bd3701cd53988133e59f527c24ca8f`
+- 字节：1990921
+- 未打 tag、未交 APK/密钥

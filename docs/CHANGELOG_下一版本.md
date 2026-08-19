@@ -30,10 +30,11 @@
 
 ## 发布
 
-- 源码：`src/index.html`
-- 发布文件：`release/樱夜尸潮_下一版本_单文件.html`
-- 两者 SHA-256：`0CE75E3EB81B1A922C9A7183E1FE6356ADD89C8E164CF59B7CAFA2335EEA3AEE`
-- 源码字节数：1471301
+- 源码：`src/index.html` + `src/runtime/*.js`
+- 当前单文件：`release/樱夜尸潮_V4.6.0_单文件.html`（与 Android assets 同步，不进 git）
+- SHA-256：`b509755294730094c266865cbfa4b36999bd3701cd53988133e59f527c24ca8f`
+- 字节：1990921
+- 版本仍 4.6.0，未升 4.6.1，未交 APK
 
 ## Image2 角色与 UI 核心美术（2026-07-11）
 
