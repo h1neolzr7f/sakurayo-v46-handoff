@@ -388,8 +388,12 @@ assert.equal(second.merged, true);
 assert.equal(grantSave.shop40.ops.owned.fusion_gunshrine, 2);
 for (let i = 0; i < 5; i++) L.grantBuildCard(grantSave, { fusion: "gunshrine" });
 assert.equal(L.starFromCount(grantSave.shop40.ops.owned.fusion_gunshrine), 5);
-assert.match(fs.readFileSync(path.join(root, "src/index.html"), "utf8"), /playGoodnight46/);
-assert.match(fs.readFileSync(path.join(root, "src/index.html"), "utf8"), /晚安，/);
+const indexHtml = fs.readFileSync(path.join(root, "src/index.html"), "utf8");
+assert.match(indexHtml, /playGoodnight46/);
+assert.match(indexHtml, /晚安，/);
+assert.match(indexHtml, /function hideCombatModals46/);
+assert.match(indexHtml, /hideTransient\(\);hideCombatModals46\(\)/);
+assert.doesNotMatch(indexHtml, /resultRadio46=true;\s*if\(\$\("#banter"\)\) \$\("#banter"\)\.style\.zIndex="40";\s*showBanter/);
 assert.match(fs.readFileSync(path.join(root, "src/runtime/sakurayo-lobby.js"), "utf8"), /同卡并星加伤/);
 assert.doesNotMatch(fs.readFileSync(path.join(root, "src/runtime/sakurayo-lobby.js"), "utf8"), /重复不加/);
 

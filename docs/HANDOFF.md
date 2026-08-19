@@ -67,7 +67,7 @@
 2. 有独特动作的融合再补 `anim_skill.webp` / `anim_dash.webp`。缺图回退，不要借错融合的图。
 3. 寻访卡扩到 16 以内；`ui/lobby_wide.webp` 去左右黑边。
 4. 全量 `powershell -File tools/verify.ps1`（`browser_smoke` 主视口仍是 430×932）。
-5. `android-app/sync-game.ps1` 后发版。模拟器上的正式包可能仍是签名对不上的 **4.2.3 / versionCode 47**；debug 不能覆盖（`INSTALL_FAILED_UPDATE_INCOMPATIBLE`）。不要擅自卸包清档。用本机 HTTP 打开 `src/index.html` 验收。
+5. `android-app/sync-game.ps1` 后发版。本云主机是 KVM 套娃，API 34 Google APIs 开加速会内核崩溃；软件模拟用 Android 30 AOSP ATD 更稳。模拟器上的正式包可能仍是签名对不上的 **4.2.3 / versionCode 47**；debug 不能覆盖（`INSTALL_FAILED_UPDATE_INCOMPATIBLE`）。不要擅自卸包清档。
 
 ### 明确不做
 
