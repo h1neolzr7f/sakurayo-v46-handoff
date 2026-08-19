@@ -5,7 +5,8 @@ param(
   [string]$Out = '',
   [switch]$Force,
   [switch]$AllowBatch,
-  [switch]$Greenscreen
+  [switch]$Greenscreen,
+  [switch]$SpendAnlas
 )
 $ErrorActionPreference = 'Stop'
 $Root = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
@@ -19,5 +20,6 @@ if ($Out) { $Args += @('--out', $Out) }
 if ($Force) { $Args += '--force' }
 if ($AllowBatch) { $Args += '--allow-batch' }
 if ($Greenscreen) { $Args += '--greenscreen' }
+if ($SpendAnlas) { $Args += '--spend-anlas' }
 & $Python.Source -I $Script @Args
 if ($LASTEXITCODE -ne 0) { throw "NAI $Command failed" }

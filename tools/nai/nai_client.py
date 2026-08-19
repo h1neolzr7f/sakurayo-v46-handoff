@@ -17,8 +17,10 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 IMAGE_API = "https://image.novelai.net"
-USER_API = "https://api.novelai.net"
+USER_API = "https://image.novelai.net"
 DEFAULT_MODEL = "nai-diffusion-4-5-full"
+FREE_MAX_PIXELS = 1024 * 1024
+FREE_MAX_STEPS = 28
 DEFAULT_SAMPLER = "k_euler_ancestral"
 DEFAULT_NEGATIVE = (
     "blurry, lowres, error, film grain, scan artifacts, worst quality, bad quality, "
@@ -32,11 +34,14 @@ GREEN_SCREEN_TAGS = (
 )
 
 SIZE_PRESETS = {
+    "small": (512, 768),
+    "small_landscape": (768, 512),
+    "small_square": (640, 640),
     "portrait": (832, 1216),
-    "portrait_large": (1024, 1536),
     "landscape": (1216, 832),
-    "landscape_wide": (1536, 1024),
     "square": (1024, 1024),
+    "portrait_large": (1024, 1536),
+    "landscape_wide": (1536, 1024),
 }
 
 TOKEN_ENV_KEYS = ("NOVELAI_TOKEN", "NAI_TOKEN", "NOVELAI_ACCESS_KEY")
@@ -91,6 +96,27 @@ def load_token(explicit: str | None = None, search_files: tuple[Path, ...] | Non
     raise NaiError(
         "NovelAI token not found. Set NOVELAI_TOKEN, or put the Persistent API "
         "token in secrets/novelai.token. Do not paste the token into chat or git."
+    )
+
+
+def is_free_quota(width: int, height: int, steps: int = 28, n_samples: int = 1) -> bool:
+    return n_samples == 1 and steps <= FREE_MAX_STEPS and width * height <= FREE_MAX_PIXELS
+
+
+def assert_free_quota(payload: dict[str, Any], *, spend_anlas: bool = False) -> None:
+    params = payload["parameters"]
+    width = int(params["width"])
+    height = int(params["height"])
+    steps = int(params["steps"])
+    n_samples = int(params["n_samples"])
+    if is_free_quota(width, height, steps, n_samples):
+        return
+    if spend_anlas:
+        return
+    raise NaiError(
+        f"{width}x{height} steps={steps} n={n_samples} would spend Anlas. "
+        "Opus free quota is 1 image, <=28 steps, <=1024x1024. "
+        "Use a small/normal preset, or pass --spend-anlas."
     )
 
 

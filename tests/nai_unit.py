@@ -16,8 +16,10 @@ import generate as nai_gen  # noqa: E402
 from nai_client import (  # noqa: E402
     DEFAULT_NEGATIVE,
     NaiError,
+    assert_free_quota,
     build_payload,
     compose_prompt,
+    is_free_quota,
     is_v4_model,
     job_to_payload,
     load_jobs,
@@ -31,7 +33,16 @@ from nai_client import (  # noqa: E402
 class SizeTests(unittest.TestCase):
     def test_presets(self):
         self.assertEqual(resolve_size("portrait"), (832, 1216))
-        self.assertEqual(resolve_size("landscape_wide"), (1536, 1024))
+        self.assertEqual(resolve_size("small"), (512, 768))
+        self.assertEqual(resolve_size("landscape"), (1216, 832))
+        self.assertTrue(is_free_quota(832, 1216, 28, 1))
+        self.assertFalse(is_free_quota(1024, 1536, 28, 1))
+        cheap = build_payload("1girl", size="portrait")
+        assert_free_quota(cheap)
+        costly = build_payload("1girl", size="portrait_large")
+        with self.assertRaises(NaiError):
+            assert_free_quota(costly)
+        assert_free_quota(costly, spend_anlas=True)
 
     def test_custom_and_invalid(self):
         self.assertEqual(resolve_size(width=768, height=1280), (768, 1280))
@@ -101,7 +112,8 @@ class JobTests(unittest.TestCase):
         ])
         payload = job_to_payload(jobs[0])
         self.assertIn("#00ff00", payload["input"])
-        self.assertEqual(payload["parameters"]["width"], 1024)
+        self.assertEqual(payload["parameters"]["width"], 832)
+        assert_free_quota(payload)
         self.assertTrue(jobs[3]["out"].endswith("lobby_wide.png"))
 
     def test_safe_id(self):

@@ -14,9 +14,11 @@ from nai_client import (  # noqa: E402
     DEFAULT_MODEL,
     NaiError,
     ROOT as CLIENT_ROOT,
+    assert_free_quota,
     build_payload,
     check_subscription,
     generate_image,
+    is_free_quota,
     job_to_payload,
     load_jobs,
     load_token,
@@ -40,8 +42,9 @@ def cmd_check(_: argparse.Namespace) -> int:
     _print(f"  tier: {info['tierName']}")
     _print(f"  expiresAtUtc: {info['expiresAtUtc']}")
     _print(f"  grace: {info['isGracePeriod']}")
-    _print(f"  fixedSteps: {info['fixedTrainingStepsLeft']}")
-    _print(f"  purchasedSteps: {info['purchasedTrainingSteps']}")
+    _print(f"  anlasLeft: {info['fixedTrainingStepsLeft']}")
+    _print(f"  purchasedAnlas: {info['purchasedTrainingSteps']}")
+    _print("  freeQuota: 1 image, <=28 steps, <=1024x1024 (Opus normal/small)")
     if not info["active"]:
         raise NaiError("NovelAI subscription is not active")
     return 0
@@ -58,6 +61,12 @@ def cmd_dry_run(args: argparse.Namespace) -> int:
             "height": payload["parameters"]["height"],
             "steps": payload["parameters"]["steps"],
             "sampler": payload["parameters"]["sampler"],
+            "freeQuota": is_free_quota(
+                payload["parameters"]["width"],
+                payload["parameters"]["height"],
+                payload["parameters"]["steps"],
+                payload["parameters"]["n_samples"],
+            ),
         }, ensure_ascii=False, indent=2))
     return 0
 
@@ -76,8 +85,25 @@ def cmd_gen(args: argparse.Namespace) -> int:
         if dest.exists() and not args.force:
             _print(f"SKIP existing {dest}")
             continue
+        assert_free_quota(payload, spend_anlas=args.spend_anlas)
         _print(f"GEN {dest} [{payload['model']} {payload['parameters']['width']}x{payload['parameters']['height']}]")
-        images = generate_image(token, payload)
+        try:
+            images = generate_image(token, payload)
+        except NaiError as exc:
+            blocked = "Free generations are unavailable" in str(exc)
+            if not blocked or args.no_fallback_paid:
+                raise
+            paid_size = "portrait_large" if payload["parameters"]["height"] >= payload["parameters"]["width"] else "landscape_wide"
+            payload = build_payload(
+                payload["input"],
+                model=payload["model"],
+                size=paid_size,
+                steps=int(payload["parameters"]["steps"]),
+                scale=float(payload["parameters"]["scale"]),
+                seed=int(payload["parameters"]["seed"] or 0),
+            )
+            _print(f"FREE_BLOCKED, retry paid {payload['parameters']['width']}x{payload['parameters']['height']}")
+            images = generate_image(token, payload)
         written.extend(write_pngs(images, dest))
         if index < len(targets) - 1:
             sleep_between(args.delay)
@@ -155,6 +181,8 @@ def build_parser() -> argparse.ArgumentParser:
     add_common(gen)
     gen.add_argument("--force", action="store_true")
     gen.add_argument("--allow-batch", action="store_true")
+    gen.add_argument("--spend-anlas", action="store_true", help="Allow Large sizes that cost Anlas")
+    gen.add_argument("--no-fallback-paid", action="store_true", help="Do not retry Large/Anlas after a free-queue 403")
     gen.add_argument("--delay", type=float, default=1.5)
     gen.set_defaults(func=cmd_gen)
     return parser
