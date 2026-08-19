@@ -21,7 +21,10 @@ assert.equal([...L.SCHOOL_CARDS].filter((card) => card.r === "SR").map((card) =>
 assert.ok(L.SCHOOL_CARDS.every((card) => card.kind === "school" && Array.isArray(card.lore) && card.lore.length === 4));
 assert.deepEqual([...L.DEFAULT_SHOWN], ["sayo_echo", "aya_petal"]);
 assert.deepEqual([...L.POOL_IDS], ["remnant", "fashion", "weapon"]);
-assert.deepEqual([...L.ROSTER_TABS], ["scrap", "school", "fashion", "weapon"]);
+assert.equal(L.JOB_CARDS.length, 28);
+assert.ok(L.JOB_CARDS.every((card) => card.r === "SR" && card.kind === "job" && card.dmg === 0.005 && Array.isArray(card.lore) && card.lore.length === 4));
+assert.ok(L.JOB_CARDS.every((card) => card.lore.every((line) => [...line].filter((ch) => /[\u4e00-\u9fff]/.test(ch)).length > 8)));
+assert.deepEqual([...L.ROSTER_TABS], ["scrap", "school", "job", "fusion", "fashion", "weapon"]);
 assert.equal(L.FASHION_CARDS.length, 12);
 assert.equal(L.WEAPON_CARDS.length, 12);
 assert.ok(L.FASHION_CARDS.filter((card) => card.legend).map((card) => card.id).join(",").includes("fashion_sayo_crown"));
@@ -36,7 +39,7 @@ assert.ok(L.CARDS.every((card) => card.r === "R" && card.kind === "scrap"));
 assert.ok(L.CARDS.every((card) => Array.isArray(card.lore) && card.lore.length === 4));
 assert.equal(L.cardOf("last_witness").n, "碎镜后的人");
 assert.match(L.cardOf("last_witness").lore[0], /他不是小夜/);
-["school_shrine","school_idol","school_magical","school_mech","school_spore","school_gun","school_mage","school_alch","school_ninja","school_vamp","school_cult","school_necro","school_gene","school_summon","fashion_sayo_crown","fashion_aya_funeral","fashion_rion_bride","fashion_sayo_plain","weapon_sayo_final","weapon_aya_mirror","weapon_rion_burial","weapon_sayo_spare"].forEach((id) => {
+["school_shrine","school_idol","school_magical","school_mech","school_spore","school_gun","school_mage","school_alch","school_ninja","school_vamp","school_cult","school_necro","school_gene","school_summon","job_swarm","job_railLord","job_hive","job_garden","job_starIdol","job_miracle","job_exorcist","job_guardian","job_warSinger","job_healingIdol","job_barrage","job_sniper","job_plagueDoctor","job_philosopher","job_bloodDuke","job_batQueen","job_element","job_timeMage","job_shadow","job_bombNinja","job_swordSaint","job_thunderLord","job_titan","job_berserk","job_beast","job_heroic","job_boneKing","job_soulHerd","fashion_sayo_crown","fashion_aya_funeral","fashion_rion_bride","fashion_sayo_plain","weapon_sayo_final","weapon_aya_mirror","weapon_rion_burial","weapon_sayo_spare"].forEach((id) => {
   const art = path.join(root, "android-app/app/src/main/assets/game/art/gacha", id + ".webp");
   assert.equal(fs.existsSync(art), true, "missing " + id);
   assert.ok(fs.statSync(art).size > 8000, id + " too small");
@@ -64,6 +67,11 @@ old.shop40 = migrated;
 assert.equal(migrated.ops.pity, 17);
 assert.equal(migrated.ops.owned.sayo_echo, 2);
 assert.equal(migrated.ops.owned.aya_petal, 0);
+assert.equal(migrated.ops.rosterTab, "scrap");
+assert.equal(migrated.ops.owned.job_swarm, 0);
+const oldJobTab = { coins: 90, shop40: { ops: { rosterTab: "job", owned: { sayo_echo: 1 } } } };
+assert.equal(L.normalizeOps(oldJobTab.shop40).ops.rosterTab, "job");
+assert.equal(L.normalizeOps({ ops: { rosterTab: "unknown" } }).ops.rosterTab, "scrap");
 
 const poor = { coins: 10, shop40: L.normalizeOps({}) };
 const denied = L.pull(poor, 1, () => 0);
@@ -89,15 +97,15 @@ pitySave.shop40.ops.pity = 79;
 const forced = L.pull(pitySave, 1, () => 0.999);
 assert.notEqual(forced.results[0].r, "SSR");
 assert.equal(forced.results[0].r, "SR");
-assert.ok(["school_shrine", "school_gun", "school_cult"].includes(forced.results[0].id));
-assert.equal(forced.results[0].kind, "school");
+assert.ok(forced.results[0].kind === "job" || forced.results[0].kind === "school", "硬保必须落在转职或基础 SR，不是残件");
 assert.notEqual(forced.results[0].kind, "scrap");
+assert.ok(["job", "school"].includes(forced.results[0].kind));
 assert.equal(pitySave.shop40.ops.pity, 0, "残片 SSR 保底降成 SR 后必须清 pity");
 const afterPity = L.pull(pitySave, 1, () => 0.99);
 assert.equal(afterPity.ok, true);
 assert.equal(afterPity.results[0].r, "R");
 
-const remnantPool = [...L.CARDS, ...L.SCHOOL_CARDS];
+const remnantPool = [...L.CARDS, ...L.SCHOOL_CARDS, ...L.JOB_CARDS];
 assert.equal(L.downgradeRarity("N", remnantPool), "R");
 assert.equal(L.downgradeRarity("R", remnantPool), "R");
 assert.equal(L.downgradeRarity("SR", remnantPool), "SR");
@@ -125,12 +133,26 @@ function tallyPulls(pool, n, seed) {
   }
   return tally;
 }
-const remnantTally = tallyPulls("remnant", 2000, 0x51c0de);
+function tallyRemnantJobs(n, seed) {
+  const save = { coins: n * 160 + 160, shop40: L.normalizeOps({}) };
+  const rng = lcg(seed);
+  const tally = { N: 0, R: 0, SR: 0, SSR: 0 };
+  const jobs = new Set();
+  for (let i = 0; i < n; i++) {
+    const row = L.pull(save, 1, rng, "remnant");
+    tally[row.results[0].r] += 1;
+    if (String(row.results[0].id).startsWith("job_")) jobs.add(row.results[0].id);
+  }
+  return { tally, jobs };
+}
+const remnantPack = tallyRemnantJobs(2000, 0x51c0de);
+const remnantTally = remnantPack.tally;
 assert.ok(remnantTally.R > remnantTally.SR * 3, "残片 R 应远多于 SR: " + JSON.stringify(remnantTally));
 assert.ok(remnantTally.R / 2000 >= 0.55, "残片约六七成应为 R: " + JSON.stringify(remnantTally));
 assert.ok(remnantTally.SR / 2000 >= 0.04 && remnantTally.SR / 2000 <= 0.25, "残片 SR 应在一成左右: " + JSON.stringify(remnantTally));
 assert.equal(remnantTally.SSR, 0);
 assert.ok(remnantTally.SR / 2000 < 0.5, "残片不能再出现过半 SR");
+assert.ok(remnantPack.jobs.size >= 10, "2000 抽至少 10 个不同 job_*: " + remnantPack.jobs.size);
 const fashionTally = tallyPulls("fashion", 2000, 0x51c0de);
 assert.ok(fashionTally.N > fashionTally.SR, "时装 N 应多于 SR: " + JSON.stringify(fashionTally));
 assert.ok(fashionTally.N / 2000 >= 0.5, "时装 N 应保持现有量级: " + JSON.stringify(fashionTally));
@@ -147,6 +169,9 @@ assert.ok(fashionPull.results[0].id.startsWith("fashion_"));
 const scrapSpark = L.spark({ coins: 0, shop40: L.normalizeOps({}) }, "remnant", "sayo_echo");
 assert.equal(scrapSpark.ok, false);
 assert.equal(scrapSpark.reason, "scrap");
+const jobSpark = L.spark({ coins: 0, shop40: L.normalizeOps({ ops: { shards: 200 } }) }, "remnant", "job_swarm");
+assert.equal(jobSpark.ok, false);
+assert.equal(jobSpark.reason, "rarity");
 fashionSave.shop40.ops.fashion.shards = 200;
 const sparked = L.spark(fashionSave, "fashion", "fashion_sayo_crown");
 assert.equal(sparked.ok, true);
@@ -195,6 +220,23 @@ L.applyOwnedBonus(schoolP14, schoolSave);
 const fourteenMul = L.SCHOOL_CARDS.reduce((m, card) => m * (1 + card.dmg), 1) * 1.02 * 1.03;
 assert.ok(Math.abs(schoolP14.dmg - 20 * fourteenMul) < 1e-6);
 assert.equal(L.snapshot(schoolSave).schoolOwned, 14);
+
+const jobP = { dmg: 20 };
+const jobSave = { shop40: L.normalizeOps({}) };
+jobSave.shop40.ops.owned.job_swarm = 1;
+jobSave.shop40.ops.owned.job_railLord = 2;
+L.applyOwnedBonus(jobP, jobSave);
+assert.ok(Math.abs(jobP.dmg - 20 * 1.005 * 1.005) < 1e-6, "每张转职 +0.5%，重复不加");
+assert.equal(L.hasJob(jobSave, "mech"), true);
+assert.equal(L.hasJob(jobSave, "spore"), false);
+assert.equal(L.hasJob({ shop40: L.normalizeOps({}) }, "mech"), false);
+const jobP2 = { dmg: 20 };
+jobSave.shop40.ops.owned.job_swarm = 9;
+L.applyOwnedBonus(jobP2, jobSave);
+assert.ok(Math.abs(jobP2.dmg - 20 * 1.005 * 1.005) < 1e-6, "同一张转职重复不叠伤");
+assert.equal(L.JOB_CARDS.length, 28);
+assert.ok(L.JOB_CARDS.every((card) => card.id.startsWith("job_") && card.r === "SR" && card.kind === "job" && card.dmg === 0.005));
+assert.equal(L.snapshot(jobSave).jobOwned, 2);
 
 const shardSave = { coins: 20000, shop40: L.normalizeOps({}) };
 L.CARDS.forEach((card) => { shardSave.shop40.ops.owned[card.id] = 1; });
@@ -367,6 +409,20 @@ assert.match(rosterHost.innerHTML, /待寻访/);
 assert.match(rosterHost.innerHTML, /data-card="school_shrine"/);
 assert.equal(rosterHost.innerHTML.includes("school_shrine.webp"), false);
 assert.match(rosterHost.innerHTML, /card_back\.webp/);
+V.setRosterTab(save, "job");
+V.renderRoster(rosterHost, save, { art: (p) => "game/art/" + p });
+assert.equal((rosterHost.innerHTML.match(/class="rosterSlot46/g) || []).length, 28);
+assert.match(rosterHost.innerHTML, /data-roster="job"/);
+assert.match(rosterHost.innerHTML, /data-card="job_swarm"/);
+assert.equal(rosterHost.innerHTML.includes("job_swarm.webp"), false);
+assert.match(rosterHost.innerHTML, /card_back\.webp/);
+assert.match(rosterHost.innerHTML, /待寻访/);
+V.setRosterTab(save, "fusion");
+V.renderRoster(rosterHost, save, { art: (p) => "game/art/" + p });
+assert.match(rosterHost.innerHTML, /后续写入/);
+assert.equal(rosterHost.innerHTML.includes("星核机甲少女"), false);
+assert.equal(rosterHost.innerHTML.includes("血炼剑仙"), false);
+assert.equal((rosterHost.innerHTML.match(/class="rosterSlot46/g) || []).length, 0);
 V.setRosterTab(save, "fashion");
 V.renderRoster(rosterHost, save, { art: (p) => "game/art/" + p });
 assert.equal((rosterHost.innerHTML.match(/class="rosterSlot46/g) || []).length, 12);

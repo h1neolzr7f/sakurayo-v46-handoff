@@ -16,3 +16,9 @@ A/B 每轮追加一行，不准删旧记录。
 | 2026-08-18 | A | 清虫轮2 / 剧情吐槽分层 | 升级模态时断言 dialogue/banter hidden。transientBlocked 已在。 | 门A绿 | 轮1只看大厅点击 | 轮3回归 |
 | 2026-08-18 | A | 清虫轮3 / 回归 | 再跑门 A+C。无新 P0/P1。见 docs/PHASE1_GATE6.md | 门A/C绿 | 连续两轮无新洞 | 停，等人收工 |
 | 2026-08-19 | A | 残片降级 | 收工打回：残片无 N 时 N 被抬成 SR。downgradeRarity 先降档，走到底取最低档；仅 want=SSR 且无 SSR 才给最高档。want=SSR（硬保/软保）降成 SR 后清 pity，避免卡在 ≥80 后每抽都是 SR。lobby_unit 2000 抽残片 R 远多于 SR。 | 门A绿；门C Playwright 51 checks 绿 | 检查点3接线后没测无 N 池；保底降档后没清 pity | 停，等人再验收 |
+| 2026-08-19 | 二期 | 刀2 转职图 | 28 张 job_*.webp：商店礼装、去站桩/同跪、赛璐璐去噪。见 docs/PHASE2_FACE_CHECK.md。未覆盖旧 8/14/传说/公共图。 | 自检 28/28 能报出人 | 首轮抄参考图站桩 | 刀3加成 |
+| 2026-08-19 | 二期 | 刀3 加成与保底 | resetP 转职 +0.5% 重复不加；upgradeWeight 基础 ×1.3 后再 ×1.5；want=SSR 的 SR 桶优先未拥有 job/shrine/gun/cult，禁止残件。lobby_unit：28 张、仓库转职页、分布、硬保不是残件、2000 抽 ≥10 个 job_*。 | static/lobby/live/ops/framework 绿 | — | 刀4清虫 |
+| 2026-08-19 | 二期 | 刀4 清虫 | 门 A 脚本绿。browser_smoke 核心寻访/仓库/三角色/升级/Boss/结算绿；末尾孤证试炼点 #skill 超时与刀 0 基线相同，本轮未改战斗。无新 P0/P1。未升 4.6.1。 | 门A绿 | 基线已有 #skill 不可见 | 停，等人收工 |
+| 2026-08-19 | 二期 | 绫枪姿复检 | 十张绫封面过目视。禁 `aya_petal` 竖举脸边/朝天。整张重画 plagueDoctor / element / bombNinja；barrage / timeMage 一并换构图。sniper / philosopher / bloodDuke / batQueen / shadow 可留。未动旧 8/14/传说/公共图。 | 目视 10/10 枪不贴脸 | 首轮抄默认举枪 | 停，等人收工 |
+| 2026-08-19 | 二期 | 表情复检 | 28 张过目视。禁全员抿嘴杀气。可留 hive / warSinger / healingIdol / bloodDuke / beast / heroic / boneKing。其余 21 张整张重画，情绪按 lore 拆开。绫仍禁举枪贴脸。未动旧 8/14/传说/公共图。 | 目视 28/28 能报出不同情绪 | 上轮只修枪姿没拆表情 | 停，等人收工 |
+| 2026-08-19 | 二期 | garden 打回 | 只重画 job_garden。上一张围裙跪泥纯哭，和 hive 同属菌校含泪。新图必须看见笑裂，泪只留一滴。其余 27 张、逻辑、旧图不动。 | 目视：嘴角上扬、一滴泪 | 自检写了笑裂图是纯哭 | 这一张过了才能点合并 |
