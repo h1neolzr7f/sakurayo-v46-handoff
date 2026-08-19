@@ -12,6 +12,14 @@ sandbox.globalThis = sandbox;
 vm.runInNewContext(code, sandbox);
 const L = sandbox.window.SakurayoLobby;
 
+assert.equal(code.includes("#rotateHint46"), false, "lobby 不得再写横持提示");
+assert.equal(code.includes("portraitFallback46"), false, "lobby 不得再写竖版回退");
+assert.match(code, /html\.landscape46 \.wishPity46\{bottom:max\(240px/);
+const indexSrc = fs.readFileSync(path.join(root, "src/index.html"), "utf8");
+assert.equal(indexSrc.includes('hint.textContent = "请横持设备"'), false, "index 不得再创建横持提示");
+assert.equal(indexSrc.includes('toggle("portraitFallback46"'), false, "index 不得再打开竖版回退");
+assert.match(indexSrc, /runMode36=pendingMode46==="testimony"\?"testimony":"story"/, "出击必须把 pendingMode46 写入 runMode36");
+assert.equal(indexSrc.includes('["dialogue","event","level","pause","result","menu"]'), false, "大厅 toast 不得被 menu 态挡死");
 assert.equal(L.version, "4.6.0");
 assert.equal(L.CARDS.length, 8);
 assert.equal(L.CHRONICLE.length, 5);

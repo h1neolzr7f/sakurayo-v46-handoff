@@ -13,6 +13,9 @@ assert.match(html, /runtime\/sakurayo-ops\.js/);
 assert.match(html, /CONTENT41\.hook\("combat:after-update"/);
 assert.match(html, /core\.ops46/);
 assert.doesNotMatch(html, /update=function\(dt\)\{[^}]*SakurayoOps/);
+assert.doesNotMatch(code, /html\.landscape46 #opsDock46\{[^}]*bottom:max\(18px/);
+assert.match(code, /html\.landscape46 #opsDock46\{[^}]*bottom:max\(168px/);
+assert.match(html, /closest\("#opsDock46"\)/);
 
 const sandbox = { window: {}, document: null, Math, Object, Array, Number, String, Set };
 sandbox.globalThis = sandbox;

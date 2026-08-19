@@ -20,6 +20,9 @@ Invoke-Step "syntax live" { node --check src/runtime/sakurayo-live.js }
 Invoke-Step "syntax ops" { node --check src/runtime/sakurayo-ops.js }
 Invoke-Step "syntax camera" { node --check src/runtime/sakurayo-camera.js }
 Invoke-Step "camera unit" { node tests/camera_unit.mjs }
+Invoke-Step "lifecycle unit" { node tests/lifecycle_unit.mjs }
+Invoke-Step "emu loop" { node tests/emu_loop.mjs }
+Invoke-Step "emu scan" { node tests/emu_scan.mjs }
 Invoke-Step "lobby unit" { node tests/lobby_unit.mjs }
 Invoke-Step "chronicle unit" { node tests/chronicle_unit.mjs }
 Invoke-Step "live unit" { node tests/live_unit.mjs }

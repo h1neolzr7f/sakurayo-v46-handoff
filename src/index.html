@@ -31,16 +31,17 @@
   line-height:1.45!important;
 }
 #toast{
-  top:max(110px,calc(env(safe-area-inset-top) + 98px))!important;
+  top:max(136px,calc(env(safe-area-inset-top) + 124px))!important;
   bottom:auto!important;
-  z-index:11!important;
+  transform:translateX(-50%)!important;
+  z-index:25!important;
   width:max-content!important;
   max-width:84vw!important;
   white-space:normal!important;
   text-align:center!important;
   line-height:1.35!important;
 }
-#toast.show{top:max(118px,calc(env(safe-area-inset-top) + 106px))!important}
+#toast.show{top:max(136px,calc(env(safe-area-inset-top) + 124px))!important}
 .warn{
   top:max(164px,calc(env(safe-area-inset-top) + 150px))!important;
   z-index:13!important;
@@ -53,7 +54,7 @@
 .choice .legend{color:#ffd86f!important}
 @media(max-height:700px){
   .banter{bottom:max(118px,calc(env(safe-area-inset-bottom) + 105px))!important;font-size:11px!important}
-  #toast{top:max(96px,calc(env(safe-area-inset-top) + 86px))!important;font-size:11px!important}
+  #toast{top:max(122px,calc(env(safe-area-inset-top) + 110px))!important;font-size:11px!important}
 }
 
 /* V3.5 三角色与衣装商店 */
@@ -522,11 +523,12 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     warSinger:["小夜","尸潮歌姬成型。副歌一响，僵尸负责倒下。"],healingIdol:["凛","治愈偶像进阶。","小夜","终于有观众看完演出后生命值会上升。"],
     boneKing:["小夜","白骨君王成型。王座先免了，我不想知道材料来源。"],soulHerd:["小夜","群魂牧者进阶。请亡魂排队，不要挤占弹幕通道。"],
   };
-  function transientBlocked(){return ["dialogue","event","level","pause","result","menu"].includes(state) || !$("#warning").classList.contains("hidden") || (P.outfitReveal||0)>0.18;}
+  function transientBlocked(){return ["dialogue","event","level","pause","result"].includes(state) || !$("#warning").classList.contains("hidden") || (P.outfitReveal||0)>0.18;}
   function hideTransient(){
     $("#banter").classList.add("hidden");
     $("#toast").classList.remove("show");
-    banterBusy=false;toastBusy=false;
+    $("#warning").classList.add("hidden");
+    banterBusy=false;toastBusy=false;toastQueue.length=0;
     clearTimeout(playBanter.t);clearTimeout(playToast.t);
   }
   function showBanter(lines,force=false){
@@ -2297,18 +2299,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     return { w: Math.max(1, w), h: Math.max(1, h) };
   }
   function preferLandscape46() {
-    const view = viewportSize46();
-    const portrait = view.h > view.w;
     document.documentElement.classList.add("landscape46");
-    document.documentElement.classList.toggle("portraitFallback46", view.w < 640);
-    document.documentElement.classList.toggle("tallWindow46", portrait && view.w >= 640);
-    let hint = $("#rotateHint46");
-    if (!hint) {
-      hint = document.createElement("div");
-      hint.id = "rotateHint46";
-      hint.textContent = "请横持设备";
-      document.body.appendChild(hint);
-    }
+    document.documentElement.classList.remove("portraitFallback46", "tallWindow46", "playing46");
+    const hint = $("#rotateHint46");
+    if (hint && hint.parentNode) hint.parentNode.removeChild(hint);
     try {
       if (screen.orientation && screen.orientation.lock) {
         screen.orientation.lock("landscape").catch(() => {});
@@ -2746,6 +2740,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     banterQueue = [];
     banterBusy = false;
     banterTick = 0;
+    toastQueue = [];
+    toastBusy = false;
     enemies = [];
     gems = [];
     parts = [];
@@ -2772,6 +2768,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     $("#warning").classList.add("hidden");
     $("#hud").classList.remove("hidden");
     $("#stageHud").textContent = stage().short;
+    preferLandscape46();
     showDialogue(openingDialogue(), () => {
       state = "play";
       const radio44 = window.SakurayoLifecycle?.radio?.(lifecycleWorld44(), save.character);
@@ -2779,7 +2776,6 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       showBanter(["雨宫凛", radio44 || "电台接通。你负责走位，构筑去暂停页看。"], true);
       if (hint44 && !P.banterSeen.has("ground44")) {
         P.banterSeen.add("ground44");
-        toast(hint44);
       }
       last = performance.now();
       scheduleLoop();
@@ -2793,6 +2789,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       (s) => $(s).classList.add("hidden"),
     );
     $("#menu").classList.remove("hidden");
+    preferLandscape46();
     P.fusion = null;
     setForm(null);
     checkAch();
@@ -2817,8 +2814,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     checkAch(); persist();
     $("#ricon").textContent=win?"🌸":"☠️"; $("#rankBig").textContent=win?(P.damageTaken===0?"S":P.plan?.rank||"A"):(runTime>stage().dur*.65?"B":"C");
     $("#rtitle").textContent=win?"镜界节点已净化":"防线失守";
-    $("#rsub").textContent=win?`${stage().short} 已封回证词。${stage().boss} 不再开口。${P.fusion?`「${fusionData()?.n}」`:"未融合"} / ${P.form?ASC.find(a=>a.id===P.form).n:"未飞升"}`:`${stage().short}被尸潮吞没。${window.SakurayoLifecycle?.hint?.(lifecycleWorld44())||"下次可以在暂停页看清短板，再决定补什么。"} ${runCoach45(false)}`;
-    $("#rstats").innerHTML=`坚持 <b>${fmt(runTime)}</b><br>击破 <b>${P.kills}</b> · 精英 <b>${P.eliteKills}</b> · 等级 <b>${P.level}</b><br>职业：<b>${careerSummary()}</b><br>融合：<b>${P.fusion?fusionData()?.n:"未融合"}</b><br>飞升：<b>${P.form?ASC.find(a=>a.id===P.form).n:"未飞升"}</b><br>获得樱花币 <b style="color:var(--g)">🌸 ${reward}</b>${pay44&&window.SakurayoEconomy?window.SakurayoEconomy.rewardHtml(pay44):""}`;
+    $("#rsub").textContent=win?`${stage().short} 已封回证词。${stage().boss} 不再开口。${P.fusion?`「${fusionData()?.n||P.fusion}」`:"未融合"} / ${P.form?ASC.find(a=>a.id===P.form)?.n||P.form:"未飞升"}`:`${stage().short}被尸潮吞没。${window.SakurayoLifecycle?.hint?.(lifecycleWorld44())||"下次可以在暂停页看清短板，再决定补什么。"} ${runCoach45(false)}`;
+    $("#rstats").innerHTML=`坚持 <b>${fmt(runTime)}</b><br>击破 <b>${P.kills}</b> · 精英 <b>${P.eliteKills}</b> · 等级 <b>${P.level}</b><br>职业：<b>${careerSummary()}</b><br>融合：<b>${P.fusion?fusionData()?.n||P.fusion:"未融合"}</b><br>飞升：<b>${P.form?ASC.find(a=>a.id===P.form)?.n||P.form:"未飞升"}</b><br>获得樱花币 <b style="color:var(--g)">🌸 ${reward}</b>${pay44&&window.SakurayoEconomy?window.SakurayoEconomy.rewardHtml(pay44):""}`;
     renderRunReport(); $("#result").classList.remove("hidden"); sound(win?"win":"over");
   }
   function pauseGame() {
@@ -3340,6 +3337,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       let cb = dialogueDone;
       dialogueDone = null;
       cb?.();
+      if (typeof opsPaint46 === "function") opsPaint46();
       return;
     }
     let l = dialogueQueue.shift();
@@ -5718,9 +5716,22 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
 
   function toast(s){toastQueue.push(s);playToast();}
+  function placeToast46(){
+    const e=$("#toast");
+    if(!e)return;
+    let top=0;
+    for(const id of ["mission","bossRule39","warning"]){
+      const n=$("#"+id);
+      if(!n||n.classList.contains("hidden")||n.hidden)continue;
+      const r=n.getBoundingClientRect();
+      if(r.width>1&&r.height>1)top=Math.max(top,r.bottom+8);
+    }
+    if(top>0)e.style.setProperty("top",Math.round(top)+"px","important");
+  }
   function playToast(){
     if(toastBusy||!toastQueue.length||transientBlocked())return;
     toastBusy=true;let e=$("#toast");e.textContent=toastQueue.shift();e.classList.add("show");
+    placeToast46();
     clearTimeout(playToast.t);playToast.t=setTimeout(()=>{e.classList.remove("show");toastBusy=false;setTimeout(playToast,160)},1100);
   }
   function ensureAudio() {
@@ -5771,6 +5782,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (
       state !== "play" ||
       e.target.closest(".act") ||
+      e.target.closest("#opsDock46") ||
       e.target === $("#pause")
     )
       return;
@@ -6621,7 +6633,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   };
   document.body.classList.toggle("noContrast39",!save.settings.contrast);document.body.classList.toggle("richUi39",!save.settings.uiCalm);
   ensureBossRule39();installCalmMenu39();
-  style37.textContent+=`.bossRule39{position:absolute;z-index:16;top:112px;left:50%;transform:translateX(-50%);max-width:min(78vw,410px);padding:7px 12px;border-radius:999px;background:#090716df;border:1px solid #ff72b577;color:#fff;font:800 11px/1.25 system-ui;text-align:center;pointer-events:none}.calmUtility39{display:grid!important;grid-template-columns:1fr!important}.calmUtility39>button:not(#moreButton39){display:none}.calmUtility39.open39{grid-template-columns:repeat(2,1fr)!important}.calmUtility39.open39>#moreButton39{grid-column:1/-1}.calmUtility39.open39>button{display:block!important}.recap39{border-color:#65d9cf55!important;background:#0b1720cc!important}.settingGroup39{display:grid;gap:8px}.richUi39 .calmUtility39{grid-template-columns:repeat(2,1fr)!important}.richUi39 .calmUtility39>button{display:block!important}.noContrast39 .bossRule39{opacity:.86}@media(max-height:720px){.bossRule39{top:96px;font-size:10px;max-width:72vw}}`;
+  style37.textContent+=`.bossRule39{position:absolute;z-index:16;top:138px;left:50%;transform:translateX(-50%);max-width:min(78vw,410px);padding:7px 12px;border-radius:999px;background:#090716df;border:1px solid #ff72b577;color:#fff;font:800 11px/1.25 system-ui;text-align:center;pointer-events:none}.calmUtility39{display:grid!important;grid-template-columns:1fr!important}.calmUtility39>button:not(#moreButton39){display:none}.calmUtility39.open39{grid-template-columns:repeat(2,1fr)!important}.calmUtility39.open39>#moreButton39{grid-column:1/-1}.calmUtility39.open39>button{display:block!important}.recap39{border-color:#65d9cf55!important;background:#0b1720cc!important}.settingGroup39{display:grid;gap:8px}.richUi39 .calmUtility39{grid-template-columns:repeat(2,1fr)!important}.richUi39 .calmUtility39>button{display:block!important}.noContrast39 .bossRule39{opacity:.86}@media(max-height:720px){.bossRule39{top:132px;font-size:10px;max-width:72vw}}`;
 
   /* ================= V4.0 内测轮回：后门、普通商店与纯初始挑战 ================= */
   const BETA40=TEST_MODE||new URLSearchParams(location.search).has("beta"),BASE_STAGE_DUR40=ST.map(s=>s.dur);
@@ -7056,7 +7068,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         }
         throw new Error(`Unknown outfit kind: ${kind}`);
       },
-      selectStage(id){const value=Number(id);if(!ST.some(s=>s.id===value))throw new Error(`Unknown stage: ${id}`);runMode36="story";selected=value;menuUpdate();return snapshot35();},
+      selectStage(id){const value=Number(id);if(!ST.some(s=>s.id===value))throw new Error(`Unknown stage: ${id}`);runMode36="story";pendingMode46="story";selected=value;menuUpdate();return snapshot35();},
       setRunMode46(mode){if(!["story","testimony","mainGod"].includes(mode))throw new Error(`Unknown mode: ${mode}`);runMode36=mode;pendingMode46=mode;menuUpdate();return snapshot35();},
       unlockMainGod(){if(!save.done.includes(4))save.done.push(4);save.unlock=Math.max(save.unlock,4);persist();return snapshot35();},
       selectMainGodTier(tier=1){const value=clamp(Math.floor(Number(tier)||1),1,4);runMode36="mainGod";selectedMainGodTier36=value;save.mainGod.unlockedTier=Math.max(save.mainGod.unlockedTier,value);menuUpdate();return snapshot35();},
@@ -7353,7 +7365,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     wireLivePuppet46();
     return result;
   };
-  style37.textContent += `#menu.homeDock46{overflow-x:hidden}#menu.homeDock46 .bg{filter:brightness(.7) saturate(.9)}#menu.homeDock46 .bg:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#05051266 0%,#05051200 22%,#08071300 54%,#080713f0 86%);pointer-events:none}#coverTitle36{z-index:4}#menu.homeDock46 #coverTitle36{top:max(8px,env(safe-area-inset-top));left:50%;width:auto;max-width:86%;transform:translateX(-50%);pointer-events:auto}#menu.homeDock46 .coverTitle36 b{font-size:clamp(15px,4.2vw,22px);letter-spacing:.2em}#menu.homeDock46 .coverTitle36 span{margin-top:3px;padding:2px 8px;font-size:8px;letter-spacing:.22em;opacity:.88}.heroLive46{position:absolute;z-index:1;left:-18%;right:-18%;top:-4%;bottom:19%;pointer-events:none;overflow:hidden;-webkit-mask-image:linear-gradient(to top,transparent 0%,#000 24%,#000 100%);mask-image:linear-gradient(to top,transparent 0%,#000 24%,#000 100%);-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}.heroLiveSway46{height:100%;width:100%;display:grid;place-items:end center;transform-origin:50% 100%;animation:heroSway46 5.4s ease-in-out infinite}.heroLiveBreath46{position:relative;height:100%;width:min(72vw,680px);transform-origin:50% 100%;animation:heroBreath46 3.8s ease-in-out infinite}.heroLiveBreath46 img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center 8%;background:transparent!important;pointer-events:none;filter:none}.heroLiveBlink46,.heroLiveHair46,.heroLiveBlink46.off,.heroLiveHair46.off{opacity:0}.heroLiveName46{position:absolute;z-index:2;left:14px;right:auto;top:18%;bottom:auto;text-align:left;text-shadow:0 2px 16px #05020d;max-width:48%}.heroLiveName46 b{display:block;font-size:22px;letter-spacing:.22em}.heroLiveName46 small{display:block;margin-top:4px;color:#ffe7a3;font-size:10px;letter-spacing:.28em}#menu.homeDock46 .menu{transform:none;z-index:3;justify-content:flex-end}#menu.homeDock46 .top{z-index:5;gap:8px;align-items:center}#menu.homeDock46 .profile{display:none}#menu.homeDock46 .coins{margin-right:auto;padding:4px 10px;border-radius:99px;background:#0b0818cc;border:1px solid #ff9bcc44}#menu.homeDock46 .menuBrand35{width:30px;height:30px;border-radius:10px}#menu.homeDock46 .utilityButtons37{position:static;margin:0;max-width:148px;gap:6px}#menu.homeDock46 .calmUtility39.open39{position:absolute;top:0;right:0;width:min(74vw,280px);max-width:none;padding:8px;border-radius:14px;background:#0b0818f2;border:1px solid #ff9bcc55;z-index:8}#menu.homeDock46 .charSelectPanel{position:absolute;left:8px;bottom:30%;width:auto;margin:0;padding:0;border:0;background:none;box-shadow:none;z-index:6;pointer-events:auto}#menu.homeDock46 .sectionTitle{display:none}#menu.homeDock46 .characterList{display:flex;flex-direction:column;justify-content:flex-end;gap:9px}#menu.homeDock46 .charCard{width:52px;height:52px;min-width:52px;padding:3px;border-radius:50%;background:#0b0818d8}#menu.homeDock46 .charCard.selected{box-shadow:0 0 0 2px #fff7d8,0 0 16px #ff4fa8aa}#menu.homeDock46 .charCard img{width:44px;height:44px}#menu.homeDock46 .charCard b,#menu.homeDock46 .charCard em,#menu.homeDock46 .charCard p,#menu.homeDock46 .charCard .selectedMark{display:none}#menu.homeDock46 .stageMini{width:min(100%,560px);grid-template-columns:48px 1fr auto;padding:6px 10px;margin:0 auto 8px;border-radius:16px;background:#0b0818e8;backdrop-filter:blur(8px)}#menu.homeDock46 .stageMini img{width:48px;height:32px}#menu.homeDock46 .stageMini h3{font-size:13px}#menu.homeDock46 .stageMini p{display:none}#menu.homeDock46 .stageMini strong{font-size:16px}#menu.homeDock46 .start{margin:0 auto 8px;padding:14px;font-size:17px;letter-spacing:.14em;width:min(100%,560px);border-radius:16px;box-shadow:0 8px 28px #ff4ea355}#menu.homeDock46 .nav{width:min(100%,560px);margin:0 auto;padding:6px 4px calc(8px + env(safe-area-inset-bottom));border-radius:18px 18px 0 0;background:#0b0818f0;border:1px solid #ff9bcc33}@keyframes heroSway46{0%,100%{transform:rotate(-0.55deg) translate3d(-0.5%,0,0)}50%{transform:rotate(0.65deg) translate3d(0.5%,0,0)}}@keyframes heroBreath46{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-1%) scale(1.01)}}@keyframes heroHair46{0%,100%{transform:rotate(-1.8deg)}50%{transform:rotate(2deg)}}@keyframes heroBlink46{0%,94%,100%{opacity:0}95.2%,96.4%{opacity:1}}@keyframes heroBaseBlink46{0%,94%,100%{opacity:1}95.2%,96.4%{opacity:0}}@media(prefers-reduced-motion:reduce){.heroLiveSway46,.heroLiveBreath46,.heroLive46.hasBlink .heroLiveBase46,.heroLive46.hasBlink .heroLiveBlink46,.heroLive46.hasHair .heroLiveHair46{animation:none}}@media(max-height:760px){#menu.homeDock46 .heroLive46{bottom:28%}#menu.homeDock46 .charSelectPanel{bottom:32%}#menu.homeDock46 .charCard{width:44px;height:44px;min-width:44px}#menu.homeDock46 .charCard img{width:36px;height:36px}#menu.homeDock46 .heroLiveName46{top:14%;font-size:16px}}@media(orientation:landscape){#menu.homeDock46 .heroLive46{top:0;bottom:0;left:0;right:auto;width:58%;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 8%,#000 82%,transparent 100%);mask-image:linear-gradient(to right,transparent 0%,#000 8%,#000 82%,transparent 100%);-webkit-mask-size:100% 100%;mask-size:100% 100%}#menu.homeDock46 .menu{width:min(34vw,360px);max-width:360px;margin-left:auto;padding-left:0;transform:none;box-sizing:border-box}#menu.homeDock46 #coverTitle36{left:max(16px,env(safe-area-inset-left));right:auto;width:auto;transform:none;text-align:left}#menu.homeDock46 .charSelectPanel{position:relative;left:auto;right:auto;bottom:auto;width:100%}#menu.homeDock46 .charSelectPanel,#menu.homeDock46 .stageMini,#menu.homeDock46 .start,#menu.homeDock46 .nav{margin-left:auto;width:100%}#joy{left:max(18px,env(safe-area-inset-left));bottom:max(16px,env(safe-area-inset-bottom))}#hud .acts{right:max(18px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom))}}`;
+  style37.textContent += `#menu.homeDock46{overflow-x:hidden}#menu.homeDock46 .bg{filter:brightness(.7) saturate(.9)}#menu.homeDock46 .bg:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#05051266 0%,#05051200 22%,#08071300 54%,#080713f0 86%);pointer-events:none}#coverTitle36{z-index:4}#menu.homeDock46 #coverTitle36{top:max(8px,env(safe-area-inset-top));left:max(16px,env(safe-area-inset-left));width:auto;max-width:40%;transform:none;text-align:left;pointer-events:auto}#menu.homeDock46 .coverTitle36 b{font-size:clamp(15px,4.2vw,22px);letter-spacing:.2em}#menu.homeDock46 .coverTitle36 span{margin-top:3px;padding:2px 8px;font-size:8px;letter-spacing:.14em;opacity:.88;white-space:nowrap}.heroLive46{position:absolute;z-index:1;left:0;right:auto;width:64%;top:0;bottom:0;pointer-events:none;overflow:hidden;-webkit-mask-image:linear-gradient(to top,transparent 0%,#000 24%,#000 100%);mask-image:linear-gradient(to top,transparent 0%,#000 24%,#000 100%);-webkit-mask-size:100% 100%;mask-size:100% 100%;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}.heroLiveSway46{height:100%;width:100%;display:grid;place-items:end center;transform-origin:50% 100%;animation:heroSway46 5.4s ease-in-out infinite}.heroLiveBreath46{position:relative;height:100%;width:min(72vw,680px);transform-origin:50% 100%;animation:heroBreath46 3.8s ease-in-out infinite}.heroLiveBreath46 img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center 8%;background:transparent!important;pointer-events:none;filter:none}.heroLiveBlink46,.heroLiveHair46,.heroLiveBlink46.off,.heroLiveHair46.off{opacity:0}.heroLiveName46{position:absolute;z-index:2;left:14px;right:auto;top:18%;bottom:auto;text-align:left;text-shadow:0 2px 16px #05020d;max-width:48%}.heroLiveName46 b{display:block;font-size:22px;letter-spacing:.22em}.heroLiveName46 small{display:block;margin-top:4px;color:#ffe7a3;font-size:10px;letter-spacing:.28em}#menu.homeDock46 .menu{transform:none;z-index:3;justify-content:flex-end}#menu.homeDock46 .top{z-index:5;gap:8px;align-items:center}#menu.homeDock46 .profile{display:none}#menu.homeDock46 .coins{margin-right:auto;padding:4px 10px;border-radius:99px;background:#0b0818cc;border:1px solid #ff9bcc44}#menu.homeDock46 .menuBrand35{width:30px;height:30px;border-radius:10px}#menu.homeDock46 .utilityButtons37{position:static;margin:0;max-width:148px;gap:6px}#menu.homeDock46 .calmUtility39.open39{position:absolute;top:0;right:0;width:min(74vw,280px);max-width:none;padding:8px;border-radius:14px;background:#0b0818f2;border:1px solid #ff9bcc55;z-index:8}#menu.homeDock46 .charSelectPanel{position:absolute;left:8px;bottom:30%;width:auto;margin:0;padding:0;border:0;background:none;box-shadow:none;z-index:6;pointer-events:auto}#menu.homeDock46 .sectionTitle{display:none}#menu.homeDock46 .characterList{display:flex;flex-direction:column;justify-content:flex-end;gap:9px}#menu.homeDock46 .charCard{width:52px;height:52px;min-width:52px;padding:3px;border-radius:50%;background:#0b0818d8}#menu.homeDock46 .charCard.selected{box-shadow:0 0 0 2px #fff7d8,0 0 16px #ff4fa8aa}#menu.homeDock46 .charCard img{width:44px;height:44px}#menu.homeDock46 .charCard b,#menu.homeDock46 .charCard em,#menu.homeDock46 .charCard p,#menu.homeDock46 .charCard .selectedMark{display:none}#menu.homeDock46 .stageMini{width:min(100%,560px);grid-template-columns:48px 1fr auto;padding:6px 10px;margin:0 auto 8px;border-radius:16px;background:#0b0818e8;backdrop-filter:blur(8px)}#menu.homeDock46 .stageMini img{width:48px;height:32px}#menu.homeDock46 .stageMini h3{font-size:13px}#menu.homeDock46 .stageMini p{display:none}#menu.homeDock46 .stageMini strong{font-size:16px}#menu.homeDock46 .start{margin:0 auto 8px;padding:14px;font-size:17px;letter-spacing:.14em;width:min(100%,560px);border-radius:16px;box-shadow:0 8px 28px #ff4ea355}#menu.homeDock46 .nav{width:min(100%,560px);margin:0 auto;padding:6px 4px calc(8px + env(safe-area-inset-bottom));border-radius:18px 18px 0 0;background:#0b0818f0;border:1px solid #ff9bcc33}@keyframes heroSway46{0%,100%{transform:rotate(-0.55deg) translate3d(-0.5%,0,0)}50%{transform:rotate(0.65deg) translate3d(0.5%,0,0)}}@keyframes heroBreath46{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-1%) scale(1.01)}}@keyframes heroHair46{0%,100%{transform:rotate(-1.8deg)}50%{transform:rotate(2deg)}}@keyframes heroBlink46{0%,94%,100%{opacity:0}95.2%,96.4%{opacity:1}}@keyframes heroBaseBlink46{0%,94%,100%{opacity:1}95.2%,96.4%{opacity:0}}@media(prefers-reduced-motion:reduce){.heroLiveSway46,.heroLiveBreath46,.heroLive46.hasBlink .heroLiveBase46,.heroLive46.hasBlink .heroLiveBlink46,.heroLive46.hasHair .heroLiveHair46{animation:none}}@media(max-height:760px){#menu.homeDock46 .heroLive46{bottom:28%}#menu.homeDock46 .charSelectPanel{bottom:32%}#menu.homeDock46 .charCard{width:44px;height:44px;min-width:44px}#menu.homeDock46 .charCard img{width:36px;height:36px}#menu.homeDock46 .heroLiveName46{top:14%;font-size:16px}}@media(orientation:landscape){#menu.homeDock46 .heroLive46{top:0;bottom:0;left:0;right:auto;width:58%;-webkit-mask-image:linear-gradient(to right,transparent 0%,#000 8%,#000 82%,transparent 100%);mask-image:linear-gradient(to right,transparent 0%,#000 8%,#000 82%,transparent 100%);-webkit-mask-size:100% 100%;mask-size:100% 100%}#menu.homeDock46 .menu{width:min(34vw,360px);max-width:360px;margin-left:auto;padding-left:0;transform:none;box-sizing:border-box}#menu.homeDock46 #coverTitle36{left:max(16px,env(safe-area-inset-left));right:auto;width:auto;transform:none;text-align:left}#menu.homeDock46 .charSelectPanel{position:relative;left:auto;right:auto;bottom:auto;width:100%}#menu.homeDock46 .charSelectPanel,#menu.homeDock46 .stageMini,#menu.homeDock46 .start,#menu.homeDock46 .nav{margin-left:auto;width:100%}#joy{left:max(18px,env(safe-area-inset-left));bottom:max(16px,env(safe-area-inset-bottom))}#hud .acts{right:max(18px,env(safe-area-inset-right));bottom:max(16px,env(safe-area-inset-bottom))}}`;
 
   /* ================= V4.5.2 闪图结算、图鉴三行、融合色特效 ================= */
   function liveSplashPath45(){
@@ -7504,6 +7516,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       if(!btn||btn.disabled)return;
       const id=Number(card.dataset.stageId);
       btn.onclick=()=>{
+        if(pendingMode46==="mainGod"){
+          $("#stageList .mainGodCard36")?.scrollIntoView({block:"nearest"});
+          return;
+        }
         const s=ST.find(x=>x.id===id);
         runMode36=pendingMode46==="testimony"?"testimony":"story";
         selected=id;
@@ -7569,6 +7585,18 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     };
     const _startGame46=startGame;
     startGame=function(){
+      if(state==="menu"){
+        if(pendingMode46==="mainGod"){
+          if(runMode36!=="mainGod"){
+            openDrawer("stage");
+            renderStages();
+            $("#stageList .mainGodCard36")?.scrollIntoView({block:"nearest"});
+            return;
+          }
+        }else{
+          runMode36=pendingMode46==="testimony"?"testimony":"story";
+        }
+      }
       const result=_startGame46();
       if(runMode36==="testimony"&&$("#stageHud")) $("#stageHud").textContent=`证词 · ${stage().short}`;
       return result;
@@ -7602,7 +7630,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const dock=opsDock46();
     if(!O||!dock)return null;
     const hudOn=!!$("#hud")&&!$("#hud").classList.contains("hidden");
-    const on=hudOn&&O.enabled(runMode36)&&(state==="play"||state==="dialogue"||state==="paused");
+    const on=hudOn&&O.enabled(runMode36)&&state==="play";
     dock.hidden=!on;
     if(on)O.renderDock(dock,save.character||P.character||"sayo",artUrl);
     return O.snapshot();

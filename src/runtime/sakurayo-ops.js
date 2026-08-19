@@ -17,7 +17,7 @@
   var WEAPON = Object.freeze({ sayo: "rifle", aya: "pistol", rion: "blade" });
 
   var CSS =
-    "#opsDock46{position:absolute;z-index:6;left:max(8px,env(safe-area-inset-left));bottom:max(128px,calc(env(safe-area-inset-bottom) + 112px));width:min(168px,42vw);padding:8px;border-radius:16px;background:#0b0818d8;border:1px solid #ffe6a344;pointer-events:auto}" +
+    "#opsDock46{position:absolute;z-index:6;left:max(8px,env(safe-area-inset-left));bottom:max(168px,calc(env(safe-area-inset-bottom) + 150px));width:min(168px,42vw);padding:8px;border-radius:16px;background:#0b0818d8;border:1px solid #ffe6a344;pointer-events:auto}" +
     "#opsDock46[hidden]{display:none!important}" +
     ".opsDp46{display:flex;align-items:center;gap:8px;margin:0 0 8px}" +
     ".opsDp46 b{color:#ffe7a3;font:800 11px/1 system-ui;letter-spacing:.08em;white-space:nowrap}" +
@@ -29,8 +29,8 @@
     ".opsSlots46 button.on{border-color:#ffe6a3aa;box-shadow:0 0 12px #ffd36b44}" +
     ".opsSlots46 button.poor{opacity:.42}" +
     ".opsSlots46 button small{display:block;margin-top:2px;color:#ffe7a3;font:700 9px/1 system-ui}" +
-    "@media(orientation:landscape){#opsDock46{left:max(12px,env(safe-area-inset-left));bottom:max(18px,env(safe-area-inset-bottom));width:196px}}" +
-    "html.landscape46 #opsDock46{left:max(12px,env(safe-area-inset-left));bottom:max(18px,env(safe-area-inset-bottom));width:196px}";
+    "@media(orientation:landscape){#opsDock46{left:max(12px,env(safe-area-inset-left));bottom:max(168px,calc(env(safe-area-inset-bottom) + 150px));width:196px}}" +
+    "html.landscape46 #opsDock46{left:max(12px,env(safe-area-inset-left));bottom:max(168px,calc(env(safe-area-inset-bottom) + 150px));width:196px}";
 
   var state = emptyState();
 

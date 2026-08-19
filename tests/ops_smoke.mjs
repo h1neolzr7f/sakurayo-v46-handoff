@@ -55,6 +55,20 @@ assert.equal(await dock.count(), 1);
 assert.equal(await dock.isVisible(), true);
 assert.match(await dock.textContent(), /DP/);
 assert.equal(await page.locator("#opsDock46 [data-op]").count(), 2);
+const stickClear = await page.evaluate(() => {
+  const x = Math.round(innerWidth * 0.2);
+  const y = Math.round(innerHeight * 0.82);
+  const el = document.elementFromPoint(x, y);
+  const dock = document.querySelector("#opsDock46");
+  const joy = document.querySelector("#joy");
+  const a = dock.getBoundingClientRect();
+  const b = joy.getBoundingClientRect();
+  const w = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+  const h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+  return { onDock: !!(el && dock.contains(el)), overlap: w > 1 && h > 1 ? w * h : 0 };
+});
+assert.equal(stickClear.onDock, false, "默认摇杆点不得落在干员坞");
+assert.equal(stickClear.overlap, 0, `干员坞压住摇杆 ${stickClear.overlap}`);
 
 const before = await api("opsSnapshot46");
 assert.equal(before.dp, 10);
