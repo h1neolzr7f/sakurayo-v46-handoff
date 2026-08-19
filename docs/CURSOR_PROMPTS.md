@@ -2,13 +2,16 @@
 
 用法：同一仓库开三个对话。大脑贴「提示词〇」。A 只开一个对话贴「提示词 A」。B 按切片开多个对话，每个都贴「提示词 B」，只改切片那一行。
 
-第一期已进 `main`（`491e548`）。第二期 28 转职已 merge commit 进 `main`（`0657136`，PR #11）。版本仍 4.6.0。
+卡池一二三期已进 `main`（第三期 `4176014`）。版本仍 4.6.0。下一轮不要再加伤。怎么开见 [AUTORUN_NEXT.md](AUTORUN_NEXT.md)。
 
-- 严重度 P2（换拼卡，可不做）：[CURSOR_PROMPT_P2.md](CURSOR_PROMPT_P2.md)
-- 第二期 28 转职（已完成）：[CURSOR_PROMPT_PHASE2.md](CURSOR_PROMPT_PHASE2.md) · [AUTORUN_PHASE2.md](AUTORUN_PHASE2.md) · [PHASE2_ACCEPT.md](PHASE2_ACCEPT.md)
-- **第三期 24 融合**（下一个主项目）：[CURSOR_PROMPT_PHASE3.md](CURSOR_PROMPT_PHASE3.md) · [AUTORUN_PHASE3.md](AUTORUN_PHASE3.md)
+- **镜头大地图**（先开）：[CURSOR_PROMPT_CAMERA.md](CURSOR_PROMPT_CAMERA.md)
+- **换 18 张拼卡**：[CURSOR_PROMPT_FASHION.md](CURSOR_PROMPT_FASHION.md)
+- **绫 / 凛音编年**（勿与换拼卡并行改 lobby）：[CURSOR_PROMPT_CHRONICLE.md](CURSOR_PROMPT_CHRONICLE.md)
+- 第三期 24 融合（已完成）：[CURSOR_PROMPT_PHASE3.md](CURSOR_PROMPT_PHASE3.md) · [PHASE3_ACCEPT.md](PHASE3_ACCEPT.md)
+- 第二期 28 转职（已完成）：[CURSOR_PROMPT_PHASE2.md](CURSOR_PROMPT_PHASE2.md) · [PHASE2_ACCEPT.md](PHASE2_ACCEPT.md)
+- 旧 P2 占位稿作废：[CURSOR_PROMPT_P2.md](CURSOR_PROMPT_P2.md)（仓库「后续写入」已过时）
 
-P2 ≠ 第二期 ≠ 第三期。第三期提示词单独贴，不要和第一期 / 第二期 / P2 混用。
+镜头 ≠ 换拼卡 ≠ 编年。三份提示词单独贴，不要混进同一个项目。
 
 下面三段都是自洽的，不依赖再去翻别的文档。仍建议把本文件和 `docs/SWEEP_LOG.md` 留在仓库里当进度。
 

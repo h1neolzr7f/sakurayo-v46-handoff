@@ -12,7 +12,7 @@
 
 1. **开工**：已开。施工 PR https://github.com/h1neolzr7f/sakurayo-v46-handoff/pull/12
 2. **认人**：先打回 `fusion_shadowmage`、`fusion_necrospore`。`dae7774` 两张过了。见 `docs/PHASE3_FACE_REVIEW.md`。
-3. **收工**：可以合并。你点合并 #12。不要升 4.6.1。
+3. **收工**：已并进 `main` `4176014`。不要升 4.6.1。下一轮见 `docs/AUTORUN_NEXT.md`。
 
 ## 已锁死（开工后不准改）
 
