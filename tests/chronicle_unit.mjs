@@ -121,11 +121,13 @@ assert.equal(
   JSON.stringify(L.CHRONICLE.map((item) => ({ id: item.id, n: item.n, lore: [...item.lore] }))),
   JSON.stringify(SAYO_LOCKED)
 );
-assert.equal([...C.TITLES].join("|"), "月城小夜 · 未写完的夜|神代绫 · 未结案的夜|黑羽凛音 · 未收剑的夜");
-assert.equal(C.CHRONICLE_AYA.length, 3);
-assert.equal(C.CHRONICLE_RION.length, 3);
-assert.equal(C.CHRONICLE_AYA.map((item) => item.id).join(","), "ch_aya_sign,ch_aya_parts,ch_aya_one");
-assert.equal(C.CHRONICLE_RION.map((item) => item.id).join(","), "ch_rion_dojo,ch_rion_ledger,ch_rion_living");
+assert.equal([...C.TITLES].join("|"), "月城小夜 · 未写完的夜|神代绫 · 作废的工号|黑羽凛音 · 未署名的刀");
+assert.equal(C.CHRONICLE_AYA.length, 4);
+assert.equal(C.CHRONICLE_RION.length, 4);
+assert.equal(C.CHRONICLE_AYA.map((item) => item.id).join(","), "ch_aya_badge,ch_aya_void,ch_aya_petal,ch_aya_seam");
+assert.equal(C.CHRONICLE_RION.map((item) => item.id).join(","), "ch_rion_page,ch_rion_mound,ch_rion_unsaid,ch_rion_bride");
+assert.equal(C.CHRONICLE_AYA.map((item) => item.n).join(","), "工牌还在,作废回收,花比刀快,镜缝本体");
+assert.equal(C.CHRONICLE_RION.map((item) => item.n).join(","), "刀背署名,剑冢旁观,没有道号,无人掀盖");
 C.CHRONICLE_AYA.concat(C.CHRONICLE_RION).forEach((item) => {
   assert.equal(item.lore.length, 4);
   assert.ok(item.lore.some((line) => line.includes("我")));
@@ -143,18 +145,20 @@ L.setRosterTab(save, "chronicle");
 L.renderRoster(rosterHost, save, { art: (p) => "game/art/" + p });
 
 assert.match(rosterHost.innerHTML, /月城小夜 · 未写完的夜/);
-assert.match(rosterHost.innerHTML, /神代绫 · 未结案的夜/);
-assert.match(rosterHost.innerHTML, /黑羽凛音 · 未收剑的夜/);
-assert.match(rosterHost.innerHTML, /三角色 · 未写完的夜/);
+assert.match(rosterHost.innerHTML, /神代绫 · 作废的工号/);
+assert.match(rosterHost.innerHTML, /黑羽凛音 · 未署名的刀/);
+assert.equal(rosterHost.innerHTML.includes("三角色 · 未写完的夜"), false);
 assert.match(rosterHost.innerHTML, /第零次死亡/);
 assert.match(rosterHost.innerHTML, /镜零之后/);
-assert.match(rosterHost.innerHTML, /签名救援/);
-assert.match(rosterHost.innerHTML, /人格拆件/);
-assert.match(rosterHost.innerHTML, /碎镜只够一个人/);
-assert.match(rosterHost.innerHTML, /道场失联/);
-assert.match(rosterHost.innerHTML, /无名名册/);
-assert.match(rosterHost.innerHTML, /活人的道场/);
-assert.equal((rosterHost.innerHTML.match(/class="chronicleCard46/g) || []).length, 11);
+assert.match(rosterHost.innerHTML, /工牌还在/);
+assert.match(rosterHost.innerHTML, /作废回收/);
+assert.match(rosterHost.innerHTML, /花比刀快/);
+assert.match(rosterHost.innerHTML, /镜缝本体/);
+assert.match(rosterHost.innerHTML, /刀背署名/);
+assert.match(rosterHost.innerHTML, /剑冢旁观/);
+assert.match(rosterHost.innerHTML, /没有道号/);
+assert.match(rosterHost.innerHTML, /无人掀盖/);
+assert.equal((rosterHost.innerHTML.match(/class="chronicleCard46/g) || []).length, 13);
 assert.equal((rosterHost.innerHTML.match(/<h4>/g) || []).length, 3);
 assert.match(rosterHost.innerHTML, /data-chronicle-sides="1"/);
 assert.equal((rosterHost.innerHTML.match(/data-roster="chronicle"/g) || []).length, 1);
@@ -162,15 +166,17 @@ assert.equal(rosterHost.innerHTML.includes("school_gun"), false);
 assert.equal(document.getElementById("sakurayo-chronicle-css").id, "sakurayo-chronicle-css");
 
 L.renderRoster(rosterHost, save, { art: (p) => "game/art/" + p });
-assert.equal((rosterHost.innerHTML.match(/class="chronicleCard46/g) || []).length, 11);
-assert.equal((rosterHost.innerHTML.match(/签名救援/g) || []).length, 1);
+assert.equal((rosterHost.innerHTML.match(/class="chronicleCard46/g) || []).length, 13);
+assert.equal((rosterHost.innerHTML.match(/data-chronicle="ch_aya_badge"/g) || []).length, 1);
 
 L.setRosterTab(save, "scrap");
 L.renderRoster(rosterHost, save, { art: (p) => "game/art/" + p });
-assert.equal(rosterHost.innerHTML.includes("神代绫 · 未结案的夜"), false);
+assert.equal(rosterHost.innerHTML.includes("神代绫 · 作废的工号"), false);
 assert.equal((rosterHost.innerHTML.match(/class="rosterSlot46/g) || []).length, 8);
 
-assert.doesNotMatch(lobbySrc, /ch_aya_sign/);
-assert.doesNotMatch(lobbySrc, /神代绫 · 未结案的夜/);
-assert.doesNotMatch(lobbySrc, /黑羽凛音 · 未收剑的夜/);
+assert.doesNotMatch(lobbySrc, /ch_aya_badge/);
+assert.doesNotMatch(lobbySrc, /神代绫 · 作废的工号/);
+assert.doesNotMatch(lobbySrc, /黑羽凛音 · 未署名的刀/);
+assert.doesNotMatch(chronicleSrc, /ch_aya_sign|ch_aya_parts|ch_aya_one|ch_rion_dojo|ch_rion_ledger|ch_rion_living/);
+assert.doesNotMatch(chronicleSrc, /三角色 · 未写完的夜/);
 assert.match(lobbySrc, /月城小夜 · 未写完的夜/);

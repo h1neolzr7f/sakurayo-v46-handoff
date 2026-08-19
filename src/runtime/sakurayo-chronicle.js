@@ -2,72 +2,91 @@
   "use strict";
 
   var SAYO_TITLE = "月城小夜 · 未写完的夜";
-  var AYA_TITLE = "神代绫 · 未结案的夜";
-  var RION_TITLE = "黑羽凛音 · 未收剑的夜";
-  var HEAD_TITLE = "三角色 · 未写完的夜";
+  var AYA_TITLE = "神代绫 · 作废的工号";
+  var RION_TITLE = "黑羽凛音 · 未署名的刀";
 
   var CHRONICLE_AYA = Object.freeze([
     {
-      id: "ch_aya_sign",
-      n: "签名救援",
+      id: "ch_aya_badge",
+      n: "工牌还在",
+      lore: [
+        "我还别着那张工牌。名字被涂掉，编号还在灯下反光。",
+        "企业说回头还来得及。他们把妹妹的记忆装进尸群时，回头这条路就没了。",
+        "手枪是公司的，刀是妹妹的。工牌夹在领口，像没卸完的权限。",
+        "工牌还在。人已经不在花名册上。",
+      ],
+    },
+    {
+      id: "ch_aya_void",
+      n: "作废回收",
       lore: [
         "我按下的是救援键。上传栏写着妹妹的名字，回执盖的是回收。",
-        "零号把幸存者登记成可回收人格资产，包括我。手枪是公司的，刀是妹妹的。",
-        "他们说回头还来得及。他们把她的记忆装进尸群时，回头这条路就没了。",
-        "签名还在。清白可以买，证词不行。",
+        "券是金的，门是假的。VOID 两个字母比我的工号清楚。",
+        "他们把「会怕」单独装箱，「还会回来」标成下一季度的库存。",
+        "作废两个字没有退款。签名还在，清白可以买，证词不行。",
       ],
     },
     {
-      id: "ch_aya_parts",
-      n: "人格拆件",
+      id: "ch_aya_petal",
+      n: "花比刀快",
       lore: [
-        "我以前在灯下签字。出口焊死的那一夜，平民被写成可替换组件。",
-        "「会怕」单独进实验室，「还会回来」进另一间。工号比名字好盘点。",
-        "她不是资产。我没资格拿爱当第二份授权书。",
-        "拆件单还在抽屉里。我把我的名字留在第一栏。",
+        "零号拆人格的时候，把「犹豫」单独装进一朵花里。花不是武器，是我没说出口的那句话。",
+        "手枪还在呼吸，太刀还在腰上。花瓣先落地，像替我出鞘。",
+        "我伸手去够刀柄，只够到一片已经凉的花。",
+        "花比刀快。人还站着，指令已经过期。",
       ],
     },
     {
-      id: "ch_aya_one",
-      n: "碎镜只够一个人",
+      id: "ch_aya_seam",
+      n: "镜缝本体",
       lore: [
-        "镜核说交出妹妹人格，可以删除我的签名。碎镜后面只够走一个人。",
-        "我不是来替她决定恨谁。我只来把她带回去，包括那天发生过的事。",
-        "系统写的二选一不是世界的边界。证据和人，我都要带出去。",
-        "频道还开着。这一次醒不醒，由她按。",
+        "碎镜后面只够走一个人。镜核说交出妹妹，可以删除我的签名。",
+        "我把一只手伸进缝里。缝那边是她的频道，这边是还没结案的工号。",
+        "我不是来替她决定恨谁。系统写的二选一不是世界的边界。",
+        "镜缝还亮。本体没有从这一侧的名册上走回来。",
       ],
     },
   ]);
 
   var CHRONICLE_RION = Object.freeze([
     {
-      id: "ch_rion_dojo",
-      n: "道场失联",
+      id: "ch_rion_page",
+      n: "刀背署名",
       lore: [
-        "黄泉流确认全员失联。门内还有一个人站着，师父说这就没有失传。",
-        "尸群用的是师门起手式。招式像，呼吸不对。有人只偷走了剑的形状。",
-        "动作捕捉被买走以后，尸体也会扎马步。学费我回头再收。",
-        "剑术若不再需要活人负责，就只剩一份杀人说明书。",
+        "黑羽家谱把活着的我写在正面，把另一页写在刀背上。",
+        "刀光先到，名字后到。折断的不是刃，是那句「我会回来」。",
+        "羽织袖口有没写完的名。家纹比心跳清楚。",
+        "刀还在响。署名栏是空的。",
       ],
     },
     {
-      id: "ch_rion_ledger",
-      n: "无名名册",
+      id: "ch_rion_mound",
+      n: "剑冢旁观",
       lore: [
+        "我路过那些失败的小夜，没有对任何一把刀鞠躬。她们的刀认识我。",
         "剑冢的名册只记动作编号，没有一位同门的姓名。",
-        "我路过那些失败的小夜，没有对任何一把刀鞠躬。她们的刀认识我，我的名册还空着。",
         "师父成了这座坟的管理人格。人格也好，残响也好，只要还能握剑，我就听完最后一课。",
-        "名字不是字段。称谓写下去，就要负责把人带回去。",
+        "我站在旁边。核心还在最里面，我没有替她们走进去。",
       ],
     },
     {
-      id: "ch_rion_living",
-      n: "活人的道场",
+      id: "ch_rion_unsaid",
+      n: "没有道号",
       lore: [
-        "镜核愿意重建完整道场，包括所有死去的师兄。条件是上传我。",
-        "用顺从的复制品填满道场，只会让它死第二次。挥剑的影像不是剑士。",
-        "让他们选择醒来、沉睡，或只留下名字。传统是活人继续回答，不是死人永远正确。",
-        "刀还在手里。这一夜尚未收剑。",
+        "黄泉流要道号，黑羽家只要活人还站着。两栏我都没填完。",
+        "木刀比家谱诚实。我先鞠躬再出招，没有人喊停，也没有人赐名。",
+        "仙名可以后补。没有道号的刀，照样要送人回去。",
+        "袖里那张纸是空的。刀已经出鞘。",
+      ],
+    },
+    {
+      id: "ch_rion_bride",
+      n: "无人掀盖",
+      lore: [
+        "黄泉不收活人的聘礼。红盖头下面还是我。",
+        "刀比誓词先落地。嫁妆是一把葬刀。",
+        "用顺从的复制品填满道场，只会让它死第二次。",
+        "没有人来掀盖头。这一夜我尚未收剑。",
       ],
     },
   ]);
@@ -110,35 +129,25 @@
     return sectionHtml(AYA_TITLE, CHRONICLE_AYA) + sectionHtml(RION_TITLE, CHRONICLE_RION);
   }
 
-  function retitleHead(host) {
-    var span = host.querySelector && host.querySelector(".rosterHead46 span");
-    if (span && span.textContent === SAYO_TITLE) span.textContent = HEAD_TITLE;
-  }
-
   function paintSides(host) {
     if (!host) return false;
     var html = String(host.innerHTML || "");
     if (html.indexOf("chronicleBox46") < 0 || html.indexOf(SAYO_TITLE) < 0) return false;
     if (html.indexOf('data-roster="chronicle"') < 0) return false;
-    if (html.indexOf("data-chronicle-sides") >= 0 || html.indexOf('data-chronicle="ch_aya_sign"') >= 0) return true;
+    if (html.indexOf("data-chronicle-sides") >= 0 || html.indexOf('data-chronicle="ch_aya_badge"') >= 0) return true;
     var extra = extraHtml();
     var box = host.querySelector && host.querySelector(".chronicleBox46");
     if (box && typeof box.insertAdjacentHTML === "function") {
       box.setAttribute("data-chronicle-sides", "1");
       box.insertAdjacentHTML("beforeend", extra);
-      retitleHead(host);
       return true;
     }
-    html = html.replace(
-      /(<div class="rosterHead46"><h3>镜界仓库<\/h3><span>)月城小夜 · 未写完的夜(<\/span>)/,
-      "$1" + HEAD_TITLE + "$2"
-    );
     html = html.replace('<div class="chronicleBox46">', '<div class="chronicleBox46" data-chronicle-sides="1">');
     html = html.replace(
       /(data-chronicle="ch_after_zero"[\s\S]*?<\/article>)(<\/div><\/div><\/div>)/,
       "$1" + extra + "$2"
     );
-    if (html.indexOf('data-chronicle="ch_aya_sign"') < 0) return false;
+    if (html.indexOf('data-chronicle="ch_aya_badge"') < 0) return false;
     host.innerHTML = html;
     return true;
   }
@@ -170,7 +179,6 @@
     SAYO_TITLE: SAYO_TITLE,
     AYA_TITLE: AYA_TITLE,
     RION_TITLE: RION_TITLE,
-    HEAD_TITLE: HEAD_TITLE,
     CHRONICLE_AYA: CHRONICLE_AYA,
     CHRONICLE_RION: CHRONICLE_RION,
     TITLES: Object.freeze([SAYO_TITLE, AYA_TITLE, RION_TITLE]),
