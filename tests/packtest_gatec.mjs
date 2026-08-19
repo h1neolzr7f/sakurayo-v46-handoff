@@ -168,9 +168,28 @@ try {
   const hudAfter = await page.evaluate(() => {
     const hud = document.querySelector("#hud");
     const box = hud.getBoundingClientRect();
-    return { left: box.left, top: box.top };
+    const hint = document.querySelector("#rotateHint46");
+    const hintShown = !!(hint && getComputedStyle(hint).display !== "none");
+    const cv = document.querySelector("#game");
+    const ctx = cv.getContext("2d", { willReadFrequently: true });
+    let leftBright = 0;
+    try {
+      const w = cv.width, h = cv.height;
+      const data = ctx.getImageData(0, Math.floor(h * 0.4), Math.max(1, Math.floor(w * 0.16)), Math.max(1, Math.floor(h * 0.2))).data;
+      let bright = 0, n = 0;
+      for (let i = 0; i < data.length; i += 16) {
+        if (data[i] + data[i + 1] + data[i + 2] > 540) bright++;
+        n++;
+      }
+      leftBright = n ? bright / n : 0;
+    } catch (err) {
+      leftBright = 0;
+    }
+    return { left: box.left, top: box.top, hintShown, leftBright };
   });
   assert.ok(Math.abs(hudAfter.left) < 2, "镜头平移后 HUD 不得被 translate 拖走");
+  assert.equal(hudAfter.hintShown, false, "战斗中不得用横持提示挡住 HUD");
+  assert.ok(hudAfter.leftBright < 0.25, "左缘不得半屏空白/拼缝亮带");
   const spawned = await api(page, "spawnFromEdge50");
   assert.equal(spawned.inside, false, "怪应从当前视口外刷");
   pass("镜头夹边、HUD 不跟飞、怪从视口外进");

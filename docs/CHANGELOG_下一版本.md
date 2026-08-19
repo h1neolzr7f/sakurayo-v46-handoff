@@ -4,8 +4,9 @@
 
 - 现网 `0af3809` 打可测包：含局内 4×2 镜头夹边、仓库编年一段三页签（小夜 5 + 绫 4 + 凛音 4）、残片 74（8+14+28+24）、时装 12、武器 12、寻访三页。
 - Android 壳 `assets/index.html` 已从旧大厅同步到现网源码（含 `SakurayoCamera` / `SakurayoChronicle`）。
-- 单文件 HTML：`/tmp/sakurayo-460-test.html`，SHA-256 `18ee4eb9014eec07f82c0470d24b6c14fd28e4f6b208e751f40446e53ccfacfc`。未交 APK / 密钥。
+- 单文件 HTML：`/tmp/sakurayo-460-test.html`，SHA-256 `e25ff5bd6ee827f157925107b8ff85e151e7df06abf3f74a0260f6b831804717`。未交 APK / 密钥。
 - 门 A 能跑的全绿（含 Playwright framework 8 / browser 52）。门 C 剧本 `tests/packtest_gatec.mjs` 13 项绿。未升 4.6.1。
+- 实测修复：4×2 镜头不再每格重铺同一张战场图（左缘拼缝/半屏裂开）；战斗中收起「请横持设备」，不再压住 HUD。
 - 存档键仍 `sakurayoV3`。传说 #16 未并。未出新图。
 
 ## 第一期镜界寻访（源码仍 4.6.0，未下令不升 4.6.1）

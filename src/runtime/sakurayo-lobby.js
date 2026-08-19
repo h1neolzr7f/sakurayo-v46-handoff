@@ -340,6 +340,7 @@
     "#rotateHint46{display:block}" +
     "}" +
     "html.tallWindow46 #rotateHint46{display:block}" +
+    "html.playing46 #rotateHint46{display:none!important}" +
     "@media(prefers-reduced-motion:reduce){.wishStage46:before,.wishPetals46 i,.revealInner46,.revealFace46.front:after,.revealCard46.r-SSR.flipped .revealFace46.front{animation:none;transition:none}}";
 
   var ROOM_CSS =
