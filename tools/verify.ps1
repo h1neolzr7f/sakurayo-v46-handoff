@@ -15,9 +15,11 @@ Invoke-Step "syntax extracted" { node --check tests/artifacts/static/index.extra
 Invoke-Step "syntax cutscene" { node --check src/runtime/sakurayo-cutscene.js }
 Invoke-Step "syntax economy" { node --check src/runtime/sakurayo-economy.js }
 Invoke-Step "syntax lobby" { node --check src/runtime/sakurayo-lobby.js }
+Invoke-Step "syntax chronicle" { node --check src/runtime/sakurayo-chronicle.js }
 Invoke-Step "syntax live" { node --check src/runtime/sakurayo-live.js }
 Invoke-Step "syntax ops" { node --check src/runtime/sakurayo-ops.js }
 Invoke-Step "lobby unit" { node tests/lobby_unit.mjs }
+Invoke-Step "chronicle unit" { node tests/chronicle_unit.mjs }
 Invoke-Step "live unit" { node tests/live_unit.mjs }
 Invoke-Step "ops unit" { node tests/ops_unit.mjs }
 Invoke-Step "ops smoke" { node tests/ops_smoke.mjs }
