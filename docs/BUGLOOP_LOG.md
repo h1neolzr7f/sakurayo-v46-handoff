@@ -21,3 +21,21 @@
 三层：门A 绿 / Playwright视口 红（本类） / Android 无 adb。
 
 修完复跑：门A 绿（static/lobby/live/ops/chronicle/camera/lifecycle/framework 8/browser 52） / emu_loop 23 绿 / Android 无 adb。
+
+---
+
+## 轮 2
+
+自动打回：**未过。不要进入下一类。**
+层：Playwright视口
+类：竖屏战斗时 #rotateHint46 仍 display:block，压住顶部 HUD
+复现：430×932 开局后 `getComputedStyle(#rotateHint46).display === "block"` 且高度 25、top=8
+上一轮为什么没发现：`emu_loop.mjs` 用 `offsetParent !== null` 判断可见；`position:fixed` 的 offsetParent 恒为 null，提示明明显示却被记成隐藏。缺了用 computed style + 盒子高度这一步。
+回归：`tests/emu_loop.mjs` 改成断言 `getComputedStyle(hint).display === "none"`（不看 offsetParent）
+
+本轮新问题：横持提示压 HUD。
+变成哪条回归：emu_loop 战斗中 hint display 必须 none。
+
+三层：门A 绿 / Playwright视口 红（本类） / Android 无 adb。
+
+修完复跑：门A 绿（static/lobby/live/ops/chronicle/camera/lifecycle/framework 8/browser 52/ops_smoke/gacha_visual/testimony） / emu_loop 23 绿含「战斗中无横持提示」 / Android 无 adb。

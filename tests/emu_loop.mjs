@@ -135,9 +135,13 @@ async function runViewport(width, height, tag) {
   await shot(page, `${tag}-combat.png`);
   const hintPlay = await page.evaluate(() => {
     const hint = document.querySelector("#rotateHint46");
-    return !!(hint && getComputedStyle(hint).display !== "none" && hint.offsetParent !== null);
+    if (!hint) return { shown: false, display: "none" };
+    const s = getComputedStyle(hint);
+    const box = hint.getBoundingClientRect();
+    return { shown: s.display !== "none" && box.height > 0, display: s.display, height: box.height };
   });
-  assert.equal(hintPlay, false, `${tag} 战斗中横持提示不得挡住 HUD`);
+  assert.equal(hintPlay.display, "none", `${tag} 战斗中横持提示必须 display:none，实际 ${hintPlay.display}`);
+  assert.equal(hintPlay.shown, false, `${tag} 战斗中横持提示不得挡住 HUD`);
   pass(`${tag} 战斗中无横持提示`);
 
   const before = await snap(page);
