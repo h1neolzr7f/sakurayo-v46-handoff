@@ -31,6 +31,22 @@ const mid = C.current();
 assert.ok(Math.abs(mid.x + 430 / 2 - view.worldW / 2) < 0.01);
 assert.ok(Math.abs(mid.y + 932 / 2 - view.worldH / 2) < 0.01);
 
+const left = C.snap(28, 73);
+assert.equal(left.x, 0);
+assert.equal(left.y, 0);
+assert.ok(left.x >= 0 && left.x <= view.worldW - view.viewW);
+assert.ok(left.y >= 0 && left.y <= view.worldH - view.viewH);
+
+const right = C.snap(view.worldW - 28, view.worldH - 22);
+assert.equal(right.x, view.worldW - view.viewW);
+assert.equal(right.y, view.worldH - view.viewH);
+
+C.follow(28, 73, 1, true);
+const edgeFollow = C.current();
+assert.equal(edgeFollow.x, 0);
+assert.equal(edgeFollow.y, 0);
+
+C.snap(view.worldW / 2, view.worldH / 2);
 const screen = C.worldToScreen(view.worldW / 2, view.worldH / 2);
 assert.ok(Math.abs(screen.x - 215) < 0.5);
 assert.ok(Math.abs(screen.y - 466) < 0.5);
@@ -56,6 +72,7 @@ for (const roll of rolls) {
 }
 assert.equal(sides.size, 4);
 
+C.snap(view.worldW / 2, view.worldH / 2);
 C.follow(view.worldW / 2 + 200, view.worldH / 2, 1 / 60, false);
 const lagged = C.current();
 assert.ok(lagged.x > mid.x);
