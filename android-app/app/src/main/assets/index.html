@@ -11761,9 +11761,9 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       if(state==="menu"){
         if(pendingMode46==="mainGod"){
           if(runMode36!=="mainGod"){
-            toastQueue.length=0;
-            hideTransient();
-            toast("请先在主神卡片点「进入轮回」");
+            openDrawer("stage");
+            renderStages();
+            $("#stageList .mainGodCard36")?.scrollIntoView({block:"nearest"});
             return;
           }
         }else{
