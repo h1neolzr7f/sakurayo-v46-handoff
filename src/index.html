@@ -31,8 +31,9 @@
   line-height:1.45!important;
 }
 #toast{
-  top:max(110px,calc(env(safe-area-inset-top) + 98px))!important;
+  top:max(136px,calc(env(safe-area-inset-top) + 124px))!important;
   bottom:auto!important;
+  transform:translateX(-50%)!important;
   z-index:11!important;
   width:max-content!important;
   max-width:84vw!important;
@@ -40,7 +41,7 @@
   text-align:center!important;
   line-height:1.35!important;
 }
-#toast.show{top:max(118px,calc(env(safe-area-inset-top) + 106px))!important}
+#toast.show{top:max(136px,calc(env(safe-area-inset-top) + 124px))!important}
 .warn{
   top:max(164px,calc(env(safe-area-inset-top) + 150px))!important;
   z-index:13!important;
@@ -53,7 +54,7 @@
 .choice .legend{color:#ffd86f!important}
 @media(max-height:700px){
   .banter{bottom:max(118px,calc(env(safe-area-inset-bottom) + 105px))!important;font-size:11px!important}
-  #toast{top:max(96px,calc(env(safe-area-inset-top) + 86px))!important;font-size:11px!important}
+  #toast{top:max(122px,calc(env(safe-area-inset-top) + 110px))!important;font-size:11px!important}
 }
 
 /* V3.5 三角色与衣装商店 */
@@ -5713,9 +5714,22 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
 
   function toast(s){toastQueue.push(s);playToast();}
+  function placeToast46(){
+    const e=$("#toast");
+    if(!e)return;
+    let top=0;
+    for(const id of ["mission","bossRule39","warning"]){
+      const n=$("#"+id);
+      if(!n||n.classList.contains("hidden")||n.hidden)continue;
+      const r=n.getBoundingClientRect();
+      if(r.width>1&&r.height>1)top=Math.max(top,r.bottom+8);
+    }
+    if(top>0)e.style.setProperty("top",Math.round(top)+"px","important");
+  }
   function playToast(){
     if(toastBusy||!toastQueue.length||transientBlocked())return;
     toastBusy=true;let e=$("#toast");e.textContent=toastQueue.shift();e.classList.add("show");
+    placeToast46();
     clearTimeout(playToast.t);playToast.t=setTimeout(()=>{e.classList.remove("show");toastBusy=false;setTimeout(playToast,160)},1100);
   }
   function ensureAudio() {

@@ -179,3 +179,19 @@
 
 本轮新问题：结算软锁。
 变成哪条回归：emu_loop 无效飞升仍弹出结算。
+
+修完复跑：门A 绿（static/lobby/live/ops/chronicle/camera/lifecycle/framework 8/browser 52/ops_smoke） / emu_loop 27 绿含「无效飞升仍弹出结算」 / emu_scan 0 P0/P1 / Android 无 adb。
+
+---
+
+## 轮 13（全游戏，不限横屏）
+
+自动打回：**未过。不要进入下一类。**
+层：Playwright视口
+类：play 态 #toast 仍用 translate(-50%,-50%) 锚在 118/96，与 top:91 的 #mission 同带叠字
+复现：430×932 证词模式 triggerUpgrade，toast「证词模式 · Lv.2…」∩ mission ≈ 4200px²
+上一轮为什么没发现：轮 9 只删了开局同文案 toast，没量其它 play 态 toast 盒子；emu_loop 升级项走普通关会开 #level（hideTransient 收 toast），证词/孤证不弹卡却仍 toast。
+回归：`emu_loop` 证词升级 toast∩mission ≤8
+
+本轮新问题：系统提示压构筑条。
+变成哪条回归：emu_loop 证词 toast 不压 mission。
