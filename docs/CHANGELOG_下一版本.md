@@ -3,9 +3,10 @@
 ## 4.6.3 交付
 
 - 升补丁号 **4.6.3** / Android `versionCode` **64**，UA `SakurayoAndroid/4.6.3`。
+- 关掉 `?beta` / 内测抽屉 / `__SAKURAYO_BETA__` / 立绘连点。`?test=1` 只在 `src/index.html` 生效。内测 🌸9999 改从大厅邮箱领取。
 - 叠层修复随包带走：横屏电台避开摇杆；回大厅 / Android 返回收起探索层；隐藏关入口藏大厅。
 - 存档键仍 `sakurayoV3`。不卖衣装永久伤害。不包 `update`。
-- 单文件 SHA-256 `9cd75586cad8a0633514ed2a3ad74ec59f7df41720b54a4bfd7476758d649e81`
+- 单文件 SHA-256 `7a87fbe90d14bd93ea779df37162003bab0d836790b2a48bcf6cb8aa2778be67`（关后门 + 邮箱后重打）
 - Debug APK SHA-256 `0bdd39509d387f295913db560e28d2e0c959ff99a826e8f76dc188b4734b1bf9`（无正式证书，不要卸旧正式包）
 - 本仓 Release：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.3
 - 公开玩家仓 Releases 无写权限，未挂到 sakurayo-zombietide。

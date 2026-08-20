@@ -430,8 +430,9 @@ assert.equal(dupe.ok, true);
 assert.equal(shardSave.shop40.ops.shards, shardsBefore + 1 + 8);
 
 const cheat = L.grantCheat({ coins: 3, shop40: L.normalizeOps({}) });
-assert.equal(cheat.coins, 3 + 9999);
-assert.equal(cheat.cheatUsed, 1);
+assert.equal(cheat.coins, 3);
+assert.equal(cheat.blocked, 1);
+assert.equal(cheat.cheatUsed, 0);
 assert.deepEqual(Object.keys(L.snapshot(old).cards[0]).sort(), ["count", "id", "kind", "n", "r"]);
 assert.equal(typeof L.showReveal, "function");
 assert.equal(typeof L.injectStyle, "function");
@@ -443,7 +444,15 @@ assert.match(fs.readFileSync(path.join(root, "src/index.html"), "utf8"), /classL
 const tap9 = Array.from({ length: 9 }, (_, i) => L.portraitTap(1000 + i));
 assert.equal(tap9[8].granted, false);
 const tap10 = L.portraitTap(1009);
-assert.equal(tap10.granted, true);
+assert.equal(tap10.granted, false);
+assert.equal(tap10.blocked, 1);
+assert.match(indexHtml, /id="mailDrawer"/);
+assert.match(indexHtml, /function seedMail46/);
+assert.match(indexHtml, /function openMailDrawer46/);
+assert.match(indexHtml, /const BETA40=false/);
+assert.match(indexHtml, /function sealBetaPorts40/);
+assert.doesNotMatch(indexHtml, /window\.__SAKURAYO_BETA__=Object\.freeze/);
+assert.match(indexHtml, /"mail46"/);
 
 function fakeEl(tag, attrs = {}) {
   const node = {

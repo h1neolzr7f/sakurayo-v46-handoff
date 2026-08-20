@@ -27,7 +27,7 @@
   → 结算回大厅
 ```
 
-作弊只保留一种：大厅立绘 10 连点 → 9999 樱花币。不另开商店卖数值。
+内测后门、`?beta`、立绘 10 连点全部关闭。内测奖励只走大厅邮箱领取，不另开商店卖数值。
 
 ## 3. 信息架构
 
@@ -105,7 +105,7 @@
 pity, pitySR, pulls, tenPulls, owned, last, cheatUsed
 ```
 
-证词进度写在 `shop40.ops.story`。隐藏门闩只读 `storyChoices38`。禁止新 top-level key。
+证词进度写在 `shop40.ops.story`。隐藏门闩只读 `storyChoices38`。除 `mail46` 外不要再加新的 top-level key。
 
 ## 7. 美术清单
 
@@ -147,7 +147,7 @@ pity, pitySR, pulls, tenPulls, owned, last, cheatUsed
 ## 9. 明确不做
 
 - 不做抽卡加攻击、加生命、加暴击。
-- 不做每日任务、邮件、赛季、通行证、广告复活。
+- 不做每日任务、赛季、通行证、广告复活。邮箱只发内测致谢，不做运营活动。
 - 不做联网账号与排行榜。
 - 不换引擎，不引 Vue/Phaser/原神素材。
 - 不把主神空间删掉或并进寻访。
