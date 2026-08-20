@@ -23,7 +23,7 @@ await page.goto(`${pathToFileURL(source).href}?test=1`, { waitUntil: "domcontent
 await page.waitForFunction(() => window.__SAKURAYO_TEST__ && document.getElementById("start"), null, { timeout: 30000 });
 await page.waitForTimeout(800);
 await page.screenshot({ path: path.join(out, "lobby.png"), fullPage: true });
-await page.evaluate(() => window.__SAKURAYO_TEST__.grantCheat46());
+await page.evaluate(() => window.__SAKURAYO_TEST__.claimMail46("beta-thanks-463"));
 await page.evaluate(() => window.__SAKURAYO_TEST__.openDrawer("gacha"));
 await page.waitForSelector("#gachaPull1", { timeout: 10000 });
 await page.waitForTimeout(400);

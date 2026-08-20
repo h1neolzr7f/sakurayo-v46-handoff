@@ -47,7 +47,7 @@
   → 结算回大厅
 ```
 
-作弊只保留一种：大厅立绘 10 连点 → 9999 樱花币。不另开商店卖数值。
+内测后门、`?beta`、立绘 10 连点全部关闭。内测奖励只走大厅邮箱领取，不另开商店卖数值。
 
 底栏五格：寻访 / 名册 / 商店 / 关卡 / 档案。出击是大厅主按钮，不进五格。
 
@@ -75,7 +75,7 @@
 ### 明确不做
 
 - 商店衣装加攻击、加生命、加暴击。寻访/构筑卡按星级加伤是正规则。
-- 每日任务、邮件、赛季、通行证、广告复活。
+- 每日任务、赛季、通行证、广告复活。邮箱只发内测致谢，不做运营活动。
 - 联网账号与排行榜。
 - 换引擎，引 Vue / Phaser / 原神素材。
 - 把主神空间删掉或并进寻访。
@@ -138,7 +138,7 @@ pitySSR 80 / pitySR 10
 pity, pitySR, pulls, tenPulls, owned, last, cheatUsed
 ```
 
-禁止新 top-level save key。证词进度写在 `shop40.ops.story`（`{sayo,aya,rion}`）。隐藏门闩只读 `storyChoices38`（回收演习）。`normalizeOps` 必须保留 `ops.story`，否则大厅一刷新证词记忆就没了。旧档缺字段当空，不要清档。
+除 `mail46`（内测致谢邮箱）外，不要再加新的 top-level save key。证词进度写在 `shop40.ops.story`（`{sayo,aya,rion}`）。隐藏门闩只读 `storyChoices38`（回收演习）。`normalizeOps` 必须保留 `ops.story`，否则大厅一刷新证词记忆就没了。旧档缺字段当空，不要清档。
 
 名册 8 格。未回收只用卡背，禁止灰图剧透。点开详情。重复只加计数，不进战斗。锁卡脚注「待寻访」，墙上仍可写「未回收」。
 
@@ -173,7 +173,7 @@ pity, pitySR, pulls, tenPulls, owned, last, cheatUsed
 - 眨眼：Cubism Mean **2.5 ± 2s**，不要 5.4s CSS `steps` 循环。
 - 注视阻尼，松手回正。
 - `#heroTap46` + `#heroHead46`：TapHead / TapBody 淡入淡出。
-- 立绘 10 连点作弊仍走 lobby 的 `portraitTap`。
+- 立绘连点和 `?beta` / `__SAKURAYO_BETA__` 已封。内测 🌸9999 走 `save.mail46` 邮箱信 `beta-thanks-463`。已用过旧后门的存档只收致谢信，不再补发。
 - 不要给站桩叠多层 `drop-shadow` / `blur`。不要给抽屉整屏 `backdrop-filter`。横屏菜单不要 14px 毛玻璃。
 - `sakurayo-live.js` 不得覆盖大厅 dock / 角色圆钮布局。
 

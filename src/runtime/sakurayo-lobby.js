@@ -5,7 +5,7 @@
   var portraitTaps = 0;
   var portraitStamp = 0;
   var TAP_WINDOW = 1200;
-  var CHEAT_TOAST = "镜界后门已打开。樱花币已入账。";
+  var CHEAT_TOAST = "内测后门已关闭。奖励请到邮箱领取。";
 
   var RATES = Object.freeze({
     N: 0.7,
@@ -249,6 +249,7 @@
     ".chronicleCard46 b{display:block;margin:0 0 6px;color:#ffe7a3;letter-spacing:.14em}" +
     ".chronicleCard46 p{margin:0 0 6px;color:#f4eaf4;font-size:12px;line-height:1.55}" +
     ".homeNav46{position:relative;z-index:8}" +
+    ".mailButton46,.mailCard46 button{touch-action:manipulation}" +
     "#menu.homeDock46 .nav{position:relative;z-index:8}" +
     "#gachaPull1{background:linear-gradient(180deg,#ff86cc,#ff3d9a 58%,#b02078);border-color:#ffb6d888}" +
     "#gachaPull10{background:linear-gradient(180deg,#ffe08a,#f0c14a 42%,#d8892b);border-color:#ffe6a3aa;color:#2a1608}" +
@@ -763,11 +764,13 @@
   }
 
   function grantCheat(save) {
-    if (!save || typeof save !== "object") return { coins: 0, cheatUsed: 0 };
+    if (!save || typeof save !== "object") return { coins: 0, cheatUsed: 0, blocked: 1 };
     save.shop40 = normalizeOps(save.shop40 || {});
-    save.coins = clampInt(save.coins, 0, 99999999) + RATES.cheat;
-    save.shop40.ops.cheatUsed = 1;
-    return { coins: save.coins, cheatUsed: 1 };
+    return {
+      coins: clampInt(save.coins, 0, 99999999),
+      cheatUsed: save.shop40.ops.cheatUsed ? 1 : 0,
+      blocked: 1,
+    };
   }
 
   function portraitTap(now) {
@@ -775,9 +778,8 @@
     if (!portraitStamp || t - portraitStamp > TAP_WINDOW) portraitTaps = 0;
     portraitStamp = t;
     portraitTaps += 1;
-    var granted = portraitTaps >= RATES.taps;
-    if (granted) portraitTaps = 0;
-    return { taps: portraitTaps, granted: granted };
+    if (portraitTaps >= RATES.taps) portraitTaps = 0;
+    return { taps: portraitTaps, granted: false, blocked: 1 };
   }
 
   function snapshot(save) {
@@ -1494,8 +1496,7 @@
     if (!root || !global.document) return;
     function handle(kind) {
       if (typeof onTap === "function") onTap(kind);
-      var result = portraitTap(Date.now());
-      if (result.granted && typeof onGrant === "function") onGrant();
+      portraitTap(Date.now());
     }
     bindHit(root, "heroTap46", "heroTap46", "角色立绘").onclick = function () {
       handle("tapBody");
