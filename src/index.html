@@ -8557,18 +8557,20 @@ window.SAKURAYO_GAME_VERSION = "4.6.7";
     const faces = ["sayo","aya","rion"].map(id => `<img alt="${id}" src="${artUrl("characters/"+id+"/default/dialogue.webp")}">`).join("");
     const forms = crestImgs("ascensions/", ["tech","bio","psi"]);
     box.innerHTML =
-      `<div class="exWallet47"><img alt="" src="${artUrl("ui/app_icon.webp")}"><div><b>樱花币 ${save.coins || 0}</b><small>点立绘每次 +1。衣装仍只改外观，不卖永久伤害。</small></div><div class="exFaces47">${faces}</div></div>` +
+      `<div class="exMain47"><div class="exWallet47"><img alt="" src="${artUrl("ui/app_icon.webp")}"><div><b>樱花币 ${save.coins || 0}</b><small>点立绘每次 +1。衣装仍只改外观，不卖永久伤害。</small></div><div class="exFaces47">${faces}</div></div>` +
       rows.map(row => {
         const ex = L.EXCHANGE[row.id];
         return `<article class="exCard47"><img alt="" src="${artUrl(row.art)}"><div><b>${ex.mark} ${ex.n}</b><p>${row.hint}</p><small>持有 ${row.have} · ${ex.coins} 🌸 = ${ex.give}</small></div><div class="exActs47"><button type="button" data-ex="${row.id}" data-n="1">兑 1</button><button type="button" data-ex="${row.id}" data-n="10">兑 10</button></div></article>`;
       }).join("") +
+      `</div><div class="exSide47">` +
       `<section class="exGallery47"><b>十四职业纹章</b><div>${crestImgs("classes/", classIds)}${forms}</div></section>` +
       `<section class="exGallery47"><b>二十八转职纹章</b><div>${crestImgs("careers/", careerIds)}</div></section>` +
       `<section class="exGallery47"><b>二十四融合纹章</b><div>${crestImgs("fusions/", fusionIds)}</div></section>` +
       `<section class="exGallery47 wide47"><b>残件卡面</b><div>${remnants}</div></section>` +
       `<section class="exGallery47 wide47"><b>时装卡面</b><div>${fashions}</div></section>` +
       `<section class="exGallery47 wide47"><b>武器卡面</b><div>${weapons}</div></section>` +
-      `<section class="exGallery47 wide47"><b>四章现场</b><div>${stages}</div></section>`;
+      `<section class="exGallery47 wide47"><b>四章现场</b><div>${stages}</div></section>` +
+      `</div>`;
     box.querySelectorAll("[data-ex]").forEach(btn => {
       btn.onclick = () => doExchange47(btn.getAttribute("data-ex"), btn.getAttribute("data-n"));
     });
@@ -8661,6 +8663,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.7";
       "@keyframes homePickUp47{to{transform:translateY(-52px);opacity:0}}" +
       ".homeCrests47{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:3px;margin:0 0 6px;padding:4px;border-radius:12px;background:#0b0818e8;border:1px solid #ff9bcc44;flex:0 0 auto}" +
       ".homeCrests47 img{width:100%;aspect-ratio:1;border-radius:6px;object-fit:cover;box-shadow:0 0 0 1px #ff9bcc33}" +
+      "#exchangeDrawer47{overflow:auto;touch-action:pan-y}" +
+      "html.landscape46 #exchangeDrawer47{overflow-x:hidden;overflow-y:auto;touch-action:pan-y}" +
+      "html.landscape46 #exchangeDrawer47 .dbody{display:grid;grid-template-columns:minmax(300px,380px) minmax(0,1fr);gap:12px;align-items:start;max-width:1100px}" +
+      ".exMain47,.exSide47{min-width:0}" +
       ".exGallery47{margin:10px 0 0;padding:8px;border-radius:14px;background:#0b0818e8;border:1px solid #ff9bcc44}" +
       ".exGallery47 b{display:block;margin:0 0 6px;color:#ffe7a3;font:800 12px/1 system-ui;letter-spacing:.12em}" +
       ".exGallery47 div{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}" +
