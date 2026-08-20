@@ -1,4 +1,4 @@
-# 《樱夜·尸潮》V4.6.5 交接规格
+# 《樱夜·尸潮》V4.6.6 交接规格
 
 2026-08-19。给下一位 AI / 维护者。先读根目录 [README.md](../README.md)，再读本文和 [AGENTS.md](../AGENTS.md)。二游分期原文在 [PLAN_V46_ERYOU.md](PLAN_V46_ERYOU.md)。升版本见 [MAINTAIN.md](MAINTAIN.md)。
 
@@ -8,11 +8,11 @@
 
 | 项 | 值 |
 |---|---|
-| 源码版本 | **4.6.5** |
-| Android `versionName` / `versionCode` | 4.6.5-test / **66** |
+| 源码版本 | **4.6.6** |
+| Android `versionName` / `versionCode` | 4.6.6-test / **67** |
 | 测试包名 / 桌面名 | `com.sakurayo.zombietide.test` / **测试版樱夜**（不覆盖正式包） |
 | 公开仓 | https://github.com/h1neolzr7f/sakurayo-zombietide |
-| 已发布 APK | 公开仓仍 **v4.4.6**；本仓测试包 **v4.6.5**：[直接下载](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.5/Sakurayo-ZombieTide-TEST-v4.6.5.apk) |
+| 已发布 APK | 公开仓仍 **v4.4.6**；本仓测试包以 Releases 最新 `v4.6.6` 为准 |
 | 存档键 | **`sakurayoV3`** |
 | 代码基线 | `src/index.html` + `src/runtime/*.js` |
 | 运行时美术 | `android-app/app/src/main/assets/game/art` |
@@ -67,11 +67,12 @@
 
 ### 下一步（按优先级）
 
-1. I2V 绿幕重出三角色站桩（需 infsh login）。现用 `battle.webp` / `live_idle` 静帧 + JS 动。
-2. 有独特动作的融合再补 `anim_skill.webp` / `anim_dash.webp`。缺图回退，不要借错融合的图。
-3. 寻访卡扩到 16 以内；`ui/lobby_wide.webp` 去左右黑边。
-4. 全量 `powershell -File tools/verify.ps1`（`browser_smoke` 主视口仍是 430×932）。
-5. `android-app/sync-game.ps1` 后发版。本云主机是 KVM 套娃，API 34 Google APIs 开加速会内核崩溃；软件模拟用 Android 30 AOSP ATD 更稳。Debug 测试包 applicationId 是 `com.sakurayo.zombietide.test`，桌面名「测试版樱夜」，和正式包并排安装，不会覆盖。不要擅自卸正式包清档。
+1. 画面必须先跑 `node tests/real_shots.mjs` 看完整 DOM 真图，再改。不要用 canvas 拼图或无窗口 `adb screencap` 当过关。
+2. I2V 绿幕重出三角色站桩（需 infsh login）。现用 `battle.webp` / `live_idle` 静帧 + JS 动。
+3. 有独特动作的融合再补 `anim_skill.webp` / `anim_dash.webp`。缺图回退，不要借错融合的图。
+4. 寻访卡扩到 16 以内；`ui/lobby_wide.webp` 去左右黑边。
+5. 全量 `powershell -File tools/verify.ps1`（`browser_smoke` 主视口仍是 430×932）。
+6. `android-app/sync-game.ps1` 后发版。本云主机是 KVM 套娃，API 34 Google APIs 开加速会内核崩溃；软件模拟用 Android 30 AOSP ATD 更稳。Debug 测试包 applicationId 是 `com.sakurayo.zombietide.test`，桌面名「测试版樱夜」，和正式包并排安装，不会覆盖。不要擅自卸正式包清档。
 
 ### 明确不做
 
@@ -293,7 +294,7 @@ powershell -File tools/verify.ps1
 - `tests/testimony_smoke.mjs`
 - `tests/gacha_visual.mjs`（会出 932×430 截图到 `tests/artifacts/gacha/`，该目录 gitignore）
 
-改证词或寻访视觉时请单独跑这两项。`browser_smoke.mjs` 断言版本 `"4.6.5"`，主视口 430×932；竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。
+改证词或寻访视觉时请单独跑这两项。`browser_smoke.mjs` 断言版本 `"4.6.6"`，主视口 430×932；竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。画面必须用 `node tests/real_shots.mjs` 拿横屏完整 DOM 真图，禁止再用 canvas 拼图或全黑 screencap 当过关。
 
 发版（用户明确要求再做）：
 

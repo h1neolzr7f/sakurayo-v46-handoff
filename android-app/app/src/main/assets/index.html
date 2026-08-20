@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" name="viewport"/>
 <meta content="#090714" name="theme-color"/>
-<title>樱夜·尸潮：Mod Kit V4.6.5</title>
+<title>樱夜·尸潮：Mod Kit V4.6.6</title>
 <style>
 :root{--p:#ff58a7;--p2:#ffb4d5;--c:#56ddff;--g:#ffd36b;--bg:#080713;--panel:rgba(18,14,39,.96);--line:rgba(170,220,255,.24);--mut:#cfc4df;--red:#ff4e72}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:#fff;font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;touch-action:none}button{border:0;color:inherit;font:inherit}button:active{transform:scale(.985)}canvas{position:fixed;inset:0;top:0;right:0;bottom:0;left:0;width:100%;height:100%}.hidden{display:none!important}.screen{position:fixed;inset:0;top:0;right:0;bottom:0;left:0;z-index:10}
@@ -38,7 +38,7 @@
 .buildReward46 em{display:block;color:#ffe08a;letter-spacing:.12em;font-style:normal}
 .buildReward46 small{color:#bfb1d3}
 #eventIcon.eventArt47{width:100%;height:132px;margin:0 0 10px;border-radius:14px;border:1px solid #ffffff18;background:#0b0818 center 28%/cover no-repeat;font-size:0;box-shadow:inset 0 -40px 50px #0e0b21cc}
-#dialogue .dialogueModal{background-size:cover;background-position:center 28%;background-repeat:no-repeat}
+#dialogue .dialogueModal{background-size:cover;background-position:center;background-repeat:no-repeat}
 @media(orientation:landscape){#eventIcon.eventArt47{height:92px}}
 #toast{
   top:max(136px,calc(env(safe-area-inset-top) + 124px))!important;
@@ -119,7 +119,7 @@ html.landscape46 .banter{
 <div class="overlay hidden" id="result"><div class="modal"><div class="resultIcon" id="ricon">🌸</div><div class="rankBig" id="rankBig"></div><h2 id="rtitle"></h2><p class="sub" id="rsub"></p><div class="stats" id="rstats"></div><div class="endingTag" id="endingTag">结局演算中</div><div class="report" id="damageReport"></div><div class="routeNote" id="routeNote"></div><div class="actions"><button class="primary" id="again">再次迎击</button><button class="secondary" id="back">返回主界面</button></div></div></div>
 <div class="warn hidden" id="warning"></div><div id="toast"></div>
 <script>
-window.SAKURAYO_GAME_VERSION = "4.6.5";
+window.SAKURAYO_GAME_VERSION = "4.6.6";
 (() => {
   "use strict";
   const srcHarness = !String(location.href || "").includes("/android_asset/") && /\/src\/index\.html$/i.test(String(location.pathname || location.href || ""));
@@ -169,7 +169,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.5";
   "use strict";
 
   var API_VERSION = 2;
-  var GAME_VERSION = String(global.SAKURAYO_GAME_VERSION || "4.6.5");
+  var GAME_VERSION = String(global.SAKURAYO_GAME_VERSION || "4.6.6");
   var packs = [];
   var orderedPacks = [];
   var packById = Object.create(null);
@@ -639,7 +639,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.5";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.5";
+  var VERSION = "4.6.6";
   var TAU = Math.PI * 2;
   var EARLY_WINDOW = 40;
   var EARLY_INTERVAL = 0.28;
@@ -848,12 +848,24 @@ window.SAKURAYO_GAME_VERSION = "4.6.5";
   }
 
   function drawWorldPhoto(ctx, world) {
-    var W = world.worldW || world.W,
-      H = world.worldH || world.H;
-    if (!photoReady(world) || !W || !H) return false;
-    drawCover(ctx, world.battleBg, W, H);
-    ctx.fillStyle = "rgba(5,4,14,0.08)";
-    ctx.fillRect(0, 0, W, H);
+    var vw = world.W,
+      vh = world.H;
+    if (!photoReady(world) || !vw || !vh) return false;
+    var tiles = global.SakurayoCamera && global.SakurayoCamera.visibleChunks
+      ? global.SakurayoCamera.visibleChunks()
+      : [{ x: 0, y: 0 }];
+    var n;
+    for (n = 0; n < tiles.length; n++) {
+      ctx.save();
+      ctx.translate(tiles[n].x, tiles[n].y);
+      ctx.beginPath();
+      ctx.rect(0, 0, vw, vh);
+      ctx.clip();
+      drawCover(ctx, world.battleBg, vw, vh);
+      ctx.fillStyle = "rgba(5,4,14,0.04)";
+      ctx.fillRect(0, 0, vw, vh);
+      ctx.restore();
+    }
     return true;
   }
 
@@ -1376,7 +1388,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.5";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.5";
+  var VERSION = "4.6.6";
   var COLS = 4;
   var ROWS = 2;
   var DAMP = 10;
@@ -1575,7 +1587,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.5";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.5";
+  var VERSION = "4.6.6";
   var typing = null;
   var flashTimer = 0;
   var styleInjected = false;
@@ -1598,7 +1610,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.5";
       "@keyframes sakurayoBeatFade{from{opacity:0}to{opacity:1}}" +
       "#dialogue .dialogueModal{overflow:hidden}" +
       "#dialogue:not(.hidden) .dialogueModal{animation:sakurayoCutIn .36s ease}" +
-      "#dialogue .dialogueArt{transform-origin:center bottom;background-size:contain;background-position:center bottom;background-repeat:no-repeat}" +
+      "#dialogue .dialogueArt{transform-origin:center bottom;background-size:contain!important;background-position:center bottom!important;background-repeat:no-repeat!important}" +
+      "html.landscape46 #dialogue .dialogueArt:after{display:none!important}" +
       "#dialogueChapter{margin:0 0 8px;color:#9ee7ff;letter-spacing:.22em;font-size:10px;font-weight:800}" +
       "#dialogue[data-ground='torii'] .dialogueModal{border-color:#ff6fb088;box-shadow:0 0 40px #ff4ea324}" +
       "#dialogue[data-ground='neon'] .dialogueModal{border-color:#5ad2ff88;box-shadow:0 0 40px #5ad2ff24}" +
@@ -1901,7 +1914,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.5";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.5";
+  var VERSION = "4.6.6";
   var TABS = ["skins", "starters", "items", "talismans", "extensions"];
   var FIRST_CLEAR = 40;
   var styleInjected = false;
@@ -2045,7 +2058,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.5";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.5";
+  var VERSION = "4.6.6";
   var portraitTaps = 0;
   var portraitStamp = 0;
   var TAP_WINDOW = 1200;
@@ -3776,7 +3789,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.5";
   }
 
   global.SakurayoChronicle = {
-    version: "4.6.5",
+    version: "4.6.6",
     SAYO_TITLE: SAYO_TITLE,
     AYA_TITLE: AYA_TITLE,
     RION_TITLE: RION_TITLE,
@@ -3796,7 +3809,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.5";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.5";
+  var VERSION = "4.6.6";
   // Live2D Cubism AutoEyeBlinkInput defaults: Mean 2.5, Maximum Deviation 2.
   // https://docs.live2d.com/en/cubism-sdk-tutorials/eyeblink/
   var BLINK = Object.freeze({
@@ -4205,7 +4218,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.5";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.5";
+  var VERSION = "4.6.6";
   var MAX = 2;
   var COST = 8;
   var REFUND = 4;
@@ -10739,12 +10752,12 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   }
   function faceSrc46(c,sk,kind){
     const bust=artImage(charArtPath35(c,"dialogue",sk));
-    if(artReady(bust))return bust.src;
+    if(bust&&bust.src)return bust.src;
     const want=faceMood46(kind);
     const chain=want==="surprised"?["surprised","serious","calm"]:want==="smile"?["smile","calm"]:want==="sad"?["sad","hurt","calm"]:[want,"calm"];
     for(const mood of chain){
       const img=artImage(`characters/${c.id}/default/face_${mood}.webp`);
-      if(artReady(img))return img.src;
+      if(img&&img.src)return img.src;
     }
     return svg35(c,sk,512);
   }
@@ -10752,9 +10765,9 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function npcFaceSrc47(sp,kind){
     const npc=NPC_ART47[sp];if(!npc)return null;
     const p=artImage(`npc/${npc}/portrait.webp`);
-    if(artReady(p))return p.src;
+    if(p&&p.src)return p.src;
     const mood=({boss:"serious",phase:"surprised",ending:"smile",win:"smile"})[kind]||"calm";
-    for(const m of [mood,"calm"]){const im=artImage(`npc/${npc}/face_${m}.webp`);if(artReady(im))return im.src;}
+    for(const m of [mood,"calm"]){const im=artImage(`npc/${npc}/face_${m}.webp`);if(im&&im.src)return im.src;}
     return null;
   }
   const _showDialogue35=showDialogue;
@@ -10854,7 +10867,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   const _finish36=finish;finish=function(win){if(isMainGodRun36())return finishMainGod36(!!win);return _finish36(win);};
   const _damagePlayer36=damagePlayer;damagePlayer=function(amount){return _damagePlayer36(amount*(P.lordRisk||1));};
 
-  function installCover36(){if(!$("#coverTitle36")){const title=document.createElement("div");title.id="coverTitle36";title.className="coverTitle36";title.innerHTML=/SakurayoAndroid\/\S*-test/.test(navigator.userAgent)?"<b>测试版樱夜</b><span>V4.6.5 · 独立测试包</span>":"<b>樱夜·尸潮</b><span>四章 · 证词尚未结束</span>";$("#menu").appendChild(title);}}
+  function installCover36(){if(!$("#coverTitle36")){const title=document.createElement("div");title.id="coverTitle36";title.className="coverTitle36";title.innerHTML=/SakurayoAndroid\/\S*-test/.test(navigator.userAgent)?"<b>测试版樱夜</b><span>V4.6.6 · 独立测试包</span>":"<b>樱夜·尸潮</b><span>四章 · 证词尚未结束</span>";$("#menu").appendChild(title);}}
   const _menuUpdate36=menuUpdate;menuUpdate=function(){_menuUpdate36();installCover36();renderMainGodShop36();};
 
   /* ================= V3.7 主神长期循环 ================= */
@@ -10896,7 +10909,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function finishTutorial37(){const launch=tutorialLaunch37;save.tutorialDone=true;persist();ensureTutorial37().classList.add("hidden");tutorialLaunch37=false;if(launch)startGame();}
   const _startGame37=startGame;startGame=function(){if(!save.tutorialDone&&state==="menu"){openTutorial37(true);return;}return _startGame37();};
 
-  function runAnalytics37(){const runs=save.runHistory||[],wins=runs.filter(x=>x.win),byChar={};for(const r of runs){const id=r.character||"unknown";byChar[id]=(byChar[id]||0)+1;}const avg=k=>runs.length?(runs.reduce((s,r)=>s+(Number(r[k])||0),0)/runs.length).toFixed(1):"0";return {version:window.SAKURAYO_GAME_VERSION||"4.6.5",generatedAt:new Date().toISOString(),summary:{runs:runs.length,wins:wins.length,winRate:runs.length?Math.round(wins.length/runs.length*100):0,averageLevel:avg("level"),averageKills:avg("kills"),characters:byChar,mainGod:{...save.mainGod}},runs};}
+  function runAnalytics37(){const runs=save.runHistory||[],wins=runs.filter(x=>x.win),byChar={};for(const r of runs){const id=r.character||"unknown";byChar[id]=(byChar[id]||0)+1;}const avg=k=>runs.length?(runs.reduce((s,r)=>s+(Number(r[k])||0),0)/runs.length).toFixed(1):"0";return {version:window.SAKURAYO_GAME_VERSION||"4.6.6",generatedAt:new Date().toISOString(),summary:{runs:runs.length,wins:wins.length,winRate:runs.length?Math.round(wins.length/runs.length*100):0,averageLevel:avg("level"),averageKills:avg("kills"),characters:byChar,mainGod:{...save.mainGod}},runs};}
   function ensureAnalytics37(){let d=$("#analyticsDrawer37");if(d)return d;d=document.createElement("section");d.id="analyticsDrawer37";d.className="drawer hidden";d.innerHTML='<div class="dhead"><h2>战斗统计与导出</h2><button class="close">×</button></div><div class="dbody"><div id="analyticsSummary37"></div><textarea id="analyticsText37" readonly></textarea><div class="analyticsActions37"><button id="copyAnalytics37">复制统计</button><button id="downloadAnalytics37">导出 JSON</button></div></div>';d.querySelector(".close").onclick=()=>d.classList.add("hidden");d.querySelector("#copyAnalytics37").onclick=async()=>{const text=$("#analyticsText37").value;try{await navigator.clipboard.writeText(text);toast("统计已复制");}catch{$("#analyticsText37").select();toast("已选中文本，请手动复制");}};d.querySelector("#downloadAnalytics37").onclick=()=>{const blob=new Blob([$("#analyticsText37").value],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`sakurayo-v37-stats-${Date.now()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};document.body.appendChild(d);return d;}
   function openAnalytics37(){closeDrawers();const d=ensureAnalytics37(),data=runAnalytics37(),s=data.summary;$("#analyticsSummary37").innerHTML=`<div class="analyticsGrid37"><b>${s.runs}<small>记录局数</small></b><b>${s.winRate}%<small>胜率</small></b><b>${s.averageLevel}<small>平均等级</small></b><b>${s.averageKills}<small>平均击破</small></b></div><p>本地仅保留最近 30 局；导出文件不会上传网络。</p>`;$("#analyticsText37").value=JSON.stringify(data,null,2);d.classList.remove("hidden");}
 
@@ -11013,19 +11026,23 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     }
     if(sp==="妹妹频道"){
       const img=artImage("characters/aya/default/dialogue.webp");
-      if(artReady(img))return img.src;
+      if(img&&img.src)return img.src;
     }
     if(sp==="同门残响"){
       const img=artImage("characters/rion/default/dialogue.webp");
-      if(artReady(img))return img.src;
+      if(img&&img.src)return img.src;
     }
     return typeof faceSrc46==="function"?faceSrc46(char35(),skin35(),kind):"";
   }
   function paintDialogueStage47(sp,kind){
-    const chap=Math.max(1,Math.min(4,(typeof stage==="function"&&stage().id)||1));
-    const cg=artImage(`stages/stage_${chap}/cg.webp`);
+    const overlay=$("#dialogue");
     const modal=document.querySelector("#dialogue .dialogueModal");
-    if(modal&&artReady(cg))modal.style.backgroundImage=`linear-gradient(#0e0b21d4,#0e0b21ee),url('${cg.src}')`;
+    if(overlay){
+      overlay.style.backgroundImage="linear-gradient(#05040e22,#05040ed8)";
+      overlay.style.backgroundSize="auto";
+      overlay.style.backgroundPosition="";
+    }
+    if(modal)modal.style.backgroundImage="none";
     const face=speakerArt47(sp,kind||lastDialogueKind47||"talk");
     if(face)$(".dialogueArt").style.backgroundImage=`url('${face}')`;
   }
@@ -11301,7 +11318,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function combatArtPath38(e){if(e.type==="boss"){if(isMainGodRun36())return `content-packs/maingod-void/bosses/void_phase${clamp(e.phase||1,1,4)}.webp`;return `bosses/stage${clamp(stage().id,1,4)}_phase${clamp(e.phase||1,1,4)}.webp`;}if(VOID_ART45.includes(e.type))return `content-packs/maingod-void/enemies/${e.type}.webp`;return `enemies/${e.elite?"elite":ENEMY_ART38.includes(e.type)?e.type:"normal"}.webp`;}
   function drawEnemyOverlay38(e){if(e.elite){ctx.strokeStyle="#ffd36b";ctx.lineWidth=3;ctx.shadowBlur=10*battleGlow421(false);ctx.shadowColor="#ffb24e";ctx.beginPath();ctx.arc(0,0,e.r+7,0,TAU);ctx.stroke();ctx.shadowBlur=0;}if(e.infected>0){ctx.strokeStyle="#8dff72";ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,e.r+4,0,TAU);ctx.stroke();}const marks={shield:"盾",disruptor:"扰",purifier:"净",specter:"灵",decay:"腐",seal:"封"};if(marks[e.type]){ctx.font=`900 ${Math.max(10,e.r*.55)}px system-ui`;ctx.textAlign="center";ctx.strokeStyle="#130a22";ctx.lineWidth=4;ctx.fillStyle="#fff";ctx.strokeText(marks[e.type],0,-e.r-15);ctx.fillText(marks[e.type],0,-e.r-15);}if(e.hp<e.max||e.type==="boss"){const width=e.r*2.25,ratio=clamp(e.hp/Math.max(1,e.max),0,1);ctx.fillStyle="#07050bcc";ctx.fillRect(-width/2,-e.r-10,width,5);ctx.fillStyle=e.type==="boss"?"#ff57ad":e.elite?"#ffd36b":"#69e89a";ctx.fillRect(-width/2,-e.r-10,width*ratio,5);}}
   const _enemyFallback38=enemyDraw;
-  enemyDraw=function(e){const crowd=enemies.length,screenScale=clamp(Math.sqrt(Math.max(1,W*H)/(430*932)),.82,1),crowdScale=e.type==="boss"?1:crowd>74?.66:crowd>56?.78:1,margin=e.type==="boss"?150:85;if(e.x<-margin||e.x>W+margin||e.y<-margin||e.y>H+margin)return;const path=combatArtPath38(e);let image=path?artImage(path):null;if(e.type!=="boss"){if(VOID_ART45.includes(e.type)){const extra=artImage(`content-packs/maingod-void/enemies/${e.type}_b.webp`);if(artReady(extra)&&(Math.floor((runTime||0)*5+(e.x||0)*.02)%2))image=extra;}else{const id=e.elite?"elite":ENEMY_ART38.includes(e.type)?e.type:"normal";if(ENEMY_EXTRA38[id]){const extra=artImage(`enemies/${id}_b.webp`);if(artReady(extra)&&(Math.floor((runTime||0)*5+(e.x||0)*.02)%2))image=extra;}}}if(!artReady(image)){_enemyFallback38(e);ctx.save();ctx.translate(e.x,e.y);ctx.strokeStyle="#fff4ea";ctx.lineWidth=2.6;ctx.beginPath();ctx.arc(0,0,e.r+4,0,TAU);ctx.stroke();ctx.restore();return;}ctx.save();ctx.translate(e.x,e.y);if(e.hit)ctx.globalAlpha=.62;ctx.fillStyle="#0007";ctx.beginPath();ctx.ellipse(0,e.r*.78,e.r*1.12,e.r*.35,0,0,TAU);ctx.fill();const size=(e.type==="boss"?e.r*3.35:e.r*(e.type==="tank"?3.7:3.45))*screenScale*crowdScale,bob=e.type==="fast"?Math.sin(runTime*12)*2:Math.sin(runTime*4+e.x*.01)*1.2;drawEnemySilhouette412(e,size);drawBossSprite412(e,image,size,bob);drawEnemyOverlay38(e);ctx.strokeStyle=e.elite?"#ffe08a":"#fff4ea";ctx.lineWidth=2.2;ctx.beginPath();ctx.arc(0,0,e.r+4,0,TAU);ctx.stroke();ctx.restore();};
+  enemyDraw=function(e){const crowd=enemies.length,screenScale=clamp(Math.sqrt(Math.max(1,W*H)/(430*932)),.82,1),crowdScale=e.type==="boss"?1:crowd>74?.66:crowd>56?.78:1,margin=e.type==="boss"?150:85;if(window.SakurayoCamera?!window.SakurayoCamera.contains(e.x,e.y,margin):(e.x<-margin||e.x>W+margin||e.y<-margin||e.y>H+margin))return;const path=combatArtPath38(e);let image=path?artImage(path):null;if(e.type!=="boss"){if(VOID_ART45.includes(e.type)){const extra=artImage(`content-packs/maingod-void/enemies/${e.type}_b.webp`);if(artReady(extra)&&(Math.floor((runTime||0)*5+(e.x||0)*.02)%2))image=extra;}else{const id=e.elite?"elite":ENEMY_ART38.includes(e.type)?e.type:"normal";if(ENEMY_EXTRA38[id]){const extra=artImage(`enemies/${id}_b.webp`);if(artReady(extra)&&(Math.floor((runTime||0)*5+(e.x||0)*.02)%2))image=extra;}}}if(!artReady(image)){_enemyFallback38(e);ctx.save();ctx.translate(e.x,e.y);ctx.strokeStyle="#fff4ea";ctx.lineWidth=2.6;ctx.beginPath();ctx.arc(0,0,e.r+4,0,TAU);ctx.stroke();ctx.restore();return;}ctx.save();ctx.translate(e.x,e.y);if(e.hit)ctx.globalAlpha=.62;ctx.fillStyle="#0007";ctx.beginPath();ctx.ellipse(0,e.r*.78,e.r*1.12,e.r*.35,0,0,TAU);ctx.fill();const size=(e.type==="boss"?e.r*3.35:e.r*(e.type==="tank"?3.7:3.45))*screenScale*crowdScale,bob=e.type==="fast"?Math.sin(runTime*12)*2:Math.sin(runTime*4+e.x*.01)*1.2;drawEnemySilhouette412(e,size);drawBossSprite412(e,image,size,bob);drawEnemyOverlay38(e);ctx.strokeStyle=e.elite?"#ffe08a":"#fff4ea";ctx.lineWidth=2.2;ctx.beginPath();ctx.arc(0,0,e.r+4,0,TAU);ctx.stroke();ctx.restore();};
   window.__SAKURAYO_COMBAT_ART__=Object.freeze({paths:()=>[...COMBAT_ART38],status:()=>COMBAT_ART38.map(path=>{const image=ART_CACHE.get(path);return {path,loaded:!!image,ready:artReady(image),width:image?.naturalWidth||0,height:image?.naturalHeight||0};})});
 
   function upgradeDelta38(id){const l=lv(id),map={damage:["伤害",`${Math.round(P.dmg)}`,`${Math.round(P.dmg*1.12)}`],rate:["射速",`${(1/P.rate).toFixed(1)}/秒`,`${(1/(P.rate*.9)).toFixed(1)}/秒`],hp:["生命",`${Math.round(P.maxHp)}`,`${Math.round(P.maxHp+18)}`],speed:["移速",`${Math.round(P.spd)}`,`${Math.round(P.spd*1.08)}`],crit:["暴击",`${Math.round(P.crit*100)}%`,`${Math.round((P.crit+.06)*100)}%`],pierce:["穿透",`${P.pierce}`,`${P.pierce+1}`],multishot:["弹丸",`${P.multi}`,`${P.multi+1}`]};const key=Object.keys(map).find(k=>id.toLowerCase().includes(k));return key?map[key]:["技能等级",`Lv.${l}`,`Lv.${l+1}`];}
@@ -11422,7 +11439,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   const _menuUpdate39=menuUpdate;
   menuUpdate=function(){const result=_menuUpdate39();installCalmMenu39();return result;};
   const _runAnalytics39=runAnalytics37;
-  runAnalytics37=function(){return {..._runAnalytics39(),version:window.SAKURAYO_GAME_VERSION||"4.6.5"};};
+  runAnalytics37=function(){return {..._runAnalytics39(),version:window.SAKURAYO_GAME_VERSION||"4.6.6"};};
 
   function drawMechanics39(){
     if(state!=="play")return;
@@ -11665,7 +11682,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   const _renderShop40=renderShop35;
   renderShop35=function(){_renderShop40();const box=$("#shopList");if(!box)return;const skins=[...box.children],tabs=document.createElement("nav");tabs.className="shopTabs40 filterTabs38";tabs.innerHTML='<button class="on" data-shop="skins">服饰</button><button data-shop="starters">初始强化</button><button data-shop="items">道具与武器</button><button data-shop="talismans">排除符咒</button>';box.innerHTML="";if(window.SakurayoEconomy)box.appendChild(window.SakurayoEconomy.walletNode(save.character,save.coins,save.shop40,STARTERS40,ITEMS40,SKINS35));box.appendChild(tabs);const groups={skins:document.createElement("section"),starters:document.createElement("section"),items:document.createElement("section"),talismans:document.createElement("section")};for(const [id,node] of Object.entries(groups)){node.className="shopGroup40";node.dataset.shopGroup=id;node.style.display=id==="skins"?"grid":"none";box.appendChild(node);}skins.forEach(x=>groups.skins.appendChild(x));renderStarterShop40(groups.starters);renderItemShop40(groups.items);renderTalismanShop40(groups.talismans);const challenge=document.createElement("button");challenge.className="challengeToggle40";challenge.textContent=`孤证试炼：${save.shop40.noUpgradeChallenge?"开启":"关闭"} · 升级不获得局内强化`;challenge.disabled=!save.shop40.equippedStarter;challenge.onclick=()=>{save.shop40.noUpgradeChallenge=!save.shop40.noUpgradeChallenge;persist();renderShop35();};groups.starters.prepend(challenge);bindShopTabs40(box);};
 
-  function balanceReport40(){const a=save.balance40.samples||[],wins=a.filter(x=>x.win),group={};for(const s of a){const k=`${s.character}/S${s.stage}/${s.starter||"none"}${s.noUpgrade?"/孤证":""}`;(group[k]||(group[k]={runs:0,wins:0,levels:0,damage:0})).runs++;group[k].wins+=s.win?1:0;group[k].levels+=s.level||0;group[k].damage+=s.damageTaken||0;}return {version:window.SAKURAYO_GAME_VERSION||"4.6.5",samples:a.length,winRate:a.length?Math.round(wins.length/a.length*100):0,groups:Object.fromEntries(Object.entries(group).map(([k,v])=>[k,{runs:v.runs,winRate:Math.round(v.wins/v.runs*100),avgLevel:+(v.levels/v.runs).toFixed(1),avgDamage:Math.round(v.damage/v.runs)}])),recent:a.slice(0,20)};}
+  function balanceReport40(){const a=save.balance40.samples||[],wins=a.filter(x=>x.win),group={};for(const s of a){const k=`${s.character}/S${s.stage}/${s.starter||"none"}${s.noUpgrade?"/孤证":""}`;(group[k]||(group[k]={runs:0,wins:0,levels:0,damage:0})).runs++;group[k].wins+=s.win?1:0;group[k].levels+=s.level||0;group[k].damage+=s.damageTaken||0;}return {version:window.SAKURAYO_GAME_VERSION||"4.6.6",samples:a.length,winRate:a.length?Math.round(wins.length/a.length*100):0,groups:Object.fromEntries(Object.entries(group).map(([k,v])=>[k,{runs:v.runs,winRate:Math.round(v.wins/v.runs*100),avgLevel:+(v.levels/v.runs).toFixed(1),avgDamage:Math.round(v.damage/v.runs)}])),recent:a.slice(0,20)};}
   function sealBetaPorts40(){
     $("#betaButton40")?.remove();
     $("#betaDrawer40")?.remove();
@@ -11685,7 +11702,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   renderChoices=function(){const result=_renderChoices40();document.querySelectorAll("#choices .choice").forEach(card=>{const u=U.find(x=>x.id===card.dataset.upgradeId);if(!u?.conflict40)return;card.classList.add("conflictChoice40");const p=card.querySelector("p");if(p)p.insertAdjacentHTML("beforeend",'<strong class="conflictWarn40">高风险冲突：收益与削弱同时生效，可能让构筑失控。</strong>');});return result;};
 
   style37.textContent+=`.shopTabs40{margin:0 0 10px}.shopGroup40{display:grid;gap:9px}.shopItem40{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:11px;border-radius:14px;background:#100c20e8;border:1px solid #ffffff18;margin-bottom:9px}.shopItem40 h3{margin:0 0 4px;font-size:14px}.shopItem40 p{margin:0;color:#c7bfd2;font-size:11px;line-height:1.45}.shopItem40 button,.shopUpgrade40,.challengeToggle40,.betaActions40 button,.betaDrawer40>[class] button[data-beta="refresh"],.betaDrawer40 .dbody>button[data-beta="refresh"]{padding:9px;border-radius:10px;border:1px solid #8463aa;background:#261b3d;color:#fff}.shopIcon40{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:#27183d;font-size:24px}.shopUpgrade40{grid-column:3;margin-top:-6px}.challengeToggle40{width:100%;margin-bottom:10px;border-color:#ffd36b;color:#ffe69b;background:#35251d}.conflictChoice40{border-color:#ff6f7e!important;background:linear-gradient(145deg,#2a101be8,#160d22e8)!important}.conflictWarn40{display:block;margin-top:6px;color:#ff8793}.betaGrid40{display:grid;grid-template-columns:1fr 1fr;gap:8px}.betaGrid40 label{display:grid;gap:5px;font-size:11px}.betaGrid40 select{padding:9px;border-radius:9px;background:#141025;color:#fff;border:1px solid #70558c}.betaActions40{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}.betaDrawer40 textarea{width:100%;height:230px;background:#080713;color:#bdf4de;border:1px solid #6b548b;border-radius:10px;padding:9px;font:10px/1.4 ui-monospace,monospace}.betaDrawer40 .dbody>button[data-beta="refresh"]{width:100%;margin-top:8px}.hiddenStory40{border-color:#ffe6a455!important}.utilityButtons37.open39>#betaButton40{display:block!important}`;
-  document.title=/SakurayoAndroid\/\S*-test/.test(navigator.userAgent)?"测试版樱夜 V4.6.5":"樱夜·尸潮：Mod Kit V4.6.5";
+  document.title=/SakurayoAndroid\/\S*-test/.test(navigator.userAgent)?"测试版樱夜 V4.6.6":"樱夜·尸潮：Mod Kit V4.6.6";
 
   /* ================= V4.0 融合扩展：24种跨职业机制 ================= */
   const FUSION_ICON_ALIAS41={elementalbeast:"chimera",plagueidol:"plagueforge",soulgun:"gunshrine",nanoninja:"shadowmage",fleshshrine:"corpseimmortal",bloodmage:"bloodstar"};
@@ -12637,19 +12654,23 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       "html.landscape46 #talentList .talent{display:flex;flex-direction:column;min-width:0;padding:10px;margin:0}"+
       "html.landscape46 #shopList{overflow:visible}"+
       "html.landscape46 .shopGroup40{display:grid;grid-auto-flow:column;grid-template-rows:repeat(2,minmax(0,auto));grid-auto-columns:minmax(168px,210px);gap:8px}"+
-      "html.landscape46 #level.overlay,html.landscape46 #paused.overlay,html.landscape46 #event.overlay{align-items:flex-end;padding:10px 14px 12px;background:radial-gradient(circle at 50% 80%,#ff4ea318,#05040e88 70%)}"+
-      "html.landscape46 #level .modal,html.landscape46 #paused .modal,html.landscape46 #event .modal{width:min(86vw,700px);max-height:68vh;overflow:hidden;padding:10px 12px 8px;touch-action:none}"+
-      "html.landscape46 #level h2,html.landscape46 #paused h2{font-size:18px;margin:0 0 2px}"+
-      "html.landscape46 #level .sub,html.landscape46 #paused .sub{margin:0 0 8px;font-size:10px}"+
+      "html.landscape46 #level.overlay,html.landscape46 #paused.overlay,html.landscape46 #event.overlay{align-items:flex-end;padding:8px 12px 10px;background:radial-gradient(circle at 50% 86%,#ff4ea314,#05040e55 62%)}"+
+      "html.landscape46 #level .modal,html.landscape46 #paused .modal,html.landscape46 #event .modal{width:min(92vw,780px);max-height:48vh;overflow:hidden;padding:8px 10px 6px;touch-action:none}"+
+      "html.landscape46 #level h2,html.landscape46 #paused h2{font-size:16px;margin:0 0 2px}"+
+      "html.landscape46 #level .sub,html.landscape46 #paused .sub{margin:0 0 6px;font-size:10px}"+
       "html.landscape46 #level .choices{gap:6px}"+
-      "html.landscape46 #level .choice{min-height:0;padding:8px 6px}"+
-      "html.landscape46 #level .choice img{width:40px;height:40px}"+
-      "html.landscape46 #level .choice b{font-size:13px}"+
-      "html.landscape46 #level .reroll{margin-top:6px}"+
-      "html.landscape46 #dialogue.overlay{align-items:flex-end;padding:8px 16px 10px;background:linear-gradient(180deg,#0000 40%,#05040ecc)}"+
-      "html.landscape46 #dialogue .dialogueModal{display:flex;flex-direction:row;align-items:stretch;width:min(92vw,860px);max-height:38vh;overflow:hidden;padding:0;touch-action:none}"+
-      "html.landscape46 #dialogue .dialogueArt{width:34%;height:auto;min-height:128px;max-height:none;margin:0;border-radius:0;background-color:#120b22;background-size:contain;background-position:center bottom;background-repeat:no-repeat;animation:none}"+
-      "html.landscape46 #dialogue .dialogueBody{flex:1;margin:0;padding:12px 16px 10px;text-align:left}"+
+      "html.landscape46 #level .choice{min-height:0;padding:6px 4px}"+
+      "html.landscape46 #level .choice img{width:32px;height:32px}"+
+      "html.landscape46 #level .choice b{font-size:12px}"+
+      "html.landscape46 #level .choice p{margin:2px 0;font-size:9px}"+
+      "html.landscape46 #level .choiceReadout38{display:none}"+
+      "html.landscape46 #level .reroll{margin-top:4px;padding:6px 10px}"+
+      "html.landscape46 #dialogue.overlay{display:block;align-items:stretch;justify-content:stretch;padding:0;background:#05040e66;backdrop-filter:none}"+
+      "html.landscape46 #dialogue .dialogueModal{position:absolute;inset:0;top:0;right:0;bottom:0;left:0;display:block;width:100%;max-width:none;height:100%;max-height:none;overflow:visible;padding:0;border:none;border-radius:0;box-shadow:none;background:transparent!important;touch-action:none}"+
+      "html.landscape46 #dialogue .dialogueArt{position:absolute;left:0;bottom:18%;width:min(46vw,460px);height:82%;min-height:0;max-height:none;margin:0;border-radius:0;background-color:transparent;background-size:contain!important;background-position:center bottom!important;background-repeat:no-repeat!important;animation:none;z-index:1}"+
+      "html.landscape46 #dialogue .dialogueArt:after{display:none!important;background:none!important}"+
+      "html.landscape46 #dialogue .dialogueBody{position:absolute;left:4%;right:4%;bottom:3%;z-index:2;margin:0;padding:8px 16px 6px;text-align:left;border-radius:14px;background:linear-gradient(180deg,#1a1238f4,#0b0818f8);border:1px solid #ff6fb066}"+
+      "html.landscape46 #dialogue .dialogueText{min-height:44px;margin:6px 0;font-size:14px}"+
       "html.landscape46 #tutorialDrawer37{overflow:hidden;touch-action:none}"+
       "html.landscape46 #tutorialDrawer37 .dbody{display:flex;flex-direction:row;align-items:center;gap:16px}"+
       "#opsDock46{display:none!important}";

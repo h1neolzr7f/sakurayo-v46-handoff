@@ -1,7 +1,7 @@
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.5";
+  var VERSION = "4.6.6";
   var TAU = Math.PI * 2;
   var EARLY_WINDOW = 40;
   var EARLY_INTERVAL = 0.28;
@@ -210,12 +210,24 @@
   }
 
   function drawWorldPhoto(ctx, world) {
-    var W = world.worldW || world.W,
-      H = world.worldH || world.H;
-    if (!photoReady(world) || !W || !H) return false;
-    drawCover(ctx, world.battleBg, W, H);
-    ctx.fillStyle = "rgba(5,4,14,0.08)";
-    ctx.fillRect(0, 0, W, H);
+    var vw = world.W,
+      vh = world.H;
+    if (!photoReady(world) || !vw || !vh) return false;
+    var tiles = global.SakurayoCamera && global.SakurayoCamera.visibleChunks
+      ? global.SakurayoCamera.visibleChunks()
+      : [{ x: 0, y: 0 }];
+    var n;
+    for (n = 0; n < tiles.length; n++) {
+      ctx.save();
+      ctx.translate(tiles[n].x, tiles[n].y);
+      ctx.beginPath();
+      ctx.rect(0, 0, vw, vh);
+      ctx.clip();
+      drawCover(ctx, world.battleBg, vw, vh);
+      ctx.fillStyle = "rgba(5,4,14,0.04)";
+      ctx.fillRect(0, 0, vw, vh);
+      ctx.restore();
+    }
     return true;
   }
 

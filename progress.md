@@ -1,5 +1,13 @@
 Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先阅读根目录的 AGENTS.md、README_FIRST.md 和 CODEX_TASK.md，基于 src/index.html 继续开发，不要使用旧版本文件。
 
+## 2026-08-20 拿到真图再改
+
+- 用 Playwright Chromium 横屏 932×430 截完整页面（含 DOM），不是 canvas 拼图，也不是全黑 screencap。
+- 真图里对话仍是半脸：旧 CSS `center 26%/cover` + `:after` 暗角 + `max-height:290px`。已拆掉，改成左侧高清半身。
+- 真图里 10 秒战斗看不见怪：`enemyDraw` 用 `e.x>W` 裁世界坐标。已改 `SakurayoCamera.contains`。10 秒约 30+ 只、描边可见。
+- 升级层不再铺满，战场顶部还能看见。大厅三角色封面已是 `lobby_wide`。
+- 源码 **4.6.6** / versionCode **67**。单文件 SHA-256 `cd1756dc2862a4426a2fa25f07afaaa0887edfb1f053789252753327b96553a5`。测试 APK SHA-256 `7962f564c8cad2774b3769277a968dd69fd4032661fb6958db7629bb9977b1c1`。拿图：`node tests/real_shots.mjs`。
+
 ## 2026-08-20 横屏二游手感修补
 
 - 用户反馈封面回退、半脸对话、升级铺满、竖滑、怪物看不见、密度低、背景粗、塔防坞还在。

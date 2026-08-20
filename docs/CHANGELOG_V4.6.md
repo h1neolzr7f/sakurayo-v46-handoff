@@ -1,6 +1,18 @@
 # V4.6 — 横屏大厅与镜界寻访
 
-当前源码 **4.6.5**。versionCode 66。测试包已打。
+当前源码 **4.6.6**。versionCode 67。按真图修过对话立绘和怪物可见。
+
+## 4.6.6 — 2026-08-20
+
+用 Playwright 横屏 932×430 截完整 DOM 真图后再改，不再用 canvas 拼图验收。
+
+- 对话去掉 `center 26%/cover` 和 `:after` 暗角，左侧放大高清半身（`dialogue.webp` / NPC `portrait.webp`），底部台词条
+- 怪物绘制裁剪改走 `SakurayoCamera.contains`，不再用屏幕宽高把世界坐标敌人裁没
+- 战场图按屏铺，不再拉满整张大地图
+- 升级层再压到约半屏，横屏隐藏过长 readout
+- 拿真图命令：`node tests/real_shots.mjs`
+- 单文件 SHA-256 `cd1756dc2862a4426a2fa25f07afaaa0887edfb1f053789252753327b96553a5`
+- 测试 APK SHA-256 `7962f564c8cad2774b3769277a968dd69fd4032661fb6958db7629bb9977b1c1`
 
 ## 4.6.5 — 2026-08-20
 
