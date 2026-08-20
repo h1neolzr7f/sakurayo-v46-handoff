@@ -11,7 +11,7 @@
 | 源码版本 | **4.6.3** |
 | Android `versionName` / `versionCode` | 4.6.3 / **64** |
 | 公开仓 | https://github.com/h1neolzr7f/sakurayo-zombietide |
-| 已发布 APK | **v4.4.6** |
+| 已发布 APK | 公开仓仍 **v4.4.6**；本仓 Debug **v4.6.3** |
 | 存档键 | **`sakurayoV3`** |
 | 代码基线 | `src/index.html` + `src/runtime/*.js` |
 | 运行时美术 | `android-app/app/src/main/assets/game/art` |

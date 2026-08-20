@@ -6,6 +6,11 @@
 
 升补丁号。叠层修复随 4.6.2 复测一并带上：电台 `bottom ≥ 158px`、`hideExplorationLayer41()`、隐藏关藏 `#menu`。`sakurayoV3` 只补字段。
 
+- 离线/Android 单文件 SHA-256：`9cd75586cad8a0633514ed2a3ad74ec59f7df41720b54a4bfd7476758d649e81`
+- Debug APK SHA-256：`0bdd39509d387f295913db560e28d2e0c959ff99a826e8f76dc188b4734b1bf9`
+- 包名 `com.sakurayo.zombietide`，versionName 4.6.3 / versionCode 64。无正式证书（本环境无 `keystore.properties`），debug 签名。不要卸旧正式包覆盖。
+- 本仓 Release：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.3
+
 ## 4.6.2 — 2026-08-19
 
 证词与演习彻底分账：结算不写 `done` / `unlock` / `endings` / 构筑卡，也不累加 `kills` / `runs` / `best`，不跑 `checkAch()`，局内不点 `lv12` / `flaw` / `phasebreak`。跨章回声按模式分袋。局内存档只在大厅刷新。隐藏关通关标题用完美结局名。`plan` 文案对上稳定度 +8。versionCode 63。存档仍 `sakurayoV3`。
