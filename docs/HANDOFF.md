@@ -108,7 +108,9 @@
 - 左上角色状态：名字、Lv、经验条、当日台词。有未读邮件时台词提醒先领补给。
 - 左侧竖栏必须在：任务 / 成就 / 邮件 / 公告 / 设置。
 - 顶中：三角色圆头切换。
-- 右侧：四货币（主神点 / 碎镜片 / 樱花币 / 寻访剩余）+ 背包 / 菜单 / 更多；关卡大卡要有风味文、推荐等级、进度；证词模式卡、主神空间卡；**出击 START >>>**；底栏五格 **寻访 / 名册 / 商店 / 关卡 / 档案**。
+- 右侧：四货币（主神点 / 碎镜片 / 樱花币 / **寻访票**）+ 背包 / 菜单 / 更多；关卡大卡要有风味文、推荐等级、进度；证词模式卡、主神空间卡；出击上方 14 格职业纹章；**出击 START >>>**；底栏五格 **寻访 / 名册 / 商店 / 关卡 / 档案**。
+- 四货币的 `+` 打开樱花兑换所：🌸20→💠1、🌸40→💎1、🌸160→🎫1。🎫 是真账户寻访票，不是保底倒计时。
+- 大厅点立绘一次捡 🌸1，飘 `+1`，随机捡钱台词，计入 `shop40.ops.picks`。成就「石阶拾樱 / 神社守财」。这和十连点后门不是一回事，`portraitTap()` 仍 `granted:false`。
 - 出击不要改成「角色名 · 进入樱夜」。也不要再改回光秃秃的「出击」。
 - 底栏不要再改回「仓库」。抽屉功能可以仍叫镜界仓库。
 - **不做竖版。** 不要 `#rotateHint46`、不要 `portraitFallback46` / `tallWindow46`。
@@ -158,8 +160,10 @@ pitySSR 80 / pitySR 10
 存档只写在已有对象 `shop40.ops`：
 
 ```
-pity, pitySR, pulls, tenPulls, owned, last, cheatUsed
+pity, pitySR, pulls, tenPulls, owned, last, cheatUsed, shards, tickets, picks
 ```
+
+寻访先扣票再扣币。纯票也能抽。`tickets` / `picks` 不是新的 top-level key。
 
 除 `mail46`（内测致谢邮箱）外，不要再加新的 top-level save key。证词进度写在 `shop40.ops.story`（`{sayo,aya,rion}`）。隐藏门闩只读 `storyChoices38`（回收演习）。`normalizeOps` 必须保留 `ops.story`，否则大厅一刷新证词记忆就没了。旧档缺字段当空，不要清档。
 
@@ -196,7 +200,8 @@ pity, pitySR, pulls, tenPulls, owned, last, cheatUsed
 - 眨眼：Cubism Mean **2.5 ± 2s**，不要 5.4s CSS `steps` 循环。
 - 注视阻尼，松手回正。
 - `#heroTap46` + `#heroHead46`：TapHead / TapBody 淡入淡出。
-- 立绘连点和 `?beta` / `__SAKURAYO_BETA__` 已封。内测 🌸9999 走 `save.mail46` 邮箱信 `beta-thanks-463`。已用过旧后门的存档只收致谢信，不再补发。
+- 立绘连点和 `?beta` / `__SAKURAYO_BETA__` 已封。`grantCheat()` / `portraitTap()` 继续 `granted:false` / `blocked:1`，十连点不加 🌸9999。大厅点立绘捡 🌸1 走 `pickPortraitCoin47()`，不要把两套混回去。
+- 内测 🌸9999 走 `save.mail46` 邮箱信 `beta-thanks-463`。已用过旧后门的存档只收致谢信，不再补发。
 - 不要给站桩叠多层 `drop-shadow` / `blur`。不要给抽屉整屏 `backdrop-filter`。横屏菜单不要 14px 毛玻璃。
 - `sakurayo-live.js` 不得覆盖大厅 dock / 角色圆钮布局。
 
@@ -243,7 +248,10 @@ pity, pitySR, pulls, tenPulls, owned, last, cheatUsed
 | `lobby46()` | 大厅快照 |
 | `pullGacha46(count)` | 抽卡 |
 | `grantCheat46()` | 发币 |
-| `tapPortrait46(times)` | 连点立绘 |
+| `tapPortrait46(times)` | 只走旧 `portraitTap`，不加币，`granted:false` |
+| `pickPortrait47()` | 大厅点立绘捡 🌸1 |
+| `openExchange47()` / `exchange47(kind,n)` | 打开兑换所 / 兑碎镜片、主神点、寻访票 |
+| `wallet47()` | 四货币 + `picks` |
 | `snapshot35()` | 含 `live`、`ops`、`runMode` |
 
 `startGame` 的 v37 包装：若 `!save.tutorialDone && state==="menu"`，打开教程并 **return**。隔离冒烟必须先结束教程（`#tutorialSkip37` / `#tutorialNext37`）。
@@ -282,6 +290,7 @@ ART_ROOT =
 - 新图同时考虑进 `game/art`；源 PNG 在 `assets/image2/source/`（本仓未收录）。
 - 规格见 [IMAGE2_ASSET_SPEC.md](IMAGE2_ASSET_SPEC.md)。
 - 已入库且必须继续接线：职业/融合闪图、三角色 career/form/fusion 战斗帧、`gacha/` 98 张卡面、`ui/lobby_wide.webp`、底栏 `ui/nav/*.webp`、大厅左栏/启动页 `ui/nav` + `ui/loading_art.webp` + `ui/menu_emblem.webp`、桌面图标 `ui/app_icon.webp`（已进 mipmap）。
+- 大厅出击上方用 14 张 `classes/*/icon.webp`。兑换所再展 14 职业 + 28 转职 + 24 融合 + 8 残件 + 12 时装 + 12 武器 + 四章 CG + 三相飞升，不要为了用满 1284 张把大厅铺满。
 - 不要把左栏/启动页再改回「任/就/邮」或单独一个「樱」字。底栏已经在用生成图标，不要改回字母。
 - 编年五条是正文，不进卡池，本来就没有封面图。
 - 寻访卡池仍是残件/时装/武器；14+28+24 职业卡在名册里，扩池到 16 另做，不要当漏接。

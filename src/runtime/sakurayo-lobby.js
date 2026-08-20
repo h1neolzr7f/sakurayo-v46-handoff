@@ -22,6 +22,13 @@
     ten: 1440,
     cheat: 9999,
     taps: 10,
+    pick: 1,
+  });
+
+  var EXCHANGE = Object.freeze({
+    shard: { id: "shard", n: "碎镜片", coins: 20, give: 1, mark: "💠" },
+    point: { id: "point", n: "主神点", coins: 40, give: 1, mark: "💎" },
+    ticket: { id: "ticket", n: "寻访票", coins: 160, give: 1, mark: "🎫" },
   });
 
   var STAR_MAX = 5;
@@ -557,6 +564,8 @@
       last: Array.isArray(incoming.last) ? incoming.last.slice(0, 20) : [],
       cheatUsed: incoming.cheatUsed ? 1 : 0,
       shards: clampInt(incoming.shards, 0, 999999),
+      tickets: clampInt(incoming.tickets, 0, 999999),
+      picks: clampInt(incoming.picks, 0, 999999),
       pool: pool,
       rosterTab: rosterTab,
       fashion: normalizePool(incoming.fashion, FASHION_CARDS),
@@ -725,7 +734,6 @@
 
   function pull(save, count, rng, poolId) {
     var n = count === 10 ? 10 : 1;
-    var cost = n === 10 ? RATES.ten : RATES.single;
     if (!save || typeof save !== "object") return { ok: false, reason: "save", results: [] };
     save.shop40 = normalizeOps(save.shop40 || {});
     var pool = poolId || save.shop40.ops.pool || "remnant";
@@ -735,8 +743,12 @@
     if (!list.length) {
       return { ok: false, reason: "empty", results: [], coins: coins, pool: pool, pity: save.shop40.ops.pity, pitySR: save.shop40.ops.pitySR, owned: save.shop40.ops.owned };
     }
-    if (coins < cost) {
-      return { ok: false, reason: "coins", results: [], coins: coins, pool: pool, pity: save.shop40.ops.pity, pitySR: save.shop40.ops.pitySR, owned: save.shop40.ops.owned };
+    var tickets = clampInt(save.shop40.ops.tickets, 0, 999999);
+    var useTickets = Math.min(tickets, n);
+    var remain = n - useTickets;
+    var coinNeed = remain <= 0 ? 0 : n === 10 ? Math.ceil(remain * (RATES.ten / 10)) : remain * RATES.single;
+    if (coins < coinNeed) {
+      return { ok: false, reason: "coins", results: [], coins: coins, tickets: tickets, pool: pool, pity: save.shop40.ops.pity, pitySR: save.shop40.ops.pitySR, owned: save.shop40.ops.owned };
     }
     var rand = typeof rng === "function" ? rng : Math.random;
     var state = poolState(save.shop40.ops, pool);
@@ -748,11 +760,14 @@
     }
     if (n === 10) state.tenPulls += 1;
     state.last = results.slice();
-    save.coins = coins - cost;
+    save.shop40.ops.tickets = clampInt(tickets - useTickets, 0, 999999);
+    save.coins = coins - coinNeed;
     return {
       ok: true,
       results: results,
       coins: save.coins,
+      tickets: save.shop40.ops.tickets,
+      ticketUsed: useTickets,
       pool: pool,
       pity: save.shop40.ops.pity,
       pitySR: save.shop40.ops.pitySR,
@@ -760,6 +775,36 @@
       pulls: save.shop40.ops.pulls,
       tenPulls: save.shop40.ops.tenPulls,
       shards: save.shop40.ops.shards,
+    };
+  }
+
+  function ensureMainGod(save) {
+    if (!save.mainGod || typeof save.mainGod !== "object" || Array.isArray(save.mainGod)) save.mainGod = { points: 0 };
+    save.mainGod.points = clampInt(save.mainGod.points, 0, 999999);
+    return save.mainGod;
+  }
+
+  function exchange(save, kind, times) {
+    var row = EXCHANGE[kind];
+    var n = Math.max(1, Math.min(99, Math.floor(Number(times) || 1)));
+    if (!row || !save || typeof save !== "object") return { ok: false, reason: "kind" };
+    save.shop40 = normalizeOps(save.shop40 || {});
+    ensureMainGod(save);
+    var cost = row.coins * n;
+    var coins = clampInt(save.coins, 0, 99999999);
+    if (coins < cost) return { ok: false, reason: "coins", coins: coins, need: cost, kind: kind };
+    save.coins = coins - cost;
+    if (kind === "shard") save.shop40.ops.shards = clampInt(save.shop40.ops.shards + row.give * n, 0, 999999);
+    else if (kind === "ticket") save.shop40.ops.tickets = clampInt(save.shop40.ops.tickets + row.give * n, 0, 999999);
+    else save.mainGod.points = clampInt(save.mainGod.points + row.give * n, 0, 999999);
+    return {
+      ok: true,
+      kind: kind,
+      n: n,
+      coins: save.coins,
+      shards: save.shop40.ops.shards,
+      tickets: save.shop40.ops.tickets,
+      points: save.mainGod.points,
     };
   }
 
@@ -814,6 +859,8 @@
       pulls: ops.pulls,
       tenPulls: ops.tenPulls,
       shards: ops.shards,
+      tickets: ops.tickets,
+      picks: ops.picks,
       fashion: ops.fashion,
       weapon: ops.weapon,
       story: ops.story,
@@ -1077,8 +1124,9 @@
     var ssrPct = Math.max(0, Math.min(100, Math.round((pity / RATES.pitySSR) * 100)));
     var srPct = Math.max(0, Math.min(100, Math.round((pitySR / RATES.pitySR) * 100)));
     var empty = !cardsForPool(pool).length;
-    var poor1 = info.coins < RATES.single || empty;
-    var poor10 = info.coins < RATES.ten || empty;
+    var tickets = info.tickets || 0;
+    var poor1 = empty || (tickets < 1 && info.coins < RATES.single);
+    var poor10 = empty || (tickets + Math.floor(info.coins / (RATES.ten / 10)) < 10);
     var sub = pool === "fashion" ? "时装装备才吃满" : pool === "weapon" ? "武器装备才吃满" : "残片进仓库 · 拥有即加成";
     host.innerHTML =
       '<div class="wishStage46">' +
@@ -1110,6 +1158,8 @@
       '%"></i></div></div></div>' +
       '<div class="wishDock46"><div class="wishPills46"><b>樱花币 ' +
       info.coins +
+      "</b><b>寻访票 " +
+      (info.tickets || 0) +
       "</b><b>寻访 " +
       pulls +
       "</b><b>软保 " +
@@ -1527,6 +1577,8 @@
     normalizeOps: normalizeOps,
     snapshot: snapshot,
     pull: pull,
+    EXCHANGE: EXCHANGE,
+    exchange: exchange,
     grantCheat: grantCheat,
     portraitTap: portraitTap,
     applyOwnedBonus: applyOwnedBonus,
