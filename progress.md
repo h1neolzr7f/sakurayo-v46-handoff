@@ -6,6 +6,8 @@ Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先
 - `installCover36` 不再写背景。对话改用高清半身。升级层缩小。抽屉左右滑。
 - 局内 DP 坞隐藏且不再部署。刷怪加密，怪物描边，地面暗角减淡。
 - 存档键仍 `sakurayoV3`。没有再包 `update`。
+- 4.6.5 测试包 SHA-256 `6b1c1883e5af73bfd8bbbd9c39e0bcb5eb9bb448c92b4ab4d1a7240b702caffe`。单文件 `71eb24fa33059686cad3029ac94033bebec4afd00fde9bd0850465f3f6375914`。
+- 下载：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.5/Sakurayo-ZombieTide-TEST-v4.6.5.apk
 
 ## 2026-08-20 独立测试包「测试版樱夜」
 

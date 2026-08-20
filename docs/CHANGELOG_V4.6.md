@@ -11,6 +11,8 @@
 - 升级/暂停缩小；抽屉左右滑
 - 局内塔防坞退役
 - 刷怪加密、怪物描边、地面变亮
+- 测试 APK SHA-256 `6b1c1883e5af73bfd8bbbd9c39e0bcb5eb9bb448c92b4ab4d1a7240b702caffe`
+- 直链：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.5/Sakurayo-ZombieTide-TEST-v4.6.5.apk
 
 ## 4.6.4 画面与操作修补 — 2026-08-20
 
