@@ -11,6 +11,8 @@
 - `versionName` 4.6.4-test / `versionCode` **65**
 - 统计导出和平衡报告不再写死 3.8 / 4.1
 - 本仓 Release：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.4
+- 单文件 SHA-256：`957a8dbecc1c8e77838430325b7510561d30ade6f0c295244b2d18211843ca88`
+- 测试 APK SHA-256：`c6aaf1972ce2d27860514a2dda3a4c0f93b1f10fbe5c80a0d237e4bd521f16e2`
 - APK 直链：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.4/Sakurayo-ZombieTide-TEST-v4.6.4.apk
 
 ## 4.6.3 — 2026-08-20

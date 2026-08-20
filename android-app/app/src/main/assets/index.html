@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" name="viewport"/>
 <meta content="#090714" name="theme-color"/>
-<title>樱夜·尸潮：Mod Kit V4.6.3</title>
+<title>樱夜·尸潮：Mod Kit V4.6.4</title>
 <style>
 :root{--p:#ff58a7;--p2:#ffb4d5;--c:#56ddff;--g:#ffd36b;--bg:#080713;--panel:rgba(18,14,39,.96);--line:rgba(170,220,255,.24);--mut:#cfc4df;--red:#ff4e72}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:#fff;font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;touch-action:none}button{border:0;color:inherit;font:inherit}button:active{transform:scale(.985)}canvas{position:fixed;inset:0;top:0;right:0;bottom:0;left:0;width:100%;height:100%}.hidden{display:none!important}.screen{position:fixed;inset:0;top:0;right:0;bottom:0;left:0;z-index:10}
@@ -119,7 +119,7 @@ html.landscape46 .banter{
 <div class="overlay hidden" id="result"><div class="modal"><div class="resultIcon" id="ricon">🌸</div><div class="rankBig" id="rankBig"></div><h2 id="rtitle"></h2><p class="sub" id="rsub"></p><div class="stats" id="rstats"></div><div class="endingTag" id="endingTag">结局演算中</div><div class="report" id="damageReport"></div><div class="routeNote" id="routeNote"></div><div class="actions"><button class="primary" id="again">再次迎击</button><button class="secondary" id="back">返回主界面</button></div></div></div>
 <div class="warn hidden" id="warning"></div><div id="toast"></div>
 <script>
-window.SAKURAYO_GAME_VERSION = "4.6.3";
+window.SAKURAYO_GAME_VERSION = "4.6.4";
 (() => {
   "use strict";
   const srcHarness = !String(location.href || "").includes("/android_asset/") && /\/src\/index\.html$/i.test(String(location.pathname || location.href || ""));
@@ -169,7 +169,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.3";
   "use strict";
 
   var API_VERSION = 2;
-  var GAME_VERSION = String(global.SAKURAYO_GAME_VERSION || "4.6.3");
+  var GAME_VERSION = String(global.SAKURAYO_GAME_VERSION || "4.6.4");
   var packs = [];
   var orderedPacks = [];
   var packById = Object.create(null);
@@ -639,7 +639,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.3";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.3";
+  var VERSION = "4.6.4";
   var TAU = Math.PI * 2;
   var EARLY_WINDOW = 20;
   var EARLY_INTERVAL = 0.45;
@@ -1375,7 +1375,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.3";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.3";
+  var VERSION = "4.6.4";
   var COLS = 4;
   var ROWS = 2;
   var DAMP = 10;
@@ -1574,7 +1574,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.3";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.3";
+  var VERSION = "4.6.4";
   var typing = null;
   var flashTimer = 0;
   var styleInjected = false;
@@ -1900,7 +1900,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.3";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.3";
+  var VERSION = "4.6.4";
   var TABS = ["skins", "starters", "items", "talismans", "extensions"];
   var FIRST_CLEAR = 40;
   var styleInjected = false;
@@ -2044,7 +2044,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.3";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.3";
+  var VERSION = "4.6.4";
   var portraitTaps = 0;
   var portraitStamp = 0;
   var TAP_WINDOW = 1200;
@@ -3775,7 +3775,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.3";
   }
 
   global.SakurayoChronicle = {
-    version: "4.6.3",
+    version: "4.6.4",
     SAYO_TITLE: SAYO_TITLE,
     AYA_TITLE: AYA_TITLE,
     RION_TITLE: RION_TITLE,
@@ -3795,7 +3795,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.3";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.3";
+  var VERSION = "4.6.4";
   // Live2D Cubism AutoEyeBlinkInput defaults: Mean 2.5, Maximum Deviation 2.
   // https://docs.live2d.com/en/cubism-sdk-tutorials/eyeblink/
   var BLINK = Object.freeze({
@@ -4204,7 +4204,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.3";
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.3";
+  var VERSION = "4.6.4";
   var MAX = 2;
   var COST = 8;
   var REFUND = 4;
@@ -10851,7 +10851,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   const _finish36=finish;finish=function(win){if(isMainGodRun36())return finishMainGod36(!!win);return _finish36(win);};
   const _damagePlayer36=damagePlayer;damagePlayer=function(amount){return _damagePlayer36(amount*(P.lordRisk||1));};
 
-  function installCover36(){const bg=$("#menu .bg");if(bg){bg.style.backgroundImage=`linear-gradient(180deg,#05051212 0%,#0505120a 38%,#080713b8 72%,#080713 100%),url('${artUrl("ui/cover_v36_main_god.webp")}')`;bg.style.backgroundPosition="center 30%";bg.style.backgroundSize="cover";}if(!$("#coverTitle36")){const title=document.createElement("div");title.id="coverTitle36";title.className="coverTitle36";title.innerHTML="<b>樱夜·尸潮</b><span>四章 · 证词尚未结束</span>";$("#menu").appendChild(title);}}
+  function installCover36(){const bg=$("#menu .bg");if(bg){bg.style.backgroundImage=`linear-gradient(180deg,#05051212 0%,#0505120a 38%,#080713b8 72%,#080713 100%),url('${artUrl("ui/cover_v36_main_god.webp")}')`;bg.style.backgroundPosition="center 30%";bg.style.backgroundSize="cover";}if(!$("#coverTitle36")){const title=document.createElement("div");title.id="coverTitle36";title.className="coverTitle36";title.innerHTML=/SakurayoAndroid\/\S*-test/.test(navigator.userAgent)?"<b>测试版樱夜</b><span>V4.6.4 · 独立测试包</span>":"<b>樱夜·尸潮</b><span>四章 · 证词尚未结束</span>";$("#menu").appendChild(title);}}
   const _menuUpdate36=menuUpdate;menuUpdate=function(){_menuUpdate36();installCover36();renderMainGodShop36();};
 
   /* ================= V3.7 主神长期循环 ================= */
@@ -10893,7 +10893,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function finishTutorial37(){const launch=tutorialLaunch37;save.tutorialDone=true;persist();ensureTutorial37().classList.add("hidden");tutorialLaunch37=false;if(launch)startGame();}
   const _startGame37=startGame;startGame=function(){if(!save.tutorialDone&&state==="menu"){openTutorial37(true);return;}return _startGame37();};
 
-  function runAnalytics37(){const runs=save.runHistory||[],wins=runs.filter(x=>x.win),byChar={};for(const r of runs){const id=r.character||"unknown";byChar[id]=(byChar[id]||0)+1;}const avg=k=>runs.length?(runs.reduce((s,r)=>s+(Number(r[k])||0),0)/runs.length).toFixed(1):"0";return {version:"3.8",generatedAt:new Date().toISOString(),summary:{runs:runs.length,wins:wins.length,winRate:runs.length?Math.round(wins.length/runs.length*100):0,averageLevel:avg("level"),averageKills:avg("kills"),characters:byChar,mainGod:{...save.mainGod}},runs};}
+  function runAnalytics37(){const runs=save.runHistory||[],wins=runs.filter(x=>x.win),byChar={};for(const r of runs){const id=r.character||"unknown";byChar[id]=(byChar[id]||0)+1;}const avg=k=>runs.length?(runs.reduce((s,r)=>s+(Number(r[k])||0),0)/runs.length).toFixed(1):"0";return {version:window.SAKURAYO_GAME_VERSION||"4.6.4",generatedAt:new Date().toISOString(),summary:{runs:runs.length,wins:wins.length,winRate:runs.length?Math.round(wins.length/runs.length*100):0,averageLevel:avg("level"),averageKills:avg("kills"),characters:byChar,mainGod:{...save.mainGod}},runs};}
   function ensureAnalytics37(){let d=$("#analyticsDrawer37");if(d)return d;d=document.createElement("section");d.id="analyticsDrawer37";d.className="drawer hidden";d.innerHTML='<div class="dhead"><h2>战斗统计与导出</h2><button class="close">×</button></div><div class="dbody"><div id="analyticsSummary37"></div><textarea id="analyticsText37" readonly></textarea><div class="analyticsActions37"><button id="copyAnalytics37">复制统计</button><button id="downloadAnalytics37">导出 JSON</button></div></div>';d.querySelector(".close").onclick=()=>d.classList.add("hidden");d.querySelector("#copyAnalytics37").onclick=async()=>{const text=$("#analyticsText37").value;try{await navigator.clipboard.writeText(text);toast("统计已复制");}catch{$("#analyticsText37").select();toast("已选中文本，请手动复制");}};d.querySelector("#downloadAnalytics37").onclick=()=>{const blob=new Blob([$("#analyticsText37").value],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`sakurayo-v37-stats-${Date.now()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};document.body.appendChild(d);return d;}
   function openAnalytics37(){closeDrawers();const d=ensureAnalytics37(),data=runAnalytics37(),s=data.summary;$("#analyticsSummary37").innerHTML=`<div class="analyticsGrid37"><b>${s.runs}<small>记录局数</small></b><b>${s.winRate}%<small>胜率</small></b><b>${s.averageLevel}<small>平均等级</small></b><b>${s.averageKills}<small>平均击破</small></b></div><p>本地仅保留最近 30 局；导出文件不会上传网络。</p>`;$("#analyticsText37").value=JSON.stringify(data,null,2);d.classList.remove("hidden");}
 
@@ -11419,7 +11419,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   const _menuUpdate39=menuUpdate;
   menuUpdate=function(){const result=_menuUpdate39();installCalmMenu39();return result;};
   const _runAnalytics39=runAnalytics37;
-  runAnalytics37=function(){return {..._runAnalytics39(),version:"4.6.3"};};
+  runAnalytics37=function(){return {..._runAnalytics39(),version:window.SAKURAYO_GAME_VERSION||"4.6.4"};};
 
   function drawMechanics39(){
     if(state!=="play")return;
@@ -11662,7 +11662,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   const _renderShop40=renderShop35;
   renderShop35=function(){_renderShop40();const box=$("#shopList");if(!box)return;const skins=[...box.children],tabs=document.createElement("nav");tabs.className="shopTabs40 filterTabs38";tabs.innerHTML='<button class="on" data-shop="skins">服饰</button><button data-shop="starters">初始强化</button><button data-shop="items">道具与武器</button><button data-shop="talismans">排除符咒</button>';box.innerHTML="";if(window.SakurayoEconomy)box.appendChild(window.SakurayoEconomy.walletNode(save.character,save.coins,save.shop40,STARTERS40,ITEMS40,SKINS35));box.appendChild(tabs);const groups={skins:document.createElement("section"),starters:document.createElement("section"),items:document.createElement("section"),talismans:document.createElement("section")};for(const [id,node] of Object.entries(groups)){node.className="shopGroup40";node.dataset.shopGroup=id;node.style.display=id==="skins"?"grid":"none";box.appendChild(node);}skins.forEach(x=>groups.skins.appendChild(x));renderStarterShop40(groups.starters);renderItemShop40(groups.items);renderTalismanShop40(groups.talismans);const challenge=document.createElement("button");challenge.className="challengeToggle40";challenge.textContent=`孤证试炼：${save.shop40.noUpgradeChallenge?"开启":"关闭"} · 升级不获得局内强化`;challenge.disabled=!save.shop40.equippedStarter;challenge.onclick=()=>{save.shop40.noUpgradeChallenge=!save.shop40.noUpgradeChallenge;persist();renderShop35();};groups.starters.prepend(challenge);bindShopTabs40(box);};
 
-  function balanceReport40(){const a=save.balance40.samples||[],wins=a.filter(x=>x.win),group={};for(const s of a){const k=`${s.character}/S${s.stage}/${s.starter||"none"}${s.noUpgrade?"/孤证":""}`;(group[k]||(group[k]={runs:0,wins:0,levels:0,damage:0})).runs++;group[k].wins+=s.win?1:0;group[k].levels+=s.level||0;group[k].damage+=s.damageTaken||0;}return {version:"4.1",samples:a.length,winRate:a.length?Math.round(wins.length/a.length*100):0,groups:Object.fromEntries(Object.entries(group).map(([k,v])=>[k,{runs:v.runs,winRate:Math.round(v.wins/v.runs*100),avgLevel:+(v.levels/v.runs).toFixed(1),avgDamage:Math.round(v.damage/v.runs)}])),recent:a.slice(0,20)};}
+  function balanceReport40(){const a=save.balance40.samples||[],wins=a.filter(x=>x.win),group={};for(const s of a){const k=`${s.character}/S${s.stage}/${s.starter||"none"}${s.noUpgrade?"/孤证":""}`;(group[k]||(group[k]={runs:0,wins:0,levels:0,damage:0})).runs++;group[k].wins+=s.win?1:0;group[k].levels+=s.level||0;group[k].damage+=s.damageTaken||0;}return {version:window.SAKURAYO_GAME_VERSION||"4.6.4",samples:a.length,winRate:a.length?Math.round(wins.length/a.length*100):0,groups:Object.fromEntries(Object.entries(group).map(([k,v])=>[k,{runs:v.runs,winRate:Math.round(v.wins/v.runs*100),avgLevel:+(v.levels/v.runs).toFixed(1),avgDamage:Math.round(v.damage/v.runs)}])),recent:a.slice(0,20)};}
   function sealBetaPorts40(){
     $("#betaButton40")?.remove();
     $("#betaDrawer40")?.remove();
@@ -11682,7 +11682,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   renderChoices=function(){const result=_renderChoices40();document.querySelectorAll("#choices .choice").forEach(card=>{const u=U.find(x=>x.id===card.dataset.upgradeId);if(!u?.conflict40)return;card.classList.add("conflictChoice40");const p=card.querySelector("p");if(p)p.insertAdjacentHTML("beforeend",'<strong class="conflictWarn40">高风险冲突：收益与削弱同时生效，可能让构筑失控。</strong>');});return result;};
 
   style37.textContent+=`.shopTabs40{margin:0 0 10px}.shopGroup40{display:grid;gap:9px}.shopItem40{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:11px;border-radius:14px;background:#100c20e8;border:1px solid #ffffff18;margin-bottom:9px}.shopItem40 h3{margin:0 0 4px;font-size:14px}.shopItem40 p{margin:0;color:#c7bfd2;font-size:11px;line-height:1.45}.shopItem40 button,.shopUpgrade40,.challengeToggle40,.betaActions40 button,.betaDrawer40>[class] button[data-beta="refresh"],.betaDrawer40 .dbody>button[data-beta="refresh"]{padding:9px;border-radius:10px;border:1px solid #8463aa;background:#261b3d;color:#fff}.shopIcon40{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:#27183d;font-size:24px}.shopUpgrade40{grid-column:3;margin-top:-6px}.challengeToggle40{width:100%;margin-bottom:10px;border-color:#ffd36b;color:#ffe69b;background:#35251d}.conflictChoice40{border-color:#ff6f7e!important;background:linear-gradient(145deg,#2a101be8,#160d22e8)!important}.conflictWarn40{display:block;margin-top:6px;color:#ff8793}.betaGrid40{display:grid;grid-template-columns:1fr 1fr;gap:8px}.betaGrid40 label{display:grid;gap:5px;font-size:11px}.betaGrid40 select{padding:9px;border-radius:9px;background:#141025;color:#fff;border:1px solid #70558c}.betaActions40{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}.betaDrawer40 textarea{width:100%;height:230px;background:#080713;color:#bdf4de;border:1px solid #6b548b;border-radius:10px;padding:9px;font:10px/1.4 ui-monospace,monospace}.betaDrawer40 .dbody>button[data-beta="refresh"]{width:100%;margin-top:8px}.hiddenStory40{border-color:#ffe6a455!important}.utilityButtons37.open39>#betaButton40{display:block!important}`;
-  document.title="樱夜·尸潮：Mod Kit V4.6.3";
+  document.title=/SakurayoAndroid\/\S*-test/.test(navigator.userAgent)?"测试版樱夜 V4.6.4":"樱夜·尸潮：Mod Kit V4.6.4";
 
   /* ================= V4.0 融合扩展：24种跨职业机制 ================= */
   const FUSION_ICON_ALIAS41={elementalbeast:"chimera",plagueidol:"plagueforge",soulgun:"gunshrine",nanoninja:"shadowmage",fleshshrine:"corpseimmortal",bloodmage:"bloodstar"};
