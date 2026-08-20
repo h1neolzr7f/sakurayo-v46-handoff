@@ -1,6 +1,17 @@
 # V4.6 — 横屏大厅与镜界寻访
 
-当前源码 **4.6.3**。versionCode 64。Debug APK 已打。
+当前源码 **4.6.4**。versionCode 65。测试包已打。
+
+## 4.6.4 — 2026-08-20
+
+独立测试包，避免覆盖正式「樱夜·尸潮」。`sakurayoV3` 只补字段。
+
+- Debug `applicationId` → `com.sakurayo.zombietide.test`（正式包仍是 `com.sakurayo.zombietide`）
+- 桌面名「测试版樱夜」；大厅封面在测试 APK 里也写这个名字
+- `versionName` 4.6.4-test / `versionCode` **65**
+- 统计导出和平衡报告不再写死 3.8 / 4.1
+- 本仓 Release：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.4
+- APK 直链：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.4/Sakurayo-ZombieTide-TEST-v4.6.4.apk
 
 ## 4.6.3 — 2026-08-20
 

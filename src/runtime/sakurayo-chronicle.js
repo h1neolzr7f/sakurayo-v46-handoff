@@ -175,7 +175,7 @@
   }
 
   global.SakurayoChronicle = {
-    version: "4.6.3",
+    version: "4.6.4",
     SAYO_TITLE: SAYO_TITLE,
     AYA_TITLE: AYA_TITLE,
     RION_TITLE: RION_TITLE,

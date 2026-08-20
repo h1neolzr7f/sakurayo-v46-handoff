@@ -1,4 +1,4 @@
-# 《樱夜·尸潮》V4.6.3 交接规格
+# 《樱夜·尸潮》V4.6.4 交接规格
 
 2026-08-19。给下一位 AI / 维护者。先读根目录 [README.md](../README.md)，再读本文和 [AGENTS.md](../AGENTS.md)。二游分期原文在 [PLAN_V46_ERYOU.md](PLAN_V46_ERYOU.md)。升版本见 [MAINTAIN.md](MAINTAIN.md)。
 
@@ -8,10 +8,11 @@
 
 | 项 | 值 |
 |---|---|
-| 源码版本 | **4.6.3** |
-| Android `versionName` / `versionCode` | 4.6.3 / **64** |
+| 源码版本 | **4.6.4** |
+| Android `versionName` / `versionCode` | 4.6.4-test / **65** |
+| 测试包名 / 桌面名 | `com.sakurayo.zombietide.test` / **测试版樱夜**（不覆盖正式包） |
 | 公开仓 | https://github.com/h1neolzr7f/sakurayo-zombietide |
-| 已发布 APK | 公开仓仍 **v4.4.6**；本仓 Debug **v4.6.3**：[直接下载](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.3/Sakurayo-ZombieTide-v4.6.3-android-debug.apk) |
+| 已发布 APK | 公开仓仍 **v4.4.6**；本仓测试包 **v4.6.4**：[直接下载](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.4/Sakurayo-ZombieTide-TEST-v4.6.4.apk) |
 | 存档键 | **`sakurayoV3`** |
 | 代码基线 | `src/index.html` + `src/runtime/*.js` |
 | 运行时美术 | `android-app/app/src/main/assets/game/art` |
@@ -62,7 +63,7 @@
 | 横屏主体验 | `html.landscape46` 默认就在；Android 锁 `landscape` | 已落地 |
 | 仿 Live2D | 随机眨眼 / 注视 / 点触，去掉卡顿滤镜 | 已落地 |
 | D | 寻访卡扩到 16 以内；站桩与大厅背景重出；商店/档案换皮 | **未做** |
-| E | 全量 `verify.ps1`、`release/`、APK、CHANGELOG | **本轮交付 4.6.3 / versionCode 64** |
+| E | 全量 `verify.ps1`、`release/`、APK、CHANGELOG | **本轮交付 4.6.4 / versionCode 65 / 测试包** |
 
 ### 下一步（按优先级）
 
@@ -70,7 +71,7 @@
 2. 有独特动作的融合再补 `anim_skill.webp` / `anim_dash.webp`。缺图回退，不要借错融合的图。
 3. 寻访卡扩到 16 以内；`ui/lobby_wide.webp` 去左右黑边。
 4. 全量 `powershell -File tools/verify.ps1`（`browser_smoke` 主视口仍是 430×932）。
-5. `android-app/sync-game.ps1` 后发版。本云主机是 KVM 套娃，API 34 Google APIs 开加速会内核崩溃；软件模拟用 Android 30 AOSP ATD 更稳。模拟器上的正式包可能仍是签名对不上的 **4.2.3 / versionCode 47**；debug 不能覆盖（`INSTALL_FAILED_UPDATE_INCOMPATIBLE`）。不要擅自卸包清档。
+5. `android-app/sync-game.ps1` 后发版。本云主机是 KVM 套娃，API 34 Google APIs 开加速会内核崩溃；软件模拟用 Android 30 AOSP ATD 更稳。Debug 测试包 applicationId 是 `com.sakurayo.zombietide.test`，桌面名「测试版樱夜」，和正式包并排安装，不会覆盖。不要擅自卸正式包清档。
 
 ### 明确不做
 
@@ -292,7 +293,7 @@ powershell -File tools/verify.ps1
 - `tests/testimony_smoke.mjs`
 - `tests/gacha_visual.mjs`（会出 932×430 截图到 `tests/artifacts/gacha/`，该目录 gitignore）
 
-改证词或寻访视觉时请单独跑这两项。`browser_smoke.mjs` 断言版本 `"4.6.3"`，主视口 430×932；竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。
+改证词或寻访视觉时请单独跑这两项。`browser_smoke.mjs` 断言版本 `"4.6.4"`，主视口 430×932；竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。
 
 发版（用户明确要求再做）：
 

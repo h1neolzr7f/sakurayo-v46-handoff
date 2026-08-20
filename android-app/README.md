@@ -31,7 +31,8 @@ $env:ANDROID_SDK_ROOT='E:\Android\android-sdk'
 ## WebView 行为
 
 - JavaScript、DOM Storage、数据库存储启用，`sakurayoV3` localStorage 会保存在应用数据中。
-- APK 更新时，只要 applicationId 和签名不变，应用数据与存档不会被主动清理。
+- Debug 测试包 applicationId 是 `com.sakurayo.zombietide.test`，桌面名叫「测试版樱夜」，不会覆盖正式包 `com.sakurayo.zombietide`。
+- APK 更新时，只要 applicationId 和签名不变，应用数据与存档不会被主动清理。正式包和测试包各有一份存档。
 - 没有网络权限，WebViewClient 也会拦截 HTTP/HTTPS 请求。
 - 系统栏使用沉浸式隐藏，可从屏幕边缘临时滑出。
 - 返回键依次处理抽屉、结算、暂停与游戏中暂停；菜单下连续按两次退出。

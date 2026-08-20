@@ -17,7 +17,7 @@ sandbox.globalThis = sandbox;
 vm.runInNewContext(code, sandbox);
 const C = sandbox.window.SakurayoCamera;
 
-assert.equal(C.version, "4.6.3");
+assert.equal(C.version, "4.6.4");
 assert.equal(C.COLS, 4);
 assert.equal(C.ROWS, 2);
 

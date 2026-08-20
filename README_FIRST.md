@@ -1,7 +1,8 @@
 # 接手检查清单
 
-当前：**V4.6.3。** 公开玩家仓是 https://github.com/h1neolzr7f/sakurayo-zombietide 。
-最新 APK：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.3/Sakurayo-ZombieTide-v4.6.3-android-debug.apk
+当前：**V4.6.4 测试版。** 公开玩家仓是 https://github.com/h1neolzr7f/sakurayo-zombietide 。
+最新测试 APK：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.4/Sakurayo-ZombieTide-TEST-v4.6.4.apk
+桌面名「测试版樱夜」，包名 `com.sakurayo.zombietide.test`，不会覆盖正式包。
 
 按这个顺序读：
 
@@ -26,7 +27,7 @@ node tests/ops_unit.mjs
 
 ## 这一版已经有了
 
-横屏大厅、五房、镜界寻访（只收藏）、证词模式、局内 2 干员 DP、仿 Live2D。版本号是 4.6.3。
+横屏大厅、五房、镜界寻访（只收藏）、证词模式、局内 2 干员 DP、仿 Live2D。版本号是 4.6.4。
 
 ## 你接下来做
 
