@@ -329,6 +329,13 @@ powershell -File tools/verify.ps1
 
 改证词或寻访视觉时请单独跑这两项。`browser_smoke.mjs` 断言版本 `"4.6.7"`，主视口 430×932；竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。画面必须用 `node tests/real_shots.mjs` 拿横屏完整 DOM 真图，禁止再用 canvas 拼图或全黑 screencap 当过关。
 
+模拟器 ATD 的 `adb screencap` 是全黑。要从正在跑的测试包截图：
+
+```
+adb forward tcp:9222 localabstract:webview_devtools_remote_$(adb shell pidof com.sakurayo.zombietide.test)
+python3 tests/emu_webview_shots.py
+```
+
 发版（用户明确要求再做）：
 
 ```powershell
