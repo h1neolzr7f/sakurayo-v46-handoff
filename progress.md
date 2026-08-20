@@ -1,5 +1,13 @@
 Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先阅读根目录的 AGENTS.md、README_FIRST.md 和 CODEX_TASK.md，基于 src/index.html 继续开发，不要使用旧版本文件。
 
+## 2026-08-20 独立测试包「测试版樱夜」
+
+- 用户看到上一份 APK 仍是正式包名，会覆盖/冲突 4.4.x 正式包。要求全部改掉，并单独叫测试版。
+- Debug `applicationId` 改为 `com.sakurayo.zombietide.test`，桌面名「测试版樱夜」，`versionName` 4.6.4-test / `versionCode` 65。
+- 正式包 `com.sakurayo.zombietide` 继续留着，两包并排安装，各写各的存档。不要卸正式包。
+- 统计导出和平衡报告不再写死 3.8 / 4.1。
+- GitHub 下载：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.4/Sakurayo-ZombieTide-TEST-v4.6.4.apk
+
 ## 2026-08-20 关掉内测作弊口，奖励改走邮箱
 
 - 用户要列不足/bug，并屏蔽内测作弊端口，内测奖励改邮箱发送。

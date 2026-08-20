@@ -4,13 +4,13 @@
 
 当前开发仓：`h1neolzr7f/sakurayo-v46-handoff`  
 公开玩家仓：`h1neolzr7f/sakurayo-zombietide`  
-当前源码版本：**4.6.3。** 存档键仍 `sakurayoV3`。
+当前源码版本：**4.6.4。** 存档键仍 `sakurayoV3`。
 
-**玩家下载（当前 4.6.3 Debug）：**
+**玩家下载（当前 4.6.4 测试版，不覆盖正式包）：**
 
-- [Android APK](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.3/Sakurayo-ZombieTide-v4.6.3-android-debug.apk)（约 112 MB，debug 签名，不要卸旧正式包）
-- [单文件 HTML](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.3/Sakurayo-ZombieTide-v4.6.3.html)
-- [Release 说明](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.3)
+- [Android 测试包](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.4/Sakurayo-ZombieTide-TEST-v4.6.4.apk)（桌面名「测试版樱夜」，包名 `com.sakurayo.zombietide.test`）
+- [单文件 HTML](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.4/Sakurayo-ZombieTide-v4.6.4.html)
+- [Release 说明](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.4)
 
 公开玩家仓 Releases 仍停在 v4.4.6（本环境无写权限）。最新包在本仓 Release。
 

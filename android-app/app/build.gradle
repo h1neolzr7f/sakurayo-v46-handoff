@@ -14,8 +14,8 @@ android {
         applicationId "com.sakurayo.zombietide"
         minSdk 23
         targetSdk 36
-        versionCode 64
-        versionName "4.6.3"
+        versionCode 65
+        versionName "4.6.4"
     }
 
     signingConfigs {
@@ -32,6 +32,8 @@ android {
     buildTypes {
         debug {
             debuggable true
+            applicationIdSuffix ".test"
+            versionNameSuffix "-test"
         }
         release {
             minifyEnabled false

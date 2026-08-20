@@ -36,7 +36,7 @@ assert.match(indexSrc, /function storyChoiceBag47/, "跨章回声要按证词/�
 assert.match(indexSrc, /if \(state === "menu"\) menuUpdate\(\);/, "局内存档不得刷新大厅");
 assert.match(indexSrc, /P\.publicTruth \|\| P\.storyFlags\?\.identity === "broadcast"/, "公开名单要提高精英刷率");
 assert.equal(indexSrc.includes('["dialogue","event","level","pause","result","menu"]'), false, "大厅 toast 不得被 menu 态挡死");
-assert.equal(L.version, "4.6.3");
+assert.equal(L.version, "4.6.4");
 assert.equal(L.CARDS.length, 8);
 assert.equal(L.CHRONICLE.length, 5);
 assert.equal(L.CHRONICLE[0].n, "第零次死亡");

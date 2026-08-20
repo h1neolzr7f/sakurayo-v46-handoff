@@ -1,6 +1,12 @@
 # 更新记录
 
-当前版本 **v4.6.3**。完整条目按大版本写在 `docs/CHANGELOG_V*.md`。
+当前版本 **v4.6.4**。完整条目按大版本写在 `docs/CHANGELOG_V*.md`。
+
+## v4.6.4 — 2026-08-20
+
+Debug 改成独立测试包「测试版樱夜」，包名 `com.sakurayo.zombietide.test`，不会覆盖正式「樱夜·尸潮」。versionCode 65。存档仍 `sakurayoV3`。
+
+下载：[测试 APK](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.4/Sakurayo-ZombieTide-TEST-v4.6.4.apk) · [Release](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.4)
 
 ## v4.6.3 — 2026-08-20
 

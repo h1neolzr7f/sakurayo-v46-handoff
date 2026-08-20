@@ -1,5 +1,14 @@
 # 《樱夜·尸潮》下一版本 CHANGELOG
 
+## 4.6.4 交付
+
+- 升补丁号 **4.6.4** / Android `versionCode` **65**，UA 跟 `BuildConfig.VERSION_NAME`。
+- Debug 测试包改名「测试版樱夜」，包名 `com.sakurayo.zombietide.test`，和正式包并排安装，不会覆盖。
+- 统计/平衡报告版本号跟 `SAKURAYO_GAME_VERSION`，不再写死 3.8 / 4.1。
+- 存档键仍 `sakurayoV3`。不卖衣装永久伤害。不包 `update`。
+- 本仓 Release：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.4
+- APK 直链：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.4/Sakurayo-ZombieTide-TEST-v4.6.4.apk
+
 ## 4.6.3 交付
 
 - 升补丁号 **4.6.3** / Android `versionCode` **64**，UA `SakurayoAndroid/4.6.3`。
