@@ -1,5 +1,10 @@
 Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先阅读根目录的 AGENTS.md、README_FIRST.md 和 CODEX_TASK.md，基于 src/index.html 继续开发，不要使用旧版本文件。
 
+## 2026-08-20 设计师 skill 收寻访字标
+
+- 补 Anthropic `frontend-design`：夜神社材料（朱印、箔金、月纸），不走通用紫盒。
+- 寻访标题改衬线 + 朱印「鏡」；十连改箔金纸符斜切；页签选中用朱红下划。不引外部字体。
+
 ## 2026-08-20 寻访改成卡池海报
 
 - 按 ui-aesthetics：层次和留白先于装饰。立绘拉大到左侧约 54%，标题/保底贴右上，抽卡坞贴右下。
