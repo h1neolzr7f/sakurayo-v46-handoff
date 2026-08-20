@@ -8,8 +8,8 @@
 - Android 壳预先创建 WebView Crashpad 缓存目录。
 - 旧 WebView 不认 `inset`：`#hud` / `.overlay` / `.screen` / `.drawer` 等全屏层补 `top/right/bottom/left`，横屏摇杆和技能钮回到视口内。
 - 源码版本 **4.6.2**，Android `versionCode` 63
-- 单文件 SHA-256 `e57e4e856b868d5b63e3a235f04bb2ddf0ec38fbd40d8b0512234cf4ab7c9281`
-- Debug APK SHA-256 `dd2575d6daabfb6af1f317fb0659fb4eb08aab533d3a72e36142c7b97e621a07`（无正式证书，不要卸旧正式包）
+- 单文件 SHA-256 `112cbbcb7258f5f125f3b52df466593d773bcfa54a0b024215dcd5039bab4fed`
+- Debug APK SHA-256 `b5eca9cc09fdc56f547e1ccd82bc619ebaab09289f6e0cf3e1253e5d911a715f`（无正式证书，不要卸旧正式包）
 
 ## 第一期镜界寻访（源码 4.6.1）
 
