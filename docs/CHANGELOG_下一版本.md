@@ -7,9 +7,10 @@
 - 结算时收起对话/升级/事件层；失败「晚安」只写在结算卡里，不再和底部电台叠字。
 - Android 壳预先创建 WebView Crashpad 缓存目录。
 - 旧 WebView 不认 `inset`：`#hud` / `.overlay` / `.screen` / `.drawer` 等全屏层补 `top/right/bottom/left`，横屏摇杆和技能钮回到视口内。
+- 大厅 `.menu` 同样补四边，并 `left:auto;right:0`，出击和三角色钮回到右侧，不再压在立绘上。
 - 源码版本 **4.6.2**，Android `versionCode` 63
-- 单文件 SHA-256 `112cbbcb7258f5f125f3b52df466593d773bcfa54a0b024215dcd5039bab4fed`
-- Debug APK SHA-256 `b5eca9cc09fdc56f547e1ccd82bc619ebaab09289f6e0cf3e1253e5d911a715f`（无正式证书，不要卸旧正式包）
+- 单文件 SHA-256 `f482ceab796604270f341664e4209a5512e46cc48d52ce9f4bf79471d2023608`
+- Debug APK SHA-256 `b037094592244350dfa7e86a69718382b6b02a4ce694dc830e0400f9ec399443`（无正式证书，不要卸旧正式包）
 
 ## 第一期镜界寻访（源码 4.6.1）
 
