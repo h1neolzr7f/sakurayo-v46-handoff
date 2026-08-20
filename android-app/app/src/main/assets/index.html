@@ -63,8 +63,13 @@
 #level,#event,#paused,#result{z-index:34!important}
 .choice .legend{color:#ffd86f!important}
 @media(max-height:700px){
-  .banter{bottom:max(118px,calc(env(safe-area-inset-bottom) + 105px))!important;font-size:11px!important}
+  .banter{bottom:max(158px,calc(env(safe-area-inset-bottom) + 146px))!important;font-size:11px!important}
   #toast{top:max(122px,calc(env(safe-area-inset-top) + 110px))!important;font-size:11px!important}
+}
+html.landscape46 .banter{
+  top:auto!important;
+  bottom:max(158px,calc(env(safe-area-inset-bottom) + 146px))!important;
+  width:min(36vw,240px)!important;
 }
 
 /* V3.5 三角色与衣装商店 */
@@ -11178,6 +11183,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     P.inv=Math.max(P.inv||0,2.4);
     P.hp=Math.min(P.maxHp,Math.max(P.hp,P.maxHp*.42)+P.maxHp*.18);
     hideTransient();
+    if(typeof hideExplorationLayer41==="function") hideExplorationLayer41();
+    $("#menu").classList.add("hidden");
     $("#hud").classList.remove("hidden");
     if($("#stageHud"))$("#stageHud").textContent="隐藏关 · 未写完的页";
     toast("隐藏关开启：未写完的那一页");
@@ -11719,7 +11726,27 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function openExploration41(scene){
     const root=ensureExploration41(),data=extensionState41(scene.__packId);if(!data)return false;data.collected=data.collected&&typeof data.collected==="object"?data.collected:{};data.visits=data.visits&&typeof data.visits==="object"?data.visits:{};data.visits[scene.id]=(data.visits[scene.id]||0)+1;persist();closeDrawers();root.classList.remove("hidden");$("#exploreTitle41").textContent=scene.title||"剧情探索";exploreImage41=new Image();exploreImage41.onload=drawExploration41;exploreImage41.onerror=()=>{CONTENT41.guard(scene.__packId,"asset:exploration",()=>{throw new Error(`Map image unavailable: ${scene.background}`);});drawExploration41();};exploreImage41.src=artUrl(scene.background);exploreAvatar41=new Image();exploreAvatar41.onerror=()=>{exploreAvatar41=null;};exploreAvatar41.src=artUrl(charAnimPath35(char35(),"idle"));exploration41={scene,x:(scene.spawn?.[0]||.5)*1280,y:(scene.spawn?.[1]||.75)*853,joyX:0,joyY:0,facing:1,moving:false};exploreLast41=0;updateExploreProgress41();cancelAnimationFrame(exploreFrame41);exploreFrame41=requestAnimationFrame(exploreLoop41);CONTENT41.emit("exploration:opened",{sceneId:scene.id});return true;
   }
-  function closeExploration41(){if(!exploration41)return;CONTENT41?.emit("exploration:closed",{sceneId:exploration41.scene.id});exploration41=null;cancelAnimationFrame(exploreFrame41);$("#exploration41")?.classList.add("hidden");renderStages();openDrawer("stage");}
+  function hideExplorationLayer41(){
+    if(exploration41){
+      try{CONTENT41?.emit("exploration:closed",{sceneId:exploration41.scene.id});}catch(e){}
+      exploration41=null;
+      cancelAnimationFrame(exploreFrame41);
+    }
+    $("#exploration41")?.classList.add("hidden");
+    $("#exploreEvent412")?.classList.add("hidden");
+  }
+  function closeExploration41(){
+    const wasOpen=!!exploration41||($("#exploration41")&&!$("#exploration41").classList.contains("hidden"));
+    hideExplorationLayer41();
+    if(!wasOpen)return;
+    renderStages();
+    openDrawer("stage");
+  }
+  const _backMenuExplore41=backMenu;
+  backMenu=function(){
+    hideExplorationLayer41();
+    return _backMenuExplore41();
+  };
   addEventListener("keydown",e=>{if(exploration41){exploreKeys41[e.key.toLowerCase()]=1;e.preventDefault();}});
   addEventListener("keyup",e=>{exploreKeys41[e.key.toLowerCase()]=0;});
   const _renderStagesExtension41=renderStages;
