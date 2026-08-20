@@ -1,6 +1,12 @@
 # 更新记录
 
-当前版本 **v4.6.4**。完整条目按大版本写在 `docs/CHANGELOG_V*.md`。
+当前版本 **v4.6.5**。完整条目按大版本写在 `docs/CHANGELOG_V*.md`。
+
+## v4.6.5 — 2026-08-20
+
+横屏二游手感：封面、对话半身、升级层、禁止竖滑、去掉塔防坞、刷怪可见。versionCode 66。存档仍 `sakurayoV3`。
+
+下载：[测试 APK](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.5/Sakurayo-ZombieTide-TEST-v4.6.5.apk) · [Release](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.5)
 
 ## v4.6.4 — 2026-08-20
 

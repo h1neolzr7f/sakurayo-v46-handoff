@@ -1,11 +1,11 @@
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.4";
+  var VERSION = "4.6.5";
   var TAU = Math.PI * 2;
-  var EARLY_WINDOW = 20;
-  var EARLY_INTERVAL = 0.45;
-  var EARLY_FLOOR = 8;
+  var EARLY_WINDOW = 40;
+  var EARLY_INTERVAL = 0.28;
+  var EARLY_FLOOR = 16;
   var cacheKey = "";
   var cacheObs = [];
   var fillAcc = 0;
@@ -130,11 +130,12 @@
   }
 
   function ensureMinCrowd(world, dt) {
-    if (!earlyCh1(world)) {
+    if (!world || world.bossBorn || world.mainGod || (world.runTime || 0) > 90) {
       fillAcc = 0;
       return 0;
     }
-    if ((world.enemyCount || 0) >= EARLY_FLOOR || (world.enemyCount || 0) >= (world.capE || EARLY_FLOOR)) {
+    var floor = (world.runTime || 0) < EARLY_WINDOW ? EARLY_FLOOR : 14;
+    if ((world.enemyCount || 0) >= floor || (world.enemyCount || 0) >= (world.capE || floor)) {
       fillAcc = 0;
       return 0;
     }
@@ -213,7 +214,7 @@
       H = world.worldH || world.H;
     if (!photoReady(world) || !W || !H) return false;
     drawCover(ctx, world.battleBg, W, H);
-    ctx.fillStyle = "rgba(5,4,14,0.26)";
+    ctx.fillStyle = "rgba(5,4,14,0.08)";
     ctx.fillRect(0, 0, W, H);
     return true;
   }
@@ -272,7 +273,7 @@
     if (photoDone) return;
     if (photo && photo.complete && photo.naturalWidth > 0) {
       drawCover(ctx, photo, W, H);
-      ctx.fillStyle = "rgba(5,4,14,0.26)";
+      ctx.fillStyle = "rgba(5,4,14,0.08)";
       ctx.fillRect(0, 0, W, H);
       ctx.fillStyle = pal.accent + "14";
       var n = q < 0.8 ? 2 : 4;
