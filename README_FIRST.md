@@ -1,6 +1,6 @@
 # 接手检查清单
 
-当前：**V4.6.0 源码，未发版。** 公开玩家仓是 https://github.com/h1neolzr7f/sakurayo-zombietide ，已发布 APK 仍是 v4.4.6。
+当前：**V4.6.2。** 公开玩家仓是 https://github.com/h1neolzr7f/sakurayo-zombietide 。
 
 按这个顺序读：
 
@@ -25,7 +25,7 @@ node tests/ops_unit.mjs
 
 ## 这一版已经有了
 
-横屏大厅、五房、镜界寻访（只收藏）、证词模式、局内 2 干员 DP、仿 Live2D。版本号仍是 4.6.0。
+横屏大厅、五房、镜界寻访（只收藏）、证词模式、局内 2 干员 DP、仿 Live2D。版本号是 4.6.2。
 
 ## 你接下来做
 
@@ -35,7 +35,7 @@ I2V 绿幕站桩、融合 skill/dash、寻访卡扩到 16、全量 verify、再�
 
 - 再包 `update`
 - 改存档键或清档
-- 抽卡/商店卖永久伤害
+- 商店衣装直接卖永久伤害（寻访/构筑卡按星级加伤是正规则）
 - 改名 `startGame` / `update` / `draw` / `spawnEnemy` / `showDialogue` 却不改调用点
 - 提交 `keystore.properties`、`local.properties`、APK、`assets/image2/source/`
 - 卸掉模拟器上签名对不上的旧正式包（会清档）

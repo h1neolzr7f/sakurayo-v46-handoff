@@ -46,7 +46,7 @@
 last_witness 画面是男人，lore 接镜零/碎镜后的人，禁止改画成三女之一。
 残件与职业卡是不同的卡：镜中残影 ≠ 巫女小夜那一夜。
 
-残件拥有即生效（重复不加）：
+残件拥有即生效，同卡并星加伤，最高五星：
 - sayo_echo 小夜·镜中残影：暴击 +0.5%
 - aya_petal 绫·花瓣残件：移速 +0.5%
 - rion_edge 凛音·刀光残件：刀伤 +1%
@@ -144,7 +144,7 @@ B 认人没过之前，禁止 A 把 14 张职业假故事或新 id 写进存档�
 打包权只在你。A/B 说「好了」不算。
 打包前必须：门 A 绿、门 C 八步过、SWEEP_LOG 连续两轮无 P0/P1。
 不要把 APK、密钥、tests/artifacts 推进 git。不要卸签名冲突的正式包。
-公开玩家仓 APK 只走 GitHub Releases。源码版本未得你下令不要擅自升 4.6.1。
+公开玩家仓 APK 只走 GitHub Releases。源码版本未得你下令不要擅自升 4.6.2。
 
 进度：要求 A/B 把每轮追加进 docs/SWEEP_LOG.md，格式：
 日期 / 角色 A或B / 切片或类名 / 做了什么 / 测试红绿 / 上轮为何漏 / 下一件建议
@@ -178,7 +178,7 @@ pitySSR 80 / pitySR 10 / 软保底从 65 抬 SSR。Spark 200。
 旧 ops.pity/owned/pulls = 残片池。fashion 与 weapon 自己的 pity/owned/equipped/shards。
 默认点亮 sayo_echo、aya_petal。
 
-残件（全是 R，拥有即生效，重复不加）：
+残件（全是 R，拥有即生效，同卡并星加伤，最高五星）：
 sayo_echo 暴击+0.5%；aya_petal 移速+0.5%；rion_edge 刀伤+1%；
 night_radio 技能冷却-0.5%；shrine_seal 减伤+0.4%；void_ticket 护盾+4；
 cherry_crown 全伤害+0.8%；last_witness 生命+1%（男人，不当女主）。
@@ -189,7 +189,7 @@ cherry_crown 全伤害+0.8%；last_witness 生命+1%（男人，不当女主）�
 武器装备 1 把：对口 SR+8% / 传说+14%，错角色减半。与商店弹匣/磨刀石/镜盾叠加。
 在 resetP 里乘一次，禁止每帧叠。开局总加成控制在约 +25%～35% 量级。
 
-商店现有 SKINS35 继续不卖伤害。寻访才卖伤害。
+商店现有 SKINS35 继续不卖伤害。寻访卡与结算构筑卡按星级加伤害。
 
 ====================
 第一期你要交出的代码（按总指挥拍次，不要一次做完）

@@ -1,7 +1,7 @@
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.0";
+  var VERSION = "4.6.2";
   var TABS = ["skins", "starters", "items", "talismans", "extensions"];
   var FIRST_CLEAR = 40;
   var styleInjected = false;
