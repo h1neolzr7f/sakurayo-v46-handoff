@@ -35,7 +35,7 @@
     "#menu.homeDock46 .heroLiveBreath46:before{filter:none!important;background:radial-gradient(ellipse at 50% 78%,#1a103066 0%,#12081c00 70%)}" +
     ".drawer.hidden .wishPetals46 i,.drawer.hidden .wishStage46:before{animation:none!important}" +
     "html.landscape46 #menu.homeDock46 .heroLive46{top:0;bottom:0;left:0;right:auto;width:64%}" +
-    "html.landscape46 #menu.homeDock46 .menu{width:min(34vw,360px);max-width:360px;margin-left:auto}" +
+    "html.landscape46 #menu.homeDock46 .menu{left:auto;right:0;top:0;bottom:0;width:min(34vw,360px);max-width:360px;margin-left:auto}" +
     "html.landscape46 #menu.homeDock46 #coverTitle36{left:max(16px,env(safe-area-inset-left));right:auto;transform:none;text-align:left}" +
     "html.landscape46 .nav,html.landscape46 .homeNav46{grid-template-columns:repeat(5,minmax(0,1fr))!important}" +
     "html.landscape46 .heroHead46{left:22%;width:18%;top:8%;height:26%}" +
