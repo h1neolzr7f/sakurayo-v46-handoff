@@ -16,7 +16,7 @@ vm.runInNewContext(code, sandbox);
 const L = sandbox.window.SakurayoLive;
 
 assert.doesNotMatch(code, /rotateHint46|portraitFallback46|tallWindow46/);
-assert.equal(L.version, "4.6.0");
+assert.equal(L.version, "4.6.4");
 assert.equal(L.BLINK.mean, 2.5);
 assert.equal(L.BLINK.deviation, 2);
 assert.equal(L.blinkEnvelope(-1), 1);

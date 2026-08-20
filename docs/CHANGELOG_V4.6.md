@@ -1,6 +1,62 @@
-# V4.6.0 — 横屏大厅与镜界寻访
+# V4.6 — 横屏大厅与镜界寻访
 
-2026-08-14。versionCode 61。
+当前源码 **4.6.4**。versionCode 65。测试包已打。
+
+## 4.6.4 — 2026-08-20
+
+独立测试包，避免覆盖正式「樱夜·尸潮」。`sakurayoV3` 只补字段。
+
+- Debug `applicationId` → `com.sakurayo.zombietide.test`（正式包仍是 `com.sakurayo.zombietide`）
+- 桌面名「测试版樱夜」；大厅封面在测试 APK 里也写这个名字
+- `versionName` 4.6.4-test / `versionCode` **65**
+- 统计导出和平衡报告不再写死 3.8 / 4.1
+- 本仓 Release：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.4
+- 单文件 SHA-256：`957a8dbecc1c8e77838430325b7510561d30ade6f0c295244b2d18211843ca88`
+- 测试 APK SHA-256：`c6aaf1972ce2d27860514a2dda3a4c0f93b1f10fbe5c80a0d237e4bd521f16e2`
+- APK 直链：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.4/Sakurayo-ZombieTide-TEST-v4.6.4.apk
+
+## 4.6.3 — 2026-08-20
+
+升补丁号。叠层修复随 4.6.2 复测一并带上：电台 `bottom ≥ 158px`、`hideExplorationLayer41()`、隐藏关藏 `#menu`。`sakurayoV3` 只补字段。
+
+后续同号修补：关掉 `?beta` / 内测抽屉 / `__SAKURAYO_BETA__` / 立绘 10 连点。`?test=1` 与 `?debug=1` 只在 `src/index.html` 开发源码生效，正式包和 Android 资源打不开。内测 🌸9999 改从大厅邮箱领取；旧档若已用过后门，只收致谢信。
+
+- 离线/Android 单文件 SHA-256：`7a87fbe90d14bd93ea779df37162003bab0d836790b2a48bcf6cb8aa2778be67`（关后门 + 邮箱后重打）
+- Debug APK SHA-256：`c886e0820ca2932ff0573f783ad03fdfcca6ea0172d3536c8498a2bdb8a64dda`（关后门 + 邮箱后重打）
+- 包名 `com.sakurayo.zombietide`，versionName 4.6.3 / versionCode 64。无正式证书（本环境无 `keystore.properties`），debug 签名。不要卸旧正式包覆盖。
+- 本仓 Release：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.3
+- APK 直链：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.3/Sakurayo-ZombieTide-v4.6.3-android-debug.apk
+
+## 4.6.2 — 2026-08-19
+
+证词与演习彻底分账：结算不写 `done` / `unlock` / `endings` / 构筑卡，也不累加 `kills` / `runs` / `best`，不跑 `checkAch()`，局内不点 `lv12` / `flaw` / `phasebreak`。跨章回声按模式分袋。局内存档只在大厅刷新。隐藏关通关标题用完美结局名。`plan` 文案对上稳定度 +8。versionCode 63。存档仍 `sakurayoV3`。
+
+- 离线/Android 单文件 SHA-256：`b873d8d712cfddad93c242aa68a666838bd6c1238dd9a1b5c3375e962b924390`
+- Debug APK SHA-256：`e96a16323b2234f2c781d3e2c099114d7c56f04662d97abc35224e65b9364376`
+- 包名 `com.sakurayo.zombietide`，versionName 4.6.2 / versionCode 63。无正式证书（本环境无 `keystore.properties`），debug 签名。不要卸旧正式包覆盖。
+
+## 4.6.1 — 2026-08-19
+
+补丁号，方便和 4.6.0 清虫包区分。`sakurayoV3` 只补字段。未打 tag、未交 APK/密钥。
+
+- `VERSION` / `SAKURAYO_GAME_VERSION` / 运行时回退值 / Android `versionName` → **4.6.1**
+- `versionCode` 61 → **62**
+- `MainActivity` UA `SakurayoAndroid/4.6.1`
+- 冒烟断言 `"version": "4.6.1"`
+- 结算把本局构筑卡（融合 > 转职 > 基础校 > 角色残件）发进仓库；同卡并星 1–5，按星级加伤害
+- 失败时电台播「晚安，小夜 / 绫 / 凛音」
+- 去掉「重复不加 / 寻访卡不卖伤害」的过时设定；商店衣装仍只改外观和倾向
+- 局内剧情按人味三层重写：先对上情绪，再讲清楚发生了什么。开场、抉择、转阶段、通关改为能听懂的人话。抉择用章节 CG，拥有对应卡则出卡面回声。flag / 编年 / 未归卡正文未改
+- 专有词由主角问一句、电台闲聊答：可预测的版本＝数字备份，回收＝拷进机器，备份＝另存一份也会疼的人
+- 终章补「突破」宣泄口：先写死悲剧（第318座墓 / 门后只走一个人 / 假人续黄泉流），Boss 死后抢回不在表上的结局。选项名、flag、结局名未改
+- 完美结局改为隐藏关：四章八步线索都做对、且已通关前三章，终章先结算写定的最坏结局，再打更强隐藏 Boss 才解锁双生存续 / 姐妹归还 / 黄泉活人道场
+- 剧情节奏再收：终章先写人的损失，选项不再剧透隐藏结局，跨章回声读真实 flag，选对线索电台各不相同。1–3 章转阶段用人话，第四章才念最坏结局。flag / 结局名 / 选项名未改
+- 档案回顾改成八步人话清单；证词写入 `shop40.ops.story`，隐藏门闩只读演习记忆；公开名单约 +4% 精英；删掉绫/凛音第四章叠着的旧结局层
+- 证词通关不再解锁演习章节、档案、结局和构筑卡；跨章回声按当前模式读记忆；局内存档不再刷新大厅；抉择「压强下降」改成「构筑稳定度 +8」
+
+## 4.6.0 — 2026-08-14
+
+versionCode 61。
 
 ## 落地
 
@@ -21,7 +77,7 @@
 - 仿 Live2D 按 Cubism 教程重做：眨眼用 Mean 2.5s ±2s，不再 5.4s 死循环；注视跟指针并阻尼回正；点头/点身各有一段淡入淡出动作。立绘去掉多层 `drop-shadow`/`blur`，抽屉不再整屏 backdrop-filter。`html.landscape46` 按宽高比铺横屏，不单靠 orientation 媒体查询。
 - 局内镜头大地图：世界 4×2 视口（8 屏），角色居中跟随，怪从当前视口外刷。卡池未改。
 
-## 清虫修复（源码仍 4.6.0，未升 4.6.1，未交 APK）
+## 清虫修复（已并入 4.6.1）
 
 2026-08-19。`sakurayoV3` 只补字段。门 A + `emu_loop` 37 绿。
 

@@ -1,6 +1,43 @@
 # 《樱夜·尸潮》下一版本 CHANGELOG
 
-## 第一期镜界寻访（源码仍 4.6.0，未下令不升 4.6.1）
+## 4.6.4 交付
+
+- 升补丁号 **4.6.4** / Android `versionCode` **65**，UA 跟 `BuildConfig.VERSION_NAME`。
+- Debug 测试包改名「测试版樱夜」，包名 `com.sakurayo.zombietide.test`，和正式包并排安装，不会覆盖。
+- 统计/平衡报告版本号跟 `SAKURAYO_GAME_VERSION`，不再写死 3.8 / 4.1。
+- 存档键仍 `sakurayoV3`。不卖衣装永久伤害。不包 `update`。
+- 本仓 Release：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.4
+- 单文件 SHA-256 `957a8dbecc1c8e77838430325b7510561d30ade6f0c295244b2d18211843ca88`
+- 测试 APK SHA-256 `c6aaf1972ce2d27860514a2dda3a4c0f93b1f10fbe5c80a0d237e4bd521f16e2`
+- APK 直链：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.4/Sakurayo-ZombieTide-TEST-v4.6.4.apk
+
+## 4.6.3 交付
+
+- 升补丁号 **4.6.3** / Android `versionCode` **64**，UA `SakurayoAndroid/4.6.3`。
+- 关掉 `?beta` / 内测抽屉 / `__SAKURAYO_BETA__` / 立绘连点。`?test=1` 只在 `src/index.html` 生效。内测 🌸9999 改从大厅邮箱领取。
+- 叠层修复随包带走：横屏电台避开摇杆；回大厅 / Android 返回收起探索层；隐藏关入口藏大厅。
+- 存档键仍 `sakurayoV3`。不卖衣装永久伤害。不包 `update`。
+- 单文件 SHA-256 `7a87fbe90d14bd93ea779df37162003bab0d836790b2a48bcf6cb8aa2778be67`（关后门 + 邮箱后重打）
+- Debug APK SHA-256 `c886e0820ca2932ff0573f783ad03fdfcca6ea0172d3536c8498a2bdb8a64dda`（关后门 + 邮箱后重打；无正式证书，不要卸旧正式包）
+- 本仓 Release：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.3
+- APK 直链：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.3/Sakurayo-ZombieTide-v4.6.3-android-debug.apk
+- 公开玩家仓 Releases 无写权限，未挂到 sakurayo-zombietide。
+
+## 4.6.2 交付
+
+- 证词结算与演习进度彻底隔离（章节、档案、结局、构筑卡、击杀/局数/成就）。
+- 局内存档不刷新大厅；隐藏关结算标题用完美结局名。
+- 结算时收起对话/升级/事件层；失败「晚安」只写在结算卡里，不再和底部电台叠字。
+- Android 壳预先创建 WebView Crashpad 缓存目录。
+- 旧 WebView 不认 `inset`：`#hud` / `.overlay` / `.screen` / `.drawer` 等全屏层补 `top/right/bottom/left`，横屏摇杆和技能钮回到视口内。
+- 大厅 `.menu` 同样补四边，并 `left:auto;right:0`，出击和三角色钮回到右侧，不再压在立绘上。
+- 横屏矮屏电台抬到摇杆上方（`bottom ≥ 158px`，宽度 36vw），不再压住摇杆。
+- 回大厅 / Android 返回会收起探索层；隐藏关入口会藏大厅 `#menu`。
+- 源码版本 **4.6.2**，Android `versionCode` 63
+- 单文件 SHA-256 `dbf60308ff3cea6f71490684066adfe15940181d9abdf6f572ccb1752ee26d5e`
+- Debug APK SHA-256 `a5d44b64a8a325213027c3503abc8b6ba94eb936ee055d8b92ab367eb3c638be`（无正式证书，不要卸旧正式包）
+
+## 第一期镜界寻访（源码 4.6.1）
 
 - 寻访三页：残片 / 时装 / 武器。价格 160 / 1440。软保 65、硬保 80、碎镜片 Spark 200。
 - 底栏第二格改为仓库。旧 8 张降为 R 残件并在 `resetP` 给小加成。`last_witness` 仍是男人。
@@ -31,10 +68,17 @@
 ## 发布
 
 - 源码：`src/index.html` + `src/runtime/*.js`
-- 当前单文件：`release/樱夜尸潮_V4.6.0_单文件.html`（与 Android assets 同步，不进 git）
+- 源码版本 **4.6.2**，Android `versionCode` 63
+- 上一份 4.6.0 单文件：`release/樱夜尸潮_V4.6.0_单文件.html`（gitignore，不进 git）
 - SHA-256：`b509755294730094c266865cbfa4b36999bd3701cd53988133e59f527c24ca8f`
 - 字节：1990921
-- 版本仍 4.6.0，未升 4.6.1，未交 APK
+- 未打 tag、未交 APK/密钥
+- 结算构筑卡入仓、同卡 1–5 星按星加伤；失败电台「晚安，小夜/绫/凛音」
+- 终章补突破宣泄口：写死悲剧后再抢回不在表上的结局（守岸人式张力）
+- 完美结局改隐藏关：线索齐了才开门，先打出最坏结局，再打隐藏 Boss
+- 剧情节奏再收：终章先写人的损失，选项不剧透隐藏结局，跨章回声读真实 flag，选对线索电台各不相同
+- 档案回顾用人话标八步；证词与演习分记；公开名单让街更乱；收掉绫/凛音旧终章名叠层
+- 证词结算与演习进度隔离；跨章回声分袋；局内存档不刷新大厅；抉择文案对上稳定度 +8
 
 ## Image2 角色与 UI 核心美术（2026-07-11）
 

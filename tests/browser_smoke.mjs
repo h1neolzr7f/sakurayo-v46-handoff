@@ -102,8 +102,14 @@ try {
   assert.equal(await normalPage.evaluate(() => typeof window.__SAKURAYO_TEST__), "undefined");
   assert.equal(await normalPage.evaluate(() => typeof window.__SAKURAYO_BETA__), "undefined");
   assert.equal(await normalPage.locator("#betaButton40").count(), 0);
+  assert.equal(await normalPage.locator("#mailButton46").count(), 1);
+  assert.equal(await normalPage.locator("#mailDrawer").count(), 1);
   for (let i = 0; i < 7; i++) await normalPage.locator("#coverTitle36").click({ force: true });
   assert.equal(await normalPage.locator("#betaDrawer40").count(), 0);
+  await normalPage.locator("#mailButton46").click();
+  assert.equal(await normalPage.locator("#mailDrawer").isVisible(), true);
+  assert.match(await normalPage.locator("#mailDrawer").textContent(), /内测致谢/);
+  await normalPage.locator("#mailDrawer .close").click();
   assert.equal(await normalPage.evaluate(() => typeof window.render_game_to_text), "undefined");
   assert.equal(await normalPage.evaluate(() => window.__SAKURAYO_DEV__.enabled), false);
   assert.equal(normalTracker.pageErrors.length, 0);
@@ -231,7 +237,7 @@ try {
   await page.locator("#shopDrawer .close").click();
 
   const lobby = await api(page, "lobby46");
-  assert.equal(lobby.version, "4.6.0");
+  assert.equal(lobby.version, "4.6.4");
   assert.ok(lobby.shown.includes("sayo_echo"));
   assert.ok(lobby.shown.includes("aya_petal"));
   assert.equal(lobby.cards.length, 8);
@@ -272,8 +278,15 @@ try {
   assert.equal(broke.reason, "coins");
   assert.equal(broke.coins, coinsBeforeFail);
   const cheat = await api(page, "grantCheat46");
-  assert.ok(cheat.coins >= 9999);
-  assert.equal(cheat.cheatUsed, true);
+  assert.equal(cheat.blocked, true);
+  assert.ok(cheat.coins < 9999);
+  const mailOpen = await api(page, "openMail46");
+  assert.equal(mailOpen.visible, true);
+  assert.equal(await page.locator("#mailDrawer").isVisible(), true);
+  assert.match(await page.locator("#mailDrawer").textContent(), /内测致谢/);
+  const claimed = await api(page, "claimMail46", "beta-thanks-463");
+  assert.equal(claimed.ok, true);
+  assert.ok(claimed.coins >= 9999);
   const shardsBefore = (await api(page, "lobby46")).shards;
   const single = await api(page, "pullGacha46", 1);
   assert.equal(single.ok, true);
@@ -332,14 +345,15 @@ try {
   assert.match(await page.locator("#archiveDrawer").textContent(), /永久天赋/);
   await shot(page, "01k-archive.png");
   await page.locator("#archiveDrawer .close").click();
-  pass("V4.6.0 镜界寻访三页、仓库与作弊币");
+  pass("V4.6.4 镜界寻访三页、仓库与邮箱领取");
 
   const betaPanel = await api(page, "openBeta40");
-  assert.equal(betaPanel.visible, true);
-  assert.equal(betaPanel.report.version, "4.1");
-  assert.equal(await page.locator("#betaDrawer40 [data-beta]").count(), 9);
-  await shot(page, "01g-beta-backdoor.png");
-  await page.locator("#betaDrawer40 .close").click();
+  assert.equal(betaPanel.visible, false);
+  assert.equal(betaPanel.blocked, true);
+  assert.equal(await page.locator("#betaDrawer40").count(), 0);
+  assert.equal(await page.locator("#betaButton40").count(), 0);
+  assert.equal(await page.evaluate(() => typeof window.__SAKURAYO_BETA__), "undefined");
+  await page.locator("#mailDrawer .close").click();
   await api(page, "grantCoins40", 500);
   const starterPurchase = await api(page, "buyInitialCore40", "assault");
   assert.equal(starterPurchase.bought, true);
@@ -401,7 +415,7 @@ try {
   assert.equal(await page.locator("#statsButton37").isVisible(), true);
   await page.locator("#statsButton37").click();
   assert.equal(await page.locator("#analyticsDrawer37").isVisible(), true);
-  assert.match(await page.locator("#analyticsText37").inputValue(), /"version": "4.6.0"/);
+  assert.match(await page.locator("#analyticsText37").inputValue(), /"version": "4.6.4"/);
   await page.locator("#analyticsDrawer37 .close").click();
   await page.locator("#settingsButton37").click();
   assert.equal(await page.locator("#settingsDrawer37").isVisible(), true);
@@ -872,15 +886,20 @@ try {
   const persistentStory = await api(page, "storyMemory");
   assert.equal(Object.keys(persistentStory.aya).length >= 8, true, "绫的剧情选择应跨章节保存");
   assert.equal(Object.keys(persistentStory.rion).length >= 8, true, "凛音的剧情选择应跨章节保存");
-  assert.match((await api(page, "endingPreview")).name, /黄泉/);
+  assert.match((await api(page, "endingPreview")).name, /写定的结局/);
   await api(page, "backMenu");
   await api(page, "selectCharacter", "aya");
   await api(page, "selectStage", 4);
   await api(page, "start");
   await api(page, "dismissDialogue");
   await api(page, "setStoryFlag", "ayaFinal", "free");
-  assert.match((await api(page, "endingPreview")).name, /姐妹归还/);
-  pass("绫与凛音各八段专属抉择、跨章节记忆及角色结局");
+  assert.match((await api(page, "endingPreview")).name, /写定的结局/);
+  const seeded = await api(page, "seedHiddenRoute47");
+  assert.equal(seeded.ready, true, "八步线索与前三章通关后才可进隐藏关");
+  assert.match((await api(page, "endingPreview")).name, /写定的结局/, "隐藏关打完前仍是写定结局");
+  const perfect = await api(page, "setHiddenCleared47", true);
+  assert.match(perfect.name, /姐妹归还/);
+  pass("绫与凛音各八段专属抉择、跨章节记忆；完美结局要隐藏关");
 
   const pressure = await api(page, "directorProbe", 18, 74);
   const breath = await api(page, "directorProbe", 25, 74);

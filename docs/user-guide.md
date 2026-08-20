@@ -1,13 +1,13 @@
 # 怎么玩
 
-当前版本 **v4.4.6**。玩家优先下 [Releases](https://github.com/h1neolzr7f/sakurayo-zombietide/releases/tag/v4.4.6)，不要从源码里找 APK。
+当前版本 **v4.6.4 测试版**。玩家优先下 [本仓 Releases](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.4)，不要从源码里找 APK。公开玩家仓仍停在 v4.4.6。
 
 ## 手机
 
-1. 下载 `Sakurayo-ZombieTide-v4.4.6-android.apk`。
-2. 用发布说明中的 SHA-256 核对。
-3. 允许未知来源后安装。覆盖安装旧正式包会保留存档。
-4. 打开应用，选角色，左手摇杆移动，右侧冲刺和技能。
+1. 下载 [Sakurayo-ZombieTide-TEST-v4.6.4.apk](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.4/Sakurayo-ZombieTide-TEST-v4.6.4.apk)。
+2. 允许未知来源后安装。桌面会出现新图标「测试版樱夜」，**不会覆盖**原来的「樱夜·尸潮」。
+3. 正式包和测试包各有一份存档。不要卸载旧正式包，卸了会清正式档。
+4. 打开「测试版樱夜」，选角色，左手摇杆移动，右侧冲刺和技能。
 
 最低 Android 6.0。正式包锁横屏，对标二游大厅和宽战场。不做竖版。
 

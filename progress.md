@@ -1,5 +1,56 @@
 Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先阅读根目录的 AGENTS.md、README_FIRST.md 和 CODEX_TASK.md，基于 src/index.html 继续开发，不要使用旧版本文件。
 
+## 2026-08-20 独立测试包「测试版樱夜」
+
+- 用户看到上一份 APK 仍是正式包名，会覆盖/冲突 4.4.x 正式包。要求全部改掉，并单独叫测试版。
+- Debug `applicationId` 改为 `com.sakurayo.zombietide.test`，桌面名「测试版樱夜」，`versionName` 4.6.4-test / `versionCode` 65。
+- 正式包 `com.sakurayo.zombietide` 继续留着，两包并排安装，各写各的存档。不要卸正式包。
+- 统计导出和平衡报告不再写死 3.8 / 4.1。
+- GitHub 下载：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.4/Sakurayo-ZombieTide-TEST-v4.6.4.apk
+- 测试 APK SHA-256 `c6aaf1972ce2d27860514a2dda3a4c0f93b1f10fbe5c80a0d237e4bd521f16e2`。单文件 SHA-256 `957a8dbecc1c8e77838430325b7510561d30ade6f0c295244b2d18211843ca88`。`aapt` 复核包名 `com.sakurayo.zombietide.test`、label「测试版樱夜」、versionName 4.6.4-test / versionCode 65。
+
+## 2026-08-20 关掉内测作弊口，奖励改走邮箱
+
+- 用户要列不足/bug，并屏蔽内测作弊端口，内测奖励改邮箱发送。
+- `?beta`、内测抽屉、`__SAKURAYO_BETA__`、立绘 10 连点全部关掉，打不开。
+- `?test=1` / `?debug=1` 只在 `src/index.html` 开发源码生效，正式包和 Android 资源无效。
+- 新档与未用过后门的旧档，大厅邮箱发一封「内测致谢」，领取 🌸9999。已用过旧后门的旧档只收致谢，不补发。
+- 存档键仍 `sakurayoV3`，只补 `mail46`。
+- 已重打 debug APK：`release/樱夜尸潮_V4.6.3_Android_Debug.apk`，SHA-256 `c886e0820ca2932ff0573f783ad03fdfcca6ea0172d3536c8498a2bdb8a64dda`。versionCode 仍 64。无正式证书。不要卸旧正式包。
+- GitHub 下载：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.3/Sakurayo-ZombieTide-v4.6.3-android-debug.apk
+
+## 2026-08-20 升补丁号 4.6.3
+
+- 用户要求打包最新版上传，并再进一个小版本、打 APK。
+- `VERSION` / `SAKURAYO_GAME_VERSION` / 运行时回退值 / Android `versionName` → 4.6.3；`versionCode` 63 → 64。
+- 叠层修复随包带走。存档键仍 `sakurayoV3`。
+
+## 2026-08-19 升补丁号 4.6.2
+
+- 用户要求再检查漏洞后升 4.6.2 并交付 APK。
+- 证词结算不再累加演习击杀/局数/最佳时长，不跑战役成就；局内不点 `lv12` / `flaw` / `phasebreak`。
+- `VERSION` / `SAKURAYO_GAME_VERSION` / 运行时回退值 / Android `versionName` → 4.6.2；`versionCode` 62 → 63。
+- 存档键仍 `sakurayoV3`。
+
+## 2026-08-19 局内剧情按三层人味重写
+
+- 用户认可库洛三层写法：先对准真实情绪，再补因果，内核留到终章和仓库。不要开服谜语，也不要开场论文。
+- 四章开场、抉择、转阶段、通关改成能听懂的人话。选项名、flag、数值、编年五条、未归卡四段正文未改。
+- 抉择画面用章节 CG；抽到对应残件/时装/武器则换卡面，电台补卡面第一句。终章装备传说衣/刀时通关多一句。对话按说话人换脸，背景用本章 CG。
+- 专有词不删：主角当场问「这是什么」，电台闲聊用白话答（可预测的版本＝数字备份；回收＝拷进机器）。
+
+## 2026-08-19 结算构筑卡并星与晚安电台
+
+- 用户要求把角色抽卡素材用起来：失败电台播「晚安，小夜/绫/凛音」；局终把本局构筑卡发进仓库；同卡合并 1–5 星。
+- 用户随后明确：卡片可以加伤害，去掉「重复不加 / 卡不卖伤害」的过时设定。
+- 实现：`grantBuildCard` / `resolveBuildCard`；`applyOwnedBonus` 按星级乘算；仓库显星；结算用 `gacha/{id}.webp`。存档仍 `sakurayoV3`。
+
+## 2026-08-19 升补丁号 4.6.1
+
+- 用户要求把最新版本提升一个小级别，方便和 4.6.0 清虫包区分。
+- `VERSION` / `SAKURAYO_GAME_VERSION` / 运行时回退值 / Android `versionName` → 4.6.1；`versionCode` 61 → 62。
+- 存档键仍 `sakurayoV3`。玩法未改。未交 APK、未打 tag。
+
 ## 2026-07-11 自由方向与主神空间
 
 - 用户要求：枪械可自由随方向转动，刀剑只在挥砍扇形内造成伤害；三角色各有独立吐槽彩蛋；新增高难爽发育“主神空间”，奖励点强化仅在该副本跨局保留。
