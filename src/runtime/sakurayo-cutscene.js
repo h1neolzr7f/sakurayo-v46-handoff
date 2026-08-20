@@ -34,12 +34,12 @@
       "#dialogue[data-kind='ending'] .dialogueModal{border-color:#ffe6a488}" +
       "#event:not(.hidden) .modal,#result:not(.hidden) .modal,#level:not(.hidden) .modal,#paused:not(.hidden) .modal{animation:sakurayoCutIn .3s ease}" +
       "#warning:not(.hidden){animation:sakurayoWarnPulse .55s ease 2}" +
-      "#phaseFlash44{position:fixed;inset:0;z-index:34;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 40%,#ff4ea366,#05040ecc 62%)}" +
+      "#phaseFlash44{position:fixed;inset:0;top:0;right:0;bottom:0;left:0;z-index:34;pointer-events:none;opacity:0;background:radial-gradient(circle at 50% 40%,#ff4ea366,#05040ecc 62%)}" +
       "#phaseFlash44.on{animation:sakurayoPhaseFlash .48s ease}" +
-      "#storyBeat44{position:fixed;inset:0;z-index:38;overflow:hidden;background:#05040e;color:#fff}" +
+      "#storyBeat44{position:fixed;inset:0;top:0;right:0;bottom:0;left:0;z-index:38;overflow:hidden;background:#05040e;color:#fff}" +
       "#storyBeat44.hidden{display:none!important}" +
-      "#storyBeat44 .storyBeatBg{position:absolute;inset:-10%;background:#120b22 center 38%/cover no-repeat;transform-origin:center 30%;animation:sakurayoKenBurns 14s linear alternate infinite;filter:saturate(1.08) brightness(.68)}" +
-      "#storyBeat44 .storyBeatShade{position:absolute;inset:0;background:linear-gradient(180deg,#05040e55 0%,#05040e22 38%,#05040ef0 78%);pointer-events:none}" +
+      "#storyBeat44 .storyBeatBg{position:absolute;inset:-10%;top:-10%;right:-10%;bottom:-10%;left:-10%;background:#120b22 center 38%/cover no-repeat;transform-origin:center 30%;animation:sakurayoKenBurns 14s linear alternate infinite;filter:saturate(1.08) brightness(.68)}" +
+      "#storyBeat44 .storyBeatShade{position:absolute;inset:0;top:0;right:0;bottom:0;left:0;background:linear-gradient(180deg,#05040e55 0%,#05040e22 38%,#05040ef0 78%);pointer-events:none}" +
       "#storyBeat44 .storyBeatPortrait{position:absolute;right:-8%;bottom:-10%;width:min(92vw,520px);height:78%;background:transparent right bottom/contain no-repeat;pointer-events:none;animation:sakurayoCutIn .55s ease}" +
       "#storyBeat44 .storyBeatPortrait.empty{display:none}" +
       "#storyBeat44 .storyBeatCopy{position:absolute;left:0;right:0;bottom:0;padding:max(18px,env(safe-area-inset-bottom)) 22px 28px;text-align:left;animation:sakurayoBeatFade .35s ease}" +
