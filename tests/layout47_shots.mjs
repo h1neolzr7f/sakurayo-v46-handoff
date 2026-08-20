@@ -61,7 +61,7 @@ const wishTitle = await boxOf(page, ".wishTitle46");
 assert.ok(wishHero && wishHero.w >= 450, `寻访立绘要撑住左半屏，w=${wishHero?.w}`);
 assert.ok(wishTabs && wishTabs.x > 600, `页签应在右上，x=${wishTabs?.x}`);
 assert.ok(wishTitle && wishTitle.y >= 48 && wishTitle.x > 500, `标题应在右上，x=${wishTitle?.x} y=${wishTitle?.y}`);
-assert.ok(wishPity && wishPity.y >= 140 && wishPity.y < 230, `保底应在标题下，y=${wishPity?.y}`);
+assert.ok(wishPity && wishPity.y >= 168 && wishPity.y < 250, `保底应在标题下，y=${wishPity?.y}`);
 assert.ok(wishDock && wishDock.y > 280, `抽卡坞应贴底，y=${wishDock?.y}`);
 await page.evaluate(() => document.getElementById("gachaDrawer")?.classList.add("hidden"));
 await api(page, "start");

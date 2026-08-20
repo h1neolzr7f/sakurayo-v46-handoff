@@ -223,22 +223,23 @@
     ".wishPetals46{position:absolute;inset:0;top:0;right:0;bottom:0;left:0;z-index:3;pointer-events:none;overflow:hidden}" +
     ".wishPetals46 i{position:absolute;top:-12%;width:7px;height:9px;border-radius:0 70% 0 70%;background:#ff9bcc99;box-shadow:0 0 8px #ff9bcc66;animation:petalFall46 11s linear infinite}" +
     ".wishTitle46{position:absolute;z-index:4;top:max(56px,calc(env(safe-area-inset-top) + 48px));right:max(16px,env(safe-area-inset-right));left:auto;text-align:right;max-width:48%;pointer-events:none}" +
-    ".wishTitle46 h3{margin:0;font-size:clamp(28px,5.8vw,44px);font-weight:700;letter-spacing:.36em;color:#fffaf6;text-shadow:0 2px 18px #05020dcc}" +
-    ".wishTitle46 p{margin:8px 0 0;color:#e8dcc8;font-size:11px;letter-spacing:.22em;opacity:.84;text-shadow:0 2px 10px #05020d}" +
+    ".wishSeal47{display:inline-block;margin:0 0 6px;padding:4px 5px 3px;border:1px solid #c44536;color:#c44536;font:600 11px/1 \"Songti SC\",\"STSong\",\"Noto Serif CJK SC\",\"Noto Serif\",serif;letter-spacing:.32em;font-style:normal}" +
+    ".wishTitle46 h3{margin:0;font-family:\"Songti SC\",\"STSong\",\"Noto Serif CJK SC\",\"Source Han Serif SC\",\"Noto Serif\",\"Times New Roman\",serif;font-size:clamp(26px,5.4vw,40px);font-weight:600;letter-spacing:.42em;color:#f4ead8;text-shadow:0 2px 18px #05020dcc}" +
+    ".wishTitle46 p{margin:8px 0 0;color:#c9c2d4;font-size:11px;letter-spacing:.22em;opacity:.88;text-shadow:0 2px 10px #05020d}" +
     ".wishPity46{position:absolute;z-index:4;left:auto;right:max(16px,env(safe-area-inset-right));bottom:118px;width:min(46%,380px);padding:0;border-radius:0;background:none;border:0}" +
     ".pityRow46{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:8px}" +
     ".pityRow46:first-child{margin-top:0}" +
-    ".pityRow46 span{min-width:0;color:#efe6d4;font-size:10px;letter-spacing:.12em;text-shadow:0 1px 8px #05020d;white-space:nowrap}" +
-    ".pityRail46{flex:0 1 132px;height:2px;border-radius:99px;background:#ffffff1a;overflow:hidden;box-shadow:none}" +
-    ".pityRail46 i{display:block;height:100%;border-radius:99px;background:#e8c56a;box-shadow:none}" +
-    ".pityRow46.sr .pityRail46 i{background:#c4b0ff}" +
-    ".wishMeta46{margin:8px 0 0;color:#c9b89a;font:600 10px/1 system-ui;letter-spacing:.14em;text-align:right;text-shadow:0 1px 8px #05020d}" +
+    ".pityRow46 span{min-width:0;color:#c9c2d4;font-size:10px;letter-spacing:.12em;text-shadow:0 1px 8px #05020d;white-space:nowrap}" +
+    ".pityRail46{flex:0 1 132px;height:2px;border-radius:99px;background:#f4ead81a;overflow:hidden;box-shadow:none}" +
+    ".pityRail46 i{display:block;height:100%;border-radius:99px;background:#d4b56a;box-shadow:none}" +
+    ".pityRow46.sr .pityRail46 i{background:#c9c2d4}" +
+    ".wishMeta46{margin:8px 0 0;color:#c9c2d4;font:600 10px/1 system-ui;letter-spacing:.14em;text-align:right;text-shadow:0 1px 8px #05020d;opacity:.72}" +
     ".wishDock46{position:absolute;z-index:5;left:auto;right:0;bottom:0;width:min(58%,560px);padding:10px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#06041000 0%,#06041088 46%,#060410f2 100%)}" +
     ".wishTabs46{position:absolute;z-index:6;top:max(12px,calc(env(safe-area-inset-top) + 4px));left:auto;right:max(56px,calc(env(safe-area-inset-right) + 48px));display:flex;gap:2px}" +
-    ".wishTabs46 button{min-height:32px;padding:0 10px;border-radius:0;border:0;border-bottom:1px solid transparent;background:transparent;color:#efe6d4aa;font:600 12px/1 system-ui;letter-spacing:.2em}" +
-    ".wishTabs46 button.on{background:none;color:#ffe7b0;border-bottom-color:#ffe7b0}" +
+    ".wishTabs46 button{min-height:32px;padding:0 10px;border-radius:0;border:0;border-bottom:1px solid transparent;background:transparent;color:#c9c2d4aa;font:600 12px/1 system-ui;letter-spacing:.2em}" +
+    ".wishTabs46 button.on{background:none;color:#f4ead8;border-bottom-color:#c44536}" +
     ".wishPills46{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;margin:0 0 10px}" +
-    ".wishPills46 b{padding:0;border-radius:0;background:none;border:0;color:#efe6d4;font-size:10px;letter-spacing:.08em;font-weight:600;text-shadow:0 1px 8px #05020d}" +
+    ".wishPills46 b{padding:0;border-radius:0;background:none;border:0;color:#c9c2d4;font-size:10px;letter-spacing:.08em;font-weight:600;text-shadow:0 1px 8px #05020d}" +
     ".rosterTabs46{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}" +
     ".rosterTabs46 button{min-height:32px;padding:0 12px;border-radius:999px;border:1px solid #ffe6a355;background:#0b0818cc;color:#ffe7a3;font:800 11px/1 system-ui;letter-spacing:.12em}" +
     ".rosterTabs46 button.on{background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;border-color:#ffe6a3aa}" +
@@ -246,11 +247,11 @@
     ".revealCard46.r-LEGEND .revealFace46{border-color:#ffe6a3;box-shadow:0 0 26px #ffd36baa}" +
     ".revealLegend46{position:absolute;z-index:4;left:7px;bottom:36px;padding:3px 7px;border-radius:6px;background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;font:800 9px/1 system-ui;letter-spacing:.14em}" +
     ".gachaActions46{display:flex;justify-content:flex-end;gap:10px}" +
-    ".gachaActions46 button{min-height:44px;min-width:128px;padding:8px 18px;border-radius:4px;border:1px solid #ffffff24;color:#fffaf6;font:700 14px/1.1 system-ui;letter-spacing:.16em;box-shadow:none}" +
+    ".gachaActions46 button{min-height:44px;min-width:132px;padding:8px 18px;border-radius:0;border:1px solid #f4ead855;color:#f4ead8;font:600 14px/1.1 \"Songti SC\",\"STSong\",\"Noto Serif\",serif;letter-spacing:.22em;box-shadow:none;-webkit-clip-path:polygon(7% 0,100% 0,93% 100%,0 100%);clip-path:polygon(7% 0,100% 0,93% 100%,0 100%)}" +
     ".gachaActions46 button small{display:block;margin-top:3px;font:600 10px/1 system-ui;letter-spacing:.08em;opacity:.78}" +
     ".gachaActions46 button.poor{opacity:.42}" +
-    ".wishSpark46{display:flex;flex-wrap:nowrap;justify-content:flex-end;gap:8px;margin-top:8px;max-height:28px;overflow:auto}" +
-    ".wishSpark46 button{min-height:24px;padding:0 4px;border-radius:0;border:0;background:none;color:#c9b89a;font:600 10px/1 system-ui}" +
+    ".wishSpark46{display:flex;flex-wrap:nowrap;justify-content:flex-end;gap:8px;margin-top:8px;max-height:22px;overflow:auto}" +
+    ".wishSpark46 button{min-height:22px;padding:0 4px;border-radius:0;border:0;background:none;color:#c9c2d4;font:600 10px/1 system-ui;opacity:.7}" +
     ".wishSpark46 button.poor{opacity:.42}" +
     ".rosterEquip46{margin-top:8px;min-height:36px;padding:0 12px;border-radius:10px;border:1px solid #ffe6a366;background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;font:800 12px/1 system-ui}" +
     ".chronicleBox46{display:grid;gap:10px}" +
@@ -260,8 +261,8 @@
     ".homeNav46{position:relative;z-index:8}" +
     ".mailButton46,.mailCard46 button{touch-action:manipulation}" +
     "#menu.homeDock46 .nav{position:relative;z-index:8}" +
-    "#gachaPull1{background:transparent;border-color:#ffffff28;color:#fffaf6}" +
-    "#gachaPull10{background:linear-gradient(180deg,#f3d9a0,#c9a056);border-color:#e8c56a88;color:#2a1608}" +
+    "#gachaPull1{background:#f4ead814;border-color:#f4ead855;color:#f4ead8}" +
+    "#gachaPull10{background:#d4b56a;border-color:#d4b56a;color:#2a1608}" +
     "#gachaReveal46{position:absolute;inset:0;top:0;right:0;bottom:0;left:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(44px,env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom));background:radial-gradient(circle at 50% 40%,#4a2878ee,#12081cf6 68%)}" +
     ".revealGrid46{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:96%;perspective:1200px}" +
     ".revealGrid46.ten{max-width:640px;gap:8px}" +
@@ -346,7 +347,7 @@
     "html.landscape46 .wishHero46{left:-4%;width:54%;height:114%;bottom:-8%}" +
     "html.landscape46 .wishTitle46{right:max(20px,4%);top:max(56px, calc(env(safe-area-inset-top, 0px) + 48px));max-width:42%}" +
     "html.landscape46 .wishDock46{left:auto;right:0;width:min(52%,520px)}" +
-    "html.landscape46 .wishPity46{left:auto;right:max(18px,3%);top:max(152px, calc(env(safe-area-inset-top, 0px) + 142px));bottom:auto;width:min(40vw,360px)}" +
+    "html.landscape46 .wishPity46{left:auto;right:max(18px,3%);top:max(176px, calc(env(safe-area-inset-top, 0px) + 166px));bottom:auto;width:min(40vw,360px)}" +
     "html.landscape46 .wishTabs46{left:auto;right:max(56px, calc(env(safe-area-inset-right, 0px) + 48px));top:max(10px, env(safe-area-inset-top, 0px))}" +
     "html.landscape46 #rosterWall46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
     "html.landscape46 #archiveDrawer .archiveDock46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
@@ -1148,7 +1149,7 @@
       '<button type="button" data-pool="fashion"' + (pool === "fashion" ? ' class="on"' : "") + ">时装</button>" +
       '<button type="button" data-pool="weapon"' + (pool === "weapon" ? ' class="on"' : "") + ">武器</button>" +
       "</div>" +
-      '<div class="wishTitle46"><h3>镜界寻访</h3><p>' +
+      '<div class="wishTitle46"><em class="wishSeal47">鏡</em><h3>镜界寻访</h3><p>' +
       sub +
       "</p></div>" +
       '<div class="wishPity46"><div class="pityRow46"><span>距证人保底还有 ' +
@@ -1227,7 +1228,7 @@
             card.id +
             '"' +
             (poor ? ' class="poor"' : "") +
-            ">Spark " +
+            ">兑 " +
             card.n +
             "</button>"
           );
