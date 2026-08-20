@@ -1,4 +1,4 @@
-# 《樱夜·尸潮》V4.6.4 交接规格
+# 《樱夜·尸潮》V4.6.5 交接规格
 
 2026-08-19。给下一位 AI / 维护者。先读根目录 [README.md](../README.md)，再读本文和 [AGENTS.md](../AGENTS.md)。二游分期原文在 [PLAN_V46_ERYOU.md](PLAN_V46_ERYOU.md)。升版本见 [MAINTAIN.md](MAINTAIN.md)。
 
@@ -8,11 +8,11 @@
 
 | 项 | 值 |
 |---|---|
-| 源码版本 | **4.6.4** |
-| Android `versionName` / `versionCode` | 4.6.4-test / **65** |
+| 源码版本 | **4.6.5** |
+| Android `versionName` / `versionCode` | 4.6.5-test / **66** |
 | 测试包名 / 桌面名 | `com.sakurayo.zombietide.test` / **测试版樱夜**（不覆盖正式包） |
 | 公开仓 | https://github.com/h1neolzr7f/sakurayo-zombietide |
-| 已发布 APK | 公开仓仍 **v4.4.6**；本仓测试包 **v4.6.4**：[直接下载](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.4/Sakurayo-ZombieTide-TEST-v4.6.4.apk) |
+| 已发布 APK | 公开仓仍 **v4.4.6**；本仓测试包 **v4.6.5**：[直接下载](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.5/Sakurayo-ZombieTide-TEST-v4.6.5.apk) |
 | 存档键 | **`sakurayoV3`** |
 | 代码基线 | `src/index.html` + `src/runtime/*.js` |
 | 运行时美术 | `android-app/app/src/main/assets/game/art` |
@@ -98,7 +98,7 @@
 - 尝试 `screen.orientation.lock("landscape")`
 - 画布跟 `visualViewport` 铺满
 
-大厅背景：`paintHomeBg46()` 用 `ui/lobby_wide.webp`，必须跑在 `installCover36` 之后。
+大厅背景：`paintHomeBg46()` 用 `ui/lobby_wide.webp`。`installCover36` 只写标题，不再盖回 `cover_v36_main_god.webp`。局内 DP 坞已退役，不画、不部署。
 
 ## 6. 三种出击模式
 
@@ -293,7 +293,7 @@ powershell -File tools/verify.ps1
 - `tests/testimony_smoke.mjs`
 - `tests/gacha_visual.mjs`（会出 932×430 截图到 `tests/artifacts/gacha/`，该目录 gitignore）
 
-改证词或寻访视觉时请单独跑这两项。`browser_smoke.mjs` 断言版本 `"4.6.4"`，主视口 430×932；竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。
+改证词或寻访视觉时请单独跑这两项。`browser_smoke.mjs` 断言版本 `"4.6.5"`，主视口 430×932；竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。
 
 发版（用户明确要求再做）：
 

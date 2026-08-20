@@ -1,7 +1,7 @@
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.4";
+  var VERSION = "4.6.5";
   var typing = null;
   var flashTimer = 0;
   var styleInjected = false;
@@ -24,7 +24,7 @@
       "@keyframes sakurayoBeatFade{from{opacity:0}to{opacity:1}}" +
       "#dialogue .dialogueModal{overflow:hidden}" +
       "#dialogue:not(.hidden) .dialogueModal{animation:sakurayoCutIn .36s ease}" +
-      "#dialogue .dialogueArt{transform-origin:center 30%;animation:sakurayoKenBurns 12s linear alternate infinite}" +
+      "#dialogue .dialogueArt{transform-origin:center bottom;background-size:contain;background-position:center bottom;background-repeat:no-repeat}" +
       "#dialogueChapter{margin:0 0 8px;color:#9ee7ff;letter-spacing:.22em;font-size:10px;font-weight:800}" +
       "#dialogue[data-ground='torii'] .dialogueModal{border-color:#ff6fb088;box-shadow:0 0 40px #ff4ea324}" +
       "#dialogue[data-ground='neon'] .dialogueModal{border-color:#5ad2ff88;box-shadow:0 0 40px #5ad2ff24}" +
