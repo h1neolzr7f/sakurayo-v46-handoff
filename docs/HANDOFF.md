@@ -32,6 +32,8 @@
 - 不允许恢复「每颗子弹遍历全部敌人」的无界碰撞。敌人、子弹、Boss 弹、召唤物、伤害字、粒子都有上限。Boss 阶段不无限召唤普通怪。
 - Android WebView 锁横屏（`landscape`）。大厅/寻访/战场默认就是横版，不靠窗口先变成横的才切换。竖屏只保留射击操作并提示横持。
 - Android 11 WebView（Chrome 83）不认 `inset`。全屏层必须同时写 `top/right/bottom/left`。只写 `inset:0` 时 `#hud` 会收成 0×0，摇杆/冲刺/技能飞出屏幕。`.menu` 同样：不补四边时操作台缩到左上，压在立绘上。横屏大厅还要写 `left:auto;right:0`。
+- 横屏 360 高时电台 `bottom` 必须 ≥ 158px，且宽度避开左侧干员坞和右侧冲刺/技能。`@media(max-height:700px)` 不得把 `bottom` 降到 118px，否则压住摇杆。
+- `backMenu()` / Android 返回必须先 `hideExplorationLayer41()`。探索层 z=90，漏关会挡住整个大厅。`enterHiddenArena47()` 必须藏 `#menu`。
 - 最终发布仍需单文件 HTML。
 
 ## 3. 玩家闭环

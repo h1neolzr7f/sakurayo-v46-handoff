@@ -41,6 +41,7 @@ public final class MainActivity extends Activity {
             "const click=id=>{const e=document.querySelector(id);if(e){e.click();return true;}return false;};" +
             "const drawer=[...document.querySelectorAll('.drawer')].find(visible);" +
             "if(drawer){const close=drawer.querySelector('.close');if(close)close.click();return true;}" +
+            "if(visible(document.querySelector('#exploration41')))return click('#exploreClose41');" +
             "if(visible(document.querySelector('#result')))return click('#back');" +
             "if(visible(document.querySelector('#paused')))return click('#resume');" +
             "if(visible(document.querySelector('#level'))||visible(document.querySelector('#event'))||" +
