@@ -12,6 +12,7 @@
 - Debug APK SHA-256：`c886e0820ca2932ff0573f783ad03fdfcca6ea0172d3536c8498a2bdb8a64dda`（关后门 + 邮箱后重打）
 - 包名 `com.sakurayo.zombietide`，versionName 4.6.3 / versionCode 64。无正式证书（本环境无 `keystore.properties`），debug 签名。不要卸旧正式包覆盖。
 - 本仓 Release：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.3
+- APK 直链：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.3/Sakurayo-ZombieTide-v4.6.3-android-debug.apk
 
 ## 4.6.2 — 2026-08-19
 

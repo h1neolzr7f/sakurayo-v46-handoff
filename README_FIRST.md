@@ -1,6 +1,7 @@
 # 接手检查清单
 
 当前：**V4.6.3。** 公开玩家仓是 https://github.com/h1neolzr7f/sakurayo-zombietide 。
+最新 APK：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.3/Sakurayo-ZombieTide-v4.6.3-android-debug.apk
 
 按这个顺序读：
 
