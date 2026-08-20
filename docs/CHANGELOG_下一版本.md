@@ -11,8 +11,8 @@
 - 横屏矮屏电台抬到摇杆上方（`bottom ≥ 158px`，宽度 36vw），不再压住摇杆。
 - 回大厅 / Android 返回会收起探索层；隐藏关入口会藏大厅 `#menu`。
 - 源码版本 **4.6.2**，Android `versionCode` 63
-- 单文件 SHA-256 `f482ceab796604270f341664e4209a5512e46cc48d52ce9f4bf79471d2023608`
-- Debug APK SHA-256 `b037094592244350dfa7e86a69718382b6b02a4ce694dc830e0400f9ec399443`（无正式证书，不要卸旧正式包）
+- 单文件 SHA-256 `dbf60308ff3cea6f71490684066adfe15940181d9abdf6f572ccb1752ee26d5e`
+- Debug APK SHA-256 `a5d44b64a8a325213027c3503abc8b6ba94eb936ee055d8b92ab367eb3c638be`（无正式证书，不要卸旧正式包）
 
 ## 第一期镜界寻访（源码 4.6.1）
 
