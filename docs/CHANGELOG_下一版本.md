@@ -8,6 +8,8 @@
 - Android 壳预先创建 WebView Crashpad 缓存目录。
 - 旧 WebView 不认 `inset`：`#hud` / `.overlay` / `.screen` / `.drawer` 等全屏层补 `top/right/bottom/left`，横屏摇杆和技能钮回到视口内。
 - 大厅 `.menu` 同样补四边，并 `left:auto;right:0`，出击和三角色钮回到右侧，不再压在立绘上。
+- 横屏矮屏电台抬到摇杆上方（`bottom ≥ 158px`，宽度 36vw），不再压住摇杆。
+- 回大厅 / Android 返回会收起探索层；隐藏关入口会藏大厅 `#menu`。
 - 源码版本 **4.6.2**，Android `versionCode` 63
 - 单文件 SHA-256 `f482ceab796604270f341664e4209a5512e46cc48d52ce9f4bf79471d2023608`
 - Debug APK SHA-256 `b037094592244350dfa7e86a69718382b6b02a4ce694dc830e0400f9ec399443`（无正式证书，不要卸旧正式包）

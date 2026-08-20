@@ -396,6 +396,14 @@ assert.match(indexHtml, /hideTransient\(\);hideCombatModals46\(\)/);
 assert.match(indexHtml, /#hud\{position:fixed;inset:0;top:0;right:0;bottom:0;left:0;/);
 assert.match(indexHtml, /\.menu\{position:absolute;inset:0;top:0;right:0;bottom:0;left:0;/);
 assert.match(indexHtml, /#menu\.homeDock46 \.menu\{left:auto;right:0;top:0;bottom:0;/);
+assert.match(indexHtml, /function hideExplorationLayer41/);
+assert.match(indexHtml, /hideExplorationLayer41\(\)/);
+assert.match(indexHtml, /html\.landscape46 \.banter\{/);
+assert.match(indexHtml, /bottom:max\(158px/);
+assert.match(
+  fs.readFileSync(path.join(root, "android-app/app/src/main/java/com/sakurayo/zombietide/MainActivity.java"), "utf8"),
+  /exploreClose41/,
+);
 assert.match(indexHtml, /\.overlay\{position:fixed;inset:0;top:0;right:0;bottom:0;left:0;/);
 assert.match(indexHtml, /\.screen\{position:fixed;inset:0;top:0;right:0;bottom:0;left:0;/);
 assert.doesNotMatch(indexHtml, /resultRadio46=true;\s*if\(\$\("#banter"\)\) \$\("#banter"\)\.style\.zIndex="40";\s*showBanter/);
