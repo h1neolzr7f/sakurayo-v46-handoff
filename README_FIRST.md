@@ -1,6 +1,6 @@
 # 接手检查清单
 
-当前：**V4.6.2。** 公开玩家仓是 https://github.com/h1neolzr7f/sakurayo-zombietide 。
+当前：**V4.6.3。** 公开玩家仓是 https://github.com/h1neolzr7f/sakurayo-zombietide 。
 
 按这个顺序读：
 
@@ -25,7 +25,7 @@ node tests/ops_unit.mjs
 
 ## 这一版已经有了
 
-横屏大厅、五房、镜界寻访（只收藏）、证词模式、局内 2 干员 DP、仿 Live2D。版本号是 4.6.2。
+横屏大厅、五房、镜界寻访（只收藏）、证词模式、局内 2 干员 DP、仿 Live2D。版本号是 4.6.3。
 
 ## 你接下来做
 

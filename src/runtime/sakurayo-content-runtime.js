@@ -2,7 +2,7 @@
   "use strict";
 
   var API_VERSION = 2;
-  var GAME_VERSION = String(global.SAKURAYO_GAME_VERSION || "4.6.2");
+  var GAME_VERSION = String(global.SAKURAYO_GAME_VERSION || "4.6.3");
   var packs = [];
   var orderedPacks = [];
   var packById = Object.create(null);

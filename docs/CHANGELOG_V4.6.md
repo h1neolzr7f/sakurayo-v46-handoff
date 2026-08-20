@@ -1,6 +1,10 @@
 # V4.6 — 横屏大厅与镜界寻访
 
-当前源码 **4.6.2**。versionCode 63。Debug APK 已打。
+当前源码 **4.6.3**。versionCode 64。Debug APK 已打。
+
+## 4.6.3 — 2026-08-20
+
+升补丁号。叠层修复随 4.6.2 复测一并带上：电台 `bottom ≥ 158px`、`hideExplorationLayer41()`、隐藏关藏 `#menu`。`sakurayoV3` 只补字段。
 
 ## 4.6.2 — 2026-08-19
 
