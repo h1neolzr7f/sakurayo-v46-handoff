@@ -4,7 +4,7 @@
 
 ## v4.6.3 — 2026-08-20
 
-升补丁号，方便和 4.6.2 模拟器叠层修复包区分。横屏矮屏电台不再压摇杆；回大厅 / Android 返回会收起探索层；隐藏关入口藏大厅。versionCode 64。存档仍 `sakurayoV3`。Debug APK SHA-256 `0bdd39509d387f295913db560e28d2e0c959ff99a826e8f76dc188b4734b1bf9`。
+升补丁号，方便和 4.6.2 模拟器叠层修复包区分。横屏矮屏电台不再压摇杆；回大厅 / Android 返回会收起探索层；隐藏关入口藏大厅。versionCode 64。存档仍 `sakurayoV3`。Debug APK SHA-256 `c886e0820ca2932ff0573f783ad03fdfcca6ea0172d3536c8498a2bdb8a64dda`（关后门 + 邮箱后重打）。
 
 同号修补：关掉 `?beta` / 内测抽屉 / 立绘连点。`?test=1` 只在开发源码 `src/index.html` 生效。内测 🌸9999 改从大厅邮箱领取。
 

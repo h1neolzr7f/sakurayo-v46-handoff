@@ -7,6 +7,7 @@ Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先
 - `?test=1` / `?debug=1` 只在 `src/index.html` 开发源码生效，正式包和 Android 资源无效。
 - 新档与未用过后门的旧档，大厅邮箱发一封「内测致谢」，领取 🌸9999。已用过旧后门的旧档只收致谢，不补发。
 - 存档键仍 `sakurayoV3`，只补 `mail46`。
+- 已重打 debug APK：`release/樱夜尸潮_V4.6.3_Android_Debug.apk`，SHA-256 `c886e0820ca2932ff0573f783ad03fdfcca6ea0172d3536c8498a2bdb8a64dda`。versionCode 仍 64。无正式证书。不要卸旧正式包。
 
 ## 2026-08-20 升补丁号 4.6.3
 

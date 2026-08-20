@@ -9,7 +9,7 @@
 后续同号修补：关掉 `?beta` / 内测抽屉 / `__SAKURAYO_BETA__` / 立绘 10 连点。`?test=1` 与 `?debug=1` 只在 `src/index.html` 开发源码生效，正式包和 Android 资源打不开。内测 🌸9999 改从大厅邮箱领取；旧档若已用过后门，只收致谢信。
 
 - 离线/Android 单文件 SHA-256：`7a87fbe90d14bd93ea779df37162003bab0d836790b2a48bcf6cb8aa2778be67`（关后门 + 邮箱后重打）
-- Debug APK SHA-256：`0bdd39509d387f295913db560e28d2e0c959ff99a826e8f76dc188b4734b1bf9`
+- Debug APK SHA-256：`c886e0820ca2932ff0573f783ad03fdfcca6ea0172d3536c8498a2bdb8a64dda`（关后门 + 邮箱后重打）
 - 包名 `com.sakurayo.zombietide`，versionName 4.6.3 / versionCode 64。无正式证书（本环境无 `keystore.properties`），debug 签名。不要卸旧正式包覆盖。
 - 本仓 Release：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.3
 
