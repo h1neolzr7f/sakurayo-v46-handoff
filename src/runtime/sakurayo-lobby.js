@@ -213,42 +213,44 @@
     ".drawer.wishDrawer46{padding:0;background:#060410;overflow:hidden}" +
     ".wishDrawer46>.dhead{position:absolute;z-index:30;inset:0 0 auto 0;top:0;right:0;bottom:auto;left:0;max-width:none;width:100%;box-sizing:border-box;margin:0;padding:max(8px,env(safe-area-inset-top)) 10px 8px;background:transparent;pointer-events:none}" +
     ".wishDrawer46>.dhead h2{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}" +
-    ".wishDrawer46>.dhead .close{pointer-events:auto;width:36px;height:36px;margin-left:auto;border-radius:50%;background:#0b0818cc;border:1px solid #ffe6a355;color:#fff7fb}" +
+    ".wishDrawer46>.dhead .close{pointer-events:auto;width:36px;height:36px;margin-left:auto;border-radius:50%;background:#05020d88;border:1px solid #ffffff22;color:#fff7fb}" +
     ".wishDrawer46>.dbody{display:block;max-width:none;margin:0;padding:0;height:100%;min-height:100%;gap:0}" +
     ".wishStage46{position:relative;min-height:100%;min-height:100dvh;height:100%;overflow:hidden;background:radial-gradient(circle at 28% 18%,#4a1d55 0%,#1a1030 38%,#060410 100%)}" +
     ".wishStage46:before{content:\"\";position:absolute;inset:0;top:0;right:0;bottom:0;left:0;background:radial-gradient(circle at 16% 20%,#ff72b433 0 4%,transparent 42%),radial-gradient(circle at 80% 16%,#ffe08a26 0 3%,transparent 38%),radial-gradient(circle at 60% 72%,#7a3dff28 0 5%,transparent 44%);pointer-events:none;animation:wishDrift46 8s ease-in-out infinite}" +
     ".wishBanner46{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}" +
-    ".wishHero46{position:absolute;z-index:2;left:-4%;bottom:-6%;width:58%;height:118%;object-fit:contain;object-position:left bottom;background:transparent!important;pointer-events:none;-webkit-mask-image:linear-gradient(to top,transparent 0%,#000 12%,#000 100%);mask-image:linear-gradient(to top,transparent 0%,#000 12%,#000 100%)}" +
+    ".wishStage46:after{content:\"\";position:absolute;inset:0;top:0;right:0;bottom:0;left:0;z-index:1;background:linear-gradient(90deg,#0000 40%,#06041055 70%,#06041099 100%);pointer-events:none}" +
+    ".wishHero46{position:absolute;z-index:2;left:-4%;bottom:-8%;width:56%;height:118%;object-fit:contain;object-position:left bottom;background:transparent!important;pointer-events:none;-webkit-mask-image:linear-gradient(to top,transparent 0%,#000 10%,#000 100%);mask-image:linear-gradient(to top,transparent 0%,#000 10%,#000 100%)}" +
     ".wishPetals46{position:absolute;inset:0;top:0;right:0;bottom:0;left:0;z-index:3;pointer-events:none;overflow:hidden}" +
     ".wishPetals46 i{position:absolute;top:-12%;width:7px;height:9px;border-radius:0 70% 0 70%;background:#ff9bcc99;box-shadow:0 0 8px #ff9bcc66;animation:petalFall46 11s linear infinite}" +
-    ".wishTitle46{position:absolute;z-index:4;top:max(52px,calc(env(safe-area-inset-top) + 44px));right:16px;left:auto;text-align:right;max-width:58%;pointer-events:none}" +
-    ".wishTitle46 h3{margin:0;font-size:clamp(26px,5.6vw,40px);letter-spacing:.28em;color:#fff7fb;text-shadow:0 0 22px #ff9bcc99,0 4px 18px #05020d}" +
-    ".wishTitle46 p{margin:6px 0 0;color:#ffe7a3;font-size:11px;letter-spacing:.18em;text-shadow:0 2px 10px #05020d}" +
-    ".wishPity46{position:absolute;z-index:4;left:12px;right:12px;bottom:118px;padding:8px 10px;border-radius:14px;background:#0b0818cc;border:1px solid #ffe6a333}" +
-    ".pityRow46{display:flex;align-items:center;gap:8px;margin-top:6px}" +
+    ".wishTitle46{position:absolute;z-index:4;top:max(56px,calc(env(safe-area-inset-top) + 48px));right:max(16px,env(safe-area-inset-right));left:auto;text-align:right;max-width:48%;pointer-events:none}" +
+    ".wishTitle46 h3{margin:0;font-size:clamp(28px,5.8vw,44px);font-weight:700;letter-spacing:.36em;color:#fffaf6;text-shadow:0 2px 18px #05020dcc}" +
+    ".wishTitle46 p{margin:8px 0 0;color:#e8dcc8;font-size:11px;letter-spacing:.22em;opacity:.84;text-shadow:0 2px 10px #05020d}" +
+    ".wishPity46{position:absolute;z-index:4;left:auto;right:max(16px,env(safe-area-inset-right));bottom:118px;width:min(46%,380px);padding:0;border-radius:0;background:none;border:0}" +
+    ".pityRow46{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:8px}" +
     ".pityRow46:first-child{margin-top:0}" +
-    ".pityRow46 span{min-width:11.5em;color:#ffe7a3;font-size:10px;letter-spacing:.08em;text-shadow:0 1px 8px #05020d;white-space:nowrap}" +
-    ".pityRail46{flex:1;height:8px;border-radius:99px;background:#ffe6a355;overflow:hidden;box-shadow:inset 0 0 0 1px #ffe6a322,0 0 10px #ffe08a33}" +
-    ".pityRail46 i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#ffe08a,#ffd36b 70%,#fff4c4);box-shadow:0 0 12px #ffd36b}" +
-    ".pityRow46.sr .pityRail46 i{background:linear-gradient(90deg,#c18cff,#9c8cff)}" +
-    ".wishDock46{position:absolute;z-index:5;left:0;right:0;bottom:0;padding:10px 12px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#06041000,#060410ee 34%,#060410)}" +
-    ".wishTabs46{position:absolute;z-index:6;top:max(14px,calc(env(safe-area-inset-top) + 6px));left:12px;display:flex;gap:6px}" +
-    ".wishTabs46 button{min-height:32px;padding:0 12px;border-radius:999px;border:1px solid #ffe6a355;background:#0b0818cc;color:#ffe7a3;font:800 11px/1 system-ui;letter-spacing:.12em}" +
-    ".wishTabs46 button.on{background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;border-color:#ffe6a3aa}" +
-    ".wishPills46{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px}" +
-    ".wishPills46 b{padding:4px 10px;border-radius:999px;background:#0b0818cc;border:1px solid #ffe6a355;color:#ffe7a3;font-size:10px;letter-spacing:.1em}" +
+    ".pityRow46 span{min-width:0;color:#efe6d4;font-size:10px;letter-spacing:.12em;text-shadow:0 1px 8px #05020d;white-space:nowrap}" +
+    ".pityRail46{flex:0 1 132px;height:2px;border-radius:99px;background:#ffffff1a;overflow:hidden;box-shadow:none}" +
+    ".pityRail46 i{display:block;height:100%;border-radius:99px;background:#e8c56a;box-shadow:none}" +
+    ".pityRow46.sr .pityRail46 i{background:#c4b0ff}" +
+    ".wishMeta46{margin:8px 0 0;color:#c9b89a;font:600 10px/1 system-ui;letter-spacing:.14em;text-align:right;text-shadow:0 1px 8px #05020d}" +
+    ".wishDock46{position:absolute;z-index:5;left:auto;right:0;bottom:0;width:min(58%,560px);padding:10px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#06041000 0%,#06041088 46%,#060410f2 100%)}" +
+    ".wishTabs46{position:absolute;z-index:6;top:max(12px,calc(env(safe-area-inset-top) + 4px));left:auto;right:max(56px,calc(env(safe-area-inset-right) + 48px));display:flex;gap:2px}" +
+    ".wishTabs46 button{min-height:32px;padding:0 10px;border-radius:0;border:0;border-bottom:1px solid transparent;background:transparent;color:#efe6d4aa;font:600 12px/1 system-ui;letter-spacing:.2em}" +
+    ".wishTabs46 button.on{background:none;color:#ffe7b0;border-bottom-color:#ffe7b0}" +
+    ".wishPills46{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;margin:0 0 10px}" +
+    ".wishPills46 b{padding:0;border-radius:0;background:none;border:0;color:#efe6d4;font-size:10px;letter-spacing:.08em;font-weight:600;text-shadow:0 1px 8px #05020d}" +
     ".rosterTabs46{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}" +
     ".rosterTabs46 button{min-height:32px;padding:0 12px;border-radius:999px;border:1px solid #ffe6a355;background:#0b0818cc;color:#ffe7a3;font:800 11px/1 system-ui;letter-spacing:.12em}" +
     ".rosterTabs46 button.on{background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;border-color:#ffe6a3aa}" +
     ".rosterLater46{min-height:180px;display:grid;place-items:center;border:1px dashed #ffe6a344;border-radius:16px;color:#bfb1d3;letter-spacing:.2em;font:800 13px/1.4 system-ui}" +
     ".revealCard46.r-LEGEND .revealFace46{border-color:#ffe6a3;box-shadow:0 0 26px #ffd36baa}" +
     ".revealLegend46{position:absolute;z-index:4;left:7px;bottom:36px;padding:3px 7px;border-radius:6px;background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;font:800 9px/1 system-ui;letter-spacing:.14em}" +
-    ".gachaActions46{display:grid;grid-template-columns:1fr 1fr;gap:10px}" +
-    ".gachaActions46 button{min-height:54px;border-radius:16px;border:1px solid #ff9bcc66;color:#fff;font:800 15px/1.1 system-ui;letter-spacing:.14em;box-shadow:0 10px 24px #05020d66}" +
-    ".gachaActions46 button small{display:block;margin-top:3px;font:700 10px/1 system-ui;letter-spacing:.08em;opacity:.88}" +
+    ".gachaActions46{display:flex;justify-content:flex-end;gap:10px}" +
+    ".gachaActions46 button{min-height:44px;min-width:128px;padding:8px 18px;border-radius:4px;border:1px solid #ffffff24;color:#fffaf6;font:700 14px/1.1 system-ui;letter-spacing:.16em;box-shadow:none}" +
+    ".gachaActions46 button small{display:block;margin-top:3px;font:600 10px/1 system-ui;letter-spacing:.08em;opacity:.78}" +
     ".gachaActions46 button.poor{opacity:.42}" +
-    ".wishSpark46{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;max-height:72px;overflow:auto}" +
-    ".wishSpark46 button{min-height:28px;padding:0 8px;border-radius:999px;border:1px solid #ffe6a355;background:#0b0818cc;color:#ffe7a3;font:800 10px/1 system-ui}" +
+    ".wishSpark46{display:flex;flex-wrap:nowrap;justify-content:flex-end;gap:8px;margin-top:8px;max-height:28px;overflow:auto}" +
+    ".wishSpark46 button{min-height:24px;padding:0 4px;border-radius:0;border:0;background:none;color:#c9b89a;font:600 10px/1 system-ui}" +
     ".wishSpark46 button.poor{opacity:.42}" +
     ".rosterEquip46{margin-top:8px;min-height:36px;padding:0 12px;border-radius:10px;border:1px solid #ffe6a366;background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;font:800 12px/1 system-ui}" +
     ".chronicleBox46{display:grid;gap:10px}" +
@@ -258,8 +260,8 @@
     ".homeNav46{position:relative;z-index:8}" +
     ".mailButton46,.mailCard46 button{touch-action:manipulation}" +
     "#menu.homeDock46 .nav{position:relative;z-index:8}" +
-    "#gachaPull1{background:linear-gradient(180deg,#ff86cc,#ff3d9a 58%,#b02078);border-color:#ffb6d888}" +
-    "#gachaPull10{background:linear-gradient(180deg,#ffe08a,#f0c14a 42%,#d8892b);border-color:#ffe6a3aa;color:#2a1608}" +
+    "#gachaPull1{background:transparent;border-color:#ffffff28;color:#fffaf6}" +
+    "#gachaPull10{background:linear-gradient(180deg,#f3d9a0,#c9a056);border-color:#e8c56a88;color:#2a1608}" +
     "#gachaReveal46{position:absolute;inset:0;top:0;right:0;bottom:0;left:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(44px,env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom));background:radial-gradient(circle at 50% 40%,#4a2878ee,#12081cf6 68%)}" +
     ".revealGrid46{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:96%;perspective:1200px}" +
     ".revealGrid46.ten{max-width:640px;gap:8px}" +
@@ -331,19 +333,21 @@
     "#menu.homeDock46 .homeNav46 button{min-height:58px}" +
     "#menu.homeDock46 .stageMini{width:100%}" +
     "#menu.homeDock46 .charSelectPanel{position:relative;left:auto;right:auto;bottom:auto;width:100%}" +
-    ".wishHero46{left:-2%;width:46%;height:124%;bottom:-8%}" +
-    ".wishTitle46{right:4%;max-width:46%}" +
-    ".wishDock46,.wishPity46{left:46%}" +
+    ".wishHero46{left:-4%;width:54%;height:118%;bottom:-8%}" +
+    ".wishTitle46{right:4%;max-width:42%}" +
+    ".wishDock46{left:auto;width:min(52%,520px)}" +
+    ".wishPity46{left:auto;right:4%}" +
     "#rosterWall46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
     ".rosterArt46{height:168px}" +
     ".heroTap46{left:10%;width:28%;top:16%;bottom:18%}" +
     "}" +
     "html.landscape46 #menu.homeDock46 .heroLive46{pointer-events:none;left:0;width:64%;top:0;bottom:0}" +
     "html.landscape46 #menu.homeDock46 .menu{left:auto;right:0;top:0;bottom:0;width:min(34vw,360px);max-width:360px;margin-left:auto}" +
-    "html.landscape46 .wishHero46{left:0;width:34%;height:100%;bottom:0}" +
-    "html.landscape46 .wishTitle46{right:4%;max-width:46%}" +
-    "html.landscape46 .wishDock46,html.landscape46 .wishPity46{left:46%}" +
-    "html.landscape46 .wishPity46{bottom:max(240px,calc(env(safe-area-inset-bottom) + 220px));right:12px}" +
+    "html.landscape46 .wishHero46{left:-4%;width:54%;height:114%;bottom:-8%}" +
+    "html.landscape46 .wishTitle46{right:max(20px,4%);top:max(56px,calc(env(safe-area-inset-top)+48px));max-width:42%}" +
+    "html.landscape46 .wishDock46{left:auto;right:0;width:min(52%,520px)}" +
+    "html.landscape46 .wishPity46{left:auto;right:max(18px,3%);top:max(118px,calc(env(safe-area-inset-top)+108px));bottom:auto;width:min(40vw,360px)}" +
+    "html.landscape46 .wishTabs46{left:auto;right:max(56px,calc(env(safe-area-inset-right)+48px));top:max(10px,env(safe-area-inset-top))}" +
     "html.landscape46 #rosterWall46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
     "html.landscape46 #archiveDrawer .archiveDock46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
     "html.landscape46 #stageList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}" +
@@ -1155,15 +1159,15 @@
       srLeft +
       ' 抽</span><div class="pityRail46"><i style="width:' +
       srPct +
-      '%"></i></div></div></div>' +
+      '%"></i></div></div><p class="wishMeta46">寻访 ' +
+      pulls +
+      " · 软保 " +
+      RATES.softPity +
+      "</p></div>" +
       '<div class="wishDock46"><div class="wishPills46"><b>樱花币 ' +
       info.coins +
       "</b><b>寻访票 " +
       (info.tickets || 0) +
-      "</b><b>寻访 " +
-      pulls +
-      "</b><b>软保 " +
-      RATES.softPity +
       "</b><b>碎镜片 " +
       shards +
       " / " +
