@@ -1,5 +1,12 @@
 Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先阅读根目录的 AGENTS.md、README_FIRST.md 和 CODEX_TASK.md，基于 src/index.html 继续开发，不要使用旧版本文件。
 
+## 2026-08-20 大厅加回二游首页
+
+- 用户对照两张大厅图，明确原来那张高密度首页才是二游，4.6.6 极简右栏不像。
+- 已加回：经验条、登录台词、左栏任务/成就/邮件/公告/设置、四货币、关卡大卡、证词/主神卡、出击 START >>>、底栏名册。
+- 立绘和 `lobby_wide` 留下。没有新存档键，没有后门，没有塔防坞。
+- 源码 **4.6.7** / versionCode **68**。单文件 SHA-256 `16bf84e8fa88ffabad655c7a914c7e4cdcea89c4e85d2d3a79af7947d30ec589`。测试 APK SHA-256 `f4d8456266048d6e475a64c887050e764af89d3d6bc6c0c2d0174f2ddc91530e`。拿图：`node tests/real_shots.mjs`。
+
 ## 2026-08-20 拿到真图再改
 
 - 用 Playwright Chromium 横屏 932×430 截完整页面（含 DOM），不是 canvas 拼图，也不是全黑 screencap。

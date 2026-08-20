@@ -1,4 +1,4 @@
-# 《樱夜·尸潮》V4.6.6 交接规格
+# 《樱夜·尸潮》V4.6.7 交接规格
 
 2026-08-19。给下一位 AI / 维护者。先读根目录 [README.md](../README.md)，再读本文和 [AGENTS.md](../AGENTS.md)。二游分期原文在 [PLAN_V46_ERYOU.md](PLAN_V46_ERYOU.md)。升版本见 [MAINTAIN.md](MAINTAIN.md)。
 
@@ -8,11 +8,11 @@
 
 | 项 | 值 |
 |---|---|
-| 源码版本 | **4.6.6** |
-| Android `versionName` / `versionCode` | 4.6.6-test / **67** |
+| 源码版本 | **4.6.7** |
+| Android `versionName` / `versionCode` | 4.6.7-test / **68** |
 | 测试包名 / 桌面名 | `com.sakurayo.zombietide.test` / **测试版樱夜**（不覆盖正式包） |
 | 公开仓 | https://github.com/h1neolzr7f/sakurayo-zombietide |
-| 已发布 APK | 公开仓仍 **v4.4.6**；本仓测试包以 Releases 最新 `v4.6.6` 为准 |
+| 已发布 APK | 公开仓仍 **v4.4.6**；本仓测试包以 Releases 最新 `v4.6.7` 为准 |
 | 存档键 | **`sakurayoV3`** |
 | 代码基线 | `src/index.html` + `src/runtime/*.js` |
 | 运行时美术 | `android-app/app/src/main/assets/game/art` |
@@ -294,7 +294,7 @@ powershell -File tools/verify.ps1
 - `tests/testimony_smoke.mjs`
 - `tests/gacha_visual.mjs`（会出 932×430 截图到 `tests/artifacts/gacha/`，该目录 gitignore）
 
-改证词或寻访视觉时请单独跑这两项。`browser_smoke.mjs` 断言版本 `"4.6.6"`，主视口 430×932；竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。画面必须用 `node tests/real_shots.mjs` 拿横屏完整 DOM 真图，禁止再用 canvas 拼图或全黑 screencap 当过关。
+改证词或寻访视觉时请单独跑这两项。`browser_smoke.mjs` 断言版本 `"4.6.7"`，主视口 430×932；竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。画面必须用 `node tests/real_shots.mjs` 拿横屏完整 DOM 真图，禁止再用 canvas 拼图或全黑 screencap 当过关。
 
 发版（用户明确要求再做）：
 
