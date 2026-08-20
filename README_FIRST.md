@@ -43,6 +43,7 @@ I2V 绿幕站桩、融合 skill/dash、寻访卡扩到 16、全量 verify、再�
 - 卸掉模拟器上签名对不上的旧正式包（会清档）
 - 删 `progress.md` 顶部 Original prompt
 - 把竖屏重新做成主体验
+- 把大厅再收成「立绘 + 一条右栏工具条」。4.6.7 密度清单和已签字画面见 `docs/HANDOFF.md` §4–§5。`PLAN_V46_ERYOU.md` 旧 34% 胶囊规格已作废
 
 ## 目录
 
