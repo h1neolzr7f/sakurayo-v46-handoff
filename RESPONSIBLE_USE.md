@@ -4,7 +4,7 @@
 
 ## 推荐用法
 
-1. 从 [Releases](https://github.com/h1neolzr7f/sakurayo-zombietide/releases) 下载当前版本 APK，或克隆后打开 `src/index.html`。
+1. 从 [本仓 Releases v4.6.4](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.4) 下载「测试版樱夜」APK，或克隆后打开 `src/index.html`。公开玩家仓仍停在 v4.4.6。测试包不会覆盖正式包。
 2. 用发布说明里的 SHA-256 核对安装包。
 3. 在本机游玩。存档键是 `sakurayoV3`，升级后缺字段会自动补齐。
 

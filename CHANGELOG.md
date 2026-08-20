@@ -1,6 +1,52 @@
 # 更新记录
 
-当前版本 **v4.6.0**。完整条目按大版本写在 `docs/CHANGELOG_V*.md`。
+当前版本 **v4.6.8**。完整条目按大版本写在 `docs/CHANGELOG_V*.md`。
+
+## v4.6.8 — 2026-08-20
+
+把 4.6.7 同号增补的兑换/捡钱拆成独立补丁号，方便覆盖安装。樱花币可兑碎镜片 / 主神点 / 寻访票（🌸20→💠1、🌸40→💎1、🌸160→🎫1）；点立绘捡 🌸1，飘 +1 和随机捡钱台词；成就「石阶拾樱 / 神社守财」。🎫 是真账户寻访票，先扣票再扣币。十连点后门仍关。大厅密度仍按 4.6.7 完成态，没有收成毛坯。测试包名仍 `com.sakurayo.zombietide.test`。versionCode 69。测试 APK SHA-256 `c85432867fca105a02594b58fa8f7768c86e6c820a808f59a16b982fc500ca27`。
+
+下载：[测试 APK](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.8/Sakurayo-ZombieTide-TEST-v4.6.8.apk) · [Release](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.8)
+
+## v4.6.7 — 2026-08-20
+
+大厅加回二游首页：经验条、登录台词、左栏、多货币、证词/主神卡、出击 START 辉光。左栏和启动页改回用已生成的 `ui/nav` / `loading_art` / `menu_emblem`，不再用「任/就/邮」和单独一个「樱」字。
+
+同号增补：樱花币可兑碎镜片 / 主神点 / 寻访票；点立绘捡 🌸1，飘 +1 和随机捡钱台词；成就「石阶拾樱 / 神社守财」。右栏改弹性分栏，钱包分行，14 职业纹章压成一条，兑换所展职业/转职/融合/卡面。十连点后门仍关。测试包名仍 `com.sakurayo.zombietide.test`。versionCode 68。测试 APK SHA-256 `f4d8456266048d6e475a64c887050e764af89d3d6bc6c0c2d0174f2ddc91530e`。
+
+## v4.6.6 — 2026-08-20
+
+按横屏真图修对话半身、怪物可见、升级层高度。测试包名仍 `com.sakurayo.zombietide.test`。
+
+## v4.6.5 — 2026-08-20
+
+横屏二游手感：封面、对话半身、升级层、禁止竖滑、去掉塔防坞、刷怪可见。versionCode 66。存档仍 `sakurayoV3`。
+
+下载：[测试 APK](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.5/Sakurayo-ZombieTide-TEST-v4.6.5.apk) · [Release](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.5)
+
+## v4.6.4 — 2026-08-20
+
+Debug 改成独立测试包「测试版樱夜」，包名 `com.sakurayo.zombietide.test`，不会覆盖正式「樱夜·尸潮」。versionCode 65。存档仍 `sakurayoV3`。测试 APK SHA-256 `c6aaf1972ce2d27860514a2dda3a4c0f93b1f10fbe5c80a0d237e4bd521f16e2`。
+
+下载：[测试 APK](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.4/Sakurayo-ZombieTide-TEST-v4.6.4.apk) · [Release](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.4)
+
+## v4.6.3 — 2026-08-20
+
+升补丁号，方便和 4.6.2 模拟器叠层修复包区分。横屏矮屏电台不再压摇杆；回大厅 / Android 返回会收起探索层；隐藏关入口藏大厅。versionCode 64。存档仍 `sakurayoV3`。Debug APK SHA-256 `c886e0820ca2932ff0573f783ad03fdfcca6ea0172d3536c8498a2bdb8a64dda`（关后门 + 邮箱后重打）。
+
+同号修补：关掉 `?beta` / 内测抽屉 / 立绘连点。`?test=1` 只在开发源码 `src/index.html` 生效。内测 🌸9999 改从大厅邮箱领取。
+
+下载：[APK](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.3/Sakurayo-ZombieTide-v4.6.3-android-debug.apk) · [Release](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.3)
+
+## v4.6.2 — 2026-08-19
+
+证词结算与演习进度彻底隔离：不写章节/档案/结局/构筑卡，也不累加击杀、局数、最佳时长和战役成就。局内存档不刷大厅。隐藏关结算用完美结局名。横屏矮屏电台不再压摇杆。回大厅 / Android 返回会收起探索层。versionCode 63。存档仍 `sakurayoV3`。Debug APK SHA-256 `a5d44b64a8a325213027c3503abc8b6ba94eb936ee055d8b92ab367eb3c638be`。
+
+## v4.6.1 — 2026-08-19
+
+清虫包升补丁号，方便和 4.6.0 区分。versionCode 62。存档仍 `sakurayoV3`。未交 APK、未打 tag。
+
+结算发卡：本局构筑卡（融合 > 转职 > 基础校 > 角色残件）入仓库，同卡并星 1–5，按星级加伤害。失败时电台播「晚安，小夜/绫/凛音」。角色寻访卡面全部用于仓库与结算揭示。过时的「重复不加 / 卡不卖伤害」已去掉。
 
 ## v4.6.0 — 2026-08-14
 

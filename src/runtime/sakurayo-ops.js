@@ -1,7 +1,7 @@
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.0";
+  var VERSION = "4.6.8";
   var MAX = 2;
   var COST = 8;
   var REFUND = 4;

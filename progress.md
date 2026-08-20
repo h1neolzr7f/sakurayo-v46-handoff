@@ -1,5 +1,103 @@
 Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先阅读根目录的 AGENTS.md、README_FIRST.md 和 CODEX_TASK.md，基于 src/index.html 继续开发，不要使用旧版本文件。
 
+## 2026-08-20 发 4.6.8 测试包
+
+- 把 4.6.7 同号增补的兑换/捡钱拆成独立补丁号，方便覆盖安装。大厅密度仍按 4.6.7 完成态。
+- 源码 **4.6.8** / versionCode **69**。测试包名仍 `com.sakurayo.zombietide.test` / 桌面名「测试版樱夜」。
+- 樱花币兑换：🌸20→💠1、🌸40→💎1、🌸160→🎫1。点立绘捡 🌸1。十连点后门仍关。
+- 单文件 SHA-256 `2a12bc8cebd86f2ee100a831853e4e2254243b7cb0e0d3baae96c4869fcf5def`。测试 APK SHA-256 `c85432867fca105a02594b58fa8f7768c86e6c820a808f59a16b982fc500ca27`。
+- 下载：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.8/Sakurayo-ZombieTide-TEST-v4.6.8.apk
+
+## 2026-08-20 兑换、点立绘捡钱、素材展陈
+
+- 樱花币兑换：🌸20→💠1、🌸40→💎1、🌸160→🎫1。🎫 改为真账户寻访票，寻访先扣票再扣币。字段写在 `shop40.ops.tickets` / `picks`，没有新 top-level key。
+- 大厅点立绘一次 🌸+1，飘字 +1，三角色各 6 句随机捡钱台词。成就「石阶拾樱」（第一次）、「神社守财」（累计 100）。旧十连点后门仍 `granted:false`。
+- 布局优化不删控件：右栏弹性分栏，钱包上四币下四钮，纹章压成 14 格一条，捡钱气泡靠立绘胸口，三角色圆头挪到 36%。
+- 兑换所展 14 职业 + 28 转职 + 24 融合 + 8 残件 + 12 时装 + 12 武器 + 四章 CG + 三相飞升。大厅只放 14 职业纹章，不把 1284 张铺满首页。
+
+## 2026-08-20 对照生成素材
+
+- `game/art` 现有 **1284** 张。底栏 `ui/nav`、寻访 98 张卡面、职业/融合闪图、桌面图标已经在用。
+- 4.6.7 大厅左栏和启动页曾用「任/就/邮」和「樱」字盖掉生成图。已改回：左栏用 talent/achievement/archive/story/emblem，启动页用 `loading_art` + `menu_emblem`，右上背包/邮箱用 roster/archive。
+- 四货币没有单独生成图标，继续 emoji，不拿寻访金币冒充樱花币。
+- 编年五条本来就没有封面。职业/转职/融合卡在名册，不在当前三池寻访。
+
+## 2026-08-20 大厅加回二游首页
+
+- 用户对照两张大厅图，明确原来那张高密度首页才是二游，4.6.6 极简右栏不像。
+- 已加回：经验条、登录台词、左栏任务/成就/邮件/公告/设置、四货币、关卡大卡、证词/主神卡、出击 START >>>、底栏名册。
+- 立绘和 `lobby_wide` 留下。没有新存档键，没有后门，没有塔防坞。
+- 源码 **4.6.7** / versionCode **68**。单文件 SHA-256 `16bf84e8fa88ffabad655c7a914c7e4cdcea89c4e85d2d3a79af7947d30ec589`。测试 APK SHA-256 `f4d8456266048d6e475a64c887050e764af89d3d6bc6c0c2d0174f2ddc91530e`。拿图：`node tests/real_shots.mjs`。
+- **防回退：** 不是图1不好才替换。2026-08-14 `PLAN_V46_ERYOU.md` 把「打开先看到立绘和出击」写成必须极简；4.6.0–4.6.6 按这个砍控件；4.6.4–4.6.6 为横屏不挡立绘再削一层。HANDOFF §5 和本计划 §4.1 已改成 4.6.7 密度清单，旧 34% 胶囊作废。用户已签字的画面未经点名不要拆。
+
+## 2026-08-20 拿到真图再改
+
+- 用 Playwright Chromium 横屏 932×430 截完整页面（含 DOM），不是 canvas 拼图，也不是全黑 screencap。
+- 真图里对话仍是半脸：旧 CSS `center 26%/cover` + `:after` 暗角 + `max-height:290px`。已拆掉，改成左侧高清半身。
+- 真图里 10 秒战斗看不见怪：`enemyDraw` 用 `e.x>W` 裁世界坐标。已改 `SakurayoCamera.contains`。10 秒约 30+ 只、描边可见。
+- 升级层不再铺满，战场顶部还能看见。大厅三角色封面已是 `lobby_wide`。
+- 源码 **4.6.6** / versionCode **67**。单文件 SHA-256 `cd1756dc2862a4426a2fa25f07afaaa0887edfb1f053789252753327b96553a5`。测试 APK SHA-256 `7962f564c8cad2774b3769277a968dd69fd4032661fb6958db7629bb9977b1c1`。拿图：`node tests/real_shots.mjs`。
+
+## 2026-08-20 横屏二游手感修补
+
+- 用户反馈封面回退、半脸对话、升级铺满、竖滑、怪物看不见、密度低、背景粗、塔防坞还在。
+- `installCover36` 不再写背景。对话改用高清半身。升级层缩小。抽屉左右滑。
+- 局内 DP 坞隐藏且不再部署。刷怪加密，怪物描边，地面暗角减淡。
+- 存档键仍 `sakurayoV3`。没有再包 `update`。
+- 4.6.5 测试包 SHA-256 `6b1c1883e5af73bfd8bbbd9c39e0bcb5eb9bb448c92b4ab4d1a7240b702caffe`。单文件 `71eb24fa33059686cad3029ac94033bebec4afd00fde9bd0850465f3f6375914`。
+- 下载：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.5/Sakurayo-ZombieTide-TEST-v4.6.5.apk
+
+## 2026-08-20 独立测试包「测试版樱夜」
+
+- 用户看到上一份 APK 仍是正式包名，会覆盖/冲突 4.4.x 正式包。要求全部改掉，并单独叫测试版。
+- Debug `applicationId` 改为 `com.sakurayo.zombietide.test`，桌面名「测试版樱夜」，`versionName` 4.6.4-test / `versionCode` 65。
+- 正式包 `com.sakurayo.zombietide` 继续留着，两包并排安装，各写各的存档。不要卸正式包。
+- 统计导出和平衡报告不再写死 3.8 / 4.1。
+- GitHub 下载：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.4/Sakurayo-ZombieTide-TEST-v4.6.4.apk
+- 测试 APK SHA-256 `c6aaf1972ce2d27860514a2dda3a4c0f93b1f10fbe5c80a0d237e4bd521f16e2`。单文件 SHA-256 `957a8dbecc1c8e77838430325b7510561d30ade6f0c295244b2d18211843ca88`。`aapt` 复核包名 `com.sakurayo.zombietide.test`、label「测试版樱夜」、versionName 4.6.4-test / versionCode 65。
+
+## 2026-08-20 关掉内测作弊口，奖励改走邮箱
+
+- 用户要列不足/bug，并屏蔽内测作弊端口，内测奖励改邮箱发送。
+- `?beta`、内测抽屉、`__SAKURAYO_BETA__`、立绘 10 连点全部关掉，打不开。
+- `?test=1` / `?debug=1` 只在 `src/index.html` 开发源码生效，正式包和 Android 资源无效。
+- 新档与未用过后门的旧档，大厅邮箱发一封「内测致谢」，领取 🌸9999。已用过旧后门的旧档只收致谢，不补发。
+- 存档键仍 `sakurayoV3`，只补 `mail46`。
+- 已重打 debug APK：`release/樱夜尸潮_V4.6.3_Android_Debug.apk`，SHA-256 `c886e0820ca2932ff0573f783ad03fdfcca6ea0172d3536c8498a2bdb8a64dda`。versionCode 仍 64。无正式证书。不要卸旧正式包。
+- GitHub 下载：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.3/Sakurayo-ZombieTide-v4.6.3-android-debug.apk
+
+## 2026-08-20 升补丁号 4.6.3
+
+- 用户要求打包最新版上传，并再进一个小版本、打 APK。
+- `VERSION` / `SAKURAYO_GAME_VERSION` / 运行时回退值 / Android `versionName` → 4.6.3；`versionCode` 63 → 64。
+- 叠层修复随包带走。存档键仍 `sakurayoV3`。
+
+## 2026-08-19 升补丁号 4.6.2
+
+- 用户要求再检查漏洞后升 4.6.2 并交付 APK。
+- 证词结算不再累加演习击杀/局数/最佳时长，不跑战役成就；局内不点 `lv12` / `flaw` / `phasebreak`。
+- `VERSION` / `SAKURAYO_GAME_VERSION` / 运行时回退值 / Android `versionName` → 4.6.2；`versionCode` 62 → 63。
+- 存档键仍 `sakurayoV3`。
+
+## 2026-08-19 局内剧情按三层人味重写
+
+- 用户认可库洛三层写法：先对准真实情绪，再补因果，内核留到终章和仓库。不要开服谜语，也不要开场论文。
+- 四章开场、抉择、转阶段、通关改成能听懂的人话。选项名、flag、数值、编年五条、未归卡四段正文未改。
+- 抉择画面用章节 CG；抽到对应残件/时装/武器则换卡面，电台补卡面第一句。终章装备传说衣/刀时通关多一句。对话按说话人换脸，背景用本章 CG。
+- 专有词不删：主角当场问「这是什么」，电台闲聊用白话答（可预测的版本＝数字备份；回收＝拷进机器）。
+
+## 2026-08-19 结算构筑卡并星与晚安电台
+
+- 用户要求把角色抽卡素材用起来：失败电台播「晚安，小夜/绫/凛音」；局终把本局构筑卡发进仓库；同卡合并 1–5 星。
+- 用户随后明确：卡片可以加伤害，去掉「重复不加 / 卡不卖伤害」的过时设定。
+- 实现：`grantBuildCard` / `resolveBuildCard`；`applyOwnedBonus` 按星级乘算；仓库显星；结算用 `gacha/{id}.webp`。存档仍 `sakurayoV3`。
+
+## 2026-08-19 升补丁号 4.6.1
+
+- 用户要求把最新版本提升一个小级别，方便和 4.6.0 清虫包区分。
+- `VERSION` / `SAKURAYO_GAME_VERSION` / 运行时回退值 / Android `versionName` → 4.6.1；`versionCode` 61 → 62。
+- 存档键仍 `sakurayoV3`。玩法未改。未交 APK、未打 tag。
+
 ## 2026-07-11 自由方向与主神空间
 
 - 用户要求：枪械可自由随方向转动，刀剑只在挥砍扇形内造成伤害；三角色各有独立吐槽彩蛋；新增高难爽发育“主神空间”，奖励点强化仅在该副本跨局保留。
