@@ -36,6 +36,10 @@ await page.waitForFunction(() => window.__SAKURAYO_TEST__ && document.getElement
 await page.waitForTimeout(600);
 
 await api(page, "selectCharacter", "sayo");
+const faces = await boxOf(page, ".charSelectPanel");
+const status = await boxOf(page, ".homeStatus47");
+assert.ok(faces && faces.y > 220, `三角色圆头不得挡脸，实际 y=${faces?.y}`);
+assert.ok(status && status.right < 200, `左上状态不得压脸，right=${status?.right}`);
 await api(page, "openDrawer", "shop");
 await page.waitForTimeout(300);
 await page.screenshot({ path: path.join(out, "shop.png") });
@@ -43,7 +47,7 @@ const shop = await boxOf(page, "#shopDrawer");
 const buy = await boxOf(page, "#shopDrawer .skinCard button, #shopDrawer .shopItem40 button");
 assert.ok(shop && !shop.hidden, "商店抽屉打开");
 assert.ok(shop.x > 400, `商店应在右半屏，实际 x=${shop.x}`);
-assert.ok(shop.w <= 520, `商店不应铺满，实际 w=${shop.w}`);
+assert.ok(shop.w <= 500, `商店不应铺满，实际 w=${shop.w}`);
 assert.ok(buy && buy.bottom <= 430 && buy.y >= 0, `购买按钮必须在屏内 y=${buy?.y} bottom=${buy?.bottom}`);
 
 await page.evaluate(() => document.getElementById("shopDrawer")?.classList.add("hidden"));
