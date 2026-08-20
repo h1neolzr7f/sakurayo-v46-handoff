@@ -1,6 +1,6 @@
-# 《樱夜·尸潮》V4.6.0 交接规格
+# 《樱夜·尸潮》V4.6.3 交接规格
 
-2026-08-14。给下一位 AI / 维护者。先读根目录 [README.md](../README.md)，再读本文和 [AGENTS.md](../AGENTS.md)。二游分期原文在 [PLAN_V46_ERYOU.md](PLAN_V46_ERYOU.md)。升版本见 [MAINTAIN.md](MAINTAIN.md)。
+2026-08-19。给下一位 AI / 维护者。先读根目录 [README.md](../README.md)，再读本文和 [AGENTS.md](../AGENTS.md)。二游分期原文在 [PLAN_V46_ERYOU.md](PLAN_V46_ERYOU.md)。升版本见 [MAINTAIN.md](MAINTAIN.md)。
 
 这不是另做一款原神。局外做成能横着玩的二次元手游大厅，局内继续是离线肉鸽射击。
 
@@ -8,10 +8,10 @@
 
 | 项 | 值 |
 |---|---|
-| 源码版本 | **4.6.0**（未发版，不要擅自升 4.6.1） |
-| Android `versionName` / `versionCode` | 4.6.0 / **61** |
+| 源码版本 | **4.6.3** |
+| Android `versionName` / `versionCode` | 4.6.3 / **64** |
 | 公开仓 | https://github.com/h1neolzr7f/sakurayo-zombietide |
-| 已发布 APK | **v4.4.6** |
+| 已发布 APK | 公开仓仍 **v4.4.6**；本仓 Debug **v4.6.3** |
 | 存档键 | **`sakurayoV3`** |
 | 代码基线 | `src/index.html` + `src/runtime/*.js` |
 | 运行时美术 | `android-app/app/src/main/assets/game/art` |
@@ -23,14 +23,17 @@
 
 - 三名角色：月城小夜（步枪远程）、神代绫（手枪＋太刀）、黑羽凛音（纯太刀）。
 - 14 基础职业、28 转职、融合、科技/生物/灵能三相飞升。
-- 四章剧情、Boss 四阶段（75% / 50% / 25%）、主神空间。
+- 四章剧情、Boss 四阶段（75% / 50% / 25%）、主神空间。局内对白先对人话、对准情绪（放不下的人 / 被写成办完 / 接过位置却填不上名字），设定和仓库卡后置。终章先落地人的损失，再打出写定的最坏结局；八步线索都做对且通关前三章后，才进更强隐藏关，打完才给完美结局。档案回顾用人话标八步，只写做没做，不剧透隐藏结局。证词记忆与演习记忆分开。专有词由主角问、电台答，不要开场论文，也不要谜语。选项描述不剧透隐藏结局。选项 flag 与未归卡四段、小夜编年五条不要改正文。凛「先问她想不想活」和失败电台「晚安，小夜 / 绫 / 凛音」不要改。
 - 触控摇杆、冲刺、主动技能必须可用。
 - 继续 `sakurayoV3`。旧档缺字段自动补齐，禁止清档。
 - 不依赖网络、CDN、外部字体或外部图片。
-- 商店衣装与寻访卡**都不卖永久伤害**。卡只进名册。
+- 商店衣装只改外观和职业倾向，不直接卖永久伤害。寻访卡与结算构筑卡**按星级加伤害**（同卡并星，最高五星）。
 - 不要再给 `update` 加包装层。不要改名 `startGame` / `update` / `draw` / `spawnEnemy` / `showDialogue` 却不改调用点。
 - 不允许恢复「每颗子弹遍历全部敌人」的无界碰撞。敌人、子弹、Boss 弹、召唤物、伤害字、粒子都有上限。Boss 阶段不无限召唤普通怪。
 - Android WebView 锁横屏（`landscape`）。大厅/寻访/战场默认就是横版，不靠窗口先变成横的才切换。竖屏只保留射击操作并提示横持。
+- Android 11 WebView（Chrome 83）不认 `inset`。全屏层必须同时写 `top/right/bottom/left`。只写 `inset:0` 时 `#hud` 会收成 0×0，摇杆/冲刺/技能飞出屏幕。`.menu` 同样：不补四边时操作台缩到左上，压在立绘上。横屏大厅还要写 `left:auto;right:0`。
+- 横屏 360 高时电台 `bottom` 必须 ≥ 158px，且宽度避开左侧干员坞和右侧冲刺/技能。`@media(max-height:700px)` 不得把 `bottom` 降到 118px，否则压住摇杆。
+- `backMenu()` / Android 返回必须先 `hideExplorationLayer41()`。探索层 z=90，漏关会挡住整个大厅。`enterHiddenArena47()` 必须藏 `#menu`。
 - 最终发布仍需单文件 HTML。
 
 ## 3. 玩家闭环
@@ -59,7 +62,7 @@
 | 横屏主体验 | `html.landscape46` 默认就在；Android 锁 `landscape` | 已落地 |
 | 仿 Live2D | 随机眨眼 / 注视 / 点触，去掉卡顿滤镜 | 已落地 |
 | D | 寻访卡扩到 16 以内；站桩与大厅背景重出；商店/档案换皮 | **未做** |
-| E | 全量 `verify.ps1`、`release/`、APK、CHANGELOG | **未做** |
+| E | 全量 `verify.ps1`、`release/`、APK、CHANGELOG | **本轮交付 4.6.3 / versionCode 64** |
 
 ### 下一步（按优先级）
 
@@ -67,11 +70,11 @@
 2. 有独特动作的融合再补 `anim_skill.webp` / `anim_dash.webp`。缺图回退，不要借错融合的图。
 3. 寻访卡扩到 16 以内；`ui/lobby_wide.webp` 去左右黑边。
 4. 全量 `powershell -File tools/verify.ps1`（`browser_smoke` 主视口仍是 430×932）。
-5. `android-app/sync-game.ps1` 后发版。模拟器上的正式包可能仍是签名对不上的 **4.2.3 / versionCode 47**；debug 不能覆盖（`INSTALL_FAILED_UPDATE_INCOMPATIBLE`）。不要擅自卸包清档。用本机 HTTP 打开 `src/index.html` 验收。
+5. `android-app/sync-game.ps1` 后发版。本云主机是 KVM 套娃，API 34 Google APIs 开加速会内核崩溃；软件模拟用 Android 30 AOSP ATD 更稳。模拟器上的正式包可能仍是签名对不上的 **4.2.3 / versionCode 47**；debug 不能覆盖（`INSTALL_FAILED_UPDATE_INCOMPATIBLE`）。不要擅自卸包清档。
 
 ### 明确不做
 
-- 抽卡加攻击、加生命、加暴击。
+- 商店衣装加攻击、加生命、加暴击。寻访/构筑卡按星级加伤是正规则。
 - 每日任务、邮件、赛季、通行证、广告复活。
 - 联网账号与排行榜。
 - 换引擎，引 Vue / Phaser / 原神素材。
@@ -103,7 +106,7 @@
 | 模式 | `runMode36` | 规则 |
 |---|---|---|
 | 回收演习 | `story` | 现有肉鸽四章，规则不动 |
-| 证词模式 | `testimony` | 复用章节/对话/场地；升级只回血，不打开 `#level`；关闭干员坞；第一章与证词都门禁融合/飞升 |
+| 证词模式 | `testimony` | 复用章节/对话/场地；升级只回血，不打开 `#level`；关闭干员坞；第一章与证词都门禁融合/飞升。结算只记证词战绩和樱花币，不写 `save.done` / `unlock` / `story` / `endings`，不发构筑卡，不触发孤证者。跨章回声读 `ops.story` |
 | 主神空间 | `mainGod` | 已有高难。`isMainGodRun36()` 只认 `mainGod`。证词不是主神 |
 
 测试约定：
@@ -117,6 +120,8 @@
 ## 7. 寻访与名册
 
 实现：[`src/runtime/sakurayo-lobby.js`](../src/runtime/sakurayo-lobby.js)（`window.SakurayoLobby`）。
+
+局终 `grantBuildCard`：融合 > 转职分支 > 成型基础校 > 角色残件。同卡 `owned` 计数即星级，1–5 星按星乘算卡上伤害。失败电台 `playGoodnight46`。
 
 爆率与价格**不改**：
 
@@ -133,7 +138,7 @@ pitySSR 80 / pitySR 10
 pity, pitySR, pulls, tenPulls, owned, last, cheatUsed
 ```
 
-禁止新 top-level save key。证词进度若以后要记，加 `shop40.ops.story` 或沿用现有剧情字段。
+禁止新 top-level save key。证词进度写在 `shop40.ops.story`（`{sayo,aya,rion}`）。隐藏门闩只读 `storyChoices38`（回收演习）。`normalizeOps` 必须保留 `ops.story`，否则大厅一刷新证词记忆就没了。旧档缺字段当空，不要清档。
 
 名册 8 格。未回收只用卡背，禁止灰图剧透。点开详情。重复只加计数，不进战斗。锁卡脚注「待寻访」，墙上仍可写「未回收」。
 
@@ -287,7 +292,7 @@ powershell -File tools/verify.ps1
 - `tests/testimony_smoke.mjs`
 - `tests/gacha_visual.mjs`（会出 932×430 截图到 `tests/artifacts/gacha/`，该目录 gitignore）
 
-改证词或寻访视觉时请单独跑这两项。`browser_smoke.mjs` 断言版本 `"4.6.0"`，主视口 430×932；竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。
+改证词或寻访视觉时请单独跑这两项。`browser_smoke.mjs` 断言版本 `"4.6.3"`，主视口 430×932；竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。
 
 发版（用户明确要求再做）：
 
