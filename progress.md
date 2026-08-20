@@ -1,5 +1,11 @@
 Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先阅读根目录的 AGENTS.md、README_FIRST.md 和 CODEX_TASK.md，基于 src/index.html 继续开发，不要使用旧版本文件。
 
+## 2026-08-20 升补丁号 4.6.3
+
+- 用户要求打包最新版上传，并再进一个小版本、打 APK。
+- `VERSION` / `SAKURAYO_GAME_VERSION` / 运行时回退值 / Android `versionName` → 4.6.3；`versionCode` 63 → 64。
+- 叠层修复随包带走。存档键仍 `sakurayoV3`。
+
 ## 2026-08-19 升补丁号 4.6.2
 
 - 用户要求再检查漏洞后升 4.6.2 并交付 APK。

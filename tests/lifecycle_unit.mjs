@@ -15,7 +15,7 @@ vm.runInNewContext(lifeSrc, sandbox);
 const C = sandbox.window.SakurayoCamera;
 const L = sandbox.window.SakurayoLifecycle;
 
-assert.equal(L.version, "4.6.2");
+assert.equal(L.version, "4.6.3");
 C.configure(430, 932);
 C.snap(860, 932);
 

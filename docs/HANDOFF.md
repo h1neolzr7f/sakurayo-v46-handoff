@@ -1,4 +1,4 @@
-# 《樱夜·尸潮》V4.6.2 交接规格
+# 《樱夜·尸潮》V4.6.3 交接规格
 
 2026-08-19。给下一位 AI / 维护者。先读根目录 [README.md](../README.md)，再读本文和 [AGENTS.md](../AGENTS.md)。二游分期原文在 [PLAN_V46_ERYOU.md](PLAN_V46_ERYOU.md)。升版本见 [MAINTAIN.md](MAINTAIN.md)。
 
@@ -8,8 +8,8 @@
 
 | 项 | 值 |
 |---|---|
-| 源码版本 | **4.6.2** |
-| Android `versionName` / `versionCode` | 4.6.2 / **63** |
+| 源码版本 | **4.6.3** |
+| Android `versionName` / `versionCode` | 4.6.3 / **64** |
 | 公开仓 | https://github.com/h1neolzr7f/sakurayo-zombietide |
 | 已发布 APK | **v4.4.6** |
 | 存档键 | **`sakurayoV3`** |
@@ -62,7 +62,7 @@
 | 横屏主体验 | `html.landscape46` 默认就在；Android 锁 `landscape` | 已落地 |
 | 仿 Live2D | 随机眨眼 / 注视 / 点触，去掉卡顿滤镜 | 已落地 |
 | D | 寻访卡扩到 16 以内；站桩与大厅背景重出；商店/档案换皮 | **未做** |
-| E | 全量 `verify.ps1`、`release/`、APK、CHANGELOG | **本轮交付 4.6.2 / versionCode 63** |
+| E | 全量 `verify.ps1`、`release/`、APK、CHANGELOG | **本轮交付 4.6.3 / versionCode 64** |
 
 ### 下一步（按优先级）
 
@@ -292,7 +292,7 @@ powershell -File tools/verify.ps1
 - `tests/testimony_smoke.mjs`
 - `tests/gacha_visual.mjs`（会出 932×430 截图到 `tests/artifacts/gacha/`，该目录 gitignore）
 
-改证词或寻访视觉时请单独跑这两项。`browser_smoke.mjs` 断言版本 `"4.6.2"`，主视口 430×932；竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。
+改证词或寻访视觉时请单独跑这两项。`browser_smoke.mjs` 断言版本 `"4.6.3"`，主视口 430×932；竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。
 
 发版（用户明确要求再做）：
 
