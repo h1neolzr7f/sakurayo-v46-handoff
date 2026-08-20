@@ -344,10 +344,10 @@
     "html.landscape46 #menu.homeDock46 .heroLive46{pointer-events:none;left:0;width:64%;top:0;bottom:0}" +
     "html.landscape46 #menu.homeDock46 .menu{left:auto;right:0;top:0;bottom:0;width:min(34vw,360px);max-width:360px;margin-left:auto}" +
     "html.landscape46 .wishHero46{left:-4%;width:54%;height:114%;bottom:-8%}" +
-    "html.landscape46 .wishTitle46{right:max(20px,4%);top:max(56px,calc(env(safe-area-inset-top)+48px));max-width:42%}" +
+    "html.landscape46 .wishTitle46{right:max(20px,4%);top:max(56px, calc(env(safe-area-inset-top, 0px) + 48px));max-width:42%}" +
     "html.landscape46 .wishDock46{left:auto;right:0;width:min(52%,520px)}" +
-    "html.landscape46 .wishPity46{left:auto;right:max(18px,3%);top:max(118px,calc(env(safe-area-inset-top)+108px));bottom:auto;width:min(40vw,360px)}" +
-    "html.landscape46 .wishTabs46{left:auto;right:max(56px,calc(env(safe-area-inset-right)+48px));top:max(10px,env(safe-area-inset-top))}" +
+    "html.landscape46 .wishPity46{left:auto;right:max(18px,3%);top:max(152px, calc(env(safe-area-inset-top, 0px) + 142px));bottom:auto;width:min(40vw,360px)}" +
+    "html.landscape46 .wishTabs46{left:auto;right:max(56px, calc(env(safe-area-inset-right, 0px) + 48px));top:max(10px, env(safe-area-inset-top, 0px))}" +
     "html.landscape46 #rosterWall46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
     "html.landscape46 #archiveDrawer .archiveDock46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
     "html.landscape46 #stageList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}" +
