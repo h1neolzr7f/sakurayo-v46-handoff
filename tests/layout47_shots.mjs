@@ -51,6 +51,15 @@ assert.ok(shop.w <= 500, `商店不应铺满，实际 w=${shop.w}`);
 assert.ok(buy && buy.bottom <= 430 && buy.y >= 0, `购买按钮必须在屏内 y=${buy?.y} bottom=${buy?.bottom}`);
 
 await page.evaluate(() => document.getElementById("shopDrawer")?.classList.add("hidden"));
+await api(page, "openDrawer", "gacha");
+await page.waitForTimeout(280);
+const wishHero = await boxOf(page, ".wishHero46");
+const wishPity = await boxOf(page, ".wishPity46");
+const wishDock = await boxOf(page, ".wishDock46");
+assert.ok(wishHero && wishHero.w >= 450, `寻访立绘要撑住左半屏，w=${wishHero?.w}`);
+assert.ok(wishPity && wishPity.y < 200, `保底应在右上，y=${wishPity?.y}`);
+assert.ok(wishDock && wishDock.y > 280, `抽卡坞应贴底，y=${wishDock?.y}`);
+await page.evaluate(() => document.getElementById("gachaDrawer")?.classList.add("hidden"));
 await api(page, "start");
 await page.waitForTimeout(400);
 await page.evaluate(() => {

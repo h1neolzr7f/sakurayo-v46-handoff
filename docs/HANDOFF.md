@@ -169,7 +169,7 @@ pity, pitySR, pulls, tenPulls, owned, last, cheatUsed, shards, tickets, picks
 
 名册 8 格。未回收只用卡背，禁止灰图剧透。点开详情。重复只加计数，不进战斗。锁卡脚注「待寻访」，墙上仍可写「未回收」。
 
-揭示层挂在 `#gachaDrawer`，不要挂在 `#gachaBody46`（刷新会抹掉翻牌）。`TEST_MODE` / `?test=1` 立即翻开。
+揭示层挂在 `#gachaDrawer`，不要挂在 `#gachaBody46`（刷新会抹掉翻牌）。`TEST_MODE` / `?test=1` 立即翻开。横屏寻访按卡池海报排：立绘约 54% 靠左，标题/保底贴右上，抽卡坞贴右下，不要再做中间说明书玻璃盒。
 
 `injectStyle` 会替换 `#sakurayo-lobby-css`。
 
