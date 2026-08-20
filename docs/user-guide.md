@@ -1,12 +1,12 @@
 # 怎么玩
 
-当前版本 **v4.4.6**。玩家优先下 [Releases](https://github.com/h1neolzr7f/sakurayo-zombietide/releases/tag/v4.4.6)，不要从源码里找 APK。
+当前版本 **v4.6.3**。玩家优先下 [本仓 Releases](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.3)，不要从源码里找 APK。公开玩家仓仍停在 v4.4.6。
 
 ## 手机
 
-1. 下载 `Sakurayo-ZombieTide-v4.4.6-android.apk`。
-2. 用发布说明中的 SHA-256 核对。
-3. 允许未知来源后安装。覆盖安装旧正式包会保留存档。
+1. 下载 [Sakurayo-ZombieTide-v4.6.3-android-debug.apk](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.3/Sakurayo-ZombieTide-v4.6.3-android-debug.apk)。
+2. 用发布说明中的 SHA-256 核对：`c886e0820ca2932ff0573f783ad03fdfcca6ea0172d3536c8498a2bdb8a64dda`。
+3. 允许未知来源后安装。这是 debug 签名，可覆盖上一份 4.6.3 debug。不要卸载旧正式包，卸了会清档。
 4. 打开应用，选角色，左手摇杆移动，右侧冲刺和技能。
 
 最低 Android 6.0。正式包锁横屏，对标二游大厅和宽战场。不做竖版。

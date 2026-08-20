@@ -1,7 +1,7 @@
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.0";
+  var VERSION = "4.6.3";
   var TAU = Math.PI * 2;
   var EARLY_WINDOW = 20;
   var EARLY_INTERVAL = 0.45;
