@@ -8,6 +8,8 @@
 
 同号修补：关掉 `?beta` / 内测抽屉 / 立绘连点。`?test=1` 只在开发源码 `src/index.html` 生效。内测 🌸9999 改从大厅邮箱领取。
 
+下载：[APK](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.3/Sakurayo-ZombieTide-v4.6.3-android-debug.apk) · [Release](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.3)
+
 ## v4.6.2 — 2026-08-19
 
 证词结算与演习进度彻底隔离：不写章节/档案/结局/构筑卡，也不累加击杀、局数、最佳时长和战役成就。局内存档不刷大厅。隐藏关结算用完美结局名。横屏矮屏电台不再压摇杆。回大厅 / Android 返回会收起探索层。versionCode 63。存档仍 `sakurayoV3`。Debug APK SHA-256 `a5d44b64a8a325213027c3503abc8b6ba94eb936ee055d8b92ab367eb3c638be`。

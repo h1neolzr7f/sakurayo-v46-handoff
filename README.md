@@ -6,6 +6,14 @@
 公开玩家仓：`h1neolzr7f/sakurayo-zombietide`  
 当前源码版本：**4.6.3。** 存档键仍 `sakurayoV3`。
 
+**玩家下载（当前 4.6.3 Debug）：**
+
+- [Android APK](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.3/Sakurayo-ZombieTide-v4.6.3-android-debug.apk)（约 112 MB，debug 签名，不要卸旧正式包）
+- [单文件 HTML](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.3/Sakurayo-ZombieTide-v4.6.3.html)
+- [Release 说明](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.3)
+
+公开玩家仓 Releases 仍停在 v4.4.6（本环境无写权限）。最新包在本仓 Release。
+
 ## 1. 唯一总目标：效果优先
 
 《樱夜·尸潮》是横屏、手机端、二次元、离线肉鸽射击游戏。现有核心包括三角色（月城小夜 / 神代绫 / 黑羽凛音）、14 基础职业、28 转职、融合、科技/生物/灵能三相飞升、四章、Boss 多阶段、主神空间、触控摇杆/冲刺/主动技能、局外大厅、寻访、名册、商店、关卡、档案、证词模式和局内 DP 干员。
