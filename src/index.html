@@ -8849,7 +8849,54 @@ window.SAKURAYO_GAME_VERSION = "4.6.8";
       "#opsDock46{display:none!important}";
     document.head.appendChild(s);
   }
+  function installLayout47(){
+    if($("#sakurayo-layout-css"))return;
+    const s=document.createElement("style");
+    s.id="sakurayo-layout-css";
+    s.textContent=
+      "html.landscape46 .hudtop{padding:max(6px,env(safe-area-inset-top)) 8px 0;grid-template-columns:minmax(150px,210px) auto}"+
+      "html.landscape46 .hero{max-width:210px;grid-template-columns:30px 1fr;gap:5px;padding:2px 6px 2px 2px;background:linear-gradient(90deg,#0d0a21cc,#17103566);border-color:#ffffff14}"+
+      "html.landscape46 .hero img{width:28px;height:28px;border-width:1px}"+
+      "html.landscape46 .bar{height:9px}"+
+      "html.landscape46 .bar span{font-size:7px}"+
+      "html.landscape46 .rinfo{padding:4px 7px;font-size:9px;background:#0c0922b8}"+
+      "html.landscape46 .rinfo b{font-size:12px}"+
+      "html.landscape46 .wave{top:max(6px,env(safe-area-inset-top));left:26%;right:26%;width:auto;transform:none;height:11px;background:#080714aa}"+
+      "html.landscape46 .wave span{font-size:8px}"+
+      "html.landscape46 .mission{left:8px;top:max(46px,calc(env(safe-area-inset-top)+38px));max-width:26vw;max-height:28px;padding:4px 8px;font-size:8px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;background:#0a081fbb}"+
+      "html.landscape46 .mission.expanded38{max-height:76px;white-space:normal}"+
+      "html.landscape46 .combo{right:44px;top:max(42px,calc(env(safe-area-inset-top)+34px));font-size:11px}"+
+      "html.landscape46 .perf{right:44px;top:max(8px,calc(env(safe-area-inset-top)+4px));padding:2px 6px}"+
+      "html.landscape46 #pause{width:32px;height:32px;right:8px;top:max(8px,calc(env(safe-area-inset-top)+4px))}"+
+      "html.landscape46 #joy{opacity:.5}"+
+      "html.landscape46 #dash{width:46px;height:46px;font-size:16px}"+
+      "html.landscape46 #skill{width:62px;height:62px;font-size:9px}"+
+      "html.landscape46 .acts{gap:7px;bottom:max(14px,env(safe-area-inset-bottom))}"+
+      "html.landscape46 .banter{left:max(10px,env(safe-area-inset-left))!important;right:auto!important;transform:none!important;width:min(28vw,210px)!important;max-height:3.3em;overflow:hidden;padding:4px 8px 5px!important;background:#0b0818c8!important;box-shadow:none!important;border-color:#ff82bd44!important}"+
+      "html.landscape46 .banter b{font-size:8px;margin-bottom:1px}"+
+      "html.landscape46 .banter span{font-size:10px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}"+
+      "html.landscape46 #level.overlay{align-items:stretch;justify-content:flex-end;padding:8px 8px 8px 0;background:linear-gradient(90deg,#05040e00 36%,#05040ed4 78%)}"+
+      "html.landscape46 #level .modal{width:min(36vw,320px);max-width:320px;max-height:calc(100vh - 16px);height:auto;align-self:stretch;margin:0;overflow:auto;padding:8px 8px 10px;touch-action:pan-y}"+
+      "html.landscape46 #level .choices{display:flex;flex-direction:column;gap:6px}"+
+      "html.landscape46 #level .choice{grid-template-columns:40px 1fr;min-height:58px;padding:6px 8px}"+
+      "html.landscape46 #level .choice img{width:36px;height:36px}"+
+      "html.landscape46 #shopDrawer{left:auto;width:min(52vw,500px);background:linear-gradient(180deg,#1a1030f7,#060410fa);overflow-x:hidden;overflow-y:auto;touch-action:pan-y;box-shadow:-18px 0 40px #05020d99}"+
+      "html.landscape46 #shopDrawer .dbody{overflow:visible;max-height:none}"+
+      "html.landscape46 .shopGroup40,html.landscape46 #shopDrawer .shopGroup40[data-shop-group=skins]{display:flex!important;flex-direction:column;grid-auto-flow:unset;grid-template-rows:none;grid-auto-columns:unset;grid-template-columns:none;gap:6px}"+
+      "html.landscape46 #shopDrawer .skinCard{display:grid;grid-template-columns:56px 1fr auto;align-items:center;min-height:0;padding:6px 8px;gap:8px}"+
+      "html.landscape46 #shopDrawer .skinPreview{width:56px;height:56px;border-radius:10px}"+
+      "html.landscape46 #shopDrawer .skinCard>div{padding:0}"+
+      "html.landscape46 #shopDrawer .skinCard>button{margin:0;min-width:72px;min-height:36px}"+
+      "html.landscape46 #shopDrawer .shopItem40{grid-template-columns:44px 1fr auto;padding:8px}"+
+      "html.landscape46 #shopDrawer .shopTabs40{display:flex;flex-wrap:wrap;grid-template-columns:none;gap:4px}"+
+      "html.landscape46 #shopDrawer .shopTabs40 button{min-height:30px;padding:0 8px;font-size:10px;flex:1 1 auto}"+
+      "html.landscape46 .wishHero46{left:0!important;width:34%!important;height:100%!important;bottom:0!important}"+
+      "html.landscape46 #result.overlay{justify-content:flex-end;align-items:stretch;padding:10px 12px;background:linear-gradient(90deg,#05040e33 28%,#05040ee8 74%)}"+
+      "html.landscape46 #result .modal{width:min(40vw,380px);max-height:calc(100vh - 20px);overflow:auto}";
+    document.head.appendChild(s);
+  }
   installVisualPolish46();
+  installLayout47();
   installLobby46();
   installOps46();
   checkAch();

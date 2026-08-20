@@ -340,7 +340,7 @@
     "}" +
     "html.landscape46 #menu.homeDock46 .heroLive46{pointer-events:none;left:0;width:64%;top:0;bottom:0}" +
     "html.landscape46 #menu.homeDock46 .menu{left:auto;right:0;top:0;bottom:0;width:min(34vw,360px);max-width:360px;margin-left:auto}" +
-    "html.landscape46 .wishHero46{left:-2%;width:46%;height:124%;bottom:-8%}" +
+    "html.landscape46 .wishHero46{left:0;width:34%;height:100%;bottom:0}" +
     "html.landscape46 .wishTitle46{right:4%;max-width:46%}" +
     "html.landscape46 .wishDock46,html.landscape46 .wishPity46{left:46%}" +
     "html.landscape46 .wishPity46{bottom:max(240px,calc(env(safe-area-inset-bottom) + 220px));right:12px}" +
