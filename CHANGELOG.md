@@ -1,6 +1,10 @@
 # 更新记录
 
-当前版本 **v4.6.6**。完整条目按大版本写在 `docs/CHANGELOG_V*.md`。
+当前版本 **v4.6.7**。完整条目按大版本写在 `docs/CHANGELOG_V*.md`。
+
+## v4.6.7 — 2026-08-20
+
+大厅加回二游首页：经验条、登录台词、左栏、多货币、证词/主神卡、出击 START 辉光。测试包名仍 `com.sakurayo.zombietide.test`。versionCode 68。测试 APK SHA-256 `f4d8456266048d6e475a64c887050e764af89d3d6bc6c0c2d0174f2ddc91530e`。
 
 ## v4.6.6 — 2026-08-20
 

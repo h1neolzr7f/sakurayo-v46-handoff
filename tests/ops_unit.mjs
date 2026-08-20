@@ -22,7 +22,7 @@ sandbox.globalThis = sandbox;
 vm.runInNewContext(code, sandbox);
 const O = sandbox.window.SakurayoOps;
 
-assert.equal(O.version, "4.6.6");
+assert.equal(O.version, "4.6.7");
 assert.equal(O.MAX, 2);
 assert.equal(O.COST, 8);
 assert.equal(O.START, 10);
