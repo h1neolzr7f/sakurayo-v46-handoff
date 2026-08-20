@@ -16,6 +16,8 @@ const C = sandbox.window.SakurayoCamera;
 const L = sandbox.window.SakurayoLifecycle;
 
 assert.equal(L.version, "4.6.8");
+assert.ok(L.heroVisualScale(932) < 1, "横屏角色视觉缩小，不再 1.12 放大");
+assert.ok(L.heroVisualScale(430) <= 1, "竖屏也不再放大角色");
 C.configure(430, 932);
 C.snap(860, 932);
 
