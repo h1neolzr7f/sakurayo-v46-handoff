@@ -198,7 +198,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.7";
       "characters/rion/default/portrait.webp","characters/rion/default/battle.webp","characters/rion/default/dialogue.webp",
       "ui/nav/stage.webp","ui/nav/talent.webp","ui/nav/story.webp",
       "ui/nav/ascension.webp","ui/nav/achievement.webp","ui/nav/shop.webp",
-      "ui/nav/gacha.webp","ui/nav/roster.webp","ui/nav/archive.webp","gacha/banner_bg.webp","ui/lobby_wide.webp"
+      "ui/nav/gacha.webp","ui/nav/roster.webp","ui/nav/archive.webp","gacha/banner_bg.webp","ui/lobby_wide.webp",
+      "ui/loading_art.webp","ui/menu_emblem.webp","ui/app_icon.webp"
     ];
   function artUrl(path) { return `${ART_ROOT}/${path}`; }
   function artImage(path) {
@@ -241,6 +242,21 @@ window.SAKURAYO_GAME_VERSION = "4.6.7";
       top.insertBefore(emblem, top.firstChild);
     }
     const boot = document.querySelector("#bootArt35");
+    if (boot) {
+      boot.style.backgroundImage = `linear-gradient(180deg,#050512b8 0%,#05051266 42%,#090713f0 100%),url("${artUrl("ui/loading_art.webp")}")`;
+      boot.style.backgroundSize = "cover";
+      boot.style.backgroundPosition = "center";
+      const mark = boot.querySelector(".bootMark411");
+      if (mark && !mark.querySelector("img")) {
+        const emblem = new Image();
+        emblem.alt = "";
+        emblem.decoding = "async";
+        emblem.onerror = () => { emblem.remove(); mark.textContent = "樱"; };
+        emblem.src = artUrl("ui/menu_emblem.webp");
+        mark.textContent = "";
+        mark.appendChild(emblem);
+      }
+    }
     const dismissBoot = () => {
       if (!boot || !boot.isConnected || boot.classList.contains("gone")) return;
       boot.classList.add("gone");
@@ -7853,7 +7869,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.7";
           start: document.getElementById("start")?.textContent || "",
           roster: document.querySelector('.homeNav46 [data-open="roster"]')?.textContent || "",
           modes: !!document.getElementById("homeModes47"),
-          rail: !!document.querySelector(".homeRail47")
+          rail: !!document.querySelector(".homeRail47"),
+          railArts: [...document.querySelectorAll(".homeRail47 [data-art]")].map(n => n.getAttribute("data-art") || "")
         };
       },
       liveSnapshot46(){return window.SakurayoLive?window.SakurayoLive.snapshot():null;},
@@ -8440,14 +8457,19 @@ window.SAKURAYO_GAME_VERSION = "4.6.7";
       ".homeQuote47{margin:0;padding:6px 8px;border-radius:10px;background:#ff72b218;border:1px solid #ff9bcc44;color:#ffe6f3;font:700 11px/1.35 system-ui}" +
       ".homeRail47{position:absolute;left:max(8px,env(safe-area-inset-left));top:50%;transform:translateY(-42%);display:flex;flex-direction:column;gap:6px}" +
       ".homeRail47 button{position:relative;width:54px;min-height:52px;padding:6px 2px 5px;border-radius:14px;border:1px solid #ff9bcc77;background:linear-gradient(180deg,#2a183ef5,#120c22f8);color:#fff8fb;box-shadow:0 0 0 1px #ff72b422,0 8px 18px #05020d88}" +
-      ".homeRail47 button i{display:grid;place-items:center;width:22px;height:22px;margin:0 auto 3px;border-radius:8px;background:#ff72b430;color:#ffe6f3;font:800 11px/1 system-ui;font-style:normal}" +
+      ".homeRail47 button i{display:grid;place-items:center;width:28px;height:28px;margin:0 auto 3px;border-radius:8px;background:#ff72b430;color:#ffe6f3;font:800 11px/1 system-ui;font-style:normal;overflow:hidden}" +
+      ".homeRail47 button i img,.homeIcon47 img,.bootMark411 img{display:block;width:100%;height:100%;object-fit:cover;border-radius:inherit}" +
+      ".bootMark411{overflow:hidden;padding:0}" +
       ".homeRail47 button span{display:block;font:800 10px/1 system-ui;letter-spacing:.08em}" +
       ".homeRail47 .homeDot47{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:#ff3d9a;box-shadow:0 0 8px #ff3d9a}" +
       ".homeWallet47{position:relative;top:auto;right:auto;display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:4px;z-index:8;margin:0 0 6px}" +
       ".homeCoin47,.homeIcon47,.homeRail47 button,.homeModes47 button{appearance:none;-webkit-appearance:none;cursor:pointer}" +
       ".homeCoin47{display:flex;align-items:center;gap:3px;min-height:26px;padding:0 3px 0 6px;border-radius:99px;background:#0b0818ee;border:1px solid #ff9bcc55;color:#fff7fb;font:800 10px/1 system-ui}" +
       ".homeCoin47 em{display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:linear-gradient(180deg,#ffe08a,#ff74c8);color:#2a1608;font:900 12px/1 system-ui}" +
-      ".homeIcon47{position:relative;min-width:32px;height:32px;padding:0 8px;border-radius:10px;border:1px solid #ffe6a355;background:#0b0818ee;color:#ffe7a3;font:800 11px/1 system-ui}" +
+      ".homeIcon47{position:relative;min-width:32px;height:32px;padding:0;border-radius:10px;border:1px solid #ffe6a355;background:#0b0818ee;color:#ffe7a3;font:800 11px/1 system-ui;overflow:hidden}" +
+      ".homeIcon47.homeMore47{padding:0 8px;overflow:visible}" +
+      ".homeIcon47>b{display:block;width:100%;height:100%;margin:0;font:800 11px/32px system-ui;text-align:center}" +
+      ".homeIcon47>b img{display:block;width:100%;height:100%;object-fit:cover}" +
       ".homeIcon47 i{position:absolute;top:-4px;right:-4px;min-width:14px;height:14px;border-radius:99px;background:#ff3d9a;color:#fff;font:800 8px/14px system-ui}" +
       ".homeModes47{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 0 6px}" +
       ".homeModes47 button{min-height:54px;padding:7px 8px;border-radius:14px;border:1px solid #ff9bcc55;background:linear-gradient(180deg,#2a183ef2,#120c22f6);color:#fff7fb;text-align:left;box-shadow:0 8px 18px #05020d66}" +
@@ -8479,6 +8501,21 @@ window.SAKURAYO_GAME_VERSION = "4.6.7";
       "@media(max-height:400px){.homeStatus47{padding:6px 8px}.homeQuote47{display:none}.homeRail47 button{width:48px;min-height:44px}.homeModes47 button{min-height:44px;padding:5px 6px}#menu.homeDock46.homeChromeOn47 .stageMini{min-height:70px;padding:6px 8px}#menu.homeDock46.homeChromeOn47 .start{min-height:40px;font-size:14px}#menu.homeDock46.homeChromeOn47 .homeNav46 button{min-height:44px}}";
     document.head.appendChild(s);
   }
+  function wireHomeArt47(root){
+    if (!root) return;
+    root.querySelectorAll("[data-art]").forEach(node => {
+      if (node.querySelector("img")) return;
+      const path = node.getAttribute("data-art");
+      const fallback = node.getAttribute("data-fallback") || "";
+      const img = document.createElement("img");
+      img.alt = "";
+      img.decoding = "async";
+      img.onerror = () => { img.remove(); node.textContent = fallback; };
+      node.textContent = "";
+      node.appendChild(img);
+      img.src = artUrl(path);
+    });
+  }
   function installHomeChrome47(){
     const menu = $("#menu");
     const pane = $("#menu .menu");
@@ -8492,11 +8529,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.7";
       chrome.innerHTML =
         '<div class="homeStatus47"><div class="homeStatusHead47"><b id="homeHeroName47">月城小夜</b><em id="homeHeroLv47">Lv.1</em></div><div class="homeXp47"><i id="homeXpFill47"></i><span id="homeXpText47">0/950</span></div><p class="homeQuote47" id="homeQuote47">今天的登录补给还在，出门前先领。</p></div>' +
         '<aside class="homeRail47">' +
-        '<button type="button" data-home="quest"><i>任</i><span>任务</span><b class="homeDot47" id="homeQuestDot47" hidden></b></button>' +
-        '<button type="button" data-home="ach"><i>就</i><span>成就</span></button>' +
-        '<button type="button" data-home="mail"><i>邮</i><span>邮件</span><b class="homeDot47" id="homeMailDot47" hidden></b></button>' +
-        '<button type="button" data-home="notice"><i>告</i><span>公告</span></button>' +
-        '<button type="button" data-home="settings"><i>设</i><span>设置</span></button>' +
+        '<button type="button" data-home="quest"><i data-art="ui/nav/talent.webp" data-fallback="任"></i><span>任务</span><b class="homeDot47" id="homeQuestDot47" hidden></b></button>' +
+        '<button type="button" data-home="ach"><i data-art="ui/nav/achievement.webp" data-fallback="就"></i><span>成就</span></button>' +
+        '<button type="button" data-home="mail"><i data-art="ui/nav/archive.webp" data-fallback="邮"></i><span>邮件</span><b class="homeDot47" id="homeMailDot47" hidden></b></button>' +
+        '<button type="button" data-home="notice"><i data-art="ui/nav/story.webp" data-fallback="告"></i><span>公告</span></button>' +
+        '<button type="button" data-home="settings"><i data-art="ui/menu_emblem.webp" data-fallback="设"></i><span>设置</span></button>' +
         "</aside>";
       menu.insertBefore(chrome, pane);
       chrome.addEventListener("click", onHomeChromeClick47);
@@ -8510,13 +8547,15 @@ window.SAKURAYO_GAME_VERSION = "4.6.7";
         '<button type="button" class="homeCoin47" data-home="shop"><i>💠</i><b id="homeShard47">0</b><em>+</em></button>' +
         '<button type="button" class="homeCoin47" data-home="shop"><i>🌸</i><b id="homeBloom47">0</b><em>+</em></button>' +
         '<button type="button" class="homeCoin47" data-home="shop"><i>🎫</i><b id="homeTicket47">0</b><em>+</em></button>' +
-        '<button type="button" class="homeIcon47" data-home="mail" aria-label="邮箱">✉<i id="homeMailHeadDot47" hidden></i></button>' +
-        '<button type="button" class="homeIcon47" data-home="bag" aria-label="背包">🎒</button>' +
-        '<button type="button" class="homeIcon47" data-home="grid" aria-label="菜单">▦</button>' +
-        '<button type="button" class="homeIcon47" data-home="more">更多</button>';
+        '<button type="button" class="homeIcon47" data-home="mail" aria-label="邮箱"><b data-art="ui/nav/archive.webp" data-fallback="✉"></b><i id="homeMailHeadDot47" hidden></i></button>' +
+        '<button type="button" class="homeIcon47" data-home="bag" aria-label="背包"><b data-art="ui/nav/roster.webp" data-fallback="包"></b></button>' +
+        '<button type="button" class="homeIcon47" data-home="grid" aria-label="菜单"><b data-art="ui/nav/ascension.webp" data-fallback="▦"></b></button>' +
+        '<button type="button" class="homeIcon47 homeMore47" data-home="more">更多</button>';
       pane.insertBefore(wallet, pane.firstChild);
       wallet.addEventListener("click", onHomeChromeClick47);
     }
+    wireHomeArt47($("#homeChrome47"));
+    wireHomeArt47($("#homeWallet47"));
     const chars = menu.querySelector(".charSelectPanel");
     if (chars && chars.parentElement !== menu) menu.appendChild(chars);
     const util = menu.querySelector(".utilityButtons37");

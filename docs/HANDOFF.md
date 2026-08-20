@@ -281,8 +281,11 @@ ART_ROOT =
 - 出图：无字、无水印。角色绿幕 `#00ff00`。
 - 新图同时考虑进 `game/art`；源 PNG 在 `assets/image2/source/`（本仓未收录）。
 - 规格见 [IMAGE2_ASSET_SPEC.md](IMAGE2_ASSET_SPEC.md)。
-- 已入库但未发版的包括：职业/融合闪图、三角色 career/form/fusion 战斗帧、`gacha/`、`ui/lobby_wide.webp`、寻访/名册/档案导航图。
-- 还缺：I2V 绿幕全身站桩、无缝大厅宽背景、部分融合的 skill/dash。
+- 已入库且必须继续接线：职业/融合闪图、三角色 career/form/fusion 战斗帧、`gacha/` 98 张卡面、`ui/lobby_wide.webp`、底栏 `ui/nav/*.webp`、大厅左栏/启动页 `ui/nav` + `ui/loading_art.webp` + `ui/menu_emblem.webp`、桌面图标 `ui/app_icon.webp`（已进 mipmap）。
+- 不要把左栏/启动页再改回「任/就/邮」或单独一个「樱」字。底栏已经在用生成图标，不要改回字母。
+- 编年五条是正文，不进卡池，本来就没有封面图。
+- 寻访卡池仍是残件/时装/武器；14+28+24 职业卡在名册里，扩池到 16 另做，不要当漏接。
+- 还缺：I2V 绿幕全身站桩、无缝大厅宽背景、部分融合的 skill/dash、独立货币图标（四货币暂时用 emoji，不要拿寻访图标冒充樱花币）。
 
 ## 14. 怎么跑
 

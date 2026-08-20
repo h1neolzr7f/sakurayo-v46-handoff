@@ -4,7 +4,7 @@
 
 ## v4.6.7 — 2026-08-20
 
-大厅加回二游首页：经验条、登录台词、左栏、多货币、证词/主神卡、出击 START 辉光。测试包名仍 `com.sakurayo.zombietide.test`。versionCode 68。测试 APK SHA-256 `f4d8456266048d6e475a64c887050e764af89d3d6bc6c0c2d0174f2ddc91530e`。
+大厅加回二游首页：经验条、登录台词、左栏、多货币、证词/主神卡、出击 START 辉光。左栏和启动页改回用已生成的 `ui/nav` / `loading_art` / `menu_emblem`，不再用「任/就/邮」和单独一个「樱」字。测试包名仍 `com.sakurayo.zombietide.test`。versionCode 68。测试 APK SHA-256 `f4d8456266048d6e475a64c887050e764af89d3d6bc6c0c2d0174f2ddc91530e`。
 
 ## v4.6.6 — 2026-08-20
 
