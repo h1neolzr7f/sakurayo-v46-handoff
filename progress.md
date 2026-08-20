@@ -1,5 +1,12 @@
 Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先阅读根目录的 AGENTS.md、README_FIRST.md 和 CODEX_TASK.md，基于 src/index.html 继续开发，不要使用旧版本文件。
 
+## 2026-08-20 对照生成素材
+
+- `game/art` 现有 **1284** 张。底栏 `ui/nav`、寻访 98 张卡面、职业/融合闪图、桌面图标已经在用。
+- 4.6.7 大厅左栏和启动页曾用「任/就/邮」和「樱」字盖掉生成图。已改回：左栏用 talent/achievement/archive/story/emblem，启动页用 `loading_art` + `menu_emblem`，右上背包/邮箱用 roster/archive。
+- 四货币没有单独生成图标，继续 emoji，不拿寻访金币冒充樱花币。
+- 编年五条本来就没有封面。职业/转职/融合卡在名册，不在当前三池寻访。
+
 ## 2026-08-20 大厅加回二游首页
 
 - 用户对照两张大厅图，明确原来那张高密度首页才是二游，4.6.6 极简右栏不像。
