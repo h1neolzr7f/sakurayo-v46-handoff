@@ -1,6 +1,12 @@
 # 更新记录
 
-当前版本 **v4.6.7**。完整条目按大版本写在 `docs/CHANGELOG_V*.md`。
+当前版本 **v4.6.8**。完整条目按大版本写在 `docs/CHANGELOG_V*.md`。
+
+## v4.6.8 — 2026-08-20
+
+把 4.6.7 同号增补的兑换/捡钱拆成独立补丁号，方便覆盖安装。樱花币可兑碎镜片 / 主神点 / 寻访票（🌸20→💠1、🌸40→💎1、🌸160→🎫1）；点立绘捡 🌸1，飘 +1 和随机捡钱台词；成就「石阶拾樱 / 神社守财」。🎫 是真账户寻访票，先扣票再扣币。十连点后门仍关。大厅密度仍按 4.6.7 完成态，没有收成毛坯。测试包名仍 `com.sakurayo.zombietide.test`。versionCode 69。测试 APK SHA-256 `c85432867fca105a02594b58fa8f7768c86e6c820a808f59a16b982fc500ca27`。
+
+下载：[测试 APK](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.8/Sakurayo-ZombieTide-TEST-v4.6.8.apk) · [Release](https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/tag/v4.6.8)
 
 ## v4.6.7 — 2026-08-20
 
