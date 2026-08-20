@@ -7,6 +7,7 @@ Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先
 - 正式包 `com.sakurayo.zombietide` 继续留着，两包并排安装，各写各的存档。不要卸正式包。
 - 统计导出和平衡报告不再写死 3.8 / 4.1。
 - GitHub 下载：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.4/Sakurayo-ZombieTide-TEST-v4.6.4.apk
+- 测试 APK SHA-256 `c6aaf1972ce2d27860514a2dda3a4c0f93b1f10fbe5c80a0d237e4bd521f16e2`。单文件 SHA-256 `957a8dbecc1c8e77838430325b7510561d30ade6f0c295244b2d18211843ca88`。`aapt` 复核包名 `com.sakurayo.zombietide.test`、label「测试版樱夜」、versionName 4.6.4-test / versionCode 65。
 
 ## 2026-08-20 关掉内测作弊口，奖励改走邮箱
 
