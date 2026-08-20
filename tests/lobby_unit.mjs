@@ -404,9 +404,14 @@ assert.match(indexHtml, /html\.landscape46 \.banter\{/);
 assert.match(indexHtml, /bottom:max\(158px/);
 assert.match(indexHtml, /sakurayo-layout-css/);
 assert.match(indexHtml, /html\.landscape46 #level\.overlay\{align-items:stretch;justify-content:flex-end/);
-assert.match(indexHtml, /html\.landscape46 #shopDrawer\{left:auto;width:min\(52vw,500px\)/);
+assert.match(indexHtml, /html\.landscape46 #shopDrawer\{left:auto;width:min\(50vw,480px\)/);
 assert.match(indexHtml, /html\.landscape46 #shopDrawer \.skinCard\{display:grid;grid-template-columns:56px 1fr auto/);
 assert.match(indexHtml, /html\.landscape46 \.banter\{left:max\(10px,env\(safe-area-inset-left\)\)/);
+assert.match(indexHtml, /homeChromeOn47 \.charSelectPanel\{position:absolute!important;left:max\(72px/);
+assert.match(indexHtml, /bottom:12%!important/);
+assert.match(indexHtml, /\.homeStatus47\{position:absolute;left:max\(60px/);
+assert.match(indexHtml, /width:min\(14vw,120px\)/);
+assert.match(indexHtml, /homeChromeOn47 \.menu\{width:min\(38vw,380px\).*border:0;border-left:1px solid #ffffff22/);
 assert.match(
   fs.readFileSync(path.join(root, "android-app/app/src/main/java/com/sakurayo/zombietide/MainActivity.java"), "utf8"),
   /exploreClose41/,
