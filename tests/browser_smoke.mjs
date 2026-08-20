@@ -237,7 +237,7 @@ try {
   await page.locator("#shopDrawer .close").click();
 
   const lobby = await api(page, "lobby46");
-  assert.equal(lobby.version, "4.6.7");
+  assert.equal(lobby.version, "4.6.8");
   assert.ok(lobby.shown.includes("sayo_echo"));
   assert.ok(lobby.shown.includes("aya_petal"));
   assert.equal(lobby.cards.length, 8);
@@ -345,7 +345,7 @@ try {
   assert.match(await page.locator("#archiveDrawer").textContent(), /永久天赋/);
   await shot(page, "01k-archive.png");
   await page.locator("#archiveDrawer .close").click();
-  pass("V4.6.7 镜界寻访三页、仓库与邮箱领取");
+  pass("V4.6.8 镜界寻访三页、仓库与邮箱领取");
 
   const betaPanel = await api(page, "openBeta40");
   assert.equal(betaPanel.visible, false);
@@ -415,7 +415,7 @@ try {
   assert.equal(await page.locator("#statsButton37").isVisible(), true);
   await page.locator("#statsButton37").click();
   assert.equal(await page.locator("#analyticsDrawer37").isVisible(), true);
-  assert.match(await page.locator("#analyticsText37").inputValue(), /"version": "4.6.7"/);
+  assert.match(await page.locator("#analyticsText37").inputValue(), /"version": "4.6.8"/);
   await page.locator("#analyticsDrawer37 .close").click();
   await page.locator("#settingsButton37").click();
   assert.equal(await page.locator("#settingsDrawer37").isVisible(), true);

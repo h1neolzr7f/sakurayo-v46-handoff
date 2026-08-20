@@ -1,5 +1,13 @@
 Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先阅读根目录的 AGENTS.md、README_FIRST.md 和 CODEX_TASK.md，基于 src/index.html 继续开发，不要使用旧版本文件。
 
+## 2026-08-20 发 4.6.8 测试包
+
+- 把 4.6.7 同号增补的兑换/捡钱拆成独立补丁号，方便覆盖安装。大厅密度仍按 4.6.7 完成态。
+- 源码 **4.6.8** / versionCode **69**。测试包名仍 `com.sakurayo.zombietide.test` / 桌面名「测试版樱夜」。
+- 樱花币兑换：🌸20→💠1、🌸40→💎1、🌸160→🎫1。点立绘捡 🌸1。十连点后门仍关。
+- 单文件 SHA-256 `2a12bc8cebd86f2ee100a831853e4e2254243b7cb0e0d3baae96c4869fcf5def`。测试 APK SHA-256 `c85432867fca105a02594b58fa8f7768c86e6c820a808f59a16b982fc500ca27`。
+- 下载：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.8/Sakurayo-ZombieTide-TEST-v4.6.8.apk
+
 ## 2026-08-20 兑换、点立绘捡钱、素材展陈
 
 - 樱花币兑换：🌸20→💠1、🌸40→💎1、🌸160→🎫1。🎫 改为真账户寻访票，寻访先扣票再扣币。字段写在 `shop40.ops.tickets` / `picks`，没有新 top-level key。
