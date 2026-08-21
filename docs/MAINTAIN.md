@@ -23,7 +23,7 @@ python tools/build_game.py --source src/index.html --output ../offline/index.htm
 powershell -File android-app/sync-game.ps1
 ```
 
-Android 壳版本在 `android-app/app/build.gradle`（`versionName` / `versionCode`）和 `MainActivity` 的 UA `SakurayoAndroid/x.y.z`。三者与 `window.SAKURAYO_GAME_VERSION` 对齐。
+Android 壳版本在 `android-app/app/build.gradle`（`versionName` / `versionCode`）。`MainActivity` UA 读 `BuildConfig.VERSION_NAME`。Debug 测试包会加 `applicationIdSuffix .test` 和 `versionNameSuffix -test`，桌面名「测试版樱夜」，不覆盖正式包。三者与 `window.SAKURAYO_GAME_VERSION` 对齐（测试 APK 的 versionName 会多 `-test`）。
 
 ## 升一版时一起改
 

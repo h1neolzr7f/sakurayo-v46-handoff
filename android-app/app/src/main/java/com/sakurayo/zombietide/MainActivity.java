@@ -27,6 +27,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.util.Locale;
 
 public final class MainActivity extends Activity {
@@ -40,6 +41,7 @@ public final class MainActivity extends Activity {
             "const click=id=>{const e=document.querySelector(id);if(e){e.click();return true;}return false;};" +
             "const drawer=[...document.querySelectorAll('.drawer')].find(visible);" +
             "if(drawer){const close=drawer.querySelector('.close');if(close)close.click();return true;}" +
+            "if(visible(document.querySelector('#exploration41')))return click('#exploreClose41');" +
             "if(visible(document.querySelector('#result')))return click('#back');" +
             "if(visible(document.querySelector('#paused')))return click('#resume');" +
             "if(visible(document.querySelector('#level'))||visible(document.querySelector('#event'))||" +
@@ -56,6 +58,7 @@ public final class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         configureWindow();
+        ensureWebViewCacheDirs();
         webView = createWebView();
 
         FrameLayout root = new FrameLayout(this);
@@ -74,6 +77,13 @@ public final class MainActivity extends Activity {
             getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
                     android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT,
                     this::handleBackRequest);
+        }
+    }
+
+    private void ensureWebViewCacheDirs() {
+        File webViewCache = new File(getCacheDir(), "WebView");
+        if (!new File(webViewCache, "Crashpad").mkdirs() && !new File(webViewCache, "Crashpad").isDirectory()) {
+            Log.w(TAG, "WebView Crashpad cache dir unavailable");
         }
     }
 
@@ -118,7 +128,7 @@ public final class MainActivity extends Activity {
         settings.setTextZoom(100);
         settings.setDefaultTextEncodingName("utf-8");
         settings.setMediaPlaybackRequiresUserGesture(true);
-        settings.setUserAgentString(settings.getUserAgentString() + " SakurayoAndroid/4.6.0");
+        settings.setUserAgentString(settings.getUserAgentString() + " SakurayoAndroid/" + BuildConfig.VERSION_NAME);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             settings.setSafeBrowsingEnabled(true);
         }

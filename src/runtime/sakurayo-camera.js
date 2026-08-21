@@ -1,7 +1,7 @@
 (function (global) {
   "use strict";
 
-  var VERSION = "4.6.0";
+  var VERSION = "4.6.8";
   var COLS = 4;
   var ROWS = 2;
   var DAMP = 10;

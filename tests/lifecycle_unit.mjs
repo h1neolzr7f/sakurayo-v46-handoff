@@ -15,7 +15,9 @@ vm.runInNewContext(lifeSrc, sandbox);
 const C = sandbox.window.SakurayoCamera;
 const L = sandbox.window.SakurayoLifecycle;
 
-assert.equal(L.version, "4.6.0");
+assert.equal(L.version, "4.6.8");
+assert.ok(L.heroVisualScale(932) < 1, "横屏角色视觉缩小，不再 1.12 放大");
+assert.ok(L.heroVisualScale(430) <= 1, "竖屏也不再放大角色");
 C.configure(430, 932);
 C.snap(860, 932);
 
@@ -35,6 +37,8 @@ const ctx = {
   createLinearGradient() { return { addColorStop() {} }; },
   fillRect() {},
   strokeRect() {},
+  rect() {},
+  clip() {},
   drawImage(img, x, y, w, h) { draws.push({ w, h }); },
   fillStyle: "",
   strokeStyle: "",
@@ -57,15 +61,15 @@ const world = {
 };
 
 L.drawGround(ctx, world);
-assert.equal(draws.length, 1, "4×2 镜头只应铺一张战场图");
-assert.ok(draws[0].w >= 1720);
-assert.ok(draws[0].h >= 1864);
+assert.ok(draws.length >= 1, "可见镜头至少铺一张战场图");
+assert.ok(draws.every((d) => d.h <= 932 + 1), "战场图按屏高铺，不再拉满整张大地图");
 
 C.snap(28, 73);
 world.camX = C.current().x;
 world.camY = C.current().y;
 draws.length = 0;
 L.drawGround(ctx, world);
-assert.equal(draws.length, 1, "夹边后仍只铺一张战场图");
+assert.ok(draws.length >= 1, "夹边后仍铺战场图");
+assert.ok(draws.every((d) => d.h <= 932 + 1), "夹边后仍按屏铺");
 
 console.log("lifecycle_unit ok");

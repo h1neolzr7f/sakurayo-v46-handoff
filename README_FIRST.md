@@ -1,6 +1,8 @@
 # 接手检查清单
 
-当前：**V4.6.0 源码，未发版。** 公开玩家仓是 https://github.com/h1neolzr7f/sakurayo-zombietide ，已发布 APK 仍是 v4.4.6。
+当前：**V4.6.8 测试版。** 公开玩家仓是 https://github.com/h1neolzr7f/sakurayo-zombietide 。
+最新测试 APK：https://github.com/h1neolzr7f/sakurayo-v46-handoff/releases/download/v4.6.8/Sakurayo-ZombieTide-TEST-v4.6.8.apk
+桌面名「测试版樱夜」，包名 `com.sakurayo.zombietide.test`，不会覆盖正式包。
 
 按这个顺序读：
 
@@ -25,7 +27,7 @@ node tests/ops_unit.mjs
 
 ## 这一版已经有了
 
-横屏大厅、五房、镜界寻访（只收藏）、证词模式、局内 2 干员 DP、仿 Live2D。版本号仍是 4.6.0。
+横屏大厅、五房、镜界寻访（只收藏）、证词模式、仿 Live2D。局内塔防坞已退役。版本号是 4.6.8。点立绘捡樱花币，可用樱花币兑换碎镜片/主神点/寻访票。
 
 ## 你接下来做
 
@@ -35,12 +37,13 @@ I2V 绿幕站桩、融合 skill/dash、寻访卡扩到 16、全量 verify、再�
 
 - 再包 `update`
 - 改存档键或清档
-- 抽卡/商店卖永久伤害
+- 商店衣装直接卖永久伤害（寻访/构筑卡按星级加伤是正规则）
 - 改名 `startGame` / `update` / `draw` / `spawnEnemy` / `showDialogue` 却不改调用点
 - 提交 `keystore.properties`、`local.properties`、APK、`assets/image2/source/`
 - 卸掉模拟器上签名对不上的旧正式包（会清档）
 - 删 `progress.md` 顶部 Original prompt
 - 把竖屏重新做成主体验
+- 把大厅再收成「立绘 + 一条右栏工具条」。4.6.7 密度清单和已签字画面见 `docs/HANDOFF.md` §4–§5。`PLAN_V46_ERYOU.md` 旧 34% 胶囊规格已作废
 
 ## 目录
 
