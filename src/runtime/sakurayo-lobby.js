@@ -219,14 +219,14 @@
     ".wishStage46:before{content:\"\";position:absolute;inset:0;top:0;right:0;bottom:0;left:0;background:radial-gradient(circle at 16% 20%,#ff72b433 0 4%,transparent 42%),radial-gradient(circle at 80% 16%,#ffe08a26 0 3%,transparent 38%),radial-gradient(circle at 60% 72%,#7a3dff28 0 5%,transparent 44%);pointer-events:none;animation:wishDrift46 8s ease-in-out infinite}" +
     ".wishBanner46{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}" +
     ".wishStage46:after{content:\"\";position:absolute;inset:0;top:0;right:0;bottom:0;left:0;z-index:1;background:linear-gradient(90deg,#0000 40%,#06041055 70%,#06041099 100%);pointer-events:none}" +
-    ".wishHero46{position:absolute;z-index:2;left:0;top:0;bottom:0;width:52%;height:100%;object-fit:cover;object-position:center bottom;background:transparent!important;pointer-events:none;-webkit-mask-image:linear-gradient(to right,#000 0%,#000 72%,transparent 100%);mask-image:linear-gradient(to right,#000 0%,#000 72%,transparent 100%)}" +
+    ".wishHero46{position:absolute;z-index:2;left:0;top:0;bottom:0;width:48%;height:100%;object-fit:cover;object-position:center 86%;background:transparent!important;pointer-events:none;-webkit-mask-image:linear-gradient(to right,#000 0%,#000 78%,transparent 100%);mask-image:linear-gradient(to right,#000 0%,#000 78%,transparent 100%)}" +
     ".wishPetals46{position:absolute;inset:0;top:0;right:0;bottom:0;left:0;z-index:3;pointer-events:none;overflow:hidden}" +
     ".wishPetals46 i{position:absolute;top:-12%;width:7px;height:9px;border-radius:0 70% 0 70%;background:#ff9bcc99;box-shadow:0 0 8px #ff9bcc66;animation:petalFall46 11s linear infinite}" +
-    ".wishTitle46{position:absolute;z-index:4;top:max(56px,calc(env(safe-area-inset-top) + 48px));right:max(16px,env(safe-area-inset-right));left:auto;text-align:right;max-width:48%;pointer-events:none}" +
-    ".wishSeal47{display:inline-block;margin:0 0 6px;padding:4px 5px 3px;border:1px solid #c44536;color:#c44536;font:600 11px/1 \"Songti SC\",\"STSong\",\"Noto Serif CJK SC\",\"Noto Serif\",serif;letter-spacing:.32em;font-style:normal}" +
-    ".wishTitle46 h3{margin:0;font-family:\"Songti SC\",\"STSong\",\"Noto Serif CJK SC\",\"Source Han Serif SC\",\"Noto Serif\",\"Times New Roman\",serif;font-size:clamp(22px,4vw,32px);font-weight:600;letter-spacing:.18em;color:#f4ead8;text-shadow:0 2px 18px #05020dcc}" +
-    ".wishTitle46 p{margin:8px 0 0;color:#c9c2d4;font-size:11px;letter-spacing:.22em;opacity:.88;text-shadow:0 2px 10px #05020d}" +
-    ".wishPity46{position:absolute;z-index:4;left:auto;right:max(16px,env(safe-area-inset-right));bottom:118px;width:min(46%,380px);padding:0;border-radius:0;background:none;border:0}" +
+    ".wishTitle46{position:absolute;z-index:4;top:max(44px, calc(env(safe-area-inset-top, 0px) + 36px));right:max(16px,env(safe-area-inset-right));left:auto;text-align:right;max-width:42%;pointer-events:none}" +
+    ".wishSeal47{display:inline-block;margin:0 8px 0 0;padding:2px 4px 1px;border:1px solid #c44536;color:#c44536;font:600 10px/1 \"Songti SC\",\"STSong\",\"Noto Serif CJK SC\",\"Noto Serif\",serif;letter-spacing:.2em;font-style:normal;vertical-align:middle}" +
+    ".wishTitle46 h3{margin:0;display:inline;font-family:\"Songti SC\",\"STSong\",\"Noto Serif CJK SC\",\"Source Han Serif SC\",\"Noto Serif\",\"Times New Roman\",serif;font-size:clamp(20px,3.2vw,26px);font-weight:600;letter-spacing:.12em;color:#f4ead8;text-shadow:0 2px 14px #05020dcc}" +
+    ".wishTitle46 p{margin:6px 0 0;color:#c9c2d4;font-size:10px;letter-spacing:.16em;opacity:.8;text-shadow:0 2px 10px #05020d}" +
+    ".wishPity46{position:absolute;z-index:4;left:auto;right:max(16px,env(safe-area-inset-right));bottom:112px;width:min(40%,340px);padding:0;border-radius:0;background:none;border:0}" +
     ".pityRow46{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:8px}" +
     ".pityRow46:first-child{margin-top:0}" +
     ".pityRow46 span{min-width:0;color:#c9c2d4;font-size:10px;letter-spacing:.12em;text-shadow:0 1px 8px #05020d;white-space:nowrap}" +
@@ -234,7 +234,7 @@
     ".pityRail46 i{display:block;height:100%;border-radius:99px;background:#d4b56a;box-shadow:none}" +
     ".pityRow46.sr .pityRail46 i{background:#c9c2d4}" +
     ".wishMeta46{margin:8px 0 0;color:#c9c2d4;font:600 10px/1 system-ui;letter-spacing:.14em;text-align:right;text-shadow:0 1px 8px #05020d;opacity:.72}" +
-    ".wishDock46{position:absolute;z-index:5;left:auto;right:0;bottom:0;width:min(58%,560px);padding:10px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#06041000 0%,#06041088 46%,#060410f2 100%)}" +
+    ".wishDock46{position:absolute;z-index:5;left:auto;right:0;bottom:0;width:min(44%,400px);padding:8px 18px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(180deg,#06041000 0%,#06041077 40%,#060410ee 100%)}" +
     ".wishTabs46{position:absolute;z-index:6;top:max(12px,calc(env(safe-area-inset-top) + 4px));left:auto;right:max(56px,calc(env(safe-area-inset-right) + 48px));display:flex;gap:2px}" +
     ".wishTabs46 button{min-height:32px;padding:0 10px;border-radius:0;border:0;border-bottom:1px solid transparent;background:transparent;color:#c9c2d4aa;font:600 12px/1 system-ui;letter-spacing:.2em}" +
     ".wishTabs46 button.on{background:none;color:#f4ead8;border-bottom-color:#c44536}" +
@@ -246,9 +246,9 @@
     ".rosterLater46{min-height:180px;display:grid;place-items:center;border:1px dashed #ffe6a344;border-radius:16px;color:#bfb1d3;letter-spacing:.2em;font:800 13px/1.4 system-ui}" +
     ".revealCard46.r-LEGEND .revealFace46{border-color:#ffe6a3;box-shadow:0 0 26px #ffd36baa}" +
     ".revealLegend46{position:absolute;z-index:4;left:7px;bottom:36px;padding:3px 7px;border-radius:6px;background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;font:800 9px/1 system-ui;letter-spacing:.14em}" +
-    ".gachaActions46{display:flex;justify-content:flex-end;gap:10px}" +
-    ".gachaActions46 button{min-height:44px;min-width:132px;padding:8px 18px;border-radius:0;border:1px solid #f4ead855;color:#f4ead8;font:600 14px/1.1 \"Songti SC\",\"STSong\",\"Noto Serif\",serif;letter-spacing:.22em;box-shadow:none;-webkit-clip-path:polygon(7% 0,100% 0,93% 100%,0 100%);clip-path:polygon(7% 0,100% 0,93% 100%,0 100%)}" +
-    ".gachaActions46 button small{display:block;margin-top:3px;font:600 10px/1 system-ui;letter-spacing:.08em;opacity:.78}" +
+    ".gachaActions46{display:flex;justify-content:flex-end;gap:8px}" +
+    ".gachaActions46 button{min-height:40px;min-width:118px;padding:6px 14px;border-radius:2px;border:1px solid #f4ead844;color:#f4ead8;font:600 13px/1.1 system-ui;letter-spacing:.12em;box-shadow:none}" +
+    ".gachaActions46 button small{display:block;margin-top:2px;font:600 10px/1 system-ui;letter-spacing:.06em;opacity:.72}" +
     ".gachaActions46 button.poor{opacity:.42}" +
     ".wishSpark46{display:flex;flex-wrap:nowrap;justify-content:flex-end;gap:8px;margin-top:8px;max-height:22px;overflow:auto}" +
     ".wishSpark46 button{min-height:22px;padding:0 4px;border-radius:0;border:0;background:none;color:#c9c2d4;font:600 10px/1 system-ui;opacity:.7}" +
@@ -334,7 +334,7 @@
     "#menu.homeDock46 .homeNav46 button{min-height:58px}" +
     "#menu.homeDock46 .stageMini{width:100%}" +
     "#menu.homeDock46 .charSelectPanel{position:relative;left:auto;right:auto;bottom:auto;width:100%}" +
-    ".wishHero46{left:0;top:0;width:52%;height:100%;bottom:0;object-fit:cover;object-position:center bottom}" +
+    ".wishHero46{left:0;top:0;width:48%;height:100%;bottom:0;object-fit:cover;object-position:center 86%}" +
     ".wishTitle46{right:4%;max-width:42%}" +
     ".wishDock46{left:auto;width:min(52%,520px)}" +
     ".wishPity46{left:auto;right:4%}" +
@@ -344,10 +344,10 @@
     "}" +
     "html.landscape46 #menu.homeDock46 .heroLive46{pointer-events:none;left:0;width:64%;top:0;bottom:0}" +
     "html.landscape46 #menu.homeDock46 .menu{left:auto;right:0;top:0;bottom:0;width:min(34vw,360px);max-width:360px;margin-left:auto}" +
-    "html.landscape46 .wishHero46{left:0;top:0;width:52%;height:100%;bottom:0;object-fit:cover;object-position:center bottom}" +
-    "html.landscape46 .wishTitle46{right:max(20px,4%);top:max(56px, calc(env(safe-area-inset-top, 0px) + 48px));max-width:42%}" +
-    "html.landscape46 .wishDock46{left:auto;right:0;width:min(52%,520px)}" +
-    "html.landscape46 .wishPity46{left:auto;right:max(18px,3%);top:max(176px, calc(env(safe-area-inset-top, 0px) + 166px));bottom:auto;width:min(40vw,360px)}" +
+    "html.landscape46 .wishHero46{left:0;top:0;width:48%;height:100%;bottom:0;object-fit:cover;object-position:center 86%}" +
+    "html.landscape46 .wishTitle46{right:max(18px,3%);top:max(44px, calc(env(safe-area-inset-top, 0px) + 36px));max-width:38%}" +
+    "html.landscape46 .wishDock46{left:auto;right:0;width:min(42%,400px)}" +
+    "html.landscape46 .wishPity46{left:auto;right:max(18px,3%);top:auto;bottom:max(112px, calc(env(safe-area-inset-bottom, 0px) + 100px));width:min(38vw,340px)}" +
     "html.landscape46 .wishTabs46{left:auto;right:max(56px, calc(env(safe-area-inset-right, 0px) + 48px));top:max(10px, env(safe-area-inset-top, 0px))}" +
     "html.landscape46 #rosterWall46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
     "html.landscape46 #archiveDrawer .archiveDock46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
