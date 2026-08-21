@@ -15,7 +15,7 @@ const L = sandbox.window.SakurayoLobby;
 assert.equal(code.includes("#rotateHint46"), false, "lobby 不得再写横持提示");
 assert.equal(code.includes("portraitFallback46"), false, "lobby 不得再写竖版回退");
 assert.match(code, /html\.landscape46 \.wishPity46\{left:auto;right:max\(18px,3%\);top:max\(176px, calc\(env\(safe-area-inset-top, 0px\) \+ 166px\)\)/);
-assert.match(code, /html\.landscape46 \.wishHero46\{left:-4%;width:54%/);
+assert.match(code, /html\.landscape46 \.wishHero46\{left:0;top:0;width:52%;height:100%;bottom:0;object-fit:cover/);
 const indexSrc = fs.readFileSync(path.join(root, "src/index.html"), "utf8");
 assert.equal(indexSrc.includes('hint.textContent = "请横持设备"'), false, "index 不得再创建横持提示");
 assert.equal(indexSrc.includes('toggle("portraitFallback46"'), false, "index 不得再打开竖版回退");

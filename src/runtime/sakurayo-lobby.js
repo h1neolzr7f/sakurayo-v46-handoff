@@ -219,12 +219,12 @@
     ".wishStage46:before{content:\"\";position:absolute;inset:0;top:0;right:0;bottom:0;left:0;background:radial-gradient(circle at 16% 20%,#ff72b433 0 4%,transparent 42%),radial-gradient(circle at 80% 16%,#ffe08a26 0 3%,transparent 38%),radial-gradient(circle at 60% 72%,#7a3dff28 0 5%,transparent 44%);pointer-events:none;animation:wishDrift46 8s ease-in-out infinite}" +
     ".wishBanner46{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}" +
     ".wishStage46:after{content:\"\";position:absolute;inset:0;top:0;right:0;bottom:0;left:0;z-index:1;background:linear-gradient(90deg,#0000 40%,#06041055 70%,#06041099 100%);pointer-events:none}" +
-    ".wishHero46{position:absolute;z-index:2;left:-4%;bottom:-8%;width:56%;height:118%;object-fit:contain;object-position:left bottom;background:transparent!important;pointer-events:none;-webkit-mask-image:linear-gradient(to top,transparent 0%,#000 10%,#000 100%);mask-image:linear-gradient(to top,transparent 0%,#000 10%,#000 100%)}" +
+    ".wishHero46{position:absolute;z-index:2;left:0;top:0;bottom:0;width:52%;height:100%;object-fit:cover;object-position:center bottom;background:transparent!important;pointer-events:none;-webkit-mask-image:linear-gradient(to right,#000 0%,#000 72%,transparent 100%);mask-image:linear-gradient(to right,#000 0%,#000 72%,transparent 100%)}" +
     ".wishPetals46{position:absolute;inset:0;top:0;right:0;bottom:0;left:0;z-index:3;pointer-events:none;overflow:hidden}" +
     ".wishPetals46 i{position:absolute;top:-12%;width:7px;height:9px;border-radius:0 70% 0 70%;background:#ff9bcc99;box-shadow:0 0 8px #ff9bcc66;animation:petalFall46 11s linear infinite}" +
     ".wishTitle46{position:absolute;z-index:4;top:max(56px,calc(env(safe-area-inset-top) + 48px));right:max(16px,env(safe-area-inset-right));left:auto;text-align:right;max-width:48%;pointer-events:none}" +
     ".wishSeal47{display:inline-block;margin:0 0 6px;padding:4px 5px 3px;border:1px solid #c44536;color:#c44536;font:600 11px/1 \"Songti SC\",\"STSong\",\"Noto Serif CJK SC\",\"Noto Serif\",serif;letter-spacing:.32em;font-style:normal}" +
-    ".wishTitle46 h3{margin:0;font-family:\"Songti SC\",\"STSong\",\"Noto Serif CJK SC\",\"Source Han Serif SC\",\"Noto Serif\",\"Times New Roman\",serif;font-size:clamp(26px,5.4vw,40px);font-weight:600;letter-spacing:.42em;color:#f4ead8;text-shadow:0 2px 18px #05020dcc}" +
+    ".wishTitle46 h3{margin:0;font-family:\"Songti SC\",\"STSong\",\"Noto Serif CJK SC\",\"Source Han Serif SC\",\"Noto Serif\",\"Times New Roman\",serif;font-size:clamp(22px,4vw,32px);font-weight:600;letter-spacing:.18em;color:#f4ead8;text-shadow:0 2px 18px #05020dcc}" +
     ".wishTitle46 p{margin:8px 0 0;color:#c9c2d4;font-size:11px;letter-spacing:.22em;opacity:.88;text-shadow:0 2px 10px #05020d}" +
     ".wishPity46{position:absolute;z-index:4;left:auto;right:max(16px,env(safe-area-inset-right));bottom:118px;width:min(46%,380px);padding:0;border-radius:0;background:none;border:0}" +
     ".pityRow46{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:8px}" +
@@ -334,7 +334,7 @@
     "#menu.homeDock46 .homeNav46 button{min-height:58px}" +
     "#menu.homeDock46 .stageMini{width:100%}" +
     "#menu.homeDock46 .charSelectPanel{position:relative;left:auto;right:auto;bottom:auto;width:100%}" +
-    ".wishHero46{left:-4%;width:54%;height:118%;bottom:-8%}" +
+    ".wishHero46{left:0;top:0;width:52%;height:100%;bottom:0;object-fit:cover;object-position:center bottom}" +
     ".wishTitle46{right:4%;max-width:42%}" +
     ".wishDock46{left:auto;width:min(52%,520px)}" +
     ".wishPity46{left:auto;right:4%}" +
@@ -344,7 +344,7 @@
     "}" +
     "html.landscape46 #menu.homeDock46 .heroLive46{pointer-events:none;left:0;width:64%;top:0;bottom:0}" +
     "html.landscape46 #menu.homeDock46 .menu{left:auto;right:0;top:0;bottom:0;width:min(34vw,360px);max-width:360px;margin-left:auto}" +
-    "html.landscape46 .wishHero46{left:-4%;width:54%;height:114%;bottom:-8%}" +
+    "html.landscape46 .wishHero46{left:0;top:0;width:52%;height:100%;bottom:0;object-fit:cover;object-position:center bottom}" +
     "html.landscape46 .wishTitle46{right:max(20px,4%);top:max(56px, calc(env(safe-area-inset-top, 0px) + 48px));max-width:42%}" +
     "html.landscape46 .wishDock46{left:auto;right:0;width:min(52%,520px)}" +
     "html.landscape46 .wishPity46{left:auto;right:max(18px,3%);top:max(176px, calc(env(safe-area-inset-top, 0px) + 166px));bottom:auto;width:min(40vw,360px)}" +

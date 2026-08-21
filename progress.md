@@ -1,5 +1,10 @@
 Original prompt: 解压项目，在桌面上弄一个专门的文件夹，首先阅读根目录的 AGENTS.md、README_FIRST.md 和 CODEX_TASK.md，基于 src/index.html 继续开发，不要使用旧版本文件。
 
+## 2026-08-21 寻访立绘按宽度撑开
+
+- `hero_sayo.webp` 上半截是空的。`contain` 会把人缩在左下。改 `cover` + 底对齐，左半屏铺满。
+- 标题字距从 0.42em 收到 0.18em。
+
 ## 2026-08-20 设计师 skill 收寻访字标
 
 - 补 Anthropic `frontend-design`：夜神社材料（朱印、箔金、月纸），不走通用紫盒。
