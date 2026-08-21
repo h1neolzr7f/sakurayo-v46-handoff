@@ -590,7 +590,7 @@
   }
 
   function heroVisualScale(width) {
-    return (width || 0) >= 560 ? 1.12 : 1;
+    return 1;
   }
 
   function careerProgress(careers, fusionId, formId, fusionCatalog, schools, careerDefs) {

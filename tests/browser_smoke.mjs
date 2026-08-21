@@ -440,10 +440,10 @@ try {
 
   const baseCombat = {};
   const geometry = await api(page, "playerGeometry");
-  assert.equal(geometry.visualSize, 96);
-  assert.equal(geometry.footOffset, 18);
+  assert.equal(geometry.visualSize, 80);
+  assert.equal(geometry.footOffset, 15);
   assert.equal(geometry.radius, 16);
-  assert.ok(geometry.radius * 2 / geometry.visualSize <= 0.36);
+  assert.ok(geometry.radius * 2 / geometry.visualSize <= 0.42);
   assert.equal(await api(page, "circleCollision", 20, 16, 5), true);
   assert.equal(await api(page, "circleCollision", 22, 16, 5), false);
   assert.equal(await api(page, "meleeCollision", 145, 128, 18), true);

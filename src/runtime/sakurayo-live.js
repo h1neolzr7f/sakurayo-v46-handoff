@@ -34,7 +34,10 @@
     "#menu.homeDock46 .heroLiveBreath46 img,.wishHero46{filter:none!important}" +
     "#menu.homeDock46 .heroLiveBreath46:before{filter:none!important;background:radial-gradient(ellipse at 50% 78%,#1a103066 0%,#12081c00 70%)}" +
     ".drawer.hidden .wishPetals46 i,.drawer.hidden .wishStage46:before{animation:none!important}" +
+    "#menu.homeDock46 .heroLiveBreath46{height:78%;width:min(42vw,440px);max-height:78%;justify-self:start;margin:0 0 0 7%}" +
     "html.landscape46 #menu.homeDock46 .heroLive46{top:0;bottom:0;left:0;right:auto;width:64%}" +
+    "html.landscape46 #menu.homeDock46 .heroLiveBreath46{height:78%;width:min(42vw,440px);max-height:78%}" +
+    "html.landscape46 #menu.homeDock46 .heroLiveBreath46 img{object-fit:contain;object-position:center 10%}" +
     "html.landscape46 #menu.homeDock46 .menu{width:min(34vw,360px);max-width:360px;margin-left:auto}" +
     "html.landscape46 #menu.homeDock46 #coverTitle36{left:max(16px,env(safe-area-inset-left));right:auto;transform:none;text-align:left}" +
     "html.landscape46 .nav,html.landscape46 .homeNav46{grid-template-columns:repeat(5,minmax(0,1fr))!important}" +

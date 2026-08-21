@@ -16,6 +16,8 @@ const C = sandbox.window.SakurayoCamera;
 const L = sandbox.window.SakurayoLifecycle;
 
 assert.equal(L.version, "4.6.0");
+assert.equal(L.heroVisualScale(430), 1);
+assert.equal(L.heroVisualScale(932), 1);
 C.configure(430, 932);
 C.snap(860, 932);
 
