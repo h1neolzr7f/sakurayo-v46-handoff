@@ -1324,7 +1324,7 @@
     var first = !(host.getAttribute && host.getAttribute("data-dressed46") === "1");
     if (host.setAttribute) host.setAttribute("data-dressed46", "1");
     var copy = {
-      talent: ["永久天赋", "跨局成长"],
+      talent: ["樱核树", "点枝成长"],
       story: ["剧情档案", "四章证词"],
       asc: ["职业与飞升", "成型与代价"],
       ach: ["成就图鉴", "回收记录"],

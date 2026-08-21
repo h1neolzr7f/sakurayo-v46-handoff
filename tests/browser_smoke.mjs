@@ -329,9 +329,19 @@ try {
   await page.locator("#stageDrawer .close").click();
   await page.locator('[data-open="archive"]').click();
   assert.match(await page.locator("#archiveDrawer").textContent(), /剧情档案/);
-  assert.match(await page.locator("#archiveDrawer").textContent(), /永久天赋/);
+  assert.match(await page.locator("#archiveDrawer").textContent(), /樱核树/);
   await shot(page, "01k-archive.png");
-  await page.locator("#archiveDrawer .close").click();
+  await page.locator("#archiveDrawer [data-open='talent']").click();
+  assert.equal(await page.locator(".talentTree46").count(), 1);
+  assert.match(await page.locator("#talentDrawer h2").textContent(), /樱核树/);
+  await api(page, "grantCoins40", 80);
+  const talentBuy = await api(page, "buyTalent46", "atk");
+  assert.equal(talentBuy.bought, true);
+  assert.equal(talentBuy.level, 1);
+  assert.equal(talentBuy.snapshot.tal.atk, 1);
+  assert.match(await page.locator(".treePanel46").textContent(), /破魔弹芯/);
+  await shot(page, "01m-talent-tree.png");
+  await page.locator("#talentDrawer .close").click();
   pass("V4.6.0 镜界寻访三页、仓库与作弊币");
 
   const betaPanel = await api(page, "openBeta40");
