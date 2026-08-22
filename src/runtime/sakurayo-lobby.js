@@ -195,9 +195,9 @@
   var LOBBY_CSS =
     "html,body{width:100%;height:100%;overscroll-behavior:none}" +
     ".homeNav46{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:6px}" +
-    ".homeNav46 button{min-height:58px;padding:8px 2px;border-radius:14px;border:1px solid #ff9bcc55;background:linear-gradient(180deg,#2a183ef2,#120c22f5);color:#fff8fb;font:800 11px/1.15 system-ui;letter-spacing:.06em}" +
-    ".homeNav46 button span{display:grid;place-items:center;width:36px;height:36px;margin:0 auto 4px;border-radius:50%;background:transparent;color:#ffe6f3;font-size:12px;overflow:visible}" +
-    ".homeNav46 button span img{display:block!important;width:100%;height:100%;border-radius:50%;object-fit:cover;visibility:visible;opacity:1}" +
+    ".homeNav46 button{min-height:68px;padding:4px 0 2px;border-radius:12px;border:0;background:transparent;color:#fff8fb;font:800 10px/1.1 system-ui;letter-spacing:.06em;text-shadow:0 1px 6px #05020d}" +
+    ".homeNav46 button span{display:grid;place-items:center;width:48px;height:48px;margin:0 auto 4px;border-radius:50%;background:#120c22;box-shadow:0 0 0 1.5px #ffe6a366,0 8px 16px #05020d99;color:#ffe6f3;font-size:12px;overflow:hidden}" +
+    ".homeNav46 button span img{display:block!important;width:100%;height:100%;border-radius:50%;object-fit:contain;padding:3px;box-sizing:border-box;visibility:visible;opacity:1}" +
     "#menu.homeDock46 .start,#menu .start{background:linear-gradient(180deg,#ffe7b0 0%,#ff74c8 26%,#c13bff 66%,#6a28ff 100%);border:1px solid #ffe6a3aa;box-shadow:0 14px 40px #ff4ea888,0 0 28px #ffe08a40,inset 0 1px #fff8;font-weight:1000;letter-spacing:.42em;text-shadow:0 2px 10px #3a106688}" +
     "#menu.homeDock46 .heroLive46{left:0;right:auto;overflow:hidden}" +
     "#archiveDrawer .archiveDock46{display:grid;gap:10px}" +
@@ -209,7 +209,8 @@
     ".wishDrawer46>.dbody{display:block;max-width:none;margin:0;padding:0;height:100%;min-height:100%;gap:0}" +
     ".wishStage46{position:relative;min-height:100%;min-height:100dvh;height:100%;overflow:hidden;background:radial-gradient(circle at 28% 18%,#4a1d55 0%,#1a1030 38%,#060410 100%)}" +
     ".wishStage46:before{content:\"\";position:absolute;inset:0;background:radial-gradient(circle at 16% 20%,#ff72b433 0 4%,transparent 42%),radial-gradient(circle at 80% 16%,#ffe08a26 0 3%,transparent 38%),radial-gradient(circle at 60% 72%,#7a3dff28 0 5%,transparent 44%);pointer-events:none;animation:wishDrift46 8s ease-in-out infinite}" +
-    ".wishBanner46{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}" +
+    ".wishBanner46{position:absolute;inset:-10% -6%;width:112%;height:120%;object-fit:cover;object-position:center 40%;pointer-events:none}" +
+    ".wishStage46:after{content:\"\";position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,#06041000 38%,#06041066 64%,#060410d0 100%),linear-gradient(180deg,#06041077 0%,transparent 24%,transparent 58%,#060410f0 100%)}" +
     ".wishHero46{position:absolute;z-index:2;left:-4%;bottom:-6%;width:58%;height:118%;object-fit:contain;object-position:left bottom;background:transparent!important;pointer-events:none;-webkit-mask-image:linear-gradient(to top,transparent 0%,#000 12%,#000 100%);mask-image:linear-gradient(to top,transparent 0%,#000 12%,#000 100%)}" +
     ".wishPetals46{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden}" +
     ".wishPetals46 i{position:absolute;top:-12%;width:7px;height:9px;border-radius:0 70% 0 70%;background:#ff9bcc99;box-shadow:0 0 8px #ff9bcc66;animation:petalFall46 11s linear infinite}" +
@@ -229,6 +230,7 @@
     ".wishTabs46 button.on{background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;border-color:#ffe6a3aa}" +
     ".wishPills46{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px}" +
     ".wishPills46 b{padding:4px 10px;border-radius:999px;background:#0b0818cc;border:1px solid #ffe6a355;color:#ffe7a3;font-size:10px;letter-spacing:.1em}" +
+    ".wishSparkToggle46{display:none;margin-top:8px;min-height:28px;padding:0 12px;border-radius:999px;border:1px solid #ffe6a355;background:#0b0818cc;color:#ffe7a3;font:800 10px/1 system-ui;letter-spacing:.12em}" +
     ".rosterTabs46{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}" +
     ".rosterTabs46 button{min-height:32px;padding:0 12px;border-radius:999px;border:1px solid #ffe6a355;background:#0b0818cc;color:#ffe7a3;font:800 11px/1 system-ui;letter-spacing:.12em}" +
     ".rosterTabs46 button.on{background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;border-color:#ffe6a3aa}" +
@@ -251,7 +253,7 @@
     "#menu.homeDock46 .nav{position:relative;z-index:8}" +
     "#gachaPull1{background:linear-gradient(180deg,#ff86cc,#ff3d9a 58%,#b02078);border-color:#ffb6d888}" +
     "#gachaPull10{background:linear-gradient(180deg,#ffe08a,#f0c14a 42%,#d8892b);border-color:#ffe6a3aa;color:#2a1608}" +
-    "#gachaReveal46{position:absolute;inset:0;z-index:20;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(44px,env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom));background:radial-gradient(circle at 50% 40%,#4a2878ee,#12081cf6 68%)}" +
+    "#gachaReveal46{position:absolute;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(44px,env(safe-area-inset-top)) 12px calc(16px + env(safe-area-inset-bottom));background:radial-gradient(circle at 50% 38%,#3a1d58 0%,#0a0614 58%,#05030c 100%)}" +
     ".revealGrid46{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;max-width:96%;perspective:1200px}" +
     ".revealGrid46.ten{max-width:640px;gap:8px}" +
     ".revealCard46{position:relative;width:104px;height:146px;perspective:900px}" +
@@ -278,7 +280,7 @@
     ".revealTake46{background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;box-shadow:0 10px 24px #05020d66}" +
     ".revealSkip46,.revealAgain46{background:#0b0818cc;color:#fff7fb}" +
     "#gachaReveal46.isTest .revealInner46,#gachaReveal46.isTest .revealFace46.front:after,#gachaReveal46.isTest .revealCard46.r-SSR.flipped .revealFace46.front{transition:none;animation:none}" +
-    ".rosterStage46{min-height:100%;padding:max(52px,calc(env(safe-area-inset-top) + 40px)) 12px calc(16px + env(safe-area-inset-bottom));background:radial-gradient(circle at 18% 0,#ff72b428 0%,#1a1030 42%,#060410 100%)}" +
+    ".rosterStage46{min-height:100%;padding:max(52px,calc(env(safe-area-inset-top) + 40px)) 18px calc(16px + env(safe-area-inset-bottom));background:radial-gradient(circle at 18% 0,#ff72b428 0%,#1a1030 42%,#060410 100%)}" +
     ".rosterHead46{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 12px}" +
     ".rosterHead46 h3{margin:0;font-size:22px;letter-spacing:.28em}" +
     ".rosterHead46 span{color:#ffe7a3;font-size:11px;letter-spacing:.12em}" +
@@ -317,7 +319,7 @@
     "#menu.homeDock46 .menu{width:min(42vw,400px);max-width:400px;padding:10px 14px calc(10px + env(safe-area-inset-bottom))}" +
     "#menu.homeDock46 .start{width:100%;margin:0 0 8px;letter-spacing:.42em}" +
     "#menu.homeDock46 .nav{width:100%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;padding:8px;border-radius:18px}" +
-    "#menu.homeDock46 .homeNav46 button{min-height:58px}" +
+    "#menu.homeDock46 .homeNav46 button{min-height:64px}" +
     "#menu.homeDock46 .stageMini{width:100%}" +
     "#menu.homeDock46 .charSelectPanel{position:relative;left:auto;right:auto;bottom:auto;width:100%}" +
     ".wishHero46{left:-2%;width:46%;height:124%;bottom:-8%}" +
@@ -341,8 +343,8 @@
   var ROOM_CSS =
     "#shopDrawer,#stageDrawer,#archiveDrawer,#talentDrawer,#storyDrawer,#ascDrawer,#achDrawer{background-color:#060410}" +
     "#shopDrawer.room46,#stageDrawer.room46,#archiveDrawer.room46,#talentDrawer.room46,#storyDrawer.room46,#ascDrawer.room46,#achDrawer.room46{background-repeat:no-repeat;background-size:cover;background-position:center 28%}" +
-    "#shopDrawer>.dhead,#stageDrawer>.dhead,#archiveDrawer>.dhead,#talentDrawer>.dhead,#storyDrawer>.dhead,#ascDrawer>.dhead,#achDrawer>.dhead{max-width:none;width:100%;box-sizing:border-box;margin:0 0 10px;padding:10px 4px 12px;border-bottom:1px solid #ffe6a344;background:linear-gradient(180deg,#1a1238cc,#0b081800)}" +
-    "#shopDrawer.room46>.dhead,#stageDrawer.room46>.dhead,#archiveDrawer.room46>.dhead,#talentDrawer.room46>.dhead,#storyDrawer.room46>.dhead,#ascDrawer.room46>.dhead,#achDrawer.room46>.dhead{background-repeat:no-repeat;background-size:100% auto;background-position:center top}" +
+    "#shopDrawer>.dhead,#stageDrawer>.dhead,#archiveDrawer>.dhead,#talentDrawer>.dhead,#storyDrawer>.dhead,#ascDrawer>.dhead,#achDrawer>.dhead{max-width:none;width:100%;box-sizing:border-box;margin:0 0 10px;padding:8px 8px 10px;border-bottom:1px solid #ffe6a344;background:linear-gradient(180deg,#1a1238cc,#0b081800);gap:10px}" +
+    "#shopDrawer .shopMoney{margin-right:4px;padding:4px 10px;border-radius:999px;background:#0b0818cc;border:1px solid #ffe6a344;color:#ffe7a3;font:800 13px/1 system-ui}" +
     "#shopDrawer>.dhead h2,#stageDrawer>.dhead h2,#archiveDrawer>.dhead h2,#talentDrawer>.dhead h2,#storyDrawer>.dhead h2,#ascDrawer>.dhead h2,#achDrawer>.dhead h2{letter-spacing:.18em;color:#fff7fb;text-shadow:0 0 16px #ff9bcc66}" +
     "#shopDrawer>.dhead .close,#stageDrawer>.dhead .close,#archiveDrawer>.dhead .close,#talentDrawer>.dhead .close,#storyDrawer>.dhead .close,#ascDrawer>.dhead .close,#achDrawer>.dhead .close{border:1px solid #ffe6a355;background:#0b0818cc;color:#fff7fb}" +
     "#shopDrawer>.dbody,#stageDrawer>.dbody,#archiveDrawer>.dbody,#talentDrawer>.dbody,#storyDrawer>.dbody,#ascDrawer>.dbody,#achDrawer>.dbody{max-width:920px}" +
@@ -352,13 +354,15 @@
     "#shopDrawer .shopTabs40 button.on{background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;border-color:#ffe6a3aa}" +
     "#shopDrawer .skinCard,#shopDrawer .shopItem40{border:1px solid #ff9bcc33;background:linear-gradient(135deg,#1a132cf2,#100c1cee);border-radius:16px}" +
     "#shopWallet44{border:1px solid #ffe6a344;border-radius:14px;background:#120c20cc}" +
+    "#shopWallet44>b{display:none}" +
     ".modeBar46{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 12px}" +
-    ".modeBar46 button{min-height:58px;padding:8px 6px;border-radius:14px;border:1px solid #ff9bcc44;background:linear-gradient(180deg,#221436,#120c20);color:#fff7fb;font:800 13px/1.15 system-ui;letter-spacing:.08em}" +
-    ".modeBar46 button small{display:block;margin-top:4px;color:#ffe7a3;font:700 10px/1 system-ui;letter-spacing:.1em}" +
+    ".modeBar46 button{min-height:52px;padding:7px 8px;border-radius:14px;border:1px solid #ff9bcc44;background:linear-gradient(180deg,#221436,#120c20);color:#fff7fb;font:800 13px/1.15 system-ui;letter-spacing:.08em;overflow:hidden}" +
+    ".modeBar46 button small{display:block;margin-top:4px;color:#ffe7a3;font:700 10px/1 system-ui;letter-spacing:.1em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}" +
     ".modeBar46 button.on{border-color:#ffe6a3aa;background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;box-shadow:0 8px 20px #05020d66}" +
     ".modeBar46 button.on small{color:#5a2a08}" +
-    "#stageList .stageCard{min-height:168px;border:1px solid #ffe6a344;box-shadow:0 12px 28px #05020d55}" +
-    "#stageList .stageCard h3{letter-spacing:.08em}" +
+    "#stageList .stageCard{min-height:168px;border:1px solid #ffe6a344;box-shadow:0 12px 28px #05020d55;isolation:isolate;background:#0b0818}" +
+    "#stageList .stageCard>img{opacity:.92}" +
+    "#stageList .stageCard h3{letter-spacing:.08em;font-size:16px;text-shadow:0 2px 10px #05020d}" +
     "#stageList .stageCard button{border-radius:12px;border:1px solid #ff9bcc66;background:linear-gradient(180deg,#ff86cc,#b02078);color:#fff}" +
     "#archiveDrawer .archiveDock46{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}" +
     "#archiveDrawer .archiveDock46 button{min-height:92px;padding:16px 14px;border-radius:16px;border:1px solid #ffe6a344;background:linear-gradient(135deg,#2a183ef2,#120c22f5);display:flex;flex-direction:column;justify-content:flex-end;gap:4px}" +
@@ -384,9 +388,9 @@
     "#shopDrawer .shopItem40{border-radius:16px;background:linear-gradient(135deg,#1a132cf2,#100c1cee);border:1px solid #ffe6a344}" +
     "#shopDrawer .shopIcon40{background:linear-gradient(180deg,#2a183e,#171027);border:1px solid #ff9bcc44}" +
     "#shopDrawer .shopItem40 button,#shopDrawer .shopUpgrade40{border:1px solid #ff9bcc66;background:linear-gradient(180deg,#ff86cc,#b02078);color:#fff}" +
-    "#stageList .stageCard:after{background:linear-gradient(180deg,#08071400 22%,#080714f0)}" +
-    "#stageList .stageCard .i{width:100%;padding:56px 14px 14px;box-sizing:border-box}" +
-    "#stageList .stageCard p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;max-height:2.7em}" +
+    "#stageList .stageCard:after{background:linear-gradient(180deg,#08071400 18%,#080714f6)}" +
+    "#stageList .stageCard .i{width:100%;padding:64px 14px 12px;box-sizing:border-box}" +
+    "#stageList .stageCard p{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;max-height:1.5em;font-size:11px;text-shadow:0 1px 8px #05020d}" +
     "#archiveDrawer .archiveDock46 button{background-size:cover;background-position:center;background-color:#120c22}" +
     "#talentDrawer .talent,#storyDrawer .storyCard,#ascDrawer .storyCard,#achDrawer .ach{border:1px solid #ffe6a344;border-radius:16px;background:linear-gradient(135deg,#1a132cf2,#100c1cee)}" +
     "#talentDrawer .talent button,#achDrawer .ach .claim{border-radius:12px;border:1px solid #ff9bcc66;background:linear-gradient(180deg,#ff86cc,#b02078);color:#fff}" +
@@ -424,6 +428,24 @@
     "html.landscape46 #menu.homeDock46 .charCard{width:auto;height:auto;min-width:0;max-width:56px;margin:0 auto;aspect-ratio:1}" +
     "html.landscape46 #menu.homeDock46 .charCard img{width:100%;height:100%}" +
     "html.landscape46 #menu.homeDock46 .stageMini,html.landscape46 #menu.homeDock46 .start,html.landscape46 #menu.homeDock46 .nav{width:100%;margin-left:0;margin-right:0}" +
+    "html.landscape46 #menu.homeDock46 .nav{padding:4px 0 0;border-radius:0;background:transparent;gap:8px}" +
+    "html.landscape46 .homeNav46 button{min-height:64px;font-size:10px;letter-spacing:.04em}" +
+    "html.landscape46 .homeNav46 button span{width:48px;height:48px}" +
+    "html.landscape46 .wishPills46 b:nth-child(2),html.landscape46 .wishPills46 b:nth-child(3){display:none}" +
+    "html.landscape46 .wishSparkToggle46{display:inline-flex;align-items:center}" +
+    "html.landscape46 .wishSpark46{display:none}" +
+    "html.landscape46 .wishDock46.showSpark46 .wishSpark46{display:flex;flex-wrap:nowrap;overflow-x:auto;max-height:36px;margin-top:6px;gap:6px}" +
+    "html.landscape46 .wishDock46.showSpark46 .wishSpark46 button{flex:0 0 auto;max-width:148px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}" +
+    "html.landscape46 .wishPity46{bottom:max(176px,calc(env(safe-area-inset-bottom) + 164px))}" +
+    "html.landscape46 #menu.homeDock46 #coverTitle36{text-shadow:0 2px 12px #05020dcc,0 0 18px #ff9bcc66}" +
+    "html.landscape46 #shopDrawer .shopTabs40{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}" +
+    "html.landscape46 #shopDrawer .shopTabs40 button{min-height:34px;padding:0 4px;font-size:10px;letter-spacing:0}" +
+    "html.landscape46 #shopWallet44{display:none}" +
+    "html.landscape46 #stageList .stageCard:after{background:linear-gradient(180deg,#08071422 12%,#080714f8)}" +
+    "html.landscape46 #stageList .stageCard h3{font-size:17px}" +
+    "html.landscape46 #stageList .stageCard p{-webkit-line-clamp:1;max-height:1.45em}" +
+    "html.landscape46 #archiveDrawer .archiveDock46{gap:12px;padding-top:4px}" +
+    "html.landscape46 #rosterWall46{gap:12px}" +
     "@media(prefers-reduced-motion:reduce){.heroLive46.hasBlink .heroLiveBlink46,.heroLive46.hasBlink .heroLiveBase46{animation:none}}";
 
   function injectStyle() {
@@ -1028,6 +1050,13 @@
         }
       };
     }
+    var sparkToggle = host.querySelector("#gachaSparkToggle46");
+    if (sparkToggle) {
+      sparkToggle.onclick = function () {
+        var dock = host.querySelector(".wishDock46");
+        if (dock) dock.classList.toggle("showSpark46");
+      };
+    }
     return info;
   }
 
@@ -1038,6 +1067,7 @@
     if (!missing.length) return "";
     var poor = (shards || 0) < RATES.spark;
     return (
+      '<button type="button" class="wishSparkToggle46" id="gachaSparkToggle46">碎镜兑换</button>' +
       '<div class="wishSpark46">' +
       missing
         .map(function (card) {
@@ -1046,7 +1076,7 @@
             card.id +
             '"' +
             (poor ? ' class="poor"' : "") +
-            ">Spark " +
+            ">" +
             card.n +
             "</button>"
           );
