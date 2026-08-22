@@ -203,7 +203,7 @@
     "#archiveDrawer .archiveDock46{display:grid;gap:10px}" +
     "#archiveDrawer .archiveDock46 button{padding:14px 12px;border-radius:14px;border:1px solid #ff9bcc44;background:linear-gradient(135deg,#221436,#120c20);color:#fff;text-align:left;font:800 14px/1.3 system-ui}" +
     ".drawer.wishDrawer46{padding:0;background:#060410;overflow:hidden}" +
-    ".wishDrawer46>.dhead{position:absolute;z-index:30;inset:0 0 auto 0;max-width:none;width:100%;box-sizing:border-box;margin:0;padding:max(8px,env(safe-area-inset-top)) 10px 8px;background:transparent;pointer-events:none}" +
+    ".wishDrawer46>.dhead{position:absolute;z-index:60;inset:0 0 auto 0;max-width:none;width:100%;box-sizing:border-box;margin:0;padding:max(8px,env(safe-area-inset-top)) 10px 8px;background:transparent;pointer-events:none}" +
     ".wishDrawer46>.dhead h2{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}" +
     ".wishDrawer46>.dhead .close{pointer-events:auto;width:36px;height:36px;margin-left:auto;border-radius:50%;background:#0b0818cc;border:1px solid #ffe6a355;color:#fff7fb}" +
     ".wishDrawer46>.dbody{display:block;max-width:none;margin:0;padding:0;height:100%;min-height:100%;gap:0}" +
@@ -432,18 +432,23 @@
     "html.landscape46 .homeNav46 button{min-height:64px;font-size:10px;letter-spacing:.04em}" +
     "html.landscape46 .homeNav46 button span{width:48px;height:48px}" +
     "html.landscape46 .wishPills46 b:nth-child(2),html.landscape46 .wishPills46 b:nth-child(3){display:none}" +
-    "html.landscape46 .wishSparkToggle46{display:inline-flex;align-items:center}" +
+    "html.landscape46 .wishSparkToggle46{display:flex;width:100%;justify-content:center;align-items:center;margin-top:10px}" +
     "html.landscape46 .wishSpark46{display:none}" +
     "html.landscape46 .wishDock46.showSpark46 .wishSpark46{display:flex;flex-wrap:nowrap;overflow-x:auto;max-height:36px;margin-top:6px;gap:6px}" +
     "html.landscape46 .wishDock46.showSpark46 .wishSpark46 button{flex:0 0 auto;max-width:148px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}" +
-    "html.landscape46 .wishPity46{bottom:max(176px,calc(env(safe-area-inset-bottom) + 164px))}" +
+    "html.landscape46 .wishPity46{bottom:max(188px,calc(env(safe-area-inset-bottom) + 176px))}" +
     "html.landscape46 #menu.homeDock46 #coverTitle36{text-shadow:0 2px 12px #05020dcc,0 0 18px #ff9bcc66}" +
     "html.landscape46 #shopDrawer .shopTabs40{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}" +
     "html.landscape46 #shopDrawer .shopTabs40 button{min-height:34px;padding:0 4px;font-size:10px;letter-spacing:0}" +
     "html.landscape46 #shopWallet44{display:none}" +
-    "html.landscape46 #stageList .stageCard:after{background:linear-gradient(180deg,#08071422 12%,#080714f8)}" +
-    "html.landscape46 #stageList .stageCard h3{font-size:17px}" +
-    "html.landscape46 #stageList .stageCard p{-webkit-line-clamp:1;max-height:1.45em}" +
+    "html.landscape46 #stageList{gap:14px}" +
+    "html.landscape46 #stageList .stageCard{min-height:220px;display:flex;align-items:flex-end;background:#0b0818}" +
+    "html.landscape46 #stageList .stageCard>img{opacity:1;filter:brightness(.92)}" +
+    "html.landscape46 #stageList .stageCard:after{display:none}" +
+    "html.landscape46 #stageList .stageCard .i{padding:14px 14px 12px;background:#080714f8;border-top:1px solid #ffe6a328}" +
+    "html.landscape46 #stageList .stageCard h3{font-size:16px;margin:0 0 10px}" +
+    "html.landscape46 #stageList .stageCard p{display:none}" +
+    "html.landscape46 #rosterDrawer .rosterStage46{padding-left:22px;padding-right:22px}" +
     "html.landscape46 #archiveDrawer .archiveDock46{gap:12px;padding-top:4px}" +
     "html.landscape46 #rosterWall46{gap:12px}" +
     "@media(prefers-reduced-motion:reduce){.heroLive46.hasBlink .heroLiveBlink46,.heroLive46.hasBlink .heroLiveBase46{animation:none}}";
