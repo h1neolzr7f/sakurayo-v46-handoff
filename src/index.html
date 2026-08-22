@@ -7496,6 +7496,32 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     bg.style.backgroundSize="cover";
     $("#menu")?.classList.add("lobbyWide46");
   }
+  function paintRoomBgs46(){
+    const night=path=>`linear-gradient(180deg,#05051299 0%,#080713c8 58%,#080713f2 100%),url("${artUrl(path)}")`;
+    const head=path=>`linear-gradient(180deg,#0b081888,#0b081800 72%),url("${artUrl(path)}")`;
+    [
+      ["shopDrawer","ui/shop_room.webp","ui/shop_header.webp"],
+      ["stageDrawer","ui/shop_room.webp","ui/shop_header.webp"],
+      ["archiveDrawer","ui/archive_room.webp","ui/archive_header.webp"],
+      ["talentDrawer","ui/archive_room.webp","ui/archive_header.webp"],
+      ["storyDrawer","ui/archive_room.webp","ui/archive_header.webp"],
+      ["ascDrawer","ui/archive_room.webp","ui/archive_header.webp"],
+      ["achDrawer","ui/archive_room.webp","ui/archive_header.webp"]
+    ].forEach(([id,room,header])=>{
+      const el=$(`#${id}`);
+      if(!el)return;
+      el.classList.add("room46");
+      el.style.backgroundImage=night(room);
+      el.style.backgroundSize="cover";
+      el.style.backgroundPosition="center 28%";
+      const dh=el.querySelector(":scope > .dhead");
+      if(!dh||!header)return;
+      dh.style.backgroundImage=head(header);
+      dh.style.backgroundSize="100% auto";
+      dh.style.backgroundPosition="center top";
+      dh.style.backgroundRepeat="no-repeat";
+    });
+  }
   function bindStageModes46(){
     const L=window.SakurayoLobby;
     const box=$("#stageList");
@@ -7560,7 +7586,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }
     wireLivePuppet46();
     L.dressArchive($("#archiveDrawer .archiveDock46"));
-    ["shopDrawer","stageDrawer","archiveDrawer"].forEach(id=>$(`#${id}`)?.classList.add("room46"));
+    paintRoomBgs46();
     const _openDrawer46=openDrawer;
     openDrawer=function(n){
       _openDrawer46(n);
@@ -7608,6 +7634,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       if(runMode36==="testimony"&&$("#sdesc")) $("#sdesc").textContent="证词模式 · 不发放升级卡";
       refreshLobby46();
       paintHomeBg46();
+      paintRoomBgs46();
       return result;
     };
   }
