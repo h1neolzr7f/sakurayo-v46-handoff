@@ -48,6 +48,8 @@ NAI 只走 Opus 免费 Normal：`832×1216` / `1216×832` / `1024×1024`，模�
 
 风景提示词**要写 `location`**，并锁 `no humans`。不要用会变成照片风的 `background dataset`。禁止字、招牌、黑边、分屏。战场图中间留空地，给角色和怪站。风景 WebP 用有损 90（无透明）；角色站桩仍无损。
 
+战斗怪 / Boss / 宠物走绿幕抠图，必须是妖怪或尸潮单位，禁止猫耳少女、禁止第四张人脸、禁止画成小夜/绫/凛音。职业/转职/融合卡、转职 `full.webp`、技能图标和特效只出无人静物或绿幕爆点，不重出三角色。批量入口：`python tools/nai/generate_queue.py`。已入库的跳过，缺图继续排。
+
 ```bash
 python tools/nai/generate_other_assets.py --kind scene --ids lobby_wide --max 1
 python tools/nai/align_assets.py --src outputs/nai/raw/lobby_wide_20260831.png --scene lobby_wide --install

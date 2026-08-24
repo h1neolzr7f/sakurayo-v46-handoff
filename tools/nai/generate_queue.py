@@ -14,6 +14,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from align_assets import (  # noqa: E402
+    ANDROID,
     install_catalog,
     process_cover,
     process_creature,
@@ -22,13 +23,17 @@ from align_assets import (  # noqa: E402
 from free_v45 import SafetyError, fetch_account, generate_free_image, read_token  # noqa: E402
 from more_prompts import (  # noqa: E402
     CARD_PROPS,
+    CAREER_FULL,
     CREATURES,
     EXTRAS,
+    FX,
     RETRY_PROPS,
     SCENES_MORE,
     compose_card_prompt,
     compose_creature_prompt,
     compose_extra_prompt,
+    compose_full_prompt,
+    compose_fx_prompt,
 )
 from prompts import PROPS, compose_prop_prompt  # noqa: E402
 
@@ -56,6 +61,10 @@ def plan() -> list[tuple[str, str]]:
         out.append(("creature", cid))
     for cid in CARD_PROPS:
         out.append(("card", cid))
+    for cid in CAREER_FULL:
+        out.append(("full", cid))
+    for cid in FX:
+        out.append(("fx", cid))
     for cid in SCENES_MORE:
         out.append(("extra", cid))
     for cid in EXTRAS:
@@ -78,6 +87,14 @@ def compose(kind: str, cid: str) -> tuple[dict, str, str, int]:
         spec = {**SCENES_MORE, **EXTRAS}[cid]
         prompt, negative = compose_extra_prompt(cid)
         return spec, prompt, negative, spec["seed"]
+    if kind == "full":
+        spec = CAREER_FULL[cid]
+        prompt, negative = compose_full_prompt(cid)
+        return spec, prompt, negative, spec["seed"]
+    if kind == "fx":
+        spec = FX[cid]
+        prompt, negative = compose_fx_prompt(cid)
+        return spec, prompt, negative, spec["seed"]
     if kind == "retry":
         spec = PROPS[cid]
         prompt, negative = compose_prop_prompt(cid)
@@ -88,7 +105,7 @@ def compose(kind: str, cid: str) -> tuple[dict, str, str, int]:
 def align_install(kind: str, cid: str, spec: dict, src: Path) -> Path:
     canvas = tuple(spec["canvas"])
     dest_rel = spec["dest"]
-    if kind == "creature":
+    if kind in {"creature", "fx"}:
         aligned = process_creature(src, canvas)
         lossless = False
     else:
@@ -104,7 +121,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Sakurayo free v4.5 leftover queue")
     parser.add_argument("--max", type=int, default=200)
     parser.add_argument("--start", type=int, default=0)
-    parser.add_argument("--kinds", default="", help="comma: creature,card,extra,retry")
+    parser.add_argument("--kinds", default="", help="comma: creature,card,extra,full,fx,retry")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--skip-existing", action="store_true", default=True)
     parser.add_argument("--no-skip-existing", action="store_true")
@@ -115,6 +132,16 @@ def main(argv: list[str] | None = None) -> int:
     jobs = plan()
     if wanted:
         jobs = [j for j in jobs if j[0] in wanted]
+    if skip:
+        pending: list[tuple[str, str]] = []
+        for kind, cid in jobs:
+            spec, _prompt, _negative, seed = compose(kind, cid)
+            raw = RAW / f"{cid}_{seed}.png"
+            dest = ANDROID / spec["dest"]
+            if raw.is_file() and raw.stat().st_size > 8000 and dest.is_file() and dest.stat().st_size > 4000:
+                continue
+            pending.append((kind, cid))
+        jobs = pending
     jobs = jobs[args.start: args.start + args.max]
     hit = [cid for _, cid in jobs if cid in BLOCKED or cid.split("_")[0] in BLOCKED]
     # allow school/job/fusion ids that contain sayo only in lore, not as ids

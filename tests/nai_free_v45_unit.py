@@ -24,12 +24,17 @@ from free_v45 import (  # noqa: E402
 from align_assets import cover_fit  # noqa: E402
 from more_prompts import (  # noqa: E402
     CARD_PROPS,
+    CAREER_FULL,
     CREATURES,
     EXTRAS,
+    FX,
+    SKILL_LOOK,
     SCENES_MORE,
     compose_card_prompt,
     compose_creature_prompt,
     compose_extra_prompt,
+    compose_full_prompt,
+    compose_fx_prompt,
 )
 from prompts import (  # noqa: E402
     ARTIST_STRING,
@@ -314,6 +319,41 @@ class FreeV45SafetyTests(unittest.TestCase):
         self.assertIn("cover_v36_main_god", EXTRAS)
         cover_p, _ = compose_extra_prompt("cover_v36_main_god")
         self.assertIn("no humans", cover_p)
+
+    def test_career_full_are_still_life(self):
+        self.assertEqual(len(CAREER_FULL), 28)
+        for cid, spec in CAREER_FULL.items():
+            prompt, negative = compose_full_prompt(cid)
+            self.assertIn("still life", prompt, cid)
+            self.assertIn("no humans", prompt, cid)
+            self.assertNotIn("1girl", prompt, cid)
+            self.assertIn("people", negative, cid)
+            self.assertTrue(spec["dest"].startswith("careers/") and spec["dest"].endswith("/full.webp"), spec["dest"])
+            self.assertEqual(spec["canvas"], (512, 512), cid)
+            self.assertNotIn(cid.split("_")[-1], {"sayo", "aya", "rion"})
+
+    def test_batch5_icons_are_still_life(self):
+        self.assertEqual(len(SKILL_LOOK), 48)
+        for sid in SKILL_LOOK:
+            prompt, _negative = compose_extra_prompt(f"skill_{sid}")
+            self.assertIn("still life", prompt, sid)
+            self.assertIn("no humans", prompt, sid)
+            self.assertNotIn("1girl", prompt, sid)
+            self.assertEqual(EXTRAS[f"skill_{sid}"]["dest"], f"skills/{sid}.webp")
+        for cid in ("cicon_barrage", "ficon_gunshrine", "aicon_bio", "ui_locked", "ui_app_icon"):
+            prompt, _negative = compose_extra_prompt(cid)
+            self.assertIn("no humans", prompt, cid)
+            self.assertNotIn("1girl", prompt, cid)
+
+    def test_fx_are_faceless_bursts(self):
+        self.assertEqual(len(FX), 16)
+        for cid, spec in FX.items():
+            prompt, negative = compose_fx_prompt(cid)
+            self.assertIn("no humans", prompt, cid)
+            self.assertIn("chroma key", prompt, cid)
+            self.assertIn("1girl", negative, cid)
+            self.assertTrue(spec["dest"].startswith("fx/"), spec["dest"])
+            self.assertEqual(spec["canvas"], (384, 384), cid)
 
     def test_cover_fit_fills_canvas(self):
         from PIL import Image

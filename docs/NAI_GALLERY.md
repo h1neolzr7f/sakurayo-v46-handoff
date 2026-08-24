@@ -36,4 +36,18 @@
 |---|---|---|---|
 | ![战1](../android-app/app/src/main/assets/game/art/stages/stage_1/battle_bg.webp) | ![战2](../android-app/app/src/main/assets/game/art/stages/stage_2/battle_bg.webp) | ![战3](../android-app/app/src/main/assets/game/art/stages/stage_3/battle_bg.webp) | ![战4](../android-app/app/src/main/assets/game/art/stages/stage_4/battle_bg.webp) |
 
-游戏里：选关看四章 CG，寻访看横幅，仓库残件/武器页看卡面。
+## 战斗怪 / Boss（无人脸猫耳）
+
+| 普通尸 | 精英 | 裂镜刃 | 一章终相 | 三章终相 |
+|---|---|---|---|---|
+| ![普通](../android-app/app/src/main/assets/game/art/enemies/normal.webp) | ![精英](../android-app/app/src/main/assets/game/art/enemies/elite.webp) | ![裂镜](../android-app/app/src/main/assets/game/art/enemies/mirrorblade.webp) | ![一终](../android-app/app/src/main/assets/game/art/bosses/stage1_phase4.webp) | ![三终](../android-app/app/src/main/assets/game/art/bosses/stage3_phase4.webp) |
+
+## 基础 / 转职 / 融合静物卡（不再画三角色）
+
+| 巫女 | 枪斗 | 蜂群 | 祓魔枪 |
+|---|---|---|---|
+| ![巫女](../android-app/app/src/main/assets/game/art/gacha/school_shrine.webp) | ![枪斗](../android-app/app/src/main/assets/game/art/gacha/school_gun.webp) | ![蜂群](../android-app/app/src/main/assets/game/art/gacha/job_swarm.webp) | ![祓魔枪](../android-app/app/src/main/assets/game/art/gacha/fusion_gunshrine.webp) |
+
+时装卡和三角色站桩没有重出。
+
+游戏里：选关看四章 CG，寻访看横幅，仓库残件/基础/转职/融合/武器页看卡面，开局看新怪。

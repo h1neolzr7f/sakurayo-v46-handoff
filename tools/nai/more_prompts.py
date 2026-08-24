@@ -406,6 +406,137 @@ for i, (cid, look) in enumerate(CLASS_LOOK.items()):
         f"still life, no humans, {look}, game class icon, centered object, no text",
     )
 
+for i, (cid, look) in enumerate(CAREER_SPLASH.items()):
+    EXTRAS[f"cicon_{cid}"] = _entry(
+        "square", (256, 256), f"careers/{cid}/icon.webp", 20261401 + i,
+        f"still life, no humans, {look}, game career icon, centered symbol, no text, no letters",
+    )
+
+for i, (cid, look) in enumerate(FUSION_SPLASH.items()):
+    EXTRAS[f"ficon_{cid}"] = _entry(
+        "square", (256, 256), f"fusions/{cid}/icon.webp", 20261440 + i,
+        f"still life, no humans, {look}, game fusion icon, centered symbol, no text, no letters",
+    )
+
+ASC_ICON = {
+    "bio": "bioluminescent flesh-flower seed in a glass vial, pink spores",
+    "psi": "cracked gold mirror shard orbiting a purple core",
+    "tech": "tiny sakura-painted machine core, cyan sparks",
+}
+for i, (cid, look) in enumerate(ASC_ICON.items()):
+    EXTRAS[f"aicon_{cid}"] = _entry(
+        "square", (256, 256), f"ascensions/{cid}/icon.webp", 20261470 + i,
+        f"still life, no humans, {look}, game ascension icon, centered symbol, no text",
+    )
+
+SKILL_LOOK = {
+    "acid": "cracked flask dripping green acid, no hands",
+    "barrier": "hexagonal ofuda shield, vermilion cords",
+    "bat": "tiny crimson spirit bat silhouette, gold earring",
+    "beat": "vintage radio speaker pulsing pink sound rings",
+    "blast": "alchemical explosion burst from a crucible",
+    "bloodnova": "crimson nova ring and empty vial",
+    "bone": "crowned bone spike, blue soul fire",
+    "carapace": "cracked keratin armor plate",
+    "chain": "lightning chain arcs between ofuda",
+    "cloud": "green spore fog cloud, no face",
+    "contract": "burning red contract scroll, no writing",
+    "crit": "cracked gold critical star",
+    "cyber": "sakura-painted cyber core, cyan sparks",
+    "dmg": "glowing pink damage rune stone",
+    "drone": "tiny sakura scout drone, pink lens",
+    "encore": "unused microphone under a pink encore light",
+    "familiar": "paper shikigami fox, ofuda body",
+    "fireball": "pink-gold fireball, sakura embers",
+    "frost": "ice crystal shard, frost mist",
+    "harvest": "soul-harvest sickle and a blue wisp",
+    "kunai": "ofuda-wrapped tracking kunai",
+    "magnet": "bent magnetic rail shard",
+    "mark": "glowing blank mark seal",
+    "multi": "twin sakura bullets crossing",
+    "nano": "nano armor plate with sakura etch",
+    "overdrive": "overheating white rifle barrel glow, no hands",
+    "pierce": "piercing gold needle of light",
+    "qi": "swirling qi circle, no body",
+    "rail": "magnetic rail spear of light",
+    "raise": "rising blue soul from cracked earth",
+    "rate": "spinning unmarked cartridge drum",
+    "regen": "healing sakura petal swirl",
+    "ribbon": "defensive satin ribbon knot",
+    "sacrifice": "cracked blood vial offering",
+    "shadowstep": "empty cloak afterimage",
+    "skill": "sakura skill burst emblem",
+    "soul": "blue soul lantern",
+    "speed": "motion-blurred petal streak",
+    "spirit": "pale spirit flame",
+    "spore": "glowing pink mushroom cluster",
+    "spotlight": "empty stage spotlight cone",
+    "star": "magical star shard, gold filigree",
+    "steal": "empty ornate blood vial",
+    "sword": "planted flying sword, no wielder",
+    "talisman": "stacked ofuda charms",
+    "thunder": "lightning-split ofuda",
+    "transform": "cracked magical crown",
+    "transmute": "philosopher slag in a crucible",
+}
+for i, (sid, look) in enumerate(SKILL_LOOK.items()):
+    EXTRAS[f"skill_{sid}"] = _entry(
+        "square", (256, 256), f"skills/{sid}.webp", 20261301 + i,
+        f"still life, no humans, {look}, game skill icon, centered object, no text, no letters",
+    )
+
+EXTRAS["ui_locked"] = _entry(
+    "square", (256, 256), "ui/locked.webp", 20261480,
+    "still life, no humans, cracked golden lock over a blank sakura seal, night, "
+    "game ui icon, centered object, no text, no letters",
+)
+EXTRAS["ui_app_icon"] = _entry(
+    "square", (512, 512), "ui/app_icon.webp", 20261481,
+    "still life, no humans, cracked golden oval hand-mirror emblem, sakura crest, "
+    "purple void, square app icon, centered symbol, no text, no letters",
+)
+EXTRAS["ui_achievement_master"] = _entry(
+    "square", (512, 512), "ui/achievement_master.webp", 20261482,
+    "still life, no humans, broken gold laurel around a blank sakura seal, "
+    "game achievement emblem, centered symbol, no text, no letters",
+)
+
+CAREER_FULL: dict[str, dict] = {}
+for i, (jid, sub) in enumerate(JOB_EMBLEM.items()):
+    cid = jid.removeprefix("job_")
+    CAREER_FULL[f"cfull_{cid}"] = _entry(
+        "square",
+        (512, 512),
+        f"careers/{cid}/full.webp",
+        20261501 + i,
+        sub + ", square item illustration, centered object, no readable writing",
+    )
+
+FX_BASE = (
+    "no humans, no 1girl, no hands, no people, "
+    "simple background, chroma key, #00ff00, neon green background, solid color background"
+)
+FX_LOOK = {
+    "muzzle": "sakura-colored muzzle flash burst, sparks, no gun body",
+    "slash": "crescent katana slash arc, pink gold energy, no wielder",
+    "hit": "impact burst of petals and gold sparks",
+    "dash": "speed afterimage streaks, pink petals",
+    "skill": "sakura skill nova ring, gold filigree",
+    "shatter": "exploding gold mirror shards",
+    "levelup": "rising gold seal and falling petals",
+    "loot": "glowing loot sparkle cluster, unmarked coins as discs",
+}
+FX: dict[str, dict] = {}
+for i, (fid, look) in enumerate(FX_LOOK.items()):
+    FX[fid] = _entry(
+        "square", (384, 384), f"fx/{fid}.webp", 20261601 + i,
+        f"{FX_BASE}, {look}",
+    )
+    FX[f"{fid}_b"] = _entry(
+        "square", (384, 384), f"fx/{fid}_b.webp", 20261621 + i,
+        f"{FX_BASE}, {look}, animation frame 2, larger burst",
+    )
+
 
 def compose_creature_prompt(cid: str, extra: str = "") -> tuple[str, str]:
     if cid not in CREATURES:
@@ -441,6 +572,24 @@ def compose_extra_prompt(cid: str, extra: str = "") -> tuple[str, str]:
     parts = [ARTIST_STRING, YEAR_TAGS, spec["subject"], extra, style, QUALITY_TAGS]
     prompt = ", ".join(p.strip().strip(",") for p in parts if p and p.strip())
     return prompt, ", ".join(p for p in (NEGATIVE, neg) if p)
+
+
+def compose_full_prompt(cid: str, extra: str = "") -> tuple[str, str]:
+    if cid not in CAREER_FULL:
+        raise ValueError(f"unknown career full {cid!r}")
+    spec = CAREER_FULL[cid]
+    parts = [ARTIST_STRING, YEAR_TAGS, spec["subject"], extra, PROP_STYLE, QUALITY_TAGS]
+    prompt = ", ".join(p.strip().strip(",") for p in parts if p and p.strip())
+    return prompt, ", ".join(p for p in (NEGATIVE, PROP_NEGATIVE) if p)
+
+
+def compose_fx_prompt(cid: str, extra: str = "") -> tuple[str, str]:
+    if cid not in FX:
+        raise ValueError(f"unknown fx {cid!r}")
+    spec = FX[cid]
+    parts = [ARTIST_STRING, YEAR_TAGS, spec["subject"], extra, CREATURE_STYLE, QUALITY_TAGS]
+    prompt = ", ".join(p.strip().strip(",") for p in parts if p and p.strip())
+    return prompt, ", ".join(p for p in (NEGATIVE, CREATURE_NEGATIVE) if p)
 
 
 RETRY_PROPS = {
