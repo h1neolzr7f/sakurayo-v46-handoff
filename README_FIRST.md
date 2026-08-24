@@ -29,7 +29,7 @@ node tests/ops_unit.mjs
 
 ## 你接下来做
 
-I2V 绿幕站桩、融合 skill/dash、寻访卡扩到 16、全量 verify、再发版。细节在 `docs/HANDOFF.md`。
+I2V 绿幕站桩、融合 skill/dash、寻访卡扩到 16、全量 verify、再发版。细节在 `docs/HANDOFF.md`。NAI 入库图预览：[docs/NAI_GALLERY.md](docs/NAI_GALLERY.md)。
 
 ## 不要做
 

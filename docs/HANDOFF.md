@@ -63,7 +63,7 @@
 
 ### 下一步（按优先级）
 
-1. 寻访卡扩到 16 以内。风景、关卡 CG、残件/武器静物、证人男人已重出，不要再刷三角色站桩。
+1. 寻访卡扩到 16 以内。风景、关卡 CG、残件/武器静物、证人男人已重出，不要再刷三角色站桩。看图用 [docs/NAI_GALLERY.md](NAI_GALLERY.md)。
 2. 有独特动作的融合再补 `anim_skill.webp` / `anim_dash.webp`。缺图回退，不要借错融合的图。
 3. I2V 绿幕重出三角色站桩（需 infsh login）。现用 `live_idle` 静帧 + JS 动。
 4. 全量 `powershell -File tools/verify.ps1`（`browser_smoke` 主视口仍是 430×932）。

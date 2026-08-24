@@ -7,8 +7,12 @@ import shutil
 import sys
 from pathlib import Path
 
-import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
+
+try:
+    import numpy as np
+except ImportError:  # cover_fit only needs PIL; chroma-key needs numpy
+    np = None
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from prompts import PEOPLE, PROPS, SCENES

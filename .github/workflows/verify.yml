@@ -18,6 +18,7 @@ jobs:
           node-version: "22"
       - name: Static check and syntax
         run: |
+          python -m pip install --quiet pillow numpy
           python tests/nai_free_v45_unit.py
           python tools/static_check.py src/index.html
           node --check tests/artifacts/static/index.extracted.js
