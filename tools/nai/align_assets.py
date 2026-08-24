@@ -10,6 +10,9 @@ from pathlib import Path
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from prompts import PROPS, SCENES
+
 ROOT = Path(__file__).resolve().parents[2]
 ANDROID = ROOT / "android-app" / "app" / "src" / "main" / "assets" / "game" / "art"
 OUT = ROOT / "outputs" / "nai"
@@ -186,6 +189,19 @@ def process_file(src: Path, shot: str) -> Image.Image:
     return fit_bbox(keyed, LIVE_CANVAS, LIVE_TOP, LIVE_HEIGHT)
 
 
+def cover_fit(im: Image.Image, canvas: tuple[int, int]) -> Image.Image:
+    """Scale to cover a canvas and center-crop. Used for scenery / card stills."""
+    src = im.convert("RGB")
+    tw, th = canvas
+    scale = max(tw / src.width, th / src.height)
+    nw = max(1, int(round(src.width * scale)))
+    nh = max(1, int(round(src.height * scale)))
+    src = src.resize((nw, nh), Image.Resampling.LANCZOS)
+    x = max(0, (nw - tw) // 2)
+    y = max(0, (nh - th) // 2)
+    return src.crop((x, y, x + tw, y + th))
+
+
 def backup_art(dest: Path, cid: str) -> None:
     if not dest.exists():
         return
@@ -215,14 +231,58 @@ def install_portrait(aligned: Image.Image, cid: str, backup: bool = True) -> Pat
     return dest
 
 
+def install_catalog(aligned: Image.Image, dest_rel: str, backup_id: str, backup: bool = True) -> Path:
+    dest = ANDROID / dest_rel
+    if backup:
+        backup_art(dest, backup_id)
+    save_webp(aligned, dest)
+    return dest
+
+
+def process_cover(src: Path, canvas: tuple[int, int]) -> Image.Image:
+    return cover_fit(Image.open(src), canvas)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Align NAI stills to Sakurayo canvases.")
     parser.add_argument("--src", required=True, help="raw PNG")
     parser.add_argument("--shot", choices=("live", "portrait", "dialogue"), default="live")
-    parser.add_argument("--char", required=True)
+    parser.add_argument("--char", default="")
+    parser.add_argument("--scene", default="", help="scenery id from prompts.SCENES")
+    parser.add_argument("--prop", default="", help="prop id from prompts.PROPS")
     parser.add_argument("--out", default="")
-    parser.add_argument("--install", action="store_true", help="write live_idle/live_blink into game art")
+    parser.add_argument("--install", action="store_true", help="write into game art")
     args = parser.parse_args(argv)
+    kinds = [bool(args.char), bool(args.scene), bool(args.prop)]
+    if sum(kinds) != 1:
+        parser.error("specify exactly one of --char / --scene / --prop")
+
+    if args.scene:
+        if args.scene not in SCENES:
+            parser.error(f"unknown scene {args.scene}; use {sorted(SCENES)}")
+        spec = SCENES[args.scene]
+        aligned = process_cover(Path(args.src), tuple(spec["canvas"]))
+        out = Path(args.out) if args.out else OUT / "aligned" / f"{args.scene}.webp"
+        save_webp(aligned, out)
+        print(f"wrote {out} {out.stat().st_size} {aligned.size}")
+        if args.install:
+            dest = install_catalog(aligned, spec["dest"], args.scene)
+            print(f"installed {dest} {dest.stat().st_size}")
+        return 0
+
+    if args.prop:
+        if args.prop not in PROPS:
+            parser.error(f"unknown prop {args.prop}; use {sorted(PROPS)}")
+        spec = PROPS[args.prop]
+        aligned = process_cover(Path(args.src), tuple(spec["canvas"]))
+        out = Path(args.out) if args.out else OUT / "aligned" / f"{args.prop}.webp"
+        save_webp(aligned, out)
+        print(f"wrote {out} {out.stat().st_size} {aligned.size}")
+        if args.install:
+            dest = install_catalog(aligned, spec["dest"], args.prop)
+            print(f"installed {dest} {dest.stat().st_size}")
+        return 0
+
     aligned = process_file(Path(args.src), args.shot)
     out = Path(args.out) if args.out else OUT / "aligned" / f"{args.char}_{args.shot}.webp"
     save_webp(aligned, out)

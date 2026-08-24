@@ -13,13 +13,17 @@
 
 中文里说的「无限小图」= Opus 对 V4.5 及更早模型的 **Normal 免费张**，不是大图，也不是 V5。
 
-提示词在 `tools/nai/prompts.py`：画师串（ciloranko / tianliang / sho / hiten / anmi）+ v4.5 质量词（不含会破坏绿幕的 `location`）。角色锁见 `docs/ART_BIBLE.md`。
+提示词在 `tools/nai/prompts.py`：画师串（ciloranko / tianliang / sho / hiten / anmi）+ v4.5 质量词。角色绿幕不要写 `location`；风景要写。角色锁见 `docs/ART_BIBLE.md`。
+
+默认补非主角：大厅 / 商店 / 档案 / 四章战场。不要用这个脚本刷三角色。
 
 ```bash
 export NAI_API_TOKEN='pst-...'   # 不要把这一行提交进 git
 python tools/nai/generate_free_v45.py --status
-python tools/nai/generate_assets.py --shot live --chars sayo
-python tools/nai/align_assets.py --src outputs/nai/raw/sayo_live_20260824.png --char sayo --shot live
+python tools/nai/generate_other_assets.py --kind scene --ids lobby_wide --max 1
+python tools/nai/align_assets.py --src outputs/nai/raw/lobby_wide_20260831.png --scene lobby_wide --install
+# 角色站桩另走（现在先停）：
+# python tools/nai/generate_assets.py --shot live --chars sayo
 ```
 
 出图写到 gitignore 的 `outputs/nai/`。不要把 PNG 或 token 推进公开仓。质量开关默认关，质量词自己写进提示词，避免官方 `location` 乱加背景。

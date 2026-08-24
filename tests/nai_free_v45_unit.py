@@ -21,7 +21,15 @@ from free_v45 import (  # noqa: E402
     summarize_account,
     validate_free_request,
 )
-from prompts import ARTIST_STRING, QUALITY_TAGS, compose_prompt  # noqa: E402
+from align_assets import cover_fit  # noqa: E402
+from prompts import (  # noqa: E402
+    ARTIST_STRING,
+    QUALITY_TAGS,
+    SCENES,
+    compose_prompt,
+    compose_prop_prompt,
+    compose_scene_prompt,
+)
 
 
 class FreeV45SafetyTests(unittest.TestCase):
@@ -177,6 +185,38 @@ class FreeV45SafetyTests(unittest.TestCase):
         banned = summarize_account(sub, {"banStatus": "banned"})
         with self.assertRaises(SafetyError):
             assert_safe_to_generate(banned)
+
+    def test_scene_prompts_are_empty_and_widescreen(self):
+        self.assertIn("lobby_wide", SCENES)
+        self.assertNotIn("sayo", SCENES)
+        self.assertNotIn("aya", SCENES)
+        self.assertNotIn("rion", SCENES)
+        for sid, spec in SCENES.items():
+            prompt, negative = compose_scene_prompt(sid)
+            self.assertTrue(prompt.startswith("{artist:ciloranko}"), sid)
+            self.assertIn("no humans", prompt, sid)
+            self.assertIn("location", prompt, sid)
+            self.assertNotIn("1girl", prompt, sid)
+            self.assertIn("people", negative, sid)
+            self.assertIn("letterbox", negative, sid)
+            self.assertEqual(spec["size"], "landscape", sid)
+            self.assertEqual(spec["canvas"], (1600, 900), sid)
+
+    def test_prop_prompts_are_still_life(self):
+        prompt, negative = compose_prop_prompt("night_radio")
+        self.assertIn("still life", prompt)
+        self.assertIn("no humans", prompt)
+        self.assertNotIn("1girl", prompt)
+        self.assertIn("people", negative)
+
+    def test_cover_fit_fills_canvas(self):
+        from PIL import Image
+
+        src = Image.new("RGB", (1216, 832), (40, 20, 60))
+        out = cover_fit(src, (1600, 900))
+        self.assertEqual(out.size, (1600, 900))
+        self.assertEqual(out.getpixel((0, 0)), (40, 20, 60))
+        self.assertEqual(out.getpixel((1599, 899)), (40, 20, 60))
 
 
 if __name__ == "__main__":

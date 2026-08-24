@@ -30,3 +30,21 @@ NAI 只走 Opus 免费 Normal：`832×1216` / `1216×832` / `1024×1024`，模�
 ## 4. 不要画
 
 第四张脸、猫耳、中文、水印、NSFW、儿童体型、V5 模型、大图、UI Small `512×768`（Opus 上可能扣 Anlas）。
+
+## 5. 非主角风景 / 道具
+
+三角色站桩先停。下一批评免费 v4.5 的是无人风景和静物：
+
+| id | 用途 | 出图 | 入库 |
+|---|---|---|---|
+| `lobby_wide` | 大厅宽背景 | 1216×832 | cover 到 1600×900 |
+| `shop_wide` / `archive_wide` | 商店、档案抽屉 | 同上 | 同上 |
+| `stage_1`…`stage_4` | 横屏战场 | 同上 | 同上 |
+| `night_radio` 等残件 | 寻访静物卡 | 832×1216 | cover 到 768×1024 |
+
+风景提示词**要写 `location`**，并锁 `no humans`。不要用会变成照片风的 `background dataset`。禁止字、招牌、黑边、分屏。战场图中间留空地，给角色和怪站。
+
+```bash
+python tools/nai/generate_other_assets.py --kind scene --ids lobby_wide --max 1
+python tools/nai/align_assets.py --src outputs/nai/raw/lobby_wide_20260831.png --scene lobby_wide --install
+```
