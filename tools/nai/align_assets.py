@@ -336,10 +336,10 @@ def main(argv: list[str] | None = None) -> int:
         spec = CREATURES[args.creature]
         aligned = process_creature(Path(args.src), tuple(spec["canvas"]))
         out = Path(args.out) if args.out else OUT / "aligned" / f"{args.creature}.webp"
-        save_webp(aligned, out, lossless=True)
+        save_webp(aligned, out, lossless=False)
         print(f"wrote {out} {out.stat().st_size} {aligned.size}")
         if args.install:
-            dest = install_catalog(aligned, spec["dest"], args.creature, lossless=True)
+            dest = install_catalog(aligned, spec["dest"], args.creature, lossless=False)
             print(f"installed {dest} {dest.stat().st_size}")
         return 0
 

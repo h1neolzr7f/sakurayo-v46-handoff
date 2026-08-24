@@ -90,7 +90,7 @@ def align_install(kind: str, cid: str, spec: dict, src: Path) -> Path:
     dest_rel = spec["dest"]
     if kind == "creature":
         aligned = process_creature(src, canvas)
-        lossless = True
+        lossless = False
     else:
         aligned = process_cover(src, canvas)
         lossless = False
@@ -170,8 +170,43 @@ def main(argv: list[str] | None = None) -> int:
             if "Anlas" in text or "anlas" in text.lower():
                 return 3
             if "HTTP 429" in text or "HTTP 503" in text:
-                time.sleep(20)
-                continue
+                time.sleep(25)
+                try:
+                    result = generate_free_image(
+                        prompt=prompt,
+                        token=token,
+                        size=spec["size"],
+                        seed=seed,
+                        negative=negative,
+                        out_path=out,
+                        quality_toggle=False,
+                        dry_run=args.dry_run,
+                    )
+                except SafetyError as exc2:
+                    rec = {"id": cid, "kind": kind, "error": str(exc2), "retried": True}
+                    print(json.dumps(rec, ensure_ascii=False))
+                    LOG.open("a", encoding="utf-8").write(json.dumps(rec, ensure_ascii=False) + "\n")
+                    return 2
+                else:
+                    if result.get("anlas_spent", 0) > 0:
+                        return 3
+                    installed = None
+                    if not args.dry_run and out.is_file():
+                        installed = str(align_install(kind, cid, spec, out))
+                    rec = {
+                        "id": cid,
+                        "kind": kind,
+                        "seed": seed,
+                        "bytes": result.get("bytes"),
+                        "elapsed": result.get("elapsed_sec"),
+                        "anlas": (result.get("account_after") or {}).get("anlas"),
+                        "installed": installed,
+                        "retried": True,
+                    }
+                    print(json.dumps(rec, ensure_ascii=False))
+                    LOG.open("a", encoding="utf-8").write(json.dumps(rec, ensure_ascii=False) + "\n")
+                    done += 1
+                    continue
             return 2
         if result.get("anlas_spent", 0) > 0:
             return 3
