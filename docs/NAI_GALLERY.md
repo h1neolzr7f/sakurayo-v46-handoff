@@ -2,7 +2,7 @@
 
 这些图已经进游戏资源。在 GitHub 打开本页就能直接看，不必再点 Agent 链接。
 
-时装 / 职业 / 融合卡仍是旧拼卡，本页不列三角色站桩。
+时装卡仍是旧拼卡。本页不列三角色站桩。基础 / 转职 / 融合已经换成无人静物。
 
 ## 本轮 10 张
 
@@ -48,6 +48,18 @@
 |---|---|---|---|
 | ![巫女](../android-app/app/src/main/assets/game/art/gacha/school_shrine.webp) | ![枪斗](../android-app/app/src/main/assets/game/art/gacha/school_gun.webp) | ![蜂群](../android-app/app/src/main/assets/game/art/gacha/job_swarm.webp) | ![祓魔枪](../android-app/app/src/main/assets/game/art/gacha/fusion_gunshrine.webp) |
 
-时装卡和三角色站桩没有重出。
+## 转职升级图（已去掉第四张脸）
 
-游戏里：选关看四章 CG，寻访看横幅，仓库残件/基础/转职/融合/武器页看卡面，开局看新怪。
+| 瘟疫医师 | 剑圣 | 祓魔 | 磁轨 |
+|---|---|---|---|
+| ![疫](../android-app/app/src/main/assets/game/art/careers/plagueDoctor/full.webp) | ![剑](../android-app/app/src/main/assets/game/art/careers/swordSaint/full.webp) | ![祓](../android-app/app/src/main/assets/game/art/careers/exorcist/full.webp) | ![轨](../android-app/app/src/main/assets/game/art/careers/railLord/full.webp) |
+
+## 技能 / 特效 / 应用徽记
+
+| 火球 | 苦无 | 斩击特效 | 应用图标 |
+|---|---|---|---|
+| ![火](../android-app/app/src/main/assets/game/art/skills/fireball.webp) | ![苦](../android-app/app/src/main/assets/game/art/skills/kunai.webp) | ![斩](../android-app/app/src/main/assets/game/art/fx/slash.webp) | ![标](../android-app/app/src/main/assets/game/art/ui/app_icon.webp) |
+
+时装卡和三角色站桩没有重出。NPC 立绘（雨宫凛 / 镜零 / 无名剑主）原来就能用，这轮没重出。
+
+游戏里：选关看四章 CG，寻访看横幅，仓库残件/基础/转职/融合/武器页看卡面，升级看技能图标和转职 full，开局看新怪。
