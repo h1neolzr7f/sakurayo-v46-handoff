@@ -28,6 +28,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--status", action="store_true", help="print subscription / Anlas and exit")
     parser.add_argument("--dry-run", action="store_true", help="validate and print plan, do not generate")
     parser.add_argument("--char", choices=sorted(CHAR_PRESETS), help="use a Sakurayo character preset")
+    parser.add_argument("--shot", choices=("live", "portrait", "dialogue"), default="live")
     parser.add_argument("--prompt", default="", help="extra prompt tags (or full prompt if no --char)")
     parser.add_argument("--negative", default=DEFAULT_NEGATIVE)
     parser.add_argument("--size", choices=sorted(FREE_SIZES), default="portrait")
@@ -73,6 +74,8 @@ def main(argv: list[str] | None = None) -> int:
             negative=args.negative,
             out_path=out,
             dry_run=args.dry_run,
+            quality_toggle=False,
+            shot=args.shot,
         )
         if out and result.get("out_path") and result.get("seed") and "pending" in Path(result["out_path"]).name:
             final = Path(result["out_path"]).with_name(f"{args.char or 'probe'}_{result['seed']}.png")

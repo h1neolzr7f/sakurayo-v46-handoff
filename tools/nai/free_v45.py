@@ -21,6 +21,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from prompts import CHAR_PRESETS, NEGATIVE as DEFAULT_NEGATIVE, compose_prompt
+
 IMAGE_HOST = "https://image.novelai.net"
 GENERATE_URL = f"{IMAGE_HOST}/ai/generate-image"
 SUBSCRIPTION_URL = f"{IMAGE_HOST}/user/subscription"
@@ -53,45 +55,6 @@ MAX_FREE_STEPS = 28
 DEFAULT_STEPS = 28
 DEFAULT_SCALE = 5.5
 DEFAULT_SAMPLER = "k_euler_ancestral"
-
-DEFAULT_NEGATIVE = (
-    "nsfw, nude, explicit, child, loli, shota, lowres, worst quality, bad quality, "
-    "jpeg artifacts, scan artifacts, watermark, logo, text, error, extra fingers, "
-    "extra limbs, mutated hands, poorly drawn face, blurry, chromatic aberration, "
-    "multiple views, artistic error, very displeasing"
-)
-
-CHAR_PRESETS = {
-    "sayo": (
-        "1girl, solo, adult woman, 20 years old, "
-        "long dark purple hair, purple-black hair, soft pink inner highlights, wavy hair, sidelocks, "
-        "pink eyes, gentle expression, looking at viewer, "
-        "modern shrine maiden, combat miko, "
-        "white haori with purple trim, pink-purple combat skirt, thigh straps, "
-        "holding a sleek cherry-blossom assault rifle, rifle at rest beside hip, muzzle down, "
-        "night sakura petals, ruined neon city, moonlight, "
-        "cel shading, official art, anime screenshot, clean lineart, detailed face, detailed eyes, "
-        "full body, standing, boots, fully clothed, safe for work"
-    ),
-    "aya": (
-        "1girl, solo, adult woman, 20 years old, "
-        "long silver-white hair, straight hair, blue eyes, calm sharp expression, looking at viewer, "
-        "tactical white-and-blue coat, moonlight color scheme, "
-        "holding a compact pistol at the hip muzzle down and a sheathed moonlight katana, "
-        "night city, cherry petals, "
-        "cel shading, official art, anime screenshot, clean lineart, detailed face, "
-        "full body, standing, fully clothed, safe for work"
-    ),
-    "rion": (
-        "1girl, solo, adult woman, 20 years old, "
-        "very long black hair, dark red undertone, red eyes, calm expression, looking at viewer, "
-        "black and crimson swordswoman outfit, dark haori, "
-        "holding a single long katana, blade down, "
-        "night shrine, spider lilies, moonlight, "
-        "cel shading, official art, anime screenshot, clean lineart, detailed face, "
-        "full body, standing, fully clothed, safe for work"
-    ),
-}
 
 
 class SafetyError(ValueError):
@@ -214,6 +177,7 @@ def build_payload(
     steps: int,
     seed: int,
     scale: float = DEFAULT_SCALE,
+    quality_toggle: bool = False,
 ) -> dict[str, Any]:
     require_free_request(
         model=model,
@@ -236,7 +200,7 @@ def build_payload(
             "steps": steps,
             "n_samples": 1,
             "ucPreset": 0,
-            "qualityToggle": True,
+            "qualityToggle": bool(quality_toggle),
             "sm": False,
             "sm_dyn": False,
             "dynamic_thresholding": False,
@@ -336,15 +300,19 @@ def generate_free_image(
     negative: str = DEFAULT_NEGATIVE,
     out_path: Path | None = None,
     dry_run: bool = False,
+    quality_toggle: bool = False,
+    shot: str | None = None,
 ) -> dict[str, Any]:
     token = token or read_token()
     model = resolve_model(model)
     width, height = resolve_size(size)
     if char:
-        preset = CHAR_PRESETS.get(char)
-        if not preset:
+        if char not in CHAR_PRESETS:
             raise SafetyError(f"unknown char {char!r}; use {sorted(CHAR_PRESETS)}")
-        prompt = f"{preset}, {prompt}" if prompt and prompt != preset else preset
+        composed, composed_neg = compose_prompt(char, shot or "live", extra=prompt)
+        prompt = composed
+        if negative == DEFAULT_NEGATIVE:
+            negative = composed_neg
     if not prompt.strip():
         raise SafetyError("prompt is empty")
     seed = int(seed if seed is not None else random.randint(0, 2**31 - 1))
@@ -356,6 +324,7 @@ def generate_free_image(
         height=height,
         steps=steps,
         seed=seed,
+        quality_toggle=quality_toggle,
     )
     account_before = fetch_account(token)
     assert_safe_to_generate(account_before)

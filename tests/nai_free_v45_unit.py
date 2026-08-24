@@ -21,6 +21,7 @@ from free_v45 import (  # noqa: E402
     summarize_account,
     validate_free_request,
 )
+from prompts import ARTIST_STRING, QUALITY_TAGS, compose_prompt  # noqa: E402
 
 
 class FreeV45SafetyTests(unittest.TestCase):
@@ -123,6 +124,7 @@ class FreeV45SafetyTests(unittest.TestCase):
         self.assertEqual(payload["parameters"]["n_samples"], 1)
         self.assertFalse(payload["parameters"]["sm"])
         self.assertFalse(payload["parameters"]["sm_dyn"])
+        self.assertFalse(payload["parameters"]["qualityToggle"])
         self.assertIsNone(payload["parameters"]["skip_cfg_above_sigma"])
         self.assertNotIn("image", payload["parameters"])
 
@@ -131,6 +133,23 @@ class FreeV45SafetyTests(unittest.TestCase):
             self.assertIn("20 years old", prompt, name)
             self.assertIn("fully clothed", prompt, name)
             self.assertIn("safe for work", prompt, name)
+            self.assertIn("artist:ciloranko", prompt, name)
+            self.assertIn("masterpiece", prompt, name)
+            self.assertIn("best quality", prompt, name)
+            self.assertIn("year 2024", prompt, name)
+
+    def test_live_prompt_has_artist_quality_and_no_location_tag(self):
+        self.assertIn("artist:hiten", ARTIST_STRING)
+        self.assertIn("very aesthetic", QUALITY_TAGS)
+        prompt, negative = compose_prompt("sayo", "live")
+        self.assertTrue(prompt.startswith("{artist:ciloranko}"))
+        self.assertIn("green background", prompt)
+        self.assertNotRegex(prompt, r"(^|, )location(,|$)")
+        self.assertIn("location", negative)
+        self.assertIn("white rifle", prompt)
+        aya, _ = compose_prompt("aya", "live")
+        self.assertIn("short hair", aya)
+        self.assertIn("blue scabbard", aya)
 
     def test_account_helpers(self):
         sub = {

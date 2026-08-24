@@ -13,11 +13,13 @@
 
 中文里说的「无限小图」= Opus 对 V4.5 及更早模型的 **Normal 免费张**，不是大图，也不是 V5。
 
+提示词在 `tools/nai/prompts.py`：画师串（ciloranko / tianliang / sho / hiten / anmi）+ v4.5 质量词（不含会破坏绿幕的 `location`）。角色锁见 `docs/ART_BIBLE.md`。
+
 ```bash
 export NAI_API_TOKEN='pst-...'   # 不要把这一行提交进 git
 python tools/nai/generate_free_v45.py --status
-python tools/nai/generate_free_v45.py --char sayo --dry-run
-python tools/nai/generate_free_v45.py --char sayo --size portrait --model full
+python tools/nai/generate_assets.py --shot live --chars sayo
+python tools/nai/align_assets.py --src outputs/nai/raw/sayo_live_20260824.png --char sayo --shot live
 ```
 
-出图写到 gitignore 的 `outputs/nai/`。不要把 PNG 或 token 推进公开仓。
+出图写到 gitignore 的 `outputs/nai/`。不要把 PNG 或 token 推进公开仓。质量开关默认关，质量词自己写进提示词，避免官方 `location` 乱加背景。
