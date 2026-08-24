@@ -4,7 +4,7 @@ from __future__ import annotations
 from typing import Literal
 
 Shot = Literal["live", "portrait", "dialogue"]
-Kind = Literal["char", "scene", "prop"]
+Kind = Literal["char", "scene", "prop", "person"]
 
 # Clean official-game CG, not the loli-weighted 5-pack (no baku-p / tsubasa).
 # ciloranko + tianliang + sho = common v4.5 干净底；hiten + anmi 往二游官图/战术少女靠。
@@ -21,7 +21,9 @@ YEAR_TAGS = "year 2024"
 STYLE_TAGS = "official art, game cg, cel shading, clean lineart, detailed face, detailed eyes"
 SCENE_STYLE = "official art, game cg, anime background, scenery, cel shading, clean lineart, cinematic lighting"
 PROP_STYLE = "official art, game cg, item illustration, cel shading, clean lineart, product shot"
+PERSON_STYLE = "official art, game cg, character illustration, cel shading, clean lineart, detailed face, detailed eyes"
 ADULT = "1girl, solo, adult woman, 20 years old"
+ADULT_MAN = "1boy, solo, adult man, 25 years old, masculine"
 
 NEGATIVE = (
     "nsfw, nude, explicit, child, loli, shota, lowres, worst quality, bad quality, "
@@ -40,6 +42,13 @@ SCENE_NEGATIVE = (
 PROP_NEGATIVE = (
     "people, person, 1girl, 1boy, full body, landscape, cityscape, letterbox, "
     "black bars, border, frame, text, watermark, logo, signature"
+)
+PERSON_NEGATIVE = (
+    "1girl, 2girls, multiple girls, woman, female protagonist, feminine body, "
+    "long purple hair, silver hair, white hair, red inner hair, "
+    "cherry blossom hair ornament, blue ribbon, red hair ribbon, "
+    "child, loli, shota, nsfw, nude, letterbox, black bars, border, frame, "
+    "text, watermark, logo, signature, extra heads, extra arms"
 )
 
 CHARS: dict[str, dict[str, str]] = {
@@ -399,6 +408,125 @@ PROPS: dict[str, dict] = {
             "item illustration, centered weapon"
         ),
     },
+    "weapon_sayo_spare": {
+        "size": "portrait",
+        "canvas": (768, 1024),
+        "dest": "gacha/weapon_sayo_spare.webp",
+        "seed": 20260871,
+        "subject": (
+            "still life, no humans, stack of white rifle magazines with sakura print, "
+            "one empty magazine standing, spare ammunition crate, night shrine stone, "
+            "full moon, item illustration, centered object, no readable writing"
+        ),
+    },
+    "weapon_sayo_petal": {
+        "size": "portrait",
+        "canvas": (768, 1024),
+        "dest": "gacha/weapon_sayo_petal.webp",
+        "seed": 20260872,
+        "subject": (
+            "still life, no humans, rifle magazine overflowing with pink sakura petals "
+            "instead of bullets, petals spilling on wet stone, faint white rifle in soft blur, "
+            "night shrine, item illustration, centered object"
+        ),
+    },
+    "weapon_aya_side": {
+        "size": "portrait",
+        "canvas": (768, 1024),
+        "dest": "gacha/weapon_aya_side.webp",
+        "seed": 20260873,
+        "subject": (
+            "still life, no humans, silver pistol lying on its side muzzle pointing down, "
+            "blue-sheathed katana beside it still sheathed, spent gold casings on wet pavement, "
+            "full moon, item illustration, centered weapons"
+        ),
+    },
+    "weapon_aya_twin": {
+        "size": "portrait",
+        "canvas": (768, 1024),
+        "dest": "gacha/weapon_aya_twin.webp",
+        "seed": 20260874,
+        "subject": (
+            "still life, no humans, silver pistol and unsheathed katana crossed, "
+            "sakura petals on both, thin smoke from muzzle, night wet pavement, "
+            "item illustration, centered weapons"
+        ),
+    },
+    "weapon_rion_wood": {
+        "size": "portrait",
+        "canvas": (768, 1024),
+        "dest": "gacha/weapon_rion_wood.webp",
+        "seed": 20260875,
+        "subject": (
+            "still life, no humans, broken wooden bokken in two jagged pieces, "
+            "splinters on dark wooden floor, moonlight through cracked circular window, "
+            "item illustration, centered weapon"
+        ),
+    },
+    "weapon_rion_under": {
+        "size": "portrait",
+        "canvas": (768, 1024),
+        "dest": "gacha/weapon_rion_under.webp",
+        "seed": 20260876,
+        "subject": (
+            "still life, no humans, cracked empty black scabbard standing upright, "
+            "red cord tied around the split, no blade inside, sword graveyard blur, "
+            "item illustration, centered object"
+        ),
+    },
+    "weapon_sayo_final": {
+        "size": "portrait",
+        "canvas": (768, 1024),
+        "dest": "gacha/weapon_sayo_final.webp",
+        "seed": 20260877,
+        "subject": (
+            "still life, no humans, single glowing sakura-engraved rifle cartridge "
+            "standing on an empty white rifle, last round, gold and pink, night shrine moon, "
+            "legendary item illustration, centered object, no readable writing"
+        ),
+    },
+    "weapon_aya_mirror": {
+        "size": "portrait",
+        "canvas": (768, 1024),
+        "dest": "gacha/weapon_aya_mirror.webp",
+        "seed": 20260878,
+        "subject": (
+            "still life, no humans, katana whose blade is cracked golden mirror glass, "
+            "blue wrapping, gold tsuba, floating shards, purple void, "
+            "legendary item illustration, centered weapon"
+        ),
+    },
+    "weapon_rion_burial": {
+        "size": "portrait",
+        "canvas": (768, 1024),
+        "dest": "gacha/weapon_rion_burial.webp",
+        "seed": 20260879,
+        "subject": (
+            "still life, no humans, black funerary katana planted in earth like a gravestone, "
+            "red maple leaves, blue spirit lights, sword graveyard, "
+            "legendary item illustration, centered weapon"
+        ),
+    },
+}
+
+# The remnant man on last_witness. Not a fourth heroine; not sayo / aya / rion.
+PEOPLE: dict[str, dict] = {
+    "last_witness": {
+        "size": "portrait",
+        "canvas": (768, 1024),
+        "dest": "gacha/last_witness.webp",
+        "seed": 20260861,
+        "subject": (
+            f"{ADULT_MAN}, "
+            "short messy black hair, amber eyes, tired expression, looking at viewer, "
+            "dark navy haori, gold embroidery, faint sakura pattern, gold earrings, "
+            "fully clothed, safe for work, "
+            "standing behind shattered ornate golden oval mirror, cracked glowing glass, "
+            "night shrine courtyard, paper lanterns, falling sakura petals, "
+            "upper body, portrait, face focus, head complete, "
+            "card illustration, witness, not a heroine"
+        ),
+    },
 }
 
 
@@ -435,4 +563,24 @@ def compose_prop_prompt(prop_id: str, extra: str = "") -> tuple[str, str]:
     prompt = ", ".join(p.strip().strip(",") for p in parts if p and p.strip())
     extra_neg = prop.get("negative", "")
     negative = ", ".join(p for p in (NEGATIVE, PROP_NEGATIVE, extra_neg) if p)
+    return prompt, negative
+
+
+def compose_person_prompt(person_id: str, extra: str = "") -> tuple[str, str]:
+    if person_id not in PEOPLE:
+        raise ValueError(f"unknown person {person_id!r}; use {sorted(PEOPLE)}")
+    if person_id in CHARS:
+        raise ValueError(f"refusing protagonist id {person_id!r}")
+    person = PEOPLE[person_id]
+    parts = [
+        ARTIST_STRING,
+        YEAR_TAGS,
+        person["subject"],
+        extra,
+        PERSON_STYLE,
+        QUALITY_TAGS,
+    ]
+    prompt = ", ".join(p.strip().strip(",") for p in parts if p and p.strip())
+    extra_neg = person.get("negative", "")
+    negative = ", ".join(p for p in (NEGATIVE, PERSON_NEGATIVE, extra_neg) if p)
     return prompt, negative

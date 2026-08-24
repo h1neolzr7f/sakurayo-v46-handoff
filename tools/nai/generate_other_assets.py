@@ -11,7 +11,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from free_v45 import SafetyError, fetch_account, generate_free_image, read_token
-from prompts import PROPS, SCENES, compose_prop_prompt, compose_scene_prompt
+from prompts import PEOPLE, PROPS, SCENES, compose_person_prompt, compose_prop_prompt, compose_scene_prompt
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "outputs" / "nai" / "raw"
@@ -25,7 +25,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Sakurayo NAI v4.5 scenery/prop probe. Does not generate sayo/aya/rion."
     )
-    parser.add_argument("--kind", choices=("scene", "prop"), default="scene")
+    parser.add_argument("--kind", choices=("scene", "prop", "person"), default="scene")
     parser.add_argument("--ids", default="", help="comma list; default is the 7 scenery pack")
     parser.add_argument("--extra", default="")
     parser.add_argument("--model", default="full")
@@ -33,9 +33,20 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args(argv)
 
-    catalog = SCENES if args.kind == "scene" else PROPS
-    compose = compose_scene_prompt if args.kind == "scene" else compose_prop_prompt
-    raw_ids = args.ids.strip() or (DEFAULT_SCENES if args.kind == "scene" else ",".join(PROPS))
+    catalogs = {"scene": SCENES, "prop": PROPS, "person": PEOPLE}
+    composers = {
+        "scene": compose_scene_prompt,
+        "prop": compose_prop_prompt,
+        "person": compose_person_prompt,
+    }
+    defaults = {
+        "scene": DEFAULT_SCENES,
+        "prop": ",".join(PROPS),
+        "person": ",".join(PEOPLE),
+    }
+    catalog = catalogs[args.kind]
+    compose = composers[args.kind]
+    raw_ids = args.ids.strip() or defaults[args.kind]
     ids = [x.strip() for x in raw_ids.split(",") if x.strip()]
     blocked = {"sayo", "aya", "rion"}
     hit = [x for x in ids if x in blocked]

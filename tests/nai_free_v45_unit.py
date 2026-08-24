@@ -24,9 +24,11 @@ from free_v45 import (  # noqa: E402
 from align_assets import cover_fit  # noqa: E402
 from prompts import (  # noqa: E402
     ARTIST_STRING,
+    PEOPLE,
     PROPS,
     QUALITY_TAGS,
     SCENES,
+    compose_person_prompt,
     compose_prompt,
     compose_prop_prompt,
     compose_scene_prompt,
@@ -209,6 +211,17 @@ class FreeV45SafetyTests(unittest.TestCase):
         self.assertEqual(SCENES["banner_bg"]["canvas"], (1280, 720))
 
     def test_prop_prompts_are_still_life(self):
+        extra = (
+            "weapon_sayo_spare",
+            "weapon_sayo_petal",
+            "weapon_aya_side",
+            "weapon_aya_twin",
+            "weapon_rion_wood",
+            "weapon_rion_under",
+            "weapon_sayo_final",
+            "weapon_aya_mirror",
+            "weapon_rion_burial",
+        )
         for pid in (
             "night_radio",
             "shrine_seal",
@@ -218,6 +231,7 @@ class FreeV45SafetyTests(unittest.TestCase):
             "weapon_mirror_round",
             "weapon_shard_blade",
             "weapon_radio_bat",
+            *extra,
         ):
             prompt, negative = compose_prop_prompt(pid)
             self.assertIn("still life", prompt, pid)
@@ -226,6 +240,28 @@ class FreeV45SafetyTests(unittest.TestCase):
             self.assertIn("people", negative, pid)
             self.assertEqual(PROPS[pid]["size"], "portrait", pid)
             self.assertEqual(PROPS[pid]["canvas"], (768, 1024), pid)
+
+    def test_last_witness_is_adult_man_not_heroine(self):
+        self.assertIn("last_witness", PEOPLE)
+        self.assertNotIn("last_witness", PROPS)
+        self.assertNotIn("sayo", PEOPLE)
+        self.assertNotIn("aya", PEOPLE)
+        self.assertNotIn("rion", PEOPLE)
+        prompt, negative = compose_person_prompt("last_witness")
+        self.assertTrue(prompt.startswith("{artist:ciloranko}"))
+        self.assertIn("1boy", prompt)
+        self.assertIn("adult man", prompt)
+        self.assertIn("25 years old", prompt)
+        self.assertIn("fully clothed", prompt)
+        self.assertIn("safe for work", prompt)
+        self.assertNotIn("1girl", prompt)
+        self.assertNotIn("long purple hair", prompt)
+        self.assertNotIn("silver hair", prompt)
+        self.assertNotIn("red inner hair", prompt)
+        self.assertIn("1girl", negative)
+        self.assertIn("child", negative)
+        self.assertEqual(PEOPLE["last_witness"]["dest"], "gacha/last_witness.webp")
+        self.assertEqual(PEOPLE["last_witness"]["canvas"], (768, 1024))
 
     def test_cover_fit_fills_canvas(self):
         from PIL import Image

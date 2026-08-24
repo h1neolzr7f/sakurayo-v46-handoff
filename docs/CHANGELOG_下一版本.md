@@ -4,6 +4,8 @@
 
 - 停三角色出图。大厅 `ui/lobby_wide.webp`、商店 `ui/shop_wide.webp`、档案 `ui/archive_wide.webp`、四章横屏 `battle_bg` 用 Opus 免费 Normal 重出，Anlas 未扣。
 - 商店/档案/关卡抽屉接宽背景。战场图从竖屏 1024×1536 换成 1600×900，中间留空地。
+- 续出 13 张免费图：四章选关/结算 CG、寻访横幅、卡背、4 张残件静物、3 张武器静物。选关卡不再内嵌 base64，改读 `stages/stage_N/cg.webp`。Anlas 仍为 0。
+- 再续 10 张：`last_witness` 男人证人（不用静物模板），以及剩余 9 张武器卡改成无人静物。时装/职业卡仍不重出三角色。Anlas 仍为 0。
 
 ## 第一期镜界寻访（源码仍 4.6.0，未下令不升 4.6.1）
 

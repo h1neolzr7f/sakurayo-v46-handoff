@@ -11,7 +11,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from prompts import PROPS, SCENES
+from prompts import PEOPLE, PROPS, SCENES
 
 ROOT = Path(__file__).resolve().parents[2]
 ANDROID = ROOT / "android-app" / "app" / "src" / "main" / "assets" / "game" / "art"
@@ -253,12 +253,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--char", default="")
     parser.add_argument("--scene", default="", help="scenery id from prompts.SCENES")
     parser.add_argument("--prop", default="", help="prop id from prompts.PROPS")
+    parser.add_argument("--person", default="", help="person id from prompts.PEOPLE")
     parser.add_argument("--out", default="")
     parser.add_argument("--install", action="store_true", help="write into game art")
     args = parser.parse_args(argv)
-    kinds = [bool(args.char), bool(args.scene), bool(args.prop)]
+    kinds = [bool(args.char), bool(args.scene), bool(args.prop), bool(args.person)]
     if sum(kinds) != 1:
-        parser.error("specify exactly one of --char / --scene / --prop")
+        parser.error("specify exactly one of --char / --scene / --prop / --person")
 
     if args.scene:
         if args.scene not in SCENES:
@@ -283,6 +284,19 @@ def main(argv: list[str] | None = None) -> int:
         print(f"wrote {out} {out.stat().st_size} {aligned.size}")
         if args.install:
             dest = install_catalog(aligned, spec["dest"], args.prop, lossless=False)
+            print(f"installed {dest} {dest.stat().st_size}")
+        return 0
+
+    if args.person:
+        if args.person not in PEOPLE:
+            parser.error(f"unknown person {args.person}; use {sorted(PEOPLE)}")
+        spec = PEOPLE[args.person]
+        aligned = process_cover(Path(args.src), tuple(spec["canvas"]))
+        out = Path(args.out) if args.out else OUT / "aligned" / f"{args.person}.webp"
+        save_webp(aligned, out, lossless=False)
+        print(f"wrote {out} {out.stat().st_size} {aligned.size}")
+        if args.install:
+            dest = install_catalog(aligned, spec["dest"], args.person, lossless=False)
             print(f"installed {dest} {dest.stat().st_size}")
         return 0
 
