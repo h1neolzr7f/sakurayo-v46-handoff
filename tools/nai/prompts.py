@@ -240,6 +240,73 @@ SCENES: dict[str, dict] = {
             "game battle background"
         ),
     },
+    "stage_1_cg": {
+        "size": "landscape",
+        "canvas": (1600, 900),
+        "dest": "stages/stage_1/cg.webp",
+        "seed": 20260851,
+        "subject": (
+            "scenery, location, no humans, no characters, "
+            "widescreen cinematic story cg, night shrine outer street, "
+            "vermilion torii gate, paper lanterns, wet stone path, "
+            "cherry blossom trees in bloom, falling sakura petals, full moon, "
+            "distant neon city glow, atmospheric fog, empty street, "
+            "game chapter cg, full bleed, no letterbox"
+        ),
+    },
+    "stage_2_cg": {
+        "size": "landscape",
+        "canvas": (1600, 900),
+        "dest": "stages/stage_2/cg.webp",
+        "seed": 20260852,
+        "subject": (
+            "scenery, location, no humans, no characters, "
+            "widescreen cinematic story cg, rain neon shopping street at night, "
+            "magenta cherry blossom trees, wet asphalt, puddles reflecting cyan and pink neon, "
+            "empty crosswalk, abandoned cars in the distance, purple fog, "
+            "game chapter cg, full bleed, no letterbox"
+        ),
+    },
+    "stage_3_cg": {
+        "size": "landscape",
+        "canvas": (1600, 900),
+        "dest": "stages/stage_3/cg.webp",
+        "seed": 20260853,
+        "subject": (
+            "scenery, location, no humans, no characters, "
+            "widescreen cinematic story cg, sword graveyard at night, "
+            "hundreds of katanas planted in dark earth, stone stairs, "
+            "red maple leaves, blue spirit lights, crescent moon, rocky cliffs, "
+            "empty path, game chapter cg, full bleed, no letterbox"
+        ),
+    },
+    "stage_4_cg": {
+        "size": "landscape",
+        "canvas": (1600, 900),
+        "dest": "stages/stage_4/cg.webp",
+        "seed": 20260854,
+        "subject": (
+            "scenery, location, no humans, no characters, "
+            "widescreen cinematic story cg, shattered golden mirrors floating "
+            "above a neon abyss, glowing sakura emblem, purple void sky, "
+            "cracked glass shards, empty circular platform, "
+            "game chapter cg, full bleed, no letterbox"
+        ),
+    },
+    "banner_bg": {
+        "size": "landscape",
+        "canvas": (1280, 720),
+        "dest": "gacha/banner_bg.webp",
+        "seed": 20260855,
+        "subject": (
+            "scenery, location, no humans, no characters, "
+            "widescreen gacha banner background, night shrine terrace, "
+            "full moon, vermilion torii, falling sakura petals, "
+            "neon city skyline far away, gold and purple lighting, "
+            "empty walkway, game banner, full bleed, no letterbox, "
+            "blank signs, no readable writing"
+        ),
+    },
 }
 
 # Faceless remnants / still-life props. Portrait 832x1216 then cover-fit to 768x1024.
@@ -286,6 +353,50 @@ PROPS: dict[str, dict] = {
             "still life, no humans, broken pink crystal crown with gold filigree floating, "
             "sakura ornaments, night shrine rooftops below, full moon, "
             "item illustration, centered object"
+        ),
+    },
+    "card_back": {
+        "size": "portrait",
+        "canvas": (768, 1024),
+        "dest": "gacha/card_back.webp",
+        "seed": 20260846,
+        "subject": (
+            "still life, no humans, ornate gacha card back, cracked golden hand mirror, "
+            "sakura petals, purple void, gold filigree frame, centered object, "
+            "item illustration, no readable writing, no letters"
+        ),
+    },
+    "weapon_mirror_round": {
+        "size": "portrait",
+        "canvas": (768, 1024),
+        "dest": "gacha/weapon_mirror_round.webp",
+        "seed": 20260847,
+        "subject": (
+            "still life, no humans, round golden hand-mirror shield standing upright, "
+            "cracked glass, sakura crest, gold rim, night shrine background soft blur, "
+            "item illustration, centered weapon, no readable writing"
+        ),
+    },
+    "weapon_shard_blade": {
+        "size": "portrait",
+        "canvas": (768, 1024),
+        "dest": "gacha/weapon_shard_blade.webp",
+        "seed": 20260848,
+        "subject": (
+            "still life, no humans, katana forged from gold glass shards, "
+            "broken mirror blade, red wrapping on hilt, floating fragments, "
+            "purple void, item illustration, centered weapon"
+        ),
+    },
+    "weapon_radio_bat": {
+        "size": "portrait",
+        "canvas": (768, 1024),
+        "dest": "gacha/weapon_radio_bat.webp",
+        "seed": 20260849,
+        "subject": (
+            "still life, no humans, wooden baseball bat with a vintage portable radio "
+            "taped near the grip, glowing pink dial, sakura sticker, night railing, "
+            "item illustration, centered weapon"
         ),
     },
 }

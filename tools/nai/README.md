@@ -15,13 +15,14 @@
 
 提示词在 `tools/nai/prompts.py`：画师串（ciloranko / tianliang / sho / hiten / anmi）+ v4.5 质量词。角色绿幕不要写 `location`；风景要写。角色锁见 `docs/ART_BIBLE.md`。
 
-默认补非主角：大厅 / 商店 / 档案 / 四章战场。不要用这个脚本刷三角色。
+默认补非主角：大厅 / 商店 / 档案 / 四章战场 / 关卡 CG / 寻访静物。不要用这个脚本刷三角色。
 
 ```bash
 export NAI_API_TOKEN='pst-...'   # 不要把这一行提交进 git
 python tools/nai/generate_free_v45.py --status
-python tools/nai/generate_other_assets.py --kind scene --ids lobby_wide --max 1
-python tools/nai/align_assets.py --src outputs/nai/raw/lobby_wide_20260831.png --scene lobby_wide --install
+python tools/nai/generate_other_assets.py --kind scene --ids stage_1_cg --max 1
+python tools/nai/generate_other_assets.py --kind prop --ids night_radio --max 1
+python tools/nai/align_assets.py --src outputs/nai/raw/stage_1_cg_20260851.png --scene stage_1_cg --install
 # 角色站桩另走（现在先停）：
 # python tools/nai/generate_assets.py --shot live --chars sayo
 ```

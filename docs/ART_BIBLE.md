@@ -40,7 +40,10 @@ NAI 只走 Opus 免费 Normal：`832×1216` / `1216×832` / `1024×1024`，模�
 | `lobby_wide` | 大厅宽背景 | 1216×832 | cover 到 1600×900 |
 | `shop_wide` / `archive_wide` | 商店、档案抽屉 | 同上 | 同上 |
 | `stage_1`…`stage_4` | 横屏战场 | 同上 | 同上 |
+| `stage_1_cg`…`stage_4_cg` | 选关卡 / 结算剧情 CG | 同上 | 同上 |
+| `banner_bg` | 寻访横幅 | 同上 | cover 到 1280×720 |
 | `night_radio` 等残件 | 寻访静物卡 | 832×1216 | cover 到 768×1024 |
+| `card_back` / 武器静物 | 卡背与武器卡 | 832×1216 | cover 到 768×1024 |
 
 风景提示词**要写 `location`**，并锁 `no humans`。不要用会变成照片风的 `background dataset`。禁止字、招牌、黑边、分屏。战场图中间留空地，给角色和怪站。风景 WebP 用有损 90（无透明）；角色站桩仍无损。
 

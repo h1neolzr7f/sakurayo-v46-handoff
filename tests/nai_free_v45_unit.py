@@ -24,6 +24,7 @@ from free_v45 import (  # noqa: E402
 from align_assets import cover_fit  # noqa: E402
 from prompts import (  # noqa: E402
     ARTIST_STRING,
+    PROPS,
     QUALITY_TAGS,
     SCENES,
     compose_prompt,
@@ -200,14 +201,31 @@ class FreeV45SafetyTests(unittest.TestCase):
             self.assertIn("people", negative, sid)
             self.assertIn("letterbox", negative, sid)
             self.assertEqual(spec["size"], "landscape", sid)
-            self.assertEqual(spec["canvas"], (1600, 900), sid)
+            self.assertGreater(spec["canvas"][0], spec["canvas"][1], sid)
+        cg_ids = ("stage_1_cg", "stage_2_cg", "stage_3_cg", "stage_4_cg")
+        for sid in cg_ids:
+            self.assertIn(sid, SCENES)
+            self.assertEqual(SCENES[sid]["canvas"], (1600, 900), sid)
+        self.assertEqual(SCENES["banner_bg"]["canvas"], (1280, 720))
 
     def test_prop_prompts_are_still_life(self):
-        prompt, negative = compose_prop_prompt("night_radio")
-        self.assertIn("still life", prompt)
-        self.assertIn("no humans", prompt)
-        self.assertNotIn("1girl", prompt)
-        self.assertIn("people", negative)
+        for pid in (
+            "night_radio",
+            "shrine_seal",
+            "void_ticket",
+            "cherry_crown",
+            "card_back",
+            "weapon_mirror_round",
+            "weapon_shard_blade",
+            "weapon_radio_bat",
+        ):
+            prompt, negative = compose_prop_prompt(pid)
+            self.assertIn("still life", prompt, pid)
+            self.assertIn("no humans", prompt, pid)
+            self.assertNotIn("1girl", prompt, pid)
+            self.assertIn("people", negative, pid)
+            self.assertEqual(PROPS[pid]["size"], "portrait", pid)
+            self.assertEqual(PROPS[pid]["canvas"], (768, 1024), pid)
 
     def test_cover_fit_fills_canvas(self):
         from PIL import Image
