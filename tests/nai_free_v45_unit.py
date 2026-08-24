@@ -22,6 +22,15 @@ from free_v45 import (  # noqa: E402
     validate_free_request,
 )
 from align_assets import cover_fit  # noqa: E402
+from more_prompts import (  # noqa: E402
+    CARD_PROPS,
+    CREATURES,
+    EXTRAS,
+    SCENES_MORE,
+    compose_card_prompt,
+    compose_creature_prompt,
+    compose_extra_prompt,
+)
 from prompts import (  # noqa: E402
     ARTIST_STRING,
     PEOPLE,
@@ -262,6 +271,49 @@ class FreeV45SafetyTests(unittest.TestCase):
         self.assertIn("child", negative)
         self.assertEqual(PEOPLE["last_witness"]["dest"], "gacha/last_witness.webp")
         self.assertEqual(PEOPLE["last_witness"]["canvas"], (768, 1024))
+
+    def test_creatures_are_faceless_monsters(self):
+        self.assertNotIn("sayo", CREATURES)
+        self.assertNotIn("aya", CREATURES)
+        self.assertNotIn("rion", CREATURES)
+        self.assertIn("normal", CREATURES)
+        self.assertIn("stage1_phase4", CREATURES)
+        self.assertIn("void_phase4", CREATURES)
+        self.assertIn("drone", CREATURES)
+        for cid, spec in CREATURES.items():
+            prompt, negative = compose_creature_prompt(cid)
+            self.assertIn("no humans", prompt, cid)
+            self.assertIn("chroma key", prompt, cid)
+            self.assertIn("no 1girl", prompt, cid)
+            self.assertIn("1girl", negative, cid)
+            self.assertIn("cat ears", negative, cid)
+            self.assertEqual(spec["size"], "portrait", cid)
+            dest = spec["dest"]
+            self.assertTrue(
+                dest.startswith(("enemies/", "bosses/", "pets/", "content-packs/maingod-void/")),
+                dest,
+            )
+
+    def test_card_emblems_are_still_life(self):
+        self.assertEqual(len(CARD_PROPS), 14 + 28 + 24)
+        for cid, spec in CARD_PROPS.items():
+            prompt, negative = compose_card_prompt(cid)
+            self.assertIn("still life", prompt, cid)
+            self.assertIn("no humans", prompt, cid)
+            self.assertNotIn("1girl", prompt, cid)
+            self.assertEqual(spec["dest"], f"gacha/{cid}.webp", cid)
+            self.assertEqual(spec["canvas"], (768, 1024), cid)
+
+    def test_extra_scenes_stay_empty(self):
+        for sid, spec in SCENES_MORE.items():
+            prompt, negative = compose_extra_prompt(sid)
+            self.assertIn("no humans", prompt, sid)
+            self.assertIn("location", prompt, sid)
+            self.assertNotIn("1girl", prompt, sid)
+            self.assertEqual(spec["size"], "landscape", sid)
+        self.assertIn("cover_v36_main_god", EXTRAS)
+        cover_p, _ = compose_extra_prompt("cover_v36_main_god")
+        self.assertIn("no humans", cover_p)
 
     def test_cover_fit_fills_canvas(self):
         from PIL import Image

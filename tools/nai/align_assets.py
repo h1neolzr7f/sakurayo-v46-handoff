@@ -15,6 +15,7 @@ except ImportError:  # cover_fit only needs PIL; chroma-key needs numpy
     np = None
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from more_prompts import CARD_PROPS, CREATURES, EXTRAS, SCENES_MORE
 from prompts import PEOPLE, PROPS, SCENES
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -27,6 +28,12 @@ LIVE_HEIGHT = 1220
 PORTRAIT_CANVAS = (512, 512)
 PORTRAIT_TOP = 12
 PORTRAIT_HEIGHT = 488
+
+
+def _need_np():
+    if np is None:
+        raise RuntimeError("numpy is required for chroma-key alignment")
+    return np
 
 
 def feather_alpha(im: Image.Image, radius: float = 2.2) -> Image.Image:
@@ -196,6 +203,14 @@ def process_file(src: Path, shot: str) -> Image.Image:
     return fit_bbox(keyed, LIVE_CANVAS, LIVE_TOP, LIVE_HEIGHT)
 
 
+def process_creature(src: Path, canvas: tuple[int, int]) -> Image.Image:
+    _need_np()
+    keyed = cutout(Image.open(src))
+    top = 8
+    height = max(16, canvas[1] - 16)
+    return fit_bbox(keyed, canvas, top, height)
+
+
 def cover_fit(im: Image.Image, canvas: tuple[int, int]) -> Image.Image:
     """Scale to cover a canvas and center-crop. Used for scenery / card stills."""
     src = im.convert("RGB")
@@ -258,12 +273,23 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--scene", default="", help="scenery id from prompts.SCENES")
     parser.add_argument("--prop", default="", help="prop id from prompts.PROPS")
     parser.add_argument("--person", default="", help="person id from prompts.PEOPLE")
+    parser.add_argument("--creature", default="", help="creature id from more_prompts.CREATURES")
+    parser.add_argument("--card", default="", help="school/job/fusion emblem id")
+    parser.add_argument("--extra", default="", help="extra still id (cover/maps/icons)")
     parser.add_argument("--out", default="")
     parser.add_argument("--install", action="store_true", help="write into game art")
     args = parser.parse_args(argv)
-    kinds = [bool(args.char), bool(args.scene), bool(args.prop), bool(args.person)]
+    kinds = [
+        bool(args.char),
+        bool(args.scene),
+        bool(args.prop),
+        bool(args.person),
+        bool(args.creature),
+        bool(args.card),
+        bool(args.extra),
+    ]
     if sum(kinds) != 1:
-        parser.error("specify exactly one of --char / --scene / --prop / --person")
+        parser.error("specify exactly one of --char / --scene / --prop / --person / --creature / --card / --extra")
 
     if args.scene:
         if args.scene not in SCENES:
@@ -301,6 +327,46 @@ def main(argv: list[str] | None = None) -> int:
         print(f"wrote {out} {out.stat().st_size} {aligned.size}")
         if args.install:
             dest = install_catalog(aligned, spec["dest"], args.person, lossless=False)
+            print(f"installed {dest} {dest.stat().st_size}")
+        return 0
+
+    if args.creature:
+        if args.creature not in CREATURES:
+            parser.error(f"unknown creature {args.creature}")
+        spec = CREATURES[args.creature]
+        aligned = process_creature(Path(args.src), tuple(spec["canvas"]))
+        out = Path(args.out) if args.out else OUT / "aligned" / f"{args.creature}.webp"
+        save_webp(aligned, out, lossless=True)
+        print(f"wrote {out} {out.stat().st_size} {aligned.size}")
+        if args.install:
+            dest = install_catalog(aligned, spec["dest"], args.creature, lossless=True)
+            print(f"installed {dest} {dest.stat().st_size}")
+        return 0
+
+    if args.card:
+        if args.card not in CARD_PROPS:
+            parser.error(f"unknown card {args.card}")
+        spec = CARD_PROPS[args.card]
+        aligned = process_cover(Path(args.src), tuple(spec["canvas"]))
+        out = Path(args.out) if args.out else OUT / "aligned" / f"{args.card}.webp"
+        save_webp(aligned, out, lossless=False)
+        print(f"wrote {out} {out.stat().st_size} {aligned.size}")
+        if args.install:
+            dest = install_catalog(aligned, spec["dest"], args.card, lossless=False)
+            print(f"installed {dest} {dest.stat().st_size}")
+        return 0
+
+    if args.extra:
+        catalog = {**SCENES_MORE, **EXTRAS}
+        if args.extra not in catalog:
+            parser.error(f"unknown extra {args.extra}")
+        spec = catalog[args.extra]
+        aligned = process_cover(Path(args.src), tuple(spec["canvas"]))
+        out = Path(args.out) if args.out else OUT / "aligned" / f"{args.extra}.webp"
+        save_webp(aligned, out, lossless=False)
+        print(f"wrote {out} {out.stat().st_size} {aligned.size}")
+        if args.install:
+            dest = install_catalog(aligned, spec["dest"], args.extra, lossless=False)
             print(f"installed {dest} {dest.stat().st_size}")
         return 0
 
