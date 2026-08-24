@@ -42,7 +42,7 @@ NAI 只走 Opus 免费 Normal：`832×1216` / `1216×832` / `1024×1024`，模�
 | `stage_1`…`stage_4` | 横屏战场 | 同上 | 同上 |
 | `night_radio` 等残件 | 寻访静物卡 | 832×1216 | cover 到 768×1024 |
 
-风景提示词**要写 `location`**，并锁 `no humans`。不要用会变成照片风的 `background dataset`。禁止字、招牌、黑边、分屏。战场图中间留空地，给角色和怪站。
+风景提示词**要写 `location`**，并锁 `no humans`。不要用会变成照片风的 `background dataset`。禁止字、招牌、黑边、分屏。战场图中间留空地，给角色和怪站。风景 WebP 用有损 90（无透明）；角色站桩仍无损。
 
 ```bash
 python tools/nai/generate_other_assets.py --kind scene --ids lobby_wide --max 1

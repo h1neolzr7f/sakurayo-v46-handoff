@@ -7496,6 +7496,17 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     bg.style.backgroundSize="cover";
     $("#menu")?.classList.add("lobbyWide46");
   }
+  function dressRooms46(){
+    [
+      ["shopDrawer","ui/shop_wide.webp"],
+      ["archiveDrawer","ui/archive_wide.webp"],
+      ["stageDrawer","ui/lobby_wide.webp"],
+    ].forEach(([id,path])=>{
+      const el=$("#"+id);
+      if(!el)return;
+      el.style.background=`linear-gradient(180deg,#05051233 0%,#08071388 42%,#080713d4 100%),url('${artUrl(path)}') center/cover no-repeat`;
+    });
+  }
   function bindStageModes46(){
     const L=window.SakurayoLobby;
     const box=$("#stageList");
@@ -7561,6 +7572,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     wireLivePuppet46();
     L.dressArchive($("#archiveDrawer .archiveDock46"));
     ["shopDrawer","stageDrawer","archiveDrawer"].forEach(id=>$(`#${id}`)?.classList.add("room46"));
+    dressRooms46();
     const _openDrawer46=openDrawer;
     openDrawer=function(n){
       _openDrawer46(n);

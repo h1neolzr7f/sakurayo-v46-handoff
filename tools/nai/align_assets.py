@@ -175,9 +175,12 @@ def circle_portrait(im: Image.Image) -> Image.Image:
     return out
 
 
-def save_webp(im: Image.Image, dest: Path) -> None:
+def save_webp(im: Image.Image, dest: Path, *, lossless: bool = True) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
-    im.save(dest, "WEBP", lossless=True, quality=100, method=4, exact=True)
+    if lossless:
+        im.save(dest, "WEBP", lossless=True, quality=100, method=4, exact=True)
+    else:
+        im.save(dest, "WEBP", quality=90, method=6)
 
 
 def process_file(src: Path, shot: str) -> Image.Image:
@@ -231,11 +234,11 @@ def install_portrait(aligned: Image.Image, cid: str, backup: bool = True) -> Pat
     return dest
 
 
-def install_catalog(aligned: Image.Image, dest_rel: str, backup_id: str, backup: bool = True) -> Path:
+def install_catalog(aligned: Image.Image, dest_rel: str, backup_id: str, backup: bool = True, lossless: bool = False) -> Path:
     dest = ANDROID / dest_rel
     if backup:
         backup_art(dest, backup_id)
-    save_webp(aligned, dest)
+    save_webp(aligned, dest, lossless=lossless)
     return dest
 
 
@@ -263,10 +266,10 @@ def main(argv: list[str] | None = None) -> int:
         spec = SCENES[args.scene]
         aligned = process_cover(Path(args.src), tuple(spec["canvas"]))
         out = Path(args.out) if args.out else OUT / "aligned" / f"{args.scene}.webp"
-        save_webp(aligned, out)
+        save_webp(aligned, out, lossless=False)
         print(f"wrote {out} {out.stat().st_size} {aligned.size}")
         if args.install:
-            dest = install_catalog(aligned, spec["dest"], args.scene)
+            dest = install_catalog(aligned, spec["dest"], args.scene, lossless=False)
             print(f"installed {dest} {dest.stat().st_size}")
         return 0
 
@@ -276,10 +279,10 @@ def main(argv: list[str] | None = None) -> int:
         spec = PROPS[args.prop]
         aligned = process_cover(Path(args.src), tuple(spec["canvas"]))
         out = Path(args.out) if args.out else OUT / "aligned" / f"{args.prop}.webp"
-        save_webp(aligned, out)
+        save_webp(aligned, out, lossless=False)
         print(f"wrote {out} {out.stat().st_size} {aligned.size}")
         if args.install:
-            dest = install_catalog(aligned, spec["dest"], args.prop)
+            dest = install_catalog(aligned, spec["dest"], args.prop, lossless=False)
             print(f"installed {dest} {dest.stat().st_size}")
         return 0
 
