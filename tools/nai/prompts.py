@@ -76,8 +76,8 @@ CHARS: dict[str, dict[str, str]] = {
             "red laces, fingerless gloves, gold buckle, fully clothed, safe for work"
         ),
         "weapon": (
-            "holding katana, single sword, red hilt wrap, gold tsuba, "
-            "black scabbard, red sageo, blade down"
+            "holding katana, single sword, one sword, no extra swords, "
+            "red hilt wrap, gold tsuba, black scabbard, red sageo, blade down"
         ),
     },
 }
@@ -85,7 +85,7 @@ CHARS: dict[str, dict[str, str]] = {
 SHOTS: dict[str, dict[str, str]] = {
     "live": {
         "framing": "full body, standing, facing viewer, entire body in frame, head to toe, shoes visible",
-        "background": "simple background, green background, chroma key, solid color background",
+        "background": "simple background, chroma key, #00ff00, neon green background, solid color background",
         "negative": "location, scenery, cityscape, detailed background, shadow on ground, floor, "
         "multiple girls, cowboy shot, close-up, portrait, cropped legs, missing feet",
         "size": "portrait",
@@ -98,7 +98,7 @@ SHOTS: dict[str, dict[str, str]] = {
     },
     "dialogue": {
         "framing": "cowboy shot, upper body, looking at viewer, head complete",
-        "background": "simple background, green background, chroma key, solid color background",
+        "background": "simple background, chroma key, #00ff00, neon green background, solid color background",
         "negative": "location, scenery, cityscape, detailed background, shadow on ground, text",
         "size": "portrait",
     },

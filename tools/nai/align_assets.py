@@ -30,6 +30,40 @@ def feather_alpha(im: Image.Image, radius: float = 2.2) -> Image.Image:
     return Image.fromarray(arr, "RGBA")
 
 
+def key_edge_chroma(im: Image.Image, tol: int = 28) -> Image.Image:
+    """Drop the backdrop by flooding from the frame edge using sampled paper color."""
+    arr = np.asarray(im.convert("RGBA")).copy()
+    h, w = arr.shape[:2]
+    rgb = arr[:, :, :3].astype(np.int16)
+    edge = np.concatenate(
+        [arr[:6, :, :3].reshape(-1, 3), arr[-6:, :, :3].reshape(-1, 3),
+         arr[:, :6, :3].reshape(-1, 3), arr[:, -6:, :3].reshape(-1, 3)]
+    )
+    paper = np.median(edge, axis=0).astype(np.int16)
+    dist = np.abs(rgb - paper).sum(axis=2)
+    near = dist <= tol
+    vis = np.zeros((h, w), dtype=bool)
+    stack = []
+    for x in range(w):
+        for y in (0, h - 1):
+            if near[y, x] and not vis[y, x]:
+                vis[y, x] = True
+                stack.append((y, x))
+    for y in range(h):
+        for x in (0, w - 1):
+            if near[y, x] and not vis[y, x]:
+                vis[y, x] = True
+                stack.append((y, x))
+    while stack:
+        y, x = stack.pop()
+        for ny, nx in ((y - 1, x), (y + 1, x), (y, x - 1), (y, x + 1)):
+            if 0 <= ny < h and 0 <= nx < w and not vis[ny, nx] and near[ny, nx]:
+                vis[ny, nx] = True
+                stack.append((ny, nx))
+    arr[:, :, 3] = np.where(vis, 0, arr[:, :, 3])
+    return feather_alpha(Image.fromarray(arr, "RGBA"))
+
+
 def key_green(im: Image.Image) -> Image.Image:
     arr = np.asarray(im.convert("RGBA")).copy()
     r, g, b = arr[:, :, 0].astype(np.int16), arr[:, :, 1].astype(np.int16), arr[:, :, 2].astype(np.int16)
@@ -70,12 +104,29 @@ def key_flat(im: Image.Image, luma_max: int = 28) -> Image.Image:
     return feather_alpha(Image.fromarray(arr, "RGBA"))
 
 
+def clean_fringe(im: Image.Image) -> Image.Image:
+    arr = np.asarray(im.convert("RGBA")).copy()
+    r, g, b = arr[:, :, 0].astype(np.int16), arr[:, :, 1].astype(np.int16), arr[:, :, 2].astype(np.int16)
+    a = arr[:, :, 3]
+    greenish = (g > r + 10) & (g > b + 10)
+    # Drop weak green halo; despill stronger interior leftovers.
+    drop = greenish & (a < 140)
+    arr[:, :, 3] = np.where(drop, 0, a)
+    keep = greenish & (arr[:, :, 3] >= 140)
+    mid = ((r + b) // 2).astype(np.uint8)
+    arr[:, :, 1] = np.where(keep, np.minimum(arr[:, :, 1], mid), arr[:, :, 1])
+    return feather_alpha(Image.fromarray(arr, "RGBA"), radius=1.4)
+
+
 def cutout(im: Image.Image) -> Image.Image:
-    keyed = key_green(im)
-    a = np.asarray(keyed)[:, :, 3]
-    if (a > 8).mean() > 0.92:
+    keyed = key_edge_chroma(im)
+    cover = (np.asarray(keyed)[:, :, 3] > 8).mean()
+    if cover > 0.88 or cover < 0.04:
+        keyed = key_green(im)
+        cover = (np.asarray(keyed)[:, :, 3] > 8).mean()
+    if cover > 0.88 or cover < 0.04:
         keyed = key_flat(im)
-    return keyed
+    return clean_fringe(keyed)
 
 
 def fit_bbox(im: Image.Image, canvas: tuple[int, int], top: int, height: int) -> Image.Image:
@@ -96,8 +147,21 @@ def fit_bbox(im: Image.Image, canvas: tuple[int, int], top: int, height: int) ->
     return out
 
 
+def bust_crop(im: Image.Image) -> Image.Image:
+    """If NAI ignored upper-body and drew full body, keep the head and bust."""
+    rgba = im.convert("RGBA")
+    bbox = rgba.getchannel("A").getbbox()
+    if not bbox:
+        return rgba
+    subject = rgba.crop(bbox)
+    if subject.height > subject.width * 1.35:
+        cut = int(subject.height * 0.48)
+        subject = subject.crop((0, 0, subject.width, cut))
+    return subject
+
+
 def circle_portrait(im: Image.Image) -> Image.Image:
-    fitted = fit_bbox(im, PORTRAIT_CANVAS, PORTRAIT_TOP, PORTRAIT_HEIGHT)
+    fitted = fit_bbox(bust_crop(im), PORTRAIT_CANVAS, PORTRAIT_TOP, PORTRAIT_HEIGHT)
     mask = Image.new("L", PORTRAIT_CANVAS, 0)
     ImageDraw.Draw(mask).ellipse((6, 6, 505, 505), fill=255)
     mask = mask.filter(ImageFilter.GaussianBlur(radius=1.2))
@@ -122,19 +186,33 @@ def process_file(src: Path, shot: str) -> Image.Image:
     return fit_bbox(keyed, LIVE_CANVAS, LIVE_TOP, LIVE_HEIGHT)
 
 
+def backup_art(dest: Path, cid: str) -> None:
+    if not dest.exists():
+        return
+    bak = OUT / "backup" / cid / dest.name
+    bak.parent.mkdir(parents=True, exist_ok=True)
+    if not bak.exists():
+        shutil.copy2(dest, bak)
+
+
 def install_live(aligned: Image.Image, cid: str, backup: bool = True) -> list[Path]:
     dest_dir = ANDROID / "characters" / cid / "default"
     written: list[Path] = []
     for name in ("live_idle.webp", "live_blink.webp"):
         dest = dest_dir / name
-        if backup and dest.exists():
-            bak = OUT / "backup" / cid / name
-            bak.parent.mkdir(parents=True, exist_ok=True)
-            if not bak.exists():
-                shutil.copy2(dest, bak)
+        if backup:
+            backup_art(dest, cid)
         save_webp(aligned, dest)
         written.append(dest)
     return written
+
+
+def install_portrait(aligned: Image.Image, cid: str, backup: bool = True) -> Path:
+    dest = ANDROID / "characters" / cid / "default" / "portrait.webp"
+    if backup:
+        backup_art(dest, cid)
+    save_webp(aligned, dest)
+    return dest
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -150,11 +228,14 @@ def main(argv: list[str] | None = None) -> int:
     save_webp(aligned, out)
     print(f"wrote {out} {out.stat().st_size} {aligned.size}")
     if args.install:
-        if args.shot != "live":
-            print("install currently only writes live_idle/live_blink", file=sys.stderr)
-            return 2
-        for dest in install_live(aligned, args.char):
+        if args.shot == "live":
+            for dest in install_live(aligned, args.char):
+                print(f"installed {dest} {dest.stat().st_size}")
+        elif args.shot == "portrait":
+            dest = install_portrait(aligned, args.char)
             print(f"installed {dest} {dest.stat().st_size}")
+        else:
+            print("dialogue install not wired; wrote aligned file only", file=sys.stderr)
     return 0
 
 
