@@ -210,7 +210,7 @@
     ".wishStage46{position:relative;min-height:100%;min-height:100dvh;height:100%;overflow:hidden;background:radial-gradient(circle at 28% 18%,#4a1d55 0%,#1a1030 38%,#060410 100%)}" +
     ".wishStage46:before{content:\"\";position:absolute;inset:0;background:radial-gradient(circle at 16% 20%,#ff72b433 0 4%,transparent 42%),radial-gradient(circle at 80% 16%,#ffe08a26 0 3%,transparent 38%),radial-gradient(circle at 60% 72%,#7a3dff28 0 5%,transparent 44%);pointer-events:none;animation:wishDrift46 8s ease-in-out infinite}" +
     ".wishBanner46{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}" +
-    ".wishHero46{position:absolute;z-index:2;left:-4%;bottom:-6%;width:58%;height:118%;object-fit:contain;object-position:left bottom;background:transparent!important;pointer-events:none;-webkit-mask-image:linear-gradient(to top,transparent 0%,#000 12%,#000 100%);mask-image:linear-gradient(to top,transparent 0%,#000 12%,#000 100%)}" +
+    ".wishHero46{position:absolute;z-index:2;left:-2%;bottom:0;width:48%;height:100%;object-fit:contain;object-position:left bottom;background:transparent!important;pointer-events:none;-webkit-mask-image:linear-gradient(to top,transparent 0%,#000 12%,#000 100%);mask-image:linear-gradient(to top,transparent 0%,#000 12%,#000 100%)}" +
     ".wishPetals46{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden}" +
     ".wishPetals46 i{position:absolute;top:-12%;width:7px;height:9px;border-radius:0 70% 0 70%;background:#ff9bcc99;box-shadow:0 0 8px #ff9bcc66;animation:petalFall46 11s linear infinite}" +
     ".wishTitle46{position:absolute;z-index:4;top:max(52px,calc(env(safe-area-inset-top) + 44px));right:16px;left:auto;text-align:right;max-width:58%;pointer-events:none}" +
@@ -313,14 +313,14 @@
     "@media(min-width:500px){#rosterWall46{grid-template-columns:repeat(4,minmax(0,1fr))}}" +
     "@media(orientation:landscape){" +
     "#menu.homeDock46 .heroLive46{pointer-events:none;left:0;width:54%;bottom:0}" +
-    "#menu.homeDock46 .heroLiveBreath46{width:min(118vw,620px)}" +
+    "#menu.homeDock46 .heroLiveBreath46{width:min(42vw,440px);height:78%;max-height:78%}" +
     "#menu.homeDock46 .menu{width:min(42vw,400px);max-width:400px;padding:10px 14px calc(10px + env(safe-area-inset-bottom))}" +
     "#menu.homeDock46 .start{width:100%;margin:0 0 8px;letter-spacing:.42em}" +
     "#menu.homeDock46 .nav{width:100%;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;padding:8px;border-radius:18px}" +
     "#menu.homeDock46 .homeNav46 button{min-height:58px}" +
     "#menu.homeDock46 .stageMini{width:100%}" +
     "#menu.homeDock46 .charSelectPanel{position:relative;left:auto;right:auto;bottom:auto;width:100%}" +
-    ".wishHero46{left:-2%;width:46%;height:124%;bottom:-8%}" +
+    ".wishHero46{left:-2%;width:42%;height:100%;bottom:0}" +
     ".wishTitle46{right:4%;max-width:46%}" +
     ".wishDock46,.wishPity46{left:46%}" +
     "#rosterWall46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
@@ -329,7 +329,7 @@
     "}" +
     "html.landscape46 #menu.homeDock46 .heroLive46{pointer-events:none;left:0;width:64%;top:0;bottom:0}" +
     "html.landscape46 #menu.homeDock46 .menu{width:min(34vw,360px);max-width:360px;margin-left:auto}" +
-    "html.landscape46 .wishHero46{left:-2%;width:46%;height:124%;bottom:-8%}" +
+    "html.landscape46 .wishHero46{left:-2%;width:42%;height:100%;bottom:0}" +
     "html.landscape46 .wishTitle46{right:4%;max-width:46%}" +
     "html.landscape46 .wishDock46,html.landscape46 .wishPity46{left:46%}" +
     "html.landscape46 .wishPity46{bottom:max(240px,calc(env(safe-area-inset-bottom) + 220px));right:12px}" +
@@ -364,7 +364,7 @@
     "#archiveDrawer .archiveDock46 button small{color:#ffe7a3;font:700 11px/1.2 system-ui;letter-spacing:.08em}" +
     "#menu.homeDock46.lobbyWide46 .bg{filter:brightness(.78) saturate(1.05)}" +
     "#menu.homeDock46 .heroLive46{-webkit-mask-image:linear-gradient(to right,#000 0%,#000 78%,transparent 100%);mask-image:linear-gradient(to right,#000 0%,#000 78%,transparent 100%)}" +
-    "#menu.homeDock46 .heroLiveBreath46{width:min(62vw,680px);height:100%}" +
+    "#menu.homeDock46 .heroLiveBreath46{width:min(42vw,440px);height:78%;max-height:78%}" +
     "#menu.homeDock46 .heroLiveBreath46:before{content:\"\";position:absolute;inset:18% 18% 0 18%;background:radial-gradient(ellipse at 50% 78%,#1a103066 0%,#12081c00 70%);pointer-events:none}" +
     "#menu.homeDock46 .heroLiveBreath46 img,.wishHero46{background:transparent!important;image-rendering:auto;filter:none}" +
     ".heroLive46.hasBlink:not(.livePuppet46) .heroLiveBlink46{animation:heroBlink46 5.4s steps(1) infinite}" +
@@ -397,7 +397,7 @@
     ".rosterArt46:after{content:\"\";position:absolute;inset:auto 0 0;height:42%;background:linear-gradient(180deg,#100c1c00,#100c1cee)}" +
     "@media(orientation:landscape){" +
     "#menu.homeDock46 .heroLive46{width:64%;left:0;bottom:0!important}" +
-    "#menu.homeDock46 .heroLiveBreath46{width:min(58vw,680px);height:100%}" +
+    "#menu.homeDock46 .heroLiveBreath46{width:min(42vw,440px);height:78%;max-height:78%}" +
     "#menu.homeDock46 .menu{background:linear-gradient(180deg,#0b0818cc,#0b0818f2);border:1px solid #ffe6a328;border-radius:20px 0 0 0;box-shadow:-12px 0 40px #05020d66}" +
     "#shopDrawer>.dhead p,#shopDrawer .shopNotice{display:none}" +
     "#shopWallet44{display:flex;align-items:center;gap:14px;flex-wrap:wrap}" +
@@ -412,7 +412,7 @@
     "#talentList{grid-template-columns:1fr}" +
     "}" +
     "html.landscape46 #menu.homeDock46 .heroLive46{top:0;bottom:0!important;left:0;width:64%;-webkit-mask-image:linear-gradient(to right,#000 0%,#000 78%,transparent 100%);mask-image:linear-gradient(to right,#000 0%,#000 78%,transparent 100%)}" +
-    "html.landscape46 #menu.homeDock46 .heroLiveBreath46{height:100%;width:min(58vw,680px)}" +
+    "html.landscape46 #menu.homeDock46 .heroLiveBreath46{height:78%;max-height:78%;width:min(42vw,440px)}" +
     "html.landscape46 #menu.homeDock46 .heroLiveBreath46 img{object-fit:contain;object-position:center 10%}" +
     "html.landscape46 #menu.homeDock46 .heroLiveName46{top:auto;bottom:16%;left:max(16px,env(safe-area-inset-left));max-width:36%}" +
     "html.landscape46 #menu.homeDock46 #coverTitle36{left:max(16px,env(safe-area-inset-left));right:auto;top:max(10px,env(safe-area-inset-top));transform:none;text-align:left;max-width:40%}" +
@@ -1324,7 +1324,7 @@
     var first = !(host.getAttribute && host.getAttribute("data-dressed46") === "1");
     if (host.setAttribute) host.setAttribute("data-dressed46", "1");
     var copy = {
-      talent: ["永久天赋", "跨局成长"],
+      talent: ["樱核树", "点枝成长"],
       story: ["剧情档案", "四章证词"],
       asc: ["职业与飞升", "成型与代价"],
       ach: ["成就图鉴", "回收记录"],

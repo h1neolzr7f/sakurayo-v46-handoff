@@ -4,6 +4,7 @@
 python tools\static_check.py src\index.html
 node --check tests\artifacts\static\index.extracted.js
 python tools\check_content_packs.py
+node tests\talent_tree_unit.mjs
 node tests\framework_smoke.mjs src\index.html
 node tests\browser_smoke.mjs src\index.html
 ```

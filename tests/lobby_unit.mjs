@@ -13,6 +13,7 @@ vm.runInNewContext(code, sandbox);
 const L = sandbox.window.SakurayoLobby;
 
 assert.equal(code.includes("#rotateHint46"), false, "lobby 不得再写横持提示");
+assert.match(code, /heroLiveBreath46\{width:min\(42vw,440px\);height:78%/);
 assert.equal(code.includes("portraitFallback46"), false, "lobby 不得再写竖版回退");
 assert.match(code, /html\.landscape46 \.wishPity46\{bottom:max\(240px/);
 const indexSrc = fs.readFileSync(path.join(root, "src/index.html"), "utf8");
@@ -599,7 +600,7 @@ assert.match(modes, /id="modeTestimony46"[^>]*class="on"/);
 assert.match(V.renderStageModes("story"), /id="modeStory46"[^>]*class="on"/);
 
 const archiveHost = fakeEl("div", { className: "archiveDock46" });
-for (const [id, label] of [["talent", "永久天赋"], ["story", "剧情档案"], ["asc", "职业与飞升"], ["ach", "成就图鉴"]]) {
+for (const [id, label] of [["talent", "樱核树"], ["story", "剧情档案"], ["asc", "职业与飞升"], ["ach", "成就图鉴"]]) {
   const btn = fakeEl("button", { "data-open": id });
   btn.innerHTML = label;
   archiveHost.appendChild(btn);
@@ -607,6 +608,6 @@ for (const [id, label] of [["talent", "永久天赋"], ["story", "剧情档案"]
 V.dressArchive(archiveHost);
 const storyBtn = archiveHost.children.find((n) => n.getAttribute("data-open") === "story");
 assert.match(storyBtn.innerHTML, /<b>剧情档案<\/b><small>四章证词<\/small>/);
-assert.match(archiveHost.children[0].innerHTML, /永久天赋/);
+assert.match(archiveHost.children[0].innerHTML, /樱核树/);
 
 console.log("PASS lobby unit: rates, default two cards, pity, ten-pull, cheat taps, stage modes");

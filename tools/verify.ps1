@@ -14,6 +14,8 @@ Invoke-Step "static_check" { python tools/static_check.py src/index.html }
 Invoke-Step "syntax extracted" { node --check tests/artifacts/static/index.extracted.js }
 Invoke-Step "syntax cutscene" { node --check src/runtime/sakurayo-cutscene.js }
 Invoke-Step "syntax economy" { node --check src/runtime/sakurayo-economy.js }
+Invoke-Step "syntax talent-tree" { node --check src/runtime/sakurayo-talent-tree.js }
+Invoke-Step "talent tree unit" { node tests/talent_tree_unit.mjs }
 Invoke-Step "syntax lobby" { node --check src/runtime/sakurayo-lobby.js }
 Invoke-Step "syntax chronicle" { node --check src/runtime/sakurayo-chronicle.js }
 Invoke-Step "syntax live" { node --check src/runtime/sakurayo-live.js }
