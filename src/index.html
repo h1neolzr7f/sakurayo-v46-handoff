@@ -42,6 +42,11 @@
   line-height:1.35!important;
 }
 #toast.show{top:max(136px,calc(env(safe-area-inset-top) + 124px))!important}
+html.drawerOpen46 #toast,html.drawerOpen46 #toast.show{
+  display:none!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
 .warn{
   top:max(164px,calc(env(safe-area-inset-top) + 150px))!important;
   z-index:13!important;
@@ -5730,6 +5735,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
   function playToast(){
     if(toastBusy||!toastQueue.length||transientBlocked())return;
+    if(document.documentElement.classList.contains("drawerOpen46"))return;
     toastBusy=true;let e=$("#toast");e.textContent=toastQueue.shift();e.classList.add("show");
     placeToast46();
     clearTimeout(playToast.t);playToast.t=setTimeout(()=>{e.classList.remove("show");toastBusy=false;setTimeout(playToast,160)},1100);
@@ -7496,6 +7502,39 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     bg.style.backgroundSize="cover";
     $("#menu")?.classList.add("lobbyWide46");
   }
+  function paintRoomBgs46(){
+    const night=path=>`linear-gradient(180deg,#080713e6 0%,#080713f2 32%,#060410fa 72%,#05030efc 100%),url("${artUrl(path)}")`;
+    [
+      ["shopDrawer","ui/shop_room.webp"],
+      ["stageDrawer","ui/shop_room.webp"],
+      ["archiveDrawer","ui/archive_room.webp"],
+      ["talentDrawer","ui/archive_room.webp"],
+      ["storyDrawer","ui/archive_room.webp"],
+      ["ascDrawer","ui/archive_room.webp"],
+      ["achDrawer","ui/archive_room.webp"]
+    ].forEach(([id,room])=>{
+      const el=$(`#${id}`);
+      if(!el)return;
+      el.classList.add("room46");
+      el.style.backgroundImage=night(room);
+      el.style.backgroundSize="cover";
+      el.style.backgroundPosition="center 22%";
+      const dh=el.querySelector(":scope > .dhead");
+      if(dh) dh.style.backgroundImage="";
+    });
+  }
+  function syncDrawerChrome46(){
+    const open=[...document.querySelectorAll(".drawer")].some(d=>d&&!d.classList.contains("hidden"));
+    document.documentElement.classList.toggle("drawerOpen46",open);
+    if(open){
+      const t=$("#toast");
+      if(t)t.classList.remove("show");
+      toastBusy=false;
+    }else{
+      setTimeout(playToast,80);
+    }
+    placeToast46();
+  }
   function bindStageModes46(){
     const L=window.SakurayoLobby;
     const box=$("#stageList");
@@ -7560,7 +7599,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }
     wireLivePuppet46();
     L.dressArchive($("#archiveDrawer .archiveDock46"));
-    ["shopDrawer","stageDrawer","archiveDrawer"].forEach(id=>$(`#${id}`)?.classList.add("room46"));
+    paintRoomBgs46();
     const _openDrawer46=openDrawer;
     openDrawer=function(n){
       _openDrawer46(n);
@@ -7571,6 +7610,12 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       }
       if(n==="roster")L.renderRoster($("#rosterBody46"),save,lobbyHandlers46());
       if(n==="archive")L.dressArchive($("#archiveDrawer .archiveDock46"));
+      syncDrawerChrome46();
+    };
+    const _closeDrawers46=closeDrawers;
+    closeDrawers=function(){
+      _closeDrawers46();
+      syncDrawerChrome46();
     };
     const _renderStages46=renderStages;
     renderStages=function(){const result=_renderStages46();bindStageModes46();return result;};
@@ -7608,6 +7653,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       if(runMode36==="testimony"&&$("#sdesc")) $("#sdesc").textContent="证词模式 · 不发放升级卡";
       refreshLobby46();
       paintHomeBg46();
+      paintRoomBgs46();
       return result;
     };
   }
