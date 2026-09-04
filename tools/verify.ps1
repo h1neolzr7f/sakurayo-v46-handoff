@@ -32,5 +32,6 @@ Invoke-Step "syntax lifecycle" { node --check src/runtime/sakurayo-lifecycle.js 
 Invoke-Step "syntax content-runtime" { node --check src/runtime/sakurayo-content-runtime.js }
 Invoke-Step "framework smoke" { node tests/framework_smoke.mjs }
 Invoke-Step "browser smoke" { node tests/browser_smoke.mjs }
+Invoke-Step "nai free v45 unit" { python tests/nai_free_v45_unit.py }
 
 Write-Host "VERIFY PASS"

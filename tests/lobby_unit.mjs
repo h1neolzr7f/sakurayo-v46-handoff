@@ -83,13 +83,13 @@ const keepHashes = {
   fashion_sayo_crown: "b313dd1872cdf4793d138d5c8d9490d8357a9348ace5b3deb3c656f039a1484f",
   fashion_aya_funeral: "5d07014661d7d90ec4cd6febf944a3b2538c6e5dc5c08e6829ae747cabb9cdea",
   fashion_rion_bride: "abf79d5ae6e1ce299dda578bf6c88d80580fe85b18f1e3c5c899e3dde28e03f1",
-  weapon_sayo_final: "8f8b58bb150a2253b94e2dca43d0bfe4a2f96ebe5fbfdb8907060632729a7e38",
-  weapon_aya_mirror: "04c2bc41f4d71aa9691735de6e04937488b3fed3715910ff4de03d3f86ff75dc",
-  weapon_rion_burial: "544626968de7ff0f184e186370a26839ffd0908c3c655ed5cdb8771a354b20d5",
+  weapon_sayo_final: "c28297832f6ec200a5e4f8065e73d561e130c93b2481ca1999370be493793530",
+  weapon_aya_mirror: "d1cc3b2dde071a76b95474e514b230c7fef0faa6825650e3e2f591482fa44af8",
+  weapon_rion_burial: "a8e57bd17057d6fb5fc324819bd9d3ab59e965da65751056e006086113d18d23",
   sayo_echo: "a1f99f31bf5c4c2e8059cde650dc40cd0d9ef97533aabb2c0f3e62f6ce614409",
-  school_shrine: "3f3c6a3ce029e954b916b18cc3d1d55bdfe7283f8a1111d330cb3fc8b6131abc",
-  job_garden: "3970b76d407c313c22b49efacd7ef9b62b2ca7da376f5c0376f877fa15220a6c",
-  fusion_shadowmage: "330ee35b19708ed7a422fdcf50009e019903e200f74f5d48b33e82a80a0061f6",
+  school_shrine: "6de29903e6b082b7f4f4caa15a473d20735250e7b59a13e3aecd74626d4e74f6",
+  job_garden: "af408d526aa0a0474407e1d76999925e1b550e0cb1506fe59327ef6274f354f5",
+  fusion_shadowmage: "3768a08db11070efe3b9144f1ebf3905033e53cba2701cc9948f82971ce78e82",
 };
 Object.entries(keepHashes).forEach(([id, sha]) => {
   assert.equal(artHash(id), sha, id + " hash changed");

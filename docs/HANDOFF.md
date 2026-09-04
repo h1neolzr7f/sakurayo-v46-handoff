@@ -58,14 +58,14 @@
 | C | 局内 DP + 最多 2 干员钉地 | 已落地 |
 | 横屏主体验 | `html.landscape46` 默认就在；Android 锁 `landscape` | 已落地 |
 | 仿 Live2D | 随机眨眼 / 注视 / 点触，去掉卡顿滤镜 | 已落地 |
-| D | 寻访卡扩到 16 以内；站桩与大厅背景重出；商店/档案换皮 | **未做** |
+| D | 寻访卡扩到 16 以内；站桩与大厅背景重出；商店/档案换皮 | **进行中**：风景/CG/残件/武器/证人、战斗怪/Boss/宠物、基础·转职·融合静物卡、地图、闪屏、封面、导航、转职 `full.webp`、技能/职业/融合图标和战斗特效已用免费 v4.5 换过。时装卡和三角色站桩未重出。卡池张数仍未扩到 16 |
 | E | 全量 `verify.ps1`、`release/`、APK、CHANGELOG | **未做** |
 
 ### 下一步（按优先级）
 
-1. I2V 绿幕重出三角色站桩（需 infsh login）。现用 `battle.webp` / `live_idle` 静帧 + JS 动。
+1. 寻访卡扩到 16 以内。能用免费额度出的非主角图已经出完。不要再刷三角色站桩。看图用 [docs/NAI_GALLERY.md](NAI_GALLERY.md)。
 2. 有独特动作的融合再补 `anim_skill.webp` / `anim_dash.webp`。缺图回退，不要借错融合的图。
-3. 寻访卡扩到 16 以内；`ui/lobby_wide.webp` 去左右黑边。
+3. I2V 绿幕重出三角色站桩（需 infsh login）。现用 `live_idle` 静帧 + JS 动。
 4. 全量 `powershell -File tools/verify.ps1`（`browser_smoke` 主视口仍是 430×932）。
 5. `android-app/sync-game.ps1` 后发版。模拟器上的正式包可能仍是签名对不上的 **4.2.3 / versionCode 47**；debug 不能覆盖（`INSTALL_FAILED_UPDATE_INCOMPATIBLE`）。不要擅自卸包清档。用本机 HTTP 打开 `src/index.html` 验收。
 

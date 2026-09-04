@@ -51,3 +51,8 @@ assets/image2/reference/expansion_refs/
 outputs/
 *.zip.bak
 .cursor/
+
+# NovelAI local token / probe images (never commit)
+tools/nai/.token
+tools/nai/token
+tools/nai/local/
