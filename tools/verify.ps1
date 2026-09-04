@@ -11,6 +11,7 @@ function Invoke-Step([string]$Name, [scriptblock]$Command) {
 }
 
 Invoke-Step "static_check" { python tools/static_check.py src/index.html }
+Invoke-Step "nai unit" { python tests/nai_unit.py }
 Invoke-Step "syntax extracted" { node --check tests/artifacts/static/index.extracted.js }
 Invoke-Step "syntax cutscene" { node --check src/runtime/sakurayo-cutscene.js }
 Invoke-Step "syntax economy" { node --check src/runtime/sakurayo-economy.js }

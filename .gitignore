@@ -48,6 +48,9 @@ assets/image2/reference/expansion_refs/
 # Local secrets and caches
 .env
 .env.*
+secrets/*
+!secrets/README.md
+!secrets/*.example
 outputs/
 *.zip.bak
 .cursor/

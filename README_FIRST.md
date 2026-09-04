@@ -37,7 +37,7 @@ I2V 绿幕站桩、融合 skill/dash、寻访卡扩到 16、全量 verify、再�
 - 改存档键或清档
 - 抽卡/商店卖永久伤害
 - 改名 `startGame` / `update` / `draw` / `spawnEnemy` / `showDialogue` 却不改调用点
-- 提交 `keystore.properties`、`local.properties`、APK、`assets/image2/source/`
+- 提交 `keystore.properties`、`local.properties`、APK、`assets/image2/source/`、NovelAI token
 - 卸掉模拟器上签名对不上的旧正式包（会清档）
 - 删 `progress.md` 顶部 Original prompt
 - 把竖屏重新做成主体验
