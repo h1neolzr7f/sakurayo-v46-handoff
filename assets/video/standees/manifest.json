@@ -1,0 +1,17 @@
+{
+  "pack": "sakurayo-video-standees",
+  "size": [1024, 1536],
+  "aspect": "3:4",
+  "text": false,
+  "items": [
+    {"id": "01_sayo", "name": "月城小夜", "role": "hero", "chroma": "#00FF00"},
+    {"id": "02_aya", "name": "神代绫", "role": "hero", "chroma": "#00FF00"},
+    {"id": "03_rion", "name": "黑羽凛音", "role": "hero", "chroma": "#00FF00"},
+    {"id": "04_zombie_normal", "name": "普通僵尸", "role": "enemy", "chroma": "#FF7A00"},
+    {"id": "05_zombie_fast", "name": "迅捷僵尸", "role": "enemy", "chroma": "#FF7A00"},
+    {"id": "06_zombie_tank", "name": "重甲僵尸", "role": "enemy", "chroma": "#FF7A00"},
+    {"id": "07_zombie_ranged", "name": "远程僵尸", "role": "enemy", "chroma": "#FF7A00"},
+    {"id": "08_zombie_bomb", "name": "自爆僵尸", "role": "enemy", "chroma": "#FF7A00"},
+    {"id": "09_zombie_elite", "name": "精英尸", "role": "enemy", "chroma": "#FF7A00"}
+  ]
+}
