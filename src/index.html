@@ -156,6 +156,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 <script src="runtime/sakurayo-chronicle.js"></script>
 <script src="runtime/sakurayo-live.js"></script>
 <script src="runtime/sakurayo-ops.js"></script>
+<script src="runtime/sakurayo-command.js"></script>
 <script src="content/extensions.manifest.js"></script>
 <script>
 (() => {
@@ -2492,7 +2493,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     let s = stage();
     $("#coins").textContent = save.coins;
     $("#tcoins").textContent = save.coins;
-    $("#simg").src = s.img;
+    $("#simg").src = isMainGodRun36()?s.img:artUrl(`stages/stage_${s.id}/chapter_keyart_v2.webp`);
     $("#sname").textContent = s.name;
     $("#sdesc").textContent = s.desc;
     $("#sno").textContent = s.no;
@@ -2514,7 +2515,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       d.className = "stageCard ground44-" + s.id + (lock ? " lock" : "");
       d.dataset.stageId = String(s.id);
       let rank = save.done.includes(s.id) ? "已净化" : "未通关";
-      d.innerHTML = `<img src="${s.img}"><div class="i"><h3>${s.name}</h3><p>${s.desc}<br>Boss：${s.boss} · 预计 ${Math.round(s.dur / 60)} 分钟</p><button ${lock ? "disabled" : ""}>${lock ? "尚未解锁" : selected === s.id ? "已选择" : "选择关卡"}</button></div><div class="rankTag">${rank}</div>${lock ? '<div class="lockmark">🔒</div>' : ""}`;
+      d.innerHTML = `<img src="${artUrl(`stages/stage_${s.id}/chapter_keyart_v2.webp`)}"><div class="i"><h3>${s.name}</h3><p>${s.desc}<br>Boss：${s.boss} · 预计 ${Math.round(s.dur / 60)} 分钟</p><button ${lock ? "disabled" : ""}>${lock ? "尚未解锁" : selected === s.id ? "已选择" : "选择关卡"}</button></div><div class="rankTag">${rank}</div>${lock ? '<div class="lockmark">🔒</div>' : ""}`;
       if (!lock)
         d.querySelector("button").onclick = () => {
           runMode36 = "story";
@@ -2730,7 +2731,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     window.SakurayoCutscene?.stopType?.();
     ensureAudio();
     if (!(typeof isMainGodRun36 === "function" && isMainGodRun36())) {
-      artImage(`stages/stage_${Math.max(1, Math.min(4, (typeof stage === "function" && stage().id) || selected || 1))}/battle_bg.webp`);
+      artImage(`stages/stage_${Math.max(1, Math.min(4, (typeof stage === "function" && stage().id) || selected || 1))}/battle_floor_v2.webp`);
     }
     ["muzzle","slash","hit","dash","skill","shatter","levelup","loot"].forEach(kind=>artImage(`fx/${kind}.webp`));
     ["muzzle","slash","hit","skill","dash","loot","shatter","levelup"].forEach(kind=>artImage(`fx/${kind}_b.webp`));
@@ -2810,7 +2811,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if(P.form&&!save.forms.includes(P.form))save.forms.push(P.form);
     let ed=endingData(); if(win&&selected===4&&!save.endings.includes(ed.name))save.endings.push(ed.name);
     let top=Object.entries(P.damageSources).sort((a,b)=>b[1]-a[1])[0]?.[0]||"shot";
-    save.runHistory.unshift({time:Date.now(),mode:"story",stage:selected,character:save.character,skin:save.skin,duration:runTime,win,kills:P.kills,eliteKills:P.eliteKills,level:P.level,fusion:P.fusion,form:P.form,careers:careerSummary(),top,damageSources:{...P.damageSources},damageTaken:P.damageTaken,phaseTimes:[...P.phaseTimes],rank:P.plan?.rank||"?",ending:ed.name}); save.runHistory=save.runHistory.slice(0,30);
+    save.runHistory.unshift({time:Date.now(),mode:runMode36==="testimony"?"testimony":"story",stage:selected,character:save.character,skin:save.skin,duration:runTime,win,kills:P.kills,eliteKills:P.eliteKills,level:P.level,fusion:P.fusion,form:P.form,careers:careerSummary(),top,damageSources:{...P.damageSources},damageTaken:P.damageTaken,phaseTimes:[...P.phaseTimes],rank:P.plan?.rank||"?",ending:ed.name}); save.runHistory=save.runHistory.slice(0,30);
     checkAch(); persist();
     $("#ricon").textContent=win?"🌸":"☠️"; $("#rankBig").textContent=win?(P.damageTaken===0?"S":P.plan?.rank||"A"):(runTime>stage().dur*.65?"B":"C");
     $("#rtitle").textContent=win?"镜界节点已净化":"防线失守";
@@ -3242,7 +3243,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const s = stage();
     const mg = typeof isMainGodRun36 === "function" && isMainGodRun36();
     const chap = Math.max(1, Math.min(4, s.id || 1));
-    const map = artUrl(`content-packs/official-exploration/maps/chapter${chap}.webp`);
+    const map = artUrl(`stages/stage_${chap}/chapter_keyart_v2.webp`);
     const winFace = artImage(`characters/${c.id}/default/face_win.webp`);
     const portrait = artReady(winFace) ? winFace.src : artUrl(charArtPath35(c, "dialogue", skin35()));
     const cover = mg ? artUrl("ui/cover_v36_main_god.webp") : map;
@@ -3400,6 +3401,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const world = lifecycleWorld44.world || (lifecycleWorld44.world = {});
     world.stageId = s.id;
     world.mainGod = typeof isMainGodRun36 === "function" && isMainGodRun36();
+    world.tiledGround = !world.mainGod;
     world.floor = s.depth || 0;
     world.runTime = runTime;
     world.bossBorn = !!bossBorn;
@@ -3424,7 +3426,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       const voidBg = artImage("content-packs/maingod-void/maps/void_arena.webp");
       world.battleBg = artReady(voidBg) ? voidBg : null;
     } else {
-      const bgPath = `stages/stage_${Math.max(1, Math.min(4, s.id || 1))}/battle_bg.webp`;
+      const bgPath = `stages/stage_${Math.max(1, Math.min(4, s.id || 1))}/battle_floor_v2.webp`;
       const bg = artImage(bgPath);
       world.battleBg = artReady(bg) ? bg : null;
     }
@@ -6353,7 +6355,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   const _endingData36=endingData;endingData=function(){if(isMainGodRun36())return {name:`主神空间 T${selectedMainGodTier36} · 轮回存续`,text:"监察投影被击碎，白色大厅却没有关闭。奖励点和强化被保留，说明这不是一次挑战，而是一份仍在续签的轮回契约。"};return _endingData36();};
   const _spawnBoss36=spawnBoss;spawnBoss=function(){const result=_spawnBoss36();if(isMainGodRun36()&&boss){const mul=1+selectedMainGodTier36*.16;boss.hp*=mul;boss.max=boss.hp;boss.dmg*=1+selectedMainGodTier36*.08;boss.bossRes=boss.bossRes||{};boss.color="#d8a7ff";}return result;};
 
-  function finishMainGod36(win){if(state==="result")return;runWin=win;hideTransient();state="result";$("#hud").classList.add("hidden");const phasePoints=win?0:Math.max(0,Math.min(3,(boss?.phase||1)-1)),points=win?stage().pointReward+Math.min(4,P.eliteKills)+save.mainGod.sideKey*2:phasePoints;save.mainGod.points+=points;save.mainGod.runs++;save.kills+=P.kills;save.best=Math.max(save.best,runTime);save.runs++;if(win){save.mainGod.clears++;save.mainGod.bestTier=Math.max(save.mainGod.bestTier,selectedMainGodTier36);if(selectedMainGodTier36===4)save.mainGod.deepest=Math.max(save.mainGod.deepest||0,stage().depth||1);save.mainGod.unlockedTier=Math.min(4,Math.max(save.mainGod.unlockedTier,selectedMainGodTier36+1));}const ed=endingData(),top=Object.entries(P.damageSources).sort((a,b)=>b[1]-a[1])[0]?.[0]||"shot";save.runHistory.unshift({time:Date.now(),mode:"mainGod",tier:selectedMainGodTier36,depth:stage().depth||0,contract:P.mgContract?.id||null,challenge:P.mgChallenge?.id||null,challengeDone:!!P.mgChallengeDone,points,win,kills:P.kills,level:P.level,fusion:P.fusion,form:P.form,careers:careerSummary(),top,rank:P.plan?.rank||"?",ending:ed.name});save.runHistory=save.runHistory.slice(0,30);persist();$("#ricon").textContent=win?"◈":"☠️";$("#rankBig").textContent=win?(P.plan?.rank||"S"):(runTime>stage().dur*.65?"B":"C");$("#rtitle").textContent=win?(selectedMainGodTier36===4?`无限回廊第 ${stage().depth} 层完成`:"主神试炼完成"):"轮回中断";$("#rsub").textContent=win?`本轮已结算；兑换强化保留，局内构筑清空。`:"失败不会清空既有主神兑换，Boss 阶段提供少量保底点。";$("#rstats").innerHTML=`坚持 <b>${fmt(runTime)}</b><br>击破 <b>${P.kills}</b> · 等级 <b>${P.level}</b><br>职业：<b>${careerSummary()}</b><br>契约：<b>${P.mgContract?.n||"未签署"}</b><br>挑战：<b>${P.mgChallenge?.n||"无"} ${P.mgChallengeDone?"✓":"×"}</b><br>本轮获得奖励点 <b style="color:var(--g)">◈ ${points}</b><br>主神账户余额 <b>◈ ${save.mainGod.points}</b>`;renderRunReport();$("#result").classList.remove("hidden");sound(win?"win":"over");}
+  function finishMainGod36(win){if(state==="result")return;runWin=win;hideTransient();state="result";$("#hud").classList.add("hidden");const phasePoints=win?0:Math.max(0,Math.min(3,(boss?.phase||1)-1)),points=win?stage().pointReward+Math.min(4,P.eliteKills)+save.mainGod.sideKey*2:phasePoints;save.mainGod.points+=points;save.mainGod.runs++;save.kills+=P.kills;save.best=Math.max(save.best,runTime);save.runs++;if(win){save.mainGod.clears++;save.mainGod.bestTier=Math.max(save.mainGod.bestTier,selectedMainGodTier36);if(selectedMainGodTier36===4)save.mainGod.deepest=Math.max(save.mainGod.deepest||0,stage().depth||1);save.mainGod.unlockedTier=Math.min(4,Math.max(save.mainGod.unlockedTier,selectedMainGodTier36+1));}const ed=endingData(),top=Object.entries(P.damageSources).sort((a,b)=>b[1]-a[1])[0]?.[0]||"shot";save.runHistory.unshift({time:Date.now(),mode:"mainGod",character:save.character,skin:save.skin,duration:runTime,tier:selectedMainGodTier36,depth:stage().depth||0,contract:P.mgContract?.id||null,challenge:P.mgChallenge?.id||null,challengeDone:!!P.mgChallengeDone,points,win,kills:P.kills,level:P.level,fusion:P.fusion,form:P.form,careers:careerSummary(),top,rank:P.plan?.rank||"?",ending:ed.name});save.runHistory=save.runHistory.slice(0,30);persist();$("#ricon").textContent=win?"◈":"☠️";$("#rankBig").textContent=win?(P.plan?.rank||"S"):(runTime>stage().dur*.65?"B":"C");$("#rtitle").textContent=win?(selectedMainGodTier36===4?`无限回廊第 ${stage().depth} 层完成`:"主神试炼完成"):"轮回中断";$("#rsub").textContent=win?`本轮已结算；兑换强化保留，局内构筑清空。`:"失败不会清空既有主神兑换，Boss 阶段提供少量保底点。";$("#rstats").innerHTML=`坚持 <b>${fmt(runTime)}</b><br>击破 <b>${P.kills}</b> · 等级 <b>${P.level}</b><br>职业：<b>${careerSummary()}</b><br>契约：<b>${P.mgContract?.n||"未签署"}</b><br>挑战：<b>${P.mgChallenge?.n||"无"} ${P.mgChallengeDone?"✓":"×"}</b><br>本轮获得奖励点 <b style="color:var(--g)">◈ ${points}</b><br>主神账户余额 <b>◈ ${save.mainGod.points}</b>`;renderRunReport();$("#result").classList.remove("hidden");sound(win?"win":"over");}
   const _finish36=finish;finish=function(win){if(isMainGodRun36())return finishMainGod36(!!win);return _finish36(win);};
   const _damagePlayer36=damagePlayer;damagePlayer=function(amount){return _damagePlayer36(amount*(P.lordRisk||1));};
 
@@ -7491,7 +7493,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function paintHomeBg46(){
     const bg=$("#menu .bg");
     if(!bg)return;
-    bg.style.backgroundImage=`linear-gradient(180deg,#05051212 0%,#0505120a 38%,#080713b8 72%,#080713 100%),url('${artUrl("ui/lobby_wide.webp")}')`;
+    bg.style.backgroundImage=`url('${artUrl("ui/lobby-command-v2.webp")}')`;
     bg.style.backgroundPosition="center 30%";
     bg.style.backgroundSize="cover";
     $("#menu")?.classList.add("lobbyWide46");
@@ -7720,6 +7722,35 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
   installLobby46();
   installOps46();
+  function commandModel47(){
+    const character=c=>({...c,schools:c.bias.map(id=>SCHOOL[id]?.n||id)});
+    const shop=save.shop40||{},modeId=pendingMode46;
+    const s=modeId==="mainGod"?stage():ST[selected-1];
+    const mode=modeId==="mainGod"?"主神空间":modeId==="testimony"?"证词模式":"回收演习";
+    const equipment=pool=>{const state=shop.ops?.[pool],card=window.SakurayoLobby?.cardOf(state?.equipped);return card&&(state.owned?.[card.id]||0)>0?card.n:"未装备";};
+    return {
+      save,character:character(char35()),characters:Object.values(CHARACTERS35).map(character),
+      completed:new Set((save.done||[]).filter(id=>[1,2,3,4].includes(id))).size,
+      mode,modeId,tactic:window.SakurayoLifecycle?.hint({stageId:s.id,mainGod:modeId==="mainGod"})||"",
+      mission:{name:modeId==="mainGod"&&runMode36!=="mainGod"?"主神试炼 · 待选择":s.name,boss:s.boss||"主神试炼",minutes:Math.round(s.dur/60),art:modeId==="mainGod"?artUrl("ui/cover_v36_main_god.webp"):artUrl(`stages/stage_${s.id||1}/chapter_keyart_v2.webp`)},
+      skin:skin35().n,fashion:equipment("fashion"),weapon:equipment("weapon"),starter:STARTERS40[shop.equippedStarter]?`${STARTERS40[shop.equippedStarter].n} · Lv.${shop.starter?.[shop.equippedStarter]||0}`:"未装备",
+      item:ITEMS40[shop.equippedWeapon]?.n||"未装备",talismans:(shop.bannedSchools||[]).map(id=>SCHOOL[id]?.n||id).join(" / ")||"未排除职业",
+      history:(save.runHistory||[]).map(r=>({win:r.win,character:CHARACTERS35[r.character]?.name||"旧记录 · 角色未记载",stage:r.mode==="mainGod"?"主神空间":ST.find(x=>x.id===r.stage)?.short||`第 ${r.stage||1} 章`,mode:r.mode==="mainGod"?"高难轮回":r.mode==="testimony"?"证词模式":"肉鸽回收",level:r.level||1,kills:r.kills||0,duration:Number.isFinite(r.duration)?`${Math.floor(r.duration/60)}分${Math.floor(r.duration%60)}秒`:"时长未记载",date:new Date(r.time||0).toLocaleDateString()}))
+    };
+  }
+  function refreshCommand47(){
+    window.SakurayoCommand?.mount({art:artUrl,model:commandModel47,open:openDrawer,closeDrawers,
+      settings:openSettings37,start:startGame,
+      selectCharacter(id){if(!CHARACTERS35[id])return;save.character=id;persist();},
+      claim(id){const result=window.SakurayoCommand.claimSupply(save,id);if(result.ok){persist();toast(`补给已回收 · 樱花币 +${result.reward}`);}return result;}
+    });
+  }
+  const _commandMenu47=menuUpdate;
+  menuUpdate=function(){const result=_commandMenu47();refreshCommand47();return result;};
+  const _commandChar47=updateCharacterUI35;
+  updateCharacterUI35=function(){const result=_commandChar47();refreshCommand47();return result;};
+  const _commandClose47=closeDrawers;
+  closeDrawers=function(){window.SakurayoCommand?.close();return _commandClose47();};
   checkAch();
   menuUpdate();
   installModKitButton42();

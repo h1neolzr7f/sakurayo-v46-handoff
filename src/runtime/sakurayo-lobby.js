@@ -498,6 +498,10 @@
       shards: clampInt(incoming.shards, 0, 999999),
       pool: pool,
       rosterTab: rosterTab,
+      supplies: ['firstRun','chapter1','chapter2','chapter3','chapter4','kills500'].reduce(function(receipts,id){
+        receipts[id] = !!(incoming.supplies && incoming.supplies[id] === true);
+        return receipts;
+      }, {}),
       fashion: normalizePool(incoming.fashion, FASHION_CARDS),
       weapon: normalizePool(incoming.weapon, WEAPON_CARDS),
     };

@@ -167,7 +167,7 @@ try {
   assert.equal(await page.locator("#characterList .charCard").count(), 3);
   assert.equal(await page.locator("#start").isVisible(), true);
   assert.equal(await page.locator("#coverTitle36").isVisible(), true);
-  assert.match(await page.locator("#menu .bg").evaluate(node => node.style.backgroundImage), /lobby_wide\.webp/);
+  assert.match(await page.locator("#menu .bg").evaluate(node => node.style.backgroundImage), /lobby-command-v2\.webp/);
   await page.waitForFunction(() => {
     const boot = new Set(window.__SAKURAYO_ART__?.boot() || []);
     return window.__SAKURAYO_ART__?.status().filter(item => boot.has(item.path)).every(item => item.ready);

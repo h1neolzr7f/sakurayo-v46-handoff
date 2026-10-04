@@ -4,9 +4,15 @@
 
 [玩家仓](https://github.com/h1neolzr7f/sakurayo-zombietide) · [开发交接](docs/HANDOFF.md) · [v4.6 计划](docs/PLAN_V46_ERYOU.md) · [维护手册](docs/MAINTAIN.md)
 
-![v4.6 开发版首页](docs/screenshots/development-home.png)
+![指挥大厅开发版](docs/screenshots/command-lobby.webp)
 
-> 截图由本仓库当前 `main` 源码以测试模式在本地浏览器启动后采集。它展示开发基线，不代表已经发布的玩家版本。
+> 截图为指挥大厅装修分支的实际浏览器画面，仍属 v4.6.0 开发预发布。完整验证及运行方法见 [指挥大厅验收记录](docs/VALIDATION_COMMAND_LOBBY.md)。
+
+## 指挥大厅与四章精装修
+
+新增角色资料、出击整备、近期战绩和一次性里程碑补给；大厅、商店、关卡及档案使用统一视觉。四章有独立新插画、可平铺地面、落樱/雨纹/灰烬/镜屑环境动画和清晰障碍边界。所有素材离线加载，存档仍使用 `sakurayoV3`。
+
+浏览器开发依赖：`npm ci && npx playwright install chromium`；美术检查需要 `python -m pip install Pillow`。Linux/macOS 运行 `bash tools/verify.sh`（完整回归）；`--static` 仅执行静态、单位检查与打包。Windows 沿用 `tools/verify.ps1`。可直接打开已同步的 `android-app/app/src/main/assets/index.html` 试玩。
 
 ## 与玩家仓的关系
 

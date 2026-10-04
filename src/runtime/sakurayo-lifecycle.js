@@ -9,8 +9,20 @@
   var cacheKey = "";
   var cacheObs = [];
   var fillAcc = 0;
-  var echo = [0, 0, 0, 0, 0, 0];
+  var echo = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
   var echoAt = 0;
+  var echoCount = 0;
+  var echoNext = 0;
+  var echoKey = "";
+  var groundPattern = null;
+  var groundPatternImage = null;
+  var groundPatternContext = null;
+  var palettes = [
+    ["#1a1028", "#0c1424", "#ff6fb0", "torii", "石板参道"],
+    ["#0c1730", "#061018", "#5ad2ff", "neon", "雨夜沥青"],
+    ["#16141c", "#0b0a10", "#c9bdd8", "swords", "剑冢参道"],
+    ["#14102a", "#070614", "#c79bff", "mirror", "碎镜地砖"],
+  ];
 
   function clamp(v, a, b) {
     return v < a ? a : v > b ? b : v;
@@ -36,12 +48,6 @@
     var mainGod = !!(opts && opts.mainGod);
     var floor = (opts && opts.floor) || 0;
     var id = mainGod ? 0 : clamp(stageId | 0, 1, 4);
-    var palettes = [
-      ["#1a1028", "#0c1424", "#ff6fb0", "torii", "石板参道"],
-      ["#0c1730", "#061018", "#5ad2ff", "neon", "雨夜沥青"],
-      ["#16141c", "#0b0a10", "#c9bdd8", "swords", "剑冢参道"],
-      ["#14102a", "#070614", "#c79bff", "mirror", "碎镜地砖"],
-    ];
     var row = palettes[id ? id - 1 : 3];
     var hue = mainGod ? ((Math.floor(Math.max(0, floor - 1) / 3) % 4) * 18) : 0;
     return {
@@ -212,29 +218,100 @@
     var W = world.worldW || world.W,
       H = world.worldH || world.H;
     if (!photoReady(world) || !W || !H) return false;
-    drawCover(ctx, world.battleBg, W, H);
+    if (world.tiledGround && typeof ctx.createPattern === "function") {
+      if (groundPatternImage !== world.battleBg || groundPatternContext !== ctx) {
+        groundPatternImage = world.battleBg;
+        groundPatternContext = ctx;
+        groundPattern = ctx.createPattern(world.battleBg, "repeat");
+      }
+      if (groundPattern) {
+        ctx.fillStyle = groundPattern;
+        ctx.fillRect(0, 0, W, H);
+      } else drawCover(ctx, world.battleBg, W, H);
+    } else drawCover(ctx, world.battleBg, W, H);
     ctx.fillStyle = "rgba(5,4,14,0.26)";
     ctx.fillRect(0, 0, W, H);
     return true;
   }
 
   function drawMirrorEcho(ctx, world) {
-    if (!world || world.playerX == null) return;
-    var pal = stageProfile(world.stageId, world);
-    if (pal.ground !== "mirror") return;
-    var t = world.runTime || 0;
-    if (t - echoAt > 0.08) {
-      echoAt = t;
-      echo.push(world.playerX, world.playerY);
-      if (echo.length > 12) echo.splice(0, echo.length - 12);
+    if (!world || world.playerX == null || world.playerY == null ||
+        (groundId(world) !== "mirror" && !world.mainGod)) {
+      echoKey = "";
+      return;
     }
-    ctx.fillStyle = "rgba(185,146,255,0.16)";
-    var i;
-    for (i = 0; i < echo.length; i += 2) {
+    var t = world.runTime || 0;
+    var key = obsKey(world);
+    if (key !== echoKey || t < echoAt) {
+      echoKey = key;
+      echoCount = 0;
+      echoNext = 0;
+    }
+    if (!echoCount || t - echoAt >= 0.08) {
+      echoAt = t;
+      echo[echoNext * 2] = world.playerX;
+      echo[echoNext * 2 + 1] = world.playerY;
+      echoNext = (echoNext + 1) % 6;
+      echoCount = Math.min(6, echoCount + 1);
+    }
+    var i, slot;
+    for (i = 0; i < echoCount; i++) {
+      slot = ((echoNext - echoCount + i + 6) % 6) * 2;
+      ctx.fillStyle = "rgba(185,146,255," + (0.025 + (i + 1) * 0.018) + ")";
       ctx.beginPath();
-      ctx.ellipse(echo[i], echo[i + 1] + 18, 18, 7, 0, 0, TAU);
+      ctx.ellipse(echo[slot], echo[slot + 1] + 18, 18, 7, 0, 0, TAU);
       ctx.fill();
     }
+  }
+
+  // Weather is a deterministic world grid, drawn once per viewport. No particles
+  // are added to combat arrays and the work stays bounded across long runs.
+  function drawAtmosphere(ctx, world) {
+    var id = groundId(world),
+      t = (world.runTime || 0) % 3600,
+      low = world.quality != null && world.quality < 0.8,
+      cell = 168,
+      left = Math.floor((world.camX || 0) / cell) - 1,
+      top = Math.floor((world.camY || 0) / cell) - 1,
+      right = Math.ceil(((world.camX || 0) + world.W) / cell),
+      bottom = Math.ceil(((world.camY || 0) + world.H) / cell),
+      limit = low ? 20 : 48,
+      count = 0, row, col, seed, phase, x, y;
+    ctx.save();
+    for (row = top; row <= bottom && count < limit; row++) {
+      for (col = left; col <= right && count < limit; col++) {
+        if (low && (row + col) % 2) continue;
+        count++;
+        seed = Math.abs(col * 73 + row * 137);
+        phase = (seed % 101) / 101;
+        x = col * cell + ((seed * 11 + t * (id === "neon" ? -18 : 10)) % cell + cell) % cell;
+        y = row * cell + ((seed * 7 + t * (id === "neon" ? 104 : id === "swords" ? -9 : 7)) % cell + cell) % cell;
+        if (id === "neon") {
+          ctx.strokeStyle = "rgba(149,218,255,0.16)";
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 6, y + 24); ctx.stroke();
+          if (seed % 3 === 0) {
+            ctx.strokeStyle = "rgba(102,218,255,0.10)";
+            ctx.beginPath(); ctx.ellipse(x, row * cell + 120, 4 + ((t + phase) % 1) * 12, 2 + ((t + phase) % 1) * 4, 0, 0, TAU); ctx.stroke();
+          }
+        } else if (id === "swords") {
+          ctx.fillStyle = "rgba(222,211,241," + (0.08 + Math.sin(t * 1.6 + phase * TAU) * 0.035) + ")";
+          ctx.beginPath(); ctx.arc(x, y, 1.2 + phase, 0, TAU); ctx.fill();
+          if (seed % 4 === 0) {
+            ctx.strokeStyle = "rgba(191,174,210,0.08)";
+            ctx.beginPath(); ctx.moveTo(x - 17, y + 7); ctx.lineTo(x + 12, y + 4); ctx.stroke();
+          }
+        } else if (id === "mirror" || id === "maingod") {
+          ctx.strokeStyle = "rgba(208,176,255," + (0.09 + Math.sin(t + phase * TAU) * 0.035) + ")";
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(x, y - 7); ctx.lineTo(x + 4, y); ctx.lineTo(x, y + 7); ctx.lineTo(x - 4, y); ctx.closePath(); ctx.stroke();
+        } else {
+          ctx.fillStyle = "rgba(255,165,207,0.22)";
+          ctx.beginPath(); ctx.ellipse(x + Math.sin(t + phase * TAU) * 7, y, 4.5, 2, t * 0.4 + phase * TAU, 0, TAU); ctx.fill();
+        }
+      }
+    }
+    ctx.restore();
   }
 
   function drawGround(ctx, world) {
@@ -249,14 +326,17 @@
         drawGroundChunk(ctx, world, photoDone);
         ctx.restore();
       }
+      drawAtmosphere(ctx, world);
       drawMirrorEcho(ctx, world);
       return;
     }
-    drawGroundChunk(ctx, world, false);
+    drawGroundChunk(ctx, world, drawWorldPhoto(ctx, world));
+    drawAtmosphere(ctx, world);
     drawMirrorEcho(ctx, world);
   }
 
   function drawGroundChunk(ctx, world, photoDone) {
+    if (photoDone) return;
     var W = world.W,
       H = world.H,
       t = world.runTime || 0,
@@ -269,24 +349,10 @@
       pathL,
       pathR,
       photo = world.battleBg;
-    if (photoDone) return;
     if (photo && photo.complete && photo.naturalWidth > 0) {
       drawCover(ctx, photo, W, H);
       ctx.fillStyle = "rgba(5,4,14,0.26)";
       ctx.fillRect(0, 0, W, H);
-      ctx.fillStyle = pal.accent + "14";
-      var n = q < 0.8 ? 2 : 4;
-      for (i = 0; i < n; i++) {
-        var px = ((i * 211 - t * 11) % (W + 180)) - 90,
-          py = 80 + ((i * 113) % Math.max(120, H - 100));
-        ctx.save();
-        ctx.translate(px, py);
-        ctx.rotate(0.8);
-        ctx.beginPath();
-        ctx.ellipse(0, 0, 7, 3, 0, 0, TAU);
-        ctx.fill();
-        ctx.restore();
-      }
       return;
     }
     if (pal.mainGod) {
@@ -381,84 +447,118 @@
       ctx.stroke();
     }
 
-    ctx.fillStyle = pal.accent + "18";
-    var n = q < 0.8 ? 3 : 6;
-    for (i = 0; i < n; i++) {
-      var px = ((i * 211 - t * 11) % (W + 180)) - 90,
-        py = 80 + ((i * 113) % Math.max(120, H - 100));
-      ctx.save();
-      ctx.translate(px, py);
-      ctx.rotate(0.8);
-      ctx.beginPath();
-      ctx.ellipse(0, 0, 7, 3, 0, 0, TAU);
-      ctx.fill();
-      ctx.restore();
-    }
   }
 
   function drawObstacles(ctx, world) {
     if (!ctx || !world) return;
     var obs = obstacles(world),
-      i,
-      o,
-      k;
+      t = (world.runTime || 0) % 3600,
+      left = (world.camX || 0) - 84,
+      top = (world.camY || 0) - 84,
+      right = (world.camX || 0) + world.W + 84,
+      bottom = (world.camY || 0) + world.H + 84,
+      i, o, k, shimmer;
     for (i = 0; i < obs.length; i++) {
       o = obs[i];
+      if (o.x + (o.w || 0) < left || o.y + (o.h || 0) < top || o.x > right || o.y > bottom) continue;
       ctx.save();
+      ctx.fillStyle = "rgba(2,4,12,0.48)";
+      ctx.beginPath();
+      ctx.ellipse(o.x + (o.w || 0) * 0.5, o.y + (o.h || 0) + 9, o.kind === "sword" ? o.r * 0.4 : o.kind === "vehicle" ? o.w * 0.6 : 27, o.kind === "vehicle" ? 9 : 7, 0, 0, TAU);
+      ctx.fill();
       if (o.kind === "torii") {
-        ctx.fillStyle = "rgba(255,140,90,0.18)";
-        ctx.beginPath();
-        ctx.arc(o.x, o.y + 8, 22, 0, TAU);
-        ctx.fill();
-        ctx.fillStyle = "#4a1c2c";
+        ctx.fillStyle = "rgba(255,142,171,0.10)";
+        ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, TAU); ctx.fill();
+        ctx.fillStyle = "#581c33";
         ctx.fillRect(o.x - 20, o.y - 6, 8, 38);
         ctx.fillRect(o.x + 12, o.y - 6, 8, 38);
-        ctx.fillStyle = "#d45a72";
+        ctx.fillStyle = "#bc455f";
+        ctx.fillRect(o.x - 20, o.y - 6, 3, 35);
+        ctx.fillRect(o.x + 12, o.y - 6, 3, 35);
+        ctx.fillStyle = "#251923";
+        ctx.fillRect(o.x - 23, o.y + 28, 14, 5);
+        ctx.fillRect(o.x + 9, o.y + 28, 14, 5);
+        ctx.fillStyle = "#dc7586";
         ctx.fillRect(o.x - 26, o.y - 16, 52, 9);
         ctx.fillRect(o.x - 18, o.y - 4, 36, 5);
-        ctx.fillStyle = "#ffd1a8";
-        ctx.fillRect(o.x - 3, o.y - 22, 6, 6);
-        ctx.fillStyle = "rgba(255,196,120,0.55)";
-        ctx.beginPath();
-        ctx.arc(o.x, o.y - 24, 4, 0, TAU);
-        ctx.fill();
+        ctx.fillStyle = "#f5aea8";
+        ctx.fillRect(o.x - 28, o.y - 18, 56, 3);
+        ctx.fillStyle = "#352333";
+        ctx.fillRect(o.x - 4, o.y - 10, 8, 12);
+        ctx.fillStyle = "#ffc7a4";
+        ctx.fillRect(o.x - 2, o.y - 7, 4, 6);
+        ctx.fillStyle = "rgba(255,193,130," + (0.17 + Math.sin(t * 1.8 + i) * 0.045) + ")";
+        ctx.beginPath(); ctx.arc(o.x, o.y - 24, 8, 0, TAU); ctx.fill();
+        ctx.fillStyle = "#ffd0a0";
+        ctx.beginPath(); ctx.arc(o.x, o.y - 24, 3, 0, TAU); ctx.fill();
       } else if (o.kind === "vehicle") {
-        ctx.fillStyle = "#0d121c";
+        ctx.fillStyle = "#060b14";
+        ctx.fillRect(o.x + 8, o.y - 3, 9, 5);
+        ctx.fillRect(o.x + o.w - 18, o.y - 3, 9, 5);
+        ctx.fillRect(o.x + 8, o.y + o.h - 2, 9, 5);
+        ctx.fillRect(o.x + o.w - 18, o.y + o.h - 2, 9, 5);
+        ctx.fillStyle = "#203345";
         ctx.fillRect(o.x, o.y, o.w, o.h);
-        ctx.fillStyle = "rgba(92,231,255,0.35)";
-        ctx.fillRect(o.x + 6, o.y + 5, o.w * 0.4, o.h - 10);
-        ctx.fillStyle = "#ffd36b";
-        ctx.fillRect(o.x + o.w - 8, o.y + 4, 5, 6);
-        ctx.fillRect(o.x + o.w - 8, o.y + o.h - 10, 5, 6);
-        ctx.fillStyle = "#1a2430";
-        ctx.fillRect(o.x + 4, o.y + o.h - 3, 10, 4);
-        ctx.fillRect(o.x + o.w - 16, o.y + o.h - 3, 10, 4);
-        ctx.strokeStyle = "rgba(141,239,255,0.55)";
+        ctx.fillStyle = "#30495c";
+        ctx.fillRect(o.x + 4, o.y + 4, o.w - 8, o.h - 8);
+        ctx.fillStyle = "#112539";
+        ctx.fillRect(o.x + 15, o.y + 4, o.w * 0.35, o.h - 8);
+        ctx.fillStyle = "rgba(105,208,243,0.48)";
+        ctx.fillRect(o.x + 15, o.y + 5, 4, o.h - 10);
+        ctx.fillRect(o.x + o.w * 0.62, o.y + 5, 3, o.h - 10);
+        ctx.fillStyle = "#c88a74";
+        ctx.fillRect(o.x + 7, o.y + 6, 5, 3);
+        ctx.fillStyle = "rgba(255,200,112," + (0.46 + Math.sin(t * 2 + i) * 0.12) + ")";
+        ctx.fillRect(o.x + o.w - 7, o.y + 3, 4, 5);
+        ctx.fillRect(o.x + o.w - 7, o.y + o.h - 8, 4, 5);
+        ctx.strokeStyle = "rgba(168,226,247,0.72)";
+        ctx.lineWidth = 1.5;
         ctx.strokeRect(o.x, o.y, o.w, o.h);
       } else if (o.kind === "sword") {
-        ctx.strokeStyle = "rgba(239,231,255,0.22)";
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(o.x, o.y, o.r, 0, TAU);
+        // The complete boundary uses the actual slow/melee field radius.
+        ctx.fillStyle = "rgba(158,141,190,0.08)";
+        ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, TAU); ctx.fill();
+        ctx.strokeStyle = "rgba(223,203,252," + (0.29 + Math.sin(t * 1.4 + i) * 0.05) + ")";
+        ctx.lineWidth = 1.5;
         ctx.stroke();
-        ctx.strokeStyle = "#efe7ff";
-        ctx.lineWidth = 3;
+        ctx.strokeStyle = "rgba(230,216,250,0.15)";
+        ctx.beginPath(); ctx.ellipse(o.x, o.y + 3, o.r * 0.68, o.r * 0.2, 0, 0, TAU); ctx.stroke();
         for (k = -1; k <= 1; k++) {
+          ctx.strokeStyle = "#d7d2e8";
+          ctx.lineWidth = 3;
           ctx.beginPath();
-          ctx.moveTo(o.x + k * 11, o.y - o.r * 0.52);
-          ctx.lineTo(o.x + k * 7, o.y + o.r * 0.38);
+          ctx.moveTo(o.x + k * 16, o.y - o.r * 0.46);
+          ctx.lineTo(o.x + k * 11, o.y + o.r * 0.35);
+          ctx.stroke();
+          ctx.strokeStyle = "#655173";
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.moveTo(o.x + k * 16, o.y - o.r * 0.55);
+          ctx.lineTo(o.x + k * 16, o.y - o.r * 0.43);
+          ctx.stroke();
+          ctx.strokeStyle = "#ccb79c";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(o.x + k * 16 - 7, o.y - o.r * 0.44);
+          ctx.lineTo(o.x + k * 16 + 7, o.y - o.r * 0.44);
           ctx.stroke();
         }
       } else if (o.kind === "mirror") {
-        ctx.fillStyle = "rgba(212,184,255,0.22)";
+        ctx.fillStyle = "rgba(50,32,89,0.74)";
         ctx.fillRect(o.x, o.y, o.w, o.h);
-        ctx.strokeStyle = "#f4ecff";
-        ctx.lineWidth = 2;
+        ctx.fillStyle = "rgba(176,158,229,0.43)";
+        ctx.fillRect(o.x + 2, o.y + 3, o.w - 4, o.h - 6);
+        shimmer = (t * 15 + i * 21) % (o.h - 12);
+        ctx.fillStyle = "rgba(234,224,255,0.6)";
+        ctx.fillRect(o.x + 2, o.y + 3 + shimmer, o.w - 4, 7);
+        ctx.strokeStyle = "#eee2ff";
+        ctx.lineWidth = 1.5;
         ctx.strokeRect(o.x, o.y, o.w, o.h);
-        ctx.strokeStyle = "rgba(255,255,255,0.45)";
+        ctx.strokeStyle = "rgba(255,255,255,0.52)";
         ctx.beginPath();
-        ctx.moveTo(o.x + 2, o.y + 8);
-        ctx.lineTo(o.x + o.w - 2, o.y + o.h - 10);
+        ctx.moveTo(o.x + 2, o.y + 10);
+        ctx.lineTo(o.x + o.w - 2, o.y + o.h * 0.48);
+        ctx.lineTo(o.x + 2, o.y + o.h - 9);
         ctx.stroke();
       }
       ctx.restore();
@@ -656,7 +756,7 @@
 
   function hint(world) {
     var id = groundId(world);
-    if (id === "neon") return "停尸车辆挡住直线弹 · 绕过去打";
+    if (id === "neon") return "停尸车辆挡住移动与直线弹 · 绕过去打";
     if (id === "swords") return "飞剑区减速 · 近战更锋利";
     if (id === "mirror") return "碎镜折射一次 · 别对镜面开枪";
     if (id === "maingod") return "回廊每三层换色温 · 别站桩";
@@ -667,7 +767,7 @@
     var id = groundId(world);
     var who = character || "";
     if (id === "neon") {
-      if (who === "aya") return "电台接通。雨还在洗合同。车挡只拦弹，拦不住你当年签过的字。";
+      if (who === "aya") return "电台接通。雨还在洗合同。车挡会拦住脚步与子弹。绕过去，别被当年的签名绊住。";
       if (who === "rion") return "电台接通。霓虹把招式标了价。绕开车挡，别让直线弹替你决定走位。";
       return "电台接通。霓虹还亮着，人格却被写成资产。绕开车挡再开火。";
     }

@@ -18,6 +18,11 @@ Invoke-Step "syntax lobby" { node --check src/runtime/sakurayo-lobby.js }
 Invoke-Step "syntax chronicle" { node --check src/runtime/sakurayo-chronicle.js }
 Invoke-Step "syntax live" { node --check src/runtime/sakurayo-live.js }
 Invoke-Step "syntax ops" { node --check src/runtime/sakurayo-ops.js }
+Invoke-Step "syntax command" { node --check src/runtime/sakurayo-command.js }
+Invoke-Step "command art" { python tools/check_command_art.py }
+Invoke-Step "command unit" { node tests/command_unit.mjs }
+Invoke-Step "chapter design unit" { node tests/chapter_design_unit.mjs }
+Invoke-Step "command smoke" { node tests/command_smoke.mjs }
 Invoke-Step "syntax camera" { node --check src/runtime/sakurayo-camera.js }
 Invoke-Step "camera unit" { node tests/camera_unit.mjs }
 Invoke-Step "lifecycle unit" { node tests/lifecycle_unit.mjs }

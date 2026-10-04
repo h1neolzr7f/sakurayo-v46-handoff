@@ -1,0 +1,12 @@
+{
+  "name": "sakurayo-development",
+  "private": true,
+  "version": "4.6.0",
+  "scripts": {
+    "verify": "bash tools/verify.sh",
+    "verify:static": "bash tools/verify.sh --static"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}
