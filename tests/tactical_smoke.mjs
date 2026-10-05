@@ -14,6 +14,11 @@ try{
  await page.goto(pathToFileURL(entry).href+'?test=1');
  await page.locator('.bootArt35').waitFor({state:'detached',timeout:8000});
  assert.equal(await page.locator('#commandMail48').count(),1,'tactical mailbox entry must exist');
+ await page.locator('#commandSettings47').click();
+ assert.equal(await page.locator('#commandSave48').isVisible(),true,'settings exposes real save manager');
+ await page.locator('#commandSave48').click();
+ assert.equal(await page.locator('#saveDrawer38').isVisible(),true,'save manager opens through lobby settings');
+ await page.locator('#saveDrawer38 .close').click();
  const newPanels=['commandMail48','commandNotice48','commandActivity48','commandSupplies47','commandLogin48','commandPrepare47','commandHistory47','commandCharacter47'];
  const close=async()=>page.locator('#commandDrawer47 .close').click();
  await page.locator('#commandNotice48').click();
@@ -95,6 +100,12 @@ try{
  assert.equal(await page.locator('#commandMailClaim48').isDisabled(),true,'mail receipt survives reload');await close();
  await page.locator('#commandLogin48').click();assert.equal(await page.locator('#commandLoginClaim48').isDisabled(),true,'login receipt survives reload');await close();
  assert.equal(await coins(),before+260,'reload never grants extra coins');
+ await page.locator('#commandSettings47').click();await page.locator('#commandSave48').click();
+ const exported=JSON.parse(await page.locator('#saveText38').inputValue());
+ assert.equal(exported.shop40.ops.services.welcomeClaimed,true,'export includes mailbox receipt');
+ assert.equal(exported.shop40.ops.services.loginDates.length,1,'export includes login receipt');
+ assert.equal(exported.coins,before+260,'export includes current balance');
+ await page.locator('#saveDrawer38 .close').click();
  await page.locator('#commandNotice48').click();
  assert.match(await page.locator('#commandBody47').textContent(),/4\.6\.0/);await close();
  assert.deepEqual(errors,[]);assert.deepEqual(external,[]);

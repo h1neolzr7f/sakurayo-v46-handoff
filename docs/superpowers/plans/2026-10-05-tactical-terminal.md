@@ -34,3 +34,5 @@
 - [x] 更新验收/变更记录/README 与截图，提交原 PR 的后续修订。
 
 验收：bash tools/verify.sh 退出0，VERIFY PASS；源/离线各52，触控37，P0/P1均0；10张新素材全部验算。最终独立审查记录见 docs/VALIDATION_TACTICAL_LOBBY.md。交付延用原 PR #32，无正式 APK。
+
+最终审查追加：恢复设置中的存档管理；真实点击/邮件及签到导出回归 RED→GREEN，独立复审下载/导入/关闭通过。

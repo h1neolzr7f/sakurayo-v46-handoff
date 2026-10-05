@@ -227,7 +227,7 @@
   function settingsUtilities(actions){
     var d=global.document,body=d.getElementById('settingsBody37');if(!body)return;
     var section=d.getElementById('commandUtilities48');if(!section){section=d.createElement('section');section.id='commandUtilities48';section.className='cmdNotice48';body.appendChild(section);}
-    section.innerHTML='<small>LOCAL UTILITIES</small><h3>帮助与开发工具</h3><div class="cmdActions47">'+actions.map(function(a){return '<button type="button" id="'+esc(a.id)+'">'+esc(a.label)+'</button>';}).join('')+'</div>';
+    section.innerHTML='<small>LOCAL UTILITIES</small><h3>存档与帮助</h3><div class="cmdActions47">'+actions.map(function(a){return '<button type="button" id="'+esc(a.id)+'">'+esc(a.label)+'</button>';}).join('')+'</div>';
     actions.forEach(function(a){bind('#'+a.id,a.open);});
   }
   global.SakurayoCommand={inbox:inbox,claimSupply:claimSupply,mount:mount,panel:panel,close:close,settingsUtilities:settingsUtilities};

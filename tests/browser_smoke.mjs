@@ -380,9 +380,10 @@ try {
   assert.equal(await page.locator("#guideButton37").count(), 1);
   assert.equal(await page.locator("#statsButton37").count(), 1);
   assert.equal(await page.locator("#saveButton38").count(), 1);
-  const saveManager = await api(page, "openSaveManager");
-  assert.equal(saveManager.visible, true);
-  assert.match(saveManager.text, /"mainGod"/);
+  await page.locator("#commandSettings47").click();
+  await page.locator("#commandSave48").click();
+  assert.equal(await page.locator("#saveDrawer38").isVisible(), true);
+  assert.match(await page.locator("#saveText38").inputValue(), /"mainGod"/);
   await page.locator("#saveDrawer38 .close").click();
   await page.locator("#start").click();
   assert.equal(await page.locator("#tutorialDrawer37").isVisible(), true);
