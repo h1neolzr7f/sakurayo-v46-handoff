@@ -478,7 +478,7 @@ const firstCss = document.getElementById("sakurayo-lobby-css");
 V.injectStyle();
 const secondCss = document.getElementById("sakurayo-lobby-css");
 assert.ok(secondCss);
-assert.notEqual(firstCss, secondCss);
+assert.equal(firstCss, secondCss, "refresh preserves the stylesheet node and cascade order");
 assert.equal(head.children.filter((n) => n.id === "sakurayo-lobby-css").length, 1);
 
 const gachaHost = fakeEl("div", { id: "gachaBody46" });

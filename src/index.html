@@ -153,7 +153,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 <script src="runtime/sakurayo-cutscene.js"></script>
 <script src="runtime/sakurayo-economy.js"></script>
 <script src="runtime/sakurayo-services.js"></script>
+<script src="runtime/sakurayo-ui.js"></script>
 <script src="runtime/sakurayo-lobby.js"></script>
+<script src="runtime/sakurayo-save.js"></script>
 <script src="runtime/sakurayo-chronicle.js"></script>
 <script src="runtime/sakurayo-live.js"></script>
 <script src="runtime/sakurayo-ops.js"></script>
@@ -296,68 +298,16 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       return { getItem: () => null, setItem: () => {} };
     }
   })();
-  const DEF = {
-    coins: 0,
-    unlock: 1,
-    done: [],
-    kills: 0,
-    bosses: 0,
-    best: 0,
-    runs: 0,
-    tal: { atk: 0, hp: 0, luck: 0, mag: 0, flow: 0 },
-    ach: {},
-    claim: {},
-    story: [0],
-    forms: [],
-    fusions: [],
-    endings: [],
-    runHistory: [],
-    banter: 1,
-    tutorialDone: false,
-    settings: { master: 0.8, sfx: 0.8, music: 0.45, vibration: 1, fx: 1 },
-    character: "sayo",
-    skin: "default",
-    ownedSkins: ["default"],
-    mainGod: { points: 0, unlockedTier: 1, bestTier: 0, clears: 0, runs: 0, deepest: 0, contracts: {}, challenges: {}, power: 0, vitality: 0, tempo: 0, resonance: 0, fortune: 0, regenBlood: 0, psiLink: 0, gunBlade: 0, mageCircuit: 0, summonPage: 0, spaceRing: 0, rebirthDoll: 0, sideKey: 0, cursedHeart: 0 },
-  };
-  const FORBIDDEN_SAVE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
-  const ALLOWED_SAVE_KEYS = ["coins","unlock","done","kills","bosses","best","runs","tal","ach","claim","story","forms","fusions","endings","runHistory","banter","tutorialDone","settings","character","skin","ownedSkins","mainGod","storyChoices38","storySeen38","shop40","balance40","hiddenStory40","pendingLoneStory40","extensions"];
-  function isPlainObject(value) {
-    return !!value && typeof value === "object" && !Array.isArray(value);
+  const DEF = window.SakurayoSave.defaults();
+  function normalizeGameSave(raw, strict = false, skins) {
+    return window.SakurayoSave.normalize(raw, {strict, skins, normalizeOps: window.SakurayoLobby?.normalizeOps});
   }
   function htmlEscape(value) {
     return String(value ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
   }
-  function pickAllowedSave(src) {
-    const out = {};
-    if (!isPlainObject(src)) return out;
-    for (const k of ALLOWED_SAVE_KEYS) {
-      if (Object.prototype.hasOwnProperty.call(src, k)) out[k] = src[k];
-    }
-    return out;
-  }
-  const merge = (a, b) => {
-    const o = JSON.parse(JSON.stringify(a));
-    if (!isPlainObject(b)) return o;
-    for (const k of Object.keys(b)) {
-      if (FORBIDDEN_SAVE_KEYS.has(k)) continue;
-      const incoming = b[k];
-      if (isPlainObject(o[k]) && isPlainObject(incoming)) {
-        const nested = { ...o[k] };
-        for (const nk of Object.keys(incoming)) {
-          if (FORBIDDEN_SAVE_KEYS.has(nk)) continue;
-          nested[nk] = incoming[nk];
-        }
-        o[k] = nested;
-      } else {
-        o[k] = incoming;
-      }
-    }
-    return o;
-  };
   let save;
   try {
-    save = merge(DEF, JSON.parse(store.getItem("sakurayoV3") || "{}"));
+    save = normalizeGameSave(JSON.parse(store.getItem("sakurayoV3") || "{}"));
   } catch {
     save = JSON.parse(JSON.stringify(DEF));
   }
@@ -367,7 +317,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   } catch (error) {
     window.__SAKURAYO_DEV__?.report("extension:save-bootstrap", error);
   }
-  save = Object.assign(JSON.parse(JSON.stringify(DEF)), pickAllowedSave(save));
+  save = normalizeGameSave(save);
   const persist = () => {
     window.SakurayoContent?.emit("save:beforePersist", { save });
     try { store.setItem("sakurayoV3", JSON.stringify(save)); }
@@ -2286,8 +2236,6 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     {tier:3,name:"轮回试炼",dur:145,scale:2.34,points:32,xp:3.6},
     {tier:4,name:"无限回廊",dur:165,scale:2.65,points:42,xp:4.0,endless:true},
   ];
-  const MAIN_GOD_DEF36={points:0,unlockedTier:1,bestTier:0,clears:0,runs:0,deepest:0,contracts:{},challenges:{},power:0,vitality:0,tempo:0,resonance:0,fortune:0,regenBlood:0,psiLink:0,gunBlade:0,mageCircuit:0,summonPage:0,spaceRing:0,rebirthDoll:0,sideKey:0};
-  save.mainGod={...MAIN_GOD_DEF36,...(save.mainGod||{})};
   let runMode36="story",selectedMainGodTier36=1,pendingMode46="story";
   const isMainGodRun36=()=>runMode36==="mainGod";
   const mainGodTier36=()=>MAIN_GOD_TIERS36[selectedMainGodTier36-1]||MAIN_GOD_TIERS36[0];
@@ -2687,11 +2635,18 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     });
   }
   function openDrawer(n) {
-    closeDrawers();
-    $(`#${n}Drawer`)?.classList.remove("hidden");
+    const drawer=$(`#${n}Drawer`);
+    if(!drawer)return;
+    const L=window.SakurayoLobby;
+    if(n==="gacha"&&L){$("#gachaReveal46")?.remove();L.renderGacha($("#gachaBody46"),save,lobbyHandlers46());}
+    if(n==="roster"&&L)L.renderRoster($("#rosterBody46"),save,lobbyHandlers46());
+    if(n==="archive"&&L)L.dressArchive($("#archiveDrawer .archiveDock46"));
+    if(window.SakurayoUI)window.SakurayoUI.open(drawer);
+    else {closeDrawers();drawer.classList.remove("hidden");}
   }
   function closeDrawers() {
-    $$(".drawer").forEach((x) => x.classList.add("hidden"));
+    if(window.SakurayoUI)window.SakurayoUI.closeAll();
+    else $$(".drawer").forEach((x) => x.classList.add("hidden"));
   }
 
   function setForm(form) {
@@ -5885,10 +5840,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       ACH[id]={n:String(achievement.n||achievement.id),i:String(achievement.i||"🧩"),d:String(achievement.d||"扩展成就"),r:Math.max(0,Math.floor(Number(achievement.r)||0)),c:()=>extensionCondition41(achievement.condition,achievement.__packId),__extension:true};
     });
   }
-  save.character=save.character||"sayo";
-  save.skin=save.skin||"default";
-  save.ownedSkins=Array.isArray(save.ownedSkins)?save.ownedSkins:["default"];
-  if(!save.ownedSkins.includes("default"))save.ownedSkins.unshift("default");
+  save = normalizeGameSave(save, false, SKINS35.map(skin => skin.id));
   const char35=()=>CHARACTERS35[save.character]||CHARACTERS35.sayo;
   const skin35=()=>SKINS35.find(s=>s.id===save.skin)||SKINS35[0];
   function svg35(c,skin,size=256){
@@ -6412,7 +6364,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function ensureMusic37(){ensureAudio();if(!audio||music37)return;try{musicGain37=audio.createGain();musicGain37.gain.value=.0001;musicGain37.connect(audio.destination);const filter=audio.createBiquadFilter();filter.type="lowpass";filter.frequency.value=240;filter.connect(musicGain37);music37=[55,82.5].map((hz,i)=>{const o=audio.createOscillator();o.type=i?"triangle":"sine";o.frequency.value=hz;o.connect(filter);o.start();return o;});}catch(error){window.__SAKURAYO_DEV__?.report("music",error);music37=null;}}
   function setMusic37(active,bossLevel=0,force=false){ensureMusic37();if(!musicGain37||!audio)return;const mode=`${active?1:0}:${bossLevel}:${save.settings?.master}:${save.settings?.music}`;if(!force&&mode===musicMode37)return;musicMode37=mode;const target=active?clamp((save.settings?.master??.8)*(save.settings?.music??.45)*.035,0,.04):.0001;musicGain37.gain.cancelScheduledValues(audio.currentTime);musicGain37.gain.linearRampToValueAtTime(Math.max(.0001,target),audio.currentTime+.22);if(music37){music37[0].frequency.setTargetAtTime(55+bossLevel*5,audio.currentTime,.15);music37[1].frequency.setTargetAtTime(82.5+bossLevel*8,audio.currentTime,.15);}}
   function ensureSettings37(){let d=$("#settingsDrawer37");if(d)return d;d=document.createElement("section");d.id="settingsDrawer37";d.className="drawer hidden";d.innerHTML='<div class="dhead"><h2>声音、震动与画面</h2><button class="close">×</button></div><div class="dbody" id="settingsBody37"></div>';d.querySelector(".close").onclick=()=>d.classList.add("hidden");document.body.appendChild(d);return d;}
-  function openSettings37(){closeDrawers();const d=ensureSettings37(),s=save.settings||(save.settings={master:.8,sfx:.8,music:.45,vibration:1,fx:1});$("#settingsBody37").innerHTML=`<label class="settingRow37"><span>总音量 <b>${Math.round(s.master*100)}%</b></span><input data-setting="master" type="range" min="0" max="1" step=".05" value="${s.master}"></label><label class="settingRow37"><span>战斗音效 <b>${Math.round(s.sfx*100)}%</b></span><input data-setting="sfx" type="range" min="0" max="1" step=".05" value="${s.sfx}"></label><label class="settingRow37"><span>氛围音乐 <b>${Math.round(s.music*100)}%</b></span><input data-setting="music" type="range" min="0" max="1" step=".05" value="${s.music}"></label><button class="settingToggle37" data-toggle="vibration">震动反馈：${s.vibration?"开":"关"}</button><button class="settingToggle37" data-toggle="fx">特效强度：${s.fx?"完整":"精简"}</button><p class="routeNote">步枪、手枪、太刀和Boss阶段使用不同音色。省电设备可关闭震动并使用精简特效。</p>`;d.querySelectorAll("input").forEach(input=>input.oninput=()=>{s[input.dataset.setting]=Number(input.value);input.previousElementSibling.querySelector("b").textContent=`${Math.round(input.value*100)}%`;persist();setMusic37(state==="play",boss?.phase||0,true);});d.querySelectorAll("[data-toggle]").forEach(b=>b.onclick=()=>{const k=b.dataset.toggle;s[k]=s[k]?0:1;if(k==="fx")quality=s[k]?1:.62;persist();openSettings37();if(k==="vibration"&&s[k])haptic37(18);});d.classList.remove("hidden");}
+  function openSettings37(){closeDrawers();const d=ensureSettings37(),s=save.settings;$("#settingsBody37").innerHTML=`<label class="settingRow37"><span>总音量 <b>${Math.round(s.master*100)}%</b></span><input data-setting="master" type="range" min="0" max="1" step=".05" value="${s.master}"></label><label class="settingRow37"><span>战斗音效 <b>${Math.round(s.sfx*100)}%</b></span><input data-setting="sfx" type="range" min="0" max="1" step=".05" value="${s.sfx}"></label><label class="settingRow37"><span>氛围音乐 <b>${Math.round(s.music*100)}%</b></span><input data-setting="music" type="range" min="0" max="1" step=".05" value="${s.music}"></label><button class="settingToggle37" data-toggle="vibration">震动反馈：${s.vibration?"开":"关"}</button><button class="settingToggle37" data-toggle="fx">特效强度：${s.fx?"完整":"精简"}</button><p class="routeNote">步枪、手枪、太刀和Boss阶段使用不同音色。省电设备可关闭震动并使用精简特效。</p>`;d.querySelectorAll("input").forEach(input=>input.oninput=()=>{s[input.dataset.setting]=Number(input.value);input.previousElementSibling.querySelector("b").textContent=`${Math.round(input.value*100)}%`;persist();setMusic37(state==="play",boss?.phase||0,true);});d.querySelectorAll("[data-toggle]").forEach(b=>b.onclick=()=>{const k=b.dataset.toggle;s[k]=s[k]?0:1;if(k==="fx")quality=s[k]?1:.62;persist();openSettings37();if(k==="vibration"&&s[k])haptic37(18);});d.classList.remove("hidden");}
   const _startSensory37=startGame;startGame=function(){quality=save.settings?.fx===0?.62:1;const result=_startSensory37();if(save.tutorialDone)ensureMusic37();return result;};
   const _backMenuSensory37=backMenu;backMenu=function(){setMusic37(false);return _backMenuSensory37();};
   const _finishSensory37=finish;finish=function(win){setMusic37(false);return _finishSensory37(win);};
@@ -6432,9 +6384,6 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   style37.textContent+=`.settingRow37{display:block;padding:14px;margin-bottom:10px;border:1px solid #ffffff18;border-radius:14px;background:#ffffff08}.settingRow37 span{display:flex;justify-content:space-between;margin-bottom:10px}.settingRow37 input{width:100%;accent-color:#ff59ad}.settingToggle37{width:100%;padding:12px;margin-bottom:8px;border:1px solid #8668aa;border-radius:12px;background:#211934;color:#fff}`;
 
   /* ================= V3.8 战斗信息与叙事重制 ================= */
-  save.storyChoices38=save.storyChoices38||{sayo:{},aya:{},rion:{}};
-  for(const id of ["sayo","aya","rion"])save.storyChoices38[id]=save.storyChoices38[id]||{};
-  save.storySeen38=save.storySeen38||{};
   function storyMemory38(){return save.storyChoices38[save.character]||(save.storyChoices38[save.character]={});}
   function commitStory38(){Object.assign(storyMemory38(),P.storyFlags||{});persist();}
   const _resetStory38=resetP;
@@ -6500,7 +6449,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   const _renderChoices38=renderChoices;
   renderChoices=function(){_renderChoices38();document.querySelectorAll("#choices .choice").forEach(card=>{if(card.querySelector(".choiceReadout38"))return;const id=card.dataset.upgradeId||"",[label,now,next]=upgradeDelta38(id),isConflict=/机械义体|血肉超载|灵体化|奇迹变身/.test(card.textContent),readout=document.createElement("div");readout.className="choiceReadout38";readout.innerHTML=`<span>${label}</span><b>${now} → ${next}</b>${isConflict?'<em>存在代价：注意与当前路线冲突</em>':'<em>本轮生效 · 结算后清空</em>'}`;card.querySelector("div")?.appendChild(readout);});};
 
-  function ensureSaveManager38(){let d=$("#saveDrawer38");if(d)return d;d=document.createElement("section");d.id="saveDrawer38";d.className="drawer hidden";d.innerHTML='<div class="dhead"><h2>存档管理</h2><button class="close">×</button></div><div class="dbody"><p class="routeNote">导出包含剧情选择、服饰、主神永久强化与本地战绩。导入前会校验格式，不会上传网络。</p><textarea id="saveText38"></textarea><div class="saveActions38"><button id="refreshSave38">生成导出</button><button id="copySave38">复制</button><button id="downloadSave38">下载</button><button id="importSave38">导入文本</button></div></div>';d.querySelector(".close").onclick=()=>d.classList.add("hidden");d.querySelector("#refreshSave38").onclick=renderSave38;d.querySelector("#copySave38").onclick=async()=>{renderSave38();try{await navigator.clipboard.writeText($("#saveText38").value);toast("存档已复制");}catch{$("#saveText38").select();toast("已选中文本，请手动复制");}};d.querySelector("#downloadSave38").onclick=()=>{renderSave38();const blob=new Blob([$("#saveText38").value],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`sakurayo-v38-save-${Date.now()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};d.querySelector("#importSave38").onclick=()=>{try{const incoming=JSON.parse($("#saveText38").value);if(!incoming||typeof incoming!=="object"||Array.isArray(incoming))throw new Error("存档根节点必须是对象");if(!incoming.tal||!incoming.mainGod)throw new Error("缺少核心存档字段");Object.assign(save,JSON.parse(JSON.stringify(DEF)),incoming);save.storyChoices38=incoming.storyChoices38||{sayo:{},aya:{},rion:{}};persist();menuUpdate();toast("存档导入成功");d.classList.add("hidden");}catch(error){toast(`导入失败：${error.message}`);}};document.body.appendChild(d);return d;}
+  function ensureSaveManager38(){let d=$("#saveDrawer38");if(d)return d;d=document.createElement("section");d.id="saveDrawer38";d.className="drawer hidden";d.innerHTML='<div class="dhead"><h2>存档管理</h2><button class="close">×</button></div><div class="dbody"><p class="routeNote">导出包含剧情选择、服饰、主神永久强化与本地战绩。导入前会校验格式，不会上传网络。</p><textarea id="saveText38"></textarea><div class="saveActions38"><button id="refreshSave38">生成导出</button><button id="copySave38">复制</button><button id="downloadSave38">下载</button><button id="importSave38">导入文本</button></div></div>';d.querySelector(".close").onclick=()=>d.classList.add("hidden");d.querySelector("#refreshSave38").onclick=renderSave38;d.querySelector("#copySave38").onclick=async()=>{renderSave38();try{await navigator.clipboard.writeText($("#saveText38").value);toast("存档已复制");}catch{$("#saveText38").select();toast("已选中文本，请手动复制");}};d.querySelector("#downloadSave38").onclick=()=>{renderSave38();const blob=new Blob([$("#saveText38").value],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`sakurayo-v38-save-${Date.now()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};d.querySelector("#importSave38").onclick=importSave39;document.body.appendChild(d);return d;}
   function renderSave38(){const text=$("#saveText38");if(text)text.value=JSON.stringify(save,null,2);}
   function openSaveManager38(){closeDrawers();ensureSaveManager38().classList.remove("hidden");renderSave38();}
   function installSaveButton38(){installUtilityButtons37();const wrap=document.querySelector(".utilityButtons37");if(!wrap||$("#saveButton38"))return;const b=document.createElement("button");b.id="saveButton38";b.textContent="存档";b.onclick=openSaveManager38;wrap.appendChild(b);}
@@ -6521,11 +6470,6 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   /* ================= V3.5 补丁结束 ================= */
 
   /* ================= V3.9 全面收敛：手感、机制、界面与数据安全 ================= */
-  const previousGlowVersion422=Number(save.settings?.glowVersion)||0;
-  save.settings=Object.assign({master:.8,sfx:.8,music:.45,vibration:1,fx:1,hudSize:"standard",damageText:"compact",contrast:1,uiCalm:1,glow:"off",glowVersion:2},save.settings||{});
-  if(previousGlowVersion422<2){save.settings.glow="off";save.settings.glowVersion=2;persist();}
-  if(!["off","soft","vivid"].includes(save.settings.glow))save.settings.glow="off";
-  save.mainGod.cursedHeart=Number(save.mainGod.cursedHeart)||0;
   MAIN_GOD_ITEMS36.cursedHeart={n:"诅咒遗物·猩红心核",i:"🫀",d:"全伤害 +25%，最大生命 -18%；高风险永久兑换，可在重置时返还",max:1,base:24,step:0,group:"特殊效果道具"};
 
   const _resetP39=resetP;
@@ -6607,22 +6551,40 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
   CONTENT41.hook("combat:after-draw",drawMechanics39,"core.mechanics39",30);
 
-  function validateSave39(raw){
-    if(!raw||typeof raw!=="object"||Array.isArray(raw))throw new Error("存档根节点无效");
-    if(!raw.tal||typeof raw.tal!=="object"||!raw.mainGod||typeof raw.mainGod!=="object")throw new Error("缺少天赋或主神数据");
-    const clean=merge(DEF,JSON.parse(JSON.stringify(raw))),num=(v,a,b,d=0)=>clamp(Number.isFinite(Number(v))?Number(v):d,a,b);
-    clean.coins=Math.floor(num(clean.coins,0,999999));clean.unlock=Math.floor(num(clean.unlock,1,4,1));clean.kills=Math.floor(num(clean.kills,0,99999999));clean.runs=Math.floor(num(clean.runs,0,999999));
-    clean.done=Array.isArray(clean.done)?clean.done.filter(x=>[1,2,3,4].includes(Number(x))).slice(0,4):[];
-    clean.ownedSkins=Array.isArray(clean.ownedSkins)?clean.ownedSkins.filter(id=>SKINS35.some(s=>s.id===id)).slice(0,SKINS35.length):["default"];
-    if(!clean.ownedSkins.includes("default"))clean.ownedSkins.unshift("default");
-    clean.character=CHARACTERS35[clean.character]?clean.character:"sayo";clean.skin=clean.ownedSkins.includes(clean.skin)?clean.skin:"default";
-    clean.runHistory=Array.isArray(clean.runHistory)?clean.runHistory.slice(0,30):[];
-    for(const key of Object.keys(clean.mainGod))if(typeof clean.mainGod[key]==="number")clean.mainGod[key]=num(clean.mainGod[key],0,999999);
-    clean.storyChoices38=clean.storyChoices38&&typeof clean.storyChoices38==="object"?clean.storyChoices38:{sayo:{},aya:{},rion:{}};
-    return clean;
+  function validateSave39(raw) {
+    return normalizeGameSave(raw, true, SKINS35.map(skin => skin.id));
   }
-  const _ensureSaveManager39=ensureSaveManager38;
-  ensureSaveManager38=function(){const d=_ensureSaveManager39(),button=d.querySelector("#importSave38");button.onclick=()=>{try{const clean=validateSave39(JSON.parse($("#saveText38").value));for(const k of Object.keys(save))if(!Object.prototype.hasOwnProperty.call(clean,k))delete save[k];Object.assign(save,clean);window.SakurayoContent?.migrateSave(save);persist();applyUiSize38();menuUpdate();toast("存档校验通过并已导入");d.classList.add("hidden");}catch(error){toast(`导入失败：${error.message}`);}};return d;};
+  function reconcileImportedSave39() {
+    selected = clamp(selected, 1, save.unlock);
+    selectedMainGodTier36 = clamp(selectedMainGodTier36, 1, save.mainGod.unlockedTier);
+    if (!save.done.includes(4)) {
+      selectedMainGodTier36 = 1;
+      if (runMode36 === "mainGod") runMode36 = "story";
+      if (pendingMode46 === "mainGod") pendingMode46 = "story";
+    }
+    applyUiSize38();
+    document.body.classList.toggle("noContrast39", !save.settings.contrast);
+    document.body.classList.toggle("richUi39", !save.settings.uiCalm);
+    quality = save.settings.fx ? 1 : .62;
+    setMusic37(state === "play", boss?.phase || 0, true);
+    renderCharacters35();
+    updateCharacterUI35();
+  }
+  function importSave39() {
+    try {
+      let clean = validateSave39(JSON.parse($("#saveText38").value));
+      clean = window.SakurayoContent?.migrateSave(clean) || clean;
+      clean = normalizeGameSave(clean, true, SKINS35.map(skin => skin.id));
+      for (const key of Object.keys(save)) delete save[key];
+      Object.assign(save, clean);
+      reconcileImportedSave39();
+      persist();
+      toast("存档校验通过并已导入");
+      $("#saveDrawer38").classList.add("hidden");
+    } catch (error) {
+      toast(`导入失败：${error.message}`);
+    }
+  }
 
   const _openSettings39=openSettings37;
   openSettings37=function(){
@@ -6641,14 +6603,6 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 
   /* ================= V4.0 内测轮回：后门、普通商店与纯初始挑战 ================= */
   const BETA40=TEST_MODE||new URLSearchParams(location.search).has("beta"),BASE_STAGE_DUR40=ST.map(s=>s.dur);
-  const SHOP_DEF40={starter:{assault:0,bastion:0,flow:0,arcane:0},equippedStarter:null,items:{bait:0,ammo:0,whetstone:0,mirror:0},equippedWeapon:null,baitEquipped:false,ownedTalismans:[],bannedSchools:[],noUpgradeChallenge:false,lastTab:"skins",ops:{pity:0,pitySR:0,pulls:0,tenPulls:0,owned:{},last:[],cheatUsed:0}};
-  save.shop40={...SHOP_DEF40,...(save.shop40||{}),starter:{...SHOP_DEF40.starter,...(save.shop40?.starter||{})},items:{...SHOP_DEF40.items,...(save.shop40?.items||{})},ops:{...SHOP_DEF40.ops,...(save.shop40?.ops||{}),owned:{...(save.shop40?.ops?.owned||{})}}};
-  if(window.SakurayoLobby)save.shop40=window.SakurayoLobby.normalizeOps(save.shop40);
-  save.shop40.lastTab=["skins","starters","items","talismans","extensions"].includes(save.shop40.lastTab)?save.shop40.lastTab:"skins";
-  save.balance40=save.balance40&&typeof save.balance40==="object"?save.balance40:{samples:[],betaSessions:0};
-  save.hiddenStory40=save.hiddenStory40&&typeof save.hiddenStory40==="object"?save.hiddenStory40:{};
-  const _validateSave40=validateSave39;
-  validateSave39=function(raw){const clean=_validateSave40(raw),incoming=clean.shop40||{},starter=incoming.starter||{},items=incoming.items||{};clean.shop40={...SHOP_DEF40,...incoming,starter:{...SHOP_DEF40.starter,...starter},items:{...SHOP_DEF40.items,...items}};if(window.SakurayoLobby)clean.shop40=window.SakurayoLobby.normalizeOps(clean.shop40);for(const id of Object.keys(STARTERS40))clean.shop40.starter[id]=clamp(Math.floor(Number(clean.shop40.starter[id])||0),0,5);for(const [id,u] of Object.entries(ITEMS40))clean.shop40.items[id]=clamp(Math.floor(Number(clean.shop40.items[id])||0),0,u.max);clean.shop40.equippedStarter=STARTERS40[clean.shop40.equippedStarter]?clean.shop40.equippedStarter:null;clean.shop40.equippedWeapon=["ammo","whetstone","mirror"].includes(clean.shop40.equippedWeapon)?clean.shop40.equippedWeapon:null;clean.shop40.ownedTalismans=Array.isArray(clean.shop40.ownedTalismans)?clean.shop40.ownedTalismans.filter(id=>TALISMAN_SCHOOLS40.includes(id)):[];clean.shop40.bannedSchools=Array.isArray(clean.shop40.bannedSchools)?clean.shop40.bannedSchools.filter(id=>clean.shop40.ownedTalismans.includes(id)).slice(0,2):[];clean.balance40=clean.balance40&&typeof clean.balance40==="object"?clean.balance40:{samples:[],betaSessions:0};clean.balance40.samples=Array.isArray(clean.balance40.samples)?clean.balance40.samples.slice(0,80):[];clean.hiddenStory40=clean.hiddenStory40&&typeof clean.hiddenStory40==="object"&&!Array.isArray(clean.hiddenStory40)?clean.hiddenStory40:{};clean.storySeen38=clean.storySeen38&&typeof clean.storySeen38==="object"&&!Array.isArray(clean.storySeen38)?clean.storySeen38:{};clean.pendingLoneStory40=["sayo","aya","rion"].includes(clean.pendingLoneStory40)?clean.pendingLoneStory40:null;if(clean.extensions&&typeof clean.extensions==="object"&&!Array.isArray(clean.extensions)){const ext={};for(const id of Object.keys(clean.extensions)){if(FORBIDDEN_SAVE_KEYS.has(id)||!/^[a-z0-9][a-z0-9._-]{2,63}$/.test(id))continue;const entry=clean.extensions[id];if(entry&&typeof entry==="object"&&!Array.isArray(entry))ext[id]=entry;}clean.extensions=ext;}return pickAllowedSave(clean);};
 
   const STARTERS40={
     assault:{n:"夜樱火控核心",i:"🎯",d:"伤害、射速与暴击同步成长。适合纯初始挑战。",apply:(lv,m)=>{P.dmg*=1+.12*lv*m;P.rate/=1+.03*lv*m;P.crit+=.012*lv*m;}},
@@ -7256,7 +7210,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   $$("[data-open]").forEach(
     (b) => (b.onclick = () => openDrawer(b.dataset.open)),
   );
-  $$(".close").forEach((b) => (b.onclick = closeDrawers));
+  $$(".close").forEach((b) => (b.onclick = () => closeDrawers()));
   $("#banterToggle").onclick=()=>{save.banter=save.banter?0:1;$("#banterToggle").textContent=`吐槽电台：${save.banter?"开":"关"}`;persist();if(!save.banter)$("#banter").classList.add("hidden");};
   $("#fxToggle").onclick = () => {
     quality = quality < 0.8 ? 1 : 0.62;
@@ -7500,6 +7454,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     bg.style.backgroundSize="cover";
     $("#menu")?.classList.add("lobbyWide46");
   }
+  function choosePendingMode46(mode) {
+    pendingMode46 = mode === "testimony" ? "testimony" : mode === "mainGod" ? "mainGod" : "story";
+    renderStages();
+    refreshCommand47();
+  }
   function bindStageModes46(){
     const L=window.SakurayoLobby;
     const box=$("#stageList");
@@ -7510,8 +7469,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     bar.querySelectorAll("button").forEach(btn=>{
       btn.onclick=()=>{
         const mode=btn.getAttribute("data-mode");
-        pendingMode46=mode==="testimony"?"testimony":mode==="mainGod"?"mainGod":"story";
-        renderStages();
+        choosePendingMode46(mode);
         if(pendingMode46==="mainGod") $("#stageList .mainGodCard36")?.scrollIntoView({block:"nearest"});
       };
     });
@@ -7565,17 +7523,6 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     wireLivePuppet46();
     L.dressArchive($("#archiveDrawer .archiveDock46"));
     ["shopDrawer","stageDrawer","archiveDrawer"].forEach(id=>$(`#${id}`)?.classList.add("room46"));
-    const _openDrawer46=openDrawer;
-    openDrawer=function(n){
-      _openDrawer46(n);
-      if(n==="gacha"){
-        const rev=$("#gachaReveal46");
-        if(rev)rev.remove();
-        L.renderGacha($("#gachaBody46"),save,lobbyHandlers46());
-      }
-      if(n==="roster")L.renderRoster($("#rosterBody46"),save,lobbyHandlers46());
-      if(n==="archive")L.dressArchive($("#archiveDrawer .archiveDock46"));
-    };
     const _renderStages46=renderStages;
     renderStages=function(){const result=_renderStages46();bindStageModes46();return result;};
     const _openLevel46=openLevel;
@@ -7752,9 +7699,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     };
   }
   function refreshCommand47(){
-    window.SakurayoCommand?.mount({art:artUrl,model:commandModel47,open:openDrawer,closeDrawers,
+    window.SakurayoCommand?.mount({art:artUrl,model:commandModel47,open:openDrawer,closeDrawers,ui:window.SakurayoUI,
       settings:openSettings37,start:startGame,persist,notify:toast,
-      chooseMode(mode){pendingMode46=mode==='testimony'?'testimony':mode==='mainGod'?'mainGod':'story';openDrawer('stage');renderStages();},
+      chooseMode(mode){openDrawer('stage');choosePendingMode46(mode);},
       selectCharacter(id){if(!CHARACTERS35[id])return;save.character=id;persist();},
       claim(id){const result=window.SakurayoCommand.claimSupply(save,id);if(result.ok){persist();toast(`补给已回收 · 樱花币 +${result.reward}`);}return result;}
     });
@@ -7763,8 +7710,6 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   menuUpdate=function(){const result=_commandMenu47();refreshCommand47();return result;};
   const _commandChar47=updateCharacterUI35;
   updateCharacterUI35=function(){const result=_commandChar47();refreshCommand47();return result;};
-  const _commandClose47=closeDrawers;
-  closeDrawers=function(){window.SakurayoCommand?.close();return _commandClose47();};
   checkAch();
   menuUpdate();
   installModKitButton42();

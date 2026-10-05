@@ -17,6 +17,10 @@ node --check tests/artifacts/static/android.bundle.extracted.js
 if [[ "${1:-}" != "--static" ]]; then
   node tests/command_smoke.mjs
   node tests/tactical_smoke.mjs
+  node tests/save_import_smoke.mjs
+  node tests/polish_rooms_smoke.mjs
+  node tests/ui_dom_smoke.mjs
+  node tests/ui_smoke.mjs
   node tests/ops_smoke.mjs
   node tests/framework_smoke.mjs
   node tests/gacha_visual.mjs
@@ -25,6 +29,9 @@ if [[ "${1:-}" != "--static" ]]; then
   EMU_BASE="file://$root_dir/src/index.html" node tests/emu_scan.mjs
   SAKURAYO_ENTRY="$root_dir/android-app/app/src/main/assets/index.html" node tests/command_smoke.mjs
   SAKURAYO_ENTRY="$root_dir/android-app/app/src/main/assets/index.html" node tests/tactical_smoke.mjs
+  SAKURAYO_ENTRY="$root_dir/android-app/app/src/main/assets/index.html" node tests/save_import_smoke.mjs
+  SAKURAYO_ENTRY="$root_dir/android-app/app/src/main/assets/index.html" node tests/polish_rooms_smoke.mjs
+  SAKURAYO_ENTRY="$root_dir/android-app/app/src/main/assets/index.html" node tests/ui_smoke.mjs
   node tests/framework_smoke.mjs android-app/app/src/main/assets/index.html
   node tests/browser_smoke.mjs android-app/app/src/main/assets/index.html
 fi

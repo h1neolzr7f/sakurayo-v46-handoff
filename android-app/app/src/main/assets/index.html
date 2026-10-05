@@ -2190,6 +2190,133 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 
 </script>
 <script>
+/* One owner for lobby drawers. No inert dependency: older offline WebViews use focus guards. */
+(function (global) {
+  'use strict';
+  var d=global.document,stack=[],closing=false;
+  if(!d)return;
+  function visible(el) {
+    if(!el||!d.documentElement.contains(el))return false;
+    for(var n=el;n&&n.nodeType===1;n=n.parentElement){
+      if(n.hidden||n.classList.contains('hidden'))return false;
+      var s=global.getComputedStyle(n);if(s.display==='none'||s.visibility==='hidden')return false;
+    }
+    return true;
+  }
+  function blocked() {
+    var nodes=d.querySelectorAll('#dialogue,#level,#event,#paused,#result');
+    for(var i=0;i<nodes.length;i++)if(visible(nodes[i]))return true;
+    return false;
+  }
+  function focusable(el) {
+    return !!el&&visible(el)&&!el.disabled&&el.getAttribute('tabindex')!=='-1';
+  }
+  function controls(el) {
+    return Array.prototype.filter.call(el.querySelectorAll('button,input,select,textarea,a[href],[tabindex]'),focusable);
+  }
+  function focus(el) {
+    if(!focusable(el))return false;
+    try{el.focus({preventScroll:true});}catch(e){el.focus();}
+    return d.activeElement===el;
+  }
+  function refreshFocus(el,preferred) {
+    if(!el||blocked())return;
+    if(focus(preferred))return;
+    var all=controls(el);
+    if(all.length){focus(all[0]);return;}
+    el.setAttribute('tabindex','-1');
+    try{el.focus({preventScroll:true});}catch(e){el.focus();}
+  }
+  function label(el) {
+    if(!el.hasAttribute('role'))el.setAttribute('role','dialog');
+    el.setAttribute('aria-modal','true');
+    if(!el.hasAttribute('aria-labelledby')&&!el.hasAttribute('aria-label')){
+      var title=el.querySelector('h2,h3');if(title)el.setAttribute('aria-label',title.textContent.trim());
+    }
+  }
+  function finish(entry,invoke) {
+    entry.el.classList.add('hidden');
+    if(invoke&&entry.onClose)entry.onClose();
+  }
+  function restore(entry) {
+    if(blocked())return;
+    var parent=stack.length&&stack[stack.length-1].el;
+    if(focus(entry.returnFocus))return;
+    if(parent)refreshFocus(parent);
+    else focus(d.getElementById('start'));
+  }
+  function close(el,opts) {
+    opts=opts||{};
+    var at=-1;
+    for(var i=0;i<stack.length;i++)if(!el||stack[i].el===el)at=i;
+    if(at<0){if(el)el.classList.add('hidden');return;}
+    var removed=stack.splice(at),entry=removed[0];closing=true;
+    try{for(var j=removed.length-1;j>=0;j--)finish(removed[j],opts.invoke!==false);}finally{closing=false;}
+    if(opts.restore!==false)restore(entry);
+  }
+  function closeAll(opts) {
+    opts=opts||{};
+    if(stack.length)close(stack[0].el,opts);
+    var all=d.querySelectorAll('.drawer');for(var i=0;i<all.length;i++)all[i].classList.add('hidden');
+  }
+  function open(el,opts) {
+    if(!el)return;opts=opts||{};
+    var top=stack.length&&stack[stack.length-1];
+    if(top&&top.el===el){el.classList.remove('hidden');refreshFocus(el,opts.initialFocus);return;}
+    var launcher=opts.returnFocus||d.activeElement;
+    if(!opts.nested){if(stack.length)launcher=stack[0].returnFocus;closeAll({restore:false});}
+    label(el);el.classList.remove('hidden');
+    stack.push({el:el,returnFocus:launcher,onClose:opts.onClose});
+    refreshFocus(el,opts.initialFocus);
+  }
+  // Legacy settings/tutorial utilities still show their drawer directly. Adopt them
+  // at the DOM boundary while retaining each original close handler's side effects.
+  function sync() {
+    if(closing)return;
+    while(stack.length&&!visible(stack[stack.length-1].el))close(stack[stack.length-1].el,{invoke:false});
+    var nodes=d.querySelectorAll('.drawer:not(.hidden)'),candidate=null;
+    for(var i=0;i<nodes.length;i++)if(visible(nodes[i]))candidate=nodes[i];
+    if(candidate&&!stack.some(function(e){return e.el===candidate;})){
+      var button=candidate.querySelector('.dhead .close'),handler=button&&button.onclick;
+      open(candidate,{onClose:handler?function(){handler.call(button);}:null});
+    }
+  }
+  function active(){sync();return stack.length?stack[stack.length-1].el:null;}
+  d.addEventListener('keydown',function(e){
+    if(e.key!=='Escape'&&e.key!=='Tab')return;
+    var el=active();if(!el||blocked())return;
+    if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close(el);return;}
+    var all=controls(el),at=all.indexOf(d.activeElement);
+    e.preventDefault();e.stopPropagation();
+    if(!all.length){refreshFocus(el);return;}
+    focus(all[at<0?0:(at+(e.shiftKey?-1:1)+all.length)%all.length]);
+  },true);
+  d.addEventListener('focusin',function(e){
+    if(closing||blocked())return;
+    var top=stack.length&&stack[stack.length-1];
+    if(top&&visible(top.el)&&!top.el.contains(e.target))refreshFocus(top.el);
+  },true);
+  function affectsDrawers(records) {
+    for(var i=0;i<records.length;i++){
+      var r=records[i],target=r.target;
+      if(r.type==='attributes'){
+        if(target.classList.contains('drawer')||stack.some(function(e){return target===e.el||target.contains(e.el);}))return true;
+      }else{
+        var changed=Array.prototype.slice.call(r.addedNodes).concat(Array.prototype.slice.call(r.removedNodes));
+        for(var j=0;j<changed.length;j++){
+          var node=changed[j];if(node.nodeType!==1)continue;
+          if(node.classList.contains('drawer')||node.querySelector('.drawer')||stack.some(function(e){return node===e.el||node.contains(e.el);}))return true;
+        }
+      }
+    }
+    return false;
+  }
+  if(global.MutationObserver)new global.MutationObserver(function(records){if(affectsDrawers(records))sync();}).observe(d.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','hidden']});
+  global.SakurayoUI={open:open,close:close,closeAll:closeAll,refreshFocus:refreshFocus,active:active};
+})(window);
+
+</script>
+<script>
 (function (global) {
   "use strict";
 
@@ -2436,6 +2563,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     ".wishSpark46 button.poor{opacity:.42}" +
     ".rosterEquip46{margin-top:8px;min-height:36px;padding:0 12px;border-radius:10px;border:1px solid #ffe6a366;background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;font:800 12px/1 system-ui}" +
     ".chronicleBox46{display:grid;gap:10px}" +
+    "#rosterWall46>.chronicleBox46{grid-column:1/-1}" +
     ".chronicleCard46{padding:12px;border-radius:14px;border:1px solid #ffe6a344;background:#0b0818cc;color:#fff7fb;text-align:left}" +
     ".chronicleCard46 b{display:block;margin:0 0 6px;color:#ffe7a3;letter-spacing:.14em}" +
     ".chronicleCard46 p{margin:0 0 6px;color:#f4eaf4;font-size:12px;line-height:1.55}" +
@@ -2471,6 +2599,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     ".revealSkip46,.revealAgain46{background:#0b0818cc;color:#fff7fb}" +
     "#gachaReveal46.isTest .revealInner46,#gachaReveal46.isTest .revealFace46.front:after,#gachaReveal46.isTest .revealCard46.r-SSR.flipped .revealFace46.front{transition:none;animation:none}" +
     ".rosterStage46{min-height:100%;padding:max(52px,calc(env(safe-area-inset-top) + 40px)) 12px calc(16px + env(safe-area-inset-bottom));background:radial-gradient(circle at 18% 0,#ff72b428 0%,#1a1030 42%,#060410 100%)}" +
+    "#rosterDrawer>#rosterBody46{height:100%;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;box-sizing:border-box}" +
+    "#rosterDrawer .rosterStage46{box-sizing:border-box}" +
     ".rosterHead46{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 12px}" +
     ".rosterHead46 h3{margin:0;font-size:22px;letter-spacing:.28em}" +
     ".rosterHead46 span{color:#ffe7a3;font-size:11px;letter-spacing:.12em}" +
@@ -2489,8 +2619,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     ".rosterVeil46{position:absolute;inset:0;display:grid;place-items:center;background:#08071388;color:#ffe6f3;font:800 12px/1 system-ui;font-style:normal;letter-spacing:.2em}" +
     ".rosterSlot46 b{display:block;padding:8px 6px 0;font-size:11px}" +
     ".rosterSlot46 small{display:block;margin:4px 0 8px;color:#bfb1d3;font-size:9px}" +
-    "#rosterPeek46{position:absolute;inset:0;z-index:24;display:flex;align-items:center;justify-content:center;padding:18px;background:#060410ee}" +
-    ".rosterPeekCard46{width:min(86vw,280px);border-radius:18px;overflow:hidden;border:1px solid #ffe6a355;background:#120c20;box-shadow:0 18px 40px #05020d88}" +
+    "#rosterPeek46{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:18px;background:#060410ee;box-sizing:border-box}" +
+    ".rosterPeekCard46{position:relative;width:min(86vw,280px);max-height:100%;border-radius:18px;overflow:auto;overscroll-behavior:contain;border:1px solid #ffe6a355;background:#120c20;box-shadow:0 18px 40px #05020d88;box-sizing:border-box}" +
+    "#rosterPeekClose46{position:sticky;z-index:2;top:0;display:block;width:40px;height:40px;margin:0 0 -40px auto;padding:0;border-radius:4px;border:1px solid #b9e8f355;background:#172b39ee;color:#eaf5fa;font-size:24px}" +
     ".rosterPeekCard46 img{display:block;width:100%;height:220px;object-fit:cover;background:#0b0818}" +
     ".rosterPeekCard46.lock img{filter:brightness(.4)}" +
     ".rosterPeekCard46 div{padding:12px 14px 16px}" +
@@ -2528,6 +2659,19 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     "html.landscape46 #rosterWall46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
     "html.landscape46 #archiveDrawer .archiveDock46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
     "html.landscape46 #stageList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}" +
+    "@media(max-height:460px){" +
+    "html.landscape46 .wishTitle46{top:52px;max-width:48%}" +
+    "html.landscape46 .wishTitle46 h3{font-size:26px;line-height:1.15}" +
+    "html.landscape46 .wishTitle46 p{margin-top:4px;font-size:10px}" +
+    "html.landscape46 .wishPity46{top:116px;bottom:auto}" +
+    "html.landscape46 .wishPills46{gap:4px}" +
+    "html.landscape46 .wishPills46 b{padding:3px 6px;font-size:9px}" +
+    "html.landscape46 .wishSpark46{max-height:60px}" +
+    ".rosterPeekCard46{width:min(86vw,600px);display:grid;grid-template-columns:minmax(120px,38%) minmax(0,1fr)}" +
+    ".rosterPeekCard46 img{height:100%;min-height:220px;max-height:300px;grid-column:1;grid-row:1}" +
+    ".rosterPeekCard46 div{grid-column:2;grid-row:1;padding-top:48px}" +
+    "#rosterPeekClose46{position:sticky;grid-column:2;grid-row:1;align-self:start;justify-self:end}" +
+    "}" +
     "@media(prefers-reduced-motion:reduce){.wishStage46:before,.wishPetals46 i,.revealInner46,.revealFace46.front:after,.revealCard46.r-SSR.flipped .revealFace46.front{animation:none;transition:none}}";
 
   var ROOM_CSS =
@@ -2619,7 +2763,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function injectStyle() {
     if (!global.document) return;
     var style = global.document.getElementById("sakurayo-lobby-css");
-    if (style && style.parentNode) style.parentNode.removeChild(style);
+    if (style) return;
     style = global.document.createElement("style");
     style.id = "sakurayo-lobby-css";
     style.textContent = LOBBY_CSS + ROOM_CSS;
@@ -3258,26 +3402,38 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     return (card && card.d) || "";
   }
 
+  var rosterPeekState = null;
+
   function closeRosterPeek() {
     if (!global.document) return;
     var peek = global.document.getElementById("rosterPeek46");
+    if (peek && global.SakurayoUI) {
+      global.SakurayoUI.close(peek);
+      return;
+    }
     if (peek && peek.parentNode) peek.parentNode.removeChild(peek);
+    var source = rosterPeekState && rosterPeekState.source;
+    rosterPeekState = null;
+    if (source && source.isConnected && typeof source.focus === "function") source.focus();
   }
 
-  function showRosterPeek(card, locked, count, handlers, tab) {
+  function showRosterPeek(card, locked, count, handlers, tab, source) {
     if (!global.document) return;
     var drawer = global.document.getElementById("rosterDrawer");
     if (!drawer) return;
     closeRosterPeek();
     var overlay = global.document.createElement("div");
     overlay.id = "rosterPeek46";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-labelledby", "rosterPeekTitle46");
     var canEquip = !locked && (tab === "fashion" || tab === "weapon");
     overlay.innerHTML =
       '<div class="rosterPeekCard46' +
       (locked ? " lock" : "") +
-      '"><img data-art alt="" src="' +
+      '"><button type="button" id="rosterPeekClose46" aria-label="关闭卡片详情">×</button><img data-art alt="" src="' +
       artSrc(handlers, locked ? "gacha/card_back.webp" : "gacha/" + card.id + ".webp") +
-      '"><div><b>' +
+      '"><div><b id="rosterPeekTitle46">' +
       (locked ? "未回收" : card.n) +
       "</b><em>" +
       rarityLabel(card.r, card.legend) +
@@ -3288,9 +3444,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       "</p>" +
       (canEquip ? '<button type="button" class="rosterEquip46" data-equip="' + card.id + '">装备</button>' : "") +
       "</div></div>";
-    overlay.onclick = function () {
-      closeRosterPeek();
+    overlay.onclick = function (event) {
+      if (event && event.target === overlay) closeRosterPeek();
     };
+    var close = overlay.querySelector("#rosterPeekClose46");
+    if (close) close.onclick = closeRosterPeek;
     var eq = overlay.querySelector("[data-equip]");
     if (eq) {
       eq.onclick = function (ev) {
@@ -3302,6 +3460,37 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }
     drawer.appendChild(overlay);
     hideBrokenArt(overlay);
+    rosterPeekState = { source: source };
+    if (global.SakurayoUI) {
+      global.SakurayoUI.open(overlay, {
+        nested: true,
+        initialFocus: close,
+        returnFocus: source,
+        onClose: function () {
+          if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+          rosterPeekState = null;
+        }
+      });
+    } else {
+      overlay.onkeydown = function (event) {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          event.stopPropagation();
+          closeRosterPeek();
+        } else if (event.key === "Tab") {
+          var targets = overlay.querySelectorAll("button:not(:disabled)");
+          var first = targets[0], last = targets[targets.length - 1];
+          if (event.shiftKey && global.document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && global.document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+          }
+        }
+      };
+      if (close && typeof close.focus === "function") close.focus();
+    }
   }
 
   function rosterList(tab) {
@@ -3323,6 +3512,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function renderRoster(host, save, handlers) {
     injectStyle();
     if (!host) return snapshot(save);
+    closeRosterPeek();
     var info = snapshot(save);
     var tab = info.rosterTab || "scrap";
     var list = rosterList(tab);
@@ -3398,7 +3588,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
           if (!card) return;
           var count = ownedMap[card.id] || 0;
           var locked = count < 1 && DEFAULT_SHOWN.indexOf(card.id) < 0;
-          showRosterPeek(card, locked, count, handlers, tab);
+          showRosterPeek(card, locked, count, handlers, tab, node);
         };
       })(slots[i]);
     }
@@ -3611,6 +3801,98 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     cheatToast: CHEAT_TOAST,
   };
 })(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+(function (global) {
+  'use strict';
+  // Pure save boundary shared by startup and text import. No storage or UI effects.
+  var SETTINGS = {master:.8,sfx:.8,music:.45,vibration:1,fx:1,hudSize:'standard',damageText:'compact',contrast:1,uiCalm:1,glow:'off',glowVersion:2};
+  var MAIN_GOD = {points:0,unlockedTier:1,bestTier:0,clears:0,runs:0,deepest:0,contracts:{},challenges:{},power:0,vitality:0,tempo:0,resonance:0,fortune:0,regenBlood:0,psiLink:0,gunBlade:0,mageCircuit:0,summonPage:0,spaceRing:0,rebirthDoll:0,sideKey:0,cursedHeart:0};
+  var SHOP = {starter:{assault:0,bastion:0,flow:0,arcane:0},equippedStarter:null,items:{bait:0,ammo:0,whetstone:0,mirror:0},equippedWeapon:null,baitEquipped:false,ownedTalismans:[],bannedSchools:[],noUpgradeChallenge:false,lastTab:'skins',ops:{pity:0,pitySR:0,pulls:0,tenPulls:0,owned:{},last:[],cheatUsed:0}};
+  var DEFAULTS = {coins:0,unlock:1,done:[],kills:0,bosses:0,best:0,runs:0,tal:{atk:0,hp:0,luck:0,mag:0,flow:0},ach:{},claim:{},story:[0],forms:[],fusions:[],endings:[],runHistory:[],banter:1,tutorialDone:false,settings:SETTINGS,character:'sayo',skin:'default',ownedSkins:['default'],mainGod:MAIN_GOD,storyChoices38:{sayo:{},aya:{},rion:{}},storySeen38:{},shop40:SHOP,balance40:{samples:[],betaSessions:0},hiddenStory40:{},pendingLoneStory40:null,extensions:{}};
+  // Lifetime counters have no gameplay cap; keep earned values within safe integer precision.
+  var COUNT_MAX = Number.MAX_SAFE_INTEGER || 9007199254740991;
+  var SCHOOLS = ['mech','gun','alch','gene','vamp','spore','magical','cult','mage','shrine','summon','ninja','idol','necro'];
+  function object(value) {return !!value && typeof value === 'object' && !Array.isArray(value);}
+  function forbidden(key) {return key === '__proto__' || key === 'constructor' || key === 'prototype';}
+  function copy(value) {
+    if (Array.isArray(value)) return value.map(copy);
+    if (!object(value)) return value;
+    var result = {};
+    Object.keys(value).forEach(function (key) {if (!forbidden(key)) result[key] = copy(value[key]);});
+    return result;
+  }
+  function merge(defaults, raw) {
+    var out = copy(defaults);
+    if (!object(raw)) return out;
+    Object.keys(raw).forEach(function (key) {
+      if (forbidden(key)) return;
+      out[key] = object(defaults[key]) ? merge(defaults[key],raw[key]) : copy(raw[key]);
+    });
+    return out;
+  }
+  function number(value, min, max, fallback) {
+    var n = Number(value);
+    return Math.max(min,Math.min(max,Number.isFinite(n) ? n : fallback));
+  }
+  function integer(value,min,max,fallback) {return Math.floor(number(value,min,max,fallback));}
+  function list(raw) {return Array.isArray(raw) ? raw : [];}
+  function flag(value, fallback) {return value === 0 || value === false ? 0 : value === 1 || value === true ? 1 : fallback;}
+  function settings(raw) {
+    var s = merge(SETTINGS,raw);
+    ['master','sfx','music'].forEach(function (key) {s[key] = number(s[key],0,1,SETTINGS[key]);});
+    ['vibration','fx','contrast','uiCalm'].forEach(function (key) {s[key] = flag(s[key],SETTINGS[key]);});
+    s.hudSize = ['standard','compact'].indexOf(s.hudSize) >= 0 ? s.hudSize : 'standard';
+    s.damageText = ['off','compact','full'].indexOf(s.damageText) >= 0 ? s.damageText : 'compact';
+    // Version 2 deliberately removed the old always-on glow default.
+    s.glow = number(object(raw) ? raw.glowVersion : 0,0,999,0) >= 2 && ['off','soft','vivid'].indexOf(s.glow) >= 0 ? s.glow : 'off';
+    s.glowVersion = 2;
+    return s;
+  }
+  function normalize(raw, options) {
+    options = options || {};
+    if (options.strict && !object(raw)) throw new Error('存档根节点无效');
+    if (options.strict && (!object(raw.tal) || !object(raw.mainGod))) throw new Error('缺少天赋或主神数据');
+    var incoming = object(raw) ? raw : {}, clean = copy(DEFAULTS);
+    Object.keys(DEFAULTS).forEach(function (key) {
+      if (Object.prototype.hasOwnProperty.call(incoming,key)) clean[key] = object(DEFAULTS[key]) ? merge(DEFAULTS[key],incoming[key]) : copy(incoming[key]);
+    });
+    clean.coins = integer(clean.coins,0,COUNT_MAX,0);
+    clean.unlock = integer(clean.unlock,1,4,1);
+    ['kills','bosses'].forEach(function (key) {clean[key] = integer(clean[key],0,COUNT_MAX,0);});
+    clean.runs = integer(clean.runs,0,COUNT_MAX,0);clean.best = number(clean.best,0,COUNT_MAX,0);
+    clean.done = list(clean.done).map(Number).filter(function (id,index,ids) {return [1,2,3,4].indexOf(id) >= 0 && ids.indexOf(id) === index;});
+    clean.runHistory = list(clean.runHistory).filter(object).slice(0,30);
+    ['story','forms','fusions','endings'].forEach(function (key) {if (!Array.isArray(clean[key])) clean[key] = copy(DEFAULTS[key]);});
+    clean.character = ['sayo','aya','rion'].indexOf(clean.character) >= 0 ? clean.character : 'sayo';
+    clean.ownedSkins = list(clean.ownedSkins).filter(function (id,index,ids) {return typeof id === 'string' && !forbidden(id) && ids.indexOf(id) === index && (!options.skins || options.skins.indexOf(id) >= 0);});
+    if (clean.ownedSkins.indexOf('default') < 0) clean.ownedSkins.unshift('default');
+    clean.skin = clean.ownedSkins.indexOf(clean.skin) >= 0 ? clean.skin : 'default';
+    clean.settings = settings(incoming.settings);
+    Object.keys(clean.tal).forEach(function (key) {clean.tal[key] = integer(clean.tal[key],0,COUNT_MAX,0);});
+    Object.keys(MAIN_GOD).forEach(function (key) {if (typeof MAIN_GOD[key] === 'number') clean.mainGod[key] = integer(clean.mainGod[key],0,COUNT_MAX,MAIN_GOD[key]);});
+    clean.mainGod.unlockedTier = integer(clean.mainGod.unlockedTier,1,4,1);
+    clean.mainGod.bestTier = integer(clean.mainGod.bestTier,0,4,0);
+    ['sayo','aya','rion'].forEach(function (id) {if (!object(clean.storyChoices38[id])) clean.storyChoices38[id] = {};});
+    var shop = clean.shop40;
+    Object.keys(SHOP.starter).forEach(function (id) {shop.starter[id] = integer(shop.starter[id],0,5,0);});
+    Object.keys(SHOP.items).forEach(function (id) {shop.items[id] = integer(shop.items[id],0,id === 'bait' ? 3 : 1,0);});
+    if (!Object.prototype.hasOwnProperty.call(SHOP.starter,shop.equippedStarter)) shop.equippedStarter = null;
+    if (['ammo','whetstone','mirror'].indexOf(shop.equippedWeapon) < 0) shop.equippedWeapon = null;
+    shop.ownedTalismans = list(shop.ownedTalismans).filter(function (id) {return SCHOOLS.indexOf(id) >= 0;});
+    shop.bannedSchools = list(shop.bannedSchools).filter(function (id) {return shop.ownedTalismans.indexOf(id) >= 0;}).slice(0,2);
+    if (['skins','starters','items','talismans','extensions'].indexOf(shop.lastTab) < 0) shop.lastTab = 'skins';
+    // The lobby owns the evolving collection schema, including service receipts.
+    if (options.normalizeOps) clean.shop40 = options.normalizeOps(shop);
+    clean.balance40.samples = list(clean.balance40.samples).filter(object).slice(0,80);
+    clean.balance40.betaSessions = integer(clean.balance40.betaSessions,0,COUNT_MAX,0);
+    if (['sayo','aya','rion'].indexOf(clean.pendingLoneStory40) < 0) clean.pendingLoneStory40 = null;
+    Object.keys(clean.extensions).forEach(function (id) {if (!/^[a-z0-9][a-z0-9._-]{2,63}$/.test(id) || !object(clean.extensions[id])) delete clean.extensions[id];});
+    return clean;
+  }
+  global.SakurayoSave = Object.freeze({normalize:normalize,defaults:function () {return copy(DEFAULTS);}});
+})(window);
 
 </script>
 <script>
@@ -4496,6 +4778,16 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
  function label(name,text,en){return '<span class="terminalIcon48">'+icon(name)+'</span><span class="terminalLabel48"><b>'+text+'</b><small>'+en+'</small></span>';}
  var CSS=`
  :root{--cmd-ink:#101920;--cmd-paper:#f0f5f8;--cmd-dim:#b3c5cf;--cmd-line:#d5e9f338;--cmd-pink:#71e0f4;--cmd-gold:#f1d08d}
+ #rosterDrawer.wishDrawer46{background:#101c27;color:#eaf5fa}#rosterDrawer .rosterStage46{background:radial-gradient(circle at 18% 0,#46798d40,#142331 45%,#0c1720)}
+ #rosterDrawer .rosterHead46 h3{color:#f1f7fa;letter-spacing:.1em}#rosterDrawer .rosterHead46 span{color:#b8dce7}
+ #rosterDrawer .rosterTabs46 button{min-height:40px;border-radius:3px;border-color:#b9dce53d;background:#172b3b;color:#cbdfe8}
+ #rosterDrawer .rosterTabs46 button.on{background:linear-gradient(120deg,#b7eef6,#83d5e5);color:#173443;border-color:#c9f5ff}
+ #rosterDrawer .rosterSlot46 small{color:#b6cdd8}#rosterDrawer .rosterSlot46{border-radius:4px;border-color:#bedee52d;background:linear-gradient(145deg,#263b4a,#142531);box-shadow:0 3px 12px #060f1840}
+ #rosterDrawer .rosterArt46{background:#10202e}#rosterDrawer .rosterVeil46{background:#0d1b29c9;color:#c9e1e9}
+ #rosterDrawer #rosterPeek46{background:#08141de8}#rosterDrawer .rosterPeekCard46{border-radius:4px;border-color:#b9e8f355;background:#172b39;box-shadow:0 10px 60px #030a1280;color:#eaf5fa}
+ #rosterDrawer .rosterPeekCard46 em{color:#acddec}#rosterDrawer .rosterPeekCard46 p{color:#cadde6;line-height:1.65}
+ #rosterDrawer .rosterEquip46{min-height:40px;border-radius:3px;border-color:#bcecf7;background:linear-gradient(120deg,#b7eef6,#83d5e5);color:#173443}
+ #rosterDrawer button:focus-visible{outline:2px solid #9cefff;outline-offset:2px}
  #gachaDrawer.wishDrawer46{background:#142432}#gachaDrawer .wishStage46{background:#243a49}
  #gachaDrawer .wishStage46:before{background:linear-gradient(90deg,#172a3a15,transparent 48%,#152b4133)}
  #gachaDrawer .wishTitle46 h3{color:#fff;text-shadow:0 2px 12px #19344b,0 0 24px #82e6f540}#gachaDrawer .wishTitle46 p{color:#dcf5fc}
@@ -4578,6 +4870,16 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
  .terminalSupport48{left:3%;bottom:9%;width:41%;max-width:none}.terminalSupport48 button{min-height:49px;font-size:10px}.terminalSupport48 svg{width:21px;height:21px}
  html.landscape46 #menu.homeDock46.terminalLobby48 .homeNav46{width:92%;right:4%;bottom:1.5%;max-width:none}#menu.homeDock46.terminalLobby48 .homeNav46 button{min-height:56px}#menu.homeDock46.terminalLobby48 .homeNav46 .terminalIcon48{width:23px;height:23px}#menu.homeDock46.terminalLobby48 .homeNav46 b{font-size:10px}#menu.homeDock46.terminalLobby48 .homeNav46 small{display:none}.commandSignal47{bottom:9.5%;font-size:7px}
  }
+ @media(max-width:640px) and (max-height:520px) and (orientation:landscape){
+ .commandHeading47{top:23%;width:35%}.commandHeading47 b{font-size:13px}.commandHeading47 p{font-size:9px}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .heroLiveBreath46{width:70vw;height:98%;margin-left:0}html.landscape46 #menu.homeDock46.terminalLobby48 .heroLiveName46{bottom:36%;max-width:55%}
+ .tacticalDeck48{top:23%;bottom:22%;width:32%;gap:6px;grid-template-rows:minmax(40px,1fr) minmax(40px,1fr) minmax(52px,1.25fr) 40px}.tacticalDeck48>button{padding:3px 8px}.terminalLabel48 b{font-size:17px}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .start{min-height:52px;padding:3px 8px}#menu.homeDock46.terminalLobby48 .start .terminalIcon48{width:40px;height:40px}
+ .terminalActivity48{bottom:19%;width:37%;min-height:57px;padding:6px 10px}.terminalActivity48 b{font-size:11px}.terminalActivity48 small{font-size:6px}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .charSelectPanel{bottom:5.5%!important;width:23%;max-width:none}html.landscape46 #menu.homeDock46.terminalLobby48 .charCard{height:45px!important}
+ .terminalSupport48{bottom:5.5%;left:28%;width:20%}.terminalSupport48 button{min-height:45px;font-size:8px}.terminalSupport48 svg{width:18px;height:18px}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .homeNav46{width:48%;right:3%;bottom:5.5%;gap:0}#menu.homeDock46.terminalLobby48 .homeNav46 button{min-height:45px}#menu.homeDock46.terminalLobby48 .homeNav46 .terminalIcon48{width:20px;height:20px}#menu.homeDock46.terminalLobby48 .homeNav46 b{font-size:9px}.commandSignal47{bottom:1.5%;font-size:6px}
+ }
  @media(prefers-reduced-motion:reduce){.tacticalDeck48,.terminalActivity48{animation:none!important}}
  `;
  function decorate(root,dock,opts,model){
@@ -4635,7 +4937,6 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   ];
   var options = null;
   var currentPanel = '';
-  var returnFocus = null;
   var panelCharacter = '';
   var selectedMail = 'welcome';
   var ESC = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
@@ -4729,24 +5030,48 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function style(){
     var d=global.document,node=d.getElementById('sakurayo-command-css');
     if(!node){node=d.createElement('style');node.id='sakurayo-command-css';node.textContent=CSS+(global.SakurayoTerminal?global.SakurayoTerminal.css:"");}
-    if(d.head.lastElementChild!==node)d.head.appendChild(node); // last: lobby refresh may inject its older stylesheet again
+    var lobby=d.getElementById('sakurayo-lobby-css');
+    if(!node.parentNode||(lobby&&(node.compareDocumentPosition(lobby)&4)))d.head.appendChild(node);
   }
-  function bind(selector,fn){var n=global.document.querySelector(selector);if(n)n.onclick=fn;}
+  function bind(selector,fn){var n=global.document.querySelector(selector);if(n&&!n.commandBound47){n.onclick=fn;n.commandBound47=true;}}
   function loadout(model){
     return '<div class="cmdLoadout47">'+[['当前衣装',model.skin],['初始核心',model.starter],['武器道具',model.item],['排除符',model.talismans],['寻访时装',model.fashion],['寻访武器',model.weapon]].map(function(p){return '<div><small>'+p[0]+'</small><b>'+esc(p[1])+'</b></div>';}).join('')+'</div>';
   }
   function close(){
-    var d=global.document.getElementById('commandDrawer47'),wasOpen=d&&!d.classList.contains('hidden');if(d)d.classList.add('hidden');
+    var drawer=global.document.getElementById('commandDrawer47');
+    if(options&&options.ui)options.ui.close(drawer);
+    else if(drawer)drawer.classList.add('hidden');
     currentPanel='';
-    if(wasOpen&&returnFocus&&returnFocus.isConnected)returnFocus.focus({preventScroll:true});
-    returnFocus=null;
+  }
+  // The panel body is rebuilt to display current game data. One delegated handler
+  // survives those rebuilds instead of rebinding every generated button.
+  function action(e){
+    var b=e.target.closest('button');if(!b||b.disabled)return;
+    var model=options.model(),S=global.SakurayoServices,result;
+    if(b.dataset.character){panelCharacter=b.dataset.character;panel('character',true);return;}
+    if(b.dataset.supply){b.disabled=true;options.claim(b.dataset.supply);panel('supplies',true);return;}
+    if(b.dataset.mail){selectedMail=b.dataset.mail;panel('mail',true);return;}
+    if(b.dataset.operation){options.chooseMode(b.dataset.operation);return;}
+    var rooms={commandWardrobe47:'shop',commandTalent47:'talent',commandStage47:'stage',commandLoadout47:'shop',commandCards47:'roster'};
+    if(rooms[b.id]){options.open(rooms[b.id]);return;}
+    if(b.id==='commandSelect47'){options.selectCharacter(panelCharacter||model.character.id);panel('character',true);}
+    else if(b.id==='commandRole47')panel('character');
+    else if(b.id==='commandLaunch47'){close();options.start();}
+    else if(b.id==='commandNoticeActivity48')panel('activities');
+    else if(b.id==='commandMailClaim48'||b.id==='commandMailAll48'){
+      result=b.id==='commandMailClaim48'?S.claimMail(model.save,selectedMail,global.SakurayoCommand):S.claimAll(model.save,global.SakurayoCommand);
+      if(result.ok){options.persist();options.notify(b.id==='commandMailClaim48'?'邮件补给已领取 · 樱花币 +'+result.reward:'已领取 '+result.count+' 份邮件 · 樱花币 +'+result.reward);}
+      panel('mail',true);
+    }else if(b.id==='commandLoginClaim48'){
+      result=S.claimLogin(model.save);if(result.ok){options.persist();options.notify('签到完成 · 樱花币 +'+result.reward);}panel('login',true);
+    }
   }
   function panel(kind,refresh){
     if(!options)return;
     var focused=global.document.activeElement;
     var focusId=refresh&&focused?focused.id:'';
     var focusCharacter=refresh&&focused&&focused.dataset?focused.dataset.character:'';
-    if(!refresh){var launcher=currentPanel?returnFocus:null;options.closeDrawers();returnFocus=launcher&&launcher.isConnected?launcher:focused;panelCharacter=options.model().character.id;}
+    if(!refresh)panelCharacter=options.model().character.id;
     currentPanel=kind;
     var d=global.document,drawer=d.getElementById('commandDrawer47');
     if(!drawer){
@@ -4754,6 +5079,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       drawer.setAttribute('role','dialog');drawer.setAttribute('aria-modal','true');drawer.setAttribute('aria-labelledby','commandTitle47');
       drawer.innerHTML='<div class="dhead"><div><small id="commandEyebrow47"></small><h2 id="commandTitle47"></h2></div><button class="close" type="button" aria-label="返回大厅">×</button></div><div id="commandBody47"></div>';
       d.body.appendChild(drawer);drawer.querySelector('.close').onclick=close;
+      d.getElementById('commandBody47').onclick=action;
     }
     var model=options.model(),titles={character:['OPERATOR FILE','作战角色'],prepare:['SORTIE PREPARATION','出击整备'],supplies:['RECOVERY TASKS','任务补给'],history:['COMBAT RECORD','近期战绩'],mail:['DISPATCH INBOX','邮箱'],login:['SEVEN DAY SUPPLY','七日登录签到'],notice:['BUREAU BULLETIN','公告'],activities:['FIELD OPERATIONS','活动与行动']};
     if(!titles[kind])return;
@@ -4764,48 +5090,32 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       var c=model.characters.filter(function(x){return x.id===panelCharacter;})[0]||model.character;
       var active=c.id===model.character.id;
       body.innerHTML='<div class="cmdSplit47"><div class="cmdPortrait47"><img src="'+esc(options.art('characters/'+c.id+'/default/live_idle.webp'))+'" alt="'+esc(c.name)+'"><small>SAKURAYO / '+esc(c.id.toUpperCase())+'</small></div><div class="cmdSheet47"><div class="cmdTabs47">'+model.characters.map(function(x){return '<button data-character="'+esc(x.id)+'" class="'+(x.id===c.id?'on':'')+'">'+esc(x.name)+'</button>';}).join('')+'</div><h3>'+esc(c.name)+'</h3><div class="cmdRole47">'+esc(c.role)+' / '+esc(c.weapon)+'</div><p>'+esc(c.desc)+'</p><div class="cmdNotes47">'+esc(c.bonus)+'</div><div class="cmdTags47">'+c.schools.map(function(x){return '<span>'+esc(x)+'</span>';}).join('')+'</div>'+ (active?loadout(model):'<p>选择为出击角色后可查看当前装备。</p>')+'<div class="cmdActions47"><button class="primary47" id="commandSelect47">'+(active?'当前出击角色':'选择出击')+'</button><button id="commandWardrobe47">衣装与装备</button><button id="commandTalent47">永久天赋</button></div></div></div>';
-      body.querySelectorAll('[data-character]').forEach(function(b){b.onclick=function(){panelCharacter=b.dataset.character;panel('character',true);};});
-      bind('#commandSelect47',function(){options.selectCharacter(c.id);panelCharacter=c.id;panel('character',true);});
-      bind('#commandWardrobe47',function(){close();options.open('shop');});
-      bind('#commandTalent47',function(){close();options.open('talent');});
     }else if(kind==='prepare'){
       var m=model.mission;
-      body.innerHTML='<div class="cmdSplit47"><div><div class="cmdMission47" style="background-image:linear-gradient(0deg,#080e1cf5,#080e1c20),url(&quot;'+esc(m.art)+'&quot;)"><small>'+esc(model.mode)+'</small><h3>'+esc(m.name)+'</h3><p>'+esc(m.boss)+' · 预计 '+esc(m.minutes)+' 分钟</p><p style="margin-top:8px;color:#ead4a1">'+esc(model.tactic)+'</p></div><div class="cmdActions47"><button id="commandStage47">更换模式 / 关卡</button></div><div class="cmdNotes47">'+esc(model.modeId==='testimony'?'证词模式：跟随剧情，不发放随机升级卡，也不部署干员。':'肉鸽战斗：自动攻击，移动避险；升级三选一构筑职业，局内完成转职、融合与三相飞升。')+'</div></div><div class="cmdSheet47"><div class="cmdRole47">当前出击角色</div><h3>'+esc(model.character.name)+'</h3><p>'+esc(model.character.weapon)+' · '+esc(model.character.role)+'</p>'+loadout(model)+'<div class="cmdActions47"><button id="commandLoadout47">调整装备</button><button id="commandCards47">寻访装备</button><button id="commandRole47">切换角色</button><button class="primary47" id="commandLaunch47">开始出击 →</button></div><p>移动：摇杆 / WASD　冲刺：空格　主动：技能按钮<br>另外两名角色可在肉鸽模式使用 DP 部署支援。</p></div></div>';
-      bind('#commandStage47',function(){close();options.open('stage');});
-      bind('#commandLoadout47',function(){close();options.open('shop');});
-      bind('#commandCards47',function(){close();options.open('roster');});
-      bind('#commandRole47',function(){panel('character');});
-      bind('#commandLaunch47',function(){close();options.start();});
+      body.innerHTML='<div class="cmdSplit47"><div><div class="cmdMission47" style="background-image:linear-gradient(0deg,#080e1cf5,#080e1c20),url(&quot;'+esc(m.art)+'&quot;)"><small>'+esc(model.mode)+'</small><h3>'+esc(m.name)+'</h3><p>'+esc(m.boss)+' · 预计 '+esc(m.minutes)+' 分钟</p><p style="margin-top:8px;color:#ead4a1">'+esc(model.tactic)+'</p></div><div class="cmdActions47"><button id="commandStage47">更换模式 / 关卡</button></div><div class="cmdNotes47">'+esc(model.modeId==='testimony'?'证词模式：跟随剧情，不发放随机升级卡，也不部署干员。':'肉鸽战斗：自动攻击，移动避险；升级三选一构筑职业，局内完成转职、融合与三相飞升。')+'</div></div><div class="cmdSheet47"><div class="cmdRole47">当前出击角色</div><h3>'+esc(model.character.name)+'</h3><p>'+esc(model.character.weapon)+' · '+esc(model.character.role)+'</p>'+loadout(model)+'<div class="cmdActions47"><button id="commandLoadout47">调整装备</button><button id="commandCards47">寻访装备</button><button id="commandRole47">切换角色</button><button class="primary47" id="commandLaunch47">开始出击 →</button></div><p>移动：摇杆 / WASD　冲刺：Shift　主动：空格 / 技能按钮<br>另外两名角色可在肉鸽模式使用 DP 部署支援。</p></div></div>';
     }else if(kind==='supplies'){
       body.innerHTML='<p class="cmdNotes47">战斗与章节回收留下的补给。每份仅领取一次，完成记录保存在本机。</p><div class="cmdSupplies47">'+inbox(model.save).map(function(r){return '<article class="cmdSupply47"><span>'+ (r.claimed?'✓':r.ready?'✦':'◇')+'</span><div><b>'+esc(r.title)+'</b><p>'+esc(r.desc)+'</p><small>樱花币 +'+r.reward+'</small></div><button data-supply="'+r.id+'" '+(r.claimed||!r.ready?'disabled':'')+'>'+ (r.claimed?'已领取':r.ready?'领取':'待完成')+'</button></article>';}).join('')+'</div>';
-      body.querySelectorAll('[data-supply]').forEach(function(b){b.onclick=function(){b.disabled=true;options.claim(b.dataset.supply);panel('supplies',true);};});
     }else if(kind==='mail'){
       var S=global.SakurayoServices,letters=S.mailbox(model.save,global.SakurayoCommand);
       var letter=letters.filter(function(m){return m.id===selectedMail;})[0]||letters[0];selectedMail=letter.id;
       if(!letter.read){S.markRead(model.save,letter.id,global.SakurayoCommand);options.persist();letters=S.mailbox(model.save,global.SakurayoCommand);letter=letters.filter(function(m){return m.id===selectedMail;})[0];}
       var canClaim=letters.some(function(m){return !m.claimed;});
       body.innerHTML='<div class="cmdMailbox48"><div class="cmdMailList48">'+letters.map(function(m){return '<button type="button" id="mail48-'+m.id+'" data-mail="'+m.id+'" class="'+(m.id===selectedMail?'on ':'')+(m.read?'':'unread')+'"><b>'+esc(m.title)+'</b><small>'+esc(m.sender)+' / '+(m.claimed?'已领取':m.read?'已读 · 待领取':'未读')+'</small></button>';}).join('')+'</div><article class="cmdMailLetter48"><small>DISPATCH / '+esc(letter.id.toUpperCase())+'</small><h3>'+esc(letter.title)+'</h3><p>发件人：'+esc(letter.sender)+'</p><p>'+esc(letter.desc)+'</p><p>这份补给存放在你的本机档案中。任务与邮件共用领取记录。</p><div class="cmdMailAttachment48">'+global.SakurayoTerminal.icon('supplies')+'<div><b>'+letter.reward+'</b><small>樱花币</small></div></div><div class="cmdActions47"><button class="primary47" id="commandMailClaim48" '+(letter.claimed?'disabled':'')+'>'+(letter.claimed?'附件已领取':'领取附件')+'</button><button id="commandMailAll48" '+(canClaim?'':'disabled')+'>一键领取</button></div></article></div>';
-      body.querySelectorAll('[data-mail]').forEach(function(b){b.onclick=function(){selectedMail=b.dataset.mail;panel('mail',true);};});
-      bind('#commandMailClaim48',function(){var result=S.claimMail(model.save,selectedMail,global.SakurayoCommand);if(result.ok){options.persist();options.notify('邮件补给已领取 · 樱花币 +'+result.reward);}panel('mail',true);});
-      bind('#commandMailAll48',function(){var result=S.claimAll(model.save,global.SakurayoCommand);if(result.ok){options.persist();options.notify('已领取 '+result.count+' 份邮件 · 樱花币 +'+result.reward);}panel('mail',true);});
     }else if(kind==='login'){
       var status=global.SakurayoServices.loginStatus(model.save),label=status.reason==='complete'?'七日补给已全部领取':status.reason==='clock'?'请检查本机日期':status.reason==='claimed'?'今日已签到':'签到领取 · 樱花币 +'+status.reward;
       body.innerHTML='<article class="cmdNotice48"><small>WELCOME BACK / '+esc(status.today)+'</small><h3>每一次归来，都有新的补给。</h3><p>累计七个登录日，无需连续签到。本机日期每日最多领取一次；七日完成后不重复循环。已完成 '+status.count+' / 7 天。</p></article><div class="cmdLogin48">'+status.rewards.map(function(reward,i){return '<article class="cmdLoginDay48 '+(i<status.count?'done':i===status.count?'on':'')+'"><small>DAY '+(i+1)+'</small>'+global.SakurayoTerminal.icon('supplies')+'<b>'+reward+'</b><span>'+(i<status.count?'已领取':i===status.count?'本次补给':'待签到')+'</span></article>';}).join('')+'</div><div class="cmdActions47"><button class="primary47" id="commandLoginClaim48" '+(status.ready?'':'disabled')+'>'+label+'</button></div>';
-      bind('#commandLoginClaim48',function(){var result=global.SakurayoServices.claimLogin(model.save);if(result.ok){options.persist();options.notify('签到完成 · 樱花币 +'+result.reward);}panel('login',true);});
     }else if(kind==='notice'){
       body.innerHTML='<article class="cmdNotice48"><small>UPDATE / DEVELOPMENT BUILD</small><h3>4.6.0 · 行动终端更新</h3><p>新大厅加入邮箱、七日登录签到、任务补给与活动入口。邮件与任务共享领取状态，进度保存在本机。四章插画和场景动画已更新。</p><p>当前为开发预发布版本；新 Android 安装包尚未发布。</p></article><article class="cmdNotice48"><small>FIELD MANUAL</small><h3>关于这场回收行动</h3><p>三名作战角色，四章战场。回收演习保留职业、转职、融合与三相飞升的肉鸽构筑；证词模式侧重剧情；主神空间提供高难轮回挑战。</p><p>寻访、装备、剧情档案与历史战绩均可从大厅进入。导出存档请前往设置。</p></article><div class="cmdActions47"><button id="commandNoticeActivity48">查看活动与行动</button></div>';
-      bind('#commandNoticeActivity48',function(){panel('activities');});
     }else if(kind==='activities'){
       body.innerHTML='<div class="cmdActivities48">'+[['story','回收行动 · 四章演习','三名角色出击，收集随机升级并组合职业、转职与融合。'],['testimony','证词回收 · 剧情档案','沿着四章剧情完成证词回收。此模式不发放随机升级卡。'],['mainGod','主神空间 · 高难轮回','进入独立的主神试炼与兑换界面，解锁条件沿用现有游戏规则。']].map(function(a){return '<article class="cmdNotice48 cmdActivity48" style="background-image:linear-gradient(90deg,#102332e6,#10233299),url(&quot;'+esc(options.art('ui/tactical/activity-'+(a[0]==='mainGod'?'maingod':a[0])+'-v3.webp'))+'&quot;)"><small>LOCAL OPERATION / '+a[0].toUpperCase()+'</small><h3>'+a[1]+'</h3><p>'+a[2]+'</p><div class="cmdActions47"><button data-operation="'+a[0]+'">进入行动 →</button></div></article>';}).join('')+'</div>';
-      body.querySelectorAll('[data-operation]').forEach(function(b){b.onclick=function(){close();options.chooseMode(b.dataset.operation);};});
     }else{
       body.innerHTML=model.history.length?'<div class="cmdHistory47">'+model.history.slice(0,12).map(function(r){return '<article class="cmdRun47"><b>'+esc(r.win?'回收成功':'战斗结束')+'</b><div><strong>'+esc(r.character)+' · '+esc(r.stage)+'</strong><p>'+esc(r.mode)+' / Lv.'+esc(r.level)+' / '+esc(r.kills)+' 击破 / '+esc(r.duration)+'</p></div><span>'+esc(r.date)+'</span></article>';}).join('')+'</div>':'<div class="cmdEmpty47">暂无战绩。完成第一次出击后，回收记录会显示在这里。</div>';
     }
-    drawer.classList.remove('hidden');
     var next=focusId&&d.getElementById(focusId);
     if(focusCharacter)next=Array.from(body.querySelectorAll('[data-character]')).find(function(b){return b.dataset.character===focusCharacter;});
     if(!refresh||!next||next.disabled)next=drawer.querySelector('.close');
-    next.focus({preventScroll:true});
+    if(options.ui)options.ui.open(drawer,{initialFocus:next,onClose:function(){currentPanel='';}});
+    else {options.closeDrawers();drawer.classList.remove('hidden');next.focus();}
     style();
   }
   function mount(opts){
@@ -4820,15 +5130,6 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       var rail=d.createElement('div');rail.className='commandRail47';rail.id='commandRail47';rail.innerHTML='<button type="button" id="commandCharacter47">角色资料</button><button type="button" id="commandSupplies47">回收补给<i id="commandUnread47"></i></button><button type="button" id="commandSettings47">设置</button>';
       root.appendChild(rail);
       var signal=d.createElement('div');signal.className='commandSignal47';signal.id='commandSignal47';signal.textContent='离线作战就绪 · 数据保存在本机';root.appendChild(signal);
-      d.addEventListener('keydown',function(e){
-        var drawer=d.getElementById('commandDrawer47');if(!drawer||drawer.classList.contains('hidden'))return;
-        if(e.key==='Escape'){e.preventDefault();close();return;}
-        if(e.key==='Tab'){
-          var all=Array.from(drawer.querySelectorAll('button:not(:disabled),[tabindex="0"]'));
-          if(!all.length)return;var first=all[0],last=all[all.length-1];
-          if(!drawer.contains(d.activeElement)){e.preventDefault();first.focus();}else if(e.shiftKey&&d.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&d.activeElement===last){e.preventDefault();first.focus();}
-        }
-      });
     }
     var m=options.model(),unread=inbox(m.save).filter(function(r){return r.ready&&!r.claimed;}).length;
     if(global.SakurayoTerminal)global.SakurayoTerminal.decorate(root,dock,options,m);
@@ -5028,68 +5329,16 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       return { getItem: () => null, setItem: () => {} };
     }
   })();
-  const DEF = {
-    coins: 0,
-    unlock: 1,
-    done: [],
-    kills: 0,
-    bosses: 0,
-    best: 0,
-    runs: 0,
-    tal: { atk: 0, hp: 0, luck: 0, mag: 0, flow: 0 },
-    ach: {},
-    claim: {},
-    story: [0],
-    forms: [],
-    fusions: [],
-    endings: [],
-    runHistory: [],
-    banter: 1,
-    tutorialDone: false,
-    settings: { master: 0.8, sfx: 0.8, music: 0.45, vibration: 1, fx: 1 },
-    character: "sayo",
-    skin: "default",
-    ownedSkins: ["default"],
-    mainGod: { points: 0, unlockedTier: 1, bestTier: 0, clears: 0, runs: 0, deepest: 0, contracts: {}, challenges: {}, power: 0, vitality: 0, tempo: 0, resonance: 0, fortune: 0, regenBlood: 0, psiLink: 0, gunBlade: 0, mageCircuit: 0, summonPage: 0, spaceRing: 0, rebirthDoll: 0, sideKey: 0, cursedHeart: 0 },
-  };
-  const FORBIDDEN_SAVE_KEYS = new Set(["__proto__", "constructor", "prototype"]);
-  const ALLOWED_SAVE_KEYS = ["coins","unlock","done","kills","bosses","best","runs","tal","ach","claim","story","forms","fusions","endings","runHistory","banter","tutorialDone","settings","character","skin","ownedSkins","mainGod","storyChoices38","storySeen38","shop40","balance40","hiddenStory40","pendingLoneStory40","extensions"];
-  function isPlainObject(value) {
-    return !!value && typeof value === "object" && !Array.isArray(value);
+  const DEF = window.SakurayoSave.defaults();
+  function normalizeGameSave(raw, strict = false, skins) {
+    return window.SakurayoSave.normalize(raw, {strict, skins, normalizeOps: window.SakurayoLobby?.normalizeOps});
   }
   function htmlEscape(value) {
     return String(value ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
   }
-  function pickAllowedSave(src) {
-    const out = {};
-    if (!isPlainObject(src)) return out;
-    for (const k of ALLOWED_SAVE_KEYS) {
-      if (Object.prototype.hasOwnProperty.call(src, k)) out[k] = src[k];
-    }
-    return out;
-  }
-  const merge = (a, b) => {
-    const o = JSON.parse(JSON.stringify(a));
-    if (!isPlainObject(b)) return o;
-    for (const k of Object.keys(b)) {
-      if (FORBIDDEN_SAVE_KEYS.has(k)) continue;
-      const incoming = b[k];
-      if (isPlainObject(o[k]) && isPlainObject(incoming)) {
-        const nested = { ...o[k] };
-        for (const nk of Object.keys(incoming)) {
-          if (FORBIDDEN_SAVE_KEYS.has(nk)) continue;
-          nested[nk] = incoming[nk];
-        }
-        o[k] = nested;
-      } else {
-        o[k] = incoming;
-      }
-    }
-    return o;
-  };
   let save;
   try {
-    save = merge(DEF, JSON.parse(store.getItem("sakurayoV3") || "{}"));
+    save = normalizeGameSave(JSON.parse(store.getItem("sakurayoV3") || "{}"));
   } catch {
     save = JSON.parse(JSON.stringify(DEF));
   }
@@ -5099,7 +5348,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   } catch (error) {
     window.__SAKURAYO_DEV__?.report("extension:save-bootstrap", error);
   }
-  save = Object.assign(JSON.parse(JSON.stringify(DEF)), pickAllowedSave(save));
+  save = normalizeGameSave(save);
   const persist = () => {
     window.SakurayoContent?.emit("save:beforePersist", { save });
     try { store.setItem("sakurayoV3", JSON.stringify(save)); }
@@ -7018,8 +7267,6 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     {tier:3,name:"轮回试炼",dur:145,scale:2.34,points:32,xp:3.6},
     {tier:4,name:"无限回廊",dur:165,scale:2.65,points:42,xp:4.0,endless:true},
   ];
-  const MAIN_GOD_DEF36={points:0,unlockedTier:1,bestTier:0,clears:0,runs:0,deepest:0,contracts:{},challenges:{},power:0,vitality:0,tempo:0,resonance:0,fortune:0,regenBlood:0,psiLink:0,gunBlade:0,mageCircuit:0,summonPage:0,spaceRing:0,rebirthDoll:0,sideKey:0};
-  save.mainGod={...MAIN_GOD_DEF36,...(save.mainGod||{})};
   let runMode36="story",selectedMainGodTier36=1,pendingMode46="story";
   const isMainGodRun36=()=>runMode36==="mainGod";
   const mainGodTier36=()=>MAIN_GOD_TIERS36[selectedMainGodTier36-1]||MAIN_GOD_TIERS36[0];
@@ -7419,11 +7666,18 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     });
   }
   function openDrawer(n) {
-    closeDrawers();
-    $(`#${n}Drawer`)?.classList.remove("hidden");
+    const drawer=$(`#${n}Drawer`);
+    if(!drawer)return;
+    const L=window.SakurayoLobby;
+    if(n==="gacha"&&L){$("#gachaReveal46")?.remove();L.renderGacha($("#gachaBody46"),save,lobbyHandlers46());}
+    if(n==="roster"&&L)L.renderRoster($("#rosterBody46"),save,lobbyHandlers46());
+    if(n==="archive"&&L)L.dressArchive($("#archiveDrawer .archiveDock46"));
+    if(window.SakurayoUI)window.SakurayoUI.open(drawer);
+    else {closeDrawers();drawer.classList.remove("hidden");}
   }
   function closeDrawers() {
-    $$(".drawer").forEach((x) => x.classList.add("hidden"));
+    if(window.SakurayoUI)window.SakurayoUI.closeAll();
+    else $$(".drawer").forEach((x) => x.classList.add("hidden"));
   }
 
   function setForm(form) {
@@ -10617,10 +10871,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       ACH[id]={n:String(achievement.n||achievement.id),i:String(achievement.i||"🧩"),d:String(achievement.d||"扩展成就"),r:Math.max(0,Math.floor(Number(achievement.r)||0)),c:()=>extensionCondition41(achievement.condition,achievement.__packId),__extension:true};
     });
   }
-  save.character=save.character||"sayo";
-  save.skin=save.skin||"default";
-  save.ownedSkins=Array.isArray(save.ownedSkins)?save.ownedSkins:["default"];
-  if(!save.ownedSkins.includes("default"))save.ownedSkins.unshift("default");
+  save = normalizeGameSave(save, false, SKINS35.map(skin => skin.id));
   const char35=()=>CHARACTERS35[save.character]||CHARACTERS35.sayo;
   const skin35=()=>SKINS35.find(s=>s.id===save.skin)||SKINS35[0];
   function svg35(c,skin,size=256){
@@ -11144,7 +11395,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function ensureMusic37(){ensureAudio();if(!audio||music37)return;try{musicGain37=audio.createGain();musicGain37.gain.value=.0001;musicGain37.connect(audio.destination);const filter=audio.createBiquadFilter();filter.type="lowpass";filter.frequency.value=240;filter.connect(musicGain37);music37=[55,82.5].map((hz,i)=>{const o=audio.createOscillator();o.type=i?"triangle":"sine";o.frequency.value=hz;o.connect(filter);o.start();return o;});}catch(error){window.__SAKURAYO_DEV__?.report("music",error);music37=null;}}
   function setMusic37(active,bossLevel=0,force=false){ensureMusic37();if(!musicGain37||!audio)return;const mode=`${active?1:0}:${bossLevel}:${save.settings?.master}:${save.settings?.music}`;if(!force&&mode===musicMode37)return;musicMode37=mode;const target=active?clamp((save.settings?.master??.8)*(save.settings?.music??.45)*.035,0,.04):.0001;musicGain37.gain.cancelScheduledValues(audio.currentTime);musicGain37.gain.linearRampToValueAtTime(Math.max(.0001,target),audio.currentTime+.22);if(music37){music37[0].frequency.setTargetAtTime(55+bossLevel*5,audio.currentTime,.15);music37[1].frequency.setTargetAtTime(82.5+bossLevel*8,audio.currentTime,.15);}}
   function ensureSettings37(){let d=$("#settingsDrawer37");if(d)return d;d=document.createElement("section");d.id="settingsDrawer37";d.className="drawer hidden";d.innerHTML='<div class="dhead"><h2>声音、震动与画面</h2><button class="close">×</button></div><div class="dbody" id="settingsBody37"></div>';d.querySelector(".close").onclick=()=>d.classList.add("hidden");document.body.appendChild(d);return d;}
-  function openSettings37(){closeDrawers();const d=ensureSettings37(),s=save.settings||(save.settings={master:.8,sfx:.8,music:.45,vibration:1,fx:1});$("#settingsBody37").innerHTML=`<label class="settingRow37"><span>总音量 <b>${Math.round(s.master*100)}%</b></span><input data-setting="master" type="range" min="0" max="1" step=".05" value="${s.master}"></label><label class="settingRow37"><span>战斗音效 <b>${Math.round(s.sfx*100)}%</b></span><input data-setting="sfx" type="range" min="0" max="1" step=".05" value="${s.sfx}"></label><label class="settingRow37"><span>氛围音乐 <b>${Math.round(s.music*100)}%</b></span><input data-setting="music" type="range" min="0" max="1" step=".05" value="${s.music}"></label><button class="settingToggle37" data-toggle="vibration">震动反馈：${s.vibration?"开":"关"}</button><button class="settingToggle37" data-toggle="fx">特效强度：${s.fx?"完整":"精简"}</button><p class="routeNote">步枪、手枪、太刀和Boss阶段使用不同音色。省电设备可关闭震动并使用精简特效。</p>`;d.querySelectorAll("input").forEach(input=>input.oninput=()=>{s[input.dataset.setting]=Number(input.value);input.previousElementSibling.querySelector("b").textContent=`${Math.round(input.value*100)}%`;persist();setMusic37(state==="play",boss?.phase||0,true);});d.querySelectorAll("[data-toggle]").forEach(b=>b.onclick=()=>{const k=b.dataset.toggle;s[k]=s[k]?0:1;if(k==="fx")quality=s[k]?1:.62;persist();openSettings37();if(k==="vibration"&&s[k])haptic37(18);});d.classList.remove("hidden");}
+  function openSettings37(){closeDrawers();const d=ensureSettings37(),s=save.settings;$("#settingsBody37").innerHTML=`<label class="settingRow37"><span>总音量 <b>${Math.round(s.master*100)}%</b></span><input data-setting="master" type="range" min="0" max="1" step=".05" value="${s.master}"></label><label class="settingRow37"><span>战斗音效 <b>${Math.round(s.sfx*100)}%</b></span><input data-setting="sfx" type="range" min="0" max="1" step=".05" value="${s.sfx}"></label><label class="settingRow37"><span>氛围音乐 <b>${Math.round(s.music*100)}%</b></span><input data-setting="music" type="range" min="0" max="1" step=".05" value="${s.music}"></label><button class="settingToggle37" data-toggle="vibration">震动反馈：${s.vibration?"开":"关"}</button><button class="settingToggle37" data-toggle="fx">特效强度：${s.fx?"完整":"精简"}</button><p class="routeNote">步枪、手枪、太刀和Boss阶段使用不同音色。省电设备可关闭震动并使用精简特效。</p>`;d.querySelectorAll("input").forEach(input=>input.oninput=()=>{s[input.dataset.setting]=Number(input.value);input.previousElementSibling.querySelector("b").textContent=`${Math.round(input.value*100)}%`;persist();setMusic37(state==="play",boss?.phase||0,true);});d.querySelectorAll("[data-toggle]").forEach(b=>b.onclick=()=>{const k=b.dataset.toggle;s[k]=s[k]?0:1;if(k==="fx")quality=s[k]?1:.62;persist();openSettings37();if(k==="vibration"&&s[k])haptic37(18);});d.classList.remove("hidden");}
   const _startSensory37=startGame;startGame=function(){quality=save.settings?.fx===0?.62:1;const result=_startSensory37();if(save.tutorialDone)ensureMusic37();return result;};
   const _backMenuSensory37=backMenu;backMenu=function(){setMusic37(false);return _backMenuSensory37();};
   const _finishSensory37=finish;finish=function(win){setMusic37(false);return _finishSensory37(win);};
@@ -11164,9 +11415,6 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   style37.textContent+=`.settingRow37{display:block;padding:14px;margin-bottom:10px;border:1px solid #ffffff18;border-radius:14px;background:#ffffff08}.settingRow37 span{display:flex;justify-content:space-between;margin-bottom:10px}.settingRow37 input{width:100%;accent-color:#ff59ad}.settingToggle37{width:100%;padding:12px;margin-bottom:8px;border:1px solid #8668aa;border-radius:12px;background:#211934;color:#fff}`;
 
   /* ================= V3.8 战斗信息与叙事重制 ================= */
-  save.storyChoices38=save.storyChoices38||{sayo:{},aya:{},rion:{}};
-  for(const id of ["sayo","aya","rion"])save.storyChoices38[id]=save.storyChoices38[id]||{};
-  save.storySeen38=save.storySeen38||{};
   function storyMemory38(){return save.storyChoices38[save.character]||(save.storyChoices38[save.character]={});}
   function commitStory38(){Object.assign(storyMemory38(),P.storyFlags||{});persist();}
   const _resetStory38=resetP;
@@ -11232,7 +11480,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   const _renderChoices38=renderChoices;
   renderChoices=function(){_renderChoices38();document.querySelectorAll("#choices .choice").forEach(card=>{if(card.querySelector(".choiceReadout38"))return;const id=card.dataset.upgradeId||"",[label,now,next]=upgradeDelta38(id),isConflict=/机械义体|血肉超载|灵体化|奇迹变身/.test(card.textContent),readout=document.createElement("div");readout.className="choiceReadout38";readout.innerHTML=`<span>${label}</span><b>${now} → ${next}</b>${isConflict?'<em>存在代价：注意与当前路线冲突</em>':'<em>本轮生效 · 结算后清空</em>'}`;card.querySelector("div")?.appendChild(readout);});};
 
-  function ensureSaveManager38(){let d=$("#saveDrawer38");if(d)return d;d=document.createElement("section");d.id="saveDrawer38";d.className="drawer hidden";d.innerHTML='<div class="dhead"><h2>存档管理</h2><button class="close">×</button></div><div class="dbody"><p class="routeNote">导出包含剧情选择、服饰、主神永久强化与本地战绩。导入前会校验格式，不会上传网络。</p><textarea id="saveText38"></textarea><div class="saveActions38"><button id="refreshSave38">生成导出</button><button id="copySave38">复制</button><button id="downloadSave38">下载</button><button id="importSave38">导入文本</button></div></div>';d.querySelector(".close").onclick=()=>d.classList.add("hidden");d.querySelector("#refreshSave38").onclick=renderSave38;d.querySelector("#copySave38").onclick=async()=>{renderSave38();try{await navigator.clipboard.writeText($("#saveText38").value);toast("存档已复制");}catch{$("#saveText38").select();toast("已选中文本，请手动复制");}};d.querySelector("#downloadSave38").onclick=()=>{renderSave38();const blob=new Blob([$("#saveText38").value],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`sakurayo-v38-save-${Date.now()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};d.querySelector("#importSave38").onclick=()=>{try{const incoming=JSON.parse($("#saveText38").value);if(!incoming||typeof incoming!=="object"||Array.isArray(incoming))throw new Error("存档根节点必须是对象");if(!incoming.tal||!incoming.mainGod)throw new Error("缺少核心存档字段");Object.assign(save,JSON.parse(JSON.stringify(DEF)),incoming);save.storyChoices38=incoming.storyChoices38||{sayo:{},aya:{},rion:{}};persist();menuUpdate();toast("存档导入成功");d.classList.add("hidden");}catch(error){toast(`导入失败：${error.message}`);}};document.body.appendChild(d);return d;}
+  function ensureSaveManager38(){let d=$("#saveDrawer38");if(d)return d;d=document.createElement("section");d.id="saveDrawer38";d.className="drawer hidden";d.innerHTML='<div class="dhead"><h2>存档管理</h2><button class="close">×</button></div><div class="dbody"><p class="routeNote">导出包含剧情选择、服饰、主神永久强化与本地战绩。导入前会校验格式，不会上传网络。</p><textarea id="saveText38"></textarea><div class="saveActions38"><button id="refreshSave38">生成导出</button><button id="copySave38">复制</button><button id="downloadSave38">下载</button><button id="importSave38">导入文本</button></div></div>';d.querySelector(".close").onclick=()=>d.classList.add("hidden");d.querySelector("#refreshSave38").onclick=renderSave38;d.querySelector("#copySave38").onclick=async()=>{renderSave38();try{await navigator.clipboard.writeText($("#saveText38").value);toast("存档已复制");}catch{$("#saveText38").select();toast("已选中文本，请手动复制");}};d.querySelector("#downloadSave38").onclick=()=>{renderSave38();const blob=new Blob([$("#saveText38").value],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`sakurayo-v38-save-${Date.now()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};d.querySelector("#importSave38").onclick=importSave39;document.body.appendChild(d);return d;}
   function renderSave38(){const text=$("#saveText38");if(text)text.value=JSON.stringify(save,null,2);}
   function openSaveManager38(){closeDrawers();ensureSaveManager38().classList.remove("hidden");renderSave38();}
   function installSaveButton38(){installUtilityButtons37();const wrap=document.querySelector(".utilityButtons37");if(!wrap||$("#saveButton38"))return;const b=document.createElement("button");b.id="saveButton38";b.textContent="存档";b.onclick=openSaveManager38;wrap.appendChild(b);}
@@ -11253,11 +11501,6 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   /* ================= V3.5 补丁结束 ================= */
 
   /* ================= V3.9 全面收敛：手感、机制、界面与数据安全 ================= */
-  const previousGlowVersion422=Number(save.settings?.glowVersion)||0;
-  save.settings=Object.assign({master:.8,sfx:.8,music:.45,vibration:1,fx:1,hudSize:"standard",damageText:"compact",contrast:1,uiCalm:1,glow:"off",glowVersion:2},save.settings||{});
-  if(previousGlowVersion422<2){save.settings.glow="off";save.settings.glowVersion=2;persist();}
-  if(!["off","soft","vivid"].includes(save.settings.glow))save.settings.glow="off";
-  save.mainGod.cursedHeart=Number(save.mainGod.cursedHeart)||0;
   MAIN_GOD_ITEMS36.cursedHeart={n:"诅咒遗物·猩红心核",i:"🫀",d:"全伤害 +25%，最大生命 -18%；高风险永久兑换，可在重置时返还",max:1,base:24,step:0,group:"特殊效果道具"};
 
   const _resetP39=resetP;
@@ -11339,22 +11582,40 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   }
   CONTENT41.hook("combat:after-draw",drawMechanics39,"core.mechanics39",30);
 
-  function validateSave39(raw){
-    if(!raw||typeof raw!=="object"||Array.isArray(raw))throw new Error("存档根节点无效");
-    if(!raw.tal||typeof raw.tal!=="object"||!raw.mainGod||typeof raw.mainGod!=="object")throw new Error("缺少天赋或主神数据");
-    const clean=merge(DEF,JSON.parse(JSON.stringify(raw))),num=(v,a,b,d=0)=>clamp(Number.isFinite(Number(v))?Number(v):d,a,b);
-    clean.coins=Math.floor(num(clean.coins,0,999999));clean.unlock=Math.floor(num(clean.unlock,1,4,1));clean.kills=Math.floor(num(clean.kills,0,99999999));clean.runs=Math.floor(num(clean.runs,0,999999));
-    clean.done=Array.isArray(clean.done)?clean.done.filter(x=>[1,2,3,4].includes(Number(x))).slice(0,4):[];
-    clean.ownedSkins=Array.isArray(clean.ownedSkins)?clean.ownedSkins.filter(id=>SKINS35.some(s=>s.id===id)).slice(0,SKINS35.length):["default"];
-    if(!clean.ownedSkins.includes("default"))clean.ownedSkins.unshift("default");
-    clean.character=CHARACTERS35[clean.character]?clean.character:"sayo";clean.skin=clean.ownedSkins.includes(clean.skin)?clean.skin:"default";
-    clean.runHistory=Array.isArray(clean.runHistory)?clean.runHistory.slice(0,30):[];
-    for(const key of Object.keys(clean.mainGod))if(typeof clean.mainGod[key]==="number")clean.mainGod[key]=num(clean.mainGod[key],0,999999);
-    clean.storyChoices38=clean.storyChoices38&&typeof clean.storyChoices38==="object"?clean.storyChoices38:{sayo:{},aya:{},rion:{}};
-    return clean;
+  function validateSave39(raw) {
+    return normalizeGameSave(raw, true, SKINS35.map(skin => skin.id));
   }
-  const _ensureSaveManager39=ensureSaveManager38;
-  ensureSaveManager38=function(){const d=_ensureSaveManager39(),button=d.querySelector("#importSave38");button.onclick=()=>{try{const clean=validateSave39(JSON.parse($("#saveText38").value));for(const k of Object.keys(save))if(!Object.prototype.hasOwnProperty.call(clean,k))delete save[k];Object.assign(save,clean);window.SakurayoContent?.migrateSave(save);persist();applyUiSize38();menuUpdate();toast("存档校验通过并已导入");d.classList.add("hidden");}catch(error){toast(`导入失败：${error.message}`);}};return d;};
+  function reconcileImportedSave39() {
+    selected = clamp(selected, 1, save.unlock);
+    selectedMainGodTier36 = clamp(selectedMainGodTier36, 1, save.mainGod.unlockedTier);
+    if (!save.done.includes(4)) {
+      selectedMainGodTier36 = 1;
+      if (runMode36 === "mainGod") runMode36 = "story";
+      if (pendingMode46 === "mainGod") pendingMode46 = "story";
+    }
+    applyUiSize38();
+    document.body.classList.toggle("noContrast39", !save.settings.contrast);
+    document.body.classList.toggle("richUi39", !save.settings.uiCalm);
+    quality = save.settings.fx ? 1 : .62;
+    setMusic37(state === "play", boss?.phase || 0, true);
+    renderCharacters35();
+    updateCharacterUI35();
+  }
+  function importSave39() {
+    try {
+      let clean = validateSave39(JSON.parse($("#saveText38").value));
+      clean = window.SakurayoContent?.migrateSave(clean) || clean;
+      clean = normalizeGameSave(clean, true, SKINS35.map(skin => skin.id));
+      for (const key of Object.keys(save)) delete save[key];
+      Object.assign(save, clean);
+      reconcileImportedSave39();
+      persist();
+      toast("存档校验通过并已导入");
+      $("#saveDrawer38").classList.add("hidden");
+    } catch (error) {
+      toast(`导入失败：${error.message}`);
+    }
+  }
 
   const _openSettings39=openSettings37;
   openSettings37=function(){
@@ -11373,14 +11634,6 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
 
   /* ================= V4.0 内测轮回：后门、普通商店与纯初始挑战 ================= */
   const BETA40=TEST_MODE||new URLSearchParams(location.search).has("beta"),BASE_STAGE_DUR40=ST.map(s=>s.dur);
-  const SHOP_DEF40={starter:{assault:0,bastion:0,flow:0,arcane:0},equippedStarter:null,items:{bait:0,ammo:0,whetstone:0,mirror:0},equippedWeapon:null,baitEquipped:false,ownedTalismans:[],bannedSchools:[],noUpgradeChallenge:false,lastTab:"skins",ops:{pity:0,pitySR:0,pulls:0,tenPulls:0,owned:{},last:[],cheatUsed:0}};
-  save.shop40={...SHOP_DEF40,...(save.shop40||{}),starter:{...SHOP_DEF40.starter,...(save.shop40?.starter||{})},items:{...SHOP_DEF40.items,...(save.shop40?.items||{})},ops:{...SHOP_DEF40.ops,...(save.shop40?.ops||{}),owned:{...(save.shop40?.ops?.owned||{})}}};
-  if(window.SakurayoLobby)save.shop40=window.SakurayoLobby.normalizeOps(save.shop40);
-  save.shop40.lastTab=["skins","starters","items","talismans","extensions"].includes(save.shop40.lastTab)?save.shop40.lastTab:"skins";
-  save.balance40=save.balance40&&typeof save.balance40==="object"?save.balance40:{samples:[],betaSessions:0};
-  save.hiddenStory40=save.hiddenStory40&&typeof save.hiddenStory40==="object"?save.hiddenStory40:{};
-  const _validateSave40=validateSave39;
-  validateSave39=function(raw){const clean=_validateSave40(raw),incoming=clean.shop40||{},starter=incoming.starter||{},items=incoming.items||{};clean.shop40={...SHOP_DEF40,...incoming,starter:{...SHOP_DEF40.starter,...starter},items:{...SHOP_DEF40.items,...items}};if(window.SakurayoLobby)clean.shop40=window.SakurayoLobby.normalizeOps(clean.shop40);for(const id of Object.keys(STARTERS40))clean.shop40.starter[id]=clamp(Math.floor(Number(clean.shop40.starter[id])||0),0,5);for(const [id,u] of Object.entries(ITEMS40))clean.shop40.items[id]=clamp(Math.floor(Number(clean.shop40.items[id])||0),0,u.max);clean.shop40.equippedStarter=STARTERS40[clean.shop40.equippedStarter]?clean.shop40.equippedStarter:null;clean.shop40.equippedWeapon=["ammo","whetstone","mirror"].includes(clean.shop40.equippedWeapon)?clean.shop40.equippedWeapon:null;clean.shop40.ownedTalismans=Array.isArray(clean.shop40.ownedTalismans)?clean.shop40.ownedTalismans.filter(id=>TALISMAN_SCHOOLS40.includes(id)):[];clean.shop40.bannedSchools=Array.isArray(clean.shop40.bannedSchools)?clean.shop40.bannedSchools.filter(id=>clean.shop40.ownedTalismans.includes(id)).slice(0,2):[];clean.balance40=clean.balance40&&typeof clean.balance40==="object"?clean.balance40:{samples:[],betaSessions:0};clean.balance40.samples=Array.isArray(clean.balance40.samples)?clean.balance40.samples.slice(0,80):[];clean.hiddenStory40=clean.hiddenStory40&&typeof clean.hiddenStory40==="object"&&!Array.isArray(clean.hiddenStory40)?clean.hiddenStory40:{};clean.storySeen38=clean.storySeen38&&typeof clean.storySeen38==="object"&&!Array.isArray(clean.storySeen38)?clean.storySeen38:{};clean.pendingLoneStory40=["sayo","aya","rion"].includes(clean.pendingLoneStory40)?clean.pendingLoneStory40:null;if(clean.extensions&&typeof clean.extensions==="object"&&!Array.isArray(clean.extensions)){const ext={};for(const id of Object.keys(clean.extensions)){if(FORBIDDEN_SAVE_KEYS.has(id)||!/^[a-z0-9][a-z0-9._-]{2,63}$/.test(id))continue;const entry=clean.extensions[id];if(entry&&typeof entry==="object"&&!Array.isArray(entry))ext[id]=entry;}clean.extensions=ext;}return pickAllowedSave(clean);};
 
   const STARTERS40={
     assault:{n:"夜樱火控核心",i:"🎯",d:"伤害、射速与暴击同步成长。适合纯初始挑战。",apply:(lv,m)=>{P.dmg*=1+.12*lv*m;P.rate/=1+.03*lv*m;P.crit+=.012*lv*m;}},
@@ -11988,7 +12241,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   $$("[data-open]").forEach(
     (b) => (b.onclick = () => openDrawer(b.dataset.open)),
   );
-  $$(".close").forEach((b) => (b.onclick = closeDrawers));
+  $$(".close").forEach((b) => (b.onclick = () => closeDrawers()));
   $("#banterToggle").onclick=()=>{save.banter=save.banter?0:1;$("#banterToggle").textContent=`吐槽电台：${save.banter?"开":"关"}`;persist();if(!save.banter)$("#banter").classList.add("hidden");};
   $("#fxToggle").onclick = () => {
     quality = quality < 0.8 ? 1 : 0.62;
@@ -12232,6 +12485,11 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     bg.style.backgroundSize="cover";
     $("#menu")?.classList.add("lobbyWide46");
   }
+  function choosePendingMode46(mode) {
+    pendingMode46 = mode === "testimony" ? "testimony" : mode === "mainGod" ? "mainGod" : "story";
+    renderStages();
+    refreshCommand47();
+  }
   function bindStageModes46(){
     const L=window.SakurayoLobby;
     const box=$("#stageList");
@@ -12242,8 +12500,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     bar.querySelectorAll("button").forEach(btn=>{
       btn.onclick=()=>{
         const mode=btn.getAttribute("data-mode");
-        pendingMode46=mode==="testimony"?"testimony":mode==="mainGod"?"mainGod":"story";
-        renderStages();
+        choosePendingMode46(mode);
         if(pendingMode46==="mainGod") $("#stageList .mainGodCard36")?.scrollIntoView({block:"nearest"});
       };
     });
@@ -12297,17 +12554,6 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     wireLivePuppet46();
     L.dressArchive($("#archiveDrawer .archiveDock46"));
     ["shopDrawer","stageDrawer","archiveDrawer"].forEach(id=>$(`#${id}`)?.classList.add("room46"));
-    const _openDrawer46=openDrawer;
-    openDrawer=function(n){
-      _openDrawer46(n);
-      if(n==="gacha"){
-        const rev=$("#gachaReveal46");
-        if(rev)rev.remove();
-        L.renderGacha($("#gachaBody46"),save,lobbyHandlers46());
-      }
-      if(n==="roster")L.renderRoster($("#rosterBody46"),save,lobbyHandlers46());
-      if(n==="archive")L.dressArchive($("#archiveDrawer .archiveDock46"));
-    };
     const _renderStages46=renderStages;
     renderStages=function(){const result=_renderStages46();bindStageModes46();return result;};
     const _openLevel46=openLevel;
@@ -12484,9 +12730,9 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     };
   }
   function refreshCommand47(){
-    window.SakurayoCommand?.mount({art:artUrl,model:commandModel47,open:openDrawer,closeDrawers,
+    window.SakurayoCommand?.mount({art:artUrl,model:commandModel47,open:openDrawer,closeDrawers,ui:window.SakurayoUI,
       settings:openSettings37,start:startGame,persist,notify:toast,
-      chooseMode(mode){pendingMode46=mode==='testimony'?'testimony':mode==='mainGod'?'mainGod':'story';openDrawer('stage');renderStages();},
+      chooseMode(mode){openDrawer('stage');choosePendingMode46(mode);},
       selectCharacter(id){if(!CHARACTERS35[id])return;save.character=id;persist();},
       claim(id){const result=window.SakurayoCommand.claimSupply(save,id);if(result.ok){persist();toast(`补给已回收 · 樱花币 +${result.reward}`);}return result;}
     });
@@ -12495,8 +12741,6 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   menuUpdate=function(){const result=_commandMenu47();refreshCommand47();return result;};
   const _commandChar47=updateCharacterUI35;
   updateCharacterUI35=function(){const result=_commandChar47();refreshCommand47();return result;};
-  const _commandClose47=closeDrawers;
-  closeDrawers=function(){window.SakurayoCommand?.close();return _commandClose47();};
   checkAch();
   menuUpdate();
   installModKitButton42();

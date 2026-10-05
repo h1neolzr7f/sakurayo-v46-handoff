@@ -21,6 +21,16 @@
  function label(name,text,en){return '<span class="terminalIcon48">'+icon(name)+'</span><span class="terminalLabel48"><b>'+text+'</b><small>'+en+'</small></span>';}
  var CSS=`
  :root{--cmd-ink:#101920;--cmd-paper:#f0f5f8;--cmd-dim:#b3c5cf;--cmd-line:#d5e9f338;--cmd-pink:#71e0f4;--cmd-gold:#f1d08d}
+ #rosterDrawer.wishDrawer46{background:#101c27;color:#eaf5fa}#rosterDrawer .rosterStage46{background:radial-gradient(circle at 18% 0,#46798d40,#142331 45%,#0c1720)}
+ #rosterDrawer .rosterHead46 h3{color:#f1f7fa;letter-spacing:.1em}#rosterDrawer .rosterHead46 span{color:#b8dce7}
+ #rosterDrawer .rosterTabs46 button{min-height:40px;border-radius:3px;border-color:#b9dce53d;background:#172b3b;color:#cbdfe8}
+ #rosterDrawer .rosterTabs46 button.on{background:linear-gradient(120deg,#b7eef6,#83d5e5);color:#173443;border-color:#c9f5ff}
+ #rosterDrawer .rosterSlot46 small{color:#b6cdd8}#rosterDrawer .rosterSlot46{border-radius:4px;border-color:#bedee52d;background:linear-gradient(145deg,#263b4a,#142531);box-shadow:0 3px 12px #060f1840}
+ #rosterDrawer .rosterArt46{background:#10202e}#rosterDrawer .rosterVeil46{background:#0d1b29c9;color:#c9e1e9}
+ #rosterDrawer #rosterPeek46{background:#08141de8}#rosterDrawer .rosterPeekCard46{border-radius:4px;border-color:#b9e8f355;background:#172b39;box-shadow:0 10px 60px #030a1280;color:#eaf5fa}
+ #rosterDrawer .rosterPeekCard46 em{color:#acddec}#rosterDrawer .rosterPeekCard46 p{color:#cadde6;line-height:1.65}
+ #rosterDrawer .rosterEquip46{min-height:40px;border-radius:3px;border-color:#bcecf7;background:linear-gradient(120deg,#b7eef6,#83d5e5);color:#173443}
+ #rosterDrawer button:focus-visible{outline:2px solid #9cefff;outline-offset:2px}
  #gachaDrawer.wishDrawer46{background:#142432}#gachaDrawer .wishStage46{background:#243a49}
  #gachaDrawer .wishStage46:before{background:linear-gradient(90deg,#172a3a15,transparent 48%,#152b4133)}
  #gachaDrawer .wishTitle46 h3{color:#fff;text-shadow:0 2px 12px #19344b,0 0 24px #82e6f540}#gachaDrawer .wishTitle46 p{color:#dcf5fc}
@@ -102,6 +112,16 @@
  html.landscape46 #menu.homeDock46.terminalLobby48 .charSelectPanel{left:3%!important;bottom:16%!important;width:41%;max-width:none}html.landscape46 #menu.homeDock46.terminalLobby48 .charCard{height:54px!important}
  .terminalSupport48{left:3%;bottom:9%;width:41%;max-width:none}.terminalSupport48 button{min-height:49px;font-size:10px}.terminalSupport48 svg{width:21px;height:21px}
  html.landscape46 #menu.homeDock46.terminalLobby48 .homeNav46{width:92%;right:4%;bottom:1.5%;max-width:none}#menu.homeDock46.terminalLobby48 .homeNav46 button{min-height:56px}#menu.homeDock46.terminalLobby48 .homeNav46 .terminalIcon48{width:23px;height:23px}#menu.homeDock46.terminalLobby48 .homeNav46 b{font-size:10px}#menu.homeDock46.terminalLobby48 .homeNav46 small{display:none}.commandSignal47{bottom:9.5%;font-size:7px}
+ }
+ @media(max-width:640px) and (max-height:520px) and (orientation:landscape){
+ .commandHeading47{top:23%;width:35%}.commandHeading47 b{font-size:13px}.commandHeading47 p{font-size:9px}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .heroLiveBreath46{width:70vw;height:98%;margin-left:0}html.landscape46 #menu.homeDock46.terminalLobby48 .heroLiveName46{bottom:36%;max-width:55%}
+ .tacticalDeck48{top:23%;bottom:22%;width:32%;gap:6px;grid-template-rows:minmax(40px,1fr) minmax(40px,1fr) minmax(52px,1.25fr) 40px}.tacticalDeck48>button{padding:3px 8px}.terminalLabel48 b{font-size:17px}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .start{min-height:52px;padding:3px 8px}#menu.homeDock46.terminalLobby48 .start .terminalIcon48{width:40px;height:40px}
+ .terminalActivity48{bottom:19%;width:37%;min-height:57px;padding:6px 10px}.terminalActivity48 b{font-size:11px}.terminalActivity48 small{font-size:6px}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .charSelectPanel{bottom:5.5%!important;width:23%;max-width:none}html.landscape46 #menu.homeDock46.terminalLobby48 .charCard{height:45px!important}
+ .terminalSupport48{bottom:5.5%;left:28%;width:20%}.terminalSupport48 button{min-height:45px;font-size:8px}.terminalSupport48 svg{width:18px;height:18px}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .homeNav46{width:48%;right:3%;bottom:5.5%;gap:0}#menu.homeDock46.terminalLobby48 .homeNav46 button{min-height:45px}#menu.homeDock46.terminalLobby48 .homeNav46 .terminalIcon48{width:20px;height:20px}#menu.homeDock46.terminalLobby48 .homeNav46 b{font-size:9px}.commandSignal47{bottom:1.5%;font-size:6px}
  }
  @media(prefers-reduced-motion:reduce){.tacticalDeck48,.terminalActivity48{animation:none!important}}
  `;

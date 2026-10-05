@@ -26,7 +26,7 @@ try{
  assert.equal(await page.locator('#commandTitle47').textContent(),'活动与行动','notice link switches to real activity panel');
  await close();
  assert.equal(await page.evaluate(()=>document.activeElement.id),'commandNotice48','closing a switched panel restores the original lobby launcher focus');
- for(const [width,height] of [[1280,720],[932,430],[844,390],[740,360],[430,932]]){
+ for(const [width,height] of [[1280,720],[932,430],[844,390],[740,360],[640,360],[430,932]]){
   await page.setViewportSize({width,height});
   assert.equal(await page.locator('#menu .coins #coins').count(),1,'wallet keeps the live coin counter used by menu updates');
   const title=await page.locator('#coverTitle36').boundingBox();
@@ -80,6 +80,7 @@ try{
   assert.equal(await page.locator('#stageDrawer').isVisible(),true,'activity link opens stages');
   assert.equal(await page.locator('#modeBar46 [data-mode="'+mode+'"]').evaluate(button=>button.classList.contains('on')),true,'activity link selects '+mode);
   await page.locator('#stageDrawer .close').click();
+  assert.match(await page.locator('#commandActivityName48').textContent(),new RegExp({story:'回收演习',testimony:'证词模式',mainGod:'主神空间'}[mode]),'activity selection immediately updates the lobby brief');
  }
  const coins=()=>page.evaluate(()=>JSON.parse(localStorage.getItem('sakurayoV3')||'{}').coins||0);
  const before=await coins();
@@ -109,5 +110,5 @@ try{
  await page.locator('#commandNotice48').click();
  assert.match(await page.locator('#commandBody47').textContent(),/4\.6\.0/);await close();
  assert.deepEqual(errors,[]);assert.deepEqual(external,[]);
- console.log('PASS tactical smoke: six live tiles, three floating controls, mailbox/notice/activity/tasks/login, three mode links, five viewports, claim/reload, touch hits, offline');
+ console.log('PASS tactical smoke: six live tiles, three floating controls, mailbox/notice/activity/tasks/login, three mode links, six viewports, claim/reload, touch hits, offline');
 }finally{await browser.close();}

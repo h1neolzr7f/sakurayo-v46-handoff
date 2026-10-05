@@ -6,7 +6,7 @@
 
 ![指挥大厅开发版](docs/screenshots/tactical-lobby.webp)
 
-> 截图为疏朗横屏大厅的实际浏览器画面，仍属 v4.6.0 开发预发布。完整验证及运行方法见 [大厅与服务验收记录](docs/VALIDATION_TACTICAL_LOBBY.md)。
+> 截图为疏朗横屏大厅的实际浏览器画面，仍属 v4.6.0 开发预发布。完整验证及运行方法见 [大厅与服务验收记录](docs/VALIDATION_TACTICAL_LOBBY.md)；最新存档与界面重构见 [本轮验收](docs/VALIDATION_CODE_POLISH.md)。
 
 ## 横屏大厅、邮箱与四章精装修
 
@@ -50,7 +50,7 @@ python -m http.server 8000
 powershell -File tools/verify.ps1
 ```
 
-本地验证包含静态/语法检查、镜头与生命周期单元测试、大厅/档案/角色表现/DP 系统测试、扩展框架冒烟和真实浏览器冒烟。当前 GitHub Actions 的 `verify.yml` 只运行静态和语法子集。
+本地验证包含静态/语法检查、镜头与生命周期单元测试、大厅/档案/角色表现/DP 系统测试、扩展框架冒烟和真实浏览器冒烟。GitHub Actions 的 `verify.yml` 同时运行静态检查和完整离线游戏回归，并上传浏览器截图及测试日志。
 
 本次整理实际通过了静态检查、camera/lifecycle/lobby/chronicle/live/ops 单元测试、ops smoke 与 framework smoke 8 项检查，并在真实浏览器中启动当前源码。详细命令见 [docs/VALIDATION.md](docs/VALIDATION.md)。
 

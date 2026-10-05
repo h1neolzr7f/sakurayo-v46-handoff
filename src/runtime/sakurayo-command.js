@@ -12,7 +12,6 @@
   ];
   var options = null;
   var currentPanel = '';
-  var returnFocus = null;
   var panelCharacter = '';
   var selectedMail = 'welcome';
   var ESC = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
@@ -106,24 +105,48 @@
   function style(){
     var d=global.document,node=d.getElementById('sakurayo-command-css');
     if(!node){node=d.createElement('style');node.id='sakurayo-command-css';node.textContent=CSS+(global.SakurayoTerminal?global.SakurayoTerminal.css:"");}
-    if(d.head.lastElementChild!==node)d.head.appendChild(node); // last: lobby refresh may inject its older stylesheet again
+    var lobby=d.getElementById('sakurayo-lobby-css');
+    if(!node.parentNode||(lobby&&(node.compareDocumentPosition(lobby)&4)))d.head.appendChild(node);
   }
-  function bind(selector,fn){var n=global.document.querySelector(selector);if(n)n.onclick=fn;}
+  function bind(selector,fn){var n=global.document.querySelector(selector);if(n&&!n.commandBound47){n.onclick=fn;n.commandBound47=true;}}
   function loadout(model){
     return '<div class="cmdLoadout47">'+[['当前衣装',model.skin],['初始核心',model.starter],['武器道具',model.item],['排除符',model.talismans],['寻访时装',model.fashion],['寻访武器',model.weapon]].map(function(p){return '<div><small>'+p[0]+'</small><b>'+esc(p[1])+'</b></div>';}).join('')+'</div>';
   }
   function close(){
-    var d=global.document.getElementById('commandDrawer47'),wasOpen=d&&!d.classList.contains('hidden');if(d)d.classList.add('hidden');
+    var drawer=global.document.getElementById('commandDrawer47');
+    if(options&&options.ui)options.ui.close(drawer);
+    else if(drawer)drawer.classList.add('hidden');
     currentPanel='';
-    if(wasOpen&&returnFocus&&returnFocus.isConnected)returnFocus.focus({preventScroll:true});
-    returnFocus=null;
+  }
+  // The panel body is rebuilt to display current game data. One delegated handler
+  // survives those rebuilds instead of rebinding every generated button.
+  function action(e){
+    var b=e.target.closest('button');if(!b||b.disabled)return;
+    var model=options.model(),S=global.SakurayoServices,result;
+    if(b.dataset.character){panelCharacter=b.dataset.character;panel('character',true);return;}
+    if(b.dataset.supply){b.disabled=true;options.claim(b.dataset.supply);panel('supplies',true);return;}
+    if(b.dataset.mail){selectedMail=b.dataset.mail;panel('mail',true);return;}
+    if(b.dataset.operation){options.chooseMode(b.dataset.operation);return;}
+    var rooms={commandWardrobe47:'shop',commandTalent47:'talent',commandStage47:'stage',commandLoadout47:'shop',commandCards47:'roster'};
+    if(rooms[b.id]){options.open(rooms[b.id]);return;}
+    if(b.id==='commandSelect47'){options.selectCharacter(panelCharacter||model.character.id);panel('character',true);}
+    else if(b.id==='commandRole47')panel('character');
+    else if(b.id==='commandLaunch47'){close();options.start();}
+    else if(b.id==='commandNoticeActivity48')panel('activities');
+    else if(b.id==='commandMailClaim48'||b.id==='commandMailAll48'){
+      result=b.id==='commandMailClaim48'?S.claimMail(model.save,selectedMail,global.SakurayoCommand):S.claimAll(model.save,global.SakurayoCommand);
+      if(result.ok){options.persist();options.notify(b.id==='commandMailClaim48'?'邮件补给已领取 · 樱花币 +'+result.reward:'已领取 '+result.count+' 份邮件 · 樱花币 +'+result.reward);}
+      panel('mail',true);
+    }else if(b.id==='commandLoginClaim48'){
+      result=S.claimLogin(model.save);if(result.ok){options.persist();options.notify('签到完成 · 樱花币 +'+result.reward);}panel('login',true);
+    }
   }
   function panel(kind,refresh){
     if(!options)return;
     var focused=global.document.activeElement;
     var focusId=refresh&&focused?focused.id:'';
     var focusCharacter=refresh&&focused&&focused.dataset?focused.dataset.character:'';
-    if(!refresh){var launcher=currentPanel?returnFocus:null;options.closeDrawers();returnFocus=launcher&&launcher.isConnected?launcher:focused;panelCharacter=options.model().character.id;}
+    if(!refresh)panelCharacter=options.model().character.id;
     currentPanel=kind;
     var d=global.document,drawer=d.getElementById('commandDrawer47');
     if(!drawer){
@@ -131,6 +154,7 @@
       drawer.setAttribute('role','dialog');drawer.setAttribute('aria-modal','true');drawer.setAttribute('aria-labelledby','commandTitle47');
       drawer.innerHTML='<div class="dhead"><div><small id="commandEyebrow47"></small><h2 id="commandTitle47"></h2></div><button class="close" type="button" aria-label="返回大厅">×</button></div><div id="commandBody47"></div>';
       d.body.appendChild(drawer);drawer.querySelector('.close').onclick=close;
+      d.getElementById('commandBody47').onclick=action;
     }
     var model=options.model(),titles={character:['OPERATOR FILE','作战角色'],prepare:['SORTIE PREPARATION','出击整备'],supplies:['RECOVERY TASKS','任务补给'],history:['COMBAT RECORD','近期战绩'],mail:['DISPATCH INBOX','邮箱'],login:['SEVEN DAY SUPPLY','七日登录签到'],notice:['BUREAU BULLETIN','公告'],activities:['FIELD OPERATIONS','活动与行动']};
     if(!titles[kind])return;
@@ -141,48 +165,32 @@
       var c=model.characters.filter(function(x){return x.id===panelCharacter;})[0]||model.character;
       var active=c.id===model.character.id;
       body.innerHTML='<div class="cmdSplit47"><div class="cmdPortrait47"><img src="'+esc(options.art('characters/'+c.id+'/default/live_idle.webp'))+'" alt="'+esc(c.name)+'"><small>SAKURAYO / '+esc(c.id.toUpperCase())+'</small></div><div class="cmdSheet47"><div class="cmdTabs47">'+model.characters.map(function(x){return '<button data-character="'+esc(x.id)+'" class="'+(x.id===c.id?'on':'')+'">'+esc(x.name)+'</button>';}).join('')+'</div><h3>'+esc(c.name)+'</h3><div class="cmdRole47">'+esc(c.role)+' / '+esc(c.weapon)+'</div><p>'+esc(c.desc)+'</p><div class="cmdNotes47">'+esc(c.bonus)+'</div><div class="cmdTags47">'+c.schools.map(function(x){return '<span>'+esc(x)+'</span>';}).join('')+'</div>'+ (active?loadout(model):'<p>选择为出击角色后可查看当前装备。</p>')+'<div class="cmdActions47"><button class="primary47" id="commandSelect47">'+(active?'当前出击角色':'选择出击')+'</button><button id="commandWardrobe47">衣装与装备</button><button id="commandTalent47">永久天赋</button></div></div></div>';
-      body.querySelectorAll('[data-character]').forEach(function(b){b.onclick=function(){panelCharacter=b.dataset.character;panel('character',true);};});
-      bind('#commandSelect47',function(){options.selectCharacter(c.id);panelCharacter=c.id;panel('character',true);});
-      bind('#commandWardrobe47',function(){close();options.open('shop');});
-      bind('#commandTalent47',function(){close();options.open('talent');});
     }else if(kind==='prepare'){
       var m=model.mission;
-      body.innerHTML='<div class="cmdSplit47"><div><div class="cmdMission47" style="background-image:linear-gradient(0deg,#080e1cf5,#080e1c20),url(&quot;'+esc(m.art)+'&quot;)"><small>'+esc(model.mode)+'</small><h3>'+esc(m.name)+'</h3><p>'+esc(m.boss)+' · 预计 '+esc(m.minutes)+' 分钟</p><p style="margin-top:8px;color:#ead4a1">'+esc(model.tactic)+'</p></div><div class="cmdActions47"><button id="commandStage47">更换模式 / 关卡</button></div><div class="cmdNotes47">'+esc(model.modeId==='testimony'?'证词模式：跟随剧情，不发放随机升级卡，也不部署干员。':'肉鸽战斗：自动攻击，移动避险；升级三选一构筑职业，局内完成转职、融合与三相飞升。')+'</div></div><div class="cmdSheet47"><div class="cmdRole47">当前出击角色</div><h3>'+esc(model.character.name)+'</h3><p>'+esc(model.character.weapon)+' · '+esc(model.character.role)+'</p>'+loadout(model)+'<div class="cmdActions47"><button id="commandLoadout47">调整装备</button><button id="commandCards47">寻访装备</button><button id="commandRole47">切换角色</button><button class="primary47" id="commandLaunch47">开始出击 →</button></div><p>移动：摇杆 / WASD　冲刺：空格　主动：技能按钮<br>另外两名角色可在肉鸽模式使用 DP 部署支援。</p></div></div>';
-      bind('#commandStage47',function(){close();options.open('stage');});
-      bind('#commandLoadout47',function(){close();options.open('shop');});
-      bind('#commandCards47',function(){close();options.open('roster');});
-      bind('#commandRole47',function(){panel('character');});
-      bind('#commandLaunch47',function(){close();options.start();});
+      body.innerHTML='<div class="cmdSplit47"><div><div class="cmdMission47" style="background-image:linear-gradient(0deg,#080e1cf5,#080e1c20),url(&quot;'+esc(m.art)+'&quot;)"><small>'+esc(model.mode)+'</small><h3>'+esc(m.name)+'</h3><p>'+esc(m.boss)+' · 预计 '+esc(m.minutes)+' 分钟</p><p style="margin-top:8px;color:#ead4a1">'+esc(model.tactic)+'</p></div><div class="cmdActions47"><button id="commandStage47">更换模式 / 关卡</button></div><div class="cmdNotes47">'+esc(model.modeId==='testimony'?'证词模式：跟随剧情，不发放随机升级卡，也不部署干员。':'肉鸽战斗：自动攻击，移动避险；升级三选一构筑职业，局内完成转职、融合与三相飞升。')+'</div></div><div class="cmdSheet47"><div class="cmdRole47">当前出击角色</div><h3>'+esc(model.character.name)+'</h3><p>'+esc(model.character.weapon)+' · '+esc(model.character.role)+'</p>'+loadout(model)+'<div class="cmdActions47"><button id="commandLoadout47">调整装备</button><button id="commandCards47">寻访装备</button><button id="commandRole47">切换角色</button><button class="primary47" id="commandLaunch47">开始出击 →</button></div><p>移动：摇杆 / WASD　冲刺：Shift　主动：空格 / 技能按钮<br>另外两名角色可在肉鸽模式使用 DP 部署支援。</p></div></div>';
     }else if(kind==='supplies'){
       body.innerHTML='<p class="cmdNotes47">战斗与章节回收留下的补给。每份仅领取一次，完成记录保存在本机。</p><div class="cmdSupplies47">'+inbox(model.save).map(function(r){return '<article class="cmdSupply47"><span>'+ (r.claimed?'✓':r.ready?'✦':'◇')+'</span><div><b>'+esc(r.title)+'</b><p>'+esc(r.desc)+'</p><small>樱花币 +'+r.reward+'</small></div><button data-supply="'+r.id+'" '+(r.claimed||!r.ready?'disabled':'')+'>'+ (r.claimed?'已领取':r.ready?'领取':'待完成')+'</button></article>';}).join('')+'</div>';
-      body.querySelectorAll('[data-supply]').forEach(function(b){b.onclick=function(){b.disabled=true;options.claim(b.dataset.supply);panel('supplies',true);};});
     }else if(kind==='mail'){
       var S=global.SakurayoServices,letters=S.mailbox(model.save,global.SakurayoCommand);
       var letter=letters.filter(function(m){return m.id===selectedMail;})[0]||letters[0];selectedMail=letter.id;
       if(!letter.read){S.markRead(model.save,letter.id,global.SakurayoCommand);options.persist();letters=S.mailbox(model.save,global.SakurayoCommand);letter=letters.filter(function(m){return m.id===selectedMail;})[0];}
       var canClaim=letters.some(function(m){return !m.claimed;});
       body.innerHTML='<div class="cmdMailbox48"><div class="cmdMailList48">'+letters.map(function(m){return '<button type="button" id="mail48-'+m.id+'" data-mail="'+m.id+'" class="'+(m.id===selectedMail?'on ':'')+(m.read?'':'unread')+'"><b>'+esc(m.title)+'</b><small>'+esc(m.sender)+' / '+(m.claimed?'已领取':m.read?'已读 · 待领取':'未读')+'</small></button>';}).join('')+'</div><article class="cmdMailLetter48"><small>DISPATCH / '+esc(letter.id.toUpperCase())+'</small><h3>'+esc(letter.title)+'</h3><p>发件人：'+esc(letter.sender)+'</p><p>'+esc(letter.desc)+'</p><p>这份补给存放在你的本机档案中。任务与邮件共用领取记录。</p><div class="cmdMailAttachment48">'+global.SakurayoTerminal.icon('supplies')+'<div><b>'+letter.reward+'</b><small>樱花币</small></div></div><div class="cmdActions47"><button class="primary47" id="commandMailClaim48" '+(letter.claimed?'disabled':'')+'>'+(letter.claimed?'附件已领取':'领取附件')+'</button><button id="commandMailAll48" '+(canClaim?'':'disabled')+'>一键领取</button></div></article></div>';
-      body.querySelectorAll('[data-mail]').forEach(function(b){b.onclick=function(){selectedMail=b.dataset.mail;panel('mail',true);};});
-      bind('#commandMailClaim48',function(){var result=S.claimMail(model.save,selectedMail,global.SakurayoCommand);if(result.ok){options.persist();options.notify('邮件补给已领取 · 樱花币 +'+result.reward);}panel('mail',true);});
-      bind('#commandMailAll48',function(){var result=S.claimAll(model.save,global.SakurayoCommand);if(result.ok){options.persist();options.notify('已领取 '+result.count+' 份邮件 · 樱花币 +'+result.reward);}panel('mail',true);});
     }else if(kind==='login'){
       var status=global.SakurayoServices.loginStatus(model.save),label=status.reason==='complete'?'七日补给已全部领取':status.reason==='clock'?'请检查本机日期':status.reason==='claimed'?'今日已签到':'签到领取 · 樱花币 +'+status.reward;
       body.innerHTML='<article class="cmdNotice48"><small>WELCOME BACK / '+esc(status.today)+'</small><h3>每一次归来，都有新的补给。</h3><p>累计七个登录日，无需连续签到。本机日期每日最多领取一次；七日完成后不重复循环。已完成 '+status.count+' / 7 天。</p></article><div class="cmdLogin48">'+status.rewards.map(function(reward,i){return '<article class="cmdLoginDay48 '+(i<status.count?'done':i===status.count?'on':'')+'"><small>DAY '+(i+1)+'</small>'+global.SakurayoTerminal.icon('supplies')+'<b>'+reward+'</b><span>'+(i<status.count?'已领取':i===status.count?'本次补给':'待签到')+'</span></article>';}).join('')+'</div><div class="cmdActions47"><button class="primary47" id="commandLoginClaim48" '+(status.ready?'':'disabled')+'>'+label+'</button></div>';
-      bind('#commandLoginClaim48',function(){var result=global.SakurayoServices.claimLogin(model.save);if(result.ok){options.persist();options.notify('签到完成 · 樱花币 +'+result.reward);}panel('login',true);});
     }else if(kind==='notice'){
       body.innerHTML='<article class="cmdNotice48"><small>UPDATE / DEVELOPMENT BUILD</small><h3>4.6.0 · 行动终端更新</h3><p>新大厅加入邮箱、七日登录签到、任务补给与活动入口。邮件与任务共享领取状态，进度保存在本机。四章插画和场景动画已更新。</p><p>当前为开发预发布版本；新 Android 安装包尚未发布。</p></article><article class="cmdNotice48"><small>FIELD MANUAL</small><h3>关于这场回收行动</h3><p>三名作战角色，四章战场。回收演习保留职业、转职、融合与三相飞升的肉鸽构筑；证词模式侧重剧情；主神空间提供高难轮回挑战。</p><p>寻访、装备、剧情档案与历史战绩均可从大厅进入。导出存档请前往设置。</p></article><div class="cmdActions47"><button id="commandNoticeActivity48">查看活动与行动</button></div>';
-      bind('#commandNoticeActivity48',function(){panel('activities');});
     }else if(kind==='activities'){
       body.innerHTML='<div class="cmdActivities48">'+[['story','回收行动 · 四章演习','三名角色出击，收集随机升级并组合职业、转职与融合。'],['testimony','证词回收 · 剧情档案','沿着四章剧情完成证词回收。此模式不发放随机升级卡。'],['mainGod','主神空间 · 高难轮回','进入独立的主神试炼与兑换界面，解锁条件沿用现有游戏规则。']].map(function(a){return '<article class="cmdNotice48 cmdActivity48" style="background-image:linear-gradient(90deg,#102332e6,#10233299),url(&quot;'+esc(options.art('ui/tactical/activity-'+(a[0]==='mainGod'?'maingod':a[0])+'-v3.webp'))+'&quot;)"><small>LOCAL OPERATION / '+a[0].toUpperCase()+'</small><h3>'+a[1]+'</h3><p>'+a[2]+'</p><div class="cmdActions47"><button data-operation="'+a[0]+'">进入行动 →</button></div></article>';}).join('')+'</div>';
-      body.querySelectorAll('[data-operation]').forEach(function(b){b.onclick=function(){close();options.chooseMode(b.dataset.operation);};});
     }else{
       body.innerHTML=model.history.length?'<div class="cmdHistory47">'+model.history.slice(0,12).map(function(r){return '<article class="cmdRun47"><b>'+esc(r.win?'回收成功':'战斗结束')+'</b><div><strong>'+esc(r.character)+' · '+esc(r.stage)+'</strong><p>'+esc(r.mode)+' / Lv.'+esc(r.level)+' / '+esc(r.kills)+' 击破 / '+esc(r.duration)+'</p></div><span>'+esc(r.date)+'</span></article>';}).join('')+'</div>':'<div class="cmdEmpty47">暂无战绩。完成第一次出击后，回收记录会显示在这里。</div>';
     }
-    drawer.classList.remove('hidden');
     var next=focusId&&d.getElementById(focusId);
     if(focusCharacter)next=Array.from(body.querySelectorAll('[data-character]')).find(function(b){return b.dataset.character===focusCharacter;});
     if(!refresh||!next||next.disabled)next=drawer.querySelector('.close');
-    next.focus({preventScroll:true});
+    if(options.ui)options.ui.open(drawer,{initialFocus:next,onClose:function(){currentPanel='';}});
+    else {options.closeDrawers();drawer.classList.remove('hidden');next.focus();}
     style();
   }
   function mount(opts){
@@ -197,15 +205,6 @@
       var rail=d.createElement('div');rail.className='commandRail47';rail.id='commandRail47';rail.innerHTML='<button type="button" id="commandCharacter47">角色资料</button><button type="button" id="commandSupplies47">回收补给<i id="commandUnread47"></i></button><button type="button" id="commandSettings47">设置</button>';
       root.appendChild(rail);
       var signal=d.createElement('div');signal.className='commandSignal47';signal.id='commandSignal47';signal.textContent='离线作战就绪 · 数据保存在本机';root.appendChild(signal);
-      d.addEventListener('keydown',function(e){
-        var drawer=d.getElementById('commandDrawer47');if(!drawer||drawer.classList.contains('hidden'))return;
-        if(e.key==='Escape'){e.preventDefault();close();return;}
-        if(e.key==='Tab'){
-          var all=Array.from(drawer.querySelectorAll('button:not(:disabled),[tabindex="0"]'));
-          if(!all.length)return;var first=all[0],last=all[all.length-1];
-          if(!drawer.contains(d.activeElement)){e.preventDefault();first.focus();}else if(e.shiftKey&&d.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&d.activeElement===last){e.preventDefault();first.focus();}
-        }
-      });
     }
     var m=options.model(),unread=inbox(m.save).filter(function(r){return r.ready&&!r.claimed;}).length;
     if(global.SakurayoTerminal)global.SakurayoTerminal.decorate(root,dock,options,m);

@@ -32,6 +32,10 @@ Invoke-Step "offline syntax extracted" { node --check tests/artifacts/static/and
 if (-not $Static) {
     Invoke-Step "command smoke" { node tests/command_smoke.mjs }
     Invoke-Step "tactical smoke" { node tests/tactical_smoke.mjs }
+    Invoke-Step "save import smoke" { node tests/save_import_smoke.mjs }
+    Invoke-Step "room polish smoke" { node tests/polish_rooms_smoke.mjs }
+    Invoke-Step "UI DOM smoke" { node tests/ui_dom_smoke.mjs }
+    Invoke-Step "UI lifecycle smoke" { node tests/ui_smoke.mjs }
     Invoke-Step "ops smoke" { node tests/ops_smoke.mjs }
     Invoke-Step "framework smoke" { node tests/framework_smoke.mjs }
     Invoke-Step "gacha visual" { node tests/gacha_visual.mjs }
@@ -49,6 +53,9 @@ if (-not $Static) {
         $env:SAKURAYO_ENTRY = Join-Path $root "android-app/app/src/main/assets/index.html"
         Invoke-Step "offline command smoke" { node tests/command_smoke.mjs }
         Invoke-Step "offline tactical smoke" { node tests/tactical_smoke.mjs }
+        Invoke-Step "offline save import smoke" { node tests/save_import_smoke.mjs }
+        Invoke-Step "offline room polish smoke" { node tests/polish_rooms_smoke.mjs }
+        Invoke-Step "offline UI lifecycle smoke" { node tests/ui_smoke.mjs }
     } finally {
         $env:SAKURAYO_ENTRY = $previousEntry
     }

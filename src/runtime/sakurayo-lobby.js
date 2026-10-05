@@ -244,6 +244,7 @@
     ".wishSpark46 button.poor{opacity:.42}" +
     ".rosterEquip46{margin-top:8px;min-height:36px;padding:0 12px;border-radius:10px;border:1px solid #ffe6a366;background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;font:800 12px/1 system-ui}" +
     ".chronicleBox46{display:grid;gap:10px}" +
+    "#rosterWall46>.chronicleBox46{grid-column:1/-1}" +
     ".chronicleCard46{padding:12px;border-radius:14px;border:1px solid #ffe6a344;background:#0b0818cc;color:#fff7fb;text-align:left}" +
     ".chronicleCard46 b{display:block;margin:0 0 6px;color:#ffe7a3;letter-spacing:.14em}" +
     ".chronicleCard46 p{margin:0 0 6px;color:#f4eaf4;font-size:12px;line-height:1.55}" +
@@ -279,6 +280,8 @@
     ".revealSkip46,.revealAgain46{background:#0b0818cc;color:#fff7fb}" +
     "#gachaReveal46.isTest .revealInner46,#gachaReveal46.isTest .revealFace46.front:after,#gachaReveal46.isTest .revealCard46.r-SSR.flipped .revealFace46.front{transition:none;animation:none}" +
     ".rosterStage46{min-height:100%;padding:max(52px,calc(env(safe-area-inset-top) + 40px)) 12px calc(16px + env(safe-area-inset-bottom));background:radial-gradient(circle at 18% 0,#ff72b428 0%,#1a1030 42%,#060410 100%)}" +
+    "#rosterDrawer>#rosterBody46{height:100%;min-height:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;box-sizing:border-box}" +
+    "#rosterDrawer .rosterStage46{box-sizing:border-box}" +
     ".rosterHead46{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 12px}" +
     ".rosterHead46 h3{margin:0;font-size:22px;letter-spacing:.28em}" +
     ".rosterHead46 span{color:#ffe7a3;font-size:11px;letter-spacing:.12em}" +
@@ -297,8 +300,9 @@
     ".rosterVeil46{position:absolute;inset:0;display:grid;place-items:center;background:#08071388;color:#ffe6f3;font:800 12px/1 system-ui;font-style:normal;letter-spacing:.2em}" +
     ".rosterSlot46 b{display:block;padding:8px 6px 0;font-size:11px}" +
     ".rosterSlot46 small{display:block;margin:4px 0 8px;color:#bfb1d3;font-size:9px}" +
-    "#rosterPeek46{position:absolute;inset:0;z-index:24;display:flex;align-items:center;justify-content:center;padding:18px;background:#060410ee}" +
-    ".rosterPeekCard46{width:min(86vw,280px);border-radius:18px;overflow:hidden;border:1px solid #ffe6a355;background:#120c20;box-shadow:0 18px 40px #05020d88}" +
+    "#rosterPeek46{position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;padding:18px;background:#060410ee;box-sizing:border-box}" +
+    ".rosterPeekCard46{position:relative;width:min(86vw,280px);max-height:100%;border-radius:18px;overflow:auto;overscroll-behavior:contain;border:1px solid #ffe6a355;background:#120c20;box-shadow:0 18px 40px #05020d88;box-sizing:border-box}" +
+    "#rosterPeekClose46{position:sticky;z-index:2;top:0;display:block;width:40px;height:40px;margin:0 0 -40px auto;padding:0;border-radius:4px;border:1px solid #b9e8f355;background:#172b39ee;color:#eaf5fa;font-size:24px}" +
     ".rosterPeekCard46 img{display:block;width:100%;height:220px;object-fit:cover;background:#0b0818}" +
     ".rosterPeekCard46.lock img{filter:brightness(.4)}" +
     ".rosterPeekCard46 div{padding:12px 14px 16px}" +
@@ -336,6 +340,19 @@
     "html.landscape46 #rosterWall46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
     "html.landscape46 #archiveDrawer .archiveDock46{grid-template-columns:repeat(4,minmax(0,1fr))}" +
     "html.landscape46 #stageList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}" +
+    "@media(max-height:460px){" +
+    "html.landscape46 .wishTitle46{top:52px;max-width:48%}" +
+    "html.landscape46 .wishTitle46 h3{font-size:26px;line-height:1.15}" +
+    "html.landscape46 .wishTitle46 p{margin-top:4px;font-size:10px}" +
+    "html.landscape46 .wishPity46{top:116px;bottom:auto}" +
+    "html.landscape46 .wishPills46{gap:4px}" +
+    "html.landscape46 .wishPills46 b{padding:3px 6px;font-size:9px}" +
+    "html.landscape46 .wishSpark46{max-height:60px}" +
+    ".rosterPeekCard46{width:min(86vw,600px);display:grid;grid-template-columns:minmax(120px,38%) minmax(0,1fr)}" +
+    ".rosterPeekCard46 img{height:100%;min-height:220px;max-height:300px;grid-column:1;grid-row:1}" +
+    ".rosterPeekCard46 div{grid-column:2;grid-row:1;padding-top:48px}" +
+    "#rosterPeekClose46{position:sticky;grid-column:2;grid-row:1;align-self:start;justify-self:end}" +
+    "}" +
     "@media(prefers-reduced-motion:reduce){.wishStage46:before,.wishPetals46 i,.revealInner46,.revealFace46.front:after,.revealCard46.r-SSR.flipped .revealFace46.front{animation:none;transition:none}}";
 
   var ROOM_CSS =
@@ -427,7 +444,7 @@
   function injectStyle() {
     if (!global.document) return;
     var style = global.document.getElementById("sakurayo-lobby-css");
-    if (style && style.parentNode) style.parentNode.removeChild(style);
+    if (style) return;
     style = global.document.createElement("style");
     style.id = "sakurayo-lobby-css";
     style.textContent = LOBBY_CSS + ROOM_CSS;
@@ -1066,26 +1083,38 @@
     return (card && card.d) || "";
   }
 
+  var rosterPeekState = null;
+
   function closeRosterPeek() {
     if (!global.document) return;
     var peek = global.document.getElementById("rosterPeek46");
+    if (peek && global.SakurayoUI) {
+      global.SakurayoUI.close(peek);
+      return;
+    }
     if (peek && peek.parentNode) peek.parentNode.removeChild(peek);
+    var source = rosterPeekState && rosterPeekState.source;
+    rosterPeekState = null;
+    if (source && source.isConnected && typeof source.focus === "function") source.focus();
   }
 
-  function showRosterPeek(card, locked, count, handlers, tab) {
+  function showRosterPeek(card, locked, count, handlers, tab, source) {
     if (!global.document) return;
     var drawer = global.document.getElementById("rosterDrawer");
     if (!drawer) return;
     closeRosterPeek();
     var overlay = global.document.createElement("div");
     overlay.id = "rosterPeek46";
+    overlay.setAttribute("role", "dialog");
+    overlay.setAttribute("aria-modal", "true");
+    overlay.setAttribute("aria-labelledby", "rosterPeekTitle46");
     var canEquip = !locked && (tab === "fashion" || tab === "weapon");
     overlay.innerHTML =
       '<div class="rosterPeekCard46' +
       (locked ? " lock" : "") +
-      '"><img data-art alt="" src="' +
+      '"><button type="button" id="rosterPeekClose46" aria-label="关闭卡片详情">×</button><img data-art alt="" src="' +
       artSrc(handlers, locked ? "gacha/card_back.webp" : "gacha/" + card.id + ".webp") +
-      '"><div><b>' +
+      '"><div><b id="rosterPeekTitle46">' +
       (locked ? "未回收" : card.n) +
       "</b><em>" +
       rarityLabel(card.r, card.legend) +
@@ -1096,9 +1125,11 @@
       "</p>" +
       (canEquip ? '<button type="button" class="rosterEquip46" data-equip="' + card.id + '">装备</button>' : "") +
       "</div></div>";
-    overlay.onclick = function () {
-      closeRosterPeek();
+    overlay.onclick = function (event) {
+      if (event && event.target === overlay) closeRosterPeek();
     };
+    var close = overlay.querySelector("#rosterPeekClose46");
+    if (close) close.onclick = closeRosterPeek;
     var eq = overlay.querySelector("[data-equip]");
     if (eq) {
       eq.onclick = function (ev) {
@@ -1110,6 +1141,37 @@
     }
     drawer.appendChild(overlay);
     hideBrokenArt(overlay);
+    rosterPeekState = { source: source };
+    if (global.SakurayoUI) {
+      global.SakurayoUI.open(overlay, {
+        nested: true,
+        initialFocus: close,
+        returnFocus: source,
+        onClose: function () {
+          if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+          rosterPeekState = null;
+        }
+      });
+    } else {
+      overlay.onkeydown = function (event) {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          event.stopPropagation();
+          closeRosterPeek();
+        } else if (event.key === "Tab") {
+          var targets = overlay.querySelectorAll("button:not(:disabled)");
+          var first = targets[0], last = targets[targets.length - 1];
+          if (event.shiftKey && global.document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && global.document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+          }
+        }
+      };
+      if (close && typeof close.focus === "function") close.focus();
+    }
   }
 
   function rosterList(tab) {
@@ -1131,6 +1193,7 @@
   function renderRoster(host, save, handlers) {
     injectStyle();
     if (!host) return snapshot(save);
+    closeRosterPeek();
     var info = snapshot(save);
     var tab = info.rosterTab || "scrap";
     var list = rosterList(tab);
@@ -1206,7 +1269,7 @@
           if (!card) return;
           var count = ownedMap[card.id] || 0;
           var locked = count < 1 && DEFAULT_SHOWN.indexOf(card.id) < 0;
-          showRosterPeek(card, locked, count, handlers, tab);
+          showRosterPeek(card, locked, count, handlers, tab, node);
         };
       })(slots[i]);
     }

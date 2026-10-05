@@ -61,6 +61,8 @@ try {
   await page.locator('#commandPrepare47').click();
   assert.match(await page.locator('#commandBody47').textContent(),/终夜樱冠/);
   assert.match(await page.locator('#commandBody47').textContent(),/夜樱终弹/);
+  assert.match(await page.locator('#commandBody47').textContent(),/冲刺：Shift/,'preparation uses the actual dash key');
+  assert.match(await page.locator('#commandBody47').textContent(),/主动：空格 \/ 技能按钮/,'preparation uses the actual skill key');
   await page.waitForTimeout(350);
   await page.screenshot({path:path.join(output,'prepare.png')});
   await page.locator('#commandLaunch47').click();
