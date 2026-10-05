@@ -25,7 +25,10 @@ jobs:
           node --check src/runtime/sakurayo-lifecycle.js
           node --check src/runtime/sakurayo-content-runtime.js
           node --check src/runtime/sakurayo-command.js
+          node --check src/runtime/sakurayo-services.js
+          node --check src/runtime/sakurayo-terminal.js
           node tests/command_unit.mjs
+          node tests/services_unit.mjs
           node tests/chapter_design_unit.mjs
 
   offline-game:

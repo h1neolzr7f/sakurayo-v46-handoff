@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-10-04T22:34:31.278448+00:00",
+  "style_reference": "docs/screenshots/tactical-concept.webp",
+  "prompt_log": "assets/image2/prompts/tactical-portraits.jsonl",
+  "generation_mode": "authorized bundled CLI edits",
+  "provider": "LitangKing proxy",
+  "model": "gpt-image-2.5",
+  "model_note": "Model value records the actual API request alias. The proxy does not expose the underlying deployment model in bundled CLI output.",
+  "assets": [
+    {
+      "id": "portrait-sayo-v3",
+      "character": "sayo",
+      "path": "android-app/app/src/main/assets/game/art/ui/tactical/portrait-sayo-v3.webp",
+      "source_path": "assets/image2/source/tactical-portraits/portrait-sayo-v3-framing.png",
+      "model": "gpt-image-2.5",
+      "requested_size": "1024x1024",
+      "returned_dimensions": [
+        1254,
+        1254
+      ],
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "format": "webp",
+      "quality": 90,
+      "source_sha256": "ed6357366e6369f8cc0d2aba0a7da8b8c560f3750882e5d2aff2ede96f2a163f",
+      "sha256": "1d46975239fea8498cb5b823f54c98e66bd2639289c87b3f51997a1a6d681f7e",
+      "bytes": 122832,
+      "visual_qa": {
+        "full_head_visible": true,
+        "headroom": "approximately 12 percent",
+        "identity_and_clothing_preserved": true,
+        "style_consistent": true,
+        "unobtrusive_smoky_gray_background": true,
+        "no_text_or_ui": true
+      },
+      "notes": "Initial result was reframed by a second image edit to ensure the hair crown was fully visible.",
+      "status": "visually_approved"
+    },
+    {
+      "id": "portrait-aya-v3",
+      "character": "aya",
+      "path": "android-app/app/src/main/assets/game/art/ui/tactical/portrait-aya-v3.webp",
+      "source_path": "assets/image2/source/tactical-portraits/portrait-aya-v3-framing.png",
+      "model": "gpt-image-2.5",
+      "requested_size": "1024x1024",
+      "returned_dimensions": [
+        1254,
+        1254
+      ],
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "format": "webp",
+      "quality": 90,
+      "source_sha256": "136dc3364db08db6dc2507922a0a3b9b87d83ec2cc4f156257a0f739f37dd4e7",
+      "sha256": "8e4b18c858328a74081df05e67fe95943156bd701010715972b01b75cfd7beb1",
+      "bytes": 110400,
+      "visual_qa": {
+        "full_head_visible": true,
+        "headroom": "approximately 12 percent",
+        "identity_and_clothing_preserved": true,
+        "style_consistent": true,
+        "unobtrusive_smoky_gray_background": true,
+        "no_text_or_ui": true
+      },
+      "notes": "Initial result was reframed by a second image edit to ensure the hair crown was fully visible.",
+      "status": "visually_approved"
+    },
+    {
+      "id": "portrait-rion-v3",
+      "character": "rion",
+      "path": "android-app/app/src/main/assets/game/art/ui/tactical/portrait-rion-v3.webp",
+      "source_path": "assets/image2/source/tactical-portraits/portrait-rion-v3-framing.png",
+      "model": "gpt-image-2.5",
+      "requested_size": "1024x1024",
+      "returned_dimensions": [
+        1254,
+        1254
+      ],
+      "dimensions": [
+        1024,
+        1024
+      ],
+      "format": "webp",
+      "quality": 90,
+      "source_sha256": "8c886a81cd756031ba2482d591f8e2c164fab1b7dd711bc3583743e78989ce77",
+      "sha256": "405145dccafff6b0fe212cd20b0ade8f3447ec9c80164d6f526f071493569583",
+      "bytes": 120336,
+      "visual_qa": {
+        "full_head_visible": true,
+        "headroom": "approximately 12 percent",
+        "identity_and_clothing_preserved": true,
+        "style_consistent": true,
+        "unobtrusive_smoky_gray_background": true,
+        "no_text_or_ui": true
+      },
+      "notes": "Initial result was reframed by a second image edit to ensure the hair crown was fully visible.",
+      "status": "visually_approved"
+    }
+  ]
+}

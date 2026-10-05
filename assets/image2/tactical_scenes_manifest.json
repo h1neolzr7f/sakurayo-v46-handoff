@@ -1,0 +1,359 @@
+{
+  "schema_version": 1,
+  "generated_by": "Bundled imagegen CLI /root/.codex/skills/.system/imagegen/scripts/image_gen.py",
+  "mode": "generate-batch plus reference edit",
+  "requested_model": "gpt-image-2.5",
+  "quality": "high",
+  "requested_size": "1536x1024",
+  "output_format": "png",
+  "production_format": "webp",
+  "production_quality": 90,
+  "style_reference": "docs/screenshots/tactical-concept.webp",
+  "style_brief": "Airy original anime alpine outpost; cool gray/white/cyan; sparse pale cherry pink; matte architecture; calm bright daylight. No text, logos or people.",
+  "status": "complete",
+  "successful_asset_count": 7,
+  "assets": [
+    {
+      "asset_id": "gacha-remnant-v3",
+      "prompt": "Use case: stylized-concept\nAsset type: anime game lobby scenic background\nPrimary request: Memory remnant archive in an alpine field-command outpost: a refined open records vault, vertical frosted-glass cylinders and slim illuminated cyan memory cassettes, pale stone counters, a small sealed document case and restrained blank paper folios. Wide window glimpse of pale cherry branches and snow mountains. Convey quiet recovered memories, elegant archive technology, calm spacious room.\nStyle/medium: Shared art direction: original high-budget anime action-game environment illustration, crisp delicate painted linework, clean atmospheric perspective, airy daylight, cool alpine mountain outpost world with pale stone and matte white futuristic architecture, subtle glass and brushed dark graphite fittings, restrained cyan luminous details, small pale sakura-pink accents. Soft blue-gray shadows, luminous overcast sky, distant snowy mountains and layered mist where visible. Elegant clear forms, translucent atmospheric depth, polished Japanese anime background art, sharp foreground detail with calm distant scenery. No photorealism, no plastic 3D render, no heavy painterly impasto, no gold, no warm amber or orange lighting, no neon violet. Cohesive palette: cool gray, matte white, ice blue, very pale pink.\nComposition/framing: Landscape scenic stage for a gacha screen. Place the recognizable scene and feature objects chiefly in the LEFT 55 percent; the RIGHT 45 percent stays visually quiet and spacious for future interface overlays, low contrast walls or distant scenery. No UI generated. Eye-level broad environmental shot, no people.\nConstraints: Entirely original artwork. No logos, no watermark, no letters, no numbers, no text, no labels, no graphic UI, no people or creatures. Opaque image. All surfaces and paper completely unlettered.",
+      "requested_model": "gpt-image-2.5",
+      "requested_size": "1536x1024",
+      "quality": "high",
+      "source": "assets/image2/source/tactical-scenes/gacha-remnant-v3.png",
+      "production": "android-app/app/src/main/assets/game/art/ui/tactical/gacha-remnant-v3.webp",
+      "status": "visually_approved",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "source_bytes": 2194224,
+      "source_sha256": "93450cc66a4e039795514331c33b1635a73ea4522071c6a2e7be94bedeaa1b16",
+      "production_bytes": 203412,
+      "production_sha256": "3caefecf4fd168328d86667a5b0d951628ad7dc3a90fc96dbd3f834266998e86",
+      "production_size": [
+        1536,
+        1024
+      ],
+      "visual_checks": [
+        "matches cool gray/white/cyan/pale-pink palette",
+        "no readable text, logos, people or creatures",
+        "subject and composition suitable for requested UI role"
+      ],
+      "request_history": [
+        {
+          "requested_model": "gpt-image-2.5",
+          "attempt": 1,
+          "result": "success"
+        }
+      ],
+      "successful_requested_model": "gpt-image-2.5",
+      "provenance": {
+        "source_type": "AI-generated original art",
+        "service": "LitangKing authorized proxy",
+        "generator": "Bundled imagegen CLI",
+        "api_response_model": "not exposed by bundled CLI",
+        "external_stock_assets": false
+      }
+    },
+    {
+      "asset_id": "gacha-fashion-v3",
+      "prompt": "Use case: stylized-concept\nAsset type: anime game lobby scenic background\nPrimary request: Fashion outfitting atelier inside the alpine outpost: clean elegant dressing studio, a graphite rail displaying two empty white-and-black tactical coats with pale sakura embroidery and pale pink fabric, folded white ribbons and cloth on a low bench, frosted glass partitions and a daylight window toward cherry branches. Clothes alone, no mannequin, no human body shapes. Airy refined wardrobe showroom.\nStyle/medium: Shared art direction: original high-budget anime action-game environment illustration, crisp delicate painted linework, clean atmospheric perspective, airy daylight, cool alpine mountain outpost world with pale stone and matte white futuristic architecture, subtle glass and brushed dark graphite fittings, restrained cyan luminous details, small pale sakura-pink accents. Soft blue-gray shadows, luminous overcast sky, distant snowy mountains and layered mist where visible. Elegant clear forms, translucent atmospheric depth, polished Japanese anime background art, sharp foreground detail with calm distant scenery. No photorealism, no plastic 3D render, no heavy painterly impasto, no gold, no warm amber or orange lighting, no neon violet. Cohesive palette: cool gray, matte white, ice blue, very pale pink.\nComposition/framing: Landscape scenic stage for a gacha screen. Place the recognizable scene and feature objects chiefly in the LEFT 55 percent; the RIGHT 45 percent stays visually quiet and spacious for future interface overlays, low contrast walls or distant scenery. No UI generated. Eye-level broad environmental shot, no people.\nConstraints: Entirely original artwork. No logos, no watermark, no letters, no numbers, no text, no labels, no graphic UI, no people or creatures. Opaque image. All surfaces and paper completely unlettered.",
+      "requested_model": "gpt-image-2.5",
+      "requested_size": "1536x1024",
+      "quality": "high",
+      "source": "assets/image2/source/tactical-scenes/gacha-fashion-v3.png",
+      "production": "android-app/app/src/main/assets/game/art/ui/tactical/gacha-fashion-v3.webp",
+      "status": "visually_approved",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "source_bytes": 2134990,
+      "source_sha256": "6d7cf7059d326515f5ed426382072a51f874e31e75182f8259074147bcff9990",
+      "production_bytes": 193944,
+      "production_sha256": "3f33768cd8ed97af25704c12ebb4c015e44f48f1dfc4be56fa46e946dc3314ad",
+      "production_size": [
+        1536,
+        1024
+      ],
+      "visual_checks": [
+        "matches cool gray/white/cyan/pale-pink palette",
+        "no readable text, logos, people or creatures",
+        "subject and composition suitable for requested UI role"
+      ],
+      "request_history": [
+        {
+          "requested_model": "gpt-image-2.5",
+          "attempt": 1,
+          "result": "success"
+        }
+      ],
+      "successful_requested_model": "gpt-image-2.5",
+      "provenance": {
+        "source_type": "AI-generated original art",
+        "service": "LitangKing authorized proxy",
+        "generator": "Bundled imagegen CLI",
+        "api_response_model": "not exposed by bundled CLI",
+        "external_stock_assets": false
+      }
+    },
+    {
+      "asset_id": "gacha-weapon-v3",
+      "prompt": "Use case: stylized-concept\nAsset type: anime game lobby scenic background\nPrimary request: Pristine armory inside the alpine field-command outpost: carefully mounted original sleek dark graphite and matte white tactical rifles plus one sheathed Japanese katana, organized pale stone weapon display wall, cyan edge accents, a low maintenance bench, glass cabinet, daylight snowy mountain glimpse. Safe clean display, no firing, no cartridges in motion.\nStyle/medium: Shared art direction: original high-budget anime action-game environment illustration, crisp delicate painted linework, clean atmospheric perspective, airy daylight, cool alpine mountain outpost world with pale stone and matte white futuristic architecture, subtle glass and brushed dark graphite fittings, restrained cyan luminous details, small pale sakura-pink accents. Soft blue-gray shadows, luminous overcast sky, distant snowy mountains and layered mist where visible. Elegant clear forms, translucent atmospheric depth, polished Japanese anime background art, sharp foreground detail with calm distant scenery. No photorealism, no plastic 3D render, no heavy painterly impasto, no gold, no warm amber or orange lighting, no neon violet. Cohesive palette: cool gray, matte white, ice blue, very pale pink.\nComposition/framing: Landscape scenic stage for a gacha screen. Place the recognizable scene and feature objects chiefly in the LEFT 55 percent; the RIGHT 45 percent stays visually quiet and spacious for future interface overlays, low contrast walls or distant scenery. No UI generated. Eye-level broad environmental shot, no people.\nConstraints: Entirely original artwork. No logos, no watermark, no letters, no numbers, no text, no labels, no graphic UI, no people or creatures. Opaque image. All surfaces and paper completely unlettered.",
+      "requested_model": "gpt-image-2.5",
+      "requested_size": "1536x1024",
+      "quality": "high",
+      "source": "assets/image2/source/tactical-scenes/gacha-weapon-v3.png",
+      "production": "android-app/app/src/main/assets/game/art/ui/tactical/gacha-weapon-v3.webp",
+      "status": "visually_approved",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "source_bytes": 2198305,
+      "source_sha256": "727ccbb3859b81bdfd59b56d79bd3050bb53be050bc4faecdcedc62f7ab94937",
+      "production_bytes": 198194,
+      "production_sha256": "9fab29ea80787f7961442bafd33ae958581579800b7c54affd843ae406bf7d0c",
+      "production_size": [
+        1536,
+        1024
+      ],
+      "visual_checks": [
+        "matches cool gray/white/cyan/pale-pink palette",
+        "no readable text, logos, people or creatures",
+        "subject and composition suitable for requested UI role"
+      ],
+      "request_history": [
+        {
+          "requested_model": "gpt-image-2.5",
+          "attempt": 1,
+          "result": "success"
+        }
+      ],
+      "successful_requested_model": "gpt-image-2.5",
+      "provenance": {
+        "source_type": "AI-generated original art",
+        "service": "LitangKing authorized proxy",
+        "generator": "Bundled imagegen CLI",
+        "api_response_model": "not exposed by bundled CLI",
+        "external_stock_assets": false
+      }
+    },
+    {
+      "asset_id": "activity-story-v3",
+      "prompt": "Use case: stylized-concept\nAsset type: anime game lobby scenic background\nPrimary request: Shrine street campaign vista at the mountain city outpost: pale stone pedestrian street winding through an original modern Japanese shrine quarter, two slender desaturated vermilion torii gates amid matte gray futuristic buildings, pale cherry blossom trees, snowy mountain skyline, a distant field-command tower in mist. Bright cool daylight, empty hopeful street, a few scattered pale petals.\nStyle/medium: Shared art direction: original high-budget anime action-game environment illustration, crisp delicate painted linework, clean atmospheric perspective, airy daylight, cool alpine mountain outpost world with pale stone and matte white futuristic architecture, subtle glass and brushed dark graphite fittings, restrained cyan luminous details, small pale sakura-pink accents. Soft blue-gray shadows, luminous overcast sky, distant snowy mountains and layered mist where visible. Elegant clear forms, translucent atmospheric depth, polished Japanese anime background art, sharp foreground detail with calm distant scenery. No photorealism, no plastic 3D render, no heavy painterly impasto, no gold, no warm amber or orange lighting, no neon violet. Cohesive palette: cool gray, matte white, ice blue, very pale pink.\nComposition/framing: Landscape environment intended to be cropped into a wide activity banner. Keep the recognizable focus along the middle horizontal third so a wide center crop retains the subject. Strong legible silhouette, atmospheric layers, spare foreground, no people. No UI generated.\nConstraints: Entirely original artwork. No logos, no watermark, no letters, no numbers, no text, no labels, no graphic UI, no people or creatures. Opaque image. All surfaces and paper completely unlettered.",
+      "requested_model": "gpt-image-2.5",
+      "requested_size": "1536x1024",
+      "quality": "high",
+      "source": "assets/image2/source/tactical-scenes/activity-story-v3.png",
+      "production": "android-app/app/src/main/assets/game/art/ui/tactical/activity-story-v3.webp",
+      "status": "visually_approved",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "source_bytes": 2704499,
+      "source_sha256": "2a4e8f8eccee9e49bee69e8282c7c1609ad356e6036e93e1f5338a0e545400e0",
+      "production_bytes": 361394,
+      "production_sha256": "ba01da28d41ee6720bbe256a22fc2491b8bc0a3db4951b26612d237f5081f592",
+      "production_size": [
+        1536,
+        1024
+      ],
+      "visual_checks": [
+        "matches cool gray/white/cyan/pale-pink palette",
+        "no readable text, logos, people or creatures",
+        "subject and composition suitable for requested UI role"
+      ],
+      "request_history": [
+        {
+          "requested_model": "gpt-image-2.5",
+          "attempt": 1,
+          "result": "success"
+        }
+      ],
+      "successful_requested_model": "gpt-image-2.5",
+      "provenance": {
+        "source_type": "AI-generated original art",
+        "service": "LitangKing authorized proxy",
+        "generator": "Bundled imagegen CLI",
+        "api_response_model": "not exposed by bundled CLI",
+        "external_stock_assets": false
+      }
+    },
+    {
+      "asset_id": "activity-testimony-v3",
+      "prompt": "Use case: stylized-concept\nAsset type: anime game lobby scenic background\nPrimary request: Quiet testimony records conservatory in the alpine outpost: open archival atrium of matte white beams and frosted glass, neat blank folios and clear memory prisms on a pale stone table, tall calm translucent cyan archive panels, a sparse pale sakura branch in glass, snowy mountains beyond broad windows. Reflective poetic stillness, empty space, no literal readable records.\nStyle/medium: Shared art direction: original high-budget anime action-game environment illustration, crisp delicate painted linework, clean atmospheric perspective, airy daylight, cool alpine mountain outpost world with pale stone and matte white futuristic architecture, subtle glass and brushed dark graphite fittings, restrained cyan luminous details, small pale sakura-pink accents. Soft blue-gray shadows, luminous overcast sky, distant snowy mountains and layered mist where visible. Elegant clear forms, translucent atmospheric depth, polished Japanese anime background art, sharp foreground detail with calm distant scenery. No photorealism, no plastic 3D render, no heavy painterly impasto, no gold, no warm amber or orange lighting, no neon violet. Cohesive palette: cool gray, matte white, ice blue, very pale pink.\nComposition/framing: Landscape environment intended to be cropped into a wide activity banner. Keep the recognizable focus along the middle horizontal third so a wide center crop retains the subject. Strong legible silhouette, atmospheric layers, spare foreground, no people. No UI generated.\nConstraints: Entirely original artwork. No logos, no watermark, no letters, no numbers, no text, no labels, no graphic UI, no people or creatures. Opaque image. All surfaces and paper completely unlettered.",
+      "requested_model": "gpt-image-2.5",
+      "requested_size": "1536x1024",
+      "quality": "high",
+      "source": "assets/image2/source/tactical-scenes/activity-testimony-v3.png",
+      "production": "android-app/app/src/main/assets/game/art/ui/tactical/activity-testimony-v3.webp",
+      "status": "visually_approved",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "source_bytes": 2221950,
+      "source_sha256": "cd451d3ca81456f8c176c9fe89c5acb407b06b1ed16d72342a4983691291bcf7",
+      "production_bytes": 232318,
+      "production_sha256": "aa4c56d7a1151a61abeeb827909f5835eee451af22b0f25a70efbd06bd4d0067",
+      "production_size": [
+        1536,
+        1024
+      ],
+      "visual_checks": [
+        "matches cool gray/white/cyan/pale-pink palette",
+        "no readable text, logos, people or creatures",
+        "subject and composition suitable for requested UI role"
+      ],
+      "request_history": [
+        {
+          "requested_model": "gpt-image-2.5",
+          "attempt": 1,
+          "result": "success"
+        }
+      ],
+      "successful_requested_model": "gpt-image-2.5",
+      "provenance": {
+        "source_type": "AI-generated original art",
+        "service": "LitangKing authorized proxy",
+        "generator": "Bundled imagegen CLI",
+        "api_response_model": "not exposed by bundled CLI",
+        "external_stock_assets": false
+      }
+    },
+    {
+      "asset_id": "activity-maingod-v3",
+      "prompt": "Use case: stylized-concept\nAsset type: anime game lobby scenic background\nPrimary request: Abstract mirror sanctum suspended in the snowy alpine atmosphere: a spacious matte-white stone sanctuary with an elegant circular mirror portal, fragmented floating silver-gray crystalline planes around it, restrained ice-cyan luminous rim, reflective pale stone floor, distant mountain silhouettes and very sparse pale pink petals. Calm mysterious dimensional space, bright airy visual mood, no threatening figure.\nStyle/medium: Shared art direction: original high-budget anime action-game environment illustration, crisp delicate painted linework, clean atmospheric perspective, airy daylight, cool alpine mountain outpost world with pale stone and matte white futuristic architecture, subtle glass and brushed dark graphite fittings, restrained cyan luminous details, small pale sakura-pink accents. Soft blue-gray shadows, luminous overcast sky, distant snowy mountains and layered mist where visible. Elegant clear forms, translucent atmospheric depth, polished Japanese anime background art, sharp foreground detail with calm distant scenery. No photorealism, no plastic 3D render, no heavy painterly impasto, no gold, no warm amber or orange lighting, no neon violet. Cohesive palette: cool gray, matte white, ice blue, very pale pink.\nComposition/framing: Landscape environment intended to be cropped into a wide activity banner. Keep the recognizable focus along the middle horizontal third so a wide center crop retains the subject. Strong legible silhouette, atmospheric layers, spare foreground, no people. No UI generated.\nConstraints: Entirely original artwork. No logos, no watermark, no letters, no numbers, no text, no labels, no graphic UI, no people or creatures. Opaque image. All surfaces and paper completely unlettered.",
+      "requested_model": "gpt-image-2.5-flare",
+      "requested_size": "1536x1024",
+      "quality": "high",
+      "source": "assets/image2/source/tactical-scenes/activity-maingod-v3.png",
+      "production": "android-app/app/src/main/assets/game/art/ui/tactical/activity-maingod-v3.webp",
+      "status": "visually_approved",
+      "visual_checks": [
+        "matches cool gray/white/cyan/pale-pink palette",
+        "no readable text, logos, people or creatures",
+        "subject and composition suitable for requested UI role"
+      ],
+      "request_history": [
+        {
+          "requested_model": "gpt-image-2.5",
+          "attempt": 1,
+          "result": "failed",
+          "error_code": "upstream_text_reply",
+          "http_status": 400
+        },
+        {
+          "requested_model": "gpt-image-2.5",
+          "attempt": 2,
+          "result": "failed",
+          "error_code": "upstream_text_reply",
+          "http_status": 400
+        },
+        {
+          "requested_model": "gpt-image-2.5",
+          "attempt": 3,
+          "result": "failed",
+          "error_code": "upstream_text_reply",
+          "http_status": 400
+        },
+        {
+          "requested_model": "gpt-image-2.5-flare",
+          "attempt": 1,
+          "result": "generation_blocked",
+          "category": "network_policy",
+          "blocked_host": "litangking.12gg.workers.dev"
+        },
+        {
+          "requested_model": "gpt-image-2.5-flare",
+          "attempt": 2,
+          "result": "success"
+        }
+      ],
+      "source_size": [
+        1536,
+        1024
+      ],
+      "source_bytes": 2270311,
+      "source_sha256": "93a4c271448e64c8cbbc3b4bceb41b43c934618b0632aa5bf9d668829f8c2813",
+      "production_bytes": 227488,
+      "production_sha256": "0e795af453f9de2b5db6aa68fd4743b263f26071ba5a3b2ca2480d300e3a24a2",
+      "production_size": [
+        1536,
+        1024
+      ],
+      "successful_requested_model": "gpt-image-2.5-flare",
+      "provenance": {
+        "source_type": "AI-generated original art",
+        "service": "LitangKing authorized proxy",
+        "generator": "Bundled imagegen CLI",
+        "api_response_model": "not exposed by bundled CLI",
+        "external_stock_assets": false
+      },
+      "initial_requested_model": "gpt-image-2.5"
+    },
+    {
+      "asset_id": "lobby-outpost-v3",
+      "prompt": "Use case: style-transfer\nAsset type: original anime game lobby environment background\nInput images: Image 1 is the existing scene reference and edit target. Preserve the mountain city observation-outpost setting, broad panoramic perspective, distant Japanese shrine architecture, snowy mountain layers, mist valleys, structural observation-deck beams, and lower terrace railing.\nPrimary request: Polish this into the final coherent airy anime game environment art. The alpine city and observation outpost remain empty. Keep the left foreground structural deck and pale cherry blossoms, the central mountain city with graceful torii gates, and distant snow ridges. Refine matte white and cool graphite outpost surfaces with extremely restrained cyan accents. Make the entire scene luminous and clear, with soft cold daylight and pale pink cherry blossom accents. The right 35 percent should be calmer and slightly lower detail, with soft blue-gray mountain mist and sky to support future UI overlays. Preserve the natural illustrated depth and elegant original city design.\nStyle/medium: high-budget Japanese anime game background, crisp delicate painted linework, clean atmospheric perspective, airy cold alpine daylight, cool gray and matte white architecture, subtle glass and brushed graphite fittings, restrained cyan details, sparse pale sakura-pink accents. Soft blue-gray shadows and layered mist. Sharp controlled foreground detail with calm distant scenery. Original artwork matching one shared anime lobby art system.\nConstraints: Change only the environment rendering and subtle composition balance, preserving the scene identity. Entirely no text, no UI, no numbers, no letters, no labels, no logos, no watermarks, no people, no creatures. No warm amber glow, no orange lamps, no heavy gold, no neon violet, no photorealism, no plastic 3D rendering. Opaque full scene.",
+      "mode": "edit",
+      "requested_model": "gpt-image-2.5",
+      "requested_size": "1536x1024",
+      "quality": "high",
+      "reference_images": [
+        "android-app/app/src/main/assets/game/art/ui/lobby-outpost-v3.webp"
+      ],
+      "source": "assets/image2/source/tactical-scenes/lobby-outpost-v3.png",
+      "production": "android-app/app/src/main/assets/game/art/ui/tactical/lobby-outpost-v3.webp",
+      "status": "visually_approved",
+      "source_size": [
+        1536,
+        1024
+      ],
+      "source_bytes": 2454791,
+      "source_sha256": "8288e4e8569c89c97e3380afeea6c6dc44854e202457dfc1f4333386168bdfda",
+      "production_bytes": 297416,
+      "production_sha256": "b17bd4fb9ef942abb028ea87378824d16193697d934a9993ce75bbd5766adfbe",
+      "production_size": [
+        1536,
+        1024
+      ],
+      "request_history": [
+        {
+          "requested_model": "gpt-image-2.5",
+          "attempt": 1,
+          "result": "success"
+        }
+      ],
+      "visual_checks": [
+        "matches cool gray/white/cyan/pale-pink palette",
+        "no readable text, logos, people or creatures",
+        "subject and composition suitable for requested UI role"
+      ],
+      "successful_requested_model": "gpt-image-2.5",
+      "provenance": {
+        "source_type": "AI-generated original art",
+        "service": "LitangKing authorized proxy",
+        "generator": "Bundled imagegen CLI",
+        "api_response_model": "not exposed by bundled CLI",
+        "external_stock_assets": false
+      },
+      "input_path": "android-app/app/src/main/assets/game/art/ui/lobby-outpost-v3.webp",
+      "input_bytes": 389308,
+      "input_sha256": "a6ba16663c6a89967d6c4ab012592fa595eba38d0fe91893174f6d5b89d38c1d",
+      "input_size": [
+        1672,
+        941
+      ],
+      "archived_reference": "assets/image2/source/tactical-scenes/lobby-outpost-layout-reference.webp",
+      "archived_reference_sha256": "a6ba16663c6a89967d6c4ab012592fa595eba38d0fe91893174f6d5b89d38c1d"
+    }
+  ],
+  "models_used": [
+    "gpt-image-2.5",
+    "gpt-image-2.5-flare"
+  ],
+  "production_total_bytes": 1714166,
+  "completed_utc": "2026-10-04T22:47:24.154043+00:00"
+}

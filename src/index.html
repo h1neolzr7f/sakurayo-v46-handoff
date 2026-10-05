@@ -152,10 +152,12 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 <script src="runtime/sakurayo-camera.js"></script>
 <script src="runtime/sakurayo-cutscene.js"></script>
 <script src="runtime/sakurayo-economy.js"></script>
+<script src="runtime/sakurayo-services.js"></script>
 <script src="runtime/sakurayo-lobby.js"></script>
 <script src="runtime/sakurayo-chronicle.js"></script>
 <script src="runtime/sakurayo-live.js"></script>
 <script src="runtime/sakurayo-ops.js"></script>
+<script src="runtime/sakurayo-terminal.js"></script>
 <script src="runtime/sakurayo-command.js"></script>
 <script src="content/extensions.manifest.js"></script>
 <script>
@@ -7493,7 +7495,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function paintHomeBg46(){
     const bg=$("#menu .bg");
     if(!bg)return;
-    bg.style.backgroundImage=`url('${artUrl("ui/lobby-command-v2.webp")}')`;
+    bg.style.backgroundImage=`url('${artUrl("ui/tactical/lobby-outpost-v3.webp")}')`;
     bg.style.backgroundPosition="center 30%";
     bg.style.backgroundSize="cover";
     $("#menu")?.classList.add("lobbyWide46");
@@ -7722,6 +7724,16 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
   installLobby46();
   installOps46();
+  const _terminalSettings48=openSettings37;
+  openSettings37=function(){
+    const result=_terminalSettings48();
+    window.SakurayoCommand?.settingsUtilities([
+      {id:'commandGuide48',label:'新手说明',open:()=>openTutorial37(false)},
+      {id:'commandStats48',label:'战斗统计',open:openAnalytics37},
+      {id:'commandModkit48',label:'扩展包管理',open:openModKit42}
+    ]);
+    return result;
+  };
   function commandModel47(){
     const character=c=>({...c,schools:c.bias.map(id=>SCHOOL[id]?.n||id)});
     const shop=save.shop40||{},modeId=pendingMode46;
@@ -7740,7 +7752,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
   function refreshCommand47(){
     window.SakurayoCommand?.mount({art:artUrl,model:commandModel47,open:openDrawer,closeDrawers,
-      settings:openSettings37,start:startGame,
+      settings:openSettings37,start:startGame,persist,notify:toast,
+      chooseMode(mode){pendingMode46=mode==='testimony'?'testimony':mode==='mainGod'?'mainGod':'story';openDrawer('stage');renderStages();},
       selectCharacter(id){if(!CHARACTERS35[id])return;save.character=id;persist();},
       claim(id){const result=window.SakurayoCommand.claimSupply(save,id);if(result.ok){persist();toast(`补给已回收 · 樱花币 +${result.reward}`);}return result;}
     });

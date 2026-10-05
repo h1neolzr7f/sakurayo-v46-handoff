@@ -4,13 +4,13 @@
 
 [玩家仓](https://github.com/h1neolzr7f/sakurayo-zombietide) · [开发交接](docs/HANDOFF.md) · [v4.6 计划](docs/PLAN_V46_ERYOU.md) · [维护手册](docs/MAINTAIN.md)
 
-![指挥大厅开发版](docs/screenshots/command-lobby.webp)
+![指挥大厅开发版](docs/screenshots/tactical-lobby.webp)
 
-> 截图为指挥大厅装修分支的实际浏览器画面，仍属 v4.6.0 开发预发布。完整验证及运行方法见 [指挥大厅验收记录](docs/VALIDATION_COMMAND_LOBBY.md)。
+> 截图为疏朗横屏大厅的实际浏览器画面，仍属 v4.6.0 开发预发布。完整验证及运行方法见 [大厅与服务验收记录](docs/VALIDATION_TACTICAL_LOBBY.md)。
 
-## 指挥大厅与四章精装修
+## 横屏大厅、邮箱与四章精装修
 
-新增角色资料、出击整备、近期战绩和一次性里程碑补给；大厅、商店、关卡及档案使用统一视觉。四章有独立新插画、可平铺地面、落樱/雨纹/灰烬/镜屑环境动画和清晰障碍边界。所有素材离线加载，存档仍使用 `sakurayoV3`。
+大厅采用大立绘、三项悬浮主入口和六图标底栏；补齐邮箱、公告、活动、任务和七日登录签到。欢迎邮件、里程碑和签到均能实际领取并保存，任务与邮件共用收据。新增十张统一冷灰、冰蓝画风素材，覆盖大厅背景、三角色头像、三套寻访背景和三种活动插画。角色资料、出击整备、近期战绩、商店与档案沿用真实游戏数据。四章有独立新插画、可平铺地面、落樱/雨纹/灰烬/镜屑环境动画和清晰障碍边界。所有素材离线加载，存档仍使用 `sakurayoV3`。
 
 浏览器开发依赖：`npm ci && npx playwright install chromium`；美术检查需要 `python -m pip install Pillow`。Linux/macOS 运行 `bash tools/verify.sh`（完整回归）；`--static` 仅执行静态、单位检查与打包。Windows 沿用 `tools/verify.ps1`。可直接打开已同步的 `android-app/app/src/main/assets/index.html` 试玩。
 
@@ -30,7 +30,7 @@ v4.6 在原有三角色、四章、职业/转职/融合/飞升、Boss 与主神�
 核心兼容约束：
 
 - 保留本地存档键 `sakurayoV3`，迁移缺字段而不清档；
-- 保持离线优先，不加入账号、广告或每日任务；
+- 保持离线优先，不加入联网账号或广告；签到仅按本机日期记录七次有限补给；
 - 不提交签名密钥、JKS、APK、`local.properties` 或构建输出；
 - 改动战斗循环时继续遵守对象上限和现有测试 API。
 

@@ -502,6 +502,7 @@
         receipts[id] = !!(incoming.supplies && incoming.supplies[id] === true);
         return receipts;
       }, {}),
+      services: global.SakurayoServices ? global.SakurayoServices.normalize(incoming.services) : (incoming.services || {}),
       fashion: normalizePool(incoming.fashion, FASHION_CARDS),
       weapon: normalizePool(incoming.weapon, WEAPON_CARDS),
     };
@@ -958,7 +959,7 @@
     host.innerHTML =
       '<div class="wishStage46">' +
       '<img class="wishBanner46" data-art alt="" src="' +
-      artSrc(handlers, "gacha/banner_bg.webp") +
+      artSrc(handlers, "ui/tactical/gacha-" + pool + "-v3.webp") +
       '">' +
       '<img class="wishHero46" data-art alt="" src="' +
       artSrc(handlers, "gacha/hero_" + hero + ".webp") +

@@ -2124,6 +2124,72 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 
 </script>
 <script>
+(function(global){
+  'use strict';
+  // Offline finite rewards. Presentation belongs to the command room.
+  var MAIL_IDS=['welcome','firstRun','chapter1','chapter2','chapter3','chapter4','kills500'];
+  var LOGIN_REWARDS=[60,80,100,120,140,160,240];
+  function validDay(s){
+    if(typeof s!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(s))return false;
+    var parts=s.split('-').map(Number),d=new Date(s+'T12:00:00Z');
+    return Number.isFinite(d.getTime())&&d.getUTCFullYear()===parts[0]&&d.getUTCMonth()+1===parts[1]&&d.getUTCDate()===parts[2];
+  }
+  function normalize(raw){
+    var r=raw&&typeof raw==='object'&&!Array.isArray(raw)?raw:{};
+    var read={};MAIL_IDS.forEach(function(id){read[id]=!!(r.mailRead&&r.mailRead[id]===true);});
+    var dates=[];(Array.isArray(r.loginDates)?r.loginDates:[]).forEach(function(day){if(validDay(day)&&dates.indexOf(day)<0)dates.push(day);});
+    return {mailRead:read,welcomeClaimed:r.welcomeClaimed===true,loginDates:dates.sort().slice(0,7)};
+  }
+  function state(save){return normalize(save&&save.shop40&&save.shop40.ops&&save.shop40.ops.services);}
+  function write(save,value){
+    if(!save.shop40||typeof save.shop40!=='object'||Array.isArray(save.shop40))save.shop40={};
+    if(!save.shop40.ops||typeof save.shop40.ops!=='object'||Array.isArray(save.shop40.ops))save.shop40.ops={};
+    save.shop40.ops.services=value;
+  }
+  function credit(save,reward){var coins=Number(save.coins);save.coins=(Number.isFinite(coins)?Math.max(0,coins):0)+reward;}
+  function mailbox(save,command){
+    var s=state(save),rows=[{id:'welcome',title:'行动终端接入补给',desc:'欢迎回到樱夜行动局。整备你的装备，从神社外街开始回收行动。',reward:200,claimed:s.welcomeClaimed}];
+    if(command)command.inbox(save).filter(function(r){return r.ready;}).forEach(function(r){rows.push({id:r.id,title:r.title,desc:r.desc+' 补给已送达，可在邮箱或任务中领取。',reward:r.reward,claimed:r.claimed});});
+    return rows.map(function(r){r.read=s.mailRead[r.id]===true;r.sender='樱夜行动局';return r;});
+  }
+  function markRead(save,id,command){
+    if(!mailbox(save,command).some(function(m){return m.id===id;}))return false;
+    var s=state(save);s.mailRead[id]=true;write(save,s);return true;
+  }
+  function claimMail(save,id,command){
+    var mail=mailbox(save,command).filter(function(m){return m.id===id;})[0];
+    if(!mail)return {ok:false,reason:'unknown',reward:0};
+    if(mail.claimed)return {ok:false,reason:'claimed',reward:0};
+    var result;
+    if(id==='welcome'){var s=state(save);s.welcomeClaimed=true;write(save,s);credit(save,200);result={ok:true,reason:'',reward:200};}
+    else result=command.claimSupply(save,id);
+    if(result.ok)markRead(save,id,command);
+    return result;
+  }
+  function claimAll(save,command){
+    var reward=0,count=0;
+    mailbox(save,command).filter(function(m){return !m.claimed;}).forEach(function(m){var r=claimMail(save,m.id,command);if(r.ok){reward+=r.reward;count++;}});
+    return {ok:count>0,reason:count?'':'empty',reward:reward,count:count};
+  }
+  function dayKey(date){
+    var d=date||new Date();if(!d||typeof d.getTime!=='function'||!Number.isFinite(d.getTime()))return '';
+    return String(d.getFullYear()).padStart(4,'0')+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+  }
+  function loginStatus(save,date){
+    var dates=state(save).loginDates,today=dayKey(date),last=dates[dates.length-1]||'';
+    var reason=!validDay(today)?'clock':dates.length>=7?'complete':today===last?'claimed':today<last?'clock':'';
+    return {count:dates.length,today:today,ready:!reason,reason:reason,reward:LOGIN_REWARDS[dates.length]||0,rewards:LOGIN_REWARDS.slice()};
+  }
+  function claimLogin(save,date){
+    var status=loginStatus(save,date);if(!status.ready)return {ok:false,reason:status.reason,reward:0};
+    var s=state(save);s.loginDates.push(status.today);write(save,s);credit(save,status.reward);
+    return {ok:true,reason:'',reward:status.reward};
+  }
+  global.SakurayoServices={normalize:normalize,mailbox:mailbox,markRead:markRead,claimMail:claimMail,claimAll:claimAll,loginStatus:loginStatus,claimLogin:claimLogin};
+})(window);
+
+</script>
+<script>
 (function (global) {
   "use strict";
 
@@ -2628,6 +2694,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         receipts[id] = !!(incoming.supplies && incoming.supplies[id] === true);
         return receipts;
       }, {}),
+      services: global.SakurayoServices ? global.SakurayoServices.normalize(incoming.services) : (incoming.services || {}),
       fashion: normalizePool(incoming.fashion, FASHION_CARDS),
       weapon: normalizePool(incoming.weapon, WEAPON_CARDS),
     };
@@ -3084,7 +3151,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     host.innerHTML =
       '<div class="wishStage46">' +
       '<img class="wishBanner46" data-art alt="" src="' +
-      artSrc(handlers, "gacha/banner_bg.webp") +
+      artSrc(handlers, "ui/tactical/gacha-" + pool + "-v3.webp") +
       '">' +
       '<img class="wishHero46" data-art alt="" src="' +
       artSrc(handlers, "gacha/hero_" + hero + ".webp") +
@@ -4406,6 +4473,154 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 
 </script>
 <script>
+(function(global){
+ 'use strict';
+ var PATHS={
+  operator:'<path d="M21 4h22l9 11-5 19-10 7-13-7-5-13zM23 40l13 8 13-8 12 20H9z"/>',
+  equipment:'<path d="M15 5l8 2 4 9-5 5 28 28 5-5 7 7-11 11-7-7 5-5-28-28-5 5-9-4-2-8 8 4 7-7z"/><path d="M47 7l9-2-5 10 4 4 10-5-2 9-11 4-27 30-8-8 30-27z"/>',
+  combat:'<path d="M32 2l8 20 22 10-22 10-8 20-8-20L2 32l22-10zM32 18l-7 14 7 14 7-14z" fill-rule="evenodd"/>',
+  gacha:'<path d="M32 3l7 20 22 9-22 9-7 20-7-20-22-9 22-9zM32 21l-11 11 11 11 11-11z" fill-rule="evenodd"/>',
+  roster:'<path d="M9 15l23-9 23 9v34l-23 10L9 49zm8 5v24l12 6V26zm19 6v24l12-6V20zM21 16l11 5 11-5-11-4z" fill-rule="evenodd"/>',
+  shop:'<path d="M4 8h10l8 32h31l8-24H21l2 8h27l-3 8H28L20 8z"/><circle cx="29" cy="52" r="6"/><circle cx="49" cy="52" r="6"/>',
+  stage:'<path d="M32 5l28 51H4zm0 16L18 47h28z" fill-rule="evenodd"/><path d="M32 30l7 13H25z"/>',
+  archive:'<path d="M14 5h33l9 9v40H14zm8 9v32h26V19l-5-5z" fill-rule="evenodd"/><path d="M26 24h17v4H26zm0 10h17v4H26zM5 17h5v43h34v4H5z"/>',
+  records:'<path d="M8 37h9v22H8zm15-14h9v36h-9zm15-16h9v52h-9zm15 39h7v13h-7z"/>',
+  mail:'<path d="M6 13h52v38H6zm6 6l20 16 20-16zM12 27v18h40V27L32 42z" fill-rule="evenodd"/>',
+  notice:'<path d="M12 6h29l12 12v41H12zm8 8v37h25V23H36v-9z" fill-rule="evenodd"/><path d="M24 28h17v4H24zm0 9h17v4H24z"/>',
+  settings:'<path d="M25 5h14l2 9 8 5 9-2 6 12-7 6-1 9 5 7-10 10-8-4-9 2-5 7-12-6 1-9-5-8-9-2V27l9-2 5-8-2-9zM32 22a11 11 0 100 22 11 11 0 000-22z" fill-rule="evenodd"/>',
+  supplies:'<path d="M5 16l27-9 27 9v36l-27 9-27-9zm8 6v24l15 5V27zm23 5v24l15-5V22z" fill-rule="evenodd"/><path d="M25 3h14v10H25zm0 29h14v5H25z"/>',
+  login:'<path d="M9 12h46v47H9zm8 10v29h30V22z" fill-rule="evenodd"/><path d="M16 3h6v15h-6zm26 0h6v15h-6zM22 29h8v7h-8zm14 0h8v7h-8zM22 41h8v7h-8zm14 0h8v7h-8z"/>',
+  logo:'<path d="M32 4l7 13-7 14-7-14zM20 25l8 14-15 24H2zm24 0l18 38H51L36 39zM26 45h12l8 14H18z"/>'
+ };
+ function icon(name){return '<svg viewBox="0 0 64 64" aria-hidden="true" focusable="false" fill="currentColor">'+(PATHS[name]||PATHS.combat)+'</svg>';}
+ function label(name,text,en){return '<span class="terminalIcon48">'+icon(name)+'</span><span class="terminalLabel48"><b>'+text+'</b><small>'+en+'</small></span>';}
+ var CSS=`
+ :root{--cmd-ink:#101920;--cmd-paper:#f0f5f8;--cmd-dim:#b3c5cf;--cmd-line:#d5e9f338;--cmd-pink:#71e0f4;--cmd-gold:#f1d08d}
+ #gachaDrawer.wishDrawer46{background:#142432}#gachaDrawer .wishStage46{background:#243a49}
+ #gachaDrawer .wishStage46:before{background:linear-gradient(90deg,#172a3a15,transparent 48%,#152b4133)}
+ #gachaDrawer .wishTitle46 h3{color:#fff;text-shadow:0 2px 12px #19344b,0 0 24px #82e6f540}#gachaDrawer .wishTitle46 p{color:#dcf5fc}
+ #gachaDrawer .wishTabs46 button,#gachaDrawer .wishPills46 b,#gachaDrawer .wishSpark46 button{border-radius:3px;border-color:#d3eef250;background:#14283adb;color:#e5f4f9}
+ #gachaDrawer .wishTabs46 button{min-height:40px}#gachaDrawer .wishTabs46 button.on{background:linear-gradient(120deg,#b7eef6,#83d5e5);color:#173443;border-color:#c9f5ff}
+ #gachaDrawer .wishPity46{background:#162c3ee6;border-color:#c5e8f33d;border-radius:4px}#gachaDrawer .pityRow46 span{color:#d7f1f7}
+ #gachaDrawer .pityRail46{background:#d1f0f029;box-shadow:none}#gachaDrawer .pityRail46 i{background:linear-gradient(90deg,#69bfda,#b4f5ff);box-shadow:0 0 9px #8ce6f44d}
+ #gachaDrawer .pityRow46.sr .pityRail46 i{background:linear-gradient(90deg,#9aadc9,#d1dff3)}#gachaDrawer .wishDock46{background:linear-gradient(180deg,#10233300,#102333e8 34%,#102333)}
+ #gachaDrawer #gachaPull1{background:linear-gradient(120deg,#37627b,#234c65);border-color:#a6e2f363;color:#f4fcff;border-radius:4px}#gachaDrawer #gachaPull10{background:linear-gradient(120deg,#b7eef6,#83d5e5);border-color:#c9f5ff;color:#173443;border-radius:4px}
+ #gachaDrawer .wishPetals46 i{background:#e6edf480;box-shadow:0 0 7px #c4f5ff40}#gachaDrawer>.dhead .close{width:40px;height:40px;border-radius:3px;border-color:#c6edf451;background:#162c3edd}
+ .cmdActivities48{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.cmdActivities48 .cmdActivity48{margin:0;min-width:0;padding:20px;min-height:320px}.cmdActivities48 .cmdActions47{margin-top:auto;padding-top:12px}.cmdActivities48 h3{font-size:22px}.cmdActivities48 p{flex:1}@media(max-width:640px){.cmdActivities48{grid-template-columns:1fr}.cmdActivities48 .cmdActivity48{min-height:210px}}
+ .cmdActivity48{min-height:180px;display:flex;flex-direction:column;justify-content:flex-end;background-size:cover;background-position:center;border-left:2px solid #8ce1ef!important}.cmdActivity48 p{max-width:640px;color:#ecf5f8!important}.cmdActivity48 h3,.cmdActivity48 small{text-shadow:0 2px 7px #0b1b28}
+ #menu.homeDock46.terminalLobby48{isolation:isolate}html.landscape46 #menu.homeDock46.terminalLobby48 .bg{inset:0;filter:none!important;background-position:center!important}
+ #menu.homeDock46.terminalLobby48 .bg:after{background:linear-gradient(90deg,#0a11174d,transparent 47%,#14253325),linear-gradient(0deg,#111a25a0,transparent 45%,#10192238)!important}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .menu{position:absolute;inset:0;display:block;width:100%;max-width:none;height:100%;margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;overflow:visible;pointer-events:none;transform:none}
+ html.landscape46 #menu.homeDock46.terminalLobby48 #coverTitle36{top:4%;left:3%;max-width:42%;padding-left:42px;text-shadow:0 2px 10px #07111c80}
+ #menu.homeDock46.terminalLobby48 #coverTitle36 b{font-size:clamp(20px,2.8vw,36px)!important;letter-spacing:.1em!important;background:none;color:#fff;font-weight:650}
+ #menu.homeDock46.terminalLobby48 #coverTitle36 span{padding:3px 0;border:0;border-radius:0;background:none;font-size:8px;letter-spacing:.16em;color:#d8e8ee}
+ .terminalLogo48{position:absolute;left:0;top:0;width:32px;height:44px;color:#f2e4ed;pointer-events:none}.terminalLogo48 svg{width:100%;height:100%}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .heroLive46{width:68%;top:0;bottom:0;mask-image:linear-gradient(90deg,#000 0%,#000 88%,transparent);-webkit-mask-image:linear-gradient(90deg,#000 0%,#000 88%,transparent)}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .heroLiveBreath46{width:60vw;height:98%;margin-left:0}.heroLiveBreath46 img{object-position:center bottom!important}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .heroLiveName46{top:auto;bottom:31%;left:4.4%;max-width:48%;padding:5px 13px;border-left:2px solid #b9eaf4;background:linear-gradient(90deg,#0e1b2580,transparent);text-shadow:0 2px 8px #0c1520}
+ #menu.homeDock46.terminalLobby48 .heroLiveName46 b{font-size:clamp(21px,2.7vw,35px);letter-spacing:.14em;font-weight:600}#menu.homeDock46.terminalLobby48 .heroLiveName46 small{font-size:10px;letter-spacing:.12em;color:#e7eff4}
+ #menu.homeDock46.terminalLobby48 .menu>.top{position:absolute;top:4%;left:auto;right:3%;display:flex;align-items:center;gap:8px;width:auto;max-width:53%;padding:0;margin:0;background:none;border:0;min-height:40px;pointer-events:auto}
+ #menu.homeDock46.terminalLobby48 .menuBrand35,#menu.homeDock46.terminalLobby48 .profile,#menu.homeDock46.terminalLobby48 .utilityButtons37{display:none!important}
+ #menu.homeDock46.terminalLobby48 .coins{display:flex;align-items:center;gap:8px;min-height:40px;padding:0 13px;margin:0;border:1px solid #e8f4ff50!important;border-radius:0!important;background:#1a2b3f80!important;color:#fff;font-size:15px;font-weight:500;white-space:nowrap}
+ #menu.homeDock46.terminalLobby48 .coins svg{width:21px;height:21px;color:#91e3f4}
+ .terminalTop48{display:flex;gap:8px}.terminalTop48 button{position:relative;display:flex;align-items:center;justify-content:center;gap:7px;height:40px;min-width:66px;padding:0 10px;border:1px solid #e8f4ff38;border-radius:0;background:#1a2b3f80;color:#fff;font-size:12px}
+ .terminalTop48 svg{width:19px;height:19px}.terminalTop48 i,.terminalSupport48 i{position:absolute;right:0;top:-5px;min-width:13px;height:15px;padding:1px 3px;background:#eb9553;color:#151e25;font:600 10px/13px system-ui;font-style:normal;clip-path:polygon(15% 0,100% 0,100% 85%,85% 100%,0 100%,0 15%)}
+ .terminalTop48 i:empty,.terminalSupport48 i:empty{display:none}
+ .commandHeading47{position:absolute;top:18%;left:3%;width:23%;padding:0 0 8px 12px;border:0;border-left:2px solid #b7e9f0;z-index:4;background:linear-gradient(90deg,#0d1b2680,transparent);pointer-events:none}
+ .commandHeading47 picture{display:none}.commandHeading47 small{font-size:8px;letter-spacing:.17em;color:#d4e7ec}.commandHeading47 b{font-size:17px;letter-spacing:.1em;margin:4px 0;display:block;color:#fff}.commandHeading47 p{margin:5px 0;color:#dae8ee;font-size:11px}
+ .tacticalDeck48{position:absolute;right:3%;top:27%;bottom:23%;width:25%;max-width:330px;display:grid;grid-template-rows:minmax(56px,1fr) minmax(56px,1fr) minmax(74px,1.35fr) 40px;gap:14px;pointer-events:auto}
+ .tacticalDeck48>button{display:flex;align-items:center;gap:15px;position:relative;width:100%;min-width:0;padding:8px 18px;border:0;border-bottom:1px solid #d8f0f340;border-radius:0;background:linear-gradient(90deg,#20334900,#20334950 20%,#20334965);color:#fff;text-align:left;text-shadow:0 2px 6px #111e2a70;box-shadow:none}
+ .tacticalDeck48>#commandPrepare47{margin-left:7%;width:93%}.terminalIcon48{display:grid;place-items:center;flex:0 0 auto;width:52px;height:52px;margin:0!important;background:none!important}.terminalIcon48 svg{width:100%;height:100%;filter:drop-shadow(0 2px 5px #0b203445)}
+ .terminalLabel48{display:flex;flex-direction:column;align-items:flex-start;gap:4px;min-width:0}.terminalLabel48 b{font-size:clamp(17px,2.2vw,28px);letter-spacing:.08em;font-weight:600;white-space:nowrap}.terminalLabel48 small{font-size:8px;letter-spacing:.16em;color:#cde6ef}
+ .tacticalDeck48>button:after{content:'›';margin-left:auto;font-size:30px;font-weight:300;color:#def8ff}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .start{width:100%;min-height:74px;margin:0;padding:8px 18px;font-size:25px;letter-spacing:.2em;border:0;border-left:2px solid #85eeff;border-radius:0;background:linear-gradient(100deg,#54cbe924,#236c976d)!important;color:#fff!important;text-shadow:0 2px 6px #18384b;box-shadow:none}
+ #menu.homeDock46.terminalLobby48 .start .terminalIcon48{width:72px;height:72px;color:#92eaff}#menu.homeDock46.terminalLobby48 .start .terminalLabel48 b{font-size:clamp(25px,3.2vw,42px)}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .stageMini{position:relative;width:100%;min-height:40px;margin:0;padding:5px 8px;display:grid;grid-template-columns:1fr auto;gap:6px;border:0;border-bottom:2px solid #65dced;border-radius:0;background:#1c30487d;backdrop-filter:none;cursor:pointer}
+ #menu.homeDock46.terminalLobby48 .stageMini img,#menu.homeDock46.terminalLobby48 .stageMini p{display:none}#menu.homeDock46.terminalLobby48 .stageMini h3{font-size:12px;line-height:1.4;color:#e8f5fa;font-weight:500}#menu.homeDock46.terminalLobby48 .stageMini strong{font-size:13px;color:#a9ecff;font-weight:500}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .homeNav46{position:absolute;bottom:4.5%;right:3%;display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;width:51%;max-width:740px;padding:0;margin:0;border:0;border-radius:0;background:none;gap:3px;pointer-events:auto;z-index:6}
+ #menu.homeDock46.terminalLobby48 .homeNav46 button{position:relative;min-height:66px;min-width:0;padding:4px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;border-right:1px solid #d5e8f13b;border-radius:0;background:linear-gradient(0deg,#1427388a,transparent);color:#fff;font-weight:500;font-size:12px;letter-spacing:.05em;text-shadow:0 2px 5px #101e2e;box-shadow:none}
+ #menu.homeDock46.terminalLobby48 .homeNav46 .terminalLabel48{display:flex;width:auto!important;height:auto!important;margin:0!important;background:none!important;border-radius:0}
+ #menu.homeDock46.terminalLobby48 .homeNav46 button:last-child{border-right:0}#menu.homeDock46.terminalLobby48 .homeNav46 .terminalIcon48{width:30px;height:30px}#menu.homeDock46.terminalLobby48 .homeNav46 .terminalLabel48{align-items:center;gap:1px}#menu.homeDock46.terminalLobby48 .homeNav46 b{font-size:12px;font-weight:500}#menu.homeDock46.terminalLobby48 .homeNav46 small{font-size:6px;letter-spacing:.1em}
+ .commandLinks47,.commandRail47{display:none!important}
+ .terminalActivity48{position:absolute;left:3%;bottom:17%;width:31%;max-width:370px;min-height:76px;display:flex;flex-direction:column;justify-content:center;gap:5px;padding:10px 15px;border:1px solid #d1e6f56b;border-left:2px solid #7dddec;border-radius:0;background-position:center;background-size:cover;color:#fff;text-align:left;text-shadow:0 1px 5px #102036;pointer-events:auto;z-index:6}
+ .terminalActivity48 small{font-size:8px;letter-spacing:.15em}.terminalActivity48 b{font-size:15px;font-weight:550;letter-spacing:.04em}.terminalActivity48:after{content:'›';position:absolute;right:10px;top:24px;font-size:25px}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .charSelectPanel{position:absolute!important;top:auto!important;left:3%!important;right:auto!important;bottom:5%!important;width:17%;max-width:200px;margin:0!important;padding:0;border:0;background:none;box-shadow:none;z-index:6}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .characterList{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .charCard{position:relative;width:100%;max-width:none!important;min-width:40px;height:57px!important;padding:2px!important;border:1px solid #ddedf470;border-radius:0;background:#18253980;overflow:hidden;box-shadow:none}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .charCard img{width:100%!important;height:100%!important;object-fit:cover;object-position:center 16%;border:0;border-radius:0;background:transparent}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .charCard.selected{border-color:#90e8fd;box-shadow:inset 0 -3px #90e8fd,0 0 12px #6ed0ee40;background:#2b566a80}
+ #menu.homeDock46.terminalLobby48 .charCard b,#menu.homeDock46.terminalLobby48 .charCard em,#menu.homeDock46.terminalLobby48 .charCard p,#menu.homeDock46.terminalLobby48 .charCard .selectedMark{display:none!important}
+ .terminalSupport48{position:absolute;bottom:5%;left:22%;width:17%;max-width:210px;display:flex;gap:7px;pointer-events:auto;z-index:6}.terminalSupport48 button{position:relative;flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;min-height:57px;min-width:40px;padding:3px;border:1px solid #dae9f24f;border-radius:0;background:#1d304480;color:#fff;font-size:10px;white-space:nowrap}.terminalSupport48 svg{width:25px;height:25px}
+ .commandSignal47{position:absolute;right:3%;bottom:1%;left:auto;z-index:6;display:flex;align-items:center;gap:6px;color:#a6efff;font-size:8px;letter-spacing:.08em;pointer-events:none}.commandSignal47:before{content:'';width:5px;height:5px;background:#7ce8f2;transform:rotate(45deg)}
+ #menu button:focus-visible,#menu .stageMini:focus-visible{outline:2px solid #9cefff;outline-offset:3px}
+ @media(hover:hover){.tacticalDeck48>button:hover,.terminalTop48 button:hover,.terminalSupport48 button:hover,#menu.homeDock46.terminalLobby48 .homeNav46 button:hover{background-color:#54bfdb30;border-color:#92eafb}.terminalActivity48:hover{border-color:#92eafb}}
+ @media(max-height:520px) and (min-width:641px){
+ html.landscape46 #menu.homeDock46.terminalLobby48 #coverTitle36{top:4%;padding-left:31px}#menu.homeDock46.terminalLobby48 #coverTitle36 b{font-size:22px!important}.terminalLogo48{width:24px;height:30px}#menu.homeDock46.terminalLobby48 #coverTitle36 span{font-size:6px}
+ .commandHeading47{top:23%;width:24%;padding-left:8px}.commandHeading47 b{font-size:13px}.commandHeading47 small{font-size:6px}.commandHeading47 p{font-size:9px}
+ .tacticalDeck48{top:23%;bottom:22%;width:28%;gap:6px;grid-template-rows:minmax(40px,1fr) minmax(40px,1fr) minmax(52px,1.25fr) 40px}.tacticalDeck48>button{padding:3px 9px;gap:8px}.terminalIcon48{width:32px;height:32px}.terminalLabel48 b{font-size:18px}.terminalLabel48 small{font-size:6px}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .start{min-height:52px;padding:3px 9px}#menu.homeDock46.terminalLobby48 .start .terminalIcon48{width:45px;height:45px}#menu.homeDock46.terminalLobby48 .start .terminalLabel48 b{font-size:27px}
+ .terminalTop48 button{min-width:55px;font-size:10px;padding:0 7px}.terminalTop48{gap:5px}#menu.homeDock46.terminalLobby48 .coins{font-size:12px;padding:0 8px}
+ .terminalActivity48{min-height:57px;padding:6px 11px;gap:3px;bottom:19%;width:33%}.terminalActivity48 b{font-size:12px}.terminalActivity48 small{font-size:6px}.terminalActivity48:after{top:12px}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .heroLiveName46{bottom:36%;left:4.4%;padding:3px 9px}#menu.homeDock46.terminalLobby48 .heroLiveName46 b{font-size:22px}#menu.homeDock46.terminalLobby48 .heroLiveName46 small{font-size:8px}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .charCard{height:45px!important}html.landscape46 #menu.homeDock46.terminalLobby48 .charSelectPanel{bottom:5.5%!important;width:19%;max-width:180px}.terminalSupport48{bottom:5.5%;left:24%;width:17%}.terminalSupport48 button{min-height:45px;font-size:8px}.terminalSupport48 svg{width:19px;height:19px}
+ #menu.homeDock46.terminalLobby48 .homeNav46 button{min-height:48px}#menu.homeDock46.terminalLobby48 .homeNav46 .terminalIcon48{width:22px;height:22px}#menu.homeDock46.terminalLobby48 .homeNav46 b{font-size:10px}#menu.homeDock46.terminalLobby48 .homeNav46 small{display:none}
+ }
+ @media(max-width:640px){
+ html.landscape46 #menu.homeDock46.terminalLobby48 #coverTitle36{top:3%;left:3%;padding-left:0;max-width:40%}#menu.homeDock46.terminalLobby48 #coverTitle36 b{font-size:21px!important}#menu.homeDock46.terminalLobby48 #coverTitle36 span{font-size:6px;letter-spacing:0}.terminalLogo48{display:none}
+ #menu.homeDock46.terminalLobby48 .menu>.top{top:3%;max-width:53%;gap:4px}.terminalTop48{gap:4px}.terminalTop48 button{min-width:40px;width:40px;padding:0}.terminalTop48 button span{display:none}.terminalTop48 svg{width:18px;height:18px}#menu.homeDock46.terminalLobby48 .coins{min-width:40px;padding:0 5px;font-size:11px;gap:3px}#menu.homeDock46.terminalLobby48 .coins svg{width:14px;height:14px}
+ .commandHeading47{top:14%;width:37%}.commandHeading47 small{font-size:6px}.commandHeading47 b{font-size:14px}.commandHeading47 p{font-size:9px}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .heroLive46{width:76%}html.landscape46 #menu.homeDock46.terminalLobby48 .heroLiveBreath46{width:135vw;margin-left:-27vw;height:90%}html.landscape46 #menu.homeDock46.terminalLobby48 .heroLiveBreath46 img{object-position:center top!important}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .heroLiveName46{left:4%;bottom:35%;max-width:75%;padding:5px 7px}#menu.homeDock46.terminalLobby48 .heroLiveName46 b{font-size:24px}#menu.homeDock46.terminalLobby48 .heroLiveName46 small{font-size:8px}
+ .tacticalDeck48{right:3%;width:40%;top:33%;bottom:28%;gap:14px;grid-template-rows:minmax(50px,1fr) minmax(50px,1fr) minmax(72px,1.3fr) 40px}.tacticalDeck48>button{padding:6px 8px;gap:7px}.terminalIcon48{width:30px;height:30px}.terminalLabel48 b{font-size:17px}.terminalLabel48 small{font-size:6px}.tacticalDeck48>button:after{font-size:20px}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .start{min-height:72px;padding:6px 8px}#menu.homeDock46.terminalLobby48 .start .terminalIcon48{width:40px;height:40px}#menu.homeDock46.terminalLobby48 .start .terminalLabel48 b{font-size:25px}#menu.homeDock46.terminalLobby48 .stageMini h3{font-size:10px}#menu.homeDock46.terminalLobby48 .stageMini strong{font-size:10px}
+ .terminalActivity48{left:3%;width:50%;min-height:67px;bottom:24%;padding:8px 10px}.terminalActivity48 b{font-size:12px}.terminalActivity48 small{font-size:7px}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .charSelectPanel{left:3%!important;bottom:16%!important;width:41%;max-width:none}html.landscape46 #menu.homeDock46.terminalLobby48 .charCard{height:54px!important}
+ .terminalSupport48{left:3%;bottom:9%;width:41%;max-width:none}.terminalSupport48 button{min-height:49px;font-size:10px}.terminalSupport48 svg{width:21px;height:21px}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .homeNav46{width:92%;right:4%;bottom:1.5%;max-width:none}#menu.homeDock46.terminalLobby48 .homeNav46 button{min-height:56px}#menu.homeDock46.terminalLobby48 .homeNav46 .terminalIcon48{width:23px;height:23px}#menu.homeDock46.terminalLobby48 .homeNav46 b{font-size:10px}#menu.homeDock46.terminalLobby48 .homeNav46 small{display:none}.commandSignal47{bottom:9.5%;font-size:7px}
+ }
+ @media(prefers-reduced-motion:reduce){.tacticalDeck48,.terminalActivity48{animation:none!important}}
+ `;
+ function decorate(root,dock,opts,model){
+  root.classList.add('terminalLobby48');
+  var d=global.document,deck=d.getElementById('tacticalDeck48');
+  if(!deck){
+   deck=d.createElement('div');deck.id='tacticalDeck48';deck.className='tacticalDeck48';dock.appendChild(deck);
+   deck.appendChild(d.getElementById('commandCharacter47'));deck.appendChild(d.getElementById('commandPrepare47'));deck.appendChild(d.getElementById('start'));deck.appendChild(dock.querySelector('.stageMini'));
+   var nav=dock.querySelector('.homeNav46');nav.appendChild(d.getElementById('commandHistory47'));
+   var bar=d.createElement('div');bar.className='terminalTop48';bar.innerHTML='<button id="commandMail48" type="button" aria-label="邮箱">'+icon('mail')+'<span>邮箱</span><i id="commandMailUnread48"></i></button><button id="commandNotice48" type="button" aria-label="公告">'+icon('notice')+'<span>公告</span></button>';bar.appendChild(d.getElementById('commandSettings47'));dock.querySelector('.top').appendChild(bar);
+   var support=d.createElement('div');support.className='terminalSupport48';support.appendChild(d.getElementById('commandSupplies47'));support.insertAdjacentHTML('beforeend','<button id="commandLogin48" type="button">'+icon('login')+'签到<i id="commandLoginReady48"></i></button>');root.appendChild(support);
+   var activity=d.createElement('button');activity.id='commandActivity48';activity.className='terminalActivity48';activity.type='button';activity.setAttribute('aria-label','活动与行动入口');activity.innerHTML='<small>活动 / 行动简报　ACTIVITY</small><b id="commandActivityName48"></b>';root.appendChild(activity);
+   root.appendChild(d.getElementById('commandHeading47'));root.appendChild(dock.querySelector('.charSelectPanel'));
+
+  }
+  var title=d.getElementById('coverTitle36');if(title&&!title.querySelector('.terminalLogo48')){var logo=d.createElement('div');logo.className='terminalLogo48';logo.innerHTML=icon('logo');title.appendChild(logo);}
+  // Legacy menu refresh also rewrites nav art. Decorate the real existing buttons afterwards.
+  var navLabels={gacha:['寻访','HEADHUNT'],roster:['仓库','DEPOT'],shop:['采购','STORE'],stage:['关卡','MISSIONS'],archive:['档案','ARCHIVES']};
+  dock.querySelectorAll('.homeNav46 [data-open]').forEach(function(b){var key=b.dataset.open,row=navLabels[key];if(row)b.innerHTML=label(key,row[0],row[1]);});
+  root.querySelectorAll('.charCard[data-character]').forEach(function(b){
+   var id=b.dataset.character,img=b.querySelector('img');if(!img||img.dataset.terminalPortrait===id)return;
+   img.dataset.terminalPortrait=id;img.onerror=function(){this.onerror=null;this.src=opts.art('characters/'+id+'/default/portrait.webp');};
+   img.src=opts.art('ui/tactical/portrait-'+id+'-v3.webp');
+  });
+  d.getElementById('commandHistory47').innerHTML=label('records','战绩','RECORDS');
+  d.getElementById('commandCharacter47').innerHTML=label('operator','干员','OPERATORS');
+  d.getElementById('commandPrepare47').innerHTML=label('equipment','装备整备','EQUIPMENT');
+  d.getElementById('start').innerHTML=label('combat','出击','OPERATION');
+  d.getElementById('commandSettings47').innerHTML=icon('settings')+'<span>设置</span>';d.getElementById('commandSettings47').setAttribute('aria-label','设置');
+  d.getElementById('commandSupplies47').innerHTML=icon('supplies')+'任务补给<i id="commandUnread47"></i>';
+  var coins=dock.querySelector('.coins');coins.innerHTML=icon('gacha')+'<span id="coins">'+String(Math.max(0,Number(model.save.coins)||0))+'</span>';coins.setAttribute('aria-label','樱花币 '+String(model.save.coins||0));
+  d.getElementById('commandActivityName48').textContent=model.mode+' · '+model.mission.name;
+  var activityArt=opts.art('ui/tactical/activity-'+(model.modeId==='mainGod'?'maingod':model.modeId==='testimony'?'testimony':'story')+'-v3.webp');
+  d.getElementById('commandActivity48').style.backgroundImage='linear-gradient(90deg,#14283dbb,#14283d30),url("'+activityArt+'")';
+  d.getElementById('commandHeading47').querySelector('b').textContent='回收行动局';
+  d.getElementById('commandProgress47').textContent='章节 '+model.completed+'/4 · 作战 '+(Number(model.save.runs)||0);
+  d.getElementById('commandSignal47').textContent='离线作战就绪 / OFFLINE MODE';
+ }
+ global.SakurayoTerminal={css:CSS,icon:icon,decorate:decorate};
+})(window);
+
+</script>
+<script>
 (function (global) {
   'use strict';
 
@@ -4422,6 +4637,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   var currentPanel = '';
   var returnFocus = null;
   var panelCharacter = '';
+  var selectedMail = 'welcome';
   var ESC = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
   function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return ESC[c];});}
   function inbox(save){
@@ -4448,54 +4664,12 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     return {ok:true,reason:'',reward:row.reward};
   }
   var CSS = `
-    :root{--cmd-ink:#080e1c;--cmd-paper:#edf0fa;--cmd-dim:#b2bbd1;--cmd-line:#d5dbed26;--cmd-pink:#f4acc7;--cmd-gold:#ead4a1}
-    button{cursor:pointer}button:focus-visible{outline:2px solid #f4acc7;outline-offset:3px}button:disabled{cursor:default}
-    html.landscape46 #menu.homeDock46 .bg{inset:0;filter:none!important;background-position:center!important}
-    #menu.homeDock46 .bg:after{background:linear-gradient(90deg,#070d1918 20%,#070d1900 45%,#070d19b0 72%,#070d19ed),linear-gradient(0deg,#080e1cb0,transparent 28%)!important}
-    html.landscape46 #menu.homeDock46 #coverTitle36{top:max(22px,env(safe-area-inset-top));left:max(28px,env(safe-area-inset-left));max-width:48%;text-shadow:none}
-    #menu.homeDock46 .coverTitle36 b{font-size:clamp(22px,3vw,40px)!important;letter-spacing:.14em!important;background:none;color:#f5f0f1;font-weight:700}
-    #menu.homeDock46 .coverTitle36 span{border:0;border-radius:0;background:none;padding:6px 0;color:#ccd0dd;font-size:9px;letter-spacing:.23em}
-    html.landscape46 #menu.homeDock46 .heroLive46{width:64%;mask-image:linear-gradient(90deg,#000 0%,#000 88%,transparent);-webkit-mask-image:linear-gradient(90deg,#000 0%,#000 88%,transparent)}
-    html.landscape46 #menu.homeDock46 .heroLiveBreath46{width:53vw;height:94%;margin-left:8vw}
-    html.landscape46 #menu.homeDock46 .heroLiveBreath46 img{object-position:center bottom}
-    html.landscape46 #menu.homeDock46 .heroLiveName46{bottom:13%;left:7%;max-width:56%;top:auto;border-left:2px solid #f4acc7;padding:7px 14px;background:linear-gradient(90deg,#080e1cc2,transparent);text-shadow:0 2px 8px #000}
-    #menu.homeDock46 .heroLiveName46 b{font-size:clamp(20px,3vw,34px);font-weight:650;letter-spacing:.17em}
-    #menu.homeDock46 .heroLiveName46 small{color:#d0d7e7;font-size:10px;letter-spacing:.14em}
-    html.landscape46 #menu.homeDock46 .menu{width:34%;max-width:430px;margin:0 3% 0 auto;height:100%;padding:22px 0 18px;display:flex;flex-direction:column;justify-content:flex-end;gap:10px;border:0;background:none;border-radius:0;box-shadow:none;overflow:visible}
-    #menu.homeDock46 .menu>.top{margin:0 0 auto;padding:0;min-height:40px;background:none;border:0;gap:10px;justify-content:flex-end}
-    #menu.homeDock46 .menuBrand35{display:none}
-    #menu.homeDock46 .coins{margin:0 auto 0 0;padding:8px 12px;border-radius:3px!important;background:#101a2ecc!important;border:1px solid var(--cmd-line)!important;color:var(--cmd-gold);font-size:13px}
-    #menu.homeDock46 #moreButton39{width:42px;height:40px;min-height:40px;padding:0;background:#101a2ecc;border:1px solid var(--cmd-line);border-radius:3px;font-size:11px}
-    #menu.homeDock46 .calmUtility39.open39{top:65px;right:0;border-radius:4px;width:220px!important;background:#0d1729fa;border-color:var(--cmd-line)}
-    #menu.homeDock46 .calmUtility39.open39>button{min-height:40px;border-radius:3px;background:#ffffff08;border-color:var(--cmd-line)}
-    .commandHeading47{position:relative;padding:0 0 8px 43px;border-bottom:1px solid var(--cmd-line)}
-    .commandHeading47 picture{position:absolute;left:0;top:8px;width:34px;height:34px;pointer-events:none}.commandHeading47 picture img{width:100%;height:100%;object-fit:contain}
-    .commandHeading47 small{font-size:8px;color:var(--cmd-pink);letter-spacing:.25em}
-    .commandHeading47 b{display:block;margin-top:4px;font-size:20px;font-weight:600;letter-spacing:.18em}
-    .commandHeading47 p{margin:4px 0 0;color:var(--cmd-dim);font-size:10px}
-    html.landscape46 #menu.homeDock46 .charSelectPanel{margin:0!important;padding:0;background:none;border:0}
-    html.landscape46 #menu.homeDock46 .characterList{gap:8px}
-    html.landscape46 #menu.homeDock46 .charCard{max-width:none!important;width:100%;height:60px!important;aspect-ratio:auto;margin:0;padding:3px 0!important;border:1px solid #d5dbed30;border-radius:3px;background:#101a2ecc;display:flex;align-items:center;justify-content:center;gap:6px;overflow:hidden}
-    html.landscape46 #menu.homeDock46 .charCard img{width:42px!important;height:49px!important;object-fit:cover;object-position:center 18%;border-radius:0}
-    html.landscape46 #menu.homeDock46 .charCard b{display:block;font-size:10px;font-weight:500;writing-mode:vertical-rl;letter-spacing:.1em}
-    html.landscape46 #menu.homeDock46 .charCard.selected{border-color:var(--cmd-pink);background:linear-gradient(135deg,#c364851d,#101a2ee0);box-shadow:inset 0 -2px var(--cmd-pink)}
-    #menu.homeDock46 .charCard .selectedMark,#menu.homeDock46 .charCard em,#menu.homeDock46 .charCard p{display:none!important}
-    html.landscape46 #menu.homeDock46 .stageMini{position:relative;cursor:pointer;margin:0;padding:12px;min-height:73px;grid-template-columns:64px 1fr auto;border-radius:3px;background:#101a2ecd;border:1px solid var(--cmd-line);backdrop-filter:none}
-    #menu.homeDock46 .stageMini img{width:64px;height:45px;object-fit:cover;border-radius:1px}
-    #menu.homeDock46 .stageMini h3{font-size:14px;font-weight:600;letter-spacing:.06em}
-    #menu.homeDock46 .stageMini p{display:block;margin:4px 0 0;font-size:9px;color:var(--cmd-dim);line-height:1.4}
-    #menu.homeDock46 .stageMini strong{font-size:22px;font-weight:400;color:var(--cmd-gold)}
-    html.landscape46 #menu.homeDock46 .start{min-height:54px;margin:0;padding:12px;font-size:20px;font-weight:650;letter-spacing:.6em;border-radius:3px;background:linear-gradient(110deg,#f1dac0,#dca6b6)!important;color:#24243c!important;text-shadow:none;border:1px solid #f9e8d2;box-shadow:0 6px 26px #0003}
-    .commandLinks47{display:flex;gap:7px;pointer-events:auto}.commandLinks47 button{flex:1;min-height:40px;border:1px solid var(--cmd-line);background:#101a2ecc;border-radius:3px;color:#dfe4f2;font-size:11px}
-    html.landscape46 #menu.homeDock46 .homeNav46{padding:0;background:none;border:0;border-radius:0;gap:5px;margin:0}
-    #menu.homeDock46 .homeNav46 button{min-height:64px;padding:7px 1px;border:0;border-top:1px solid var(--cmd-line);border-radius:0;background:linear-gradient(#101a2e80,#101a2e10);font-weight:500;font-size:11px;letter-spacing:.08em;box-shadow:none}
-    #menu.homeDock46 .homeNav46 button span{width:30px;height:30px;background:none;border-radius:0;margin-bottom:5px}
-    #menu.homeDock46 .homeNav46 button span img{border-radius:0}
-    .commandRail47{position:absolute;z-index:6;left:max(28px,env(safe-area-inset-left));top:105px;display:flex;gap:8px}
-    .commandRail47 button{height:40px;min-width:52px;padding:8px 12px;border:1px solid var(--cmd-line);background:#080e1cbd;border-radius:3px;font-size:11px;color:#e9e9f4}
-    .commandRail47 button i{font-style:normal;font-size:10px;margin-left:6px;color:#eed5a1}
-    .commandSignal47{position:absolute;left:max(28px,env(safe-area-inset-left));bottom:max(18px,env(safe-area-inset-bottom));z-index:6;max-width:55%;display:flex;align-items:center;gap:9px;color:#c3cbdb;font-size:9px;letter-spacing:.12em}
-    .commandSignal47:before{content:'';width:5px;height:5px;border-radius:50%;background:#acd4ca;box-shadow:0 0 10px #acd4ca60}
+    button{cursor:pointer}button:focus-visible{outline:2px solid #83e4f2;outline-offset:3px}button:disabled{cursor:default}
+    .cmdMailbox48{display:grid;grid-template-columns:minmax(210px,31%) 1fr;gap:20px}.cmdMailList48{display:grid;align-content:start;gap:7px}.cmdMailList48 button{position:relative;min-height:65px;padding:12px 14px;border:1px solid var(--cmd-line);background:#1c2b39;color:#e8f0f5;text-align:left;font-size:12px}.cmdMailList48 button small{display:block;color:var(--cmd-dim);font-size:9px;margin-top:6px}.cmdMailList48 button.on{border-color:#8ce1ef;background:#244556}.cmdMailList48 button.unread:before{content:'';position:absolute;right:8px;top:8px;width:6px;height:6px;background:#efb26c;transform:rotate(45deg)}
+    .cmdMailLetter48{min-height:320px;padding:30px;background:linear-gradient(135deg,#ffffff08,transparent),#172631;border:1px solid var(--cmd-line)}.cmdMailLetter48>small{font-size:10px;letter-spacing:.15em;color:var(--cmd-pink)}.cmdMailLetter48 h3{font-size:24px;font-weight:550;margin:18px 0}.cmdMailLetter48 p{font-size:13px;color:#cbdce6;line-height:1.9;max-width:650px}.cmdMailAttachment48{display:flex;align-items:center;gap:13px;margin:28px 0;padding:15px;border:1px solid var(--cmd-line);max-width:260px;background:#90d9eb0a}.cmdMailAttachment48 svg{width:35px;height:35px;color:var(--cmd-gold)}.cmdMailAttachment48 b{font-size:18px}.cmdMailAttachment48 small{display:block;font-size:10px;color:var(--cmd-dim);margin-top:4px}
+    .cmdLogin48{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;margin:26px 0}.cmdLoginDay48{min-height:140px;padding:15px 5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#1b2c3a;border:1px solid var(--cmd-line)}.cmdLoginDay48 small{font-size:10px;letter-spacing:.1em;color:var(--cmd-dim)}.cmdLoginDay48 svg{width:30px;height:30px;color:var(--cmd-gold)}.cmdLoginDay48 b{font-size:21px;font-weight:550}.cmdLoginDay48 span{font-size:10px;color:#b7cddd}.cmdLoginDay48.on{border-color:#90e8fd;background:#204454}.cmdLoginDay48.done{opacity:.55}.cmdLoginDay48.done span{color:#9dedce}
+    .cmdNotice48{max-width:850px;padding:24px;margin-bottom:15px;border:1px solid var(--cmd-line);border-left:2px solid #8ce1ef;background:#182a37}.cmdNotice48 small{font-size:9px;letter-spacing:.15em;color:var(--cmd-pink)}.cmdNotice48 h3{margin:12px 0;font-size:22px;font-weight:500}.cmdNotice48 p{font-size:13px;color:#cbdce6;line-height:1.8}.cmdActions47 button:disabled{background:#263847!important;color:#8ea4b3!important;border-color:var(--cmd-line)!important}
+    @media(max-width:640px){.cmdMailbox48{grid-template-columns:1fr}.cmdMailList48{max-height:190px;overflow:auto}.cmdMailLetter48{min-height:280px;padding:20px}.cmdLogin48{grid-template-columns:repeat(2,1fr)}.cmdLoginDay48{min-height:110px}.cmdLoginDay48:last-child{grid-column:1/-1}}
     .drawer:not(.wishDrawer46){background:radial-gradient(ellipse at 15% 0,#22324b70,transparent 50%),#0a1020!important;color:var(--cmd-paper)}
     .drawer>.dhead{border-color:var(--cmd-line)!important;background:none!important}
     .drawer>.dhead h2{color:var(--cmd-paper)!important;text-shadow:none!important;font-size:20px;font-weight:600;letter-spacing:.13em!important}
@@ -4505,14 +4679,14 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     #archiveDrawer .archiveDock46 button small{color:#c1cada}
     #stageList .stageCard{border-radius:4px;border-color:var(--cmd-line);box-shadow:none}
     #stageList .stageCard .i{padding-top:90px}
-    #stageList .stageCard button,.modeBar46 button.on{background:#dbc0be!important;color:#252638!important;border-radius:3px!important;border-color:#eddddd!important;box-shadow:none}
+    #stageList .stageCard button,.modeBar46 button.on{background:#8ce1ef!important;color:#252638!important;border-radius:3px!important;border-color:#c7f4fa!important;box-shadow:none}
     #stageList .modeBar46{grid-column:1/-1;margin-bottom:4px}
     .modeBar46 button{min-height:56px;border-radius:3px;background:#152038;border-color:var(--cmd-line);font-weight:600}
     .modeBar46 button small,.modeBar46 button.on small{color:inherit}
     #shopDrawer .skinCard,#shopDrawer .shopItem40,#shopWallet44,#shopDrawer .shopTabs40,#shopDrawer .shopTabs40 button{border-radius:4px;border-color:var(--cmd-line);background:#131e32;box-shadow:none}
-    #shopDrawer .shopTabs40 button.on{background:#dbc0be;color:#252638;border-color:#eddddd}
+    #shopDrawer .shopTabs40 button.on{background:#8ce1ef;color:#252638;border-color:#c7f4fa}
     #shopDrawer .skinPreview{border-radius:0;background-color:#152339}
-    #shopDrawer .skinCard>button,#shopDrawer .shopItem40 button,#shopDrawer .shopUpgrade40{min-height:40px;border-radius:3px!important;background:#dbc0be!important;color:#252638!important;border-color:#eddddd!important}
+    #shopDrawer .skinCard>button,#shopDrawer .shopItem40 button,#shopDrawer .shopUpgrade40{min-height:40px;border-radius:3px!important;background:#8ce1ef!important;color:#252638!important;border-color:#c7f4fa!important}
     .wishStage46{background:#0a1020}.wishTitle46 b{text-shadow:none}.wishTitle46 p{color:#e0dbe5}.wishDock46{border-radius:4px;border-color:var(--cmd-line);background:#0c1425e0;box-shadow:none}
     .wishPull46{border-radius:3px;min-height:44px}.rosterSlot46,.rosterPeekCard46{border-radius:4px;border-color:var(--cmd-line)}
     #talentDrawer .talent,#storyDrawer .storyCard,#ascDrawer .storyCard,#achDrawer .ach{border-radius:4px!important;background:#131e32!important;border-color:var(--cmd-line)!important;box-shadow:none}
@@ -4528,13 +4702,13 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     .cmdSheet47 .cmdRole47{font-size:12px;color:var(--cmd-pink);letter-spacing:.12em}
     .cmdSheet47 p{color:var(--cmd-dim);line-height:1.75;font-size:12px}
     .cmdTabs47{display:flex;gap:8px;flex-wrap:wrap}.cmdTabs47 button{padding:8px 15px;min-height:40px;background:#19253b;border:1px solid var(--cmd-line);border-radius:3px;color:#ccd6e5;font-size:12px}
-    .cmdTabs47 button.on{background:#dbc0be;color:#252638;border-color:#eddddd}
+    .cmdTabs47 button.on{background:#8ce1ef;color:#252638;border-color:#c7f4fa}
     .cmdTags47{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0}.cmdTags47 span{padding:5px 10px;border:1px solid var(--cmd-line);font-size:10px;color:#cee0eb}
     .cmdLoadout47{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
     .cmdLoadout47>div{background:#141e32;border:1px solid var(--cmd-line);padding:12px;min-width:0;border-radius:3px}
     .cmdLoadout47 small{display:block;font-size:9px;color:#899ab5;letter-spacing:.12em;margin-bottom:6px}.cmdLoadout47 b{font-size:12px;font-weight:600}
     .cmdActions47{display:flex;gap:9px;margin:14px 0;flex-wrap:wrap}.cmdActions47 button{min-height:42px;padding:10px 22px;border-radius:3px;background:#19253b;border:1px solid var(--cmd-line);font-size:12px}
-    .cmdActions47 button.primary47,.cmdSupply47 button{background:#dbc0be;color:#252638;border:1px solid #eddddd}
+    .cmdActions47 button.primary47,.cmdSupply47 button{background:#8ce1ef;color:#252638;border:1px solid #c7f4fa}
     .cmdMission47{min-height:170px;padding:24px;display:flex;flex-direction:column;justify-content:flex-end;background-size:cover;background-position:center;border:1px solid var(--cmd-line)}
     .cmdMission47 small{font-size:10px;color:var(--cmd-pink);letter-spacing:.1em}.cmdMission47 h3{font-size:25px;margin:8px 0}.cmdMission47 p{font-size:11px;margin:0;color:#d0d7e7}
     .cmdNotes47{padding:14px;border-left:2px solid var(--cmd-gold);background:#ead4a10a;color:#c9d3e5;font-size:11px;line-height:1.8}
@@ -4545,39 +4719,16 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     .cmdEmpty47{padding:30px;text-align:center;color:var(--cmd-dim);font-size:13px;border:1px solid var(--cmd-line)}
     .cmdHistory47{display:grid;gap:10px}.cmdRun47{display:grid;grid-template-columns:80px 1fr auto;gap:18px;align-items:center;padding:16px;background:#131e32;border:1px solid var(--cmd-line)}
     .cmdRun47 b{color:var(--cmd-gold);font-size:15px}.cmdRun47 p{margin:5px 0;color:var(--cmd-dim);font-size:11px}.cmdRun47 span{font-size:12px}
-    @media(max-height:520px) and (min-width:641px){
-      html.landscape46 #menu.homeDock46 .menu{padding:12px 0;gap:7px;max-width:390px}
-      .commandHeading47 b{font-size:17px}.commandHeading47 p{font-size:9px}.commandHeading47{padding-bottom:5px}
-      html.landscape46 #menu.homeDock46 .charCard{height:49px!important}html.landscape46 #menu.homeDock46 .charCard img{height:40px!important;width:32px!important}
-      html.landscape46 #menu.homeDock46 .stageMini{min-height:58px;padding:7px 10px;grid-template-columns:49px 1fr auto}#menu.homeDock46 .stageMini img{width:49px;height:38px}
-      html.landscape46 #menu.homeDock46 .start{min-height:46px;padding:9px;font-size:18px}.commandLinks47 button{min-height:40px;font-size:10px}
-      #menu.homeDock46 .homeNav46 button{min-height:53px;font-size:10px;padding:6px 1px}#menu.homeDock46 .homeNav46 button span{width:23px;height:23px;margin-bottom:4px}
-      html.landscape46 #menu.homeDock46 #coverTitle36{top:16px;left:24px}.commandRail47{top:83px;left:24px}
-      #commandDrawer47{padding-top:10px}.cmdSheet47{padding:0}.cmdSheet47 h3{margin-top:10px}.cmdLoadout47{margin:10px 0}.cmdPortrait47>img{height:290px}
-    }
-    @media(max-width:640px){
-      html.landscape46 #menu.homeDock46 .menu{width:46%;margin-right:3%;padding-top:20px;gap:10px}
-      html.landscape46 #menu.homeDock46 .heroLive46{width:60%}html.landscape46 #menu.homeDock46 .heroLiveBreath46{width:80vw;margin-left:-10vw;height:75%}
-      html.landscape46 #menu.homeDock46 #coverTitle36{left:14px;max-width:45%}.commandRail47{left:14px;top:110px;flex-direction:column;gap:7px}
-      .commandRail47 button{min-height:40px;padding:8px}.commandSignal47{left:14px;max-width:45%;font-size:8px;line-height:1.6}
-      .commandHeading47 b{font-size:15px}.commandHeading47 p{font-size:9px}html.landscape46 #menu.homeDock46 .charCard{height:56px!important;gap:1px}
-      html.landscape46 #menu.homeDock46 .charCard img{width:28px!important;height:40px!important}html.landscape46 #menu.homeDock46 .charCard b{font-size:8px}
-      html.landscape46 #menu.homeDock46 .stageMini{grid-template-columns:1fr auto;padding:10px;min-height:70px}#menu.homeDock46 .stageMini img{display:none}#menu.homeDock46 .stageMini h3{font-size:12px}
-      #menu.homeDock46 .homeNav46 button{font-size:9px;min-height:54px}#menu.homeDock46 .homeNav46 button span{width:22px;height:22px}
-      .cmdSplit47{grid-template-columns:1fr;gap:12px}.cmdPortrait47{min-height:200px}.cmdPortrait47>img{height:240px}.cmdSupplies47{grid-template-columns:1fr}
-      .cmdSupply47{grid-template-columns:32px 1fr auto;padding:12px;gap:8px}.cmdRun47{grid-template-columns:58px 1fr;gap:10px}.cmdRun47>span{grid-column:2}
-      #archiveDrawer .archiveDock46{grid-template-columns:1fr 1fr!important;min-height:0!important}#archiveDrawer .archiveDock46 button{min-height:170px;padding:16px}
-    }
-    @media(max-height:360px){html.landscape46 #menu.homeDock46 .menu{gap:4px;padding:8px 0}.commandHeading47{display:none}html.landscape46 #menu.homeDock46 .start{min-height:40px}.commandRail47{top:70px}.commandSignal47{font-size:8px}}
+    @media(max-width:640px){.cmdSplit47{grid-template-columns:1fr;gap:12px}.cmdPortrait47{min-height:200px}.cmdPortrait47>img{height:240px}.cmdSupplies47{grid-template-columns:1fr}.cmdSupply47{grid-template-columns:32px 1fr auto;padding:12px;gap:8px}.cmdRun47{grid-template-columns:58px 1fr;gap:10px}.cmdRun47>span{grid-column:2}#archiveDrawer .archiveDock46{grid-template-columns:1fr 1fr!important;min-height:0!important}}
     @keyframes commandEnter47{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
     #commandDrawer47:not(.hidden) #commandBody47{animation:commandEnter47 .22s ease-out both}
     .commandLinks47 button,.commandRail47 button,.cmdActions47 button,.cmdTabs47 button{transition:background-color .15s,border-color .15s}
-    @media(hover:hover){.commandLinks47 button:hover,.commandRail47 button:hover,.cmdActions47 button:hover{border-color:#f4acc7;background-color:#25324a}.cmdTabs47 button:hover{border-color:#f4acc7}}
+    @media(hover:hover){.commandLinks47 button:hover,.commandRail47 button:hover,.cmdActions47 button:hover{border-color:#83e4f2;background-color:#25324a}.cmdTabs47 button:hover{border-color:#83e4f2}}
     @media(prefers-reduced-motion:reduce){.heroLiveSway46,.heroLiveBreath46,#commandBody47{animation:none!important}.heroLivePhys46,.heroLiveLook46,.commandLinks47 button,.commandRail47 button,.cmdActions47 button,.cmdTabs47 button{transition:none!important}}
   `;
   function style(){
     var d=global.document,node=d.getElementById('sakurayo-command-css');
-    if(!node){node=d.createElement('style');node.id='sakurayo-command-css';node.textContent=CSS;}
+    if(!node){node=d.createElement('style');node.id='sakurayo-command-css';node.textContent=CSS+(global.SakurayoTerminal?global.SakurayoTerminal.css:"");}
     if(d.head.lastElementChild!==node)d.head.appendChild(node); // last: lobby refresh may inject its older stylesheet again
   }
   function bind(selector,fn){var n=global.document.querySelector(selector);if(n)n.onclick=fn;}
@@ -4595,7 +4746,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     var focused=global.document.activeElement;
     var focusId=refresh&&focused?focused.id:'';
     var focusCharacter=refresh&&focused&&focused.dataset?focused.dataset.character:'';
-    if(!refresh){options.closeDrawers();returnFocus=focused;panelCharacter=options.model().character.id;}
+    if(!refresh){var launcher=currentPanel?returnFocus:null;options.closeDrawers();returnFocus=launcher&&launcher.isConnected?launcher:focused;panelCharacter=options.model().character.id;}
     currentPanel=kind;
     var d=global.document,drawer=d.getElementById('commandDrawer47');
     if(!drawer){
@@ -4604,7 +4755,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       drawer.innerHTML='<div class="dhead"><div><small id="commandEyebrow47"></small><h2 id="commandTitle47"></h2></div><button class="close" type="button" aria-label="返回大厅">×</button></div><div id="commandBody47"></div>';
       d.body.appendChild(drawer);drawer.querySelector('.close').onclick=close;
     }
-    var model=options.model(),titles={character:['OPERATOR FILE','作战角色'],prepare:['SORTIE PREPARATION','出击整备'],supplies:['RECOVERY SUPPLIES','回收补给'],history:['COMBAT RECORD','近期战绩']};
+    var model=options.model(),titles={character:['OPERATOR FILE','作战角色'],prepare:['SORTIE PREPARATION','出击整备'],supplies:['RECOVERY TASKS','任务补给'],history:['COMBAT RECORD','近期战绩'],mail:['DISPATCH INBOX','邮箱'],login:['SEVEN DAY SUPPLY','七日登录签到'],notice:['BUREAU BULLETIN','公告'],activities:['FIELD OPERATIONS','活动与行动']};
+    if(!titles[kind])return;
     d.getElementById('commandEyebrow47').textContent=titles[kind][0];
     d.getElementById('commandTitle47').textContent=titles[kind][1];
     var body=d.getElementById('commandBody47');
@@ -4627,6 +4779,25 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }else if(kind==='supplies'){
       body.innerHTML='<p class="cmdNotes47">战斗与章节回收留下的补给。每份仅领取一次，完成记录保存在本机。</p><div class="cmdSupplies47">'+inbox(model.save).map(function(r){return '<article class="cmdSupply47"><span>'+ (r.claimed?'✓':r.ready?'✦':'◇')+'</span><div><b>'+esc(r.title)+'</b><p>'+esc(r.desc)+'</p><small>樱花币 +'+r.reward+'</small></div><button data-supply="'+r.id+'" '+(r.claimed||!r.ready?'disabled':'')+'>'+ (r.claimed?'已领取':r.ready?'领取':'待完成')+'</button></article>';}).join('')+'</div>';
       body.querySelectorAll('[data-supply]').forEach(function(b){b.onclick=function(){b.disabled=true;options.claim(b.dataset.supply);panel('supplies',true);};});
+    }else if(kind==='mail'){
+      var S=global.SakurayoServices,letters=S.mailbox(model.save,global.SakurayoCommand);
+      var letter=letters.filter(function(m){return m.id===selectedMail;})[0]||letters[0];selectedMail=letter.id;
+      if(!letter.read){S.markRead(model.save,letter.id,global.SakurayoCommand);options.persist();letters=S.mailbox(model.save,global.SakurayoCommand);letter=letters.filter(function(m){return m.id===selectedMail;})[0];}
+      var canClaim=letters.some(function(m){return !m.claimed;});
+      body.innerHTML='<div class="cmdMailbox48"><div class="cmdMailList48">'+letters.map(function(m){return '<button type="button" id="mail48-'+m.id+'" data-mail="'+m.id+'" class="'+(m.id===selectedMail?'on ':'')+(m.read?'':'unread')+'"><b>'+esc(m.title)+'</b><small>'+esc(m.sender)+' / '+(m.claimed?'已领取':m.read?'已读 · 待领取':'未读')+'</small></button>';}).join('')+'</div><article class="cmdMailLetter48"><small>DISPATCH / '+esc(letter.id.toUpperCase())+'</small><h3>'+esc(letter.title)+'</h3><p>发件人：'+esc(letter.sender)+'</p><p>'+esc(letter.desc)+'</p><p>这份补给存放在你的本机档案中。任务与邮件共用领取记录。</p><div class="cmdMailAttachment48">'+global.SakurayoTerminal.icon('supplies')+'<div><b>'+letter.reward+'</b><small>樱花币</small></div></div><div class="cmdActions47"><button class="primary47" id="commandMailClaim48" '+(letter.claimed?'disabled':'')+'>'+(letter.claimed?'附件已领取':'领取附件')+'</button><button id="commandMailAll48" '+(canClaim?'':'disabled')+'>一键领取</button></div></article></div>';
+      body.querySelectorAll('[data-mail]').forEach(function(b){b.onclick=function(){selectedMail=b.dataset.mail;panel('mail',true);};});
+      bind('#commandMailClaim48',function(){var result=S.claimMail(model.save,selectedMail,global.SakurayoCommand);if(result.ok){options.persist();options.notify('邮件补给已领取 · 樱花币 +'+result.reward);}panel('mail',true);});
+      bind('#commandMailAll48',function(){var result=S.claimAll(model.save,global.SakurayoCommand);if(result.ok){options.persist();options.notify('已领取 '+result.count+' 份邮件 · 樱花币 +'+result.reward);}panel('mail',true);});
+    }else if(kind==='login'){
+      var status=global.SakurayoServices.loginStatus(model.save),label=status.reason==='complete'?'七日补给已全部领取':status.reason==='clock'?'请检查本机日期':status.reason==='claimed'?'今日已签到':'签到领取 · 樱花币 +'+status.reward;
+      body.innerHTML='<article class="cmdNotice48"><small>WELCOME BACK / '+esc(status.today)+'</small><h3>每一次归来，都有新的补给。</h3><p>累计七个登录日，无需连续签到。本机日期每日最多领取一次；七日完成后不重复循环。已完成 '+status.count+' / 7 天。</p></article><div class="cmdLogin48">'+status.rewards.map(function(reward,i){return '<article class="cmdLoginDay48 '+(i<status.count?'done':i===status.count?'on':'')+'"><small>DAY '+(i+1)+'</small>'+global.SakurayoTerminal.icon('supplies')+'<b>'+reward+'</b><span>'+(i<status.count?'已领取':i===status.count?'本次补给':'待签到')+'</span></article>';}).join('')+'</div><div class="cmdActions47"><button class="primary47" id="commandLoginClaim48" '+(status.ready?'':'disabled')+'>'+label+'</button></div>';
+      bind('#commandLoginClaim48',function(){var result=global.SakurayoServices.claimLogin(model.save);if(result.ok){options.persist();options.notify('签到完成 · 樱花币 +'+result.reward);}panel('login',true);});
+    }else if(kind==='notice'){
+      body.innerHTML='<article class="cmdNotice48"><small>UPDATE / DEVELOPMENT BUILD</small><h3>4.6.0 · 行动终端更新</h3><p>新大厅加入邮箱、七日登录签到、任务补给与活动入口。邮件与任务共享领取状态，进度保存在本机。四章插画和场景动画已更新。</p><p>当前为开发预发布版本；新 Android 安装包尚未发布。</p></article><article class="cmdNotice48"><small>FIELD MANUAL</small><h3>关于这场回收行动</h3><p>三名作战角色，四章战场。回收演习保留职业、转职、融合与三相飞升的肉鸽构筑；证词模式侧重剧情；主神空间提供高难轮回挑战。</p><p>寻访、装备、剧情档案与历史战绩均可从大厅进入。导出存档请前往设置。</p></article><div class="cmdActions47"><button id="commandNoticeActivity48">查看活动与行动</button></div>';
+      bind('#commandNoticeActivity48',function(){panel('activities');});
+    }else if(kind==='activities'){
+      body.innerHTML='<div class="cmdActivities48">'+[['story','回收行动 · 四章演习','三名角色出击，收集随机升级并组合职业、转职与融合。'],['testimony','证词回收 · 剧情档案','沿着四章剧情完成证词回收。此模式不发放随机升级卡。'],['mainGod','主神空间 · 高难轮回','进入独立的主神试炼与兑换界面，解锁条件沿用现有游戏规则。']].map(function(a){return '<article class="cmdNotice48 cmdActivity48" style="background-image:linear-gradient(90deg,#102332e6,#10233299),url(&quot;'+esc(options.art('ui/tactical/activity-'+(a[0]==='mainGod'?'maingod':a[0])+'-v3.webp'))+'&quot;)"><small>LOCAL OPERATION / '+a[0].toUpperCase()+'</small><h3>'+a[1]+'</h3><p>'+a[2]+'</p><div class="cmdActions47"><button data-operation="'+a[0]+'">进入行动 →</button></div></article>';}).join('')+'</div>';
+      body.querySelectorAll('[data-operation]').forEach(function(b){b.onclick=function(){close();options.chooseMode(b.dataset.operation);};});
     }else{
       body.innerHTML=model.history.length?'<div class="cmdHistory47">'+model.history.slice(0,12).map(function(r){return '<article class="cmdRun47"><b>'+esc(r.win?'回收成功':'战斗结束')+'</b><div><strong>'+esc(r.character)+' · '+esc(r.stage)+'</strong><p>'+esc(r.mode)+' / Lv.'+esc(r.level)+' / '+esc(r.kills)+' 击破 / '+esc(r.duration)+'</p></div><span>'+esc(r.date)+'</span></article>';}).join('')+'</div>':'<div class="cmdEmpty47">暂无战绩。完成第一次出击后，回收记录会显示在这里。</div>';
     }
@@ -4660,17 +4831,29 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       });
     }
     var m=options.model(),unread=inbox(m.save).filter(function(r){return r.ready&&!r.claimed;}).length;
-    d.getElementById('commandProgress47').textContent='四章回收 '+m.completed+' / 4 · '+m.mode;
+    if(global.SakurayoTerminal)global.SakurayoTerminal.decorate(root,dock,options,m);
+    if(!global.SakurayoTerminal)d.getElementById('commandProgress47').textContent='四章回收 '+m.completed+' / 4 · '+m.mode;
     d.getElementById('commandUnread47').textContent=unread?String(unread):'';
     bind('#commandCharacter47',function(){panel('character');});
     bind('#commandSupplies47',function(){panel('supplies');});
     bind('#commandSettings47',function(){options.settings();});
     bind('#commandPrepare47',function(){panel('prepare');});
     bind('#commandHistory47',function(){panel('history');});
+    if(global.SakurayoServices){
+      d.getElementById('commandMailUnread48').textContent=global.SakurayoServices.mailbox(m.save,global.SakurayoCommand).filter(function(row){return !row.read;}).length||'';
+      d.getElementById('commandLoginReady48').textContent=global.SakurayoServices.loginStatus(m.save).ready?'!':'';
+      bind('#commandMail48',function(){panel('mail');});bind('#commandNotice48',function(){panel('notice');});bind('#commandLogin48',function(){panel('login');});bind('#commandActivity48',function(){panel('activities');});
+    }
     var mission=dock.querySelector('.stageMini');mission.setAttribute('role','button');mission.tabIndex=0;mission.setAttribute('aria-label','选择模式与关卡');mission.onclick=function(){options.open('stage');};mission.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();options.open('stage');}};
     dock.querySelectorAll('.charCard').forEach(function(b){b.setAttribute('aria-label',b.textContent.trim());b.setAttribute('aria-pressed',b.classList.contains('selected')?'true':'false');});
   }
-  global.SakurayoCommand={inbox:inbox,claimSupply:claimSupply,mount:mount,panel:panel,close:close};
+  function settingsUtilities(actions){
+    var d=global.document,body=d.getElementById('settingsBody37');if(!body)return;
+    var section=d.getElementById('commandUtilities48');if(!section){section=d.createElement('section');section.id='commandUtilities48';section.className='cmdNotice48';body.appendChild(section);}
+    section.innerHTML='<small>LOCAL UTILITIES</small><h3>帮助与开发工具</h3><div class="cmdActions47">'+actions.map(function(a){return '<button type="button" id="'+esc(a.id)+'">'+esc(a.label)+'</button>';}).join('')+'</div>';
+    actions.forEach(function(a){bind('#'+a.id,a.open);});
+  }
+  global.SakurayoCommand={inbox:inbox,claimSupply:claimSupply,mount:mount,panel:panel,close:close,settingsUtilities:settingsUtilities};
 })(window);
 
 </script>
@@ -12044,7 +12227,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function paintHomeBg46(){
     const bg=$("#menu .bg");
     if(!bg)return;
-    bg.style.backgroundImage=`url('${artUrl("ui/lobby-command-v2.webp")}')`;
+    bg.style.backgroundImage=`url('${artUrl("ui/tactical/lobby-outpost-v3.webp")}')`;
     bg.style.backgroundPosition="center 30%";
     bg.style.backgroundSize="cover";
     $("#menu")?.classList.add("lobbyWide46");
@@ -12273,6 +12456,16 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   }
   installLobby46();
   installOps46();
+  const _terminalSettings48=openSettings37;
+  openSettings37=function(){
+    const result=_terminalSettings48();
+    window.SakurayoCommand?.settingsUtilities([
+      {id:'commandGuide48',label:'新手说明',open:()=>openTutorial37(false)},
+      {id:'commandStats48',label:'战斗统计',open:openAnalytics37},
+      {id:'commandModkit48',label:'扩展包管理',open:openModKit42}
+    ]);
+    return result;
+  };
   function commandModel47(){
     const character=c=>({...c,schools:c.bias.map(id=>SCHOOL[id]?.n||id)});
     const shop=save.shop40||{},modeId=pendingMode46;
@@ -12291,7 +12484,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   }
   function refreshCommand47(){
     window.SakurayoCommand?.mount({art:artUrl,model:commandModel47,open:openDrawer,closeDrawers,
-      settings:openSettings37,start:startGame,
+      settings:openSettings37,start:startGame,persist,notify:toast,
+      chooseMode(mode){pendingMode46=mode==='testimony'?'testimony':mode==='mainGod'?'mainGod':'story';openDrawer('stage');renderStages();},
       selectCharacter(id){if(!CHARACTERS35[id])return;save.character=id;persist();},
       claim(id){const result=window.SakurayoCommand.claimSupply(save,id);if(result.ok){persist();toast(`补给已回收 · 樱花币 +${result.reward}`);}return result;}
     });

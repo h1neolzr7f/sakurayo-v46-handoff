@@ -167,7 +167,7 @@ try {
   assert.equal(await page.locator("#characterList .charCard").count(), 3);
   assert.equal(await page.locator("#start").isVisible(), true);
   assert.equal(await page.locator("#coverTitle36").isVisible(), true);
-  assert.match(await page.locator("#menu .bg").evaluate(node => node.style.backgroundImage), /lobby-command-v2\.webp/);
+  assert.match(await page.locator("#menu .bg").evaluate(node => node.style.backgroundImage), /ui\/tactical\/lobby-outpost-v3\.webp/);
   await page.waitForFunction(() => {
     const boot = new Set(window.__SAKURAYO_ART__?.boot() || []);
     return window.__SAKURAYO_ART__?.status().filter(item => boot.has(item.path)).every(item => item.ready);
@@ -176,16 +176,14 @@ try {
   assert.equal(artStatus.length, 20);
   assert.equal(artStatus.filter(item => item.ready).length, 12);
   assert.equal(artStatus.filter(item => !item.loaded).length, 8);
-  assert.equal(await page.locator("#menu .nav img").count(), 5);
+  assert.equal(await page.locator("#menu .homeNav46 .terminalIcon48 svg").count(), 6);
   assert.ok(await page.locator("#characterList .charCard img").evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0)));
   await page.waitForFunction(() => {
     const image = document.querySelector("#menu .menuBrand35");
     return image?.complete && image.naturalWidth > 0;
   });
-  if (!(await page.locator("#statsButton37").isVisible())) {
-    await page.locator("#moreButton39").click();
-  }
-  await page.locator("#modKitButton42").click();
+  await page.locator("#commandSettings47").click();
+  await page.locator("#commandModkit48").click();
   assert.equal(await page.locator("#modKitDrawer42 .modKitPack42").count(), 5);
   assert.equal(await page.locator("#modKitDrawer42 .modKitPack42.enabled").count(), 5);
   assert.match(await page.locator("#modKitDrawer42 .modKitSummary42").textContent(), /5\/5 已启用/);
@@ -395,15 +393,13 @@ try {
   assert.equal(await page.locator("#dialogueChapter").count(), 1);
   await api(page, "dismissDialogue");
   await api(page, "backMenu");
-  if (!(await page.locator("#statsButton37").isVisible())) {
-    await page.locator("#moreButton39").click();
-  }
-  assert.equal(await page.locator("#statsButton37").isVisible(), true);
-  await page.locator("#statsButton37").click();
+  await page.locator("#commandSettings47").click();
+  assert.equal(await page.locator("#commandStats48").isVisible(), true);
+  await page.locator("#commandStats48").click();
   assert.equal(await page.locator("#analyticsDrawer37").isVisible(), true);
   assert.match(await page.locator("#analyticsText37").inputValue(), /"version": "4.6.0"/);
   await page.locator("#analyticsDrawer37 .close").click();
-  await page.locator("#settingsButton37").click();
+  await page.locator("#commandSettings47").click();
   assert.equal(await page.locator("#settingsDrawer37").isVisible(), true);
   assert.equal(await page.locator("#settingsBody37 input[type=range]").count(), 3);
   assert.equal(await page.locator("#settingsBody37 [data-toggle]").count(), 2);
