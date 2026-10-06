@@ -1283,7 +1283,7 @@
     if (!drawer) return;
     var items = Array.isArray(results) ? results : [];
     var old = global.document.getElementById("gachaReveal46");
-    if (old && old.parentNode) old.parentNode.removeChild(old);
+    if (old) global.SakurayoUI.close(old);
     if (!items.length) return;
     var instant = testMode();
     var overlay = global.document.createElement("div");
@@ -1344,9 +1344,12 @@
       })(cards[i], i);
     }
     var take = overlay.querySelector(".revealTake46");
+    global.SakurayoUI.open(overlay, {nested:true,initialFocus:take,onClose:function(){
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    }});
     if (take) {
       take.onclick = function () {
-        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        global.SakurayoUI.close(overlay);
       };
     }
     var skip = overlay.querySelector(".revealSkip46");
@@ -1354,7 +1357,7 @@
     var again = overlay.querySelector(".revealAgain46");
     if (again) {
       again.onclick = function () {
-        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        global.SakurayoUI.close(overlay);
         handlers.again();
       };
     }

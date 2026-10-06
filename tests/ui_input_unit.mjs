@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+const html=fs.readFileSync(new URL('../src/index.html',import.meta.url),'utf8');
+const live=fs.readFileSync(new URL('../src/runtime/sakurayo-live.js',import.meta.url),'utf8');
+function between(src,begin,end){const a=src.indexOf(begin);assert.ok(a>=0,begin+' must exist');return src.slice(a,src.indexOf(end,a));}
+const nodes=Object.fromEntries(['#joy','#stick','#explorePad41','#exploreStick41'].map(id=>[id,{style:{},hasPointerCapture:()=>true,releasePointerCapture(id){this.released=id;}}]));
+const s={state:'play',joy:{on:false,id:null,dx:0,dy:0},keys:{w:1},exploreKeys41:{a:1},exploration41:{joyX:1,joyY:1},explorePointer41:8,W:430,H:932,Math,save:{settings:{fx:0}},quality:1,adaptiveQuality48:1,$:id=>nodes[id],clamp:(x,a,b)=>Math.min(b,Math.max(a,x))};
+vm.createContext(s);
+vm.runInContext(between(html,'  function down(e) {','  addEventListener("pointerdown"'),s);
+const target={closest:()=>false};
+s.down({pointerId:1,clientX:100,clientY:200,target});s.move({pointerId:1,clientX:140,clientY:200});
+s.down({pointerId:2,clientX:220,clientY:300,target});
+assert.equal(s.joy.id,1,'second touch cannot steal joystick owner');
+s.up({pointerId:2});assert.equal(s.joy.on,1);s.up({pointerId:1});assert.equal(s.joy.id,null);
+vm.runInContext(between(html,'  function updateQuality48() {','  function loop(now)'),s);
+s.updateQuality48();assert.equal(s.quality,.62,'user reduced effects persist at high fps');s.adaptiveQuality48=.62;s.save.settings.fx=1;s.updateQuality48();assert.equal(s.quality,.62);
+vm.runInContext(between(html,'  function releaseInputs40() {','  addEventListener("pointerdown"'),s);
+s.joy={on:1,id:3,dx:.8,dy:.2};s.releaseInputs40();assert.deepEqual(Object.keys(s.keys),[]);assert.deepEqual(Object.keys(s.exploreKeys41),[]);assert.equal(s.exploration41.joyX,0);assert.equal(s.explorePointer41,null);assert.equal(nodes['#explorePad41'].released,8);
+const l={LOOK:{maxTX:1.35,maxTY:.7,maxX:7.2}};vm.createContext(l);vm.runInContext(between(live,'  function applyPose(nodes, pose) {','  function injectStyle()'),l);
+const pose={sway:0,x:0,hair:0,lift:0,breath:0,lookX:0,lookY:0,eye:0};
+const base={style:{}},blink={style:{},getAttribute:()=>null,classList:{contains:()=>true}};l.applyPose({base,blink},pose);assert.equal(base.style.opacity,'1','missing blink art keeps costume visible');
+console.log('PASS ui input: pointer ownership, effective quality, input release, missing blink art');
