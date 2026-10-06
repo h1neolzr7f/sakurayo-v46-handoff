@@ -27,4 +27,4 @@ Android SDK、模拟器和实体机不在本 worker 环境。debug 编译/lint�
 
 ## 远程持久化
 
-修复分支：`codex/audit-fix-platform`，源基线 `a334be6087f4ebe0e03d10ec2ada75f5ab475fa7`。发布 commit/tree SHA 在最终交付回执与后续记录中补充。
+修复分支：`codex/audit-fix-platform`，源基线 `a334be6087f4ebe0e03d10ec2ada75f5ab475fa7`。首个完整修复已持久化：commit `34bae94c7f925fe0d607ad90aa7997687c50e70d`，tree `8f128c6df73a80c2b9427bceea8c2838d09645b6`。各源/测试/report blob 与本地 git index SHA 逐一一致；随后仅回执更新继续提交在同一分支。
