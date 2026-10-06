@@ -65,7 +65,6 @@
   function closeAll(opts) {
     opts=opts||{};
     if(stack.length)close(stack[0].el,opts);
-    var all=d.querySelectorAll('.drawer');for(var i=0;i<all.length;i++)all[i].classList.add('hidden');
   }
   function open(el,opts) {
     if(!el)return;opts=opts||{};
@@ -77,19 +76,7 @@
     stack.push({el:el,returnFocus:launcher,onClose:opts.onClose});
     refreshFocus(el,opts.initialFocus);
   }
-  // Legacy settings/tutorial utilities still show their drawer directly. Adopt them
-  // at the DOM boundary while retaining each original close handler's side effects.
-  function sync() {
-    if(closing)return;
-    while(stack.length&&!visible(stack[stack.length-1].el))close(stack[stack.length-1].el,{invoke:false});
-    var nodes=d.querySelectorAll('.drawer:not(.hidden)'),candidate=null;
-    for(var i=0;i<nodes.length;i++)if(visible(nodes[i]))candidate=nodes[i];
-    if(candidate&&!stack.some(function(e){return e.el===candidate;})){
-      var button=candidate.querySelector('.dhead .close'),handler=button&&button.onclick;
-      open(candidate,{onClose:handler?function(){handler.call(button);}:null});
-    }
-  }
-  function active(){sync();return stack.length?stack[stack.length-1].el:null;}
+  function active(){return stack.length?stack[stack.length-1].el:null;}
   d.addEventListener('keydown',function(e){
     if(e.key!=='Escape'&&e.key!=='Tab')return;
     var el=active();if(!el||blocked())return;
@@ -104,21 +91,5 @@
     var top=stack.length&&stack[stack.length-1];
     if(top&&visible(top.el)&&!top.el.contains(e.target))refreshFocus(top.el);
   },true);
-  function affectsDrawers(records) {
-    for(var i=0;i<records.length;i++){
-      var r=records[i],target=r.target;
-      if(r.type==='attributes'){
-        if(target.classList.contains('drawer')||stack.some(function(e){return target===e.el||target.contains(e.el);}))return true;
-      }else{
-        var changed=Array.prototype.slice.call(r.addedNodes).concat(Array.prototype.slice.call(r.removedNodes));
-        for(var j=0;j<changed.length;j++){
-          var node=changed[j];if(node.nodeType!==1)continue;
-          if(node.classList.contains('drawer')||node.querySelector('.drawer')||stack.some(function(e){return node===e.el||node.contains(e.el);}))return true;
-        }
-      }
-    }
-    return false;
-  }
-  if(global.MutationObserver)new global.MutationObserver(function(records){if(affectsDrawers(records))sync();}).observe(d.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class','hidden']});
   global.SakurayoUI={open:open,close:close,closeAll:closeAll,refreshFocus:refreshFocus,active:active};
 })(window);

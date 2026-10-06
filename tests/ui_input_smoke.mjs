@@ -27,5 +27,7 @@ try {
  await page.keyboard.down('d');await page.evaluate(()=>window.dispatchEvent(new Event('blur')));const p0=await api('snapshot');await page.evaluate(()=>window.advanceTime(100));const p1=await api('snapshot');assert.equal(p1.player.x,p0.player.x);await page.keyboard.up('d');
  await api('backMenu');await api('openExploration41',1);
  await page.keyboard.down('a');await page.locator('#exploreClose41').click();await page.keyboard.up('a');await api('openExploration41',1);const e0=(await api('snapshot')).extensions.exploration;await page.waitForTimeout(100);const e1=(await api('snapshot')).extensions.exploration;assert.equal(e1.x,e0.x);
+ await api('collectExplorationNode41','seal-fragment');assert.equal((await api('triggerExplorationEvent41','echo-altar')).opened,true);
+ const firstChoice=page.locator('#exploreEventChoices412 button').first();await firstChoice.focus();await page.keyboard.press('Tab');assert.equal(await firstChoice.evaluate(n=>n===document.activeElement),false,'event choices retain native Tab');await page.keyboard.press('Shift+Tab');await page.keyboard.press('Enter');assert.equal(await page.locator('#exploreEvent412').isVisible(),false);assert.equal((await api('snapshot')).extensions.exploration.eventsCompleted.includes('echo-altar'),true);
  assert.deepEqual(errors,[]);console.log('PASS UI input smoke: nested reveal, costume blink, hidden RAF, dialogue keyboard, blur/exploration release');
 } finally {await browser.close();}

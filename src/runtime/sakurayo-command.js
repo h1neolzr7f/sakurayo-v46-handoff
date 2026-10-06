@@ -114,8 +114,7 @@
   }
   function close(){
     var drawer=global.document.getElementById('commandDrawer47');
-    if(options&&options.ui)options.ui.close(drawer);
-    else if(drawer)drawer.classList.add('hidden');
+    options.ui.close(drawer);
     currentPanel='';
   }
   // The panel body is rebuilt to display current game data. One delegated handler
@@ -189,8 +188,7 @@
     var next=focusId&&d.getElementById(focusId);
     if(focusCharacter)next=Array.from(body.querySelectorAll('[data-character]')).find(function(b){return b.dataset.character===focusCharacter;});
     if(!refresh||!next||next.disabled)next=drawer.querySelector('.close');
-    if(options.ui)options.ui.open(drawer,{initialFocus:next,onClose:function(){currentPanel='';}});
-    else {options.closeDrawers();drawer.classList.remove('hidden');next.focus();}
+    options.ui.open(drawer,{initialFocus:next,onClose:function(){currentPanel='';}});
     style();
   }
   function mount(opts){

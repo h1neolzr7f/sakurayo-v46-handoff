@@ -1083,19 +1083,10 @@
     return (card && card.d) || "";
   }
 
-  var rosterPeekState = null;
-
   function closeRosterPeek() {
     if (!global.document) return;
     var peek = global.document.getElementById("rosterPeek46");
-    if (peek && global.SakurayoUI) {
-      global.SakurayoUI.close(peek);
-      return;
-    }
-    if (peek && peek.parentNode) peek.parentNode.removeChild(peek);
-    var source = rosterPeekState && rosterPeekState.source;
-    rosterPeekState = null;
-    if (source && source.isConnected && typeof source.focus === "function") source.focus();
+    if (peek) global.SakurayoUI.close(peek);
   }
 
   function showRosterPeek(card, locked, count, handlers, tab, source) {
@@ -1141,37 +1132,15 @@
     }
     drawer.appendChild(overlay);
     hideBrokenArt(overlay);
-    rosterPeekState = { source: source };
-    if (global.SakurayoUI) {
-      global.SakurayoUI.open(overlay, {
+    global.SakurayoUI.open(overlay, {
         nested: true,
         initialFocus: close,
         returnFocus: source,
         onClose: function () {
           if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-          rosterPeekState = null;
         }
       });
-    } else {
-      overlay.onkeydown = function (event) {
-        if (event.key === "Escape") {
-          event.preventDefault();
-          event.stopPropagation();
-          closeRosterPeek();
-        } else if (event.key === "Tab") {
-          var targets = overlay.querySelectorAll("button:not(:disabled)");
-          var first = targets[0], last = targets[targets.length - 1];
-          if (event.shiftKey && global.document.activeElement === first) {
-            event.preventDefault();
-            last.focus();
-          } else if (!event.shiftKey && global.document.activeElement === last) {
-            event.preventDefault();
-            first.focus();
-          }
-        }
-      };
-      if (close && typeof close.focus === "function") close.focus();
-    }
+
   }
 
   function rosterList(tab) {

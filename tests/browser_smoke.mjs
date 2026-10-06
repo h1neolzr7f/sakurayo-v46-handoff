@@ -283,6 +283,7 @@ try {
   assert.equal(ten.results.length, 10);
   assert.ok(ten.tenPulls >= 1);
   await shot(page, "01h-gacha-drawer.png");
+  await page.locator("#gachaReveal46 .revealTake46").click();
   await page.locator("#gachaDrawer .close").click();
   const rosterOpen = await api(page, "openDrawer", "roster");
   assert.equal(rosterOpen.visible, true);
