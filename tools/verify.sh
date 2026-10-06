@@ -15,24 +15,13 @@ python tools/static_check.py android-app/app/src/main/assets/index.html --requir
 node --check tests/artifacts/static/android.bundle.extracted.js
 
 if [[ "${1:-}" != "--static" ]]; then
-  node tests/command_smoke.mjs
-  node tests/tactical_smoke.mjs
-  node tests/save_import_smoke.mjs
-  node tests/polish_rooms_smoke.mjs
-  node tests/ui_dom_smoke.mjs
-  node tests/ui_smoke.mjs
-  node tests/ops_smoke.mjs
-  node tests/framework_smoke.mjs
+  for smoke_file in tests/*_smoke.mjs; do node "$smoke_file"; done
   node tests/gacha_visual.mjs
-  node tests/browser_smoke.mjs
   EMU_BASE="file://$root_dir/src/index.html" node tests/emu_loop.mjs
   EMU_BASE="file://$root_dir/src/index.html" node tests/emu_scan.mjs
-  SAKURAYO_ENTRY="$root_dir/android-app/app/src/main/assets/index.html" node tests/command_smoke.mjs
-  SAKURAYO_ENTRY="$root_dir/android-app/app/src/main/assets/index.html" node tests/tactical_smoke.mjs
-  SAKURAYO_ENTRY="$root_dir/android-app/app/src/main/assets/index.html" node tests/save_import_smoke.mjs
-  SAKURAYO_ENTRY="$root_dir/android-app/app/src/main/assets/index.html" node tests/polish_rooms_smoke.mjs
-  SAKURAYO_ENTRY="$root_dir/android-app/app/src/main/assets/index.html" node tests/ui_smoke.mjs
-  node tests/framework_smoke.mjs android-app/app/src/main/assets/index.html
-  node tests/browser_smoke.mjs android-app/app/src/main/assets/index.html
+  for smoke_file in tests/*_smoke.mjs; do
+    if [[ "$smoke_file" == "tests/ui_dom_smoke.mjs" ]]; then continue; fi
+    SAKURAYO_ENTRY="$root_dir/android-app/app/src/main/assets/index.html" node "$smoke_file" android-app/app/src/main/assets/index.html
+  done
 fi
 echo 'VERIFY PASS'

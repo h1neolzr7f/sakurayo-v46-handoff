@@ -30,37 +30,24 @@ Invoke-Step "offline static_check" { python tools/static_check.py android-app/ap
 Invoke-Step "offline syntax extracted" { node --check tests/artifacts/static/android.bundle.extracted.js }
 
 if (-not $Static) {
-    Invoke-Step "command smoke" { node tests/command_smoke.mjs }
-    Invoke-Step "tactical smoke" { node tests/tactical_smoke.mjs }
-    Invoke-Step "save import smoke" { node tests/save_import_smoke.mjs }
-    Invoke-Step "room polish smoke" { node tests/polish_rooms_smoke.mjs }
-    Invoke-Step "UI DOM smoke" { node tests/ui_dom_smoke.mjs }
-    Invoke-Step "UI lifecycle smoke" { node tests/ui_smoke.mjs }
-    Invoke-Step "ops smoke" { node tests/ops_smoke.mjs }
-    Invoke-Step "framework smoke" { node tests/framework_smoke.mjs }
+    Get-ChildItem -Path tests -Filter *_smoke.mjs | Sort-Object Name | ForEach-Object {
+        $smokeFile = $_.FullName
+        Invoke-Step "$($_.Name) source" { node $smokeFile }
+    }
     Invoke-Step "gacha visual" { node tests/gacha_visual.mjs }
-    Invoke-Step "browser smoke" { node tests/browser_smoke.mjs }
     $previousEmuBase = $env:EMU_BASE
     try {
         $env:EMU_BASE = ([System.Uri](Join-Path $root "src/index.html")).AbsoluteUri
         Invoke-Step "emu loop" { node tests/emu_loop.mjs }
         Invoke-Step "emu scan" { node tests/emu_scan.mjs }
-    } finally {
-        $env:EMU_BASE = $previousEmuBase
-    }
+    } finally { $env:EMU_BASE = $previousEmuBase }
     $previousEntry = $env:SAKURAYO_ENTRY
     try {
         $env:SAKURAYO_ENTRY = Join-Path $root "android-app/app/src/main/assets/index.html"
-        Invoke-Step "offline command smoke" { node tests/command_smoke.mjs }
-        Invoke-Step "offline tactical smoke" { node tests/tactical_smoke.mjs }
-        Invoke-Step "offline save import smoke" { node tests/save_import_smoke.mjs }
-        Invoke-Step "offline room polish smoke" { node tests/polish_rooms_smoke.mjs }
-        Invoke-Step "offline UI lifecycle smoke" { node tests/ui_smoke.mjs }
-    } finally {
-        $env:SAKURAYO_ENTRY = $previousEntry
-    }
-    Invoke-Step "offline framework smoke" { node tests/framework_smoke.mjs android-app/app/src/main/assets/index.html }
-    Invoke-Step "offline browser smoke" { node tests/browser_smoke.mjs android-app/app/src/main/assets/index.html }
+        Get-ChildItem -Path tests -Filter *_smoke.mjs | Where-Object Name -ne ui_dom_smoke.mjs | Sort-Object Name | ForEach-Object {
+            $smokeFile = $_.FullName
+            Invoke-Step "$($_.Name) offline" { node $smokeFile android-app/app/src/main/assets/index.html }
+        }
+    } finally { $env:SAKURAYO_ENTRY = $previousEntry }
 }
-
 Write-Host "VERIFY PASS"

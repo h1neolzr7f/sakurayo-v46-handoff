@@ -13,7 +13,7 @@ async function loadPlaywright() {
 }
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const source = path.resolve(root, "src/index.html");
+const source = path.resolve(root, process.env.SAKURAYO_ENTRY || process.argv[2] || "src/index.html");
 const { chromium } = await loadPlaywright();
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage({ viewport: { width: 932, height: 430 } });
