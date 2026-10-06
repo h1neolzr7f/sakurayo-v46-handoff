@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { verifyContentReceipts } from "./content_receipts_smoke.mjs";
 import { createHash } from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
@@ -28,7 +29,7 @@ async function loadPlaywright() {
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(here, "..");
-const sourceArg = process.argv[2] || "src/index.html";
+const sourceArg = process.env.SAKURAYO_ENTRY || process.argv[2] || "src/index.html";
 const source = /^https?:\/\//i.test(sourceArg) ? sourceArg : path.resolve(projectRoot, sourceArg);
 const sourceFile = /^https?:\/\//i.test(source) ? path.resolve(projectRoot, "src/index.html") : source;
 const artifactDir = path.resolve(projectRoot, "tests/artifacts/smoke");
@@ -94,6 +95,9 @@ let mainContext;
 let legacyContext;
 let normalContext;
 try {
+  const receiptEvidence = await verifyContentReceipts(browser, url);
+  fs.writeFileSync(path.join(artifactDir, "content-receipts.json"), JSON.stringify(receiptEvidence, null, 2));
+  pass("F22 扩展字典收据、真实购买/事件按钮、刷新后重复领取与限购拒绝");
   normalContext = await browser.newContext({ viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true });
   const normalTracker = { pageErrors: [], consoleErrors: [], externalRequests: [] };
   const normalPage = await openPage(normalContext, normalTracker, normalUrl);

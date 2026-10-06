@@ -5828,16 +5828,15 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
   for(const skin of CONTENT41?.content("costumes")||[]){
     CONTENT41.guard(skin.__packId,"apply:costume",()=>{
-      if(!/^[a-z0-9][a-z0-9_-]{2,47}$/.test(String(skin.id||"")))throw new Error("Invalid costume id");
       if(SKINS35.some(existing=>existing.id===skin.id))throw new Error(`Duplicate costume id: ${skin.id}`);
-      SKINS35.push({...skin,price:Math.max(0,Math.floor(Number(skin.price)||0)),bias:Array.isArray(skin.bias)?skin.bias:[],__extension:true});
+      SKINS35.push({...skin,__extension:true});
     });
   }
   for(const achievement of CONTENT41?.content("achievements")||[]){
     CONTENT41.guard(achievement.__packId,"apply:achievement",()=>{
       const id=`${achievement.__packId}:${achievement.id}`;
       if(ACH[id])throw new Error(`Duplicate achievement id: ${id}`);
-      ACH[id]={n:String(achievement.n||achievement.id),i:String(achievement.i||"🧩"),d:String(achievement.d||"扩展成就"),r:Math.max(0,Math.floor(Number(achievement.r)||0)),c:()=>extensionCondition41(achievement.condition,achievement.__packId),__extension:true};
+      ACH[id]={n:achievement.n,i:achievement.i,d:achievement.d,r:achievement.r,c:()=>extensionCondition41(achievement.condition,achievement.__packId),__extension:true};
     });
   }
   save = normalizeGameSave(save, false, SKINS35.map(skin => skin.id));
@@ -6768,6 +6767,12 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const a=P.weaponAngle??Math.atan2(P.fy,P.fx),muzzle=c.id==="sayo"?52:37,g=battleGlow421(false);ctx.save();ctx.translate(x,y-18);ctx.rotate(a);ctx.translate(muzzle,0);ctx.rotate(Math.PI/2);ctx.globalCompositeOperation=(boss||isMainGodRun36()||save.settings.glow==="vivid")?"screen":"source-over";ctx.globalAlpha=clamp(P.animAttack/.16,0,1)*(.24+g*.38);ctx.filter=g>.5?`drop-shadow(0 0 ${Math.round(5*g)}px ${c.main||"#fff"})`:"none";ctx.drawImage(feedbackMuzzle411,-20,-20,40,40);ctx.restore();
   };
   function extensionItemCount41(entry){return extensionState41(entry.__packId)?.purchases?.[entry.id]||0;}
+  function buyExtensionItem41(item){
+    const data=extensionState41(item.__packId);if(!data)return false;
+    const count=data.purchases[item.id]||0;
+    if(count>=item.max||save.coins<item.price)return false;
+    save.coins-=item.price;data.purchases[item.id]=count+1;checkAch();persist();toast(`扩展补给：${item.n}`);renderShop35();return true;
+  }
   function renderExtensionShop41(){
     const box=$("#shopList"),items=CONTENT41?.content("items")||[];
     if(!box||!items.length)return;
@@ -6778,12 +6783,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     for(const item of items){
       CONTENT41.guard(item.__packId,"render:shop-item",()=>{
         const state=extensionState41(item.__packId);if(!state)return;
-        state.purchases=state.purchases&&typeof state.purchases==="object"?state.purchases:{};
-        const count=extensionItemCount41(item),max=Math.max(1,Math.floor(Number(item.max)||1)),price=Math.max(0,Math.floor(Number(item.price)||0)),full=count>=max;
-        section.appendChild(shopCard40(String(item.i||"📦"),`${String(item.n||item.id)} · ${count}/${max}`,htmlEscape(String(item.d||"扩展内容包道具")),full?"已拥有":save.coins>=price?`🌸 ${price}`:`还差 🌸 ${price-save.coins}`,full||save.coins<price,()=>{
-          if(full||save.coins<price)return;
-          save.coins-=price;state.purchases[item.id]=count+1;checkAch();persist();toast(`扩展补给：${item.n||item.id}`);renderShop35();
-        }));
+        const count=extensionItemCount41(item),max=item.max,price=item.price,full=count>=max;
+        section.appendChild(shopCard40(item.i,`${item.n} · ${count}/${max}`,htmlEscape(item.d),full?"已拥有":save.coins>=price?`🌸 ${price}`:`还差 🌸 ${price-save.coins}`,full||save.coins<price,()=>buyExtensionItem41(item)));
       });
     }
     tabs.querySelectorAll("button").forEach(button=>button.onclick=()=>{
@@ -6827,9 +6828,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function updateExploreProgress41(){const snapshot=explorationSnapshot41();if(!snapshot)return;$("#exploreProgress41").textContent=`发现 ${snapshot.collected.length}/${snapshot.total}`;}
   function collectExploreNode41(node){
     const scene=exploration41.scene,data=extensionState41(scene.__packId),key=scene.id+":"+node.id;if(!data||data.collected[key])return;
-    data.collected[key]=true;playFeedback411("reward",.36);const reward=node.reward||{};let message=node.label||"发现奖励";
-    if(reward.type==="coins"||reward.coins){const amount=Math.max(0,Math.floor(Number(reward.amount||reward.coins)||0));save.coins+=amount;message+=` · 🌸 ${amount}`;}
-    if(reward.type==="fragment"&&reward.value){data.fragments=Array.isArray(data.fragments)?data.fragments:[];if(!data.fragments.includes(reward.value))data.fragments.push(reward.value);message+=` · ${reward.value}`;}
+    data.collected[key]=true;playFeedback411("reward",.36);const reward=node.reward;let message=node.label||"发现奖励";
+    if(reward.type==="coins"||reward.coins){const amount=(reward.type==="coins"?reward.amount:reward.coins);save.coins+=amount;message+=` · 🌸 ${amount}`;}
+    if(reward.type==="fragment"&&reward.value){if(!data.fragments.includes(reward.value))data.fragments.push(reward.value);message+=` · ${reward.value}`;}
     persist();$("#exploreToast41").textContent=message;$("#exploreToast41").classList.add("show");setTimeout(()=>$("#exploreToast41")?.classList.remove("show"),1800);updateExploreProgress41();CONTENT41.emit("exploration:reward",{sceneId:scene.id,nodeId:node.id,reward});
   }
   function drawExploration41(){
@@ -6851,12 +6852,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }else{ctx.beginPath();ctx.arc(px,py-18,24,0,TAU);ctx.fillStyle=identity;ctx.fill();ctx.strokeStyle="#fff";ctx.lineWidth=4;ctx.stroke();}
     ctx.font="900 13px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";const label=`${c.icon||"◆"} ${c.short||c.name||"角色"}`,tw=ctx.measureText(label).width+18,lx=clamp(px,tw/2+8,w-tw/2-8),ly=Math.max(92,py-110);ctx.fillStyle="#090719e6";ctx.strokeStyle=identity;ctx.lineWidth=2;ctx.beginPath();if(typeof ctx.roundRect==="function")ctx.roundRect(lx-tw/2,ly-11,tw,22,11);else ctx.rect(lx-tw/2,ly-11,tw,22);ctx.fill();ctx.stroke();ctx.fillStyle="#fff";ctx.fillText(label,lx,ly);
   }
-  function exploreStep41(dt){
-    if(!exploration41)return;let dx=(exploreKeys41.d||exploreKeys41.arrowright?1:0)-(exploreKeys41.a||exploreKeys41.arrowleft?1:0)+exploration41.joyX,dy=(exploreKeys41.s||exploreKeys41.arrowdown?1:0)-(exploreKeys41.w||exploreKeys41.arrowup?1:0)+exploration41.joyY,len=Math.hypot(dx,dy);if(len>1){dx/=len;dy/=len;}exploration41.moving=len>.08;if(dx>.05)exploration41.facing=1;else if(dx<-.05)exploration41.facing=-1;const image=exploreImage41,iw=image?.naturalWidth||1280,ih=image?.naturalHeight||853,speed=255;exploration41.x=clamp(exploration41.x+dx*speed*dt,34,iw-34);exploration41.y=clamp(exploration41.y+dy*speed*dt,34,ih-34);for(const node of exploration41.scene.nodes)if(Math.hypot(exploration41.x-node.x*iw,exploration41.y-node.y*ih)<54)collectExploreNode41(node);drawExploration41();
-  }
   function exploreLoop41(now){if(!exploration41)return;const dt=Math.min(.033,Math.max(0,(now-(exploreLast41||now))/1000));exploreLast41=now;exploreStep41(dt);exploreFrame41=requestAnimationFrame(exploreLoop41);}
   function openExploration41(scene){
-    const root=ensureExploration41(),data=extensionState41(scene.__packId);if(!data)return false;data.collected=data.collected&&typeof data.collected==="object"?data.collected:{};data.visits=data.visits&&typeof data.visits==="object"?data.visits:{};data.visits[scene.id]=(data.visits[scene.id]||0)+1;persist();closeDrawers();root.classList.remove("hidden");$("#exploreTitle41").textContent=scene.title||"剧情探索";exploreImage41=new Image();exploreImage41.onload=drawExploration41;exploreImage41.onerror=()=>{CONTENT41.guard(scene.__packId,"asset:exploration",()=>{throw new Error(`Map image unavailable: ${scene.background}`);});drawExploration41();};exploreImage41.src=artUrl(scene.background);exploreAvatar41=new Image();exploreAvatar41.onerror=()=>{exploreAvatar41=null;};exploreAvatar41.src=artUrl(charAnimPath35(char35(),"idle"));exploration41={scene,x:(scene.spawn?.[0]||.5)*1280,y:(scene.spawn?.[1]||.75)*853,joyX:0,joyY:0,facing:1,moving:false};exploreLast41=0;updateExploreProgress41();cancelAnimationFrame(exploreFrame41);exploreFrame41=requestAnimationFrame(exploreLoop41);CONTENT41.emit("exploration:opened",{sceneId:scene.id});return true;
+    const root=ensureExploration41(),data=extensionState41(scene.__packId);if(!data)return false;data.visits[scene.id]=(data.visits[scene.id]||0)+1;persist();closeDrawers();root.classList.remove("hidden");$("#exploreTitle41").textContent=scene.title||"剧情探索";exploreImage41=new Image();exploreImage41.onload=drawExploration41;exploreImage41.onerror=()=>{CONTENT41.guard(scene.__packId,"asset:exploration",()=>{throw new Error(`Map image unavailable: ${scene.background}`);});drawExploration41();};exploreImage41.src=artUrl(scene.background);exploreAvatar41=new Image();exploreAvatar41.onerror=()=>{exploreAvatar41=null;};exploreAvatar41.src=artUrl(charAnimPath35(char35(),"idle"));exploration41={scene,x:(scene.spawn?.[0]||.5)*1280,y:(scene.spawn?.[1]||.75)*853,joyX:0,joyY:0,facing:1,moving:false};exploreLast41=0;updateExploreProgress41();cancelAnimationFrame(exploreFrame41);exploreFrame41=requestAnimationFrame(exploreLoop41);CONTENT41.emit("exploration:opened",{sceneId:scene.id});return true;
   }
   function closeExploration41(){if(!exploration41)return;CONTENT41?.emit("exploration:closed",{sceneId:exploration41.scene.id});exploration41=null;cancelAnimationFrame(exploreFrame41);$("#exploration41")?.classList.add("hidden");renderStages();openDrawer("stage");}
   addEventListener("keydown",e=>{if(exploration41){exploreKeys41[e.key.toLowerCase()]=1;e.preventDefault();}});
@@ -6898,10 +6896,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function closeExploreEvent412(defer=false){const event=exploration41?.activeEvent412;if(exploration41){exploration41.activeEvent412=null;exploration41.eventCooldown412=defer?1.25:.5;}$("#exploreEvent412")?.classList.add("hidden");return event;}
   function chooseExploreEvent412(choiceId){
     const event=exploration41?.activeEvent412,choice=event?.choices?.find(item=>item.id===choiceId),data=explorationData412();if(!event||!choice||!data)return false;
-    data.choices=data.choices&&typeof data.choices==="object"?data.choices:{};data.fragments=Array.isArray(data.fragments)?data.fragments:[];data.choices[explorationEventKey412(event.id)]=choice.id;const coins=Math.max(0,Math.floor(Number(choice.coins)||0));save.coins+=coins;if(choice.fragment&&!data.fragments.includes(choice.fragment))data.fragments.push(choice.fragment);persist();closeExploreEvent412(false);$("#exploreToast41").textContent=`${choice.label} · 🌸 ${coins}`;$("#exploreToast41").classList.add("show");setTimeout(()=>$("#exploreToast41")?.classList.remove("show"),1800);updateExploreProgress41();CONTENT41.emit("exploration:event",{sceneId:exploration41.scene.id,eventId:event.id,choiceId:choice.id});return true;
+    data.choices[explorationEventKey412(event.id)]=choice.id;const coins=choice.coins;save.coins+=coins;if(choice.fragment&&!data.fragments.includes(choice.fragment))data.fragments.push(choice.fragment);persist();closeExploreEvent412(false);$("#exploreToast41").textContent=`${choice.label} · 🌸 ${coins}`;$("#exploreToast41").classList.add("show");setTimeout(()=>$("#exploreToast41")?.classList.remove("show"),1800);updateExploreProgress41();CONTENT41.emit("exploration:event",{sceneId:exploration41.scene.id,eventId:event.id,choiceId:choice.id});return true;
   }
   const _ensureExploration412=ensureExploration41;ensureExploration41=function(){const root=_ensureExploration412();if(!root.querySelector("#exploreEvent412"))queueMicrotask(ensureExploreEventUi412);return root;};
-  const _openExploration412=openExploration41;openExploration41=function(scene){const opened=_openExploration412(scene);if(opened&&exploration41){const data=explorationData412();data.choices=data.choices&&typeof data.choices==="object"?data.choices:{};exploration41.blockedMoves412=0;exploration41.activeEvent412=null;exploration41.eventCooldown412=.8;exploration41.lockHint412=0;ensureExploreEventUi412();}return opened;};
+  const _openExploration412=openExploration41;openExploration41=function(scene){const opened=_openExploration412(scene);if(opened&&exploration41){exploration41.blockedMoves412=0;exploration41.activeEvent412=null;exploration41.eventCooldown412=.8;exploration41.lockHint412=0;ensureExploreEventUi412();}return opened;};
   const _collectExploreNode412=collectExploreNode41;collectExploreNode41=function(node){if(!exploreNodeVisible412(node))return false;return _collectExploreNode412(node);};
   const _explorationSnapshot412=explorationSnapshot41;explorationSnapshot41=function(){const base=_explorationSnapshot412();if(!base||!exploration41)return base;const data=explorationData412(),scene=exploration41.scene;return {...base,total:scene.nodes.filter(exploreNodeVisible412).length,walkableZones:(scene.walkable||[]).length,blockedMoves:exploration41.blockedMoves412||0,activeEvent:exploration41.activeEvent412?.id||null,eventsCompleted:(scene.events||[]).filter(event=>data?.choices?.[`${scene.id}:${event.id}`]).map(event=>event.id),eventChoices:{...(data?.choices||{})}};};
   const _drawExploration412=drawExploration41;drawExploration41=function(){
@@ -6909,11 +6907,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     for(const event of exploration41.scene.events||[]){if(exploreEventChoice412(event.id))continue;const x=event.x*iw*scale-camX,y=event.y*ih*scale-camY,open=exploreEventUnlocked412(event),pulse=1+Math.sin(now*.007+x)*.08;ctx.save();ctx.translate(x,y);ctx.rotate(Math.PI/4);ctx.fillStyle=open?"#6ae7ffbb":"#342944cc";ctx.strokeStyle=open?"#fff":"#9a91aa";ctx.lineWidth=3;ctx.fillRect(-19*pulse,-19*pulse,38*pulse,38*pulse);ctx.strokeRect(-19*pulse,-19*pulse,38*pulse,38*pulse);ctx.rotate(-Math.PI/4);ctx.fillStyle="#fff";ctx.font="900 15px system-ui";ctx.textAlign="center";ctx.textBaseline="middle";ctx.fillText(open?(event.icon||"?"):"锁",0,1);ctx.restore();}
     if(exploration41.lockHint412>0){const x=exploration41.x*scale-camX,y=exploration41.y*scale-camY;ctx.save();ctx.globalAlpha=exploration41.lockHint412;ctx.strokeStyle="#ffcc70";ctx.lineWidth=4;ctx.beginPath();ctx.arc(x,y-12,31,0,TAU);ctx.stroke();ctx.fillStyle="#fff0bd";ctx.font="900 12px system-ui";ctx.textAlign="center";ctx.fillText("先寻找附近线索",x,y-52);ctx.restore();}
   };
-  exploreStep41=function(dt){
+  function exploreStep41(dt){
     if(!exploration41)return;if(exploration41.activeEvent412){drawExploration41();return;}exploration41.eventCooldown412=Math.max(0,(exploration41.eventCooldown412||0)-dt);exploration41.lockHint412=Math.max(0,(exploration41.lockHint412||0)-dt);
     let dx=(exploreKeys41.d||exploreKeys41.arrowright?1:0)-(exploreKeys41.a||exploreKeys41.arrowleft?1:0)+exploration41.joyX,dy=(exploreKeys41.s||exploreKeys41.arrowdown?1:0)-(exploreKeys41.w||exploreKeys41.arrowup?1:0)+exploration41.joyY,len=Math.hypot(dx,dy);if(len>1){dx/=len;dy/=len;}exploration41.moving=len>.08;if(dx>.05)exploration41.facing=1;else if(dx<-.05)exploration41.facing=-1;const iw=exploreImage41?.naturalWidth||1280,ih=exploreImage41?.naturalHeight||853,speed=255,nx=clamp(exploration41.x+dx*speed*dt,16,iw-16),ny=clamp(exploration41.y+dy*speed*dt,16,ih-16);let blocked=false;if(canExploreStand412(nx,exploration41.y))exploration41.x=nx;else if(Math.abs(nx-exploration41.x)>.01)blocked=true;if(canExploreStand412(exploration41.x,ny))exploration41.y=ny;else if(Math.abs(ny-exploration41.y)>.01)blocked=true;if(blocked)exploration41.blockedMoves412=(exploration41.blockedMoves412||0)+1;
     for(const node of exploration41.scene.nodes)if(exploreNodeVisible412(node)&&Math.hypot(exploration41.x-node.x*iw,exploration41.y-node.y*ih)<54)collectExploreNode41(node);if(!exploration41.eventCooldown412)for(const event of exploration41.scene.events||[])if(!exploreEventChoice412(event.id)&&Math.hypot(exploration41.x-event.x*iw,exploration41.y-event.y*ih)<58){openExploreEvent412(event);break;}drawExploration41();
-  };
+  }
 
   const ENEMY_ROLE_VISUALS412=Object.freeze({fast:"双箭翼",tank:"重甲方肩",ranged:"远射横杆",bomb:"爆芯引线",shield:"六角盾",disruptor:"干扰天线",purifier:"净化光环",specter:"幽魂尾焰",decay:"腐败长杖",seal:"封灵符带",elite:"精英冠环"});
   function drawEnemySilhouette412(e,size){
@@ -7061,7 +7059,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       forceConflict40(id="glassMagazine40"){const u=CONFLICT_UPGRADES40.find(x=>x.id===id);if(!u)throw new Error(`Unknown conflict: ${id}`);chooseUpgrade(u);return snapshot35();},
       newFusionCatalog41(){return NEW_FUSIONS41.map(f=>({id:f.id,name:f.n,pair:[...f.pair],cost:f.cost,weak:[...f.weak],strong:[...f.strong]}));},
       extensionStatus41(){return {packs:CONTENT41?.packs()||[],errors:CONTENT41?.errors()||[],costumes:CONTENT41?.content("costumes")||[],items:CONTENT41?.content("items")||[],achievements:CONTENT41?.content("achievements")||[],stories:CONTENT41?.content("stories")||[],state:JSON.parse(JSON.stringify(save.extensions||{}))};},
-      buyExtensionItem41(packId,itemId){const item=(CONTENT41?.content("items")||[]).find(x=>x.__packId===packId&&x.id===itemId);if(!item)throw new Error("Unknown extension item");const data=extensionState41(packId);if(!data)throw new Error("Extension state unavailable");data.purchases=data.purchases||{};const count=data.purchases[itemId]||0,max=Math.max(1,Number(item.max)||1),price=Math.max(0,Number(item.price)||0);if(count>=max||save.coins<price)return false;save.coins-=price;data.purchases[itemId]=count+1;persist();return true;},
+      buyExtensionItem41(packId,itemId){const item=(CONTENT41?.content("items")||[]).find(x=>x.__packId===packId&&x.id===itemId);if(!item)throw new Error("Unknown extension item");return buyExtensionItem41(item);},
       openExploration41(stageId=1){const scene=(CONTENT41?.content("explorations")||[]).find(x=>Number(x.stageId)===Number(stageId));if(!scene)throw new Error("Unknown exploration stage");return {opened:openExploration41(scene),snapshot:explorationSnapshot41()};},
       explorationStep41(dx=0,dy=0,seconds=1){if(!exploration41)throw new Error("Exploration is not active");exploration41.joyX=Number(dx)||0;exploration41.joyY=Number(dy)||0;for(let i=0;i<Math.max(1,Math.floor(Number(seconds)*60));i++)exploreStep41(1/60);exploration41.joyX=0;exploration41.joyY=0;return explorationSnapshot41();},
       collectExplorationNode41(nodeId){if(!exploration41)throw new Error("Exploration is not active");const node=exploration41.scene.nodes.find(x=>x.id===nodeId);if(!node)throw new Error("Unknown exploration node");const image=exploreImage41,iw=image?.naturalWidth||1280,ih=image?.naturalHeight||853;exploration41.x=node.x*iw;exploration41.y=node.y*ih;exploreStep41(0);return explorationSnapshot41();},
