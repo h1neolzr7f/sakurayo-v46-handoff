@@ -65,7 +65,7 @@ const ready = O.tick(1.2, {
   play: true,
   mode: "story",
   dmg: 10,
-  petPow: 1,
+  petPow: 2,
   nearest: () => target,
 });
 assert.equal(ready.shots.length, 1);
@@ -84,7 +84,8 @@ O.fireShots(ready.shots, {
 });
 assert.equal(bullets.length, 1);
 assert.equal(bullets[0].source, "summon");
-assert.ok(bullets[0].dmg < 10);
+assert.equal(bullets[0].dmg, 3.2, "pet damage modifier belongs to damageEnemy");
+assert.equal(bullets[0].pet, true);
 
 O.reset();
 O.deploy("rion", "aya", 120, 300, 430, 932);

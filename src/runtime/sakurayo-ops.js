@@ -140,7 +140,7 @@
       state.regen -= step;
     }
     if (state.dp >= CAP) state.regen = 0;
-    var dmg = Math.max(1, (Number(world.dmg) || 8) * DMG * (Number(world.petPow) || 1));
+    var dmg = Math.max(1, (Number(world.dmg) || 8) * DMG);
     for (var i = 0; i < state.units.length; i++) {
       var u = state.units[i];
       u.clock -= dt;
@@ -167,7 +167,7 @@
     for (var i = 0; i < shots.length; i++) {
       var s = shots[i];
       if (s.weapon === "blade" && typeof world.aoe === "function") {
-        world.aoe(s.x, s.y, BLADE_RANGE, s.dmg, "#ff8fa5", false, { source: "summon", school: "summon" });
+        world.aoe(s.x, s.y, BLADE_RANGE, s.dmg, "#ff8fa5", false, { source: "summon", school: "summon", pet: true });
         n += 1;
         continue;
       }
@@ -185,6 +185,7 @@
         pierce: 0,
         home: 0,
         source: "summon",
+        pet: true,
         school: "summon",
         hit: new Set(),
       });
@@ -196,26 +197,29 @@
   function renderDock(host, playerId, art) {
     if (!host) return snapshot();
     var ids = roster(playerId);
-    var html = '<div class="opsDp46"><b>DP ' + state.dp + "/" + CAP + '</b><span class="opsRail46"><i style="width:' + Math.round((state.dp / CAP) * 100) + '%"></i></span></div><div class="opsSlots46">';
-    for (var i = 0; i < ids.length; i++) {
-      var id = ids[i];
+    // Keep interactive nodes alive: regeneration must not replace a pressed button.
+    if (host._opsPlayer46 !== playerId || !host.querySelector(".opsDp46 b")) {
+      host._opsPlayer46 = playerId;
+      host.innerHTML = '<div class="opsDp46"><b></b><span class="opsRail46"><i></i></span></div><div class="opsSlots46">' + ids.map(function (id) {
+        return '<button type="button" data-op="' + id + '"><img alt="" src="' +
+          (typeof art === "function" ? art("characters/" + id + "/default/portrait.webp") : "") +
+          '">' + (NAMES[id] || id) + '<small></small></button>';
+      }).join("") + '</div>';
+      host._opsData46 = "";
+    }
+    var data = state.dp + ":" + state.units.map(function (u) { return u.id; }).join(",");
+    if (host._opsData46 === data) return snapshot();
+    host._opsData46 = data;
+    host.querySelector(".opsDp46 b").textContent = "DP " + state.dp + "/" + CAP;
+    host.querySelector(".opsRail46 i").style.width = Math.round((state.dp / CAP) * 100) + "%";
+    ids.forEach(function (id) {
+      var button = host.querySelector('[data-op="' + id + '"]');
       var out = !!find(id);
       var gate = canDeploy(id, playerId);
-      html +=
-        '<button type="button" data-op="' +
-        id +
-        '" class="' +
-        (out ? "on" : gate.reason === "dp" || gate.reason === "full" ? "poor" : "") +
-        '"><img alt="" src="' +
-        (typeof art === "function" ? art("characters/" + id + "/default/portrait.webp") : "") +
-        '">' +
-        (NAMES[id] || id) +
-        "<small>" +
-        (out ? "撤回 +4" : "部署 " + COST) +
-        "</small></button>";
-    }
-    html += "</div>";
-    host.innerHTML = html;
+      button.classList.toggle("on", out);
+      button.classList.toggle("poor", !out && (gate.reason === "dp" || gate.reason === "full"));
+      button.querySelector("small").textContent = out ? "撤回 +4" : "部署 " + COST;
+    });
     return snapshot();
   }
 
