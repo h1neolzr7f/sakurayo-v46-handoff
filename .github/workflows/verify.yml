@@ -16,20 +16,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - run: python -m pip install Pillow
       - name: Static check and syntax
-        run: |
-          python tools/static_check.py src/index.html
-          node --check tests/artifacts/static/index.extracted.js
-          node --check src/runtime/sakurayo-cutscene.js
-          node --check src/runtime/sakurayo-economy.js
-          node --check src/runtime/sakurayo-lifecycle.js
-          node --check src/runtime/sakurayo-content-runtime.js
-          node --check src/runtime/sakurayo-command.js
-          node --check src/runtime/sakurayo-services.js
-          node --check src/runtime/sakurayo-terminal.js
-          node tests/command_unit.mjs
-          node tests/services_unit.mjs
-          node tests/chapter_design_unit.mjs
+        run: bash tools/verify.sh --static
 
   offline-game:
     runs-on: ubuntu-latest
@@ -46,9 +35,32 @@ jobs:
       - run: python -m pip install Pillow
       - run: npx playwright install --with-deps chromium
       - name: Source and offline bundle regression
-        run: bash tools/verify.sh
+        run: |
+          bash tools/verify.sh
+          node tests/platform_smoke.mjs src/index.html
+          node tests/platform_smoke.mjs android-app/app/src/main/assets/index.html
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: game-verification
           path: tests/artifacts/
+
+  android-debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v3
+      - name: Install Android SDK 36
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - name: Build and lint debug shell
+        working-directory: android-app
+        run: bash gradlew --no-daemon assembleDebug lintDebug
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-lint
+          path: android-app/app/build/reports/lint-results-debug.*

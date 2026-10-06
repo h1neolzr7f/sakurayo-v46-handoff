@@ -5698,11 +5698,12 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       const AudioCtor = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtor) return;
       audio = audio || new AudioCtor();
-      if (audio.state === "suspended") audio.resume();
+      if (audio.state === "suspended" && !platformSuspended48) audio.resume().catch(reportAudio48);
     } catch (error) { window.__SAKURAYO_DEV__?.report("audio", error); }
   }
   function sound(k) {
-    if (!audio) return;
+    const audioGain=clamp((save.settings?.master??.8)*(save.settings?.sfx??.8),0,1);
+    if (!audio || audioGain===0 || platformSuspended48) return;
     let v = {
         shot: [650, 0.035, 0.012, "square"],
         rifle: [190, 0.055, 0.032, "sawtooth"],
@@ -5731,7 +5732,6 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       Math.max(40, v[0] * 1.65),
       n + v[1],
     );
-    const audioGain=clamp((save.settings?.master??.8)*(save.settings?.sfx??.8),0,1);
     g.gain.setValueAtTime(Math.max(.0001,v[2]*audioGain), n);
     g.gain.exponentialRampToValueAtTime(0.0001, n + v[1]);
     o.start(n);
@@ -6356,13 +6356,13 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   const _startGame37=startGame;startGame=function(){if(!save.tutorialDone&&state==="menu"){openTutorial37(true);return;}return _startGame37();};
 
   function runAnalytics37(){const runs=save.runHistory||[],wins=runs.filter(x=>x.win),byChar={};for(const r of runs){const id=r.character||"unknown";byChar[id]=(byChar[id]||0)+1;}const avg=k=>runs.length?(runs.reduce((s,r)=>s+(Number(r[k])||0),0)/runs.length).toFixed(1):"0";return {version:"3.8",generatedAt:new Date().toISOString(),summary:{runs:runs.length,wins:wins.length,winRate:runs.length?Math.round(wins.length/runs.length*100):0,averageLevel:avg("level"),averageKills:avg("kills"),characters:byChar,mainGod:{...save.mainGod}},runs};}
-  function ensureAnalytics37(){let d=$("#analyticsDrawer37");if(d)return d;d=document.createElement("section");d.id="analyticsDrawer37";d.className="drawer hidden";d.innerHTML='<div class="dhead"><h2>战斗统计与导出</h2><button class="close">×</button></div><div class="dbody"><div id="analyticsSummary37"></div><textarea id="analyticsText37" readonly></textarea><div class="analyticsActions37"><button id="copyAnalytics37">复制统计</button><button id="downloadAnalytics37">导出 JSON</button></div></div>';d.querySelector(".close").onclick=()=>d.classList.add("hidden");d.querySelector("#copyAnalytics37").onclick=async()=>{const text=$("#analyticsText37").value;try{await navigator.clipboard.writeText(text);toast("统计已复制");}catch{$("#analyticsText37").select();toast("已选中文本，请手动复制");}};d.querySelector("#downloadAnalytics37").onclick=()=>{const blob=new Blob([$("#analyticsText37").value],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`sakurayo-v37-stats-${Date.now()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};document.body.appendChild(d);return d;}
+  function ensureAnalytics37(){let d=$("#analyticsDrawer37");if(d)return d;d=document.createElement("section");d.id="analyticsDrawer37";d.className="drawer hidden";d.innerHTML='<div class="dhead"><h2>战斗统计与导出</h2><button class="close">×</button></div><div class="dbody"><div id="analyticsSummary37"></div><textarea id="analyticsText37" readonly></textarea><div class="analyticsActions37"><button id="copyAnalytics37">复制统计</button><button id="downloadAnalytics37">导出 JSON</button></div></div>';d.querySelector(".close").onclick=()=>d.classList.add("hidden");d.querySelector("#copyAnalytics37").onclick=async()=>{const text=$("#analyticsText37").value;try{await navigator.clipboard.writeText(text);toast("统计已复制");}catch{$("#analyticsText37").select();toast("已选中文本，请手动复制");}};d.querySelector("#downloadAnalytics37").onclick=()=>{exportJson48(`sakurayo-v46-stats-${Date.now()}.json`,$("#analyticsText37").value);};document.body.appendChild(d);return d;}
   function openAnalytics37(){closeDrawers();const d=ensureAnalytics37(),data=runAnalytics37(),s=data.summary;$("#analyticsSummary37").innerHTML=`<div class="analyticsGrid37"><b>${s.runs}<small>记录局数</small></b><b>${s.winRate}%<small>胜率</small></b><b>${s.averageLevel}<small>平均等级</small></b><b>${s.averageKills}<small>平均击破</small></b></div><p>本地仅保留最近 30 局；导出文件不会上传网络。</p>`;$("#analyticsText37").value=JSON.stringify(data,null,2);d.classList.remove("hidden");}
 
   let music37=null,musicGain37=null,musicMode37="",hapticAt37=0;
   function haptic37(pattern){if(!save.settings?.vibration||!navigator.vibrate)return;const now=performance.now();if(now-hapticAt37<45)return;hapticAt37=now;try{navigator.vibrate(pattern);}catch{}}
-  function ensureMusic37(){ensureAudio();if(!audio||music37)return;try{musicGain37=audio.createGain();musicGain37.gain.value=.0001;musicGain37.connect(audio.destination);const filter=audio.createBiquadFilter();filter.type="lowpass";filter.frequency.value=240;filter.connect(musicGain37);music37=[55,82.5].map((hz,i)=>{const o=audio.createOscillator();o.type=i?"triangle":"sine";o.frequency.value=hz;o.connect(filter);o.start();return o;});}catch(error){window.__SAKURAYO_DEV__?.report("music",error);music37=null;}}
-  function setMusic37(active,bossLevel=0,force=false){ensureMusic37();if(!musicGain37||!audio)return;const mode=`${active?1:0}:${bossLevel}:${save.settings?.master}:${save.settings?.music}`;if(!force&&mode===musicMode37)return;musicMode37=mode;const target=active?clamp((save.settings?.master??.8)*(save.settings?.music??.45)*.035,0,.04):.0001;musicGain37.gain.cancelScheduledValues(audio.currentTime);musicGain37.gain.linearRampToValueAtTime(Math.max(.0001,target),audio.currentTime+.22);if(music37){music37[0].frequency.setTargetAtTime(55+bossLevel*5,audio.currentTime,.15);music37[1].frequency.setTargetAtTime(82.5+bossLevel*8,audio.currentTime,.15);}}
+  function ensureMusic37(){if(platformSuspended48||(save.settings?.master??.8)*(save.settings?.music??.45)<=0)return;ensureAudio();if(!audio||music37)return;try{musicGain37=audio.createGain();musicGain37.gain.value=0;musicGain37.connect(audio.destination);const filter=audio.createBiquadFilter();filter.type="lowpass";filter.frequency.value=240;filter.connect(musicGain37);music37=[55,82.5].map((hz,i)=>{const o=audio.createOscillator();o.type=i?"triangle":"sine";o.frequency.value=hz;o.connect(filter);o.start();return o;});}catch(error){window.__SAKURAYO_DEV__?.report("music",error);music37=null;}}
+  function setMusic37(active,bossLevel=0,force=false){ensureMusic37();if(!musicGain37||!audio)return;const mode=`${active?1:0}:${bossLevel}:${save.settings?.master}:${save.settings?.music}`;if(!force&&mode===musicMode37)return;musicMode37=mode;const target=active?clamp((save.settings?.master??.8)*(save.settings?.music??.45)*.035,0,.04):0;musicGain37.gain.cancelScheduledValues(audio.currentTime);musicGain37.gain.linearRampToValueAtTime(target,audio.currentTime+.22);if(music37){music37[0].frequency.setTargetAtTime(55+bossLevel*5,audio.currentTime,.15);music37[1].frequency.setTargetAtTime(82.5+bossLevel*8,audio.currentTime,.15);}}
   function ensureSettings37(){let d=$("#settingsDrawer37");if(d)return d;d=document.createElement("section");d.id="settingsDrawer37";d.className="drawer hidden";d.innerHTML='<div class="dhead"><h2>声音、震动与画面</h2><button class="close">×</button></div><div class="dbody" id="settingsBody37"></div>';d.querySelector(".close").onclick=()=>d.classList.add("hidden");document.body.appendChild(d);return d;}
   function openSettings37(){closeDrawers();const d=ensureSettings37(),s=save.settings;$("#settingsBody37").innerHTML=`<label class="settingRow37"><span>总音量 <b>${Math.round(s.master*100)}%</b></span><input data-setting="master" type="range" min="0" max="1" step=".05" value="${s.master}"></label><label class="settingRow37"><span>战斗音效 <b>${Math.round(s.sfx*100)}%</b></span><input data-setting="sfx" type="range" min="0" max="1" step=".05" value="${s.sfx}"></label><label class="settingRow37"><span>氛围音乐 <b>${Math.round(s.music*100)}%</b></span><input data-setting="music" type="range" min="0" max="1" step=".05" value="${s.music}"></label><button class="settingToggle37" data-toggle="vibration">震动反馈：${s.vibration?"开":"关"}</button><button class="settingToggle37" data-toggle="fx">特效强度：${s.fx?"完整":"精简"}</button><p class="routeNote">步枪、手枪、太刀和Boss阶段使用不同音色。省电设备可关闭震动并使用精简特效。</p>`;d.querySelectorAll("input").forEach(input=>input.oninput=()=>{s[input.dataset.setting]=Number(input.value);input.previousElementSibling.querySelector("b").textContent=`${Math.round(input.value*100)}%`;persist();setMusic37(state==="play",boss?.phase||0,true);});d.querySelectorAll("[data-toggle]").forEach(b=>b.onclick=()=>{const k=b.dataset.toggle;s[k]=s[k]?0:1;if(k==="fx")quality=s[k]?1:.62;persist();openSettings37();if(k==="vibration"&&s[k])haptic37(18);});d.classList.remove("hidden");}
   const _startSensory37=startGame;startGame=function(){quality=save.settings?.fx===0?.62:1;const result=_startSensory37();if(save.tutorialDone)ensureMusic37();return result;};
@@ -6449,7 +6449,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   const _renderChoices38=renderChoices;
   renderChoices=function(){_renderChoices38();document.querySelectorAll("#choices .choice").forEach(card=>{if(card.querySelector(".choiceReadout38"))return;const id=card.dataset.upgradeId||"",[label,now,next]=upgradeDelta38(id),isConflict=/机械义体|血肉超载|灵体化|奇迹变身/.test(card.textContent),readout=document.createElement("div");readout.className="choiceReadout38";readout.innerHTML=`<span>${label}</span><b>${now} → ${next}</b>${isConflict?'<em>存在代价：注意与当前路线冲突</em>':'<em>本轮生效 · 结算后清空</em>'}`;card.querySelector("div")?.appendChild(readout);});};
 
-  function ensureSaveManager38(){let d=$("#saveDrawer38");if(d)return d;d=document.createElement("section");d.id="saveDrawer38";d.className="drawer hidden";d.innerHTML='<div class="dhead"><h2>存档管理</h2><button class="close">×</button></div><div class="dbody"><p class="routeNote">导出包含剧情选择、服饰、主神永久强化与本地战绩。导入前会校验格式，不会上传网络。</p><textarea id="saveText38"></textarea><div class="saveActions38"><button id="refreshSave38">生成导出</button><button id="copySave38">复制</button><button id="downloadSave38">下载</button><button id="importSave38">导入文本</button></div></div>';d.querySelector(".close").onclick=()=>d.classList.add("hidden");d.querySelector("#refreshSave38").onclick=renderSave38;d.querySelector("#copySave38").onclick=async()=>{renderSave38();try{await navigator.clipboard.writeText($("#saveText38").value);toast("存档已复制");}catch{$("#saveText38").select();toast("已选中文本，请手动复制");}};d.querySelector("#downloadSave38").onclick=()=>{renderSave38();const blob=new Blob([$("#saveText38").value],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`sakurayo-v38-save-${Date.now()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);};d.querySelector("#importSave38").onclick=importSave39;document.body.appendChild(d);return d;}
+  function ensureSaveManager38(){let d=$("#saveDrawer38");if(d)return d;d=document.createElement("section");d.id="saveDrawer38";d.className="drawer hidden";d.innerHTML='<div class="dhead"><h2>存档管理</h2><button class="close">×</button></div><div class="dbody"><p class="routeNote">导出包含剧情选择、服饰、主神永久强化与本地战绩。导入前会校验格式，不会上传网络。</p><textarea id="saveText38"></textarea><div class="saveActions38"><button id="refreshSave38">生成导出</button><button id="copySave38">复制</button><button id="downloadSave38">下载</button><button id="importSave38">导入文本</button></div></div>';d.querySelector(".close").onclick=()=>d.classList.add("hidden");d.querySelector("#refreshSave38").onclick=renderSave38;d.querySelector("#copySave38").onclick=async()=>{renderSave38();try{await navigator.clipboard.writeText($("#saveText38").value);toast("存档已复制");}catch{$("#saveText38").select();toast("已选中文本，请手动复制");}};d.querySelector("#downloadSave38").onclick=()=>{renderSave38();exportJson48(`sakurayo-v46-save-${Date.now()}.json`,$("#saveText38").value);};d.querySelector("#importSave38").onclick=importSave39;document.body.appendChild(d);return d;}
   function renderSave38(){const text=$("#saveText38");if(text)text.value=JSON.stringify(save,null,2);}
   function openSaveManager38(){closeDrawers();ensureSaveManager38().classList.remove("hidden");renderSave38();}
   function installSaveButton38(){installUtilityButtons37();const wrap=document.querySelector(".utilityButtons37");if(!wrap||$("#saveButton38"))return;const b=document.createElement("button");b.id="saveButton38";b.textContent="存档";b.onclick=openSaveManager38;wrap.appendChild(b);}
@@ -6752,10 +6752,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   /* ================= V4.1 CONTENT PACK ADAPTER ================= */
   const FEEDBACK_ASSETS411=CONTENT41?.assets?.("official.feedback")||{},FEEDBACK_AUDIO411=FEEDBACK_ASSETS411.audio||{},FEEDBACK_VFX411=FEEDBACK_ASSETS411.vfx||{},feedbackPools411=new Map();
   function playFeedback411(key,volume=.32){
-    if(TEST_MODE||!FEEDBACK_AUDIO411[key]||save.settings?.sfx===0)return false;
+    if(TEST_MODE||platformSuspended48||!FEEDBACK_AUDIO411[key]||(save.settings?.master??.8)*(save.settings?.sfx??.8)*volume<=0)return false;
     try{
       let pool=feedbackPools411.get(key);if(!pool){pool=Array.from({length:3},()=>{const track=new Audio(artUrl(FEEDBACK_AUDIO411[key]));track.preload="auto";return track;});feedbackPools411.set(key,pool);}
-      const track=pool.find(item=>item.paused||item.ended)||pool[0],gain=clamp((save.settings?.master??.8)*(save.settings?.sfx??.8)*volume,0,1);track.pause();track.currentTime=0;track.volume=gain;track.play().catch(()=>{});return true;
+      const track=pool.find(item=>item.paused||item.ended)||pool[0],gain=clamp((save.settings?.master??.8)*(save.settings?.sfx??.8)*volume,0,1);track.pause();track.currentTime=0;track.volume=gain;track.play().catch(reportAudio48);return true;
     }catch(error){CONTENT41?.guard("official.feedback","audio:"+key,()=>{throw error;});return false;}
   }
   const _soundFeedback411=sound;
@@ -7216,9 +7216,6 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     quality = quality < 0.8 ? 1 : 0.62;
     $("#fxToggle").textContent = `画质：${quality < 0.8 ? "省电" : "自动"}`;
   };
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden && state === "play") pauseGame();
-  });
 
   let heroLiveKey46 = "";
   function installHomeDock46() {
@@ -7710,6 +7707,62 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   menuUpdate=function(){const result=_commandMenu47();refreshCommand47();return result;};
   const _commandChar47=updateCharacterUI35;
   updateCharacterUI35=function(){const result=_commandChar47();refreshCommand47();return result;};
+  /* ================= PLATFORM LIFECYCLE / EXPORT ================= */
+  let platformSuspended48=false;
+  const platformSamples48=[];
+  function reportAudio48(error){
+    if(error?.name==="NotAllowedError"||error?.name==="AbortError")return;
+    window.__SAKURAYO_DEV__?.report("audio",error);
+  }
+  function exportJson48(filename,text){
+    if(window.SakurayoAndroid){window.SakurayoAndroid.exportJson(filename,text);return;}
+    const blob=new Blob([text],{type:"application/json;charset=utf-8"}),a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);a.download=filename;a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  }
+  function platformBack48(){
+    const cutscene=window.SakurayoCutscene;
+    if(cutscene?.isPlaying()){cutscene.skipBeat();return true;}
+    if(state==="dialogue"){nextDialogue();return true;}
+    if(state==="level"||state==="event")return true;
+    if(state==="result"){backMenu();return true;}
+    if(state==="pause"){resumeGame();return true;}
+    const ui=window.SakurayoUI,active=ui?.active();
+    if(active){ui.close(active);return true;}
+    if(exploration41){
+      if(exploration41.activeEvent412)closeExploreEvent412(true);
+      else closeExploration41();
+      return true;
+    }
+    if(state==="play"){pauseGame();return true;}
+    return false;
+  }
+  function platformSuspend48(){
+    if(platformSuspended48)return;
+    platformSuspended48=true;
+    releaseInputs40();
+    if(state==="play")pauseGame();
+    if(exploration41){cancelAnimationFrame(exploreFrame41);exploreFrame41=0;}
+    window.SakurayoCutscene?.suspend();
+    for(const pool of feedbackPools411.values())for(const track of pool){
+      if(!track.paused&&!track.ended){platformSamples48.push(track);track.pause();}
+    }
+    if(audio&&audio.state!=="closed")audio.suspend().catch(reportAudio48);
+  }
+  function platformResume48(){
+    if(!platformSuspended48)return;
+    platformSuspended48=false;
+    if(exploration41){exploreLast41=0;exploreFrame41=requestAnimationFrame(exploreLoop41);}
+    window.SakurayoCutscene?.resume();
+    if(audio&&audio.state==="suspended")audio.resume().catch(reportAudio48);
+    for(const track of platformSamples48.splice(0)){
+      if((save.settings?.master??.8)*(save.settings?.sfx??.8)>0)track.play().catch(reportAudio48);
+    }
+  }
+  window.SakurayoPlatform=Object.freeze({back:platformBack48,suspend:platformSuspend48,resume:platformResume48});
+  document.addEventListener("visibilitychange",()=>{if(document.hidden)platformSuspend48();else platformResume48();});
+  addEventListener("pagehide",platformSuspend48);
+  addEventListener("pageshow",()=>{if(!document.hidden)platformResume48();});
   checkAch();
   menuUpdate();
   installModKitButton42();
