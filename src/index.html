@@ -5153,16 +5153,16 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         g.dead = true;
         fxStamp("loot", g.x, g.y, { size: 22, life: 0.32 });
         P.gemCount++;
-        gainXp(g.v);
-        if (state !== "play") { gems = gems.filter(item => !item.dead); return; }
         if (P.transmute && P.gemCount % 12 === 0) {
           P.sh = Math.min(P.maxSh, P.sh + 18);
           aoe(P.x, P.y, 92, P.dmg * 0.65, "#62e6ff", false, {
             source: "tech",
             school: "alch",
           });
-          if (state !== "play") return;
+          if (state !== "play") { gems = gems.filter(item => !item.dead); return; }
         }
+        gainXp(g.v);
+        if (state !== "play") { gems = gems.filter(item => !item.dead); return; }
       }
     }
     gems = gems.filter((g) => !g.dead);

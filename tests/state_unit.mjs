@@ -63,3 +63,10 @@ test('finish rejects duplicate challenge credit and balance sample at the entry'
   if(mode==='story')assert.equal(count,1);else assert.equal(challenge,1);
  }
 });
+test('a level-triggering twelfth gem still applies its transmutation reward',()=>{
+ const c=world([...resetFns,'gainXp','applyLevelGain36','openLevel','fixedUpdate']);c.resetP();let transmutations=0;
+ Object.assign(c,{runTime:0,banterTick:0,keys:{},joy:{dx:0,dy:0},enemies:[],bullets:[],ebullets:[],parts:[],texts:[],slashes:[],bossBorn:true,boss:null,eventIndex:2,shake:0,TAU:Math.PI*2,
+  playBanter:()=>{},playToast:()=>{},clamp:(n,lo,hi)=>Math.max(lo,Math.min(hi,n)),PLAYER_GEOMETRY35:{edgeX:28,edgeTop:73,edgeBottom:22},stage:()=>({dur:1000}),grid:{clear(){},add(){},near(){return[];}},updateArenaHazards:()=>{},updateHud:()=>{},aoe:()=>transmutations++});
+ Object.assign(c.P,{fire:100,plan:{rank:'A'},gemCount:11,transmute:1,maxSh:20});c.gems=[{v:11,x:c.P.x,y:c.P.y,r:4,bob:0}];
+ c.fixedUpdate(1/60);assert.equal(c.state,'level');assert.equal(transmutations,1);assert.equal(c.P.sh,18);assert.equal(c.gems.length,0);
+});
