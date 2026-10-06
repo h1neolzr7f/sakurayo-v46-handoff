@@ -1,6 +1,7 @@
 (function (global) {
   'use strict';
   // Pure save boundary shared by startup and text import. No storage or UI effects.
+  var CATALOG = global.SakurayoCatalog;
   var SETTINGS = {master:.8,sfx:.8,music:.45,vibration:1,fx:1,hudSize:'standard',damageText:'compact',contrast:1,uiCalm:1,glow:'off',glowVersion:2};
   var MAIN_GOD = {points:0,unlockedTier:1,bestTier:0,clears:0,runs:0,deepest:0,contracts:{},challenges:{},power:0,vitality:0,tempo:0,resonance:0,fortune:0,regenBlood:0,psiLink:0,gunBlade:0,mageCircuit:0,summonPage:0,spaceRing:0,rebirthDoll:0,sideKey:0,cursedHeart:0};
   var SHOP = {starter:{assault:0,bastion:0,flow:0,arcane:0},equippedStarter:null,items:{bait:0,ammo:0,whetstone:0,mirror:0},equippedWeapon:null,baitEquipped:false,ownedTalismans:[],bannedSchools:[],noUpgradeChallenge:false,lastTab:'skins',ops:{pity:0,pitySR:0,pulls:0,tenPulls:0,owned:{},last:[],cheatUsed:0}};
@@ -64,16 +65,17 @@
     if (clean.ownedSkins.indexOf('default') < 0) clean.ownedSkins.unshift('default');
     clean.skin = clean.ownedSkins.indexOf(clean.skin) >= 0 ? clean.skin : 'default';
     clean.settings = settings(incoming.settings);
-    Object.keys(clean.tal).forEach(function (key) {clean.tal[key] = integer(clean.tal[key],0,COUNT_MAX,0);});
-    Object.keys(MAIN_GOD).forEach(function (key) {if (typeof MAIN_GOD[key] === 'number') clean.mainGod[key] = integer(clean.mainGod[key],0,COUNT_MAX,MAIN_GOD[key]);});
+    Object.keys(CATALOG.tal).forEach(function (key) {clean.tal[key] = CATALOG.level(clean.tal[key],CATALOG.tal[key]);});
+    ['points','clears','runs','deepest'].forEach(function (key) {clean.mainGod[key] = integer(clean.mainGod[key],0,COUNT_MAX,0);});
+    [CATALOG.mainGodUpgrades,CATALOG.mainGodItems].forEach(function (group) {Object.keys(group).forEach(function (key) {clean.mainGod[key] = CATALOG.level(clean.mainGod[key],group[key]);});});
     clean.mainGod.unlockedTier = integer(clean.mainGod.unlockedTier,1,4,1);
     clean.mainGod.bestTier = integer(clean.mainGod.bestTier,0,4,0);
     ['sayo','aya','rion'].forEach(function (id) {if (!object(clean.storyChoices38[id])) clean.storyChoices38[id] = {};});
     var shop = clean.shop40;
-    Object.keys(SHOP.starter).forEach(function (id) {shop.starter[id] = integer(shop.starter[id],0,5,0);});
-    Object.keys(SHOP.items).forEach(function (id) {shop.items[id] = integer(shop.items[id],0,id === 'bait' ? 3 : 1,0);});
+    Object.keys(SHOP.starter).forEach(function (id) {shop.starter[id] = CATALOG.level(shop.starter[id],CATALOG.starters[id]);});
+    Object.keys(SHOP.items).forEach(function (id) {shop.items[id] = CATALOG.level(shop.items[id],CATALOG.items[id]);});
     if (!Object.prototype.hasOwnProperty.call(SHOP.starter,shop.equippedStarter)) shop.equippedStarter = null;
-    if (['ammo','whetstone','mirror'].indexOf(shop.equippedWeapon) < 0) shop.equippedWeapon = null;
+    if (['ammo','whetstone','mirror'].indexOf(shop.equippedWeapon) < 0 || !shop.items[shop.equippedWeapon]) shop.equippedWeapon = null;
     shop.ownedTalismans = list(shop.ownedTalismans).filter(function (id) {return SCHOOLS.indexOf(id) >= 0;});
     shop.bannedSchools = list(shop.bannedSchools).filter(function (id) {return shop.ownedTalismans.indexOf(id) >= 0;}).slice(0,2);
     if (['skins','starters','items','talismans','extensions'].indexOf(shop.lastTab) < 0) shop.lastTab = 'skins';

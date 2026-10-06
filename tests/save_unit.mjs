@@ -4,6 +4,7 @@ import vm from 'node:vm';
 import {test} from 'node:test';
 const runtime=new URL('../src/runtime/sakurayo-save.js',import.meta.url);
 const ctx={window:{}};vm.createContext(ctx);
+vm.runInContext(fs.readFileSync(new URL('../src/runtime/sakurayo-catalog.js',import.meta.url),'utf8'),ctx);
 vm.runInContext(fs.readFileSync(runtime,'utf8'),ctx);
 const S=ctx.window.SakurayoSave;
 const json=v=>JSON.parse(JSON.stringify(v));

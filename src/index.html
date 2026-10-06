@@ -151,6 +151,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 <script src="runtime/sakurayo-lifecycle.js"></script>
 <script src="runtime/sakurayo-camera.js"></script>
 <script src="runtime/sakurayo-cutscene.js"></script>
+<script src="runtime/sakurayo-catalog.js"></script>
 <script src="runtime/sakurayo-economy.js"></script>
 <script src="runtime/sakurayo-services.js"></script>
 <script src="runtime/sakurayo-ui.js"></script>
@@ -289,15 +290,6 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     rnd = (a, b) => a + Math.random() * (b - a),
     chance = (p) => Math.random() < p;
   /* ================= SAVE / MIGRATION ================= */
-  const store = (() => {
-    try {
-      localStorage.setItem("__sy3", "1");
-      localStorage.removeItem("__sy3");
-      return localStorage;
-    } catch {
-      return { getItem: () => null, setItem: () => {} };
-    }
-  })();
   const DEF = window.SakurayoSave.defaults();
   function normalizeGameSave(raw, strict = false, skins) {
     return window.SakurayoSave.normalize(raw, {strict, skins, normalizeOps: window.SakurayoLobby?.normalizeOps});
@@ -307,7 +299,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
   let save;
   try {
-    save = normalizeGameSave(JSON.parse(store.getItem("sakurayoV3") || "{}"));
+    save = normalizeGameSave(JSON.parse(localStorage.getItem("sakurayoV3") || "{}"));
   } catch {
     save = JSON.parse(JSON.stringify(DEF));
   }
@@ -318,15 +310,29 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     window.__SAKURAYO_DEV__?.report("extension:save-bootstrap", error);
   }
   save = normalizeGameSave(save);
-  const persist = () => {
-    window.SakurayoContent?.emit("save:beforePersist", { save });
-    try { store.setItem("sakurayoV3", JSON.stringify(save)); }
-    catch (error) {
-      window.__SAKURAYO_DEV__?.report("storage", error);
-      const quota = error && (error.name === "QuotaExceededError" || error.code === 22);
-      toast(quota ? "存档空间已满，进度未能写入" : "存档写入失败，请导出备份");
+  function storageStatus(error) {
+    let node=document.getElementById("storageStatus38");
+    if(!error){if(node)node.remove();return;}
+    if(!node){node=document.createElement("div");node.id="storageStatus38";node.setAttribute("role","alert");node.style.cssText="position:fixed;z-index:120;left:12px;bottom:12px;max-width:calc(100vw - 24px);padding:8px 12px;background:#361b31;color:#ffe6a3;border:1px solid #ffa9c5;border-radius:9px;font-size:12px;pointer-events:none";document.body.appendChild(node);}
+    const quota=error.name==="QuotaExceededError"||error.code===22;
+    node.textContent=quota?"存档空间已满，进度未能写入。请导出备份。":"存档写入失败，进度未保存。请导出备份。";
+  }
+  function writeSave(candidate=save) {
+    try {
+      window.SakurayoContent?.emit("save:beforePersist", {save:candidate});
+      localStorage.setItem("sakurayoV3",JSON.stringify(candidate));
+      storageStatus(null);
+      return true;
+    } catch (error) {
+      window.__SAKURAYO_DEV__?.report("storage",error);
+      storageStatus(error);
+      return false;
     }
+  }
+  const persist = () => {
+    const written=writeSave();
     menuUpdate();
+    return written;
   };
 
 
@@ -605,43 +611,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       story: 4,
     },
   ];
-  const TAL = {
-    atk: {
-      n: "破魔弹芯",
-      i: "⚔️",
-      d: "每级基础伤害 +5%",
-      max: 10,
-      c: (l) => 40 + l * 35,
-    },
-    hp: {
-      n: "巫女护体",
-      i: "💗",
-      d: "每级初始生命 +8",
-      max: 10,
-      c: (l) => 35 + l * 30,
-    },
-    luck: {
-      n: "神乐祝福",
-      i: "✨",
-      d: "每级暴击率 +2%",
-      max: 8,
-      c: (l) => 50 + l * 45,
-    },
-    mag: {
-      n: "灵核感应",
-      i: "🧲",
-      d: "每级拾取范围 +12",
-      max: 8,
-      c: (l) => 30 + l * 28,
-    },
-    flow: {
-      n: "战斗演算",
-      i: "⏱️",
-      d: "每级技能与冲刺冷却 -2%",
-      max: 8,
-      c: (l) => 55 + l * 42,
-    },
-  };
+  const TAL = window.SakurayoCatalog.tal;
   const STORIES = [
     {
       n: "序章：第零次死亡",
@@ -2488,7 +2458,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     box.innerHTML = "";
     Object.entries(TAL).forEach(([id, a]) => {
       let l = save.tal[id],
-        cost = a.c(l),
+        cost = window.SakurayoCatalog.price(a,l),
         max = l >= a.max,
         d = document.createElement("div");
       d.className = "talent";
@@ -6232,20 +6202,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   };
 
   /* ================= V3.6 主神空间 / 自由武器方向 ================= */
-  const MAIN_GOD_UPGRADES36={power:{n:"权能增幅",i:"⚔️",d:"主神空间全伤害 +6%/级",max:5},vitality:{n:"轮回体魄",i:"💗",d:"主神空间生命 +8%/级",max:5},tempo:{n:"时间压缩",i:"⏱️",d:"攻速与技能循环 +4%/级",max:5},resonance:{n:"经验共鸣",i:"✦",d:"经验获取 +12%/级",max:5},fortune:{n:"命运偏斜",i:"🎲",d:"每局重抽次数 +1/级",max:4}};
-  const MAIN_GOD_ITEMS36={
-    regenBlood:{n:"超凡血统·再生序列",i:"🧬",d:"每级生命 +6%，自然恢复 +0.35",max:3,base:10,step:8,group:"血统与灵能"},
-    psiLink:{n:"心灵链接芯片",i:"🔮",d:"每级护盾 +22，主动技能威力 +8%",max:3,base:10,step:8,group:"血统与灵能"},
-    gunBlade:{n:"枪剑同调印记",i:"⚔️",d:"每级枪弹、刀剑与弹速 +5%",max:3,base:12,step:9,group:"职业与技法"},
-    mageCircuit:{n:"多重魔法回路",i:"✨",d:"每级法术与主动技能威力 +10%",max:3,base:12,step:9,group:"职业与技法"},
-    summonPage:{n:"英灵召唤契约页",i:"👻",d:"开局获得使魔；每级召唤伤害 +15%",max:3,base:12,step:9,group:"职业与技法"},
-    spaceRing:{n:"折叠军械空间戒",i:"💍",d:"永久解锁：主神空间开局额外弹幕、穿透和磁吸",max:1,base:22,step:0,group:"特殊效果道具"},
-    rebirthDoll:{n:"因果替身人偶",i:"🪆",d:"永久解锁：每轮第一次致死时重构身体",max:1,base:28,step:0,group:"特殊效果道具"},
-    sideKey:{n:"支线剧情权限钥匙",i:"🗝️",d:"每级通关额外奖励点 +2，并解锁隐藏日志",max:3,base:14,step:10,group:"特殊效果道具"},
-  };
-  function mainGodUpgradeCost36(id){return 3+(save.mainGod[id]||0)*4;}
+  const MAIN_GOD_UPGRADES36=window.SakurayoCatalog.mainGodUpgrades;
+  const MAIN_GOD_ITEMS36=window.SakurayoCatalog.mainGodItems;
+  function mainGodUpgradeCost36(id){return window.SakurayoCatalog.price(MAIN_GOD_UPGRADES36[id],save.mainGod[id]);}
   function buyMainGodUpgrade36(id){const u=MAIN_GOD_UPGRADES36[id];if(!u)throw new Error(`Unknown main-god upgrade: ${id}`);const lv=save.mainGod[id]||0,cost=mainGodUpgradeCost36(id);if(lv>=u.max||save.mainGod.points<cost)return false;save.mainGod.points-=cost;save.mainGod[id]=lv+1;persist();toast(`${u.n} 已提升`);return true;}
-  function mainGodItemCost36(id){const u=MAIN_GOD_ITEMS36[id],lv=save.mainGod[id]||0;return u.base+lv*u.step;}
+  function mainGodItemCost36(id){const u=MAIN_GOD_ITEMS36[id],lv=save.mainGod[id]||0;return window.SakurayoCatalog.price(u,lv);}
   function buyMainGodItem36(id){const u=MAIN_GOD_ITEMS36[id];if(!u)throw new Error(`Unknown main-god item: ${id}`);const lv=save.mainGod[id]||0,cost=mainGodItemCost36(id);if(lv>=u.max||save.mainGod.points<cost)return false;save.mainGod.points-=cost;save.mainGod[id]=lv+1;persist();toast(`兑换完成：${u.n}`);return true;}
   function ensureMainGodShop36(){let drawer=$("#mainGodDrawer36");if(drawer)return drawer;drawer=document.createElement("section");drawer.id="mainGodDrawer36";drawer.className="drawer hidden";drawer.innerHTML='<div class="dhead"><h2>◈ 主神兑换大厅</h2><button class="close">×</button></div><div class="dbody"><div class="mainGodBalance36" id="mainGodBalance36"></div><div id="mainGodShopList36"></div></div>';drawer.querySelector(".close").onclick=()=>drawer.classList.add("hidden");document.body.appendChild(drawer);return drawer;}
   function exchangeCard36(id,u,buyer,cost){const lv=save.mainGod[id]||0,d=document.createElement("div");d.className="exchangeCard36";d.innerHTML=`<div class="ei">${u.i}</div><div><h4>${u.n} · Lv.${lv}/${u.max}</h4><p>${u.d}<br><span style="color:#ffe291">只在主神空间生效，跨轮回保留</span></p></div><button ${lv>=u.max||save.mainGod.points<cost?"disabled":""}>${lv>=u.max?"MAX":`◈ ${cost}`}</button>`;d.querySelector("button").onclick=()=>buyer(id);return d;}
@@ -6334,7 +6295,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   ];
   function randomOffers37(list,count){const pool=[...list];for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}return pool.slice(0,count);}
   function showMainGodContract37(){if(!isMainGodRun36()||P.mgContractPrompted)return;P.mgContractPrompted=1;hideTransient();state="event";$("#hud").classList.add("hidden");$("#event").classList.remove("hidden");$("#eventTitle").textContent="主神随机契约 · 三选一";$("#eventText").textContent=`监管层为本轮生成了三份有代价的强化。附加挑战：${P.mgChallenge.n}（完成奖励 ◈ ${P.mgChallenge.bonus}）`;const box=$("#eventChoices");box.innerHTML="";for(const c of randomOffers37(MAIN_GOD_CONTRACTS37,3)){const b=document.createElement("button");b.className="eventChoice";b.innerHTML=`<b>${c.n}</b><p>${c.d}</p>`;b.onclick=()=>{P.mgContract=c;c.apply();save.mainGod.contracts[c.id]=(save.mainGod.contracts[c.id]||0)+1;$("#event").classList.add("hidden");$("#hud").classList.remove("hidden");state="play";toast(`契约生效：${c.n}`);showBanter([["主神",`契约 ${c.n} 已写入本轮因果。`],[char35().short,"至少这次代价写在正面。"]],true);last=performance.now();scheduleLoop();};box.appendChild(b);}}
-  function totalMainGodInvestment37(){let total=0;for(const [id,u] of Object.entries(MAIN_GOD_UPGRADES36)){const lv=save.mainGod[id]||0;for(let i=0;i<lv;i++)total+=3+i*4;}for(const [id,u] of Object.entries(MAIN_GOD_ITEMS36)){const lv=save.mainGod[id]||0;for(let i=0;i<lv;i++)total+=u.base+i*u.step;}return total;}
+  function totalMainGodInvestment37(){return [...Object.entries(MAIN_GOD_UPGRADES36),...Object.entries(MAIN_GOD_ITEMS36)].reduce((total,[id,u])=>total+window.SakurayoCatalog.investment(u,save.mainGod[id]),0);}
   function resetMainGodBuild37(){const refund=totalMainGodInvestment37();if(!refund)return false;if(!confirm(`重置全部主神兑换并返还 ◈ ${refund}？关卡进度、契约记录和深层纪录不会清除。`))return false;for(const id of [...Object.keys(MAIN_GOD_UPGRADES36),...Object.keys(MAIN_GOD_ITEMS36)])save.mainGod[id]=0;save.mainGod.points+=refund;persist();renderMainGodShop36();toast(`已返还 ◈ ${refund}`);return true;}
   const _renderMainGodShop37=renderMainGodShop36;renderMainGodShop36=function(){_renderMainGodShop37();const balance=$("#mainGodBalance36");if(balance&&!$("#mgReset37")){const meta=document.createElement("div");meta.className="mgMeta37";meta.innerHTML=`<span>完成 ${save.mainGod.clears} 次</span><span>无限回廊 ${save.mainGod.deepest||0} 层</span><button id="mgReset37">重置兑换 · 返还 ◈ ${totalMainGodInvestment37()}</button>`;balance.appendChild(meta);meta.querySelector("button").onclick=resetMainGodBuild37;}};
   const _resetP37=resetP;resetP=function(){_resetP37();if(isMainGodRun36()){P.mgDepth=selectedMainGodTier36===4?Math.max(1,(save.mainGod.deepest||0)+1):0;P.mgContractPrompted=0;P.mgContract=null;P.mgChallenge=randomOffers37(MAIN_GOD_CHALLENGES37,1)[0];P.mgChallengeDone=false;P.mgChallengeBonus=0;P.mgPressure=0;}};
@@ -6470,7 +6431,6 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   /* ================= V3.5 补丁结束 ================= */
 
   /* ================= V3.9 全面收敛：手感、机制、界面与数据安全 ================= */
-  MAIN_GOD_ITEMS36.cursedHeart={n:"诅咒遗物·猩红心核",i:"🫀",d:"全伤害 +25%，最大生命 -18%；高风险永久兑换，可在重置时返还",max:1,base:24,step:0,group:"特殊效果道具"};
 
   const _resetP39=resetP;
   resetP=function(){const result=_resetP39();P.perfectDodges=0;P.dodgeFlash=0;P.bossRule39="";P.signalLane39=null;if(isMainGodRun36()&&save.mainGod.cursedHeart){P.dmg*=1.25;P.skillPow*=1.25;P.spellPow*=1.25;P.bladePower*=1.25;P.maxHp*=.82;P.hp=Math.min(P.hp,P.maxHp);}return result;};
@@ -6575,10 +6535,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       let clean = validateSave39(JSON.parse($("#saveText38").value));
       clean = window.SakurayoContent?.migrateSave(clean) || clean;
       clean = normalizeGameSave(clean, true, SKINS35.map(skin => skin.id));
+      if (!writeSave(clean)) return;
       for (const key of Object.keys(save)) delete save[key];
       Object.assign(save, clean);
       reconcileImportedSave39();
-      persist();
+      menuUpdate();
       toast("存档校验通过并已导入");
       $("#saveDrawer38").classList.add("hidden");
     } catch (error) {
@@ -6605,23 +6566,18 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   const BETA40=TEST_MODE||new URLSearchParams(location.search).has("beta"),BASE_STAGE_DUR40=ST.map(s=>s.dur);
 
   const STARTERS40={
-    assault:{n:"夜樱火控核心",i:"🎯",d:"伤害、射速与暴击同步成长。适合纯初始挑战。",apply:(lv,m)=>{P.dmg*=1+.12*lv*m;P.rate/=1+.03*lv*m;P.crit+=.012*lv*m;}},
-    bastion:{n:"镜甲生存核心",i:"🛡️",d:"生命、减伤与基础伤害同步成长。容错最高。",apply:(lv,m)=>{P.maxHp*=1+.14*lv*m;P.hp=P.maxHp;P.damageReduce+=.018*lv*m;P.dmg*=1+.055*lv*m;}},
-    flow:{n:"月影身法核心",i:"🌙",d:"移动、冲刺循环与基础伤害同步成长。奖励完美走位。",apply:(lv,m)=>{P.spd*=1+.055*lv*m;P.dashCd*=Math.max(.55,1-.055*lv*m);P.dmg*=1+.065*lv*m;}},
-    arcane:{n:"三相共鸣核心",i:"🔮",d:"护盾、技能与全伤害同步成长。后期章节收益更高。",apply:(lv,m)=>{P.maxSh+=18*lv*m;P.sh=P.maxSh;P.skillPow*=1+.11*lv*m;P.spellPow*=1+.08*lv*m;P.dmg*=1+.06*lv*m;}}
+    assault:{...window.SakurayoCatalog.starters.assault,apply:(lv,m)=>{P.dmg*=1+.12*lv*m;P.rate/=1+.03*lv*m;P.crit+=.012*lv*m;}},
+    bastion:{...window.SakurayoCatalog.starters.bastion,apply:(lv,m)=>{P.maxHp*=1+.14*lv*m;P.hp=P.maxHp;P.damageReduce+=.018*lv*m;P.dmg*=1+.055*lv*m;}},
+    flow:{...window.SakurayoCatalog.starters.flow,apply:(lv,m)=>{P.spd*=1+.055*lv*m;P.dashCd*=Math.max(.55,1-.055*lv*m);P.dmg*=1+.065*lv*m;}},
+    arcane:{...window.SakurayoCatalog.starters.arcane,apply:(lv,m)=>{P.maxSh+=18*lv*m;P.sh=P.maxSh;P.skillPow*=1+.11*lv*m;P.spellPow*=1+.08*lv*m;P.dmg*=1+.06*lv*m;}}
   };
-  const ITEMS40={
-    bait:{n:"丧尸诱饵",i:"🧟",max:3,base:90,step:70,d:"额外刷怪脉冲、普通波次 +8 秒/级、经验 +10%/级；仍受实体上限约束。"},
-    ammo:{n:"穿甲弹匣",i:"🔩",max:1,base:140,step:0,d:"枪弹伤害 +12%、穿透 +1；刀剑伤害 -6%。"},
-    whetstone:{n:"黄泉磨刀石",i:"🗡️",max:1,base:140,step:0,d:"刀剑伤害 +18%、主动技能 +8%；普通枪弹 -8%。"},
-    mirror:{n:"便携镜盾",i:"🔷",max:1,base:155,step:0,d:"开局护盾 +36、减伤 +5%；攻击速度 -5%。"}
-  };
+  const ITEMS40=window.SakurayoCatalog.items;
   const TALISMAN_SCHOOLS40=["mech","gun","alch","gene","vamp","spore","magical","cult","mage","shrine","summon","ninja","idol","necro"];
   function talismanSlots40(){return save.unlock>=3?2:1;}
   function isSchoolBanned40(s){return !!s&&s!=="base"&&save.shop40?.bannedSchools?.includes(s);}
   function starterChapterMul40(){return isMainGodRun36()?1:1+(clamp(selected,1,4)-1)*.18;}
-  function starterCost40(id){const lv=save.shop40.starter[id]||0;return 65+lv*55;}
-  function itemCost40(id){const u=ITEMS40[id],lv=save.shop40.items[id]||0;return u.base+u.step*lv;}
+  function starterCost40(id){const lv=save.shop40.starter[id]||0;return window.SakurayoCatalog.price(STARTERS40[id],lv);}
+  function itemCost40(id){const u=ITEMS40[id],lv=save.shop40.items[id]||0;return window.SakurayoCatalog.price(u,lv);}
   function resetStageDurations40(){ST.forEach((s,i)=>s.dur=BASE_STAGE_DUR40[i]);}
   function prepareStageEconomy40(){resetStageDurations40();if(!isMainGodRun36()&&save.shop40.baitEquipped){const lv=save.shop40.items.bait||0;if(lv)ST[selected-1].dur=BASE_STAGE_DUR40[selected-1]+lv*8;}}
 
@@ -6669,12 +6625,14 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   const _renderStory40=renderStory;
   renderStory=function(){const result=_renderStory40();const box=$("#storyList");for(const [id,text] of Object.entries(LONE_STORY40)){if(!save.hiddenStory40[id])continue;const c=CHARACTERS35[id],d=document.createElement("div");d.className="storyCard open hiddenStory40";d.innerHTML=`<div class="storyIcon">🕯️</div><div><h3>${c.name}隐藏档案 · 孤证</h3><p>${text}</p></div>`;box.appendChild(d);}return result;};
 
-  function buyStarter40(id){const u=STARTERS40[id],lv=save.shop40.starter[id]||0,cost=starterCost40(id);if(!u||lv>=5||save.coins<cost)return false;save.coins-=cost;save.shop40.starter[id]=lv+1;if(!save.shop40.equippedStarter)save.shop40.equippedStarter=id;persist();renderShop35();toast(`${u.n} 提升至 Lv.${lv+1}`);return true;}
+  function buyStarter40(id){const u=STARTERS40[id],lv=save.shop40.starter[id]||0,cost=starterCost40(id);if(!u||lv>=u.max||save.coins<cost)return false;save.coins-=cost;save.shop40.starter[id]=lv+1;if(!save.shop40.equippedStarter)save.shop40.equippedStarter=id;persist();renderShop35();toast(`${u.n} 提升至 Lv.${lv+1}`);return true;}
   function buyItem40(id){const u=ITEMS40[id],lv=save.shop40.items[id]||0,cost=itemCost40(id);if(!u||lv>=u.max||save.coins<cost)return false;save.coins-=cost;save.shop40.items[id]=lv+1;if(id==="bait")save.shop40.baitEquipped=true;else if(!save.shop40.equippedWeapon)save.shop40.equippedWeapon=id;persist();renderShop35();toast(`购入：${u.n}`);return true;}
   function shopCard40(icon,title,desc,buttonText,disabled,onClick,extra=""){const d=document.createElement("div");d.className="shopItem40";d.innerHTML=`<div class="shopIcon40">${htmlEscape(icon)}</div><div><h3>${htmlEscape(title)}</h3><p>${desc}</p>${extra}</div><button ${disabled?"disabled":""}>${htmlEscape(buttonText)}</button>`;d.querySelector("button").onclick=onClick;return d;}
-  function renderStarterShop40(section){for(const [id,u] of Object.entries(STARTERS40)){const lv=save.shop40.starter[id]||0,eq=save.shop40.equippedStarter===id,cost=starterCost40(id),mul=starterChapterMul40();const card=shopCard40(u.i,`${u.n} · Lv.${lv}/5`,`${u.d}<br><b>当前章节同步倍率 ${mul.toFixed(2)}×</b>`,eq?"已装备":lv?"装备":save.coins>=cost?`购买 🌸 ${cost}`:`还差 🌸 ${cost-save.coins}`,!lv&&save.coins<cost,()=>{if(lv){save.shop40.equippedStarter=id;persist();renderShop35();}else buyStarter40(id);},`<small>${lv<5?`下一级费用 🌸 ${cost}`:"已满级"}</small>`);if(lv>0&&lv<5){const up=document.createElement("button");up.className="shopUpgrade40";up.textContent=`升级 🌸 ${cost}`;up.disabled=save.coins<cost;up.onclick=()=>buyStarter40(id);card.appendChild(up);}if(window.SakurayoEconomy?.recommend(save.character).starterId===id)card.classList.add("shopRecommend44");if(!lv&&save.coins<cost)card.classList.add("shopShort44");section.appendChild(card);}}
-  function renderItemShop40(section){for(const [id,u] of Object.entries(ITEMS40)){const lv=save.shop40.items[id]||0,cost=itemCost40(id),active=id==="bait"?save.shop40.baitEquipped:save.shop40.equippedWeapon===id;const card=shopCard40(u.i,`${u.n} · Lv.${lv}/${u.max}`,u.d,active?"使用中":lv?(id==="bait"?"启用":"装备"):save.coins>=cost?`🌸 ${cost}`:`还差 🌸 ${cost-save.coins}`,!lv&&save.coins<cost,()=>{if(lv){if(id==="bait")save.shop40.baitEquipped=!save.shop40.baitEquipped;else save.shop40.equippedWeapon=id;persist();renderShop35();}else buyItem40(id);});if(window.SakurayoEconomy?.recommend(save.character).itemId===id)card.classList.add("shopRecommend44");if(!lv&&save.coins<cost)card.classList.add("shopShort44");section.appendChild(card);}}
-  function renderTalismanShop40(section){const note=document.createElement("p");note.className="routeNote";note.textContent=`当前可排除 ${talismanSlots40()} 个职业学校；通用生存升级不会被排除。`;section.appendChild(note);for(const id of TALISMAN_SCHOOLS40){const owned=save.shop40.ownedTalismans.includes(id),on=save.shop40.bannedSchools.includes(id),u=SCHOOL[id],card=shopCard40("符",`${u?.n||id}排除符`,on?"已从普通职业技能刷新池排除。":"装饰符咒：装备后排除该学校技能刷新。",on?"已排除":owned?"装备":save.coins>=80?`🌸 80`:`还差 🌸 ${80-save.coins}`,!owned&&save.coins<80,()=>{if(!owned){save.coins-=80;save.shop40.ownedTalismans.push(id);}const list=save.shop40.bannedSchools,pos=list.indexOf(id);if(pos>=0)list.splice(pos,1);else if(list.length<talismanSlots40())list.push(id);else return toast(`最多装备 ${talismanSlots40()} 枚排除符`);persist();renderShop35();});section.appendChild(card);}}
+  function renderStarterShop40(section){for(const [id,u] of Object.entries(STARTERS40)){const lv=save.shop40.starter[id]||0,eq=save.shop40.equippedStarter===id,cost=starterCost40(id),mul=starterChapterMul40();const card=shopCard40(u.i,`${u.n} · Lv.${lv}/${u.max}`,`${u.d}<br><b>当前章节同步倍率 ${mul.toFixed(2)}×</b>`,eq?"已装备":lv?"装备":save.coins>=cost?`购买 🌸 ${cost}`:`还差 🌸 ${cost-save.coins}`,!lv&&save.coins<cost,()=>{if(lv){save.shop40.equippedStarter=id;persist();renderShop35();}else buyStarter40(id);},`<small>${lv<u.max?`下一级费用 🌸 ${cost}`:"已满级"}</small>`);if(lv>0&&lv<u.max){const up=document.createElement("button");up.className="shopUpgrade40";up.textContent=`升级 🌸 ${cost}`;up.disabled=save.coins<cost;up.onclick=()=>buyStarter40(id);card.appendChild(up);}if(window.SakurayoEconomy?.recommend(save.character).starterId===id)card.classList.add("shopRecommend44");if(!lv&&save.coins<cost)card.classList.add("shopShort44");section.appendChild(card);}}
+  function renderItemShop40(section){for(const [id,u] of Object.entries(ITEMS40)){const lv=save.shop40.items[id]||0,cost=itemCost40(id),active=id==="bait"?save.shop40.baitEquipped:save.shop40.equippedWeapon===id;const card=shopCard40(u.i,`${u.n} · Lv.${lv}/${u.max}`,u.d,active?"使用中":lv?(id==="bait"?"启用":"装备"):save.coins>=cost?`🌸 ${cost}`:`还差 🌸 ${cost-save.coins}`,!lv&&save.coins<cost,()=>{if(lv){if(id==="bait")save.shop40.baitEquipped=!save.shop40.baitEquipped;else save.shop40.equippedWeapon=id;persist();renderShop35();}else buyItem40(id);});if(lv>0&&lv<u.max){const up=document.createElement("button");up.className="shopUpgrade40";up.textContent=`升级 🌸 ${cost}`;up.disabled=save.coins<cost;up.onclick=()=>buyItem40(id);card.appendChild(up);}if(window.SakurayoEconomy?.recommend(save.character).itemId===id)card.classList.add("shopRecommend44");if(!lv&&save.coins<cost)card.classList.add("shopShort44");section.appendChild(card);}}
+  function buyTalisman40(id){if(!TALISMAN_SCHOOLS40.includes(id)||save.shop40.ownedTalismans.includes(id)||save.coins<80)return false;save.coins-=80;save.shop40.ownedTalismans.push(id);persist();renderShop35();return true;}
+  function equipTalisman40(id){if(!save.shop40.ownedTalismans.includes(id))return false;const list=save.shop40.bannedSchools,pos=list.indexOf(id);if(pos>=0)list.splice(pos,1);else if(list.length<talismanSlots40())list.push(id);else{toast(`最多装备 ${talismanSlots40()} 枚排除符`);return false;}persist();renderShop35();return true;}
+  function renderTalismanShop40(section){const note=document.createElement("p");note.className="routeNote";note.textContent=`当前可排除 ${talismanSlots40()} 个职业学校；通用生存升级不会被排除。`;section.appendChild(note);for(const id of TALISMAN_SCHOOLS40){const owned=save.shop40.ownedTalismans.includes(id),on=save.shop40.bannedSchools.includes(id),u=SCHOOL[id],card=shopCard40("符",`${u?.n||id}排除符`,on?"已从普通职业技能刷新池排除。":"购买后可装备，排除该学校技能刷新。",on?"卸下":owned?"装备":save.coins>=80?`购买 🌸 80`:`还差 🌸 ${80-save.coins}`,!owned&&save.coins<80,owned?()=>equipTalisman40(id):()=>buyTalisman40(id));section.appendChild(card);}}
   function bindShopTabs40(box){
     const tabs=box.querySelector(".shopTabs40");if(!tabs)return;
     const groups=[...box.querySelectorAll(".shopGroup40")];

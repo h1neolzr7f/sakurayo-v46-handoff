@@ -691,7 +691,7 @@
     var pool = poolId || save.shop40.ops.pool || "remnant";
     if (POOL_IDS.indexOf(pool) < 0) pool = "remnant";
     var list = cardsForPool(pool);
-    var coins = clampInt(save.coins, 0, 99999999);
+    var coins = save.coins;
     if (!list.length) {
       return { ok: false, reason: "empty", results: [], coins: coins, pool: pool, pity: save.shop40.ops.pity, pitySR: save.shop40.ops.pitySR, owned: save.shop40.ops.owned };
     }
@@ -726,7 +726,7 @@
   function grantCheat(save) {
     if (!save || typeof save !== "object") return { coins: 0, cheatUsed: 0 };
     save.shop40 = normalizeOps(save.shop40 || {});
-    save.coins = clampInt(save.coins, 0, 99999999) + RATES.cheat;
+    save.coins = save.coins + RATES.cheat;
     save.shop40.ops.cheatUsed = 1;
     return { coins: save.coins, cheatUsed: 1 };
   }
@@ -775,7 +775,7 @@
       shards: ops.shards,
       fashion: ops.fashion,
       weapon: ops.weapon,
-      coins: clampInt(save && save.coins, 0, 99999999),
+      coins: save ? save.coins : 0,
       cheatUsed: !!ops.cheatUsed,
     };
   }
