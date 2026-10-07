@@ -691,7 +691,7 @@
     var pool = poolId || save.shop40.ops.pool || "remnant";
     if (POOL_IDS.indexOf(pool) < 0) pool = "remnant";
     var list = cardsForPool(pool);
-    var coins = clampInt(save.coins, 0, 99999999);
+    var coins = save.coins;
     if (!list.length) {
       return { ok: false, reason: "empty", results: [], coins: coins, pool: pool, pity: save.shop40.ops.pity, pitySR: save.shop40.ops.pitySR, owned: save.shop40.ops.owned };
     }
@@ -726,7 +726,7 @@
   function grantCheat(save) {
     if (!save || typeof save !== "object") return { coins: 0, cheatUsed: 0 };
     save.shop40 = normalizeOps(save.shop40 || {});
-    save.coins = clampInt(save.coins, 0, 99999999) + RATES.cheat;
+    save.coins = save.coins + RATES.cheat;
     save.shop40.ops.cheatUsed = 1;
     return { coins: save.coins, cheatUsed: 1 };
   }
@@ -775,7 +775,7 @@
       shards: ops.shards,
       fashion: ops.fashion,
       weapon: ops.weapon,
-      coins: clampInt(save && save.coins, 0, 99999999),
+      coins: save ? save.coins : 0,
       cheatUsed: !!ops.cheatUsed,
     };
   }
@@ -1083,19 +1083,10 @@
     return (card && card.d) || "";
   }
 
-  var rosterPeekState = null;
-
   function closeRosterPeek() {
     if (!global.document) return;
     var peek = global.document.getElementById("rosterPeek46");
-    if (peek && global.SakurayoUI) {
-      global.SakurayoUI.close(peek);
-      return;
-    }
-    if (peek && peek.parentNode) peek.parentNode.removeChild(peek);
-    var source = rosterPeekState && rosterPeekState.source;
-    rosterPeekState = null;
-    if (source && source.isConnected && typeof source.focus === "function") source.focus();
+    if (peek) global.SakurayoUI.close(peek);
   }
 
   function showRosterPeek(card, locked, count, handlers, tab, source) {
@@ -1141,37 +1132,15 @@
     }
     drawer.appendChild(overlay);
     hideBrokenArt(overlay);
-    rosterPeekState = { source: source };
-    if (global.SakurayoUI) {
-      global.SakurayoUI.open(overlay, {
+    global.SakurayoUI.open(overlay, {
         nested: true,
         initialFocus: close,
         returnFocus: source,
         onClose: function () {
           if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-          rosterPeekState = null;
         }
       });
-    } else {
-      overlay.onkeydown = function (event) {
-        if (event.key === "Escape") {
-          event.preventDefault();
-          event.stopPropagation();
-          closeRosterPeek();
-        } else if (event.key === "Tab") {
-          var targets = overlay.querySelectorAll("button:not(:disabled)");
-          var first = targets[0], last = targets[targets.length - 1];
-          if (event.shiftKey && global.document.activeElement === first) {
-            event.preventDefault();
-            last.focus();
-          } else if (!event.shiftKey && global.document.activeElement === last) {
-            event.preventDefault();
-            first.focus();
-          }
-        }
-      };
-      if (close && typeof close.focus === "function") close.focus();
-    }
+
   }
 
   function rosterList(tab) {
@@ -1283,7 +1252,7 @@
     if (!drawer) return;
     var items = Array.isArray(results) ? results : [];
     var old = global.document.getElementById("gachaReveal46");
-    if (old && old.parentNode) old.parentNode.removeChild(old);
+    if (old) global.SakurayoUI.close(old);
     if (!items.length) return;
     var instant = testMode();
     var overlay = global.document.createElement("div");
@@ -1344,9 +1313,12 @@
       })(cards[i], i);
     }
     var take = overlay.querySelector(".revealTake46");
+    global.SakurayoUI.open(overlay, {nested:true,initialFocus:take,onClose:function(){
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    }});
     if (take) {
       take.onclick = function () {
-        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        global.SakurayoUI.close(overlay);
       };
     }
     var skip = overlay.querySelector(".revealSkip46");
@@ -1354,7 +1326,7 @@
     var again = overlay.querySelector(".revealAgain46");
     if (again) {
       again.onclick = function () {
-        if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+        global.SakurayoUI.close(overlay);
         handlers.again();
       };
     }

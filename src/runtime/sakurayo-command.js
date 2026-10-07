@@ -99,6 +99,8 @@
     @keyframes commandEnter47{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
     #commandDrawer47:not(.hidden) #commandBody47{animation:commandEnter47 .22s ease-out both}
     .commandLinks47 button,.commandRail47 button,.cmdActions47 button,.cmdTabs47 button{transition:background-color .15s,border-color .15s}
+    .reducedFx48 .heroLiveSway46,.reducedFx48 .heroLiveBreath46,.reducedFx48 #commandBody47{animation:none!important}
+    .reducedFx48 .heroLivePhys46,.reducedFx48 .heroLiveLook46,.reducedFx48 .commandLinks47 button,.reducedFx48 .commandRail47 button,.reducedFx48 .cmdActions47 button,.reducedFx48 .cmdTabs47 button{transition:none!important}
     @media(hover:hover){.commandLinks47 button:hover,.commandRail47 button:hover,.cmdActions47 button:hover{border-color:#83e4f2;background-color:#25324a}.cmdTabs47 button:hover{border-color:#83e4f2}}
     @media(prefers-reduced-motion:reduce){.heroLiveSway46,.heroLiveBreath46,#commandBody47{animation:none!important}.heroLivePhys46,.heroLiveLook46,.commandLinks47 button,.commandRail47 button,.cmdActions47 button,.cmdTabs47 button{transition:none!important}}
   `;
@@ -114,8 +116,7 @@
   }
   function close(){
     var drawer=global.document.getElementById('commandDrawer47');
-    if(options&&options.ui)options.ui.close(drawer);
-    else if(drawer)drawer.classList.add('hidden');
+    options.ui.close(drawer);
     currentPanel='';
   }
   // The panel body is rebuilt to display current game data. One delegated handler
@@ -189,9 +190,16 @@
     var next=focusId&&d.getElementById(focusId);
     if(focusCharacter)next=Array.from(body.querySelectorAll('[data-character]')).find(function(b){return b.dataset.character===focusCharacter;});
     if(!refresh||!next||next.disabled)next=drawer.querySelector('.close');
-    if(options.ui)options.ui.open(drawer,{initialFocus:next,onClose:function(){currentPanel='';}});
-    else {options.closeDrawers();drawer.classList.remove('hidden');next.focus();}
+    options.ui.open(drawer,{initialFocus:next,onClose:function(){currentPanel='';}});
     style();
+  }
+  function refreshEffects(){
+    if(!options)return;
+    var d=global.document,reduced=options.model().save.settings.fx===0;
+    d.documentElement.classList.toggle('reducedFx48',reduced);
+    var source=d.querySelector('#commandHeading47 source');
+    if(source)source.media=reduced?'all':'(prefers-reduced-motion: reduce)';
+    if(global.SakurayoLive)global.SakurayoLive.refresh();
   }
   function mount(opts){
     options=opts;var d=global.document;if(!d)return;
@@ -222,6 +230,7 @@
     }
     var mission=dock.querySelector('.stageMini');mission.setAttribute('role','button');mission.tabIndex=0;mission.setAttribute('aria-label','选择模式与关卡');mission.onclick=function(){options.open('stage');};mission.onkeydown=function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();options.open('stage');}};
     dock.querySelectorAll('.charCard').forEach(function(b){b.setAttribute('aria-label',b.textContent.trim());b.setAttribute('aria-pressed',b.classList.contains('selected')?'true':'false');});
+    refreshEffects();
   }
   function settingsUtilities(actions){
     var d=global.document,body=d.getElementById('settingsBody37');if(!body)return;
@@ -229,5 +238,5 @@
     section.innerHTML='<small>LOCAL UTILITIES</small><h3>存档与帮助</h3><div class="cmdActions47">'+actions.map(function(a){return '<button type="button" id="'+esc(a.id)+'">'+esc(a.label)+'</button>';}).join('')+'</div>';
     actions.forEach(function(a){bind('#'+a.id,a.open);});
   }
-  global.SakurayoCommand={inbox:inbox,claimSupply:claimSupply,mount:mount,panel:panel,close:close,settingsUtilities:settingsUtilities};
+  global.SakurayoCommand={inbox:inbox,claimSupply:claimSupply,mount:mount,panel:panel,close:close,settingsUtilities:settingsUtilities,refreshEffects:refreshEffects};
 })(window);

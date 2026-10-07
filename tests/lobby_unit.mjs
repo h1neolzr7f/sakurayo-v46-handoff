@@ -377,6 +377,11 @@ assert.equal(tap10.granted, true);
 
 function fakeEl(tag, attrs = {}) {
   const node = {
+    nodeType: 1,
+    get parentElement() { return this.parentNode; },
+    hasAttribute(k) { return this.attrs[k] != null; },
+    contains(other) { return this === other || collect(this).includes(other); },
+    focus() { document.activeElement = this; },
     tagName: String(tag).toUpperCase(),
     id: attrs.id || "",
     className: attrs.className || "",
@@ -421,6 +426,11 @@ function fakeEl(tag, attrs = {}) {
       this.children = parseHtml(this._html, this);
     },
   };
+  node.classList = {
+    contains(c) { return node.className.split(/\s+/).includes(c); },
+    add(c) { if (!this.contains(c)) node.className += ' '+c; },
+    remove(c) { node.className=node.className.split(/\s+/).filter(x=>x!==c).join(' '); }
+  };
   return node;
 }
 function collect(root, acc = []) {
@@ -459,6 +469,8 @@ const allNodes = () => collect(head).concat(collect(body));
 const document = {
   head,
   body,
+  addEventListener() {},
+  querySelectorAll(sel) { return allNodes().filter(n => sel.split(",").some(part => matchSel(n, part))); },
   documentElement: fakeEl("html"),
   getElementById(id) {
     return allNodes().find((n) => n.id === id) || null;
@@ -470,6 +482,9 @@ const document = {
 const vis = { document, Math, Date, Object, Array, Number, String, TEST_MODE: true, setTimeout(fn) { fn(); } };
 vis.window = vis;
 vis.globalThis = vis;
+vis.getComputedStyle = () => ({display:"block",visibility:"visible"});
+document.documentElement.contains = n => allNodes().includes(n);
+vm.runInNewContext(fs.readFileSync(path.join(root,"src/runtime/sakurayo-ui.js"),"utf8"), vis);
 vm.runInNewContext(code, vis);
 const V = vis.window.SakurayoLobby;
 V.injectStyle();
