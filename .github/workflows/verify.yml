@@ -2,7 +2,7 @@ name: verify
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'codex/audit-integration-*']
   pull_request:
 
 jobs:
