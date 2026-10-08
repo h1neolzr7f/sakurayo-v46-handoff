@@ -1115,6 +1115,7 @@ try {
   await api(page, "setBait40", 0, false);
   await api(page, "setBannedSchools40", []);
   const loneDurations = {};
+  const loneEvidence = { save: await api(page, "saveSnapshot"), runs: [] };
   for (const character of ["sayo", "aya", "rion"]) {
     await api(page, "backMenu");
     await api(page, "configureStarter40", "assault", 5, true);
@@ -1125,6 +1126,7 @@ try {
     await api(page, "dismissDialogue");
     await api(page, "protectPlayer");
     let loneState = await state(page);
+    const loneStart = loneState;
     for (let guard = 0; guard < 100 && loneState.mode !== "result"; guard++) {
       if (loneState.mode === "event") await api(page, "chooseEvent", 0);
       else if (loneState.mode === "dialogue") await api(page, "dismissDialogue");
@@ -1141,9 +1143,11 @@ try {
     assert.equal(loneState.player.upgradeChoices, 0);
     assert.equal(loneState.build.upgradeOrder.length, 0);
     loneDurations[character] = loneState.runTime;
+    loneEvidence.runs.push({character, start:loneStart, end:loneState});
     if (character === "sayo") await shot(page, "09-lone-proof-result.png");
   }
   const loneSave = await api(page, "saveSnapshot");
+  fs.writeFileSync(path.join(artifactDir, "lone-proof-evidence.json"), JSON.stringify(loneEvidence, null, 2));
   assert.equal(loneSave.ach.loneproof, true);
   assert.deepEqual(Object.keys(loneSave.hiddenStory40).sort(), ["aya", "rion", "sayo"]);
   assert.ok((await api(page, "balanceReport40")).samples >= 3);

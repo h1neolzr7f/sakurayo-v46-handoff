@@ -31,6 +31,19 @@ test('reset deletes all old run properties and preserves player identity',()=>{
 test('first main God rebirth doll initializes a finite revive count',()=>{
  const c=world(resetFns);c.runMode36='mainGod';c.save.mainGod.rebirthDoll=1;c.resetP();assert.equal(c.P.revive,1);assert.ok(Number.isFinite(c.P.hp));
 });
+test('starting a new run discards previous enemies from spatial queries',()=>{
+ const c=world([...resetFns,'startGame']),noop=()=>{};
+ const gridStart=html.indexOf('  class Grid {'),gridEnd=html.indexOf('  function caps()',gridStart);
+ vm.runInContext(html.slice(gridStart,gridEnd).replace('  const grid = new Grid(76);','globalThis.grid = new Grid(76);'),c);
+ c.state='pause';c.window.performance=c.performance;
+ Object.assign(c,{prepareStageEconomy40:noop,updateQuality48:noop,ensureMusic37:noop,ensureAudio:noop,preferLandscape46:noop,opsPaint46:noop,showBanter:noop,scheduleLoop:noop,
+  stage:()=>({id:1,short:'test'}),openingDialogue:()=>[],showDialogue:(lines,done)=>done()});
+ const previousEnemy={x:c.W/2,y:c.H/2,r:18,hp:1,dead:false};c.enemies=[previousEnemy];c.grid.add(previousEnemy);
+ c.startGame();
+ assert.equal(c.enemies.length,0);
+ assert.equal(c.grid.nearest(c.P.x,c.P.y,150),null,'a skill or auto-attack before the first update must not target the previous run');
+ assert.equal(c.grid.within(c.P.x,c.P.y,150).length,0,'the opening skill cannot earn kills or XP from previous enemies');
+});
 test('XP earned while choosing stays unspent until each next choice',()=>{
  const c=world(['gainXp','applyLevelGain36','openLevel']);Object.assign(c.P,{level:1,xp:0,next:11,hp:50,maxHp:100});
  c.gainXp(11);c.gainXp(18);c.gainXp(27);assert.equal(c.P.level,2);assert.equal(c.P.xp,45);assert.equal(c.choices,1);
