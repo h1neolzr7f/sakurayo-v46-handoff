@@ -28,6 +28,6 @@
 
 本次环境恢复后浏览器缓存缺失，下载入口返回 HTML 而非有效 ZIP，因此上述已经运行的浏览器专项与本次静态检查分开记载；不宣称当前源码/离线完整浏览器回归通过。CI 将运行真实浏览器、Android assembleDebug/lintDebug。编译不替代实体机横屏触控、导出、返回、后台、覆盖安装和长时间性能测试。
 
-验证分支为 `codex/audit-integration-validation`，工作流增加 `codex/audit-integration-*` 推送触发，便于独立验证整合提交。工作流包含完整浏览器和 Android 编译检查；已配置不代表已经运行或通过，结果须以 Actions 记录为准。
+最新验证分支为 `codex/audit-integration-grid`，包含网格清理及完整比较证据采集；基线为 `codex/audit-integration-validation`。工作流增加 `codex/audit-integration-*` 推送触发，便于独立验证整合提交。工作流包含完整浏览器和 Android 编译检查；已配置不代表已经运行或通过，结果须以 Actions 记录为准。
 
 维持开发草稿，不合并 main、不发布 APK。各组旧报告中的单独通过结果不等于整合版发布验收。
