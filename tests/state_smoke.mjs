@@ -18,6 +18,14 @@ try {
  await api('dismissDialogue');await api('backMenu');
  await api('selectCharacter','sayo');await api('selectStage',2);
  async function start(mode='story') {await api('backMenu');await api('setRunMode46',mode);if(mode==='mainGod'){await api('unlockMainGod');await api('selectMainGodTier',1);}await api('start');await api('dismissDialogue');}
+ await api('selectCharacter','aya');await start();await api('protectPlayer');
+ await api('spawnEnemyNear','tank',30);await page.evaluate(()=>window.advanceTime(17));
+ assert.ok((await snap()).counts.enemies>0,'old run must contain a live indexed enemy');
+ await api('pauseNow');await page.locator('#retryP').click();await api('dismissDialogue');
+ assert.equal((await snap()).counts.enemies,0);await page.locator('#skill').click();
+ assert.deepEqual((await snap()).build.damageSources,{},'opening skill must not hit the old run');
+ assert.equal((await snap()).counts.gems,0,'opening skill cannot generate old-run XP');
+ await api('selectCharacter','sayo');
  for(const fusion of (await api('newFusionCatalog41'))){
   await start();await api('forceFusion41',fusion.id);assert.ok(Object.values((await snap()).build.fusionMechanics).some(Boolean));
   await api('pauseNow');await page.locator('#retryP').click();await api('dismissDialogue');
@@ -51,5 +59,5 @@ try {
  assert.equal(won.mode,'dialogue','Boss death must stop before ordinary enemy contact');assert.ok(won.player.hp>0);
  await api('dismissDialogue');won=await snap();assert.equal(won.result.win,true);assert.equal(won.mode,'result');
  assert.deepEqual(errors,[]);
- console.log('PASS state smoke: tutorial, six fusion resets, three mode retry/again, idempotent finish, stable ops DOM, Boss victory');
+ console.log('PASS state smoke: tutorial, opening skill grid reset, six fusion resets, three mode retry/again, idempotent finish, stable ops DOM, Boss victory');
 } finally {await browser.close();}

@@ -634,6 +634,7 @@ try {
     await api(page, "freezeProgression");
     await api(page, "clearCombat");
     await api(page, "spawnEnemyRelative", "normal", 80, 0);
+    await page.evaluate(() => window.advanceTime(17));
     let fused = await api(page, "forceFusion41", fusion.id);
     assert.equal(fused.build.fusion, fusion.id);
     assert.equal(fused.build.fusionMechanics[fusionFlag41[fusion.id]], true);
