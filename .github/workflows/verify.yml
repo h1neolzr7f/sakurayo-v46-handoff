@@ -34,6 +34,13 @@ jobs:
       - run: npm ci
       - run: python -m pip install Pillow
       - run: npx playwright install --with-deps chromium
+      - name: Save browser validation runtime
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-validation-runtime
+          path: ~/.cache/ms-playwright
+          retention-days: 1
+          compression-level: 1
       - name: Diagnose isolated starter runs
         run: node tests/balance_diagnostic.mjs
       - name: Source and offline bundle regression
