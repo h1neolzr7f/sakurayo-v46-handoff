@@ -1,6 +1,6 @@
 # 《樱夜·尸潮》V4.6.0 交接规格
 
-2026-10-05 更新。给下一位 AI / 维护者。先读根目录 [README.md](../README.md)，再读本文和 [AGENTS.md](../AGENTS.md)。二游分期原文在 [PLAN_V46_ERYOU.md](PLAN_V46_ERYOU.md)。升版本见 [MAINTAIN.md](MAINTAIN.md)。
+2026-10-08 更新。给下一位 AI / 维护者。先读根目录 [README.md](../README.md)，再读本文和 [AGENTS.md](../AGENTS.md)。二游分期原文在 [PLAN_V46_ERYOU.md](PLAN_V46_ERYOU.md)。升版本见 [MAINTAIN.md](MAINTAIN.md)。
 
 这不是另做一款原神。局外做成能横着玩的二次元手游大厅，局内继续是离线肉鸽射击。
 
@@ -63,8 +63,8 @@
 
 ### 当前修复与交付
 
-1. 按 [全项目审查](AUDIT_2026-10-05.md) 和 [修复计划](plans/2026-10-05-full-repair.md) 修复 F01–F30，并保留审查原证据。
-2. 运行源码、单HTML、所有新增行为回归；Android CI 编译与 lint 不替代真机验收。
+1. 已按 [全项目审查](AUDIT_2026-10-05.md) 和 [修复计划](plans/2026-10-05-full-repair.md) 整合 F01–F30 修复，保留审查原证据；续修动态效果、绫延迟技能与跨局空间网格，见[最终验证记录](VALIDATION_REPAIR_INTEGRATION.md)。
+2. [完整 CI](https://github.com/h1neolzr7f/sakurayo-v46-handoff/actions/runs/37724631795) 已通过源码、单HTML、所有适用行为回归及 Android 编译与 lint；不替代真机验收。
 3. 真机检查横屏触控、嵌套返回、文件导出、后台恢复、覆盖安装和持续运行。不要卸载旧正式包清档。
 4. 保持开发预发布。后续 I2V 素材需明确资源缺口与质量依据，当前修复不需重复生成大厅图。
 
