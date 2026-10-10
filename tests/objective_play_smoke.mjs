@@ -11,6 +11,7 @@ for (const ch of ['sayo','aya','rion']) for (const id of ids) {
   let r;
   for (let i = 0; i < 2000; i++) {
     r = await page.evaluate(() => { const a = window.__SAKURAYO_TEST__, keys = {}; const press = (k, on) => dispatchEvent(new KeyboardEvent(on ? 'keydown' : 'keyup', { key: k }));
+      if (a.avgState46()) { a.avgSkip46(); return null; } // 章末剧情（第二章起每关都有 post）
       const m = a.snapshot().mode; if (m === 'level') { a.chooseUpgrade(0); return null; } if (m === 'event') { a.chooseEvent(0); return null; } if (m === 'dialogue') { a.dismissDialogue(); return null; } if (m !== 'play') return { m, s: a.levelState46(), t: a.snapshot().runTime, hp: a.snapshot().player.hp };
       const s = a.levelState46(), p = a.snapshot().player; let tx = p.x, ty = p.y, keep = 0;
       if (s.zone) { tx = s.zone.x; ty = s.zone.y; } else if (s.targetsPos && s.targetsPos.length) { const t = s.targetsPos.sort((q, w) => Math.hypot(q.x - p.x, q.y - p.y) - Math.hypot(w.x - p.x, w.y - p.y))[0]; tx = t.x; ty = t.y; keep = 150; }

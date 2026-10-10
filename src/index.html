@@ -7290,7 +7290,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if(who==="rin")return {name:AVG_NAMES46.rin,img:artUrl(`npc/rin/avg_${ex==="serious"?"serious":"calm"}.webp`)};
     if(who==="miko")return {name:AVG_NAMES46.miko,img:artUrl(`npc/miko/avg_${ex==="afraid"?"afraid":"calm"}.webp`)};
     if(who==="kagami")return {name:AVG_NAMES46.kagami,img:artUrl("npc/kagami/portrait.webp")};
-    if(who==="yoi"||who==="tanuki")return {name:AVG_NAMES46[who],img:artUrl(`npc/${who}/avg_calm.webp`)};
+    if(who==="yoi"||who==="tanuki"||who==="guard")return {name:AVG_NAMES46[who],img:artUrl(`npc/${who}/avg_calm.webp`)};
     return null;
   }
   function storyFor46(id,part){const L=window.SakurayoLevels?.find(id);return L&&window.SakurayoStory?.["ch"+L.ch]?.[id]?.[part]||null;}
@@ -7865,6 +7865,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       skyClose46(){const ok=document.querySelector("#shm46 .res .ok,#pin46 .res .ok,#duel46 .res .ok");if(ok){ok.click();return true;}return false;},
       openWardrobe46(tab){return openWardrobe46(tab);},
       openNight46(){return openNight46();},
+      avgCast46(who,ex){return avgCast46(who,ex);},
       seasonState46(){const s=season46();return s?JSON.parse(JSON.stringify(Object.assign({},s,{level:window.SakurayoSeason.level(s),daily:window.SakurayoSeason.daily(),coins:save.coins}))):null;},
       seasonClaim46(){return seasonClaim46();},
       seasonXp46(kind,n=1){let g=0;for(let i=0;i<n;i++)g+=seasonXp46(kind);persist();return g;},

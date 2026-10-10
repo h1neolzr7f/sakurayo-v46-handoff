@@ -50,7 +50,10 @@ def main():
     ab = cut(base)
     keys = []  # (rgb, alpha)
     def progress(m):  # 动作进度 = 运动区最高点（抬手越高，运动区顶端越靠上）。gpt-image-2 常把“刚抬手”画成“已到胸前”，槽位名不可信。
-        rows = np.where((m > 0).sum(1) > 12)[0]; return 0.0 if not len(rows) else float(H - rows.min()) / H
+        # 只看最大的运动连通块（手臂）；头发/表情的细碎差异不算。指标 = 手臂块的质心高度。
+        n, lab, stt, cen = cv2.connectedComponentsWithStats((m > 0).astype(np.uint8), 8)
+        if n < 2: return 0.0
+        i = 1 + int(np.argmax(stt[1:, cv2.CC_STAT_AREA])); return float(H - cen[i][1]) / H
     pool = []
     slots = a.keys.split(',')
     for slot in slots:
@@ -67,10 +70,10 @@ def main():
     if a.auto_order:
         # 终点 = 最后一个槽位里残差最小的候选；其余关键帧按“进度”均匀取样，每个目标进度挑 残差+进度偏差+与上一帧连续性 最小者，保证单调、不回跳。
         last = min([c for c in pool if c['slot'] == slots[-1]], key=lambda c: c['res']); P1 = last['pr']
-        n = len(slots) - 1; used = {last['p']}; prev = base; prog = 0.0
+        n = len(slots) - 1; used = {last['p']}; prev = base; P0 = min(c['pr'] for c in pool); gap = (P1 - P0) / (n * 2.5); prog = P0 - gap
         for i in range(n):
-            tgt = P1 * (i + 1) / (n + 1)
-            ok = [c for c in pool if c['p'] not in used and prog < c['pr'] < P1 - 0.01]
+            tgt = P0 + (P1 - P0) * i / n  # 第一张 = 进度最低的候选（刚离开腰间），之后均匀铺到终点；相邻关键帧至少相差 gap，避免近似重复
+            ok = [c for c in pool if c['p'] not in used and prog + gap <= c['pr'] < P1 - gap]
             if not ok: continue
             def sc(c): return c['res'] + 60 * abs(c['pr'] - tgt) + float(np.abs(prev.astype(np.float32) - c['al'].astype(np.float32)).mean()) / 4
             b = min(ok, key=sc); used.add(b['p']); keys.append(b['al']); prev = b['al']; prog = b['pr']

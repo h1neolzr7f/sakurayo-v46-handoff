@@ -77,13 +77,21 @@ async function playUntil(page, api, fn, max = 400) { let s; for (let i = 0; i < 
   s = await api('levelState46'); assert.equal(s.mode, 'result'); assert.ok(s.stars46['1-4'] >= 1);
   assert.ok((await api('saveSnapshot46')).cg46.length >= 1, 'chapter CG unlocked into the album');
   // 2-2 mech
-  await api('launchLevel46', '2-2'); await api('protectPlayer'); s = await api('levelState46'); assert.equal(s.pads.length, 3);
-  s = await playUntil(page, api, "a=>{const s=a.levelState46();const p=s.pads.find(q=>!q.used);if(p)a.teleport46(p.x,p.y)}", 200);
+  const toResult = async () => { if ((await api('levelState46')).mode === 'avg') await api('avgSkip46'); for (let i = 0; i < 20 && (await api('levelState46')).mode !== 'result'; i++) await step(page, 250); return api('levelState46'); };
+  await api('launchLevel46', '2-2'); assert.ok((await api('avgState46'))?.total >= 4, '2-2 has chapter-2 pre story'); await api('avgSkip46'); await api('protectPlayer'); s = await api('levelState46'); assert.equal(s.pads.length, 3);
+  s = await playUntil(page, api, "a=>{const s=a.levelState46();const p=s.pads.find(q=>!q.used);if(p)a.teleport46(p.x,p.y)}", 200); s = await toResult();
   assert.equal(s.mode, 'result'); assert.equal(s.result.got[0], true, 'mech completes');
   // 2-1 timed
-  await api('launchLevel46', '2-1'); await api('protectPlayer'); s = await api('levelState46'); assert.equal(s.targets, 4);
-  s = await playUntil(page, api, null, 400); assert.equal(s.mode, 'result');
+  await api('launchLevel46', '2-1'); await api('avgSkip46'); await api('protectPlayer'); s = await api('levelState46'); assert.equal(s.targets, 4);
+  s = await playUntil(page, api, null, 400); s = await toResult(); assert.equal(s.mode, 'result');
   assert.ok(s.result.got[0] || /时间到/.test(s.fail || ''), 'timed ends in win or timeout');
+  { // 每一位剧本说话人都要能解析出名字与立绘（第二章新增老保安时曾漏掉）
+    const miss = await page.evaluate(() => { const T = window.__SAKURAYO_TEST__, S = window.SakurayoStory, out = [];
+      for (const ch of ['ch1', 'ch2']) for (const lv of Object.values(S[ch] || {})) for (const part of ['pre', 'post', 'awaken']) for (const l of lv[part] || [])
+        for (const w of [l.who, l.L?.who, l.R?.who]) if (w && w !== 'me' && !T.avgCast46(w, 'calm')) out.push(l.id + ':' + w);
+      return out; });
+    assert.deepEqual(miss, [], 'every story speaker resolves to a portrait');
+  }
   assert.deepEqual(errors, []);
   await page.reload(); await page.locator('.bootArt35').waitFor({ state: 'detached' });
   const after = await api('saveSnapshot46'); assert.ok(after.stars46['1-3'] >= 1 && after.stars46['1-4'] >= 1, 'stars persist across reload');
