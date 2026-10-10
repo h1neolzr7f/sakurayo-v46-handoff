@@ -168,3 +168,10 @@ bash gradlew --no-daemon assembleDebug lintDebug
 - 测试：新增 `tests/trials_unit.mjs`、`tests/trials_smoke.mjs`（改用本地 http 服务，避免 file:// localStorage 在负载下重载丢失）、`tests/mascot_smoke.mjs`；`browser_smoke`/`tactical_smoke` 底栏图标数 6→7（新增试炼入口，非放宽）；`state_unit` 夹具补 `activeTrial46`/`paintTrialResult46`。`bash tools/verify.sh` 完整 VERIFY PASS（含 1.30 门槛、打包版重跑）。
 - 截图：`/workspace/sakurayo-shots/v3-*.png`（box 本地，未入库）。
 - 仍未做：试炼专属横幅仍复用章节主视觉；Android Gradle 编译/实机验收；音乐与更多表现。
+
+### 第四阶段（2026-10-10 12:10 起 Asia/Shanghai）：试炼横幅、时装主视觉、音效与 Android 编译
+
+- `bacab44` 三项试炼专属横幅（中转站 gpt-image-2，参考小夜人设）：`art/trials/banner_{solo,sealed,flawless}.webp` 1200×800，页签缩略图 `tab_*.webp`。试炼标签改为紧跟关卡名、不再遮挡（窄屏隐藏「试炼」字样，「1-1」在试炼时让位）。
+- `c80b049` 时装卡池 UP「终夜樱冠」专属立绘 `gacha/v4/up_crown.webp`（三张候选挑一张，isnet-anime 抠图）。注意 rembg 默认模型会拉 1GB 的 bria 模型并被 OOM 杀，需显式 `new_session('isnet-anime')`。
+- `6fdedf7` 新增 `src/runtime/sakurayo-sfx.js`：24 种分层程序化音效（命中/暴击/击杀/精英击杀、技能、冲刺、升级、Boss、胜负；界面开/关/确认/错误/金币；寻访启动、翻卡、SR/SSR 揭示；试炼选择），带同类去抖；`sound(k)` 优先走此库，不依赖音频文件。战斗反馈：精英/Boss 击杀震屏 + 振动、暴击单独音色、低血量红色脉冲暗角、每 10 连击数字弹跳；尊重“减少动态效果”。新增 `tests/sfx_smoke.mjs`（离线渲染每个配方，检查有声且不削波，校验抽屉/寻访路由和低血量暗角）。
+- Android：box 上装了 OpenJDK 21（Debian 13 无 17）、Android cmdline-tools、platform 36、build-tools 36/35（SDK 在 `/workspace/android-sdk`，已接受 SDK 许可）。`ANDROID_HOME=/workspace/android-sdk ./gradlew assembleDebug lintDebug` 成功，debug APK 约 125MB（未发布、未签 release），lint 0 error / 2 warning（AGP 版本提示、DiscouragedApi）。未跑 instrumentation/模拟器（/dev/kvm 存在但当前用户无权限）。
