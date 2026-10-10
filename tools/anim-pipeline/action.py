@@ -42,7 +42,7 @@ def motion(base, img, alpha_b, alpha_i):
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--name', required=True); ap.add_argument('--act', required=True); ap.add_argument('--keys', required=True)
     ap.add_argument('--inbetween', type=int, default=3, help='每段递归二分次数 → 2^n-1 个中间帧'); ap.add_argument('--hold', type=int, default=0)
-    ap.add_argument('--scale', type=float, default=0.65); ap.add_argument('--side', choices=['l', 'r']); ap.add_argument('--auto-order', action='store_true', help='按动作进度自动排序/挑选关键帧'); a = ap.parse_args()
+    ap.add_argument('--scale', type=float, default=0.65); ap.add_argument('--side', choices=['l', 'r']); ap.add_argument('--auto-order', action='store_true', help='按动作进度自动排序/挑选关键帧'); ap.add_argument('--largest', action='store_true', help='运动区只保留最大连通块（手臂）：链式生成的关键帧在脸/头发上有细微漂移，若一起贴上会盖住 rig 的眨眼/表情形成“半透明眼睛”'); ap.add_argument('--chain', action='store_true', help='最短路选关键帧链：相邻关键帧差异平方和最小（RIFE 只在小位移下不出双影）'); a = ap.parse_args()
     work = os.path.join(R.GEN, 'live'); name = a.name
     base = np.asarray(Image.open(os.path.join(work, f'{name}_base.png')).convert('RGB')); H, W = base.shape[:2]
     from rembg import remove, new_session; sess = new_session('isnet-anime')
@@ -67,7 +67,32 @@ def main():
             res = float(np.abs(base.astype(np.float32) - al.astype(np.float32)).mean(2)[st].mean())
             pr = progress(m1); R.log(f'{slot} {os.path.basename(p)} static residual {res:.2f} motion {m1.mean():.3f} progress {pr:.3f}')
             pool.append(dict(slot=slot, p=p, al=al, res=res, pr=pr))
-    if a.auto_order:
+    if a.chain:
+        # 拖影根因：RIFE 是光流插值，相邻两张关键帧之间手臂位移/袖子形状差太大时，中间帧只能“两张叠在一起”= 双影。
+        # 所以不按槽位名/进度目标挑，而是在全部候选里找一条 base→终点 的链，边权 = 两帧手臂区域差异的平方（大跳跃代价急剧上升），
+        # 让链自动走“多而小”的步子；进度只允许单调（容差 0.01），避免回跳。
+        import heapq
+        last = min([c for c in pool if c['slot'] == slots[-1]], key=lambda c: c['res'])
+        small = lambda x: cv2.resize(x, (W // 4, H // 4), interpolation=cv2.INTER_AREA).astype(np.float32)
+        nodes = [dict(p='base', al=base, pr=min(c['pr'] for c in pool) - 0.02, res=0)] + [c for c in pool if c is not last] + [last]
+        sm = [small(n['al']) for n in nodes]; um = np.zeros((H // 4, W // 4), bool)
+        for i in range(1, len(nodes)): um |= np.abs(sm[i] - sm[0]).mean(2) > 12
+        D = lambda i, j: float(np.abs(sm[i] - sm[j]).mean(2)[um].mean())
+        N = len(nodes); dist = [1e18] * N; prv = [-1] * N; dist[0] = 0; pq = [(0.0, 0)]
+        while pq:
+            d0, i = heapq.heappop(pq)
+            if d0 > dist[i]: continue
+            for j in range(1, N):
+                if j == i or nodes[j]['pr'] < nodes[i]['pr'] - 0.01: continue
+                w = (D(i, j) / 10) ** 6 + 0.2 * nodes[j]['res']  # 六次方 ≈ 最小化“最大一步”（瓶颈路径），步子越均匀越好
+                if d0 + w < dist[j]: dist[j] = d0 + w; prv[j] = i; heapq.heappush(pq, (d0 + w, j))
+        path = []; j = N - 1
+        while j > 0: path.append(j); j = prv[j]
+        path.reverse(); steps = []; q = 0
+        for j in path: steps.append(D(q, j)); q = j
+        for k, j in enumerate(path): keys.append(nodes[j]['al']); R.log(f'  chain {k + 1}: {os.path.basename(nodes[j]["p"])} progress {nodes[j]["pr"]:.3f} step {steps[k]:.1f}')
+        R.log(f'  chain max step {max(steps):.1f}')
+    elif a.auto_order:
         # 终点 = 最后一个槽位里残差最小的候选；其余关键帧按“进度”均匀取样，每个目标进度挑 残差+进度偏差+与上一帧连续性 最小者，保证单调、不回跳。
         last = min([c for c in pool if c['slot'] == slots[-1]], key=lambda c: c['res']); P1 = last['pr']
         n = len(slots) - 1; used = {last['p']}; prev = base; P0 = min(c['pr'] for c in pool); gap = (P1 - P0) / (n * 2.5); prog = P0 - gap
@@ -92,10 +117,21 @@ def main():
     def stabilize(rgb, mask=None):
         al = cut(rgb)
         m = motion(base, rgb, ab, al) if mask is None else mask
+        if a.largest and mask is None:
+            n, lab, stt, _ = cv2.connectedComponentsWithStats(m.astype(np.uint8), 8)
+            if n > 2: m = (lab == 1 + int(np.argmax(stt[1:, cv2.CC_STAT_AREA]))).astype(np.uint8)
+            # 眼睛/嘴巴归 rig 管（眨眼、表情）：动作贴片在这里一律用原图，避免“补丁里睁眼 + rig 里闭眼”的半透明双眼
+            if face_keep is not None: m = m * (1 - face_keep)
         f = cv2.GaussianBlur(m.astype(np.float32), (0, 0), 6)
         out = (rgb.astype(np.float32) * f[..., None] + base.astype(np.float32) * (1 - f[..., None]))
         oa = al * f + ab * (1 - f)
         return np.dstack([np.clip(out, 0, 255), oa * 255]).astype(np.uint8), m
+    face_keep = None
+    try:
+        import re as _re; _rd = json.loads(_re.search(r'=(\{.*\});', open(os.path.join(R.ART, 'live', name, 'rig.js')).readline()).group(1))
+        lm = _rd['landmarks']; face_keep = np.zeros((H, W), np.uint8); r0 = int(lm['eyeDist'] * 0.32)
+        for c in lm['eyes'] + [lm['mouth']]: cv2.circle(face_keep, (int(c[0]), int(c[1])), r0, 1, -1)
+    except Exception as e: R.log('face keep skipped', e)
     kst = [np.dstack([base, ab * 255]).astype(np.uint8)]; masks = [np.zeros((H, W), np.uint8)]
     for k in keys: s, m = stabilize(k); kst.append(s); masks.append(m)
     # 先算运动区包围盒，只在包围盒内补帧（省内存：盒子上与其它进程共享 15G，整图 RIFE 会被 OOM）

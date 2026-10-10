@@ -17,7 +17,7 @@
         { id: "v33-006", R: { who: "rin", ex: "serious" }, who: "rin", ex: "serious", t: "广播站。河面上的灯笼妖正往岸上爬，像涨潮一样。撑过这一波——上游有人在放它们下来。" }
       ],
       post: [
-        { id: "v33-010", L: { who: "rion", ex: "shaken" }, who: "rion", ex: "shaken", t: "（凛音盯着上游的桥。桥上站着一个穿黑羽织的男人，正朝她举杯。）" },
+        { id: "v33-010", bg: B1, L: { who: "rion", ex: "shaken" }, who: "rion", ex: "shaken", t: "（凛音盯着上游的桥。桥上站着一个穿黑羽织的男人，正朝她举杯。）" },
         { id: "v33-011", R: { who: "soichi", ex: "calm" }, who: "soichi", t: "好久不见，凛音。……不对，对你来说，是「又见面了」吧？这是第几次了——四百次？" }
       ]
     },
@@ -31,7 +31,7 @@
         { id: "v33-025", who: "soichi", t: "我的剑，替我招待你们。——它们不太听话，会逃。追得上的话，就来桥上找我。" }
       ],
       post: [
-        { id: "v33-030", L: { who: "rion", ex: "calm" }, who: "rion", ex: "calm", t: "……他以前不是这样的。小时候，他教我第一式。他说：「凛音，刀要快。」" },
+        { id: "v33-030", bg: B1, L: { who: "rion", ex: "calm" }, who: "rion", ex: "calm", t: "……他以前不是这样的。小时候，他教我第一式。他说：「凛音，刀要快。」" },
         { id: "v33-031", R: { who: "sayo", ex: "shaken" }, who: "sayo", ex: "shaken", t: "刀要快……这句话，说书的狸老板好像也讲过？" },
         { id: "v33-032", who: "rion", ex: "calm", t: "……嗯。是黑羽家的家训。最早说这句话的人，不姓黑羽。" }
       ]
@@ -43,7 +43,7 @@
         { id: "v33-042", R: { who: "rion", ex: "calm" }, who: "rion", ex: "calm", t: "……我有话要说。等这个点完。" }
       ],
       post: [
-        { id: "v33-050", L: { who: "rion", ex: "calm" }, R: { who: "sayo", ex: "calm" }, who: "rion", ex: "calm", t: "这一夜，我已经过了四百一十二次。" },
+        { id: "v33-050", bg: B1, L: { who: "rion", ex: "calm" }, R: { who: "sayo", ex: "calm" }, who: "rion", ex: "calm", t: "这一夜，我已经过了四百一十二次。" },
         { id: "v33-051", who: "rion", ex: "calm", t: "第一次，我一个人追般若，输了。第二次也输了。第一百次，我学会了哪个摊位的章鱼烧最好吃。第三百次，我不再数了。" },
         { id: "v33-052", R: { who: "aya", ex: "shaken" }, who: "aya", ex: "shaken", t: "……所以你总知道「左边」。所以你总是困。" },
         { id: "v33-053", who: "rion", ex: "calm", t: "第四百一十二次，你们戴着面具出现了。……这是第一次，我不是一个人。" },

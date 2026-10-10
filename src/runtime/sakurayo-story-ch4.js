@@ -16,7 +16,7 @@
         { id: "v34-006", L: { who: "rion", ex: "calm" }, who: "rion", ex: "calm", t: "……本殿回廊里全是镜子。每一面都映着她那一夜没逛完的摊位。打碎它们，路才会开。" }
       ],
       post: [
-        { id: "v34-010", L: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "（最后一面镜子里，是二百年前的参道。一个铁炮手和一个剑士，分着同一盒章鱼烧。）" },
+        { id: "v34-010", bg: B1, L: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "（最后一面镜子里，是二百年前的参道。一个铁炮手和一个剑士，分着同一盒章鱼烧。）" },
         { id: "v34-011", R: { who: "sayo", ex: "calm" }, who: "sayo", ex: "calm", t: "她们看起来……好开心。" }
       ]
     },
@@ -27,7 +27,7 @@
         { id: "v34-022", R: { who: "sayo", ex: "resolve" }, who: "sayo", ex: "resolve", t: "那这次三个人守！不许用大招——留着给祖宗！" }
       ],
       post: [
-        { id: "v34-030", L: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "我开播了。观众——零。……没关系。今晚这段，我是为一个人播的。" }
+        { id: "v34-030", bg: B1, L: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "我开播了。观众——零。……没关系。今晚这段，我是为一个人播的。" }
       ]
     },
     "4-3": {
