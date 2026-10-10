@@ -20,12 +20,15 @@
     if (boss.phase >= 4 && !boss.enraged46 && phaseAge >= ENRAGE_AFTER) { boss.enraged46 = true; ev = "enrage"; }
     return ev;
   }
-  // Phase gate: phase p cannot end before the fight is p*MIN_PHASE seconds old (HP holds at the threshold, "阶段护盾").
-  // Measured on total fight age so a slow early phase does not stack extra waiting on later ones.
+  // Phase gate ("阶段护盾"): the k-th quarter of HP (k=1..3) cannot be broken before the fight is k*MIN_PHASE
+  // seconds old. Keyed on fight age + HP quarter (not on the phase index), so a burst that skips a phase
+  // transition cannot also skip its time gate.
   function gateHp(boss, fightAge) {
-    if (!boss || boss.ungate46 || boss.phase >= 4 || fightAge >= MIN_PHASE * boss.phase) { if (boss) boss.gated46 = false; return boss ? boss.hp : 0; }
-    var floor = boss.max * (1 - 0.25 * boss.phase) + 1;
-        boss.gated46 = boss.hp < floor; return Math.max(boss.hp, floor);
+    if (!boss || boss.ungate46) { if (boss) boss.gated46 = false; return boss ? boss.hp : 0; }
+    var k = Math.floor(Math.max(0, fightAge) / MIN_PHASE) + 1;
+    if (k > 3) { boss.gated46 = false; return boss.hp; }
+    var floor = boss.max * (1 - 0.25 * k) + 1;
+    boss.gated46 = boss.hp < floor; return Math.max(boss.hp, floor);
   }
   // Overtime: past OVERTIME_AFTER seconds the mirror world cracks and the boss takes rising damage.
   function overtimeMul(fightAge) { return fightAge > OVERTIME_AFTER ? 1 + (fightAge - OVERTIME_AFTER) * OVERTIME_RATE : 1; }
