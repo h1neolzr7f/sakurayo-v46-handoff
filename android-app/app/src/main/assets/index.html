@@ -8698,78 +8698,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     }
     return best;
   }
-  function shoot() {
-    let target = nearest(P.x, P.y, P.range);
-    if (!target) return;
-    let aim = Math.atan2(target.y - P.y, target.x - P.x),
-      origin = playerMuzzle35(aim),
-      a = Math.atan2(target.y - origin.y, target.x - origin.x);
-    P.fx = Math.cos(a);
-    P.fy = Math.sin(a);
-    P.shotCount++;
-    let rail = P.rail && P.shotCount % 9 === 0,
-      count = P.multi,
-      spread = 0.115;
-    for (let i = 0; i < count; i++) {
-      let q = a + (i - (count - 1) / 2) * spread;
-      pushBullet({
-        x: origin.x,
-        y: origin.y,
-        vx: Math.cos(q) * P.bSpeed,
-        vy: Math.sin(q) * P.bSpeed,
-        r: rail ? 7 : 4,
-        life: P.range / P.bSpeed,
-        dmg: P.dmg * (rail ? 2.6 : 1),
-        pierce: P.pierce + (rail ? 6 : 0),
-        rail,
-        source: rail ? "tech" : "shot",
-        school: rail ? "mech" : "gun",
-        bioSplit: !!P.bioGun,
-        hit: new Set(),
-        acid: P.acid,
-      });
-    }
-    if (P.gunWard && P.shotCount % 10 === 0) {
-      pushBullet({
-        x: origin.x,
-        y: origin.y,
-        vx: Math.cos(a) * P.bSpeed * 0.88,
-        vy: Math.sin(a) * P.bSpeed * 0.88,
-        r: 10,
-        life: 1.35,
-        dmg: P.dmg * 1.45 * P.skillPow,
-        pierce: 8,
-        home: 0.025,
-        source: "skill",
-        school: "shrine",
-        wardShot: 1,
-        hit: new Set(),
-      });
-    }
-    if (P.star && P.shotCount % Math.max(3, 7 - P.star) === 0) {
-      for (let i = 0; i < P.star; i++) {
-        let q = a + rnd(-0.45, 0.45);
-        pushBullet({
-          x: origin.x,
-          y: origin.y,
-          vx: Math.cos(q) * P.bSpeed * 0.72,
-          vy: Math.sin(q) * P.bSpeed * 0.72,
-          r: 5,
-          life: 1.45,
-          dmg: P.dmg * 0.72 * P.spellPow,
-          pierce: 1,
-          home: 0.09,
-          star: 1,
-          source: "star",
-          school: "magical",
-          hit: new Set(),
-        });
-      }
-    }
-    if(P.idolGun&&P.combo>0&&P.shotCount%6===0){let e=nearest(P.x,P.y,P.range);if(e)for(let i=0;i<3;i++){let q=a+(i-1)*.18;pushBullet({x:P.x,y:P.y,vx:Math.cos(q)*P.bSpeed,vy:Math.sin(q)*P.bSpeed,r:4,life:P.range/P.bSpeed,dmg:P.dmg*.46,pierce:1,source:"music",school:"idol",hit:new Set()});}}
-    P.fire=P.rate*(P.encoreTimer>0?.62:1);
-    sound("shot");
-  }
+  // Assigned once below (directional gun/blade shoot); gunWard/star/idolGun/encore live in gunShot36.
+  let shoot;
   function pushBullet(b) {
     let c = caps();
     if (bullets.length < c.b) bullets.push(b);
