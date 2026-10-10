@@ -4,7 +4,7 @@
    (more bullets, no extra damage) so fights cannot drag. Pure logic, no DOM. */
 (function (global) {
   "use strict";
-  var BREAK_TIME = 4.5, BREAK_MUL = 1.6, DAMAGE_SHARE = 0.11, ENRAGE_AFTER = 20, HP_SCALE = 0.88, HP_PER_PICK = 0.02, MIN_PHASE = 9, OVERTIME_AFTER = 36, OVERTIME_RATE = 0.25;
+  var BREAK_TIME = 4.5, BREAK_MUL = 1.6, DAMAGE_SHARE = 0.11, ENRAGE_AFTER = 20, HP_SCALE = 0.88, HP_PER_PICK = 0.02, MIN_PHASE = 13.5, OVERTIME_AFTER = 32, OVERTIME_RATE = 0.6;
   var OBJECTIVE = { guard: 30, dodge: 15, lane: 10, burst: 40 };
   function init(boss) { boss.brk46 = 0; boss.broken46 = 0; boss.breaks46 = 0; boss.enraged46 = false; boss.guardsDown46 = 0; boss.guardsTotal46 = 0; return boss; }
   function fill(boss, amount) {
@@ -20,12 +20,12 @@
     if (boss.phase >= 4 && !boss.enraged46 && phaseAge >= ENRAGE_AFTER) { boss.enraged46 = true; ev = "enrage"; }
     return ev;
   }
-  // Phase gate: a phase cannot be skipped faster than MIN_PHASE seconds (HP holds at the threshold, "阶段护盾").
-  function gateHp(boss, phaseAge, hpBefore) {
-    if (!boss || boss.phase >= 4 || phaseAge >= MIN_PHASE) { if (boss) boss.gated46 = false; return boss ? boss.hp : 0; }
+  // Phase gate: phase p cannot end before the fight is p*MIN_PHASE seconds old (HP holds at the threshold, "阶段护盾").
+  // Measured on total fight age so a slow early phase does not stack extra waiting on later ones.
+  function gateHp(boss, fightAge) {
+    if (!boss || boss.ungate46 || boss.phase >= 4 || fightAge >= MIN_PHASE * boss.phase) { if (boss) boss.gated46 = false; return boss ? boss.hp : 0; }
     var floor = boss.max * (1 - 0.25 * boss.phase) + 1;
-    if (hpBefore != null && hpBefore < floor) { boss.gated46 = false; return boss.hp; }
-    boss.gated46 = boss.hp < floor; return Math.max(boss.hp, floor);
+        boss.gated46 = boss.hp < floor; return Math.max(boss.hp, floor);
   }
   // Overtime: past OVERTIME_AFTER seconds the mirror world cracks and the boss takes rising damage.
   function overtimeMul(fightAge) { return fightAge > OVERTIME_AFTER ? 1 + (fightAge - OVERTIME_AFTER) * OVERTIME_RATE : 1; }

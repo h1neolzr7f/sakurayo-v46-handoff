@@ -31,7 +31,7 @@ try{
     const g=f.gems[0];if(g){const d=Math.hypot(g.dx,g.dy)||1;if(d<420){vx+=g.dx/d*1.2;vy+=g.dy/d*1.2;}}
     const m=90;if(f.x<m)vx+=1;if(f.x>f.worldW-m)vx-=1;if(f.y<m)vy+=1;if(f.y>f.worldH-m)vy-=1;
     press('d',vx>.35);press('a',vx<-.35);press('s',vy>.35);press('w',vy<-.35);};
-   const start=get();let s=start;const events=[];let picks=0,bossAt=null;
+   const start=get();let s=start;const events=[];let picks=0,bossAt=null;const bossLog=[];
    const step=agent==='stand'?5000:250,limit=agent==='stand'?100:2400;
    for(let i=0;i<limit&&s.mode!=='result';i++){
     if(s.mode==='event'){events.push({title:document.querySelector('#eventTitle').textContent});a.chooseEvent(0);}
@@ -39,13 +39,13 @@ try{
     else if(s.mode==='level'){const c=[...document.querySelectorAll('#choices .choice')];(c.find(b=>b.dataset.rec==='1')||c[0]).click();picks++;}
     else if(s.mode==='play'){if(agent!=='stand')steer();if(s.player.skillCooldown<=0)document.querySelector('#skill').click();await window.advanceTime(step);}
     else throw new Error(s.mode);
-    s=get();if(bossAt==null&&s.boss&&s.boss.hp!=null)bossAt=s.runTime;
+    s=get();if(bossAt==null&&s.boss&&s.boss.hp!=null)bossAt=s.runTime;if(s.boss&&i%8===0)bossLog.push([+(s.runTime-(bossAt||0)).toFixed(0),s.boss.phase,+(s.boss.ratio).toFixed(2),s.boss.guard]);
    }
    for(const k of Object.keys(keys))press(k,0);
-   return {character,agent,start,events,picks,bossAt,end:s};
+   return {character,agent,start,events,picks,bossAt,bossLog,end:s};
   },{character,seed,agent});
   result.seed=seed;evidence.push(result);rows.push(result);assert.equal(result.end.mode,'result');assert.equal(result.end.result.win,true);
-  console.log(agent,'seed',seed.toString(16),character,result.end.runTime,'Lv',result.end.player.level,'picks',result.picks,'boss',result.bossAt==null?'-':(result.end.runTime-result.bossAt).toFixed(1)+'s');
+  console.log(agent,'seed',seed.toString(16),character,result.end.runTime,'Lv',result.end.player.level,'picks',result.picks,'boss',result.bossAt==null?'-':(result.end.runTime-result.bossAt).toFixed(1)+'s');if(process.env.SAKURAYO_BOSSLOG)console.log(JSON.stringify(result.bossLog));
   await context.close();
  }
  const d=rows.map(r=>r.end.runTime),ratio=Math.max(...d)/Math.min(...d);summary.push({agent,seed,ratio,times:Object.fromEntries(rows.map(r=>[r.character,r.end.runTime]))});console.log(agent,'seed',seed.toString(16),'max/min',ratio.toFixed(4));
