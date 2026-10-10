@@ -1,5 +1,7 @@
 # 《樱夜·尸潮》V4.6.0 交接规格
 
+> **2026-10-10 当前执行状态以 [Grok / Linux 交接](GROK_HANDOFF_2026-10-10.md) 为准。** 接手 `codex/grok-linux-handoff-20261010`，包含后续收藏政策修复；下面的完整 CI 成功属于此前 F01–F30 整合代码，不能当作当前代码全绿。试炼、表现/音乐、平衡矩阵与 Android instrumentation 仍待实现和验证。
+
 2026-10-08 更新。给下一位 AI / 维护者。先读根目录 [README.md](../README.md)，再读本文和 [AGENTS.md](../AGENTS.md)。二游分期原文在 [PLAN_V46_ERYOU.md](PLAN_V46_ERYOU.md)。升版本见 [MAINTAIN.md](MAINTAIN.md)。
 
 这不是另做一款原神。局外做成能横着玩的二次元手游大厅，局内继续是离线肉鸽射击。

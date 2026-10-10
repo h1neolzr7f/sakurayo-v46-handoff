@@ -1,5 +1,7 @@
 # 樱夜·尸潮 v4.6 开发仓
 
+> **2026-10-10 Grok / Linux 接手包：先读 [GROK_START_HERE.md](GROK_START_HERE.md)。** 最新分支为 `codex/grok-linux-handoff-20261010`，包含收藏政策修复及未完成清单；当前完整回归有已知失败，旧的全绿 CI 不代表该分支通过。
+
 这是《樱夜·尸潮》的 **v4.6.0 预发布开发基线**，用于继续开发、回归测试和整理发布内容。玩家下载稳定版请前往 [sakurayo-zombietide](https://github.com/h1neolzr7f/sakurayo-zombietide)；当前玩家发布线仍是 v4.4.6。
 
 [玩家仓](https://github.com/h1neolzr7f/sakurayo-zombietide) · [开发交接](docs/HANDOFF.md) · [v4.6 计划](docs/PLAN_V46_ERYOU.md) · [维护手册](docs/MAINTAIN.md)
