@@ -267,7 +267,7 @@ try {
   assert.equal(emptyWeapon.ok, false);
   assert.equal(emptyWeapon.reason, "coins");
   await page.locator('#gachaTabs46 [data-pool="remnant"]').click();
-  assert.match(await page.locator("#gachaDrawer").textContent(), /残片进仓库/);
+  assert.match(await page.locator("#gachaDrawer").textContent(), /收藏不增加战斗属性/);
   const coinsBeforeFail = (await api(page, "lobby46")).coins;
   const broke = await api(page, "pullGacha46", 1);
   assert.equal(broke.ok, false);
