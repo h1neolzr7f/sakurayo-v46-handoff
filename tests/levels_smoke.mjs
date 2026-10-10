@@ -45,7 +45,8 @@ async function playUntil(page, api, fn, max = 400) { let s; for (let i = 0; i < 
   // read-only fast-forward stops at the first unread line: replay 1-1 pre (all read) → ff runs to the end
   await page.evaluate(() => window.__SAKURAYO_TEST__.backMenu?.());
   await api('openLevelMap46', 1); await page.click('.lm46Node >> nth=0'); await page.click('.lm46Sheet [data-k=replay]');
-  await page.click('#avg46 .a46bar button:has-text("快进")'); await page.waitForTimeout(1500);
+  await page.click('#avg46 .a46bar button:has-text("快进")');
+  await page.waitForFunction(() => window.__SAKURAYO_TEST__.avgState46() === null, null, { timeout: 10000 }).catch(() => {}); // ff pace is wall-clock; allow for CPU load
   assert.equal(await api('avgState46'), null, 'fast-forward runs through already-read lines');
   await api('launchLevel46', '1-2'); assert.equal((await api('avgState46')).index, 0);
   await page.click('#avg46 .a46bar button:has-text("快进")'); await page.waitForTimeout(600);
