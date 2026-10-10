@@ -127,3 +127,24 @@ bash gradlew --no-daemon assembleDebug lintDebug
 ## 本次交接选择
 
 保留原测试门槛与业务规则，将已证实失败交给接手者；代价是当前包不是全绿成品。没有重新制造未找回补丁，避免无法审查的恢复代码；代价是三个很小的修正需要重新做。保留原短期浏览器缓存 CI 上传步骤，供 Grok 判断是否还需要；本会话缓存已清理，不能承诺已有下载工件仍可用。
+
+## Grok Bot Linux 接手进度（2026-10-10 09:20–10:10 Asia/Shanghai）
+
+环境：box Linux，Node 22.19.0，Python 3.13（venv + Pillow），Playwright 1.62.1 headless Chromium。分支 `codex/sakurayo-lobby-renovation`（PR #32）。
+
+| 提交 | 内容 |
+| --- | --- |
+| `103dd37` | 问题 3：衣装详情写出实际流派显示名（`装备时巫女流派倾向 ×1.3` 等），lobby_unit 覆盖六件带 school 衣装 |
+| `2b0915f` | 问题 2：browser_smoke 寻访横幅断言改绑 `收藏不增加战斗属性`，生产文案未改 |
+| `dd2afd4` | 问题 1：收据 helper 对 file 输入启动 127.0.0.1 临时静态服务器（限仓库根目录，finally 关闭 context/server），505/收据/旧回调断言不变 |
+| `ed5af89` | `balance_diagnostic.mjs` 支持 `SAKURAYO_SEEDS=0x40c0de,0x1234,...` 多种子；快照 `boss.guardAdds` 暴露镜卫类型/HP/位置；重建 Android HTML |
+
+实测：`verify.sh --static` PASS；collection/content_receipts（source）PASS；lobby_unit PASS；`verify.sh` 完整流程在 browser_smoke 末段 1.30 门槛处失败（之前的项全部 PASS）。
+
+### 问题 4 根因诊断（未修）
+
+五种子（40c0de/1234/beef/5eed1/777）下绫通关时间呈双峰：约 232–240s 或 282–286s，与射击间隔系数基本无关（rate 1.12–1.22 时 40c0de 变快但 1234 变慢）。所以**盲调绫的伤害/射速不是根因**，已撤回试验。
+
+轨迹显示：第四章镜姬第三阶段刷 3 个镜卫（`counterType(4)||"seal"`，随机类型），镜卫存活期间 Boss 受伤 ×0.32。tank 型镜卫会贴近被斩击清掉 → 快局；seal 型镜卫停在 ~230px 外，绫自动瞄准 `nearest()` 总选与玩家重叠的 Boss，手枪子弹（pierce 0）出膛即被 Boss 吃掉 → 镜卫一直不破，第三阶段拖约 45s → 慢局。小夜（射程/穿透）与凛音（近战范围）不受同等影响。
+
+已试但撤回：镜卫存活时优先瞄准镜卫 + 子弹穿过受护 Boss。结果更慢（子弹被路上杂兵挡、Boss 不再掉血），说明需要配合设计决策（例如镜卫靠近、斩击/技能可破卫、或自动瞄准规则），交由下一步按证据决定。门槛与断言均保持原样。
