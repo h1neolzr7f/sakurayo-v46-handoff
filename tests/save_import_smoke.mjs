@@ -39,7 +39,7 @@ try {
  await page.locator('#commandMail48').click();await page.locator('[data-mail="welcome"]').click();await page.locator('#commandMailClaim48').click();await page.locator('#commandDrawer47 .close').click();
  const receipts=await stored();
  await importSave(receipts);await page.reload();await page.waitForFunction(()=>window.__SAKURAYO_TEST__);await page.locator('.bootArt35').waitFor({state:'detached'});
- assert.equal((await stored()).coins,receipts.coins);assert.deepEqual((await stored()).shop40.ops.services,receipts.shop40.ops.services,'mail receipts survive import and startup');
+ {const now=await stored();assert.equal(now.coins,receipts.coins+(receipts.talRefund46<0?Math.max(0,now.talRefund46):0),'import keeps coins; frozen-talent refund is paid once at boot');}assert.deepEqual((await stored()).shop40.ops.services,receipts.shop40.ops.services,'mail receipts survive import and startup');
  await page.locator('#commandSupplies47').click();assert.equal(await page.locator('[data-supply="chapter4"]').isDisabled(),true,'chapter reward cannot be claimed twice');await page.locator('#commandDrawer47 .close').click();
  const modern={...receipts,settings:{...receipts.settings,hudSize:'compact',contrast:0,uiCalm:0,fx:0,damageText:'full',glow:'soft',glowVersion:2}};
  await importSave(modern);assert.equal(await page.evaluate(()=>document.body.classList.contains('compactHud38')&&document.body.classList.contains('noContrast39')&&document.body.classList.contains('richUi39')),true,'import applies all UI setting classes');assert.equal((await api('crowdBudget')).quality,.62,'import applies reduced quality immediately');
@@ -53,7 +53,7 @@ try {
  await page.locator('#commandPrepare47').click();assert.match(await page.locator('#commandBody47').textContent(),/证词模式/);await page.locator('#commandDrawer47 .close').click();
  // Startup follows the same repair contract as import and continues to render the lobby.
  await page.evaluate(raw=>localStorage.setItem('sakurayoV3',JSON.stringify(raw)),legacy);await page.reload();await page.waitForFunction(()=>window.__SAKURAYO_TEST__);await page.locator('.bootArt35').waitFor({state:'detached'});
- assert.equal(await page.locator('#commandHistory47').isVisible(),true);s=await api('saveSnapshot');assert.equal(s.coins,legacy.coins,"startup preserves a legitimately earned large balance");assert.deepEqual(s.done,[1,2,3,4]);assert.deepEqual(s.runHistory,[record]);
+ assert.equal(await page.locator('#commandHistory47').isVisible(),true);s=await api('saveSnapshot');assert.equal(s.coins,legacy.coins+s.talRefund46,"startup preserves a legitimately earned large balance (plus one-time frozen-talent refund)");assert.deepEqual(s.done,[1,2,3,4]);assert.deepEqual(s.runHistory,[record]);
  assert.deepEqual(errors,[]);assert.deepEqual(external,[]);
  console.log('PASS save import/startup: legacy chapters/history/settings, receipts, selection clamps, mode brief; '+entry);
 } finally {await browser.close();}

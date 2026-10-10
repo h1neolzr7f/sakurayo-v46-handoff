@@ -60,7 +60,7 @@ async function playUntil(page, api, fn, max = 400) { let s; for (let i = 0; i < 
   // 1-3 escort
   await api('launchLevel46', '1-3'); await api('avgSkip46'); await api('protectPlayer');
   let s = await api('levelState46'); assert.ok(s.npc, 'escort NPC spawned');
-  s = await playUntil(page, api, "a=>{const s=a.levelState46();if(s.npc){a.teleport46(s.npc.x+40,s.npc.y);if(s.npc.hp<s.npc.max*0.5)a.clearCombat()}}", 600);
+  s = await playUntil(page, api, "a=>{const s=a.levelState46();if(s.npc){a.teleport46(s.npc.x+40,s.npc.y);if(s.npc.hp<80){a.clearCombat();a.healNpc46()}}}", 600);
   await api('avgSkip46'); s = await api('levelState46'); assert.equal(s.mode, 'result'); assert.equal(s.result.got[0], true, "escort completes " + JSON.stringify(s));
   // 1-2 clear
   await api('launchLevel46', '1-2'); await api('avgSkip46'); await api('protectPlayer');

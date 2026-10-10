@@ -271,7 +271,7 @@ try {
   const oldPage = await old.newPage();
   await waitMenu(oldPage);
   const oldSave = await api(oldPage, "saveSnapshot");
-  assert.equal(oldSave.coins, 11);
+  assert.equal(oldSave.coins, 11 + oldSave.talRefund46);
   assert.ok(oldSave.shop40 && oldSave.shop40.ops, "缺字段旧档应补齐 shop40.ops");
   pass("缺字段旧档进主菜单");
   await old.close();

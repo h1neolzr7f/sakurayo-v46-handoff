@@ -139,7 +139,8 @@ try {
   const legacyTracker = { pageErrors: [], consoleErrors: [], externalRequests: [] };
   const legacyPage = await openPage(legacyContext, legacyTracker);
   const migrated = await api(legacyPage, "saveSnapshot");
-  assert.equal(migrated.coins, 7);
+  assert.ok(migrated.talRefund46 > 0 && migrated.coins === 7 + migrated.talRefund46, "frozen talents refunded once on migration");
+  assert.equal(migrated.tal.atk, 1, "legacy talent level kept");
   assert.equal(migrated.tal.atk, 1);
   assert.equal(migrated.tal.hp, 0);
   assert.equal(migrated.character, "sayo");

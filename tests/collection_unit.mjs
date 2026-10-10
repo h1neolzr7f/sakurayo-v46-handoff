@@ -48,9 +48,9 @@ for(const mode of ['story','testimony','mainGod'])for(const character of ['sayo'
  }
 });
 // Catches over-broad removal of existing progression and shop tradeoffs.
-test('talents, initial core and regular shop mirror still change a real start',()=>{
+test('frozen talents no longer change a start; initial core and regular shop mirror still do',()=>{
  const c=world();Object.assign(c.save.tal,{atk:2,hp:3,luck:1,flow:2});c.save.shop40.equippedStarter='assault';c.save.shop40.starter.assault=2;c.save.shop40.equippedWeapon='mirror';c.resetP();
- assert.ok(Math.abs(c.P.dmg-27.44)<.001);assert.equal(c.P.maxHp,124);assert.equal(c.P.sh,36);assert.equal(c.P.damageReduce,.05);assert.ok(c.P.crit>.12);assert.ok(Math.abs(c.P.skillCd-6.72)<1e-9);
+ assert.ok(Math.abs(c.P.dmg-24.945408)<.001);assert.equal(c.P.maxHp,100,'hp talent frozen');assert.equal(c.P.sh,36);assert.equal(c.P.damageReduce,.05);assert.ok(c.P.crit>.1);assert.equal(c.P.skillCd,7,'flow talent frozen');
 });
 // Catches accidental removal/double stacking of declared school appearance weights.
 test('real lobby install retains declared school weights without duplicate stacking',()=>{

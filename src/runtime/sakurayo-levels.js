@@ -29,7 +29,7 @@
     L("3-2", 3, "拔剑", "timed", { n: 6, limit: 110, flee: 1 }, { k: "time", v: 70, d: "70 秒内完成" }, H(6), [34, 38]),
     L("3-3", 3, "事故日志", "channel", { t: 30 }, H(2), { k: "time", v: 70, d: "70 秒内完成" }, [58, 60]),
     L("3-4", 3, "黄泉御前", "boss", { bossAt: 22 }, { k: "breaks", v: 2, d: "触发 2 次破防" }, H(8), [84, 36]),
-    L("4-1", 4, "镜廊", "timed", { n: 8, limit: 100, hp: 180, kind: "mirror" }, { k: "time", v: 75, d: "75 秒内完成" }, H(6), [12, 44]),
+    L("4-1", 4, "镜廊", "timed", { n: 8, limit: 115, hp: 180, kind: "mirror" }, { k: "time", v: 75, d: "75 秒内完成" }, H(6), [12, 44]),
     L("4-2", 4, "第 317 室", "survive", { t: 110 }, { k: "noUlt", d: "不使用大招" }, H(6), [36, 60]),
     L("4-3", 4, "主控门", "escort", { path: [[0.15, 0.4], [0.38, 0.62], [0.62, 0.36], [0.86, 0.5]] }, { k: "npcHp", v: 100, d: "雨宫凛 0 次受伤" }, H(6), [60, 42], { npc: "rin" }),
     L("4-4", 4, "八重镜姬", "boss", { bossAt: 22 }, { k: "breaks", v: 3, d: "触发 3 次破防" }, H(8), [86, 30])
@@ -113,7 +113,7 @@
     switch (level.type) {
       case "survive": return "存活 " + Math.max(0, Math.ceil(g.t - o.t)) + " 秒";
       case "clear": return "击破尸潮 " + Math.min(g.n, o.killsNow || 0) + "/" + g.n;
-      case "timed": return (g.flee ? "摧毁无主飞剑 " : g.kind === "mirror" ? "击碎复制镜 " : "摧毁回收车 ") + o.targets.filter(function (e) { return e.dead || e.hp <= 0; }).length + "/" + g.n + " · 剩余 " + Math.max(0, Math.ceil(g.limit - o.t)) + "s";
+      case "timed": return (g.flee ? "摧毁无主飞剑 " : g.kind === "mirror" ? "击碎复制镜 " : g.kind === "elite" ? "击破精英镜卫 " : "摧毁回收车 ") + o.targets.filter(function (e) { return e.dead || e.hp <= 0; }).length + "/" + g.n + " · 剩余 " + Math.max(0, Math.ceil(g.limit - o.t)) + "s";
       case "mech": return "引爆符咒机关 " + o.pads.filter(function (q) { return q.used; }).length + "/" + g.n + "（站在机关上）";
       case "escort": return "护送 " + Math.round(o.npc.k / o.npc.path.length * 100) + "% · 血量 " + Math.ceil(o.npc.hp) + "%" + (o.npc.waiting ? " · 靠近她才会前进" : "");
       case "channel": return "读取日志 " + Math.floor(o.chan * 100) + "%" + (o.inside ? "" : " · 回到圈内");

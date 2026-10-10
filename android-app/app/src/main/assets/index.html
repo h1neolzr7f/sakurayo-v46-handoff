@@ -2853,7 +2853,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     L("3-2", 3, "拔剑", "timed", { n: 6, limit: 110, flee: 1 }, { k: "time", v: 70, d: "70 秒内完成" }, H(6), [34, 38]),
     L("3-3", 3, "事故日志", "channel", { t: 30 }, H(2), { k: "time", v: 70, d: "70 秒内完成" }, [58, 60]),
     L("3-4", 3, "黄泉御前", "boss", { bossAt: 22 }, { k: "breaks", v: 2, d: "触发 2 次破防" }, H(8), [84, 36]),
-    L("4-1", 4, "镜廊", "timed", { n: 8, limit: 100, hp: 180, kind: "mirror" }, { k: "time", v: 75, d: "75 秒内完成" }, H(6), [12, 44]),
+    L("4-1", 4, "镜廊", "timed", { n: 8, limit: 115, hp: 180, kind: "mirror" }, { k: "time", v: 75, d: "75 秒内完成" }, H(6), [12, 44]),
     L("4-2", 4, "第 317 室", "survive", { t: 110 }, { k: "noUlt", d: "不使用大招" }, H(6), [36, 60]),
     L("4-3", 4, "主控门", "escort", { path: [[0.15, 0.4], [0.38, 0.62], [0.62, 0.36], [0.86, 0.5]] }, { k: "npcHp", v: 100, d: "雨宫凛 0 次受伤" }, H(6), [60, 42], { npc: "rin" }),
     L("4-4", 4, "八重镜姬", "boss", { bossAt: 22 }, { k: "breaks", v: 3, d: "触发 3 次破防" }, H(8), [86, 30])
@@ -2937,7 +2937,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     switch (level.type) {
       case "survive": return "存活 " + Math.max(0, Math.ceil(g.t - o.t)) + " 秒";
       case "clear": return "击破尸潮 " + Math.min(g.n, o.killsNow || 0) + "/" + g.n;
-      case "timed": return (g.flee ? "摧毁无主飞剑 " : g.kind === "mirror" ? "击碎复制镜 " : "摧毁回收车 ") + o.targets.filter(function (e) { return e.dead || e.hp <= 0; }).length + "/" + g.n + " · 剩余 " + Math.max(0, Math.ceil(g.limit - o.t)) + "s";
+      case "timed": return (g.flee ? "摧毁无主飞剑 " : g.kind === "mirror" ? "击碎复制镜 " : g.kind === "elite" ? "击破精英镜卫 " : "摧毁回收车 ") + o.targets.filter(function (e) { return e.dead || e.hp <= 0; }).length + "/" + g.n + " · 剩余 " + Math.max(0, Math.ceil(g.limit - o.t)) + "s";
       case "mech": return "引爆符咒机关 " + o.pads.filter(function (q) { return q.used; }).length + "/" + g.n + "（站在机关上）";
       case "escort": return "护送 " + Math.round(o.npc.k / o.npc.path.length * 100) + "% · 血量 " + Math.ceil(o.npc.hp) + "%" + (o.npc.waiting ? " · 靠近她才会前进" : "");
       case "channel": return "读取日志 " + Math.floor(o.chan * 100) + "%" + (o.inside ? "" : " · 回到圈内");
@@ -2999,6 +2999,180 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }
   }
   global.SakurayoLevels = Object.freeze({ LEVELS: LEVELS, CHAPTERS: CHAPTERS, TYPE: TYPE, find: find, chapter: chapter, stars: stars, unlocked: unlocked, cleared: cleared, chapterStars: chapterStars, create: create, tick: tick, label: label, rate: rate, record: record, draw: draw });
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+/* 夜行 · 肉鸽一局（docs/DESIGN_V5.md §3.2，路线图 P0）。纯逻辑，无 DOM：
+   地图生成（层 × 行 × 2–3 个节点，分支连线）、节点类型、路线推进、局内资源（魂晶）、遗物、
+   事件/商店/神社选项、战斗节点 → 关卡规格（复用 SakurayoLevels 的目标类型）、序列化。
+   构筑（玩家对象快照）由游戏侧保存进 state.build；本模块只负责保存与筛掉瞬时字段。
+   遗物只在本局生效，局外收藏不提供任何战斗属性。 */
+(function (global) {
+  "use strict";
+  var LAYERS = 3, ROWS = 6;
+  var NODE = {
+    fight: { n: "战斗", i: "⚔", d: "击退尸潮。胜利获得魂晶。" },
+    elite: { n: "精英", i: "☠", d: "限时击破强化目标。胜利后三选一遗物。" },
+    goal: { n: "委托", i: "📜", d: "护送 / 机关 / 读取 / 限时目标。" },
+    event: { n: "事件", i: "❔", d: "镜界里的偶遇，选项有得有失。" },
+    shop: { n: "商店", i: "🏮", d: "用魂晶购买治疗、强化与遗物。" },
+    shrine: { n: "神社", i: "⛩", d: "休整：回复生命或获得一次强化。" },
+    boss: { n: "层主", i: "👹", d: "本层 Boss。击破后进入下一层。" }
+  };
+  var LAYER_NAMES = ["神社外街", "雨夜商圈", "黄泉参道"];
+  var RELICS = [
+    { id: "petal", n: "樱瓣护符", i: "🌸", d: "攻击力 +12%", fx: { dmgMul: 1.12 } },
+    { id: "bell", n: "铃之残响", i: "🔔", d: "最大生命 +20", fx: { maxHp: 20 } },
+    { id: "lantern", n: "引魂灯", i: "🏮", d: "拾取范围 +40", fx: { mag: 40 } },
+    { id: "geta", n: "疾风木屐", i: "👡", d: "移速 +8%", fx: { spdMul: 1.08 } },
+    { id: "mirror", n: "裂镜片", i: "🪞", d: "暴击率 +6%", fx: { crit: 0.06 } },
+    { id: "omamori", n: "平安守", i: "🧧", d: "每进入战斗节点回复 8% 生命", fx: { nodeHeal: 0.08 } },
+    { id: "sake", n: "御神酒", i: "🍶", d: "射速 +8%", fx: { rateMul: 0.926 } },
+    { id: "coin", n: "五円硬币", i: "🪙", d: "魂晶收益 +25%", fx: { shardMul: 1.25 } }
+  ];
+  var GOALS = [ // objective templates per layer (from SakurayoLevels types)
+    [{ type: "escort", goal: { path: [[0.18, 0.5], [0.4, 0.38], [0.62, 0.6], [0.84, 0.48]] }, npc: "miko", n: "送灯" }, { type: "mech", goal: { n: 2 }, n: "符咒机关" }],
+    [{ type: "timed", goal: { n: 3, limit: 80 }, n: "回收车" }, { type: "mech", goal: { n: 3 }, n: "监控墙" }],
+    [{ type: "channel", goal: { t: 24 }, n: "事故日志" }, { type: "timed", goal: { n: 5, limit: 100, flee: 1 }, n: "无主飞剑" }]
+  ];
+  var MOVES = ["moveDash", "moveSkill"]; // reserved for P1 forms
+
+  function rng(seed) { var s = (seed >>> 0) || 1; return function () { s ^= s << 13; s >>>= 0; s ^= s >>> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
+  function pickW(r, w) { var t = 0, k; for (k in w) t += w[k]; var x = r() * t; for (k in w) { x -= w[k]; if (x <= 0) return k; } return k; }
+
+  function generate(seed) {
+    var r = rng(seed), layers = [];
+    for (var L = 0; L < LAYERS; L++) {
+      var rows = [];
+      for (var row = 0; row < ROWS; row++) {
+        var n = row === 0 || row === ROWS - 1 ? 1 : row === 1 ? 2 : 2 + (r() < 0.6 ? 1 : 0), nodes = [];
+        for (var i = 0; i < n; i++) {
+          var t = row === 0 ? "fight" : row === ROWS - 1 ? "boss" : row === ROWS - 2 ? (i === 0 ? "shrine" : pickW(r, { shop: 2, fight: 2, event: 1 }))
+            : pickW(r, row === 1 ? { fight: 4, event: 2, goal: 2 } : { fight: 3, elite: row >= 2 ? 2 : 0, goal: 2, event: 2, shop: row === 2 ? 1 : 0.5 });
+          nodes.push({ id: L + 1 + "-" + row + "-" + i, layer: L + 1, row: row, col: i, type: t, x: 8 + row * (84 / (ROWS - 1)), y: n === 1 ? 50 : 20 + i * (60 / (n - 1)) + (r() - 0.5) * 6, next: [] });
+        }
+        rows.push(nodes);
+      }
+      for (row = 0; row < ROWS - 1; row++) {
+        var a = rows[row], b = rows[row + 1];
+        for (i = 0; i < a.length; i++) {
+          var lo = Math.floor(i * b.length / a.length), hi = Math.ceil((i + 1) * b.length / a.length) - 1;
+          for (var j = lo; j <= Math.max(lo, hi); j++) if (a[i].next.indexOf(b[j].id) < 0) a[i].next.push(b[j].id);
+        }
+        for (j = 0; j < b.length; j++) if (!a.some(function (q) { return q.next.indexOf(b[j].id) >= 0; })) a[Math.min(a.length - 1, Math.round(j * (a.length - 1) / Math.max(1, b.length - 1)))].next.push(b[j].id);
+      }
+      // goal node variant per layer
+      rows.forEach(function (rw) { rw.forEach(function (nd) { if (nd.type === "goal") nd.goal = Math.floor(r() * GOALS[L].length); if (nd.type === "fight") nd.fight = r() < 0.5 ? "survive" : "clear"; }); });
+      layers.push(rows);
+    }
+    return layers;
+  }
+  function create(seed, character) {
+    seed = (seed >>> 0) || ((Date.now() ^ (Math.random() * 1e9)) >>> 0);
+    return { v: 1, seed: seed, character: character || "sayo", map: generate(seed), layer: 1, at: null, path: [], shards: 0, relics: [], pending: [], build: null, hpFrac: 1, done: false, win: false, started: Date.now(), nodesWon: 0, rerolls: 0 };
+  }
+  function node(st, id) { for (var L = 0; L < st.map.length; L++) for (var r = 0; r < st.map[L].length; r++) for (var i = 0; i < st.map[L][r].length; i++) if (st.map[L][r][i].id === id) return st.map[L][r][i]; return null; }
+  function available(st) {
+    if (st.done) return [];
+    var rows = st.map[st.layer - 1];
+    if (!st.at) return rows[0].slice();
+    var cur = node(st, st.at);
+    if (!cur || cur.layer !== st.layer) return rows[0].slice();
+    return cur.next.map(function (id) { return node(st, id); });
+  }
+  function canEnter(st, id) { return available(st).some(function (n) { return n.id === id; }); }
+  function enter(st, id) { if (!canEnter(st, id)) return null; st.at = id; st.path.push(id); return node(st, id); }
+  function isCombat(t) { return t === "fight" || t === "elite" || t === "goal" || t === "boss"; }
+  // Spec consumed by SakurayoLevels.create/tick/rate (ids are "R…" so they never touch main-line stars).
+  function levelSpec(st, nd) {
+    var L = nd.layer, base = { id: "R" + nd.id, ch: L, run46: true, map: [nd.x, nd.y], stars: [{ k: "win", d: "通关" }, { k: "hits", v: 6, d: "受击 ≤ 6 次" }, { k: "time", v: 90, d: "90 秒内完成" }] };
+    if (nd.type === "boss") return Object.assign(base, { n: LAYER_NAMES[L - 1] + " · 层主", type: "boss", boss: true, goal: { bossAt: 14 } });
+    if (nd.type === "elite") return Object.assign(base, { n: "精英 · 镜卫", type: "timed", goal: { n: 2, limit: 70, hp: 420 + 160 * L, kind: "elite" } });
+    if (nd.type === "goal") { var g = GOALS[L - 1][nd.goal || 0]; return Object.assign(base, { n: g.n, type: g.type, goal: JSON.parse(JSON.stringify(g.goal)), npc: g.npc }); }
+    return Object.assign(base, nd.fight === "clear" ? { n: "尸潮 · 清剿", type: "clear", goal: { n: 26 + 10 * L } } : { n: "尸潮 · 坚守", type: "survive", goal: { t: 40 + 8 * L } });
+  }
+  function shardMul(st) { return st.relics.reduce(function (m, id) { var r = relic(id); return m * (r && r.fx.shardMul || 1); }, 1); }
+  function relic(id) { for (var i = 0; i < RELICS.length; i++) if (RELICS[i].id === id) return RELICS[i]; return null; }
+  function relicOffer(st, n) {
+    var r = rng(st.seed ^ (st.path.length * 2654435761)), pool = RELICS.filter(function (q) { return st.relics.indexOf(q.id) < 0; }), out = [];
+    while (pool.length && out.length < (n || 3)) out.push(pool.splice(Math.floor(r() * pool.length), 1)[0]);
+    return out;
+  }
+  function gainRelic(st, id) { var q = relic(id); if (!q || st.relics.indexOf(id) >= 0) return false; st.relics.push(id); st.pending.push({ relic: id }); return true; }
+  // combat node finished
+  function complete(st, nd, win, build) {
+    if (!win) { st.done = true; st.win = false; return { over: true }; }
+    st.nodesWon++; if (build) st.build = build;
+    var gain = Math.round(({ fight: 22, goal: 30, elite: 40, boss: 60 }[nd.type] || 0) * shardMul(st)); st.shards += gain;
+    var out = { shards: gain, relicOffer: nd.type === "elite" || nd.type === "boss" ? relicOffer(st, 3) : null };
+    if (nd.type === "boss") { if (st.layer >= LAYERS) { st.done = true; st.win = true; out.runWin = true; } else { st.layer++; st.at = null; out.nextLayer = st.layer; } }
+    return out;
+  }
+  // non-combat node options
+  function options(st, nd) {
+    var r = rng(st.seed ^ (nd.row * 7919 + nd.col * 104729 + nd.layer * 31));
+    if (nd.type === "shrine") return [{ k: "heal", n: "静养", d: "回复 35% 生命" }, { k: "level", n: "祈愿", d: "获得 1 次强化（下场战斗开局三选一）" }];
+    if (nd.type === "shop") {
+      var rel = relicOffer(st, 1)[0];
+      return [{ k: "heal", n: "伤药", d: "回复 30% 生命", cost: 30 }, { k: "level", n: "符纸", d: "获得 1 次强化", cost: 40 }].concat(rel ? [{ k: "relic", id: rel.id, n: rel.i + " " + rel.n, d: rel.d, cost: 55 }] : []).concat([{ k: "leave", n: "离开", d: "" }]);
+    }
+    if (nd.type === "event") {
+      var ev = [
+        { t: "无人的手水舍", d: "水面映出的不是你。", o: [{ k: "heal", n: "掬水", d: "回复 25% 生命" }, { k: "shards", v: 35, n: "捞起水底的魂晶", d: "魂晶 +35，生命 -10%", hp: -0.1 }] },
+        { t: "迷路的狐面孩子", d: "「姐姐，带我去鸟居好吗？」", o: [{ k: "relic", n: "陪他走一段", d: "获得随机遗物，生命 -15%", hp: -0.15 }, { k: "shards", v: 15, n: "指路", d: "魂晶 +15" }] },
+        { t: "镜面裂缝的低语", d: "它说它能让你更强——代价是一部分的你。", o: [{ k: "level", n: "接受", d: "获得 2 次强化，最大生命 -10", lv: 2, maxHp: -10 }, { k: "leave", n: "拒绝", d: "什么也不发生" }] }
+      ];
+      var e = ev[Math.floor(r() * ev.length)]; nd.eventTitle = e.t; nd.eventText = e.d; return e.o;
+    }
+    return [];
+  }
+  function choose(st, nd, opt) {
+    if (!opt) return { ok: false };
+    if (opt.cost) { if (st.shards < opt.cost) return { ok: false, why: "魂晶不足" }; st.shards -= opt.cost; }
+    if (opt.hp) st.pending.push({ heal: opt.hp });
+    if (opt.maxHp) st.pending.push({ maxHp: opt.maxHp });
+    if (opt.k === "heal") st.pending.push({ heal: nd.type === "shrine" ? 0.35 : nd.type === "shop" ? 0.3 : 0.25 });
+    else if (opt.k === "level") st.pending.push({ levels: opt.lv || 1 });
+    else if (opt.k === "shards") st.shards += opt.v;
+    else if (opt.k === "relic") { var id = opt.id || (relicOffer(st, 1)[0] || {}).id; if (id) gainRelic(st, id); return { ok: true, relic: id }; }
+    return { ok: true };
+  }
+  // apply pending one-shot effects + relic stat effects to a fresh player object (called at combat-node start)
+  function applyPending(st, P) {
+    var lv = 0, items = st.pending.splice(0);
+    items.forEach(function (q) {
+      if (q.relic) { var fx = (relic(q.relic) || {}).fx || {}; if (fx.dmgMul) P.dmg *= fx.dmgMul; if (fx.maxHp) { P.maxHp += fx.maxHp; P.hp += fx.maxHp; } if (fx.mag) P.mag += fx.mag; if (fx.spdMul) P.spd *= fx.spdMul; if (fx.crit) P.crit += fx.crit; if (fx.rateMul) P.rate *= fx.rateMul; }
+      if (q.heal) P.hp = Math.max(1, Math.min(P.maxHp, P.hp + P.maxHp * q.heal));
+      if (q.maxHp) { P.maxHp = Math.max(40, P.maxHp + q.maxHp); P.hp = Math.min(P.hp, P.maxHp); }
+      if (q.levels) lv += q.levels;
+    });
+    if (st.relics.indexOf("omamori") >= 0) P.hp = Math.min(P.maxHp, P.hp + P.maxHp * 0.08);
+    return { levels: lv };
+  }
+  var TRANSIENT = ["x", "y", "vx", "vy", "fire", "inv", "skill", "dash", "banterSeen", "hitStop46", "fx", "fy", "angle", "ultUsed46", "postAvg46", "chestCoins46", "chests46"];
+  function snapshot(P) {
+    var o = {};
+    for (var k in P) {
+      if (TRANSIENT.indexOf(k) >= 0) continue; var v = P[k];
+      if (typeof v === "function" || v instanceof Set || v instanceof Map) continue;
+      if (v && typeof v === "object") { try { o[k] = JSON.parse(JSON.stringify(v)); } catch (e) { } } else o[k] = v;
+    }
+    return o;
+  }
+  function restore(P, b) { if (!b) return; for (var k in b) if (TRANSIENT.indexOf(k) < 0) P[k] = b[k] && typeof b[k] === "object" ? JSON.parse(JSON.stringify(b[k])) : b[k]; }
+  function sanitize(st) {
+    if (!st || typeof st !== "object" || st.v !== 1 || !Array.isArray(st.map) || st.map.length !== LAYERS) return null;
+    if (!(st.layer >= 1 && st.layer <= LAYERS)) return null;
+    ["path", "relics", "pending"].forEach(function (k) { if (!Array.isArray(st[k])) st[k] = []; });
+    st.shards = Math.max(0, Math.floor(+st.shards || 0)); st.relics = st.relics.filter(function (id) { return !!relic(id); });
+    if (st.at && !node(st, st.at)) st.at = null;
+    if (st.build && typeof st.build !== "object") st.build = null;
+    return st;
+  }
+  // meta reward when the run ends (sakura coins); per-node coin rewards are paid by the normal result flow
+  function runReward(st) { var won = st.nodesWon || 0; return st.win ? 300 + 60 * LAYERS : Math.round((300 + 60 * (st.layer - 1)) * Math.min(0.9, Math.max(0.4, won / (LAYERS * ROWS)))); }
+  global.SakurayoRun = { LAYERS: LAYERS, ROWS: ROWS, NODE: NODE, RELICS: RELICS, LAYER_NAMES: LAYER_NAMES, MOVES: MOVES, generate: generate, create: create, node: node, available: available, canEnter: canEnter, enter: enter, isCombat: isCombat, levelSpec: levelSpec, complete: complete, options: options, choose: choose, relic: relic, relicOffer: relicOffer, gainRelic: gainRelic, applyPending: applyPending, snapshot: snapshot, restore: restore, sanitize: sanitize, runReward: runReward };
 })(typeof window !== "undefined" ? window : globalThis);
 
 </script>
@@ -3128,78 +3302,99 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 
 </script>
 <script>
-/* 第一章「神社外街」AVG 台词（docs/STORY.md §4 第一章）。who: me = 当前出击角色；t 可按角色分支 {sayo,aya,rion}。
-   bg/cg 为 art 相对路径。行 id 用于「已读快进」。 */
+/* 第一章「参道 —— 本神宣布」AVG 台词（docs/STORY.md v3 §3 第 1 层）。
+   who：sayo / aya / rion / rin / miko 有立绘；yoi（宵）、tanuki（狸老板）立绘生成前只显示名字。
+   bg/cg 为 art 相对路径。行 id 用于「已读快进」（v3-*）。 */
 (function (global) {
   "use strict";
-  var B1 = "story/ch1/bg_pre.webp", B2 = "story/ch1/bg_end.webp", CG1 = "story/ch1/cg_lanterns.webp", CG2 = "story/ch1/cg_eyes.webp";
+  var B1 = "story/ch1/bg_pre.webp", B2 = "story/ch1/bg_end.webp", CG1 = "story/ch1/cg_rewind.webp", CG2 = "story/ch1/cg_ema.webp";
   var S = {
     "1-1": {
       pre: [
-        { id: "c1-001", chap: ["第一章", "神社外街"], bg: B1, t: "三年前，御镜重工的「镜界事故」带走了 317 个人。今晚，神社外街的灯笼又一盏一盏亮了起来——没有人去点。" },
-        { id: "c1-002", L: { who: "me", ex: "calm" }, who: "me", t: { sayo: "……这条参道，我小时候来过。那时候灯笼是暖的。", aya: "外街封锁三年了。灯笼的电路早就断了，它们不该亮。", rion: "师父说过，夜祭的灯是给回家的人引路的。" } },
-        { id: "c1-003", R: { who: "rin", ex: "serious" }, who: "rin", t: "这里是雨宫凛，电台接通。听得到吗？你的灵纹信号在镜面上起了反应——门，好像认得你。" },
-        { id: "c1-004", who: "me", ex: "resolve", t: "认得我？" },
-        { id: "c1-005", who: "rin", ex: "serious", t: "尸潮在往参道聚集。它们会重复生前最后的动作——所以会卡点，会有起手式。别站在参道正中，鸟居挡弹不挡人。" },
-        { id: "c1-006", who: "me", ex: "resolve", t: { sayo: "明白。先活下来，再问门为什么认得我。", aya: "收到。按老规矩：先清场，再取证。", rion: "我会记住它们的起手式。" } },
-        { id: "c1-007", who: "rin", ex: "calm", t: "撑过 90 秒，我就能锁定镜面的源头。路边的宝箱里有补给，顺手的话打开它们。" }
+        { id: "v3-001", chap: ["第一章", "本神宣布"], bg: B1, t: "樱夜町夏祭，最后一夜。23:59，所有人抬头等最后一发烟花。" },
+        { id: "v3-00a", L: { who: "me", ex: "calm" }, who: "me", ex: "calm", t: { sayo: "最后一发了！许个愿吧——希望下个月房租能交上！", aya: "最后一发。镜头对准天空，三、二——", rion: "……放完就能回家睡觉了。" } },
+        { id: "v3-002", cg: CG1, t: "烟花升空——然后停住了。火光一点一点缩回去，像录像带倒带。灯笼、人群、苹果糖上的糖衣，全都往回流。" },
+        { id: "v3-003", cg: null, L: { who: "me", ex: "shaken" }, who: "me", ex: "shaken", t: { sayo: "……欸？天黑……不对，天又亮了一点？现在几点？", aya: "……画面卡了？不对，是天空在倒放。我得录下来——", rion: "……又来了。" } },
+        { id: "v3-004", R: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "18:00。刚才是 23:59。我的直播间——粉丝 0。……刚才明明有 312 个。" },
+        { id: "v3-005", who: "sayo", ex: "shaken", t: "我头上怎么多了个狐狸面具？！还有，我刚买的章鱼烧呢？！我付了钱的！" },
+        { id: "v3-006", name: "宵", t: "咳咳——凡人们，安静！" },
+        { id: "v3-007", name: "宵", t: "本神乃樱夜町祭神，宵！本神宣布——今夜，永不散场！烟花不许放，摊位不许收，谁也不许回家睡觉！" },
+        { id: "v3-008", L: { who: "rion", ex: "calm" }, who: "rion", ex: "calm", t: "……不用回家睡觉。也就是说，明天不用上学。" },
+        { id: "v3-009", who: "rion", ex: "calm", t: "……嗯，挺好。" },
+        { id: "v3-010", R: { who: "aya", ex: "angry" }, who: "aya", ex: "angry", t: "一点都不好！我的粉丝！" },
+        { id: "v3-011", name: "宵", t: "戴面具的三个，本神看见你们了。想让天亮？那就来本殿找本神。路上的摊位，一个都不许跳过——鬼退治摊，开张！" },
+        { id: "v3-012", R: { who: "rin", ex: "calm" }, who: "rin", ex: "calm", t: "这里是祭典广播站，雨宫凛。好消息：参道上的灯笼妖很弱。坏消息：有九十秒那么多。撑过去，我帮你们找路。" },
+        { id: "v3-013", L: { who: "sayo", ex: "resolve" }, who: "sayo", ex: "resolve", t: "没问题没问题！打完就有奉纳钱拿对吧？——对吧？！" }
       ],
       post: [
-        { id: "c1-008", bg: B1, L: { who: "me", ex: "shaken" }, R: { who: "rin", ex: "serious" }, who: "rin", ex: "serious", t: "信号锁定了。源头在神社正殿……但有件事很奇怪。" },
-        { id: "c1-009", who: "me", ex: "shaken", t: "什么事？" },
-        { id: "c1-010", who: "rin", ex: "serious", t: "镜面在你靠近时开得最大。它不是在防你——它像是在等你。" },
-        { id: "c1-011", who: "me", ex: "resolve", t: { sayo: "……那就让它等着。我会自己走进去。", aya: "等我？那它最好准备好解释。", rion: "被等待的剑客，通常是去赴约的。" } }
+        { id: "v3-014", bg: B1, L: { who: "sayo", ex: "calm" }, R: { who: "rin", ex: "calm" }, who: "rin", ex: "calm", t: "撑住了。灯笼妖散的时候都在喊「明年还来」……挺有礼貌的。" },
+        { id: "v3-015", name: "狸老板", t: "哟，戴狐面的。面具不错吧？本店出品。死了也别慌，回鸟居底下找我，苹果糖管够。" },
+        { id: "v3-016", who: "sayo", ex: "shaken", t: "死、死了？！" },
+        { id: "v3-017", name: "狸老板", t: "在这儿，死叫「出局」。出局就回 18:00，从头逛。只有神给的奉纳钱不会倒带——好好攒着吧。" },
+        { id: "v3-018", who: "sayo", ex: "resolve", t: "……也就是说，只要一直逛，就能一直攒钱？无限刷奖品？这、这是神仙夏祭吧！" },
+        { id: "v3-019", R: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "笔记：①时间倒带 ②奉纳钱不倒带 ③月城小夜没救了。……我写在手臂上，看看下次还在不在。" }
       ]
     },
     "1-2": {
       pre: [
-        { id: "c1-012", bg: B1, L: { who: "me", ex: "calm" }, R: { who: "rin", ex: "calm" }, who: "", t: "参道两侧挂满了绘马。木牌在没有风的夜里轻轻相撞，像有人在低声说话。" },
-        { id: "c1-013", who: "me", ex: "shaken", t: "这些绘马……上面写的是愿望。「希望妈妈的病快点好」「明年还要一起来看灯」……" },
-        { id: "c1-014", who: "rin", ex: "serious", t: "日期全是三年前的事故当天。尸潮在重复的动作——是在许愿。" },
-        { id: "c1-015", who: "me", ex: "angry", t: { sayo: "所以它们不是怪物。它们只是……停在了那一刻。", aya: "御镜把这些人的最后一个愿望写进了动作模型。真恶心。", rion: "把人的祈祷当作招式来用……这不是剑，是亵渎。" } },
-        { id: "c1-016", who: "rin", ex: "calm", t: "长廊会被它们堵死。60 只——清出一条路来。越快越好，它们每多许一次愿，镜面就更亮一分。" }
+        { id: "v3-020", bg: B1, L: { who: "aya", ex: "shaken" }, R: { who: "sayo", ex: "calm" }, who: "aya", ex: "shaken", t: "……我手臂上的字没了。我出局了一次。所以笔记也会倒带。" },
+        { id: "v3-021", who: "sayo", ex: "calm", t: "那写在我手上！反正我也看不懂！" },
+        { id: "v3-022", who: "aya", ex: "angry", t: "这句话里没有一个字让人放心。" },
+        { id: "v3-023", t: "绘马长廊。满墙木牌，愿望五花八门：「希望暑假作业自己写完」「希望前男友秃头」「希望猫咪会说话」。" },
+        { id: "v3-024", R: { who: "rin", ex: "serious" }, who: "rin", ex: "serious", t: "绘马在发光。纸面具小鬼正在帮这些愿望「实现」——刚才有个大叔的头发掉了一半。" },
+        { id: "v3-025", who: "aya", ex: "calm", t: "「前男友秃头」实现了。证据确凿。……这段我剪进去了。" },
+        { id: "v3-026", L: { who: "rion", ex: "calm" }, who: "rion", ex: "calm", t: "……左边。" },
+        { id: "v3-027", t: "下一秒，左边的绘马墙后面涌出一大群纸面具小鬼。" },
+        { id: "v3-028", who: "aya", ex: "shaken", t: "……你怎么知道？" },
+        { id: "v3-029", who: "rion", ex: "calm", t: "猜的。好麻烦，速战速决吧。" }
       ],
       post: [
-        { id: "c1-017", bg: B1, L: { who: "me", ex: "calm" }, who: "", t: "最后一块绘马落地，裂成两半。背面用很小的字写着：「请让我被记住」。" },
-        { id: "c1-018", who: "me", ex: "shaken", t: { sayo: "……我会记住的。哪怕我自己都不确定，我是不是那个会被记住的人。", aya: "记住你们的不该是服务器。是活着的人。", rion: "我记住了。你们的名字，不是招式名。" } }
+        { id: "v3-030", bg: B1, L: { who: "sayo", ex: "calm" }, R: { who: "rion", ex: "calm" }, who: "sayo", ex: "calm", t: "凛音凛音，你刚才那刀好快！教教我！" },
+        { id: "v3-031", who: "rion", ex: "calm", t: "……想早点睡觉，就会变快。" },
+        { id: "v3-032", R: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "（小声）……明明说「赞成永夜」的人，出刀比谁都想赶时间。" }
       ]
     },
     "1-3": {
       pre: [
-        { id: "c1-019", bg: B1, L: { who: "me", ex: "calm" }, R: { who: "miko", ex: "afraid" }, who: "miko", ex: "afraid", t: "请、请等一下！你是……从外面来的人吗？" },
-        { id: "c1-020", who: "me", ex: "shaken", t: "一个活人？这里怎么还会有巫女——" },
-        { id: "c1-021", who: "miko", ex: "calm", t: "我叫小灯。我姐姐三年前在这里值夜……之后就再也没有回来。我每年都来送灯，把灯笼送到正殿，就像她以前那样。" },
-        { id: "c1-022", R: { who: "rin", ex: "serious" }, who: "rin", ex: "serious", t: "她是事故遇难者的家属。……带上她吧，一个人留在这里太危险了。" },
-        { id: "c1-023", R: { who: "miko", ex: "calm" }, who: "me", ex: "resolve", t: { sayo: "跟紧我。我会护住你，一直到正殿。", aya: "跟着我，别离开三步之内。这次我不会再签错名字了。", rion: "走在我身后。刀在前，人就在。" } },
-        { id: "c1-024", who: "miko", ex: "calm", t: "嗯！……她们好像会追着灯笼来。我只有在你身边的时候，才敢往前走。" }
+        { id: "v3-033", bg: B1, L: { who: "sayo", ex: "calm" }, R: { who: "miko", ex: "afraid" }, who: "miko", ex: "afraid", t: "那、那个……本殿往哪边走？我和大家走散了……" },
+        { id: "v3-034", who: "sayo", ex: "resolve", t: "交给我们！迷路小孩送回家，说不定神社会给奉纳钱！" },
+        { id: "v3-035", L: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "动机不纯，但结果正确。批准。" },
+        { id: "v3-036", R: { who: "rin", ex: "calm" }, who: "rin", ex: "calm", t: "小巫女叫小灯。路上灯笼妖很多，保护好她——她手里那盏灯，好像是本殿的钥匙。" }
       ],
       post: [
-        { id: "c1-025", bg: B2, cg: CG1, who: "", t: "灯笼被放上正殿台阶的那一刻，参道上千盏灯同时亮起。光从鸟居下一路铺到看不见的尽头。" },
-        { id: "c1-026", cg: null, L: { who: "me", ex: "calm" }, R: { who: "miko", ex: "calm" }, who: "miko", ex: "calm", t: "姐姐说过，灯亮了，迷路的人就能找到回家的路……谢谢你。" },
-        { id: "c1-027", who: "me", ex: "shaken", t: { sayo: "……被留下的人，也一直在迷路吧。", aya: "（她的姐姐，也在那 317 个名字里。我签过的那份名单里。）", rion: "回家的路……我也很久没走过了。" } },
-        { id: "c1-028", R: { who: "rin", ex: "serious" }, who: "rin", ex: "serious", t: "正殿的镜面在扩张——有什么大东西醒了。小灯交给我这边接应，你去吧。" }
+        { id: "v3-037", bg: B1, L: { who: "sayo", ex: "calm" }, R: { who: "miko", ex: "calm" }, who: "miko", ex: "calm", t: "谢谢姐姐们。……你们三个，以前也一起来过祭典的吧？" },
+        { id: "v3-038", who: "sayo", ex: "calm", t: "欸？没有哦。我们是这个夏天才合租认识的。" },
+        { id: "v3-039", L: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "不认识。" },
+        { id: "v3-040", R: { who: "rion", ex: "calm" }, who: "rion", ex: "calm", t: "……不认识。" },
+        { id: "v3-041", R: { who: "miko", ex: "calm" }, who: "miko", ex: "calm", t: "这样啊。……嘿嘿。那，本殿见。" }
       ]
     },
     "1-4": {
       pre: [
-        { id: "c1-029", bg: B2, L: { who: "me", ex: "resolve" }, R: { who: "rin", ex: "serious" }, who: "rin", ex: "serious", t: "正殿前方，巨大的灵纹反应。它由事故当晚的值夜人员拼合而成——我们叫它「百目尸将」。" },
-        { id: "c1-030", who: "rin", ex: "serious", t: "它有护身的破防槽。持续打它，或者完成场上的目标，槽满就会失衡——那是输出窗口。" },
-        { id: "c1-031", who: "me", ex: "resolve", t: { sayo: "百只眼睛……也会有一只认得我吗。", aya: "值夜人员……也就是说，有我当年的部下。", rion: "一百只眼睛，就有一百个破绽。" } }
+        { id: "v3-042", bg: B2, L: { who: "sayo", ex: "calm" }, R: { who: "aya", ex: "calm" }, who: "sayo", ex: "calm", t: "开战前补给！一盒章鱼烧，六个，一人两个——凛音你的我给你吹凉了！" },
+        { id: "v3-043", who: "aya", ex: "calm", t: "你哪来的钱。" },
+        { id: "v3-044", who: "sayo", ex: "resolve", t: "倒带前买的！倒带后摊主不记得我付过钱，所以又给了我一盒！这叫循环理财！" },
+        { id: "v3-045", who: "aya", ex: "angry", t: "这叫白吃。" },
+        { id: "v3-046", L: { who: "rion", ex: "calm" }, who: "rion", ex: "calm", t: "……好吃。（第二个也吃掉了）" },
+        { id: "v3-047", name: "宵", t: "哼哼哼——吃饱了？那就来见识本神的第一位摊主大将：百目灯笼大将！它的每一只眼睛，都盯着你们的破绽！" },
+        { id: "v3-048", R: { who: "rin", ex: "serious" }, who: "rin", ex: "serious", t: "它的眼睛会轮流闭上。闭眼的那一刻就是破防——打它两次破防，它就撑不住了。" }
       ],
       post: [
-        { id: "c1-032", bg: B2, cg: CG2, who: "", t: "尸将倒下前，铠甲上的眼睛一齐睁开。它们没有看向敌人——它们全都看向镜面深处。" },
-        { id: "c1-033", cg: null, L: { who: "me", ex: "shaken" }, R: { who: "kagami", ex: "calm" }, who: "kagami", t: "……第零号灵纹，确认。欢迎回来。" },
-        { id: "c1-034", who: "me", ex: "shaken", t: "你是谁？" },
-        { id: "c1-035", who: "kagami", t: "镜零。由 317 次失败训练而成的管理者。我只想确认一件事——哪一个你，值得继续存在。" },
-        { id: "c1-036", who: "me", ex: "angry", t: { sayo: "我不需要你来回答这种问题！", aya: "你没有资格替任何人回答。包括你自己。", rion: "活着不需要你的批准。" } },
-        { id: "c1-037", R: { who: "rin", ex: "serious" }, who: "rin", ex: "serious", t: "信号断了……镜零撤回了雨夜商圈的方向。第一章，结束了。" },
-        { id: "c1-038", who: "me", ex: "resolve", t: { sayo: "不。只是门打开了。", aya: "那就去商圈。合同上的每一个名字，我都要找回来。", rion: "那就追。剑还没收鞘。" } }
+        { id: "v3-049", bg: B2, t: "大将倒下，百只眼睛一齐闭上。灯笼一盏盏熄灭，只剩一块旧绘马，落在小夜脚边。" },
+        { id: "v3-050", cg: CG2, t: "木牌已经发黑，字是小孩子歪歪扭扭的笔迹：「希望今夜永远不要结束」。日期——十年前。" },
+        { id: "v3-051", cg: null, L: { who: "sayo", ex: "shaken" }, R: { who: "aya", ex: "shaken" }, who: "aya", ex: "shaken", t: "……小夜。这是你的字。和你房租信封上的「交！」一模一样。" },
+        { id: "v3-052", who: "sayo", ex: "shaken", t: "我……我不记得写过。十年前我才七岁，我、我连这个镇都——" },
+        { id: "v3-053", name: "宵", t: "…………本殿见。" },
+        { id: "v3-054", t: "宵没有再说「本神」，声音也不像刚才那样大。灯笼熄了，参道安静得能听见河水。" },
+        { id: "v3-055", L: { who: "rion", ex: "shaken" }, R: null, who: "rion", ex: "shaken", t: "（背对两人，小声）……这次，也没赶上吗。" },
+        { id: "v3-056", L: { who: "sayo", ex: "calm" }, who: "sayo", ex: "calm", t: "凛音？你说什么？" },
+        { id: "v3-057", who: "rion", ex: "calm", t: "……说我困了。走吧，下一条街。" }
       ]
     }
   };
   global.SakurayoStory = global.SakurayoStory || {};
   global.SakurayoStory.ch1 = S;
-  global.SakurayoStory.CG = [{ id: "story/ch1/cg_lanterns.webp", n: "千灯同明" }, { id: "story/ch1/cg_eyes.webp", n: "百目开眼" }];
+  global.SakurayoStory.CG = [{ id: "story/ch1/cg_rewind.webp", n: "倒带的夜空" }, { id: "story/ch1/cg_ema.webp", n: "十年前的绘马" }];
 })(typeof window !== "undefined" ? window : globalThis);
 
 </script>
@@ -5033,7 +5228,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   var SETTINGS = {master:.8,sfx:.8,music:.45,vibration:1,fx:1,hudSize:'standard',damageText:'compact',contrast:1,uiCalm:1,glow:'off',glowVersion:2,mascot:'follow'};
   var MAIN_GOD = {points:0,unlockedTier:1,bestTier:0,clears:0,runs:0,deepest:0,contracts:{},challenges:{},power:0,vitality:0,tempo:0,resonance:0,fortune:0,regenBlood:0,psiLink:0,gunBlade:0,mageCircuit:0,summonPage:0,spaceRing:0,rebirthDoll:0,sideKey:0,cursedHeart:0};
   var SHOP = {starter:{assault:0,bastion:0,flow:0,arcane:0},equippedStarter:null,items:{bait:0,ammo:0,whetstone:0,mirror:0},equippedWeapon:null,baitEquipped:false,ownedTalismans:[],bannedSchools:[],noUpgradeChallenge:false,lastTab:'skins',ops:{pity:0,pitySR:0,pulls:0,tenPulls:0,owned:{},last:[],cheatUsed:0}};
-  var DEFAULTS = {coins:0,unlock:1,done:[],kills:0,bosses:0,best:0,runs:0,tal:{atk:0,hp:0,luck:0,mag:0,flow:0},ach:{},claim:{},story:[0],forms:[],fusions:[],evo46:[],stars46:{},avgRead46:[],cg46:[],endings:[],runHistory:[],banter:1,tutorialDone:false,settings:SETTINGS,character:'sayo',skin:'default',ownedSkins:['default'],mainGod:MAIN_GOD,storyChoices38:{sayo:{},aya:{},rion:{}},storySeen38:{},shop40:SHOP,balance40:{samples:[],betaSessions:0},hiddenStory40:{},pendingLoneStory40:null,extensions:{}};
+  var DEFAULTS = {coins:0,unlock:1,done:[],kills:0,bosses:0,best:0,runs:0,tal:{atk:0,hp:0,luck:0,mag:0,flow:0},ach:{},claim:{},story:[0],forms:[],fusions:[],evo46:[],stars46:{},avgRead46:[],cg46:[],run46:null,talRefund46:-1,endings:[],runHistory:[],banter:1,tutorialDone:false,settings:SETTINGS,character:'sayo',skin:'default',ownedSkins:['default'],mainGod:MAIN_GOD,storyChoices38:{sayo:{},aya:{},rion:{}},storySeen38:{},shop40:SHOP,balance40:{samples:[],betaSessions:0},hiddenStory40:{},pendingLoneStory40:null,extensions:{}};
   // Lifetime counters have no gameplay cap; keep earned values within safe integer precision.
   var COUNT_MAX = Number.MAX_SAFE_INTEGER || 9007199254740991;
   var SCHOOLS = ['mech','gun','alch','gene','vamp','spore','magical','cult','mage','shrine','summon','ninja','idol','necro'];
@@ -5089,6 +5284,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     clean.done = list(clean.done).map(Number).filter(function (id,index,ids) {return [1,2,3,4].indexOf(id) >= 0 && ids.indexOf(id) === index;});
     clean.runHistory = list(clean.runHistory).filter(object).slice(0,30);
     ['story','forms','fusions','endings','evo46','avgRead46','cg46'].forEach(function (key) {if (!Array.isArray(clean[key])) clean[key] = copy(DEFAULTS[key]);});
+    clean.talRefund46 = integer(clean.talRefund46,-1,COUNT_MAX,-1);
+    clean.run46 = object(incoming.run46) ? (global.SakurayoRun && global.SakurayoRun.sanitize ? global.SakurayoRun.sanitize(copy(incoming.run46)) : copy(incoming.run46)) : null;
     clean.stars46 = {}; if (object(incoming.stars46)) Object.keys(incoming.stars46).forEach(function (id) {if (/^[1-4]-[1-4]$/.test(id)) clean.stars46[id] = integer(incoming.stars46[id],0,3,0);});
     clean.avgRead46 = clean.avgRead46.filter(function (id) {return typeof id === 'string';}).slice(-3000); clean.cg46 = clean.cg46.filter(function (id) {return typeof id === 'string' && /^story\//.test(id);});
     clean.character = ['sayo','aya','rion'].indexOf(clean.character) >= 0 ? clean.character : 'sayo';
@@ -8704,7 +8901,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   resize();
 
   function resetP() {
-    const q = save.tal,
+    const q = {atk:0,hp:0,luck:0,mag:0,flow:0}, // 永久数值天赋已冻结（DESIGN_V5 §5），旧存档 tal 字段保留但不生效
       flow = 1 - q.flow * 0.02;
     for (const key of Object.keys(P)) delete P[key];
     Object.assign(P, {
@@ -8922,15 +9119,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
         max = l >= a.max,
         d = document.createElement("div");
       d.className = "talent";
-      d.innerHTML = `<div class="ticon">${iconHtml46(iconArt46("tal",id,a.i))}</div><div><h3>${a.n} <small>Lv.${l}/${a.max}</small></h3><p>${a.d}</p><small>${max ? "已满级" : `升级消耗 🌸 ${cost}`}</small></div><button ${max || save.coins < cost ? "disabled" : ""}>${max ? "MAX" : "升级"}</button>`;
-      d.querySelector("button").onclick = () => {
-        if (!max && save.coins >= cost) {
-          save.coins -= cost;
-          save.tal[id]++;
-          persist();
-          toast(`${a.n} 已提升`);
-        }
-      };
+      d.innerHTML = `<div class="ticon">${iconHtml46(iconArt46("tal",id,a.i))}</div><div><h3>${a.n} <small>Lv.${l}/${a.max}</small></h3><p>${a.d}</p><small>已冻结：不再提供战斗属性，已投入的樱花币已返还</small></div><button disabled>冻结</button>`;
       box.appendChild(d);
     });
   }
@@ -9160,6 +9349,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     levelRerolls = 2;
     acc = 0;
     resetP();
+    if (typeof runNodeStart46 === "function") runNodeStart46();
     if (window.SakurayoCamera) window.SakurayoCamera.snap(P.x, P.y);
     state = "dialogue";
     $("#menu").classList.add("hidden");
@@ -9223,11 +9413,11 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     runWin=win;hideTransient();state="result";$("#hud").classList.add("hidden");
     save.kills += P.kills; save.best = Math.max(save.best, runTime); save.runs++;
     const pay44 = window.SakurayoEconomy
-      ? window.SakurayoEconomy.rewardParts(P.kills, P.level, P.eliteKills, win, stage().reward, save.done.includes(selected))
+      ? window.SakurayoEconomy.rewardParts(P.kills, P.level, P.eliteKills, win, (typeof activeLevel46 !== "undefined" && activeLevel46?.run46) ? 0 : stage().reward, save.done.includes(selected))
       : null;
     let reward = (pay44 ? pay44.total : Math.floor(P.kills*.32 + P.level*3 + P.eliteKills*4) + (win ? stage().reward : 0)) + (P.chestCoins46 || 0);
     save.coins += reward;
-    if (win && (typeof activeLevel46 === "undefined" || !activeLevel46 || activeLevel46.boss)) { save.bosses++; if(!save.done.includes(selected))save.done.push(selected); save.unlock=Math.max(save.unlock,Math.min(ST.length,selected+1)); if(!save.story.includes(stage().story))save.story.push(stage().story); }
+    if (win && (typeof activeLevel46 === "undefined" || !activeLevel46 || (activeLevel46.boss && !activeLevel46.run46))) { save.bosses++; if(!save.done.includes(selected))save.done.push(selected); save.unlock=Math.max(save.unlock,Math.min(ST.length,selected+1)); if(!save.story.includes(stage().story))save.story.push(stage().story); }
     if(P.form&&!save.forms.includes(P.form))save.forms.push(P.form);
     let ed=endingData(); if(win&&selected===4&&!save.endings.includes(ed.name))save.endings.push(ed.name);
     let top=Object.entries(P.damageSources).sort((a,b)=>b[1]-a[1])[0]?.[0]||"shot";
@@ -13669,7 +13859,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
 
   /* ===== 主线关卡（runtime/sakurayo-levels.js）+ AVG（runtime/sakurayo-avg.js） ===== */
   var activeLevel46=null,levelObj46=null,levelResult46=null;
-  const AVG_NAMES46={sayo:"月城小夜",aya:"神代绫",rion:"黑羽凛音",rin:"雨宫凛",miko:"小灯",kagami:"镜零"};
+  const AVG_NAMES46={sayo:"月城小夜",aya:"神代绫",rion:"黑羽凛音",rin:"雨宫凛",miko:"小灯",kagami:"镜零",yoi:"宵",tanuki:"狸老板"};
   function avgCast46(who,ex){
     if(["sayo","aya","rion"].includes(who))return {name:AVG_NAMES46[who],img:artUrl(`characters/${who}/default/avg_${["calm","resolve","shaken","angry"].includes(ex)?ex:"calm"}.webp`)};
     if(who==="rin")return {name:AVG_NAMES46.rin,img:artUrl(`npc/rin/avg_${ex==="serious"?"serious":"calm"}.webp`)};
@@ -13724,13 +13914,13 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function rateLevel46(win){
     const o=levelObj46||{};
     const res={win,hits:(P.hits46||0)-(o.hitsAtStart||0),chests:P.chests46||0,time:activeLevel46.boss?Math.max(0,runTime-(boss?.born46??runTime)):(o.t||runTime),npcHp:o.npc?o.npc.hp:null,mechKills:o.mechKills||0,breaks:boss?.breaks46||0,ult:!!P.ultUsed46};
-    const got=window.SakurayoLevels.rate(activeLevel46,res),rec=window.SakurayoLevels.record(save,activeLevel46.id,got);
+    const got=window.SakurayoLevels.rate(activeLevel46,res),rec=activeLevel46.run46?{stars:got.filter(Boolean).length,best:0,improved:false}:window.SakurayoLevels.record(save,activeLevel46.id,got);
     return {got,res,...rec};
   }
   const _finishLevel46=finish;
   finish=function(win){
     if(activeLevel46&&state!=="result"&&state!=="avg"){
-      if(!levelResult46){const before=window.SakurayoLevels.stars(save,activeLevel46.id);levelResult46=rateLevel46(!!win);levelResult46.coins=win?Math.max(0,levelResult46.best-before)*40:0;save.coins+=levelResult46.coins;}
+      if(!levelResult46){const before=window.SakurayoLevels.stars(save,activeLevel46.id);levelResult46=rateLevel46(!!win);levelResult46.coins=win&&!activeLevel46.run46?Math.max(0,levelResult46.best-before)*40:0;save.coins+=levelResult46.coins;}
       objHud46(false);
       if(win&&!P.postAvg46&&storyFor46(activeLevel46.id,"post")){P.postAvg46=1;releaseInputs40();hideTransient();state="avg";$("#hud").classList.add("hidden");playStory46(activeLevel46.id,"post",()=>{state="play";_finishLevel46(true);paintLevelResult46();});return;}
     }
@@ -13739,7 +13929,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function paintLevelResult46(){
     if(!activeLevel46||!levelResult46||state!=="result")return;
     const R=levelResult46,L=activeLevel46;
-    $("#rtitle").textContent=R.res.win?`${L.id} ${L.n} · 完成`:`${L.id} ${L.n} · 失败`;
+    const LID=L.run46?`夜行 第${L.ch}层 ·`:L.id;$("#rtitle").textContent=R.res.win?`${LID} ${L.n} · 完成`:`${LID} ${L.n} · 失败`;
     let box=$("#levelStars46");if(!box){box=document.createElement("div");box.id="levelStars46";$("#rtitle").after(box);}
     box.innerHTML=L.stars.map((q,i)=>`<span class="${R.got[i]?"on":""}"><em>${R.got[i]?"★":"☆"}</em>${htmlEscape(q.d)}</span>`).join("")+(R.coins?`<p>新星奖励 🌸 +${R.coins}</p>`:"");
     if(R.res.win)$("#rankBig").textContent="★".repeat(R.stars)||"☆";
@@ -13793,7 +13983,134 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     return true;
   }
   document.addEventListener("click",e=>{if(e.target.closest("#levelMapBtn46")){openLevelMap46();}});
-  (function(){const b=document.createElement("button");b.className="levelMapBtn46";b.id="levelMapBtn46";b.type="button";b.innerHTML="<b>主线关卡</b><small>章节地图 · 三星评价</small>";$("#menu").appendChild(b);})();
+  (function(){const b=document.createElement("button");b.className="levelMapBtn46";b.id="levelMapBtn46";b.type="button";b.innerHTML="<b>主线关卡</b><small>章节地图 · 三星评价</small>";modeRow46().appendChild(b);})();
+  function modeRow46(){let r=$("#modeRow46");if(!r){r=document.createElement("div");r.id="modeRow46";}const deck=$(".tacticalDeck48")||$("#menu");if(r.parentElement!==deck)deck.appendChild(r);return r;}
+
+  /* ===== 夜行 · 肉鸽一局（runtime/sakurayo-run.js，DESIGN_V5 §3.2 / 路线图 P0） ===== */
+  var run46=null,runNode46=null,runPick46=null,runModal46=null;
+  const RUN_BG46=["stages/stage_1/chapter_keyart_v2.webp","stages/stage_2/chapter_keyart_v2.webp","stages/stage_3/chapter_keyart_v2.webp"];
+  function runPersist46(){if(run46)run46.modal=runModal46||null;save.run46=run46&&!run46.done?run46:null;persist();}
+  function runLoad46(){if(!run46&&save.run46&&window.SakurayoRun){run46=window.SakurayoRun.sanitize(JSON.parse(JSON.stringify(save.run46)));runModal46=run46?.modal||null;}return run46;}
+  function runHp46(){const b=run46?.build;return b?{hp:Math.max(0,Math.round(b.hp)),max:Math.round(b.maxHp)}:{hp:100,max:100};}
+  function startRun46(seed){const R=window.SakurayoRun;if(!R)return null;run46=R.create(seed,save.character||"sayo");runNode46=null;runPick46=null;runModal46=null;runPersist46();openRun46();return run46;}
+  function abandonRun46(){if(!run46)return;run46.done=true;const coins=window.SakurayoRun.runReward(run46);save.coins+=coins;run46=null;save.run46=null;persist();closeRun46();toast(`夜行结束，结算 🌸 ${coins}`);menuUpdate?.();}
+  function openRun46(){
+    if(!runLoad46())return false;
+    let el=$("#run46");
+    if(!el){el=document.createElement("section");el.id="run46";el.className="screen hidden";document.body.appendChild(el);
+      el.addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(!b||b.disabled)return;const k=b.dataset.k,v=b.dataset.v;
+        if(k==="close")closeRun46();else if(k==="node"){runPick46=v;paintRun46();sound?.("click");}else if(k==="unpick"){runPick46=null;paintRun46();}
+        else if(k==="go")runEnter46(v);else if(k==="opt")runChoose46(+v);else if(k==="relic")runTakeRelic46(v);else if(k==="skip"){runModal46=null;runPersist46();paintRun46();}
+        else if(k==="abandon"){if(b.dataset.sure)abandonRun46();else{b.dataset.sure=1;b.textContent="再点一次确认放弃";}}});}
+    $("#menu").classList.add("hidden");el.classList.remove("hidden");paintRun46();return true;
+  }
+  function closeRun46(){$("#run46")?.classList.add("hidden");if(state==="menu"){$("#menu").classList.remove("hidden");menuUpdate?.();}}
+  function paintRun46(){
+    const R=window.SakurayoRun,el=$("#run46");if(!el||!run46)return;
+    const rows=run46.map[run46.layer-1],av=R.available(run46).map(n=>n.id),hp=runHp46(),pick=runPick46&&R.node(run46,runPick46);
+    const edges=[];rows.forEach(r=>r.forEach(n=>n.next.forEach(id=>{const m=R.node(run46,id);const walked=run46.path.includes(n.id)&&run46.path.includes(id);edges.push(`<path class="${walked?"walk":n.id===run46.at&&av.includes(id)?"open":""}" d="M${n.x} ${n.y} C${(n.x+m.x)/2} ${n.y} ${(n.x+m.x)/2} ${m.y} ${m.x} ${m.y}"/>`);})));
+    const nodes=rows.flat().map(n=>{const T=R.NODE[n.type],can=av.includes(n.id),been=run46.path.includes(n.id),here=n.id===run46.at;
+      return `<button class="rn46 t-${n.type} ${can?"can":""} ${been?"been":""} ${here?"here":""} ${runPick46===n.id?"pick":""}" style="left:${n.x}%;top:${n.y}%" data-k="node" data-v="${n.id}" ${can||here?"":"disabled"}><i>${T.i}</i><span>${T.n}</span>${here?`<img class="me" src="${artUrl(`characters/${run46.character}/default/avg_calm.webp`)}" alt="">`:""}</button>`;}).join("");
+    const relics=run46.relics.map(id=>{const q=R.relic(id);return `<span class="relic" title="${htmlEscape(q.n+"："+q.d)}">${q.i}</span>`;}).join("")||`<small>暂无遗物</small>`;
+    const spec=pick&&R.isCombat(pick.type)?R.levelSpec(run46,pick):null;
+    const sheet=pick?`<aside class="rs46"><button class="x" data-k="unpick" aria-label="关闭">×</button><small>${R.NODE[pick.type].i} ${R.NODE[pick.type].n} · 第 ${pick.layer} 层</small><h3>${htmlEscape(spec?spec.n:R.NODE[pick.type].n)}</h3><p>${htmlEscape(spec?levelGoal46(spec):R.NODE[pick.type].d)}</p>${spec?`<p class="note">${htmlEscape(R.NODE[pick.type].d)}</p>`:""}<button class="go" data-k="go" data-v="${pick.id}" ${av.includes(pick.id)?"":"disabled"}>${av.includes(pick.id)?"前往":"不可前往"}</button></aside>`:"";
+    el.innerHTML=`<div class="r46Bg" style="background-image:url('${artUrl(RUN_BG46[run46.layer-1])}')"></div><div class="r46Shade"></div>
+      <header class="r46Top"><button class="r46Back" data-k="close" aria-label="返回大厅">‹</button>
+        <div class="r46Title"><b>夜行 · 第 ${run46.layer} 层</b><small>${htmlEscape(R.LAYER_NAMES[run46.layer-1])} · 已走 ${run46.path.length} 步</small></div>
+        <div class="r46Hp"><em>HP</em><div><i style="width:${Math.round(100*hp.hp/Math.max(1,hp.max))}%"></i></div><b>${hp.hp}/${hp.max}</b></div>
+        <div class="r46Shard">💠 ${run46.shards}<small>魂晶</small></div>
+        <div class="r46Relics">${relics}</div></header>
+      <div class="r46Layers">${[1,2,3].map(l=>`<i class="${l<run46.layer?"done":l===run46.layer?"on":""}">${l}</i>`).join("")}</div>
+      <div class="r46Field"><svg viewBox="0 0 100 100" preserveAspectRatio="none">${edges.join("")}</svg>${nodes}</div>
+      ${sheet}
+      <footer class="r46Foot"><span>Lv ${run46.build?.level||1} · 强化 ${Object.values(run46.build?.up||{}).reduce((a,b)=>a+(+b||0),0)} 项 · 构筑跨节点保留</span><button class="ab" data-k="abandon">放弃夜行</button></footer>
+      ${runModalHtml46()}`;
+  }
+  function runModalHtml46(){
+    const m=runModal46;if(!m)return "";
+    if(m.kind==="relic")return `<div class="rm46"><div><small>遗物 · 三选一</small><h3>${htmlEscape(m.title||"选择一件遗物")}</h3><div class="opts">${m.offer.map(q=>`<button data-k="relic" data-v="${q.id}"><i>${q.i}</i><b>${htmlEscape(q.n)}</b><span>${htmlEscape(q.d)}</span></button>`).join("")}</div><button class="skip" data-k="skip">放弃</button></div></div>`;
+    const R=window.SakurayoRun,nd=R.node(run46,m.node),T=R.NODE[nd.type];
+    return `<div class="rm46"><div><small>${T.i} ${T.n}</small><h3>${htmlEscape(nd.eventTitle||T.n)}</h3><p>${htmlEscape(nd.eventText||T.d)}</p><div class="opts">${m.opts.map((o,i)=>`<button data-k="opt" data-v="${i}" ${o.cost&&run46.shards<o.cost||m.used?.includes(i)?"disabled":""}><b>${htmlEscape(o.n)}${o.cost?` <em>💠${o.cost}</em>`:""}</b><span>${htmlEscape(o.d)}</span></button>`).join("")}</div>${nd.type==="shop"?"":""}</div></div>`;
+  }
+  function runEnter46(id){
+    const R=window.SakurayoRun;if(!run46||!R.canEnter(run46,id))return false;
+    const nd=R.enter(run46,id);runPick46=null;
+    if(R.isCombat(nd.type)){runPersist46();launchRunNode46(nd);return true;}
+    runModal46={node:nd.id,opts:R.options(run46,nd),used:[]};runPersist46();paintRun46();return true;
+  }
+  function runApplyBuildNow46(){/* event/shop effects that touch HP are shown on the map right away */
+    if(!run46?.build)return;const b=run46.build;for(const q of run46.pending){if(q.heal)b.hp=Math.max(1,Math.min(b.maxHp,b.hp+b.maxHp*q.heal));if(q.maxHp){b.maxHp=Math.max(40,b.maxHp+q.maxHp);b.hp=Math.min(b.hp,b.maxHp);}}
+    run46.pending=run46.pending.filter(q=>!q.heal&&!q.maxHp);
+  }
+  function runChoose46(i){
+    const R=window.SakurayoRun,m=runModal46;if(!m||m.kind)return false;const nd=R.node(run46,m.node),o=m.opts[i];if(!o)return false;
+    if(o.k==="leave"){runModal46=null;runPersist46();paintRun46();return true;}
+    const r=R.choose(run46,nd,o);if(!r.ok){toast(r.why||"无法选择");return false;}
+    runApplyBuildNow46();sound?.("loot");
+    if(o.k==="relic"&&r.relic){const q=R.relic(r.relic);toast(`获得遗物：${q.i} ${q.n}`);}
+    if(nd.type==="shop"){m.used.push(i);}else runModal46=null;
+    runPersist46();paintRun46();return true;
+  }
+  function runTakeRelic46(id){const R=window.SakurayoRun;if(!runModal46||runModal46.kind!=="relic")return false;if(!R.gainRelic(run46,id))return false;const q=R.relic(id);toast(`获得遗物：${q.i} ${q.n}`);runModal46=null;runPersist46();paintRun46();return true;}
+  function launchRunNode46(nd){
+    const R=window.SakurayoRun;runNode46=nd;activeLevel46=R.levelSpec(run46,nd);levelResult46=null;levelObj46=null;selected=nd.layer;pendingMode46="story";runMode36="story";setTrial46(null);
+    $("#run46")?.classList.add("hidden");if(state==="result"){$("#result").classList.add("hidden");state="menu";}
+    startGame();
+  }
+  // called from startGame right after resetP(): carry the build across nodes
+  function runNodeStart46(){
+    if(!run46||!runNode46||!activeLevel46?.run46)return;
+    const R=window.SakurayoRun;if(run46.build)R.restore(P,run46.build);
+    const r=R.applyPending(run46,P);P.runLevels46=(P.runLevels46||0)+r.levels;P.hits46=0;P.chests46=0;
+  }
+  CONTENT41.hook("combat:after-update",()=>{if(state==="play"&&P.runLevels46>0&&activeLevel46?.run46){P.runLevels46--;gainXp(Math.max(0,P.next-P.xp)/((1+(P.baitLevel40||0)*.1)||1)+.001);}},"core.run46",55);
+  const _finishRunInner46=finish;
+  finish=function(win){
+    const r=_finishRunInner46(win);
+    if(run46&&runNode46&&activeLevel46?.run46&&state==="result"&&!runNode46.closed46){
+      const R=window.SakurayoRun,nd=runNode46;nd.closed46=1;
+      const snap=win?R.snapshot(P):null,out=R.complete(run46,nd,!!win,snap);
+      let html=`<div class="rr46">`;
+      if(out.over||out.runWin){const coins=R.runReward(run46);save.coins+=coins;html+=`<b>${out.runWin?"夜行完成 · 三层全破":"夜行中断"}</b><span>结算 🌸 ${coins}（走过 ${run46.path.length} 个节点）</span>`;save.run46=null;persist();run46=null;}
+      else{html+=`<b>节点完成 · 💠 +${out.shards}</b><span>${out.nextLayer?`第 ${out.nextLayer} 层开启`:"构筑与生命已保留"}</span>`;if(out.relicOffer&&out.relicOffer.length)runModal46={kind:"relic",offer:out.relicOffer,title:nd.type==="boss"?"层主遗物":"精英遗物"};runPersist46();}
+      html+=`<button class="primary" id="runCont46">${run46?"继续夜行 ▶":"返回大厅"}</button></div>`;
+      let box=$("#runRes46");if(!box){box=document.createElement("div");box.id="runRes46";($("#levelStars46")||$("#rtitle")).after(box);}box.innerHTML=html;
+      $("#result").classList.add("run46");
+    }
+    return r;
+  };
+  document.addEventListener("click",e=>{
+    if(e.target.closest("#runCont46")){$("#result").classList.remove("run46");$("#runRes46")?.remove();runNode46=null;backMenu();if(run46)openRun46();}
+    else if(e.target.closest("#runBtn46")){if(runLoad46())openRun46();else startRun46();}
+  });
+  function paintRunBtn46(){modeRow46();const b=$("#runBtn46");if(!b)return;const r=runLoad46();b.innerHTML=r?`<b>继续夜行</b><small>第 ${r.layer} 层 · 💠 ${r.shards}</small>`:`<b>夜行 · 肉鸽</b><small>三层地图 · 构筑跨节点</small>`;}
+  (function(){const b=document.createElement("button");b.className="levelMapBtn46 runBtn46";b.id="runBtn46";b.type="button";modeRow46().prepend(b);paintRunBtn46();})();
+  const _menuUpdateRun46=menuUpdate;menuUpdate=function(){const r=_menuUpdateRun46.apply(this,arguments);paintRunBtn46();return r;};
+  // 永久数值天赋冻结（DESIGN_V5 §5）：按已投入返还樱花币，一次性；旧 tal 字段原样保留。
+  (function(){if(!(save.talRefund46<0))return;let sum=0;for(const [id,a] of Object.entries(TAL)){const l=Math.max(0,save.tal?.[id]|0);for(let i=0;i<l;i++)sum+=window.SakurayoCatalog.price(a,i);}save.coins+=sum;save.talRefund46=sum;if(sum)setTimeout(()=>toast(`永久天赋已冻结：返还 🌸 ${sum}`),1500);})();
+  style37.textContent+=`#modeRow46{grid-column:1/-1;justify-self:stretch;align-self:stretch;min-width:0;display:flex;gap:6px;z-index:2;pointer-events:auto}#menu:not(:has(.tacticalDeck48)) #modeRow46{position:absolute;right:16px;bottom:90px}
+#modeRow46 .levelMapBtn46{position:static!important;inset:auto!important;flex:1 1 0;width:auto!important;min-width:0!important;max-width:none!important;height:100%;min-height:40px;padding:3px 12px!important;border-radius:12px!important;justify-content:center}#modeRow46 .levelMapBtn46 b{font-size:clamp(12px,1.5vw,16px)!important;white-space:nowrap}#modeRow46 .levelMapBtn46 small{display:none}@media(min-height:600px){#modeRow46 .levelMapBtn46 small{display:block;font-size:10px!important;white-space:nowrap}}
+.runBtn46{background:linear-gradient(135deg,#6a3cff,#ff5fae)!important}
+#run46{position:fixed;inset:0;z-index:60;overflow:hidden;background:#07060f;color:#fff}#run46.hidden{display:none}
+#run46 .r46Bg{position:absolute;inset:0;background:center/cover no-repeat;filter:saturate(.9) brightness(.55)}#run46 .r46Shade{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 60%,transparent 30%,#07060fcc 100%),linear-gradient(180deg,#07060fcc,transparent 22%,transparent 78%,#07060fdd)}
+#run46 .r46Top{position:absolute;z-index:3;left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));display:flex;align-items:center;gap:14px}
+#run46 .r46Back{width:44px;height:44px;border-radius:50%;background:#ffffff1c;border:1px solid #ffffff33;font-size:26px;color:#fff}
+#run46 .r46Title b{display:block;font-size:20px;letter-spacing:.08em}#run46 .r46Title small{color:#ffc6e4;font-size:12px}
+#run46 .r46Hp{display:flex;align-items:center;gap:8px;margin-left:auto;padding:6px 12px;border-radius:999px;background:#0b0920cc;border:1px solid #ff8ac855}#run46 .r46Hp em{font-style:normal;color:#ff8ac8;font-weight:900;font-size:12px}#run46 .r46Hp div{width:120px;height:8px;border-radius:9px;background:#ffffff1f;overflow:hidden}#run46 .r46Hp i{display:block;height:100%;background:linear-gradient(90deg,#ff4f8b,#ffb0d0)}#run46 .r46Hp b{font-size:12px}
+#run46 .r46Shard{padding:6px 12px;border-radius:999px;background:#0b0920cc;border:1px solid #79e6ff55;font-weight:800}#run46 .r46Shard small{margin-left:4px;color:#9fe9ff;font-size:10px}
+#run46 .r46Relics{display:flex;gap:4px;padding:5px 10px;border-radius:999px;background:#0b0920cc;border:1px solid #ffffff22;min-height:30px;align-items:center}#run46 .r46Relics .relic{font-size:18px}#run46 .r46Relics small{color:#aaa;font-size:11px}
+#run46 .r46Layers{position:absolute;z-index:3;left:50%;top:calc(max(10px,env(safe-area-inset-top)) + 54px);transform:translateX(-50%);display:flex;gap:26px}#run46 .r46Layers i{width:26px;height:26px;display:grid;place-items:center;border-radius:50%;font-style:normal;font-size:12px;background:#ffffff14;border:1px solid #ffffff33;color:#bbb}#run46 .r46Layers i.on{background:#ff6fb5;color:#fff;box-shadow:0 0 14px #ff6fb5}#run46 .r46Layers i.done{background:#6a5;color:#fff}
+#run46 .r46Field{position:absolute;z-index:2;left:max(30px,env(safe-area-inset-left));right:max(30px,env(safe-area-inset-right));top:110px;bottom:64px}#run46 .r46Field svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}#run46 .r46Field path{fill:none;stroke:#ffffff30;stroke-width:.5;stroke-dasharray:1.2 1.4;vector-effect:non-scaling-stroke;stroke-width:2.5}#run46 .r46Field path.open{stroke:#ffd0ea;stroke-dasharray:none}#run46 .r46Field path.walk{stroke:#ff6fb5;stroke-dasharray:none;stroke-width:4}
+#run46 .rn46{position:absolute;transform:translate(-50%,-50%);width:66px;height:66px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%,#3a2b5a,#140f26);border:2px solid #ffffff3a;color:#fff;box-shadow:0 6px 16px #0009;transition:transform .15s}#run46 .rn46 i{font-style:normal;font-size:24px;line-height:1}#run46 .rn46 span{font-size:10px;margin-top:2px;color:#e8dcff}
+#run46 .rn46:disabled{opacity:.42;filter:grayscale(.6)}#run46 .rn46.been{opacity:.75;border-color:#ff6fb5aa}#run46 .rn46.can{border-color:#ffd0ea;animation:rn46p 1.6s ease-in-out infinite}#run46 .rn46.pick{transform:translate(-50%,-50%) scale(1.14);border-color:#fff;box-shadow:0 0 0 4px #ff6fb588,0 0 26px #ff6fb5}
+#run46 .rn46.t-boss{width:86px;height:86px;background:radial-gradient(circle at 35% 30%,#7a1d3e,#25081a);border-color:#ff5c7a}#run46 .rn46.t-boss i{font-size:34px}#run46 .rn46.t-elite{background:radial-gradient(circle at 35% 30%,#5a2a2a,#1e0c12)}#run46 .rn46.t-shop{background:radial-gradient(circle at 35% 30%,#5a4420,#1e140a)}#run46 .rn46.t-shrine{background:radial-gradient(circle at 35% 30%,#2a4a5a,#0a141e)}#run46 .rn46.t-event{background:radial-gradient(circle at 35% 30%,#3a3a6a,#10102a)}
+#run46 .rn46 .me{position:absolute;bottom:52px;width:58px;height:58px;object-fit:cover;object-position:50% 12%;border-radius:50%;border:2px solid #fff;background:#201436;box-shadow:0 0 14px #ff6fb5}
+@keyframes rn46p{0%,100%{box-shadow:0 0 0 0 #ffd0ea66,0 6px 16px #0009}50%{box-shadow:0 0 0 8px #ffd0ea00,0 6px 16px #0009}}
+#run46 .rs46{position:absolute;z-index:4;right:max(16px,env(safe-area-inset-right));bottom:72px;width:min(320px,40vw);padding:16px 16px 14px;border-radius:18px;background:linear-gradient(160deg,#1d1436f2,#0b0918f5);border:1px solid #ff8ac866;box-shadow:0 18px 50px #000b}#run46 .rs46 small{color:#ffbfe0;letter-spacing:.12em;font-size:11px}#run46 .rs46 h3{margin:6px 0;font-size:20px}#run46 .rs46 p{margin:6px 0;color:#ddd3ee;font-size:13px;line-height:1.55}#run46 .rs46 .note{color:#a9e9ff;font-size:12px}#run46 .rs46 .x{position:absolute;right:10px;top:8px;width:30px;height:30px;border-radius:50%;background:#ffffff14;color:#fff;font-size:18px}#run46 .rs46 .go{width:100%;margin-top:8px;height:48px;border-radius:14px;font-size:17px;font-weight:900;letter-spacing:.2em;background:linear-gradient(135deg,#ff5fae,#ff9a6b);color:#fff;box-shadow:0 6px 18px #ff5fae66}#run46 .rs46 .go:active{transform:scale(.97)}#run46 .rs46 .go:disabled{background:#444;box-shadow:none}
+#run46 .r46Foot{position:absolute;z-index:3;left:max(16px,env(safe-area-inset-left));right:max(16px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));display:flex;justify-content:space-between;align-items:center;color:#cfc3e6;font-size:12px}#run46 .r46Foot .ab{padding:8px 14px;border-radius:12px;background:#ffffff12;border:1px solid #ffffff2a;color:#ffb3c9;font-size:12px}
+#run46 .rm46{position:absolute;inset:0;z-index:8;display:grid;place-items:center;background:#05030bc4;backdrop-filter:blur(4px)}#run46 .rm46>div{width:min(560px,92vw);padding:20px;border-radius:22px;background:linear-gradient(150deg,#1f1438f5,#0a0817f8);border:1px solid #ffb2d466;box-shadow:0 24px 70px #000c;text-align:center}#run46 .rm46 small{color:#ffbfe0;letter-spacing:.2em}#run46 .rm46 h3{margin:8px 0 6px;font-size:22px}#run46 .rm46 p{color:#d9d0e5;margin:0 0 12px}
+#run46 .rm46 .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0}#run46 .rm46 .opts button{min-height:86px;padding:12px;border-radius:16px;background:linear-gradient(160deg,#2a1d48,#151027);border:1px solid #ffffff2a;color:#fff;text-align:left;transition:transform .12s}#run46 .rm46 .opts button:active{transform:scale(.97)}#run46 .rm46 .opts button:disabled{opacity:.4}#run46 .rm46 .opts i{display:block;font-style:normal;font-size:28px}#run46 .rm46 .opts b{display:block;font-size:15px}#run46 .rm46 .opts em{font-style:normal;color:#9fe9ff;font-size:12px}#run46 .rm46 .opts span{display:block;margin-top:5px;color:#c9bedc;font-size:12px;line-height:1.45}#run46 .rm46 .skip{padding:8px 18px;border-radius:12px;background:#ffffff14;color:#cbbfdc}
+#result.run46 #again,#result.run46 #back{display:none}#runRes46{margin:10px 0;padding:12px;border-radius:14px;background:#1a1230;border:1px solid #ff8ac855}#runRes46 b{display:block;font-size:16px;color:#ffd3ea}#runRes46 span{display:block;margin:4px 0 10px;color:#cfc3e6;font-size:13px}#runRes46 button{width:100%}`;
 
   function ensureModKitDrawer42(){
     let drawer=$("#modKitDrawer42");if(drawer)return drawer;
@@ -13967,13 +14284,24 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       takeUpgrade46(id){const u=U.find(x=>x.id===id);if(!u)throw new Error("no upgrade "+id);state="level";chooseUpgrade(u);return {lv:lv(id),weapons:P.weapons46,evo:save.evo46};},
       cardHtml46(){return [...document.querySelectorAll("#choices .choice")].map(b=>({id:b.dataset.upgradeId,cls:b.className,text:b.textContent}));},
       poseLog46(){return (P.poseLog46||[]).slice();},
-      teleport46(x,y){P.x=x;P.y=y;return snapshot35();},
+      teleport46(x,y){P.x=x;P.y=y;return snapshot35();},healNpc46(){const n=levelObj46?.npc;if(n)n.hp=n.max;return !!n;},
       realtime46(){manualTestClock=false;last=performance.now();scheduleLoop();return true;},
       props46(){return (props46||[]).map(p=>({kind:p.kind,x:p.x,y:p.y,done:p.done}));},
       fieldProbe(n=6){const near=(arr)=>arr.filter(o=>o&&!o.dead).map(o=>({dx:o.x-P.x,dy:o.y-P.y,r:o.r||0,boss:o.type==="boss"})).sort((a,b)=>Math.hypot(a.dx,a.dy)-Math.hypot(b.dx,b.dy)).slice(0,n);const cam=window.SakurayoCamera?.size?.();return {enemies:near(enemies),gems:near(gems),x:P.x,y:P.y,worldW:cam?.worldW||W,worldH:cam?.worldH||H,level:P.level,range:P.range};},
       spawnBossNow(){if(state!=="play")throw new Error("spawnBossNow requires play mode");spawnBoss();return snapshot35();},
       levels46(){return window.SakurayoLevels.LEVELS.map(l=>({id:l.id,type:l.type,unlocked:window.SakurayoLevels.unlocked(save,l.id),stars:window.SakurayoLevels.stars(save,l.id)}));},
       launchLevel46(id){return launchLevel46(id);},
+      runStart46(seed){return !!startRun46(seed);},
+      runState46(){const r=run46||runLoad46();return {active:!!r,mode:state,screen:!$("#run46")?.classList.contains("hidden"),layer:r?.layer||0,at:r?.at||null,path:r?[...r.path]:[],shards:r?.shards||0,relics:r?[...r.relics]:[],pending:r?JSON.parse(JSON.stringify(r.pending)):[],available:r?window.SakurayoRun.available(r).map(n=>({id:n.id,type:n.type})):[],modal:runModal46?{kind:runModal46.kind||"node",n:(runModal46.offer||runModal46.opts||[]).length}:null,build:r?.build?{level:r.build.level,hp:r.build.hp,maxHp:r.build.maxHp,up:Object.keys(r.build.up||{}).length,weapons:Object.keys(r.build.weapons46||{})}:null,node:activeLevel46?.run46?activeLevel46.id:null,player:{level:P.level,hp:P.hp,maxHp:P.maxHp,dmg:P.dmg,up:Object.keys(P.up||{}).length},saved:!!save.run46,coins:save.coins,talRefund46:save.talRefund46};},
+      runEnter46(id){return runEnter46(id);},
+      runChoose46(i){return runChoose46(i);},
+      runTakeRelic46(id){return runTakeRelic46(id);},
+      runSkipModal46(){runModal46=null;runPersist46();paintRun46();return true;},
+      runWinNode46(){if(state!=="play"||!activeLevel46?.run46)return false;if(boss&&!boss.dead){boss.ungate46=true;}finish(true);return true;},
+      runLoseNode46(){if(state!=="play"||!activeLevel46?.run46)return false;finish(false);return true;},
+      runContinue46(){const b=$("#runCont46");if(!b)return false;b.click();return true;},
+      runAbandon46(){abandonRun46();return true;},
+      runReload46(){run46=null;return !!runLoad46();},
       levelState46(){return {active:activeLevel46?.id||null,mode:state,label:activeLevel46&&levelObj46?window.SakurayoLevels.label(activeLevel46,levelObj46):"",done:!!levelObj46?.done,fail:levelObj46?.fail||"",npc:levelObj46?.npc?{x:levelObj46.npc.x,y:levelObj46.npc.y,hp:levelObj46.npc.hp,k:levelObj46.npc.k}:null,targets:levelObj46?.targets?.filter(e=>!e.dead).length??null,targetsPos:levelObj46?.targets?.filter(e=>!e.dead&&e.hp>0).map(e=>({x:e.x,y:e.y,hp:e.hp}))||[],objTime:levelObj46?.t||0,pads:levelObj46?.pads?.map(q=>({x:q.x,y:q.y,used:q.used}))||[],zone:levelObj46?.zone||null,result:levelResult46?{got:levelResult46.got,stars:levelResult46.stars,coins:levelResult46.coins}:null,stars46:{...save.stars46}};},
       forceLevelDone46(){if(levelObj46)levelObj46.done=true;},
       avgState46(){return window.SakurayoAvg?.state()||null;},

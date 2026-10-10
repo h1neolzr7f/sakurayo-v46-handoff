@@ -187,6 +187,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 <script src="runtime/sakurayo-boss.js"></script>
 <script src="runtime/sakurayo-weapons.js"></script>
 <script src="runtime/sakurayo-levels.js"></script>
+<script src="runtime/sakurayo-run.js"></script>
 <script src="runtime/sakurayo-avg.js"></script>
 <script src="runtime/sakurayo-story-ch1.js"></script>
 <script src="runtime/sakurayo-hud.js"></script>
@@ -2307,7 +2308,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   resize();
 
   function resetP() {
-    const q = save.tal,
+    const q = {atk:0,hp:0,luck:0,mag:0,flow:0}, // 永久数值天赋已冻结（DESIGN_V5 §5），旧存档 tal 字段保留但不生效
       flow = 1 - q.flow * 0.02;
     for (const key of Object.keys(P)) delete P[key];
     Object.assign(P, {
@@ -2525,15 +2526,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         max = l >= a.max,
         d = document.createElement("div");
       d.className = "talent";
-      d.innerHTML = `<div class="ticon">${iconHtml46(iconArt46("tal",id,a.i))}</div><div><h3>${a.n} <small>Lv.${l}/${a.max}</small></h3><p>${a.d}</p><small>${max ? "已满级" : `升级消耗 🌸 ${cost}`}</small></div><button ${max || save.coins < cost ? "disabled" : ""}>${max ? "MAX" : "升级"}</button>`;
-      d.querySelector("button").onclick = () => {
-        if (!max && save.coins >= cost) {
-          save.coins -= cost;
-          save.tal[id]++;
-          persist();
-          toast(`${a.n} 已提升`);
-        }
-      };
+      d.innerHTML = `<div class="ticon">${iconHtml46(iconArt46("tal",id,a.i))}</div><div><h3>${a.n} <small>Lv.${l}/${a.max}</small></h3><p>${a.d}</p><small>已冻结：不再提供战斗属性，已投入的樱花币已返还</small></div><button disabled>冻结</button>`;
       box.appendChild(d);
     });
   }
@@ -2763,6 +2756,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     levelRerolls = 2;
     acc = 0;
     resetP();
+    if (typeof runNodeStart46 === "function") runNodeStart46();
     if (window.SakurayoCamera) window.SakurayoCamera.snap(P.x, P.y);
     state = "dialogue";
     $("#menu").classList.add("hidden");
@@ -2826,11 +2820,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     runWin=win;hideTransient();state="result";$("#hud").classList.add("hidden");
     save.kills += P.kills; save.best = Math.max(save.best, runTime); save.runs++;
     const pay44 = window.SakurayoEconomy
-      ? window.SakurayoEconomy.rewardParts(P.kills, P.level, P.eliteKills, win, stage().reward, save.done.includes(selected))
+      ? window.SakurayoEconomy.rewardParts(P.kills, P.level, P.eliteKills, win, (typeof activeLevel46 !== "undefined" && activeLevel46?.run46) ? 0 : stage().reward, save.done.includes(selected))
       : null;
     let reward = (pay44 ? pay44.total : Math.floor(P.kills*.32 + P.level*3 + P.eliteKills*4) + (win ? stage().reward : 0)) + (P.chestCoins46 || 0);
     save.coins += reward;
-    if (win && (typeof activeLevel46 === "undefined" || !activeLevel46 || activeLevel46.boss)) { save.bosses++; if(!save.done.includes(selected))save.done.push(selected); save.unlock=Math.max(save.unlock,Math.min(ST.length,selected+1)); if(!save.story.includes(stage().story))save.story.push(stage().story); }
+    if (win && (typeof activeLevel46 === "undefined" || !activeLevel46 || (activeLevel46.boss && !activeLevel46.run46))) { save.bosses++; if(!save.done.includes(selected))save.done.push(selected); save.unlock=Math.max(save.unlock,Math.min(ST.length,selected+1)); if(!save.story.includes(stage().story))save.story.push(stage().story); }
     if(P.form&&!save.forms.includes(P.form))save.forms.push(P.form);
     let ed=endingData(); if(win&&selected===4&&!save.endings.includes(ed.name))save.endings.push(ed.name);
     let top=Object.entries(P.damageSources).sort((a,b)=>b[1]-a[1])[0]?.[0]||"shot";
@@ -7272,7 +7266,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 
   /* ===== 主线关卡（runtime/sakurayo-levels.js）+ AVG（runtime/sakurayo-avg.js） ===== */
   var activeLevel46=null,levelObj46=null,levelResult46=null;
-  const AVG_NAMES46={sayo:"月城小夜",aya:"神代绫",rion:"黑羽凛音",rin:"雨宫凛",miko:"小灯",kagami:"镜零"};
+  const AVG_NAMES46={sayo:"月城小夜",aya:"神代绫",rion:"黑羽凛音",rin:"雨宫凛",miko:"小灯",kagami:"镜零",yoi:"宵",tanuki:"狸老板"};
   function avgCast46(who,ex){
     if(["sayo","aya","rion"].includes(who))return {name:AVG_NAMES46[who],img:artUrl(`characters/${who}/default/avg_${["calm","resolve","shaken","angry"].includes(ex)?ex:"calm"}.webp`)};
     if(who==="rin")return {name:AVG_NAMES46.rin,img:artUrl(`npc/rin/avg_${ex==="serious"?"serious":"calm"}.webp`)};
@@ -7327,13 +7321,13 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function rateLevel46(win){
     const o=levelObj46||{};
     const res={win,hits:(P.hits46||0)-(o.hitsAtStart||0),chests:P.chests46||0,time:activeLevel46.boss?Math.max(0,runTime-(boss?.born46??runTime)):(o.t||runTime),npcHp:o.npc?o.npc.hp:null,mechKills:o.mechKills||0,breaks:boss?.breaks46||0,ult:!!P.ultUsed46};
-    const got=window.SakurayoLevels.rate(activeLevel46,res),rec=window.SakurayoLevels.record(save,activeLevel46.id,got);
+    const got=window.SakurayoLevels.rate(activeLevel46,res),rec=activeLevel46.run46?{stars:got.filter(Boolean).length,best:0,improved:false}:window.SakurayoLevels.record(save,activeLevel46.id,got);
     return {got,res,...rec};
   }
   const _finishLevel46=finish;
   finish=function(win){
     if(activeLevel46&&state!=="result"&&state!=="avg"){
-      if(!levelResult46){const before=window.SakurayoLevels.stars(save,activeLevel46.id);levelResult46=rateLevel46(!!win);levelResult46.coins=win?Math.max(0,levelResult46.best-before)*40:0;save.coins+=levelResult46.coins;}
+      if(!levelResult46){const before=window.SakurayoLevels.stars(save,activeLevel46.id);levelResult46=rateLevel46(!!win);levelResult46.coins=win&&!activeLevel46.run46?Math.max(0,levelResult46.best-before)*40:0;save.coins+=levelResult46.coins;}
       objHud46(false);
       if(win&&!P.postAvg46&&storyFor46(activeLevel46.id,"post")){P.postAvg46=1;releaseInputs40();hideTransient();state="avg";$("#hud").classList.add("hidden");playStory46(activeLevel46.id,"post",()=>{state="play";_finishLevel46(true);paintLevelResult46();});return;}
     }
@@ -7342,7 +7336,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function paintLevelResult46(){
     if(!activeLevel46||!levelResult46||state!=="result")return;
     const R=levelResult46,L=activeLevel46;
-    $("#rtitle").textContent=R.res.win?`${L.id} ${L.n} · 完成`:`${L.id} ${L.n} · 失败`;
+    const LID=L.run46?`夜行 第${L.ch}层 ·`:L.id;$("#rtitle").textContent=R.res.win?`${LID} ${L.n} · 完成`:`${LID} ${L.n} · 失败`;
     let box=$("#levelStars46");if(!box){box=document.createElement("div");box.id="levelStars46";$("#rtitle").after(box);}
     box.innerHTML=L.stars.map((q,i)=>`<span class="${R.got[i]?"on":""}"><em>${R.got[i]?"★":"☆"}</em>${htmlEscape(q.d)}</span>`).join("")+(R.coins?`<p>新星奖励 🌸 +${R.coins}</p>`:"");
     if(R.res.win)$("#rankBig").textContent="★".repeat(R.stars)||"☆";
@@ -7396,7 +7390,134 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     return true;
   }
   document.addEventListener("click",e=>{if(e.target.closest("#levelMapBtn46")){openLevelMap46();}});
-  (function(){const b=document.createElement("button");b.className="levelMapBtn46";b.id="levelMapBtn46";b.type="button";b.innerHTML="<b>主线关卡</b><small>章节地图 · 三星评价</small>";$("#menu").appendChild(b);})();
+  (function(){const b=document.createElement("button");b.className="levelMapBtn46";b.id="levelMapBtn46";b.type="button";b.innerHTML="<b>主线关卡</b><small>章节地图 · 三星评价</small>";modeRow46().appendChild(b);})();
+  function modeRow46(){let r=$("#modeRow46");if(!r){r=document.createElement("div");r.id="modeRow46";}const deck=$(".tacticalDeck48")||$("#menu");if(r.parentElement!==deck)deck.appendChild(r);return r;}
+
+  /* ===== 夜行 · 肉鸽一局（runtime/sakurayo-run.js，DESIGN_V5 §3.2 / 路线图 P0） ===== */
+  var run46=null,runNode46=null,runPick46=null,runModal46=null;
+  const RUN_BG46=["stages/stage_1/chapter_keyart_v2.webp","stages/stage_2/chapter_keyart_v2.webp","stages/stage_3/chapter_keyart_v2.webp"];
+  function runPersist46(){if(run46)run46.modal=runModal46||null;save.run46=run46&&!run46.done?run46:null;persist();}
+  function runLoad46(){if(!run46&&save.run46&&window.SakurayoRun){run46=window.SakurayoRun.sanitize(JSON.parse(JSON.stringify(save.run46)));runModal46=run46?.modal||null;}return run46;}
+  function runHp46(){const b=run46?.build;return b?{hp:Math.max(0,Math.round(b.hp)),max:Math.round(b.maxHp)}:{hp:100,max:100};}
+  function startRun46(seed){const R=window.SakurayoRun;if(!R)return null;run46=R.create(seed,save.character||"sayo");runNode46=null;runPick46=null;runModal46=null;runPersist46();openRun46();return run46;}
+  function abandonRun46(){if(!run46)return;run46.done=true;const coins=window.SakurayoRun.runReward(run46);save.coins+=coins;run46=null;save.run46=null;persist();closeRun46();toast(`夜行结束，结算 🌸 ${coins}`);menuUpdate?.();}
+  function openRun46(){
+    if(!runLoad46())return false;
+    let el=$("#run46");
+    if(!el){el=document.createElement("section");el.id="run46";el.className="screen hidden";document.body.appendChild(el);
+      el.addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(!b||b.disabled)return;const k=b.dataset.k,v=b.dataset.v;
+        if(k==="close")closeRun46();else if(k==="node"){runPick46=v;paintRun46();sound?.("click");}else if(k==="unpick"){runPick46=null;paintRun46();}
+        else if(k==="go")runEnter46(v);else if(k==="opt")runChoose46(+v);else if(k==="relic")runTakeRelic46(v);else if(k==="skip"){runModal46=null;runPersist46();paintRun46();}
+        else if(k==="abandon"){if(b.dataset.sure)abandonRun46();else{b.dataset.sure=1;b.textContent="再点一次确认放弃";}}});}
+    $("#menu").classList.add("hidden");el.classList.remove("hidden");paintRun46();return true;
+  }
+  function closeRun46(){$("#run46")?.classList.add("hidden");if(state==="menu"){$("#menu").classList.remove("hidden");menuUpdate?.();}}
+  function paintRun46(){
+    const R=window.SakurayoRun,el=$("#run46");if(!el||!run46)return;
+    const rows=run46.map[run46.layer-1],av=R.available(run46).map(n=>n.id),hp=runHp46(),pick=runPick46&&R.node(run46,runPick46);
+    const edges=[];rows.forEach(r=>r.forEach(n=>n.next.forEach(id=>{const m=R.node(run46,id);const walked=run46.path.includes(n.id)&&run46.path.includes(id);edges.push(`<path class="${walked?"walk":n.id===run46.at&&av.includes(id)?"open":""}" d="M${n.x} ${n.y} C${(n.x+m.x)/2} ${n.y} ${(n.x+m.x)/2} ${m.y} ${m.x} ${m.y}"/>`);})));
+    const nodes=rows.flat().map(n=>{const T=R.NODE[n.type],can=av.includes(n.id),been=run46.path.includes(n.id),here=n.id===run46.at;
+      return `<button class="rn46 t-${n.type} ${can?"can":""} ${been?"been":""} ${here?"here":""} ${runPick46===n.id?"pick":""}" style="left:${n.x}%;top:${n.y}%" data-k="node" data-v="${n.id}" ${can||here?"":"disabled"}><i>${T.i}</i><span>${T.n}</span>${here?`<img class="me" src="${artUrl(`characters/${run46.character}/default/avg_calm.webp`)}" alt="">`:""}</button>`;}).join("");
+    const relics=run46.relics.map(id=>{const q=R.relic(id);return `<span class="relic" title="${htmlEscape(q.n+"："+q.d)}">${q.i}</span>`;}).join("")||`<small>暂无遗物</small>`;
+    const spec=pick&&R.isCombat(pick.type)?R.levelSpec(run46,pick):null;
+    const sheet=pick?`<aside class="rs46"><button class="x" data-k="unpick" aria-label="关闭">×</button><small>${R.NODE[pick.type].i} ${R.NODE[pick.type].n} · 第 ${pick.layer} 层</small><h3>${htmlEscape(spec?spec.n:R.NODE[pick.type].n)}</h3><p>${htmlEscape(spec?levelGoal46(spec):R.NODE[pick.type].d)}</p>${spec?`<p class="note">${htmlEscape(R.NODE[pick.type].d)}</p>`:""}<button class="go" data-k="go" data-v="${pick.id}" ${av.includes(pick.id)?"":"disabled"}>${av.includes(pick.id)?"前往":"不可前往"}</button></aside>`:"";
+    el.innerHTML=`<div class="r46Bg" style="background-image:url('${artUrl(RUN_BG46[run46.layer-1])}')"></div><div class="r46Shade"></div>
+      <header class="r46Top"><button class="r46Back" data-k="close" aria-label="返回大厅">‹</button>
+        <div class="r46Title"><b>夜行 · 第 ${run46.layer} 层</b><small>${htmlEscape(R.LAYER_NAMES[run46.layer-1])} · 已走 ${run46.path.length} 步</small></div>
+        <div class="r46Hp"><em>HP</em><div><i style="width:${Math.round(100*hp.hp/Math.max(1,hp.max))}%"></i></div><b>${hp.hp}/${hp.max}</b></div>
+        <div class="r46Shard">💠 ${run46.shards}<small>魂晶</small></div>
+        <div class="r46Relics">${relics}</div></header>
+      <div class="r46Layers">${[1,2,3].map(l=>`<i class="${l<run46.layer?"done":l===run46.layer?"on":""}">${l}</i>`).join("")}</div>
+      <div class="r46Field"><svg viewBox="0 0 100 100" preserveAspectRatio="none">${edges.join("")}</svg>${nodes}</div>
+      ${sheet}
+      <footer class="r46Foot"><span>Lv ${run46.build?.level||1} · 强化 ${Object.values(run46.build?.up||{}).reduce((a,b)=>a+(+b||0),0)} 项 · 构筑跨节点保留</span><button class="ab" data-k="abandon">放弃夜行</button></footer>
+      ${runModalHtml46()}`;
+  }
+  function runModalHtml46(){
+    const m=runModal46;if(!m)return "";
+    if(m.kind==="relic")return `<div class="rm46"><div><small>遗物 · 三选一</small><h3>${htmlEscape(m.title||"选择一件遗物")}</h3><div class="opts">${m.offer.map(q=>`<button data-k="relic" data-v="${q.id}"><i>${q.i}</i><b>${htmlEscape(q.n)}</b><span>${htmlEscape(q.d)}</span></button>`).join("")}</div><button class="skip" data-k="skip">放弃</button></div></div>`;
+    const R=window.SakurayoRun,nd=R.node(run46,m.node),T=R.NODE[nd.type];
+    return `<div class="rm46"><div><small>${T.i} ${T.n}</small><h3>${htmlEscape(nd.eventTitle||T.n)}</h3><p>${htmlEscape(nd.eventText||T.d)}</p><div class="opts">${m.opts.map((o,i)=>`<button data-k="opt" data-v="${i}" ${o.cost&&run46.shards<o.cost||m.used?.includes(i)?"disabled":""}><b>${htmlEscape(o.n)}${o.cost?` <em>💠${o.cost}</em>`:""}</b><span>${htmlEscape(o.d)}</span></button>`).join("")}</div>${nd.type==="shop"?"":""}</div></div>`;
+  }
+  function runEnter46(id){
+    const R=window.SakurayoRun;if(!run46||!R.canEnter(run46,id))return false;
+    const nd=R.enter(run46,id);runPick46=null;
+    if(R.isCombat(nd.type)){runPersist46();launchRunNode46(nd);return true;}
+    runModal46={node:nd.id,opts:R.options(run46,nd),used:[]};runPersist46();paintRun46();return true;
+  }
+  function runApplyBuildNow46(){/* event/shop effects that touch HP are shown on the map right away */
+    if(!run46?.build)return;const b=run46.build;for(const q of run46.pending){if(q.heal)b.hp=Math.max(1,Math.min(b.maxHp,b.hp+b.maxHp*q.heal));if(q.maxHp){b.maxHp=Math.max(40,b.maxHp+q.maxHp);b.hp=Math.min(b.hp,b.maxHp);}}
+    run46.pending=run46.pending.filter(q=>!q.heal&&!q.maxHp);
+  }
+  function runChoose46(i){
+    const R=window.SakurayoRun,m=runModal46;if(!m||m.kind)return false;const nd=R.node(run46,m.node),o=m.opts[i];if(!o)return false;
+    if(o.k==="leave"){runModal46=null;runPersist46();paintRun46();return true;}
+    const r=R.choose(run46,nd,o);if(!r.ok){toast(r.why||"无法选择");return false;}
+    runApplyBuildNow46();sound?.("loot");
+    if(o.k==="relic"&&r.relic){const q=R.relic(r.relic);toast(`获得遗物：${q.i} ${q.n}`);}
+    if(nd.type==="shop"){m.used.push(i);}else runModal46=null;
+    runPersist46();paintRun46();return true;
+  }
+  function runTakeRelic46(id){const R=window.SakurayoRun;if(!runModal46||runModal46.kind!=="relic")return false;if(!R.gainRelic(run46,id))return false;const q=R.relic(id);toast(`获得遗物：${q.i} ${q.n}`);runModal46=null;runPersist46();paintRun46();return true;}
+  function launchRunNode46(nd){
+    const R=window.SakurayoRun;runNode46=nd;activeLevel46=R.levelSpec(run46,nd);levelResult46=null;levelObj46=null;selected=nd.layer;pendingMode46="story";runMode36="story";setTrial46(null);
+    $("#run46")?.classList.add("hidden");if(state==="result"){$("#result").classList.add("hidden");state="menu";}
+    startGame();
+  }
+  // called from startGame right after resetP(): carry the build across nodes
+  function runNodeStart46(){
+    if(!run46||!runNode46||!activeLevel46?.run46)return;
+    const R=window.SakurayoRun;if(run46.build)R.restore(P,run46.build);
+    const r=R.applyPending(run46,P);P.runLevels46=(P.runLevels46||0)+r.levels;P.hits46=0;P.chests46=0;
+  }
+  CONTENT41.hook("combat:after-update",()=>{if(state==="play"&&P.runLevels46>0&&activeLevel46?.run46){P.runLevels46--;gainXp(Math.max(0,P.next-P.xp)/((1+(P.baitLevel40||0)*.1)||1)+.001);}},"core.run46",55);
+  const _finishRunInner46=finish;
+  finish=function(win){
+    const r=_finishRunInner46(win);
+    if(run46&&runNode46&&activeLevel46?.run46&&state==="result"&&!runNode46.closed46){
+      const R=window.SakurayoRun,nd=runNode46;nd.closed46=1;
+      const snap=win?R.snapshot(P):null,out=R.complete(run46,nd,!!win,snap);
+      let html=`<div class="rr46">`;
+      if(out.over||out.runWin){const coins=R.runReward(run46);save.coins+=coins;html+=`<b>${out.runWin?"夜行完成 · 三层全破":"夜行中断"}</b><span>结算 🌸 ${coins}（走过 ${run46.path.length} 个节点）</span>`;save.run46=null;persist();run46=null;}
+      else{html+=`<b>节点完成 · 💠 +${out.shards}</b><span>${out.nextLayer?`第 ${out.nextLayer} 层开启`:"构筑与生命已保留"}</span>`;if(out.relicOffer&&out.relicOffer.length)runModal46={kind:"relic",offer:out.relicOffer,title:nd.type==="boss"?"层主遗物":"精英遗物"};runPersist46();}
+      html+=`<button class="primary" id="runCont46">${run46?"继续夜行 ▶":"返回大厅"}</button></div>`;
+      let box=$("#runRes46");if(!box){box=document.createElement("div");box.id="runRes46";($("#levelStars46")||$("#rtitle")).after(box);}box.innerHTML=html;
+      $("#result").classList.add("run46");
+    }
+    return r;
+  };
+  document.addEventListener("click",e=>{
+    if(e.target.closest("#runCont46")){$("#result").classList.remove("run46");$("#runRes46")?.remove();runNode46=null;backMenu();if(run46)openRun46();}
+    else if(e.target.closest("#runBtn46")){if(runLoad46())openRun46();else startRun46();}
+  });
+  function paintRunBtn46(){modeRow46();const b=$("#runBtn46");if(!b)return;const r=runLoad46();b.innerHTML=r?`<b>继续夜行</b><small>第 ${r.layer} 层 · 💠 ${r.shards}</small>`:`<b>夜行 · 肉鸽</b><small>三层地图 · 构筑跨节点</small>`;}
+  (function(){const b=document.createElement("button");b.className="levelMapBtn46 runBtn46";b.id="runBtn46";b.type="button";modeRow46().prepend(b);paintRunBtn46();})();
+  const _menuUpdateRun46=menuUpdate;menuUpdate=function(){const r=_menuUpdateRun46.apply(this,arguments);paintRunBtn46();return r;};
+  // 永久数值天赋冻结（DESIGN_V5 §5）：按已投入返还樱花币，一次性；旧 tal 字段原样保留。
+  (function(){if(!(save.talRefund46<0))return;let sum=0;for(const [id,a] of Object.entries(TAL)){const l=Math.max(0,save.tal?.[id]|0);for(let i=0;i<l;i++)sum+=window.SakurayoCatalog.price(a,i);}save.coins+=sum;save.talRefund46=sum;if(sum)setTimeout(()=>toast(`永久天赋已冻结：返还 🌸 ${sum}`),1500);})();
+  style37.textContent+=`#modeRow46{grid-column:1/-1;justify-self:stretch;align-self:stretch;min-width:0;display:flex;gap:6px;z-index:2;pointer-events:auto}#menu:not(:has(.tacticalDeck48)) #modeRow46{position:absolute;right:16px;bottom:90px}
+#modeRow46 .levelMapBtn46{position:static!important;inset:auto!important;flex:1 1 0;width:auto!important;min-width:0!important;max-width:none!important;height:100%;min-height:40px;padding:3px 12px!important;border-radius:12px!important;justify-content:center}#modeRow46 .levelMapBtn46 b{font-size:clamp(12px,1.5vw,16px)!important;white-space:nowrap}#modeRow46 .levelMapBtn46 small{display:none}@media(min-height:600px){#modeRow46 .levelMapBtn46 small{display:block;font-size:10px!important;white-space:nowrap}}
+.runBtn46{background:linear-gradient(135deg,#6a3cff,#ff5fae)!important}
+#run46{position:fixed;inset:0;z-index:60;overflow:hidden;background:#07060f;color:#fff}#run46.hidden{display:none}
+#run46 .r46Bg{position:absolute;inset:0;background:center/cover no-repeat;filter:saturate(.9) brightness(.55)}#run46 .r46Shade{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 60%,transparent 30%,#07060fcc 100%),linear-gradient(180deg,#07060fcc,transparent 22%,transparent 78%,#07060fdd)}
+#run46 .r46Top{position:absolute;z-index:3;left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));display:flex;align-items:center;gap:14px}
+#run46 .r46Back{width:44px;height:44px;border-radius:50%;background:#ffffff1c;border:1px solid #ffffff33;font-size:26px;color:#fff}
+#run46 .r46Title b{display:block;font-size:20px;letter-spacing:.08em}#run46 .r46Title small{color:#ffc6e4;font-size:12px}
+#run46 .r46Hp{display:flex;align-items:center;gap:8px;margin-left:auto;padding:6px 12px;border-radius:999px;background:#0b0920cc;border:1px solid #ff8ac855}#run46 .r46Hp em{font-style:normal;color:#ff8ac8;font-weight:900;font-size:12px}#run46 .r46Hp div{width:120px;height:8px;border-radius:9px;background:#ffffff1f;overflow:hidden}#run46 .r46Hp i{display:block;height:100%;background:linear-gradient(90deg,#ff4f8b,#ffb0d0)}#run46 .r46Hp b{font-size:12px}
+#run46 .r46Shard{padding:6px 12px;border-radius:999px;background:#0b0920cc;border:1px solid #79e6ff55;font-weight:800}#run46 .r46Shard small{margin-left:4px;color:#9fe9ff;font-size:10px}
+#run46 .r46Relics{display:flex;gap:4px;padding:5px 10px;border-radius:999px;background:#0b0920cc;border:1px solid #ffffff22;min-height:30px;align-items:center}#run46 .r46Relics .relic{font-size:18px}#run46 .r46Relics small{color:#aaa;font-size:11px}
+#run46 .r46Layers{position:absolute;z-index:3;left:50%;top:calc(max(10px,env(safe-area-inset-top)) + 54px);transform:translateX(-50%);display:flex;gap:26px}#run46 .r46Layers i{width:26px;height:26px;display:grid;place-items:center;border-radius:50%;font-style:normal;font-size:12px;background:#ffffff14;border:1px solid #ffffff33;color:#bbb}#run46 .r46Layers i.on{background:#ff6fb5;color:#fff;box-shadow:0 0 14px #ff6fb5}#run46 .r46Layers i.done{background:#6a5;color:#fff}
+#run46 .r46Field{position:absolute;z-index:2;left:max(30px,env(safe-area-inset-left));right:max(30px,env(safe-area-inset-right));top:110px;bottom:64px}#run46 .r46Field svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}#run46 .r46Field path{fill:none;stroke:#ffffff30;stroke-width:.5;stroke-dasharray:1.2 1.4;vector-effect:non-scaling-stroke;stroke-width:2.5}#run46 .r46Field path.open{stroke:#ffd0ea;stroke-dasharray:none}#run46 .r46Field path.walk{stroke:#ff6fb5;stroke-dasharray:none;stroke-width:4}
+#run46 .rn46{position:absolute;transform:translate(-50%,-50%);width:66px;height:66px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 35% 30%,#3a2b5a,#140f26);border:2px solid #ffffff3a;color:#fff;box-shadow:0 6px 16px #0009;transition:transform .15s}#run46 .rn46 i{font-style:normal;font-size:24px;line-height:1}#run46 .rn46 span{font-size:10px;margin-top:2px;color:#e8dcff}
+#run46 .rn46:disabled{opacity:.42;filter:grayscale(.6)}#run46 .rn46.been{opacity:.75;border-color:#ff6fb5aa}#run46 .rn46.can{border-color:#ffd0ea;animation:rn46p 1.6s ease-in-out infinite}#run46 .rn46.pick{transform:translate(-50%,-50%) scale(1.14);border-color:#fff;box-shadow:0 0 0 4px #ff6fb588,0 0 26px #ff6fb5}
+#run46 .rn46.t-boss{width:86px;height:86px;background:radial-gradient(circle at 35% 30%,#7a1d3e,#25081a);border-color:#ff5c7a}#run46 .rn46.t-boss i{font-size:34px}#run46 .rn46.t-elite{background:radial-gradient(circle at 35% 30%,#5a2a2a,#1e0c12)}#run46 .rn46.t-shop{background:radial-gradient(circle at 35% 30%,#5a4420,#1e140a)}#run46 .rn46.t-shrine{background:radial-gradient(circle at 35% 30%,#2a4a5a,#0a141e)}#run46 .rn46.t-event{background:radial-gradient(circle at 35% 30%,#3a3a6a,#10102a)}
+#run46 .rn46 .me{position:absolute;bottom:52px;width:58px;height:58px;object-fit:cover;object-position:50% 12%;border-radius:50%;border:2px solid #fff;background:#201436;box-shadow:0 0 14px #ff6fb5}
+@keyframes rn46p{0%,100%{box-shadow:0 0 0 0 #ffd0ea66,0 6px 16px #0009}50%{box-shadow:0 0 0 8px #ffd0ea00,0 6px 16px #0009}}
+#run46 .rs46{position:absolute;z-index:4;right:max(16px,env(safe-area-inset-right));bottom:72px;width:min(320px,40vw);padding:16px 16px 14px;border-radius:18px;background:linear-gradient(160deg,#1d1436f2,#0b0918f5);border:1px solid #ff8ac866;box-shadow:0 18px 50px #000b}#run46 .rs46 small{color:#ffbfe0;letter-spacing:.12em;font-size:11px}#run46 .rs46 h3{margin:6px 0;font-size:20px}#run46 .rs46 p{margin:6px 0;color:#ddd3ee;font-size:13px;line-height:1.55}#run46 .rs46 .note{color:#a9e9ff;font-size:12px}#run46 .rs46 .x{position:absolute;right:10px;top:8px;width:30px;height:30px;border-radius:50%;background:#ffffff14;color:#fff;font-size:18px}#run46 .rs46 .go{width:100%;margin-top:8px;height:48px;border-radius:14px;font-size:17px;font-weight:900;letter-spacing:.2em;background:linear-gradient(135deg,#ff5fae,#ff9a6b);color:#fff;box-shadow:0 6px 18px #ff5fae66}#run46 .rs46 .go:active{transform:scale(.97)}#run46 .rs46 .go:disabled{background:#444;box-shadow:none}
+#run46 .r46Foot{position:absolute;z-index:3;left:max(16px,env(safe-area-inset-left));right:max(16px,env(safe-area-inset-right));bottom:max(12px,env(safe-area-inset-bottom));display:flex;justify-content:space-between;align-items:center;color:#cfc3e6;font-size:12px}#run46 .r46Foot .ab{padding:8px 14px;border-radius:12px;background:#ffffff12;border:1px solid #ffffff2a;color:#ffb3c9;font-size:12px}
+#run46 .rm46{position:absolute;inset:0;z-index:8;display:grid;place-items:center;background:#05030bc4;backdrop-filter:blur(4px)}#run46 .rm46>div{width:min(560px,92vw);padding:20px;border-radius:22px;background:linear-gradient(150deg,#1f1438f5,#0a0817f8);border:1px solid #ffb2d466;box-shadow:0 24px 70px #000c;text-align:center}#run46 .rm46 small{color:#ffbfe0;letter-spacing:.2em}#run46 .rm46 h3{margin:8px 0 6px;font-size:22px}#run46 .rm46 p{color:#d9d0e5;margin:0 0 12px}
+#run46 .rm46 .opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:10px 0}#run46 .rm46 .opts button{min-height:86px;padding:12px;border-radius:16px;background:linear-gradient(160deg,#2a1d48,#151027);border:1px solid #ffffff2a;color:#fff;text-align:left;transition:transform .12s}#run46 .rm46 .opts button:active{transform:scale(.97)}#run46 .rm46 .opts button:disabled{opacity:.4}#run46 .rm46 .opts i{display:block;font-style:normal;font-size:28px}#run46 .rm46 .opts b{display:block;font-size:15px}#run46 .rm46 .opts em{font-style:normal;color:#9fe9ff;font-size:12px}#run46 .rm46 .opts span{display:block;margin-top:5px;color:#c9bedc;font-size:12px;line-height:1.45}#run46 .rm46 .skip{padding:8px 18px;border-radius:12px;background:#ffffff14;color:#cbbfdc}
+#result.run46 #again,#result.run46 #back{display:none}#runRes46{margin:10px 0;padding:12px;border-radius:14px;background:#1a1230;border:1px solid #ff8ac855}#runRes46 b{display:block;font-size:16px;color:#ffd3ea}#runRes46 span{display:block;margin:4px 0 10px;color:#cfc3e6;font-size:13px}#runRes46 button{width:100%}`;
 
   function ensureModKitDrawer42(){
     let drawer=$("#modKitDrawer42");if(drawer)return drawer;
@@ -7570,13 +7691,24 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       takeUpgrade46(id){const u=U.find(x=>x.id===id);if(!u)throw new Error("no upgrade "+id);state="level";chooseUpgrade(u);return {lv:lv(id),weapons:P.weapons46,evo:save.evo46};},
       cardHtml46(){return [...document.querySelectorAll("#choices .choice")].map(b=>({id:b.dataset.upgradeId,cls:b.className,text:b.textContent}));},
       poseLog46(){return (P.poseLog46||[]).slice();},
-      teleport46(x,y){P.x=x;P.y=y;return snapshot35();},
+      teleport46(x,y){P.x=x;P.y=y;return snapshot35();},healNpc46(){const n=levelObj46?.npc;if(n)n.hp=n.max;return !!n;},
       realtime46(){manualTestClock=false;last=performance.now();scheduleLoop();return true;},
       props46(){return (props46||[]).map(p=>({kind:p.kind,x:p.x,y:p.y,done:p.done}));},
       fieldProbe(n=6){const near=(arr)=>arr.filter(o=>o&&!o.dead).map(o=>({dx:o.x-P.x,dy:o.y-P.y,r:o.r||0,boss:o.type==="boss"})).sort((a,b)=>Math.hypot(a.dx,a.dy)-Math.hypot(b.dx,b.dy)).slice(0,n);const cam=window.SakurayoCamera?.size?.();return {enemies:near(enemies),gems:near(gems),x:P.x,y:P.y,worldW:cam?.worldW||W,worldH:cam?.worldH||H,level:P.level,range:P.range};},
       spawnBossNow(){if(state!=="play")throw new Error("spawnBossNow requires play mode");spawnBoss();return snapshot35();},
       levels46(){return window.SakurayoLevels.LEVELS.map(l=>({id:l.id,type:l.type,unlocked:window.SakurayoLevels.unlocked(save,l.id),stars:window.SakurayoLevels.stars(save,l.id)}));},
       launchLevel46(id){return launchLevel46(id);},
+      runStart46(seed){return !!startRun46(seed);},
+      runState46(){const r=run46||runLoad46();return {active:!!r,mode:state,screen:!$("#run46")?.classList.contains("hidden"),layer:r?.layer||0,at:r?.at||null,path:r?[...r.path]:[],shards:r?.shards||0,relics:r?[...r.relics]:[],pending:r?JSON.parse(JSON.stringify(r.pending)):[],available:r?window.SakurayoRun.available(r).map(n=>({id:n.id,type:n.type})):[],modal:runModal46?{kind:runModal46.kind||"node",n:(runModal46.offer||runModal46.opts||[]).length}:null,build:r?.build?{level:r.build.level,hp:r.build.hp,maxHp:r.build.maxHp,up:Object.keys(r.build.up||{}).length,weapons:Object.keys(r.build.weapons46||{})}:null,node:activeLevel46?.run46?activeLevel46.id:null,player:{level:P.level,hp:P.hp,maxHp:P.maxHp,dmg:P.dmg,up:Object.keys(P.up||{}).length},saved:!!save.run46,coins:save.coins,talRefund46:save.talRefund46};},
+      runEnter46(id){return runEnter46(id);},
+      runChoose46(i){return runChoose46(i);},
+      runTakeRelic46(id){return runTakeRelic46(id);},
+      runSkipModal46(){runModal46=null;runPersist46();paintRun46();return true;},
+      runWinNode46(){if(state!=="play"||!activeLevel46?.run46)return false;if(boss&&!boss.dead){boss.ungate46=true;}finish(true);return true;},
+      runLoseNode46(){if(state!=="play"||!activeLevel46?.run46)return false;finish(false);return true;},
+      runContinue46(){const b=$("#runCont46");if(!b)return false;b.click();return true;},
+      runAbandon46(){abandonRun46();return true;},
+      runReload46(){run46=null;return !!runLoad46();},
       levelState46(){return {active:activeLevel46?.id||null,mode:state,label:activeLevel46&&levelObj46?window.SakurayoLevels.label(activeLevel46,levelObj46):"",done:!!levelObj46?.done,fail:levelObj46?.fail||"",npc:levelObj46?.npc?{x:levelObj46.npc.x,y:levelObj46.npc.y,hp:levelObj46.npc.hp,k:levelObj46.npc.k}:null,targets:levelObj46?.targets?.filter(e=>!e.dead).length??null,targetsPos:levelObj46?.targets?.filter(e=>!e.dead&&e.hp>0).map(e=>({x:e.x,y:e.y,hp:e.hp}))||[],objTime:levelObj46?.t||0,pads:levelObj46?.pads?.map(q=>({x:q.x,y:q.y,used:q.used}))||[],zone:levelObj46?.zone||null,result:levelResult46?{got:levelResult46.got,stars:levelResult46.stars,coins:levelResult46.coins}:null,stars46:{...save.stars46}};},
       forceLevelDone46(){if(levelObj46)levelObj46.done=true;},
       avgState46(){return window.SakurayoAvg?.state()||null;},
