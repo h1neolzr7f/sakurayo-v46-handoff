@@ -19,7 +19,7 @@
     "#shopDrawer .close,#gachaDrawer .close,#achDrawer .close{border-radius:var(--sy-radius);border:1px solid var(--sy-rim-hi);background:var(--sy-glass-strong);color:var(--sy-text)}",
     /* gacha */
     "#gachaDrawer .wishTitle46 h3{text-shadow:0 2px 14px rgba(0,10,30,.75)}",
-    "#gachaDrawer .wishTitle46 p,#gachaDrawer .wishTitle46 small{display:inline-block;margin-top:4px;padding:3px 10px;border-radius:999px;background:var(--sy-glass-strong);color:var(--sy-text);border:1px solid var(--sy-rim)}",
+    
     "#gachaDrawer .wishPity46,#gachaDrawer .wishPills46>*{background:var(--sy-glass-strong);border:1px solid var(--sy-rim);border-radius:var(--sy-radius)}",
     "#gachaDrawer .pityRail46{background:rgba(255,255,255,.08);border-radius:999px;overflow:hidden}",
     "#gachaDrawer .wishSpark46 button{background:var(--sy-glass-strong);border:1px solid rgba(255,143,196,.45);color:#ffe3f0;border-radius:999px}",
@@ -34,6 +34,46 @@
     "#hud .mission br{display:none}",
     ".opsRail46{background:var(--sy-glass)!important;border:1px solid var(--sy-rim)!important;border-radius:var(--sy-radius)!important;backdrop-filter:blur(6px)}",
     "#banter{background:var(--sy-glass-strong)!important;border:1px solid var(--sy-rim)!important;border-radius:var(--sy-radius)!important}",
+    /* ===== v2 layout & hierarchy (landscape) ===== */
+    "@media (orientation:landscape){",
+    /* lobby: top capsule */
+    "#menu.terminalLobby48 .top{gap:0;padding:3px;border-radius:999px;background:var(--sy-glass-strong);border:1px solid var(--sy-rim);box-shadow:var(--sy-shadow)}",
+    "#menu.terminalLobby48 .top .coins,#menu.terminalLobby48 .terminalTop48 button{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:999px!important}",
+    "#menu.terminalLobby48 .top .coins{color:var(--sy-gold);font-weight:800;border-right:1px solid var(--sy-rim)!important;border-radius:999px 0 0 999px!important}",
+    /* lobby: tactical deck = two tiles + hero CTA */
+    "#menu.terminalLobby48 .tacticalDeck48{grid-template-columns:1fr 1fr;grid-template-rows:minmax(64px,1fr) minmax(78px,1.25fr) 38px;gap:8px}",
+    "#menu.terminalLobby48 .tacticalDeck48>#commandCharacter47,#menu.terminalLobby48 .tacticalDeck48>#commandPrepare47{margin:0;width:100%;flex-direction:column;justify-content:center;gap:4px;padding:8px;border:1px solid var(--sy-rim);border-radius:var(--sy-radius);background:var(--sy-glass);backdrop-filter:blur(8px);text-align:center}",
+    "#menu.terminalLobby48 .tacticalDeck48>#commandCharacter47:after,#menu.terminalLobby48 .tacticalDeck48>#commandPrepare47:after{display:none}",
+    "#menu.terminalLobby48 .tacticalDeck48>#commandCharacter47 .terminalLabel48,#menu.terminalLobby48 .tacticalDeck48>#commandPrepare47 .terminalLabel48{align-items:center;text-align:center}",
+    "#menu.terminalLobby48 .tacticalDeck48>#commandCharacter47 b,#menu.terminalLobby48 .tacticalDeck48>#commandPrepare47 b{font-size:17px}",
+    "#menu.terminalLobby48 .tacticalDeck48>#start{grid-column:1/-1;border:1px solid var(--sy-rim-hi)!important;border-radius:calc(var(--sy-radius) + 4px)!important;background:linear-gradient(120deg,#ff6fae,#ff9fcf 45%,#8fe6f5)!important;color:#081426!important;box-shadow:0 0 0 1px rgba(255,255,255,.25) inset,0 10px 30px rgba(143,230,245,.35)}",
+    "#menu.terminalLobby48 .tacticalDeck48>#start b,#menu.terminalLobby48 .tacticalDeck48>#start small,#menu.terminalLobby48 .tacticalDeck48>#start:after{color:#081426!important;text-shadow:none!important}",
+    "#menu.terminalLobby48 .tacticalDeck48>#start svg{color:#081426!important;filter:none!important}",
+    "#menu.terminalLobby48 .tacticalDeck48>.stageMini{grid-column:1/-1;border-radius:var(--sy-radius);background:var(--sy-glass-strong);border:1px solid var(--sy-rim)}",
+    /* lobby: unified bottom dock */
+    "#menu.homeDock46.terminalLobby48 .homeNav46{gap:0!important;padding:3px;border-radius:calc(var(--sy-radius) + 4px);background:var(--sy-glass-strong);border:1px solid var(--sy-rim);box-shadow:var(--sy-shadow);backdrop-filter:blur(10px)}",
+    "#menu.homeDock46.terminalLobby48 .homeNav46 button{background:transparent!important;border:0!important;border-radius:var(--sy-radius)!important;box-shadow:none!important;position:relative}",
+    "#menu.homeDock46.terminalLobby48 .homeNav46 button+button:before{content:'';position:absolute;left:0;top:22%;bottom:22%;width:1px;background:var(--sy-rim)}",
+    "#menu.homeDock46.terminalLobby48 .homeNav46 button:hover,#menu.homeDock46.terminalLobby48 .homeNav46 button:focus-visible{background:rgba(143,230,245,.16)!important}",
+    /* gacha: actions get the weight, pity compact */
+    "#gachaDrawer .gachaActions46 button{border-radius:calc(var(--sy-radius) + 4px)!important;min-height:58px;font-size:17px}",
+    "#gachaDrawer .gachaActions46 button:last-child{background:linear-gradient(120deg,rgba(255,143,196,.95),rgba(143,230,245,.95))!important;color:#081426!important;box-shadow:0 10px 26px rgba(255,143,196,.35)}",
+    "#gachaDrawer .wishPity46{padding:8px 12px}",
+    "#gachaDrawer .wishSpark46{max-height:66px;overflow:auto}",
+    /* shop: sticky header + segmented tabs */
+    "#shopDrawer .dhead{position:sticky;top:calc(-1 * max(17px,env(safe-area-inset-top)));z-index:3;background:linear-gradient(180deg,#0b1326 80%,rgba(11,19,38,0));margin:0 -13px;padding-left:13px;padding-right:13px}",
+    "#shopDrawer .shopMoney{padding:6px 14px;border-radius:999px;background:var(--sy-glass-strong);border:1px solid var(--sy-rim);color:var(--sy-gold);font-weight:800}",
+    "#shopDrawer .shopTabs40{padding:4px;border-radius:calc(var(--sy-radius) + 4px);background:var(--sy-glass-strong)!important;border:1px solid var(--sy-rim)!important;gap:4px}",
+    "#shopDrawer .shopTabs40 button{border-color:transparent;background:transparent}",
+    /* battle HUD: compact left column, slim stage bar */
+    "#hud .hudtop .hero{padding:6px 10px 6px 6px;clip-path:none}",
+    "#hud .wave{height:20px;border-radius:999px}",
+    "#hud .wave span{font-size:10px;letter-spacing:.06em}",
+    "#hud .mission{max-width:min(46vw,420px)}",
+    "#hud .rinfo{padding:6px 12px;text-align:right}",
+    "#hud .rinfo b{font-size:18px;letter-spacing:.06em;color:var(--sy-text)}",
+    "#hud .combo{text-shadow:0 0 12px rgba(255,215,122,.55)}",
+    "}",
     "@media (prefers-reduced-motion:reduce){#shopDrawer .shopTabs40 button{transition:none}}"
   ].join("\n");
   function apply(doc) {
