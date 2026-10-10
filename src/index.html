@@ -6673,7 +6673,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const groups=[...box.querySelectorAll(".shopGroup40")];
     const show=id=>{
       tabs.querySelectorAll("button").forEach(x=>x.classList.toggle("on",x.dataset.shop===id));
-      groups.forEach(group=>group.style.display=group.dataset.shopGroup===id?(id==="skins"?"grid":"block"):"none");
+      groups.forEach(group=>group.style.display=group.dataset.shopGroup===id?"grid":"none");
     };
     tabs.querySelectorAll("button").forEach(button=>button.onclick=()=>{
       show(button.dataset.shop);
