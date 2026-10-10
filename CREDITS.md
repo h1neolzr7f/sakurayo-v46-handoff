@@ -34,3 +34,8 @@
 
 ## 字体
 - `game/art/fonts/epic-serif.woff2`：Noto Serif CJK SC Bold 的子集（仅含第一章说书旁白用字），© Adobe / Google，SIL Open Font License 1.1。
+
+## 看板娘动画流水线（tools/anim-pipeline，详见 docs/ANIM_PIPELINE.md）
+- lbpcascade_animeface — nagadomi，MIT（工具链使用，不打包进游戏）
+- OpenCV — Apache-2.0；rembg (isnet-anime) — MIT；Depth Anything V2 Small — Apache-2.0（仅离线工具链）
+- 运行时 src/runtime/sakurayo-rig.js 为本项目自写，无第三方代码。
