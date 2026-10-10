@@ -3340,7 +3340,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     var cv = root.querySelector("canvas"), g = cv.getContext("2d"), img = {};
     ART.forEach(function (k) { var i = new Image(); i.src = o.art ? o.art("shmup/" + k + ".webp") : "art/shmup/" + k + ".webp"; img[k] = i; });
     var game = new Game(Object.assign({}, o, {
-      onPick: function (opts) { var el = document.createElement("div"); el.className = "pick"; el.innerHTML = '<div class="box"><small>镜空 · 段间补给</small><h3>三选一</h3><div class="cards">' + opts.map(function (q) { return '<button data-k="' + q.k + '"><b>' + q.n + "</b><span>" + q.d + "</span></button>"; }).join("") + "</div></div>"; root.appendChild(el); el.onclick = function (e) { var b = e.target.closest("[data-k]"); if (!b) return; el.remove(); game.choose(b.dataset.k); }; if (game.auto) setTimeout(function () { if (el.parentNode) { el.remove(); game.choose("power"); } }, 600); },
+      onPick: function (opts) { if (o.auto) { Promise.resolve().then(function () { game.choose(opts[0].k); }); return; } var el = document.createElement("div"); el.className = "pick"; el.innerHTML = '<div class="box"><small>镜空 · 段间补给</small><h3>三选一</h3><div class="cards">' + opts.map(function (q) { return '<button data-k="' + q.k + '"><b>' + q.n + "</b><span>" + q.d + "</span></button>"; }).join("") + "</div></div>"; root.appendChild(el); el.onclick = function (e) { var b = e.target.closest("[data-k]"); if (!b) return; el.remove(); game.choose(b.dataset.k); }; if (game.auto) setTimeout(function () { if (el.parentNode) { el.remove(); game.choose("power"); } }, 600); },
       onEnd: function (r) { var el = document.createElement("div"); el.className = "res"; el.innerHTML = '<div class="box"><h2>' + (r.win ? "镜空突破" : "坠机") + "</h2><p>用时 " + r.time + " s · 击坠 " + r.kills + " · 受击 " + r.hits + " · 擦弹 " + r.grazes + '</p><button class="ok">' + (o.okText || "继续") + "</button></div>"; root.appendChild(el); el.querySelector(".ok").onclick = function () { stop(); o.onClose && o.onClose(r); }; o.onEnd && o.onEnd(r); }
     }));
     game.auto = !!o.auto; game.root = root; cur = game;
@@ -5959,6 +5959,73 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 
 </script>
 <script>
+/* 衣橱（外观商店，docs/DESIGN_V5.md §2 / 路线图 P3）。纯逻辑，无 DOM。
+   原则：形态玩法局内免费获得；这里只卖“看起来怎样”。外观永远不改任何战斗数值（tests/wardrobe_unit.mjs 断言）。
+   货币：樱花币（常规产出）+ 镜屑（传说外观专用，夜行中击破 Boss/精英/玩法节点获得，每周上限 120）。无任何真实付费。
+   条目：
+   - 形态·华彩（15）：换色——形态光环/弹幕辉光/子弹核心色换成华彩配色。600 币。
+   - 形态·传说（15）：重绘立绘 + 变身大招特写 + 专属配色。4500 币 + 120 镜屑 + 该形态在夜行中使用满 3 局。
+   - 武器外观（12，每角色 4）：子弹/刀光配色 + 武器图。900 币。
+   - 特效包（6，全角色通用）：命中火花与连击数字配色。1200 币。 */
+(function (global) {
+  "use strict";
+  var CHS = ["sayo", "aya", "rion"], SLOTS = ["base", "guard", "speed", "burst", "awaken"];
+  var SLOT_N = { base: "本相", guard: "守", speed: "疾", burst: "爆", awaken: "觉醒" };
+  var CH_N = { sayo: "小夜", aya: "绫", rion: "凛音" };
+  var PRISM = { base: ["#ff9ec7", "#fff2f8"], guard: ["#b28dff", "#f4eeff"], speed: ["#ffe36d", "#fffbe6"], burst: ["#ff3d7f", "#ffe0ec"], awaken: ["#9ff7ff", "#ffffff"] };
+  var LEGEND = { base: ["#ffd1e8", "#ffffff"], guard: ["#9fe9ff", "#ffffff"], speed: ["#b6ffcf", "#ffffff"], burst: ["#ffb36b", "#fffbe6"], awaken: ["#fff1a8", "#ffffff"] };
+  var WPAL = [["#ffc1dc", "#ffffff"], ["#9fe1ff", "#ffffff"], ["#ffd76a", "#fff8dd"], ["#c69bff", "#f5ecff"]];
+  var WNAME = { sayo: ["樱吹雪", "月白", "金鱼祭", "紫藤"], aya: ["蓝调证词", "冰镜", "直播金", "夜鸦"], rion: ["朱漆", "霜刃", "黄泉灯", "鬼百合"] };
+  var FX = [["#ffffff", "#ffe08a", "初雪"], ["#ffc1dc", "#ff7fb0", "樱花"], ["#9fe1ff", "#4fb6ff", "镜光"], ["#ffd76a", "#ff9f40", "烟火"], ["#c69bff", "#7e5bff", "狐火"], ["#b6ffcf", "#3fdc8a", "萤火"]];
+  var ITEMS = [];
+  CHS.forEach(function (c) {
+    SLOTS.forEach(function (s) {
+      ITEMS.push({ id: "prism_" + c + "_" + s, kind: "prism", ch: c, form: c + "_" + s, n: CH_N[c] + "·" + SLOT_N[s] + " 华彩", price: 600, tint: PRISM[s][0], core: PRISM[s][1] });
+      ITEMS.push({ id: "legend_" + c + "_" + s, kind: "legend", ch: c, form: c + "_" + s, n: CH_N[c] + "·" + SLOT_N[s] + " 传说", price: 4500, kyo: 120, uses: 3, tint: LEGEND[s][0], core: LEGEND[s][1], art: "wardrobe/" + c + "_" + s + "_legend.webp", ult: "wardrobe/" + c + "_" + s + "_ult.webp" });
+    });
+    for (var i = 0; i < 4; i++) ITEMS.push({ id: "weapon_" + c + "_" + i, kind: "weapon", ch: c, n: CH_N[c] + "·" + WNAME[c][i], price: 900, tint: WPAL[i][0], core: WPAL[i][1], art: "wardrobe/" + c + "_w" + i + ".webp" });
+  });
+  FX.forEach(function (f, i) { ITEMS.push({ id: "fx_" + i, kind: "fx", n: "特效·" + f[2], price: 1200, spark: f[0], num: f[1], art: "wardrobe/fx_" + i + ".webp" }); });
+  var BY = {}; ITEMS.forEach(function (q) { BY[q.id] = q; });
+  var KYO_WEEK_CAP = 120, KYO_GAIN = { boss: 20, elite: 8, sky: 6, pin: 6, duel: 6 };
+  function week(now) { var d = new Date(now || Date.now()); var t = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()); return Math.floor((t / 86400000 + 3) / 7); } // 周一为界
+  function blank() { return { owned: [], equip: { form: {}, weapon: {}, fx: null }, kyo: 0, kyoWeek: 0, kyoGot: 0, formUses: {} }; }
+  function sanitize(w) {
+    var o = blank(); if (!w || typeof w !== "object") return o;
+    o.owned = Array.isArray(w.owned) ? w.owned.filter(function (id, i, a) { return BY[id] && a.indexOf(id) === i; }) : [];
+    var e = w.equip || {};
+    Object.keys(e.form || {}).forEach(function (f) { var id = e.form[f]; if (BY[id] && o.owned.indexOf(id) >= 0 && BY[id].form === f) o.equip.form[f] = id; });
+    Object.keys(e.weapon || {}).forEach(function (c) { var id = e.weapon[c]; if (BY[id] && o.owned.indexOf(id) >= 0 && BY[id].ch === c) o.equip.weapon[c] = id; });
+    if (BY[e.fx] && o.owned.indexOf(e.fx) >= 0) o.equip.fx = e.fx;
+    o.kyo = Math.max(0, Math.min(9999, +w.kyo || 0)); o.kyoWeek = +w.kyoWeek || 0; o.kyoGot = Math.max(0, +w.kyoGot || 0);
+    Object.keys(w.formUses || {}).forEach(function (f) { if (/^(sayo|aya|rion)_(base|guard|speed|burst|awaken)$/.test(f)) o.formUses[f] = Math.max(0, Math.min(999, +w.formUses[f] || 0)); });
+    return o;
+  }
+  /* 镜屑：每周上限，返回实际获得量 */
+  function gainKyo(w, kind, now) { var n = KYO_GAIN[kind] || 0; if (!n) return 0; var wk = week(now); if (w.kyoWeek !== wk) { w.kyoWeek = wk; w.kyoGot = 0; } var g = Math.max(0, Math.min(n, KYO_WEEK_CAP - w.kyoGot)); w.kyoGot += g; w.kyo += g; return g; }
+  function noteFormUse(w, formId) { if (!formId) return; w.formUses[formId] = (w.formUses[formId] || 0) + 1; }
+  function why(w, coins, id) {
+    var q = BY[id]; if (!q) return "不存在"; if (w.owned.indexOf(id) >= 0) return "已拥有";
+    if (q.kind === "legend") { if ((w.formUses[q.form] || 0) < q.uses) return "需在夜行中使用该形态 " + q.uses + " 局（" + (w.formUses[q.form] || 0) + "/" + q.uses + "）"; if (w.kyo < q.kyo) return "镜屑不足（" + w.kyo + "/" + q.kyo + "）"; }
+    if (coins < q.price) return "樱花币不足"; return "";
+  }
+  function buy(w, save, id) { var r = why(w, save.coins, id); if (r) return { ok: false, why: r }; var q = BY[id]; save.coins -= q.price; if (q.kyo) w.kyo -= q.kyo; w.owned.push(id); equip(w, id); return { ok: true, item: q }; }
+  function equip(w, id) { var q = BY[id]; if (!q || w.owned.indexOf(id) < 0) return false; if (q.form) w.equip.form[q.form] = id; else if (q.kind === "weapon") w.equip.weapon[q.ch] = id; else if (q.kind === "fx") w.equip.fx = id; return true; }
+  function unequip(w, id) { var q = BY[id]; if (!q) return false; if (q.form && w.equip.form[q.form] === id) delete w.equip.form[q.form]; else if (q.kind === "weapon" && w.equip.weapon[q.ch] === id) delete w.equip.weapon[q.ch]; else if (w.equip.fx === id) w.equip.fx = null; return true; }
+  /* 战斗/演出读取的“纯视觉”覆盖：形态光环与子弹色、武器配色、命中特效配色、传说立绘/特写。 */
+  function look(w, ch, formId) {
+    var o = {}; if (!w) return o; var f = formId && w.equip.form[formId] && BY[w.equip.form[formId]];
+    if (f) { o.tint = f.tint; o.core = f.core; if (f.art) { o.art = f.art; o.ult = f.ult; } o.form = f.id; }
+    var wp = w.equip.weapon[ch] && BY[w.equip.weapon[ch]]; if (wp) { o.bullet = wp.tint; o.bulletCore = wp.core; o.weapon = wp.id; }
+    var fx = w.equip.fx && BY[w.equip.fx]; if (fx) { o.spark = fx.spark; o.num = fx.num; o.fx = fx.id; }
+    return o;
+  }
+  function list(kind, ch) { return ITEMS.filter(function (q) { return (!kind || q.kind === kind) && (!ch || !q.ch || q.ch === ch); }); }
+  global.SakurayoWardrobe = { ITEMS: ITEMS, KYO_WEEK_CAP: KYO_WEEK_CAP, KYO_GAIN: KYO_GAIN, get: function (id) { return BY[id] || null; }, list: list, blank: blank, sanitize: sanitize, gainKyo: gainKyo, noteFormUse: noteFormUse, why: why, buy: buy, equip: equip, unequip: unequip, look: look, week: week };
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
 (function (global) {
   'use strict';
   // Pure save boundary shared by startup and text import. No storage or UI effects.
@@ -5966,7 +6033,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   var SETTINGS = {master:.8,sfx:.8,music:.45,vibration:1,fx:1,hudSize:'standard',damageText:'compact',contrast:1,uiCalm:1,glow:'off',glowVersion:2,mascot:'follow'};
   var MAIN_GOD = {points:0,unlockedTier:1,bestTier:0,clears:0,runs:0,deepest:0,contracts:{},challenges:{},power:0,vitality:0,tempo:0,resonance:0,fortune:0,regenBlood:0,psiLink:0,gunBlade:0,mageCircuit:0,summonPage:0,spaceRing:0,rebirthDoll:0,sideKey:0,cursedHeart:0};
   var SHOP = {starter:{assault:0,bastion:0,flow:0,arcane:0},equippedStarter:null,items:{bait:0,ammo:0,whetstone:0,mirror:0},equippedWeapon:null,baitEquipped:false,ownedTalismans:[],bannedSchools:[],noUpgradeChallenge:false,lastTab:'skins',ops:{pity:0,pitySR:0,pulls:0,tenPulls:0,owned:{},last:[],cheatUsed:0}};
-  var DEFAULTS = {coins:0,unlock:1,done:[],kills:0,bosses:0,best:0,runs:0,tal:{atk:0,hp:0,luck:0,mag:0,flow:0},ach:{},claim:{},story:[0],forms:[],fusions:[],evo46:[],stars46:{},avgRead46:[],cg46:[],run46:null,talRefund46:-1,endings:[],runHistory:[],banter:1,tutorialDone:false,settings:SETTINGS,character:'sayo',skin:'default',ownedSkins:['default'],mainGod:MAIN_GOD,storyChoices38:{sayo:{},aya:{},rion:{}},storySeen38:{},shop40:SHOP,balance40:{samples:[],betaSessions:0},hiddenStory40:{},pendingLoneStory40:null,extensions:{}};
+  var DEFAULTS = {coins:0,unlock:1,done:[],kills:0,bosses:0,best:0,runs:0,tal:{atk:0,hp:0,luck:0,mag:0,flow:0},ach:{},claim:{},story:[0],forms:[],fusions:[],evo46:[],stars46:{},avgRead46:[],cg46:[],run46:null,cosmetics46:null,talRefund46:-1,endings:[],runHistory:[],banter:1,tutorialDone:false,settings:SETTINGS,character:'sayo',skin:'default',ownedSkins:['default'],mainGod:MAIN_GOD,storyChoices38:{sayo:{},aya:{},rion:{}},storySeen38:{},shop40:SHOP,balance40:{samples:[],betaSessions:0},hiddenStory40:{},pendingLoneStory40:null,extensions:{}};
   // Lifetime counters have no gameplay cap; keep earned values within safe integer precision.
   var COUNT_MAX = Number.MAX_SAFE_INTEGER || 9007199254740991;
   var SCHOOLS = ['mech','gun','alch','gene','vamp','spore','magical','cult','mage','shrine','summon','ninja','idol','necro'];
@@ -6023,6 +6090,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     clean.runHistory = list(clean.runHistory).filter(object).slice(0,30);
     ['story','forms','fusions','endings','evo46','avgRead46','cg46'].forEach(function (key) {if (!Array.isArray(clean[key])) clean[key] = copy(DEFAULTS[key]);});
     clean.talRefund46 = integer(clean.talRefund46,-1,COUNT_MAX,-1);
+    clean.cosmetics46 = global.SakurayoWardrobe ? global.SakurayoWardrobe.sanitize(object(incoming.cosmetics46) ? copy(incoming.cosmetics46) : null) : (object(incoming.cosmetics46) ? copy(incoming.cosmetics46) : null);
     clean.run46 = object(incoming.run46) ? (global.SakurayoRun && global.SakurayoRun.sanitize ? global.SakurayoRun.sanitize(copy(incoming.run46)) : copy(incoming.run46)) : null;
     clean.stars46 = {}; if (object(incoming.stars46)) Object.keys(incoming.stars46).forEach(function (id) {if (/^[1-4]-[1-4]$/.test(id)) clean.stars46[id] = integer(incoming.stars46[id],0,3,0);});
     clean.avgRead46 = clean.avgRead46.filter(function (id) {return typeof id === 'string';}).slice(-3000); clean.cg46 = clean.cg46.filter(function (id) {return typeof id === 'string' && /^story\//.test(id);});
@@ -10449,6 +10517,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   }
   /* ================= GAME FLOW / RUN LIFECYCLE ================= */
   function startGame() {
+    try { refreshLook46(); } catch (e) {}
     if (state === "menu") {
       if (pendingMode46 === "mainGod" && runMode36 !== "mainGod") {
         openDrawer("stage");
@@ -11584,7 +11653,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       e.x,
       e.y,
       crit ? 6 : 3,
-      crit ? "#ffd36b" : match >= 1.28 ? "#78f6ff" : "#ff76ad",
+      crit ? "#ffd36b" : match >= 1.28 ? "#78f6ff" : look46.spark || "#ff76ad",
     );
     if (P.thunder && opt.source === "blade" && chance(P.thunder)) {
       let n = nearest(e.x, e.y, 170, e);
@@ -13517,7 +13586,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     const nearMe46 = !enemy && Math.hypot(b.x - P.x, b.y - (P.y - 20)) < 70;
     if (!enemy && b.tracer46 && b.px46 != null) {
       const k = 2.6; ctx.save(); ctx.globalCompositeOperation = nearMe46 || reduceFlash46() ? "source-over" : "lighter"; ctx.lineCap = "round";
-      ctx.strokeStyle = (P.form46 && P.form46.tint) || b.tracer46; ctx.globalAlpha = nearMe46 ? .15 : reduceFlash46() ? .4 : .45; ctx.lineWidth = b.r * 1.5;
+      ctx.strokeStyle = (P.form46 && P.form46.tint) || look46.bullet || b.tracer46; ctx.globalAlpha = nearMe46 ? .15 : reduceFlash46() ? .4 : .45; ctx.lineWidth = b.r * 1.5;
       ctx.beginPath(); ctx.moveTo(b.x - (b.x - b.px46) * k, b.y - (b.y - b.py46) * k); ctx.lineTo(b.x, b.y); ctx.stroke(); ctx.restore();
     }
     ctx.save();
@@ -13543,6 +13612,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
             ? "#fff1a6"
             : "#fff2f8";
     if (!enemy && P.form46 && P.form46.tint && !b.rail && !b.fireball) { ctx.shadowColor = P.form46.tint; ctx.fillStyle = P.form46.core; }
+    else if (!enemy && look46.bullet && !b.rail && !b.fireball) { ctx.shadowColor = look46.bullet; ctx.fillStyle = look46.bulletCore; }
     ctx.beginPath();
     ctx.arc(0, 0, b.r, 0, TAU);
     ctx.fill();
@@ -13662,7 +13732,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     ctx.textAlign = "center";
     for (const x of texts) {
       ctx.globalAlpha = Math.min(1, x.life * 2);
-      ctx.fillStyle = x.crit ? "#ffe07b" : "#fff";
+      ctx.fillStyle = x.crit ? "#ffe07b" : look46.num || "#fff";
       ctx.strokeStyle = "#140a19dd";
       ctx.lineWidth = 4;
       ctx.strokeText(x.s, x.x, x.y);
@@ -15211,15 +15281,17 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     $("#run46")?.classList.add("hidden");runNode46=nd;
     sky46=SH.start({character:run46.character||save.character||"sayo",seed:(run46.seed^(nd.layer*7919+nd.row*131+nd.col))>>>0,layer:nd.layer,
       form:fm?{slot:fm.slot,name:fm.name,tint:fm.tint}:null,weapons:b.weapons46||{},hpFrac:b.maxHp?b.hp/b.maxHp:run46.hpFrac??1,power:1+0.06*(run46.nodesWon||0),
-      art:p=>artUrl(p),auto:!!opts.auto,okText:"返回夜行地图",boss:nd.type==="duel"&&nd.layer>=3,
+      art:p=>artUrl(p),auto:!!opts.auto,okText:"返回夜行地图",boss:nd.type==="duel"&&nd.layer>=3,kind:nd.type==="sky"&&nd.layer>=3?"boss":undefined,
       onClose:r=>skyDone46(nd,r)});
     return true;
   }
+  function kyoGain46(type){const W=window.SakurayoWardrobe,w=wardrobe46();if(!W||!w)return 0;const g=W.gainKyo(w,type);if(g){toast(`镜屑 +${g}（本周 ${w.kyoGot}/${W.KYO_WEEK_CAP}）`);persist();}return g;}
+  function noteRunForms46(){const W=window.SakurayoWardrobe,w=wardrobe46(),st=run46?.form;if(!W||!w||!st)return;const ids=new Set([st.id,...(st.history||[]).flatMap(h=>[h.from,h.to])].filter(Boolean));ids.forEach(id=>W.noteFormUse(w,id));}
   function modeCur46(){return [window.SakurayoShmup,window.SakurayoPinball,window.SakurayoDuel].find(m=>m?.current())||null;}
   function skyDone46(nd,r){
     const R=window.SakurayoRun;sky46=null;if(!run46)return;
     const b=run46.build?JSON.parse(JSON.stringify(run46.build)):null;if(b&&b.maxHp)b.hp=Math.max(1,Math.round(b.maxHp*r.hpFrac));else run46.hpFrac=r.hpFrac;
-    const out=R.complete(run46,nd,!!r.win,b);runNode46=null;
+    const out=R.complete(run46,nd,!!r.win,b);runNode46=null;if(r.win)kyoGain46(nd.type);if(out.over||out.runWin)noteRunForms46();
     if(out.over){const coins=R.runReward(run46);save.coins+=coins;toast(`夜行中断 · 结算 🌸 ${coins}`);save.run46=null;persist();run46=null;$("#run46")?.classList.add("hidden");return;}
     const nm=window.SakurayoRun.NODE[nd.type]?.n||"镜空";toast(`${nm}突破 · 💠 +${out.shards}`);if(out.relicOffer&&out.relicOffer.length)runModal46={kind:"relic",offer:out.relicOffer,title:`${nm}遗物`};
     runPersist46();openRun46();
@@ -15247,10 +15319,14 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     const hr=ratio("maxHp");if(hr!==1){P.maxHp*=hr;P.hp=Math.min(P.maxHp,Math.max(1,P.hp*hr));}
     P.dmgTaken46=g(n,"dmgTaken")*(n.invuln?0.35:1);P.formRules46=n;P.formMods46={...n};
   }
-  function formSync46(){const st=formSt46();if(!st)return null;const F=window.SakurayoForms;F.init(st);const f=F.active(st,runTime);setFormMods46(F.mods(st,runTime));P.form46={id:f.id,slot:f.slot,tint:f.tint,core:f.core};paintFormHud46();return f;}
+  /* 衣橱外观：纯视觉覆盖（形态光环/子弹色、武器配色、命中特效、传说立绘）。不写入任何战斗数值。 */
+  let look46={};
+  function wardrobe46(){if(!window.SakurayoWardrobe)return null;if(!save.cosmetics46)save.cosmetics46=window.SakurayoWardrobe.blank();return save.cosmetics46;}
+  function refreshLook46(formId){const W=window.SakurayoWardrobe;look46=W?W.look(wardrobe46(),save.character||"sayo",formId||(save.character||"sayo")+"_base"):{};return look46;}
+  function formSync46(){const st=formSt46();if(!st)return null;const F=window.SakurayoForms;F.init(st);const f=F.active(st,runTime);setFormMods46(F.mods(st,runTime));const lk=refreshLook46(f.id);P.form46={id:f.id,slot:f.slot,tint:lk.tint||f.tint,core:lk.core||f.core};paintFormHud46();return f;}
   function formCut46(f){
-    if(!f)return;let el=$("#formCut46");if(el)el.remove();el=document.createElement("div");el.id="formCut46";el.className="fc46 s-"+f.slot;el.style.setProperty("--t",f.tint||"#ff9ac8");
-    el.innerHTML=`<div class="fl"></div><img src="${artUrl(f.art)}" alt=""><div class="tx"><small>${htmlEscape(f.mask==="无"?"摘下面具":f.mask)} · 形态变化</small><b>${htmlEscape(f.name)}</b><span>「${htmlEscape(f.line)}」</span></div>`;
+    if(!f)return;const lk=refreshLook46(f.id);let el=$("#formCut46");if(el)el.remove();el=document.createElement("div");el.id="formCut46";el.className="fc46 s-"+f.slot+(lk.art?" legend46":"");el.style.setProperty("--t",lk.tint||f.tint||"#ff9ac8");
+    el.innerHTML=`<div class="fl"></div><img src="${artUrl(lk.art||f.art)}" alt=""><div class="tx"><small>${htmlEscape(f.mask==="无"?"摘下面具":f.mask)} · 形态变化</small><b>${htmlEscape(f.name)}</b><span>「${htmlEscape(f.line)}」</span></div>`;
     document.body.appendChild(el);setTimeout(()=>el.remove(),1700);sound?.("skill");
     if(state==="play"){slowmo46=Math.max(slowmo46,0.6);P.inv=Math.max(P.inv,1);fxStamp?.("skill",P.x,P.y,{size:220,life:.7});shake=Math.max(shake,8);}
   }
@@ -15297,7 +15373,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     const r=_finishRunInner46(win);
     if(run46&&runNode46&&activeLevel46?.run46&&state==="result"&&!runNode46.closed46){
       const R=window.SakurayoRun,nd=runNode46;nd.closed46=1;
-      const snap=win?(setFormMods46({}),R.snapshot(P)):null,out=R.complete(run46,nd,!!win,snap);
+      const snap=win?(setFormMods46({}),R.snapshot(P)):null,out=R.complete(run46,nd,!!win,snap);if(win)kyoGain46(nd.type);if(out.over||out.runWin)noteRunForms46();
       let html=`<div class="rr46">`;
       if(out.over||out.runWin){const coins=R.runReward(run46);save.coins+=coins;html+=`<b>${out.runWin?"夜行完成 · 三层全破":"夜行中断"}</b><span>结算 🌸 ${coins}（走过 ${run46.path.length} 个节点）</span>`;save.run46=null;persist();run46=null;}
       else{html+=`<b>节点完成 · 💠 +${out.shards}</b><span>${out.nextLayer?`第 ${out.nextLayer} 层开启`:"构筑与生命已保留"}</span>`;if(out.relicOffer&&out.relicOffer.length)runModal46={kind:"relic",offer:out.relicOffer,title:nd.type==="boss"?"层主遗物":"精英遗物"};runPersist46();}
@@ -15311,14 +15387,48 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     if(e.target.closest("#runCont46")){$("#result").classList.remove("run46");$("#runRes46")?.remove();runNode46=null;backMenu();if(run46)openRun46();}
     else if(e.target.closest("#runBtn46")){if(runLoad46())openRun46();else startRun46();}
   });
+  /* —— 衣橱（外观商店）：形态华彩 / 形态传说 / 武器外观 / 特效包。只卖外观，不卖形态、不卖数值。 —— */
+  let wdTab46="prism";
+  function openWardrobe46(tab){
+    const W=window.SakurayoWardrobe;if(!W)return false;if(tab)wdTab46=tab;const w=wardrobe46(),ch=save.character||"sayo";
+    let el=$("#wd46");if(!el){el=document.createElement("div");el.id="wd46";document.body.appendChild(el);}
+    const tabs=[["prism","形态·华彩"],["legend","形态·传说"],["weapon","武器外观"],["fx","特效包"]];
+    const items=W.list(wdTab46,wdTab46==="fx"?null:ch);
+    const card=q=>{const own=w.owned.includes(q.id),eq=(q.form&&w.equip.form[q.form]===q.id)||(q.kind==="weapon"&&w.equip.weapon[q.ch]===q.id)||(q.kind==="fx"&&w.equip.fx===q.id);
+      const why=own?"":W.why(w,save.coins,q.id),fm=q.form&&window.SakurayoForms?.get(q.form),art=q.art||(fm&&fm.art);
+      const cost=`🌸 ${q.price}${q.kyo?` · 镜屑 ${q.kyo}`:""}`;
+      return `<div class="wdc ${own?"own":""} ${eq?"eq":""}" style="--t:${q.tint||q.spark||"#ffd76a"};--c:${q.core||q.num||"#fff"}"><div class="pv">${art?`<img src="${artUrl(art)}" alt="" style="${q.kind==="prism"?"filter:drop-shadow(0 0 10px var(--t)) saturate(1.25)":""}">`:""}<i></i></div><b>${htmlEscape(q.n)}</b><small>${q.kind==="legend"?"重绘立绘 · 变身特写 · 专属配色":q.kind==="prism"?"形态光环 / 弹幕配色":q.kind==="weapon"?"子弹与刀光配色":"命中火花 / 伤害数字配色"}</small>
+        <button data-wd="${q.id}" ${!own&&why?"disabled":""}>${eq?"卸下":own?"装备":why&&why!=="樱花币不足"?htmlEscape(why):cost}</button></div>`;};
+    el.innerHTML=`<div class="box"><header><b>衣橱</b><span>🌸 ${save.coins} · 镜屑 ${w.kyo}（本周 ${w.kyoGot||0}/${W.KYO_WEEK_CAP}）</span><button class="x" data-wdx>✕</button></header>
+      <p class="note">形态在夜行中免费获得；这里只收藏外观——不改变任何数值。</p>
+      <nav>${tabs.map(([k,n])=>`<button data-wdt="${k}" class="${k===wdTab46?"on":""}">${n}</button>`).join("")}</nav><div class="grid">${items.map(card).join("")}</div></div>`;
+    el.classList.remove("hidden");return true;
+  }
+  function wardrobeAct46(id){const W=window.SakurayoWardrobe,w=wardrobe46(),q=W.get(id);if(!q)return {ok:false};
+    if(w.owned.includes(id)){const eq=(q.form&&w.equip.form[q.form]===id)||(q.kind==="weapon"&&w.equip.weapon[q.ch]===id)||(q.kind==="fx"&&w.equip.fx===id);eq?W.unequip(w,id):W.equip(w,id);persist();refreshLook46();openWardrobe46();return {ok:true,equipped:!eq};}
+    const r=W.buy(w,save,id);if(!r.ok){toast(r.why);return r;}sound?.("loot");toast(`收藏：${q.n}`);persist();refreshLook46();openWardrobe46();return r;}
+  document.addEventListener("click",e=>{const t=e.target.closest("[data-wd],[data-wdt],[data-wdx],#wdBtn46");if(!t)return;
+    if(t.id==="wdBtn46")openWardrobe46();else if(t.dataset.wdx!==undefined)$("#wd46")?.classList.add("hidden");else if(t.dataset.wdt)openWardrobe46(t.dataset.wdt);else wardrobeAct46(t.dataset.wd);});
   function paintRunBtn46(){modeRow46();const b=$("#runBtn46");if(!b)return;const r=runLoad46();b.innerHTML=r?`<b>继续夜行</b><small>第 ${r.layer} 层 · 💠 ${r.shards}</small>`:`<b>夜行 · 肉鸽</b><small>三层地图 · 构筑跨节点</small>`;}
   (function(){const b=document.createElement("button");b.className="levelMapBtn46 runBtn46";b.id="runBtn46";b.type="button";modeRow46().prepend(b);paintRunBtn46();})();
+  (function(){const b=document.createElement("button");b.className="levelMapBtn46 wdBtn46";b.id="wdBtn46";b.type="button";b.innerHTML="<b>衣橱</b><small>华彩 · 传说 · 武器 · 特效</small>";modeRow46().append(b);})();
   const _menuUpdateRun46=menuUpdate;menuUpdate=function(){const r=_menuUpdateRun46.apply(this,arguments);paintRunBtn46();return r;};
   // 永久数值天赋冻结（DESIGN_V5 §5）：按已投入返还樱花币，一次性；旧 tal 字段原样保留。
   (function(){if(!(save.talRefund46<0))return;let sum=0;for(const [id,a] of Object.entries(TAL)){const l=Math.max(0,save.tal?.[id]|0);for(let i=0;i<l;i++)sum+=window.SakurayoCatalog.price(a,i);}save.coins+=sum;save.talRefund46=sum;if(sum)setTimeout(()=>toast(`永久天赋已冻结：返还 🌸 ${sum}`),1500);})();
   style37.textContent+=`#modeRow46{grid-column:1/-1;justify-self:stretch;align-self:stretch;min-width:0;display:flex;gap:6px;z-index:2;pointer-events:auto}#menu:not(:has(.tacticalDeck48)) #modeRow46{position:absolute;right:16px;bottom:90px}
 #modeRow46 .levelMapBtn46{position:static!important;inset:auto!important;flex:1 1 0;width:auto!important;min-width:0!important;max-width:none!important;height:100%;min-height:40px;padding:3px 12px!important;border-radius:12px!important;justify-content:center}#modeRow46 .levelMapBtn46 b{font-size:clamp(12px,1.5vw,16px)!important;white-space:nowrap}#modeRow46 .levelMapBtn46 small{display:none}@media(min-height:600px){#modeRow46 .levelMapBtn46 small{display:block;font-size:10px!important;white-space:nowrap}}
 .runBtn46{background:linear-gradient(135deg,#6a3cff,#ff5fae)!important}
+.wdBtn46{background:linear-gradient(135deg,#c2557f,#ffb36b)!important}
+#wd46{position:fixed;inset:0;z-index:130;background:#08050fcc;display:grid;place-items:center;padding:12px}#wd46.hidden{display:none}
+#wd46 .box{width:min(980px,100%);max-height:100%;overflow:auto;background:#1a1228;border:1px solid #ffffff22;border-radius:16px;padding:12px 16px}
+#wd46 header{display:flex;gap:12px;align-items:center}#wd46 header b{font-size:20px}#wd46 header span{flex:1;color:#ffe2a8}#wd46 .x{background:none;border:0;color:#fff;font-size:20px}
+#wd46 .note{margin:4px 0 8px;font-size:12px;color:#c9b8e8}#wd46 nav{display:flex;gap:6px;margin-bottom:10px}#wd46 nav button{flex:1;padding:8px;border-radius:10px;border:1px solid #fff3;background:#2a2040;color:#fff}#wd46 nav button.on{background:#ff8fbf;color:#2a1030;font-weight:bold}
+#wd46 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+#wd46 .wdc{background:#251a38;border:2px solid #ffffff14;border-radius:12px;padding:6px;display:flex;flex-direction:column;gap:4px}#wd46 .wdc.eq{border-color:var(--t)}
+#wd46 .pv{position:relative;height:150px;border-radius:9px;overflow:hidden;background:radial-gradient(circle at 50% 40%,var(--t),#120a1e 75%)}#wd46 .pv img{width:100%;height:100%;object-fit:cover;object-position:50% 15%}
+#wd46 .pv i{position:absolute;right:6px;bottom:6px;width:18px;height:18px;border-radius:50%;background:var(--c);box-shadow:0 0 10px 3px var(--t)}
+#wd46 .wdc b{font-size:13px}#wd46 .wdc small{font-size:11px;color:#bfaedb;min-height:28px}#wd46 .wdc button{padding:6px;border-radius:8px;border:0;background:#ffd76a;color:#2a1030;font-weight:bold;font-size:12px}#wd46 .wdc button:disabled{background:#4a3c60;color:#bba}
+.fc46.legend46 img{filter:drop-shadow(0 0 18px var(--t))}
 #run46{position:fixed;inset:0;z-index:60;overflow:hidden;background:#07060f;color:#fff}#run46.hidden{display:none}
 #run46 .r46Bg{position:absolute;inset:0;background:center/cover no-repeat;filter:saturate(.9) brightness(.55)}#run46 .r46Shade{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 60%,transparent 30%,#07060fcc 100%),linear-gradient(180deg,#07060fcc,transparent 22%,transparent 78%,#07060fdd)}
 #run46 .r46Top{position:absolute;z-index:3;left:max(12px,env(safe-area-inset-left));right:max(12px,env(safe-area-inset-right));top:max(10px,env(safe-area-inset-top));display:flex;align-items:center;gap:14px}
@@ -15515,6 +15625,11 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       skyState46(){const g=modeCur46()?.current();return g?g.snapshot():null;},
       skyStep46(sec=1,dt=1/60){const SH=modeCur46(),g=SH?.current();if(!g)return null;for(let t=0;t<sec&&!g.done;t+=dt){if(SH===window.SakurayoPinball&&g.canShoot()&&!g.done)window.SakurayoPinball.autoTurn(g);SH.step(dt);}return g.snapshot();},
       skyClose46(){const ok=document.querySelector("#shm46 .res .ok,#pin46 .res .ok,#duel46 .res .ok");if(ok){ok.click();return true;}return false;},
+      openWardrobe46(tab){return openWardrobe46(tab);},
+      wardrobeAct46(id){return wardrobeAct46(id);},
+      wardrobeState46(){const w=wardrobe46();return w?JSON.parse(JSON.stringify(Object.assign({},w,{coins:save.coins,look:refreshLook46(P.form46?.id)}))):null;},
+      kyoGain46(type){return kyoGain46(type);},
+      playerStats46(){return {dmg:P.dmg,maxHp:P.maxHp,speed:P.speed,crit:P.crit,fireRate:P.fireRate??null,form46:P.form46||null};},
       takeUpgrade46(id){const u=U.find(x=>x.id===id);if(!u)throw new Error("no upgrade "+id);state="level";chooseUpgrade(u);return {lv:lv(id),weapons:P.weapons46,evo:save.evo46};},
       cardHtml46(){return [...document.querySelectorAll("#choices .choice")].map(b=>({id:b.dataset.upgradeId,cls:b.className,text:b.textContent}));},
       poseLog46(){return (P.poseLog46||[]).slice();},
