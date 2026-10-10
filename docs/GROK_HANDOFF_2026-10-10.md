@@ -189,3 +189,5 @@ bash gradlew --no-daemon assembleDebug lintDebug
 - 已替换：四章关卡主视觉 `chapter_keyart_v2`、可平铺战斗地面 `battle_floor_v2`（偏移融合法做无缝，768x512）、四章剧情 CG `cg.webp`（改为横版）、16 张 Boss 阶段立绘、15 种敌人立绘（`_b` 帧由新图做轻微压缩倾斜，保持两帧动画一致）。
 - 新增：`ui/tactical/lobby-night-v5.webp`（大厅背景，旧 v3 保留以符合 tactical manifest）、`ui/loading_v5.webp`（启动载入背景）、`ui/result_{win,lose}_v5.webp`（结算背景）、`ui/{mail,notice}_banner_v5.webp`（邮箱/公告横幅）、`icons/{item,core,tal}_*.webp` 13 个图标替换商店道具、初始强化与天赋的 emoji（加载失败回退 emoji）。
 - 截图：/workspace/sakurayo-shots/v5-*.png。
+- 补充：普通敌人改为“幽魂小怪”文生图重做；第 1 章地面改为低对比石板+零散花瓣，平铺重复感明显降低；敌人/Boss 立绘统一按旧版占比重新排版（主体 476px、脚底 y=494）。
+- 修复严重渲染 bug：`enemyDraw` 用屏幕尺寸 W/H 做视野裁剪，但敌人坐标是世界坐标（世界 4×2 屏），导致玩家离开左上一屏后敌人和 Boss 全部不画。改为 `SakurayoCamera.contains()` 裁剪。
