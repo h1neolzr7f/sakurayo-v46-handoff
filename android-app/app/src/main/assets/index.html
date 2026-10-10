@@ -2845,10 +2845,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     L("1-2", 1, "绘马长廊", "clear", { n: 60 }, { k: "time", v: 60, d: "60 秒内完成" }, H(6), [32, 44]),
     L("1-3", 1, "送灯", "escort", { path: [[0.18, 0.5], [0.36, 0.36], [0.55, 0.62], [0.72, 0.4], [0.86, 0.52]] }, { k: "npcHp", v: 70, d: "巫女血量 ≥ 70%" }, H(5), [55, 51], { npc: "miko" }),
     L("1-4", 1, "百目尸将", "boss", { bossAt: 22 }, { k: "breaks", v: 2, d: "触发 2 次破防" }, H(8), [84, 31]),
-    L("2-1", 2, "救护车队", "timed", { n: 4, limit: 90 }, { k: "time", v: 65, d: "65 秒内完成" }, H(6), [12, 60]),
-    L("2-2", 2, "监控墙", "mech", { n: 3 }, { k: "mechKills", v: 30, d: "机关击破 ≥ 30" }, H(6), [35, 40]),
-    L("2-3", 2, "雨中撤离", "escort", { path: [[0.15, 0.7], [0.4, 0.55], [0.6, 0.3], [0.85, 0.42]] }, H(0), { k: "npcHp", v: 70, d: "保安血量 ≥ 70%" }, [60, 58], { npc: "guard" }),
-    L("2-4", 2, "雨魇行者", "boss", { bossAt: 22 }, { k: "breaks", v: 2, d: "触发 2 次破防" }, H(8), [85, 35]),
+    L("2-1", 2, "瓦版追风", "timed", { n: 4, limit: 90 }, { k: "time", v: 65, d: "65 秒内完成" }, H(6), [12, 60]),
+    L("2-2", 2, "射的屋", "mech", { n: 3 }, { k: "mechKills", v: 30, d: "机关击破 ≥ 30" }, H(6), [35, 40]),
+    L("2-3", 2, "雨伞送箱", "escort", { path: [[0.15, 0.7], [0.4, 0.55], [0.6, 0.3], [0.85, 0.42]] }, H(0), { k: "npcHp", v: 70, d: "保安血量 ≥ 70%" }, [60, 58], { npc: "guard" }),
+    L("2-4", 2, "射的屋大将", "boss", { bossAt: 22 }, { k: "breaks", v: 2, d: "触发 2 次破防" }, H(8), [85, 35]),
     L("3-1", 3, "剑冢入口", "survive", { t: 100 }, { k: "chests", v: 2, d: "打开 2 个宝箱" }, H(6), [12, 50]),
     L("3-2", 3, "拔剑", "timed", { n: 6, limit: 110, flee: 1 }, { k: "time", v: 70, d: "70 秒内完成" }, H(6), [34, 38]),
     L("3-3", 3, "事故日志", "channel", { t: 30 }, H(2), { k: "time", v: 70, d: "70 秒内完成" }, [58, 60]),
@@ -2859,7 +2859,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     L("4-4", 4, "八重镜姬", "boss", { bossAt: 22 }, { k: "breaks", v: 3, d: "触发 3 次破防" }, H(8), [86, 30])
   ];
   var CHAPTERS = [
-    { ch: 1, n: "第一章 · 神社外街", theme: "门认出了你。" }, { ch: 2, n: "第二章 · 雨夜商圈", theme: "合同把人拆成了两半。" },
+    { ch: 1, n: "第一章 · 神社外街", theme: "门认出了你。" }, { ch: 2, n: "第二章 · 夜店街", theme: "瓦版不说谎。" },
     { ch: 3, n: "第三章 · 黄泉参道", theme: "记住不等于继承痛苦。" }, { ch: 4, n: "第四章 · 碎镜地砖", theme: "像你不等于是你。" }
   ];
   function find(id) { for (var i = 0; i < LEVELS.length; i++) if (LEVELS[i].id === id) return LEVELS[i]; return null; }
@@ -3895,6 +3895,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     ["path", "relics", "pending"].forEach(function (k) { if (!Array.isArray(st[k])) st[k] = []; });
     st.shards = Math.max(0, Math.floor(+st.shards || 0)); st.relics = st.relics.filter(function (id) { return !!relic(id); });
     if (st.at && !node(st, st.at)) st.at = null;
+    st.abyss = Math.max(0, Math.min(10, st.abyss | 0)); if (st.daily && (typeof st.daily !== "object" || !(st.daily.day > 0))) st.daily = null;
     if (st.build && typeof st.build !== "object") st.build = null;
     if (st.form) { st.form = global.SakurayoForms ? global.SakurayoForms.sanitize(st.form, st.character || "sayo") : st.form; if (!st.form) delete st.form; }
     return st;
@@ -4133,6 +4134,95 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   global.SakurayoStory = global.SakurayoStory || {};
   global.SakurayoStory.ch1 = S;
   global.SakurayoStory.CG = [{ id: "story/ch1/cg_rewind.webp", n: "倒带的夜空" }, { id: "story/ch1/cg_ema.webp", n: "十年前的绘马" }];
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+/* 第二章「夜店街 —— 瓦版不说谎」AVG 台词（docs/STORY.md v3 §3 第 2 层）。
+   节奏：说书开场 → 日常吐槽 → 摊位冒险 → Boss 前最轻松的一段 → Boss 觉醒一句真心话 → 说书收尾 + 章末反转。
+   who：sayo / aya / rion / rin / guard（老保安）；yoi（宵）、tanuki（狸老板）。 */
+(function (global) {
+  "use strict";
+  var B1 = "story/ch2/bg_street.webp", B2 = "story/ch2/bg_shateki.webp", E = "说书 · 狸老板", CG1 = "story/ch2/cg_kawaraban.webp", CG2 = "story/ch2/cg_ashes.webp";
+  var S = {
+    "2-1": {
+      pre: [
+        { id: "v32-e01", chap: ["第二章", "瓦版不说谎"], bg: B1, style: "epic", name: E, t: "上回书说到，参道灯笼大将吐出一颗铅弹，上刻「月城」二字。" },
+        { id: "v32-e02", style: "epic", name: E, t: "二百年前那一夜，有一人不持刀、不持铳，只持笔。她追着般若跑了三条街，把每一刀都写进瓦版。" },
+        { id: "v32-e03", style: "epic", name: E, t: "此人姓神代。后世皆言：瓦版不说谎——只是偶尔，写得太老实。" },
+        { id: "v32-001", bg: B1, L: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "……所以，「大食切」这个丢人的名字，是我家祖上起的。" },
+        { id: "v32-002", R: { who: "sayo", ex: "resolve" }, who: "sayo", ex: "resolve", t: "这有什么！我家祖上是打铁炮的穷人，你家祖上是写八卦的记者，凛音家祖上是吃章鱼烧——" },
+        { id: "v32-003", R: { who: "rion", ex: "angry" }, who: "rion", ex: "angry", t: "……是斩般若的。章鱼烧是般若吃的。" },
+        { id: "v32-004", who: "sayo", ex: "calm", t: "对对对，斩般若的！刀名字是章鱼烧起的！" },
+        { id: "v32-005", who: "rion", ex: "calm", t: "……算了。" },
+        { id: "v32-006", R: { who: "rin", ex: "calm" }, who: "rin", ex: "calm", t: "广播站雨宫凛。夜店街起风了，旧瓦版满街飞——每一张都写着二百年前那一夜的一段。抓住四张，越快越好，不然风会把它们吹进河里。" },
+        { id: "v32-007", L: { who: "aya", ex: "resolve" }, who: "aya", ex: "resolve", t: "追新闻？这个我熟。三位观众朋友——哦，现在是零位——跟紧了。" }
+      ],
+      post: [
+        { id: "v32-010", cg: CG1, t: "第四张瓦版落进绫的手里。木刻的般若嘴里塞满了章鱼烧，脖子上骑着一个拿刀的女孩。" },
+        { id: "v32-011", cg: null, L: { who: "aya", ex: "shaken" }, who: "aya", ex: "shaken", t: "……这一张的落款，是「神代千寻」。我奶奶的奶奶的……反正很多个奶奶。" },
+        { id: "v32-012", R: { who: "sayo", ex: "calm" }, who: "sayo", ex: "calm", t: "画得好可爱！般若的脸鼓鼓的。" },
+        { id: "v32-013", who: "aya", ex: "calm", t: "……这是一份事故报告，小夜。" }
+      ]
+    },
+    "2-2": {
+      pre: [
+        { id: "v32-020", bg: B2, L: { who: "sayo", ex: "resolve" }, who: "sayo", ex: "resolve", t: "射的屋！打中奖品就能拿走对吧？那个招财猫看起来能卖三千！" },
+        { id: "v32-021", R: { who: "yoi", ex: "calm" }, who: "yoi", t: "哼哼——此乃本神麾下第二位摊主大将的地盘！奖品架上的东西，都是被夜晚吃掉的愿望。打下来，它们就自由了。" },
+        { id: "v32-022", R: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "所以打下来不能卖。" },
+        { id: "v32-023", L: { who: "sayo", ex: "shaken" }, who: "sayo", ex: "shaken", t: "……不能卖？！" },
+        { id: "v32-024", R: { who: "rin", ex: "calm" }, who: "rin", ex: "calm", t: "架子后面有三台会自己装弹的机关。拆掉它们，奖品架才会停。" }
+      ],
+      post: [
+        { id: "v32-030", L: { who: "rion", ex: "calm" }, who: "rion", ex: "calm", t: "（凛音从奖品架上取下一只褪色的护身符，看了很久，放进袖子里）" },
+        { id: "v32-031", R: { who: "sayo", ex: "calm" }, who: "sayo", ex: "calm", t: "凛音也有想要的愿望吗？" },
+        { id: "v32-032", who: "rion", ex: "calm", t: "……这个，是我掉的。很久以前。" },
+        { id: "v32-033", who: "sayo", ex: "calm", t: "很久以前是多久？我们不是今天才来的吗？" },
+        { id: "v32-034", who: "rion", ex: "calm", t: "……睡糊涂了。走吧。" }
+      ]
+    },
+    "2-3": {
+      pre: [
+        { id: "v32-040", bg: B1, t: "开始下雨了。夜店街尽头，一位撑着破伞的老保安在等人。" },
+        { id: "v32-041", R: { who: "guard", ex: "calm" }, who: "guard", ex: "calm", t: "小姑娘们，帮个忙。我得把这箱瓦版送回神代家的旧仓库。四十年了，每年今晚我都送，每年都送不到。" },
+        { id: "v32-042", L: { who: "aya", ex: "shaken" }, who: "aya", ex: "shaken", t: "……您认识神代家？" },
+        { id: "v32-043", who: "guard", ex: "calm", t: "认识你。你小时候在仓库门口哭过，说长大要当记者，把所有人都写进新闻里，这样就没人会被忘掉。" },
+        { id: "v32-044", who: "aya", ex: "calm", t: "……我不记得了。走吧，雨大了。" }
+      ],
+      post: [
+        { id: "v32-050", L: { who: "aya", ex: "calm" }, R: { who: "guard", ex: "calm" }, who: "guard", ex: "calm", t: "送到了。四十年，第一次送到。……谢谢你，神代家的小记者。" },
+        { id: "v32-051", who: "aya", ex: "calm", t: "（老保安和破伞一起化成了雨点。纸箱里，是一整套二百年前的瓦版，最后一页被封住了。）" },
+        { id: "v32-052", R: { who: "sayo", ex: "shaken" }, who: "sayo", ex: "shaken", t: "绫……你在哭吗？" },
+        { id: "v32-053", who: "aya", ex: "angry", t: "是雨。……关掉你那该死的心疼表情。" }
+      ]
+    },
+    "2-4": {
+      pre: [
+        { id: "v32-060", bg: B2, L: { who: "sayo", ex: "calm" }, R: { who: "rion", ex: "calm" }, who: "sayo", ex: "calm", t: "补给！刨冰三碗，草莓、蓝色夏威夷、还有凛音要的……「什么都不加」？" },
+        { id: "v32-061", who: "rion", ex: "calm", t: "……冰本来的味道。" },
+        { id: "v32-062", R: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "那就是水。你花钱买了一碗冻起来的水。" },
+        { id: "v32-063", who: "sayo", ex: "resolve", t: "凛音的钱我出！循环理财第二弹！" },
+        { id: "v32-064", R: { who: "yoi", ex: "calm" }, who: "yoi", t: "吃饱了？那就上吧——射的屋大将！它百发百中，从不失手——因为它打的不是你，是你最后悔的那一秒！" },
+        { id: "v32-065", R: { who: "rin", ex: "serious" }, who: "rin", ex: "serious", t: "它换弹的时候会停顿，那就是破防的窗口。打断两次，它的枪就会卡壳。" }
+      ],
+      awaken: [
+        { id: "v32-070", who: "aya", ex: "resolve", t: "四十年没送到的东西，我送到了。二百年没写完的报道——今晚，我来写完。" }
+      ],
+      post: [
+        { id: "v32-080", bg: B1, t: "射的屋大将的枪管炸成了烟花。奖品架上所有的愿望一起飞了起来，像萤火虫。" },
+        { id: "v32-081", L: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "（绫撕开瓦版最后一页的封条。纸在她手里自己烧了起来。）" },
+        { id: "v32-082", cg: CG2, t: "火光里显出一行字，墨迹二百年未干——「般若之躯，未尝化灰」。" },
+        { id: "v32-083", cg: null, L: { who: "aya", ex: "shaken" }, R: { who: "sayo", ex: "shaken" }, who: "aya", ex: "shaken", t: "……没死透。般若，二百年前根本没死透。" },
+        { id: "v32-084", who: "sayo", ex: "shaken", t: "那、那千代斩开的半座山呢？三十串章鱼烧呢？" },
+        { id: "v32-085", L: { who: "rion", ex: "calm" }, R: null, who: "rion", ex: "calm", t: "（凛音的刀又鸣了一次。她没有回头）……我知道。" },
+        { id: "v32-086", style: "epic", name: E, t: "瓦版不说谎。只是写下真相的那位神代氏，为了让那一夜「好笑一点」，把最后一页封了二百年。" },
+        { id: "v32-087", style: "epic", name: E, t: "第二夜，至此。般若的身躯藏于何处，觊觎它的又是何人——且听下回分解。" }
+      ]
+    }
+  };
+  global.SakurayoStory = global.SakurayoStory || {};
+  global.SakurayoStory.ch2 = S;
+  (global.SakurayoStory.CG = global.SakurayoStory.CG || []).push({ id: "story/ch2/cg_kawaraban.webp", n: "神代家的瓦版" }, { id: "story/ch2/cg_ashes.webp", n: "未尝化灰" });
 })(typeof window !== "undefined" ? window : globalThis);
 
 </script>
@@ -6026,6 +6116,48 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 
 </script>
 <script>
+/* 长线内容（docs/DESIGN_V5.md §2 经济 / 路线图 P4）：深渊夜难度、每日挑战、赛季任务线「百夜行纪」。纯逻辑，无 DOM。
+   - 深渊夜 0–10：每级敌人生命 +12%、Boss 破防窗口 −5%；奖励樱花币 ×(1+0.15·级)。通关第 N 级解锁 N+1。
+   - 每日挑战：以日期为种子的固定地图 + 当日词条；每日首次完成（到达第 2 层或通关）发奖一次。
+   - 赛季（28 天一期）：经验 → 40 级，奖励只有樱花币/称号/头像框（不产镜屑，镜屑仍受周上限约束），没有任何付费轨。 */
+(function (global) {
+  "use strict";
+  var ABYSS_MAX = 10, SEASON_DAYS = 28, LV_MAX = 40, XP_PER = 100;
+  var XP = { node: 10, mode: 15, elite: 20, boss: 30, layer: 25, runWin: 80, daily: 50 };
+  var MODS = [
+    { id: "glass", n: "玻璃大炮", d: "你造成和受到的伤害都 +30%" },
+    { id: "nomag", n: "手动拾取", d: "宝石磁吸范围限制为贴身" },
+    { id: "rich", n: "奉纳日", d: "节点魂晶 +50%" },
+    { id: "giant", n: "大个子祭", d: "敌人与 Boss 生命 +25%，结算樱花币 +25%" }
+  ];
+  var TITLES = { 10: "夜店常客", 20: "百夜行者", 30: "大食切的朋友", 40: "千夜一闪" };
+  function day(now) { var d = new Date(now || Date.now()); return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86400000); } // 本地日期
+  function seasonOf(now) { return Math.floor((day(now) - 20734) / SEASON_DAYS) + 1; } // 第 1 期 = 2026-10-09 起
+  function blank(now) { return { abyssMax: 0, season: seasonOf(now), xp: 0, claimed: 0, titles: [], dailyDone: 0, dailyBest: 0, runs: 0, wins: 0 }; }
+  function sanitize(s, now) {
+    var o = blank(now); if (!s || typeof s !== "object") return o;
+    o.abyssMax = Math.max(0, Math.min(ABYSS_MAX, s.abyssMax | 0)); o.titles = Array.isArray(s.titles) ? s.titles.filter(function (t, i, a) { return typeof t === "string" && a.indexOf(t) === i; }).slice(0, 20) : [];
+    o.dailyDone = s.dailyDone | 0; o.dailyBest = Math.max(0, s.dailyBest | 0); o.runs = Math.max(0, s.runs | 0); o.wins = Math.max(0, s.wins | 0);
+    if ((s.season | 0) === o.season) { o.xp = Math.max(0, Math.min(LV_MAX * XP_PER, s.xp | 0)); o.claimed = Math.max(0, Math.min(LV_MAX, s.claimed | 0)); } // 新赛季：经验与领取进度清零，称号保留
+    return o;
+  }
+  function level(s) { return Math.min(LV_MAX, Math.floor(s.xp / XP_PER)); }
+  function reward(lv) { return { coins: lv % 5 === 0 ? 300 : 60, title: TITLES[lv] || null }; }
+  function addXp(s, kind, now) { if (s.season !== seasonOf(now)) { var t = s.titles; Object.assign(s, blank(now), { abyssMax: s.abyssMax, titles: t, dailyDone: s.dailyDone, runs: s.runs, wins: s.wins }); } var g = XP[kind] || 0; s.xp = Math.min(LV_MAX * XP_PER, s.xp + g); return g; }
+  /* 领取所有已达成等级的奖励，返回 {coins, titles[]} 并写入存档对象 */
+  function claim(s, save) { var lv = level(s), out = { coins: 0, titles: [] }; while (s.claimed < lv) { s.claimed++; var r = reward(s.claimed); out.coins += r.coins; if (r.title && s.titles.indexOf(r.title) < 0) { s.titles.push(r.title); out.titles.push(r.title); } } save.coins = (save.coins || 0) + out.coins; return out; }
+  function abyss(n) { n = Math.max(0, Math.min(ABYSS_MAX, n | 0)); return { n: n, hp: 1 + 0.12 * n, brk: Math.max(0.5, 1 - 0.05 * n), coins: 1 + 0.15 * n, label: n ? "深渊夜 " + n : "常夜" }; }
+  function canAbyss(s, n) { return (n | 0) <= Math.min(ABYSS_MAX, s.abyssMax + 1) && n >= 0; }
+  function clearAbyss(s, n) { if (n >= s.abyssMax && n < ABYSS_MAX) { s.abyssMax = n + 1; return true; } return false; }
+  function rng(seed) { var x = seed >>> 0 || 1; return function () { x ^= x << 13; x >>>= 0; x ^= x >> 17; x ^= x << 5; x >>>= 0; return x / 4294967296; }; }
+  function daily(now) { var d = day(now), r = rng(d * 2654435761), m = MODS[Math.floor(r() * MODS.length)], ch = ["sayo", "aya", "rion"][Math.floor(r() * 3)]; return { day: d, seed: (d * 7919 + 17) >>> 0, mod: m, character: ch, abyss: 2, reward: 300 }; }
+  function dailyDone(s, now) { return s.dailyDone === day(now); }
+  function finishDaily(s, save, layerReached, now) { if (dailyDone(s, now) || layerReached < 2) return 0; s.dailyDone = day(now); s.dailyBest = Math.max(s.dailyBest, layerReached); save.coins = (save.coins || 0) + 300; addXp(s, "daily", now); return 300; }
+  global.SakurayoSeason = { ABYSS_MAX: ABYSS_MAX, LV_MAX: LV_MAX, XP_PER: XP_PER, XP: XP, MODS: MODS, TITLES: TITLES, blank: blank, sanitize: sanitize, level: level, reward: reward, addXp: addXp, claim: claim, abyss: abyss, canAbyss: canAbyss, clearAbyss: clearAbyss, daily: daily, dailyDone: dailyDone, finishDaily: finishDaily, seasonOf: seasonOf, day: day };
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
 (function (global) {
   'use strict';
   // Pure save boundary shared by startup and text import. No storage or UI effects.
@@ -6033,7 +6165,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   var SETTINGS = {master:.8,sfx:.8,music:.45,vibration:1,fx:1,hudSize:'standard',damageText:'compact',contrast:1,uiCalm:1,glow:'off',glowVersion:2,mascot:'follow'};
   var MAIN_GOD = {points:0,unlockedTier:1,bestTier:0,clears:0,runs:0,deepest:0,contracts:{},challenges:{},power:0,vitality:0,tempo:0,resonance:0,fortune:0,regenBlood:0,psiLink:0,gunBlade:0,mageCircuit:0,summonPage:0,spaceRing:0,rebirthDoll:0,sideKey:0,cursedHeart:0};
   var SHOP = {starter:{assault:0,bastion:0,flow:0,arcane:0},equippedStarter:null,items:{bait:0,ammo:0,whetstone:0,mirror:0},equippedWeapon:null,baitEquipped:false,ownedTalismans:[],bannedSchools:[],noUpgradeChallenge:false,lastTab:'skins',ops:{pity:0,pitySR:0,pulls:0,tenPulls:0,owned:{},last:[],cheatUsed:0}};
-  var DEFAULTS = {coins:0,unlock:1,done:[],kills:0,bosses:0,best:0,runs:0,tal:{atk:0,hp:0,luck:0,mag:0,flow:0},ach:{},claim:{},story:[0],forms:[],fusions:[],evo46:[],stars46:{},avgRead46:[],cg46:[],run46:null,cosmetics46:null,talRefund46:-1,endings:[],runHistory:[],banter:1,tutorialDone:false,settings:SETTINGS,character:'sayo',skin:'default',ownedSkins:['default'],mainGod:MAIN_GOD,storyChoices38:{sayo:{},aya:{},rion:{}},storySeen38:{},shop40:SHOP,balance40:{samples:[],betaSessions:0},hiddenStory40:{},pendingLoneStory40:null,extensions:{}};
+  var DEFAULTS = {coins:0,unlock:1,done:[],kills:0,bosses:0,best:0,runs:0,tal:{atk:0,hp:0,luck:0,mag:0,flow:0},ach:{},claim:{},story:[0],forms:[],fusions:[],evo46:[],stars46:{},avgRead46:[],cg46:[],run46:null,cosmetics46:null,season46:null,talRefund46:-1,endings:[],runHistory:[],banter:1,tutorialDone:false,settings:SETTINGS,character:'sayo',skin:'default',ownedSkins:['default'],mainGod:MAIN_GOD,storyChoices38:{sayo:{},aya:{},rion:{}},storySeen38:{},shop40:SHOP,balance40:{samples:[],betaSessions:0},hiddenStory40:{},pendingLoneStory40:null,extensions:{}};
   // Lifetime counters have no gameplay cap; keep earned values within safe integer precision.
   var COUNT_MAX = Number.MAX_SAFE_INTEGER || 9007199254740991;
   var SCHOOLS = ['mech','gun','alch','gene','vamp','spore','magical','cult','mage','shrine','summon','ninja','idol','necro'];
@@ -6090,6 +6222,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     clean.runHistory = list(clean.runHistory).filter(object).slice(0,30);
     ['story','forms','fusions','endings','evo46','avgRead46','cg46'].forEach(function (key) {if (!Array.isArray(clean[key])) clean[key] = copy(DEFAULTS[key]);});
     clean.talRefund46 = integer(clean.talRefund46,-1,COUNT_MAX,-1);
+    clean.season46 = global.SakurayoSeason ? global.SakurayoSeason.sanitize(object(incoming.season46) ? copy(incoming.season46) : null) : (object(incoming.season46) ? copy(incoming.season46) : null);
     clean.cosmetics46 = global.SakurayoWardrobe ? global.SakurayoWardrobe.sanitize(object(incoming.cosmetics46) ? copy(incoming.cosmetics46) : null) : (object(incoming.cosmetics46) ? copy(incoming.cosmetics46) : null);
     clean.run46 = object(incoming.run46) ? (global.SakurayoRun && global.SakurayoRun.sanitize ? global.SakurayoRun.sanitize(copy(incoming.run46)) : copy(incoming.run46)) : null;
     clean.stars46 = {}; if (object(incoming.stars46)) Object.keys(incoming.stars46).forEach(function (id) {if (/^[1-4]-[1-4]$/.test(id)) clean.stars46[id] = integer(incoming.stars46[id],0,3,0);});
@@ -11433,7 +11566,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     let b = EDEF[type],
       hpCurve = 1 + runTime * 0.0025 + runTime * runTime * 0.000006,
       pf = planFactor(),
-      sc = s.scale * hpCurve * (1 + (pf - 1) * 0.55) * (elite ? 1.92 : 1),
+      sc = s.scale * hpCurve * (1 + (pf - 1) * 0.55) * (elite ? 1.92 : 1) * abyssMul46(),
       dm = s.scale * (1 + (pf - 1) * 0.32);
     if (typeof activeLevel46 !== "undefined" && activeLevel46 && !activeLevel46.boss) { const soft = (1 + (s.scale - 1) * 0.5) / s.scale; dm *= 0.6 * soft; sc *= 0.8 * (0.5 + soft * 0.5); } // 目标关：玩家要分心做目标，杂兵压力降一档
     enemies.push({
@@ -11464,7 +11597,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     spawnClock = 999;
     let s = stage(),
       pf = planFactor(),
-      hp = (1280 + s.id * 470) * s.scale * (1 + (pf - 1) * 0.34) * (globalThis.SakurayoBoss ? globalThis.SakurayoBoss.HP_SCALE : 1),
+      hp = (1280 + s.id * 470) * s.scale * (1 + (pf - 1) * 0.34) * (globalThis.SakurayoBoss ? globalThis.SakurayoBoss.HP_SCALE : 1) * abyssMul46(),
       traits = [
         { shot: 0.8, acid: 1.22, skill: 1.16 },
         { tech: 0.74, shot: 1.12, bio: 1.12 },
@@ -11584,6 +11717,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function damageEnemy(e, amt, opt = {}) {
     if (!e || e.dead) return 0;
     amt *= typeof soloBonus46 === "function" ? soloBonus46() : 1;
+    if (dailyMod46("glass")) amt *= 1.3;
     if (e.type === "boss") {
       if (e.guard > 0 && !(e.broken46 > 0)) amt *= 0.32;
       amt *= globalThis.SakurayoBoss ? globalThis.SakurayoBoss.damageMul(e) * globalThis.SakurayoBoss.overtimeMul(runTime - (e.born46 ?? runTime)) : 1;
@@ -11802,7 +11936,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function damagePlayer(amt) {
     if (P.inv > 0) return false;
     P.hits46 = (P.hits46 || 0) + 1;
-    amt *= clamp(1 - P.damageReduce, .28, 1.5) * (P.dmgTaken46 || 1);
+    amt *= clamp(1 - P.damageReduce, .28, 1.5) * (P.dmgTaken46 || 1) * (dailyMod46("glass") ? 1.3 : 1);
     let left = amt;
     if (P.sh > 0) {
       let used = Math.min(P.sh, left);
@@ -13139,8 +13273,9 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     for (const g of gems) {
       g.bob += dt * 4;
       let d = Math.hypot(P.x - g.x, P.y - g.y);
-      if (d < P.mag) {
-        let sp = 180 + (P.mag - d) * 2.5;
+      const mag46 = dailyMod46("nomag") ? Math.min(P.mag, 46) : P.mag;
+      if (d < mag46) {
+        let sp = 180 + (mag46 - d) * 2.5;
         g.x += ((P.x - g.x) / (d || 1)) * sp * dt;
         g.y += ((P.y - g.y) / (d || 1)) * sp * dt;
       }
@@ -15078,7 +15213,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
 
   /* ===== 主线关卡（runtime/sakurayo-levels.js）+ AVG（runtime/sakurayo-avg.js） ===== */
   var activeLevel46=null,levelObj46=null,levelResult46=null;
-  const AVG_NAMES46={sayo:"月城小夜",aya:"神代绫",rion:"黑羽凛音",rin:"雨宫凛",miko:"小灯",kagami:"镜零",yoi:"宵",tanuki:"狸老板"};
+  const AVG_NAMES46={sayo:"月城小夜",aya:"神代绫",rion:"黑羽凛音",rin:"雨宫凛",miko:"小灯",kagami:"镜零",yoi:"宵",tanuki:"狸老板",guard:"老保安"};
   function avgCast46(who,ex){
     if(["sayo","aya","rion"].includes(who))return {name:AVG_NAMES46[who],img:artUrl(`characters/${who}/default/avg_${["calm","resolve","shaken","angry"].includes(ex)?ex:"calm"}.webp`)};
     if(who==="rin")return {name:AVG_NAMES46.rin,img:artUrl(`npc/rin/avg_${ex==="serious"?"serious":"calm"}.webp`)};
@@ -15212,7 +15347,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function runPersist46(){if(run46)run46.modal=runModal46||null;save.run46=run46&&!run46.done?run46:null;persist();}
   function runLoad46(){if(!run46&&save.run46&&window.SakurayoRun){run46=window.SakurayoRun.sanitize(JSON.parse(JSON.stringify(save.run46)));runModal46=run46?.modal||null;}return run46;}
   function runHp46(){const b=run46?.build;return b?{hp:Math.max(0,Math.round(b.hp)),max:Math.round(b.maxHp)}:{hp:100,max:100};}
-  function startRun46(seed){const R=window.SakurayoRun;if(!R)return null;run46=R.create(seed,save.character||"sayo");runNode46=null;runPick46=null;runModal46=null;runPersist46();openRun46();return run46;}
+  function startRun46(seed,opt={}){const R=window.SakurayoRun;if(!R)return null;const D=opt.daily&&window.SakurayoSeason?window.SakurayoSeason.daily():null;if(D){save.character=D.character;seed=D.seed;}run46=R.create(seed,save.character||"sayo");run46.abyss=D?D.abyss:Math.max(0,opt.abyss|0);if(D)run46.daily={day:D.day,mod:D.mod.id};runNode46=null;runPick46=null;runModal46=null;runPersist46();openRun46();return run46;}
   function abandonRun46(){if(!run46)return;run46.done=true;const coins=window.SakurayoRun.runReward(run46);save.coins+=coins;run46=null;save.run46=null;persist();closeRun46();toast(`夜行结束，结算 🌸 ${coins}`);menuUpdate?.();}
   function openRun46(){
     if(!runLoad46())return false;
@@ -15285,14 +15420,27 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       onClose:r=>skyDone46(nd,r)});
     return true;
   }
+  /* ===== 长线：深渊夜 / 每日挑战 / 赛季「百夜行纪」（runtime/sakurayo-season.js） ===== */
+  function season46(){const S=window.SakurayoSeason;if(!S)return null;if(!save.season46)save.season46=S.blank();return save.season46;}
+  function inRun46(){return !!(run46&&activeLevel46?.run46);}
+  function dailyMod46(id){return inRun46()&&run46.daily?.mod===id;}
+  function abyssMul46(){if(!inRun46())return 1;const S=window.SakurayoSeason;return (S?S.abyss(run46.abyss||0).hp:1)*(dailyMod46("giant")?1.25:1);}
+  function seasonXp46(kind){const S=window.SakurayoSeason,s=season46();if(!S||!s)return 0;return S.addXp(s,kind);}
+  function nodeDone46(nd,win,shardsBefore){if(!win)return;const t=nd.type;seasonXp46(t==="boss"?"boss":t==="elite"?"elite":window.SakurayoRun.isMode(t)?"mode":"node");if(t==="boss")seasonXp46("layer");
+    if(run46?.daily?.mod==="rich"&&shardsBefore!=null&&run46.shards>shardsBefore)run46.shards+=Math.round((run46.shards-shardsBefore)*0.5);}
+  function runEnd46(out){const S=window.SakurayoSeason,s=season46(),R=window.SakurayoRun;let coins=R.runReward(run46);const notes=[];if(!S||!s)return {coins,notes};
+    coins=Math.round(coins*S.abyss(run46.abyss||0).coins*(run46.daily?.mod==="giant"?1.25:1));s.runs++;
+    if(out.runWin){s.wins++;seasonXp46("runWin");if(!run46.daily&&S.clearAbyss(s,run46.abyss||0))notes.push(`解锁深渊夜 ${s.abyssMax}`);}
+    if(run46.daily){const g=S.finishDaily(s,save,out.runWin?R.LAYERS+1:run46.layer);if(g)notes.push(`每日挑战 🌸 +${g}`);}
+    return {coins,notes};}
   function kyoGain46(type){const W=window.SakurayoWardrobe,w=wardrobe46();if(!W||!w)return 0;const g=W.gainKyo(w,type);if(g){toast(`镜屑 +${g}（本周 ${w.kyoGot}/${W.KYO_WEEK_CAP}）`);persist();}return g;}
   function noteRunForms46(){const W=window.SakurayoWardrobe,w=wardrobe46(),st=run46?.form;if(!W||!w||!st)return;const ids=new Set([st.id,...(st.history||[]).flatMap(h=>[h.from,h.to])].filter(Boolean));ids.forEach(id=>W.noteFormUse(w,id));}
   function modeCur46(){return [window.SakurayoShmup,window.SakurayoPinball,window.SakurayoDuel].find(m=>m?.current())||null;}
   function skyDone46(nd,r){
     const R=window.SakurayoRun;sky46=null;if(!run46)return;
     const b=run46.build?JSON.parse(JSON.stringify(run46.build)):null;if(b&&b.maxHp)b.hp=Math.max(1,Math.round(b.maxHp*r.hpFrac));else run46.hpFrac=r.hpFrac;
-    const out=R.complete(run46,nd,!!r.win,b);runNode46=null;if(r.win)kyoGain46(nd.type);if(out.over||out.runWin)noteRunForms46();
-    if(out.over){const coins=R.runReward(run46);save.coins+=coins;toast(`夜行中断 · 结算 🌸 ${coins}`);save.run46=null;persist();run46=null;$("#run46")?.classList.add("hidden");return;}
+    const sh0=run46.shards,out=R.complete(run46,nd,!!r.win,b);runNode46=null;if(r.win)kyoGain46(nd.type);nodeDone46(nd,!!r.win,sh0);if(out.over||out.runWin)noteRunForms46();
+    if(out.over){const {coins,notes}=runEnd46(out);save.coins+=coins;toast(`夜行中断 · 结算 🌸 ${coins}${notes.length?' · '+notes.join(' · '):''}`);save.run46=null;persist();run46=null;$("#run46")?.classList.add("hidden");return;}
     const nm=window.SakurayoRun.NODE[nd.type]?.n||"镜空";toast(`${nm}突破 · 💠 +${out.shards}`);if(out.relicOffer&&out.relicOffer.length)runModal46={kind:"relic",offer:out.relicOffer,title:`${nm}遗物`};
     runPersist46();openRun46();
   }
@@ -15324,9 +15472,11 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function wardrobe46(){if(!window.SakurayoWardrobe)return null;if(!save.cosmetics46)save.cosmetics46=window.SakurayoWardrobe.blank();return save.cosmetics46;}
   function refreshLook46(formId){const W=window.SakurayoWardrobe;look46=W?W.look(wardrobe46(),save.character||"sayo",formId||(save.character||"sayo")+"_base"):{};return look46;}
   function formSync46(){const st=formSt46();if(!st)return null;const F=window.SakurayoForms;F.init(st);const f=F.active(st,runTime);setFormMods46(F.mods(st,runTime));const lk=refreshLook46(f.id);P.form46={id:f.id,slot:f.slot,tint:lk.tint||f.tint,core:lk.core||f.core};paintFormHud46();return f;}
+  /* 主线关卡里的觉醒：用该章剧本的「觉醒一句真心话」替换形态台词（STORY v3：Boss 觉醒处不插科打诨）。 */
+  function awLine46(f){if(!f||f.slot!=="awaken"||!activeLevel46||activeLevel46.run46)return null;const L=storyFor46(activeLevel46.id,"awaken");return L&&L[0]?(typeof L[0].t==="string"?L[0].t:L[0].t[save.character||"sayo"]):null;}
   function formCut46(f){
     if(!f)return;const lk=refreshLook46(f.id);let el=$("#formCut46");if(el)el.remove();el=document.createElement("div");el.id="formCut46";el.className="fc46 s-"+f.slot+(lk.art?" legend46":"");el.style.setProperty("--t",lk.tint||f.tint||"#ff9ac8");
-    el.innerHTML=`<div class="fl"></div><img src="${artUrl(lk.art||f.art)}" alt=""><div class="tx"><small>${htmlEscape(f.mask==="无"?"摘下面具":f.mask)} · 形态变化</small><b>${htmlEscape(f.name)}</b><span>「${htmlEscape(f.line)}」</span></div>`;
+    el.innerHTML=`<div class="fl"></div><img src="${artUrl(lk.art||f.art)}" alt=""><div class="tx"><small>${htmlEscape(f.mask==="无"?"摘下面具":f.mask)} · 形态变化</small><b>${htmlEscape(f.name)}</b><span>「${htmlEscape(awLine46(f)||f.line)}」</span></div>`;
     document.body.appendChild(el);setTimeout(()=>el.remove(),1700);sound?.("skill");
     if(state==="play"){slowmo46=Math.max(slowmo46,0.6);P.inv=Math.max(P.inv,1);fxStamp?.("skill",P.x,P.y,{size:220,life:.7});shake=Math.max(shake,8);}
   }
@@ -15373,9 +15523,9 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     const r=_finishRunInner46(win);
     if(run46&&runNode46&&activeLevel46?.run46&&state==="result"&&!runNode46.closed46){
       const R=window.SakurayoRun,nd=runNode46;nd.closed46=1;
-      const snap=win?(setFormMods46({}),R.snapshot(P)):null,out=R.complete(run46,nd,!!win,snap);if(win)kyoGain46(nd.type);if(out.over||out.runWin)noteRunForms46();
+      const snap=win?(setFormMods46({}),R.snapshot(P)):null,sh0=run46.shards,out=R.complete(run46,nd,!!win,snap);if(win)kyoGain46(nd.type);nodeDone46(nd,!!win,sh0);if(out.over||out.runWin)noteRunForms46();
       let html=`<div class="rr46">`;
-      if(out.over||out.runWin){const coins=R.runReward(run46);save.coins+=coins;html+=`<b>${out.runWin?"夜行完成 · 三层全破":"夜行中断"}</b><span>结算 🌸 ${coins}（走过 ${run46.path.length} 个节点）</span>`;save.run46=null;persist();run46=null;}
+      if(out.over||out.runWin){const {coins,notes}=runEnd46(out);save.coins+=coins;html+=`<b>${out.runWin?"夜行完成 · 三层全破":"夜行中断"}</b><span>结算 🌸 ${coins}（走过 ${run46.path.length} 个节点${run46.abyss?` · 深渊夜 ${run46.abyss}`:""}）${notes.map(n=>`<br>${htmlEscape(n)}`).join("")}</span>`;save.run46=null;persist();run46=null;}
       else{html+=`<b>节点完成 · 💠 +${out.shards}</b><span>${out.nextLayer?`第 ${out.nextLayer} 层开启`:"构筑与生命已保留"}</span>`;if(out.relicOffer&&out.relicOffer.length)runModal46={kind:"relic",offer:out.relicOffer,title:nd.type==="boss"?"层主遗物":"精英遗物"};runPersist46();}
       html+=`<button class="primary" id="runCont46">${run46?"继续夜行 ▶":"返回大厅"}</button></div>`;
       let box=$("#runRes46");if(!box){box=document.createElement("div");box.id="runRes46";($("#levelStars46")||$("#rtitle")).after(box);}box.innerHTML=html;
@@ -15385,7 +15535,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   };
   document.addEventListener("click",e=>{
     if(e.target.closest("#runCont46")){$("#result").classList.remove("run46");$("#runRes46")?.remove();runNode46=null;backMenu();if(run46)openRun46();}
-    else if(e.target.closest("#runBtn46")){if(runLoad46())openRun46();else startRun46();}
+    else if(e.target.closest("#runBtn46")){if(runLoad46())openRun46();else openNight46();}
   });
   /* —— 衣橱（外观商店）：形态华彩 / 形态传说 / 武器外观 / 特效包。只卖外观，不卖形态、不卖数值。 —— */
   let wdTab46="prism";
@@ -15409,6 +15559,23 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     const r=W.buy(w,save,id);if(!r.ok){toast(r.why);return r;}sound?.("loot");toast(`收藏：${q.n}`);persist();refreshLook46();openWardrobe46();return r;}
   document.addEventListener("click",e=>{const t=e.target.closest("[data-wd],[data-wdt],[data-wdx],#wdBtn46");if(!t)return;
     if(t.id==="wdBtn46")openWardrobe46();else if(t.dataset.wdx!==undefined)$("#wd46")?.classList.add("hidden");else if(t.dataset.wdt)openWardrobe46(t.dataset.wdt);else wardrobeAct46(t.dataset.wd);});
+  /* 夜行入口：常夜 / 深渊夜 N / 每日挑战 + 赛季「百夜行纪」进度与领取 */
+  let nightAbyss46=0;
+  function seasonClaim46(){const S=window.SakurayoSeason,s=season46();if(!S||!s)return null;const r=S.claim(s,save);if(r.coins||r.titles.length){toast(`百夜行纪 · 🌸 +${r.coins}${r.titles.length?" · 称号「"+r.titles.join("」「")+"」":""}`);persist();}return r;}
+  function openNight46(){
+    const S=window.SakurayoSeason,s=season46();if(!S||!s){startRun46();return false;}
+    nightAbyss46=Math.min(nightAbyss46,s.abyssMax);const D=S.daily(),done=S.dailyDone(s),lv=S.level(s),ab=S.abyss(nightAbyss46),CHN={sayo:"月城小夜",aya:"神代绫",rion:"黑羽凛音"};
+    let el=$("#night46");if(!el){el=document.createElement("div");el.id="night46";document.body.appendChild(el);}
+    el.innerHTML=`<div class="box"><header><b>夜行</b><button class="x" data-nx>✕</button></header>
+      <div class="cards"><div class="nc"><small>常夜 / 深渊夜</small><div class="ab"><button data-na="-1" ${nightAbyss46<=0?"disabled":""}>◀</button><b>${ab.label}</b><button data-na="1" ${nightAbyss46>=s.abyssMax?"disabled":""}>▶</button></div>
+        <p>${nightAbyss46?`敌人生命 ×${ab.hp.toFixed(2)} · 结算樱花币 ×${ab.coins.toFixed(2)}`:"标准难度。通关解锁深渊夜 1。"}<br>已解锁至 深渊夜 ${s.abyssMax}</p><button class="go" data-ngo>出发（${htmlEscape(CHN[save.character||"sayo"]||"")}）</button></div>
+      <div class="nc daily"><small>每日挑战 · ${new Date().toLocaleDateString()}</small><b>${CHN[D.character]} · ${htmlEscape(D.mod.n)}</b><p>${htmlEscape(D.mod.d)}<br>固定地图 · 深渊夜 ${D.abyss} · 到达第 2 层即得 🌸 ${D.reward}</p><button class="go" data-ndaily ${done?"disabled":""}>${done?"今日已完成":"挑战"}</button></div>
+      <div class="nc season"><small>百夜行纪 · 第 ${s.season} 期</small><b>Lv ${lv} / ${S.LV_MAX}</b><div class="bar"><i style="width:${lv>=S.LV_MAX?100:(s.xp%S.XP_PER)}%"></i></div><p>节点、Boss、玩法节点与通关都会累积行纪经验。奖励只有樱花币与称号。${s.titles.length?`<br>称号：${s.titles.map(htmlEscape).join(" · ")}`:""}</p><button class="go" data-nclaim ${s.claimed>=lv?"disabled":""}>${s.claimed>=lv?"暂无可领取":`领取 ${lv-s.claimed} 级奖励`}</button></div></div></div>`;
+    el.classList.remove("hidden");return true;}
+  document.addEventListener("click",e=>{const t=e.target.closest("#night46 [data-nx],#night46 [data-na],#night46 [data-ngo],#night46 [data-ndaily],#night46 [data-nclaim]");if(!t)return;const el=$("#night46");
+    if(t.dataset.nx!==undefined)el.classList.add("hidden");else if(t.dataset.na){nightAbyss46=Math.max(0,nightAbyss46+Number(t.dataset.na));openNight46();}
+    else if(t.dataset.ngo!==undefined){el.classList.add("hidden");startRun46(undefined,{abyss:nightAbyss46});}else if(t.dataset.ndaily!==undefined){el.classList.add("hidden");startRun46(0,{daily:true});}else if(t.dataset.nclaim!==undefined){seasonClaim46();openNight46();}});
+  style37.textContent+=`#night46{position:fixed;inset:0;z-index:130;background:#08050fcc;display:grid;place-items:center;padding:12px}#night46.hidden{display:none}#night46 .box{width:min(980px,100%);max-height:100%;overflow:auto;background:#1a1228;border:1px solid #ffffff22;border-radius:16px;padding:12px 16px}#night46 header{display:flex}#night46 header b{flex:1;font-size:20px}#night46 .x{background:none;border:0;color:#fff;font-size:20px}#night46 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:8px}#night46 .nc{background:#251a38;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;border:1px solid #ffffff18}#night46 .nc small{color:#c9b8e8}#night46 .nc b{font-size:17px}#night46 .nc p{font-size:12px;color:#d8cdea;flex:1;margin:0}#night46 .ab{display:flex;align-items:center;gap:10px}#night46 .ab button{width:34px;height:30px;border-radius:8px;border:0;background:#3a2c55;color:#fff}#night46 .go{padding:9px;border-radius:10px;border:0;background:linear-gradient(135deg,#6a3cff,#ff5fae);color:#fff;font-weight:bold}#night46 .go:disabled{background:#4a3c60;color:#bba}#night46 .daily{border-color:#ffd76a55}#night46 .bar{height:8px;background:#ffffff22;border-radius:4px;overflow:hidden}#night46 .bar i{display:block;height:100%;background:#ffd76a}`;
   function paintRunBtn46(){modeRow46();const b=$("#runBtn46");if(!b)return;const r=runLoad46();b.innerHTML=r?`<b>继续夜行</b><small>第 ${r.layer} 层 · 💠 ${r.shards}</small>`:`<b>夜行 · 肉鸽</b><small>三层地图 · 构筑跨节点</small>`;}
   (function(){const b=document.createElement("button");b.className="levelMapBtn46 runBtn46";b.id="runBtn46";b.type="button";modeRow46().prepend(b);paintRunBtn46();})();
   (function(){const b=document.createElement("button");b.className="levelMapBtn46 wdBtn46";b.id="wdBtn46";b.type="button";b.innerHTML="<b>衣橱</b><small>华彩 · 传说 · 武器 · 特效</small>";modeRow46().append(b);})();
@@ -15626,6 +15793,13 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       skyStep46(sec=1,dt=1/60){const SH=modeCur46(),g=SH?.current();if(!g)return null;for(let t=0;t<sec&&!g.done;t+=dt){if(SH===window.SakurayoPinball&&g.canShoot()&&!g.done)window.SakurayoPinball.autoTurn(g);SH.step(dt);}return g.snapshot();},
       skyClose46(){const ok=document.querySelector("#shm46 .res .ok,#pin46 .res .ok,#duel46 .res .ok");if(ok){ok.click();return true;}return false;},
       openWardrobe46(tab){return openWardrobe46(tab);},
+      openNight46(){return openNight46();},
+      seasonState46(){const s=season46();return s?JSON.parse(JSON.stringify(Object.assign({},s,{level:window.SakurayoSeason.level(s),daily:window.SakurayoSeason.daily(),coins:save.coins}))):null;},
+      seasonClaim46(){return seasonClaim46();},
+      seasonXp46(kind,n=1){let g=0;for(let i=0;i<n;i++)g+=seasonXp46(kind);persist();return g;},
+      abyssStart46(n,seed=4242){const s=season46();if(!window.SakurayoSeason.canAbyss(s,n))return null;startRun46(seed,{abyss:n});return {abyss:run46.abyss};},
+      dailyStart46(){startRun46(0,{daily:true});return {daily:run46.daily,character:save.character};},
+      abyssMul46(){return abyssMul46();},
       wardrobeAct46(id){return wardrobeAct46(id);},
       wardrobeState46(){const w=wardrobe46();return w?JSON.parse(JSON.stringify(Object.assign({},w,{coins:save.coins,look:refreshLook46(P.form46?.id)}))):null;},
       kyoGain46(type){return kyoGain46(type);},
