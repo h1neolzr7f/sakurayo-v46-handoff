@@ -156,6 +156,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 <script src="runtime/sakurayo-services.js"></script>
 <script src="runtime/sakurayo-ui.js"></script>
 <script src="runtime/sakurayo-sfx.js"></script>
+<script src="runtime/sakurayo-feel.js"></script>
+<script src="runtime/sakurayo-props.js"></script>
+<script src="runtime/sakurayo-hud.js"></script>
 <script src="runtime/sakurayo-bgm.js"></script>
 <script src="runtime/sakurayo-trials.js"></script>
 <script src="runtime/sakurayo-lobby.js"></script>
@@ -2240,7 +2243,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     } catch (err) {}
   }
   function resize() {
-    D = Math.min(2, devicePixelRatio || 1);
+    D = Math.min(adaptiveQuality48 >= 1 ? 2.5 : 2, devicePixelRatio || 1);
     const view = viewportSize46();
     const prev = window.SakurayoCamera ? window.SakurayoCamera.size() : null;
     W = view.w;
@@ -2709,6 +2712,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     gems = [];
     parts = [];
     texts = [];
+    props46 = null;
     slashes = [];
     pets = [];
     runTime = 0;
@@ -2786,7 +2790,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const pay44 = window.SakurayoEconomy
       ? window.SakurayoEconomy.rewardParts(P.kills, P.level, P.eliteKills, win, stage().reward, save.done.includes(selected))
       : null;
-    let reward = pay44 ? pay44.total : Math.floor(P.kills*.32 + P.level*3 + P.eliteKills*4) + (win ? stage().reward : 0);
+    let reward = (pay44 ? pay44.total : Math.floor(P.kills*.32 + P.level*3 + P.eliteKills*4) + (win ? stage().reward : 0)) + (P.chestCoins46 || 0);
     save.coins += reward;
     if (win) { save.bosses++; if(!save.done.includes(selected))save.done.push(selected); save.unlock=Math.max(save.unlock,Math.min(ST.length,selected+1)); if(!save.story.includes(stage().story))save.story.push(stage().story); }
     if(P.form&&!save.forms.includes(P.form))save.forms.push(P.form);
@@ -3610,6 +3614,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }
     return best;
   }
+  // Auto-aim: nearest enemy, but lock onto a boss in range unless trash is already in the player's face.
+  function aimTarget46(range){const near=nearest(P.x,P.y,range);if(!boss||boss.dead||near===boss)return near;const bd=Math.hypot(boss.x-P.x,boss.y-P.y);if(bd>range)return near;if(near&&Math.hypot(near.x-P.x,near.y-P.y)<110)return near;return boss;}
   // Assigned once below (directional gun/blade shoot); gunWard/star/idolGun/encore live in gunShot36.
   let shoot;
   function pushBullet(b) {
@@ -3696,6 +3702,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       (P.damageSources[opt.source || "shot"] || 0) + damage;
     e.hp -= damage;
     e.hit = 0.1;
+    if (globalThis.SakurayoFeel && !opt.depth) globalThis.SakurayoFeel.knock(e, P.x, P.y, damage, crit, opt.source);
+    if (crit && opt.source === "blade") requestHitStop46("crit");
     if (!["acid","spore"].includes(opt.source)) sound(crit ? "crit" : "hit");
     if (quality >= 0.7 && (e.fxHit44 || 0) < runTime) {
       e.fxHit44 = runTime + 0.09;
@@ -3780,6 +3788,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (e.dead) return;
     e.dead = true;
     P.kills++;
+    P.ult46 = Math.min(100, (P.ult46 || 0) + (e.elite ? 6 : 1.2));
     P.killsByType[e.type]=(P.killsByType[e.type]||0)+1;
     P.combo++;
     P.comboClock = 2.5;
@@ -3873,7 +3882,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if(P.soul){P.soulMeter+=1+(e.elite?2:0);if(P.soulMeter>=P.soulNeed){P.soulMeter=0;aoe(e.x,e.y,115+P.soul*10,P.dmg*(1.05+P.soul*.22)*P.spellPow,"#85c8ff",false,{source:"soul",school:"necro"});toast("魂潮爆发");}}
     if(P.deathBloom&&e.infected>0){aoe(e.x,e.y,48+P.deathBloom*8,P.dmg*.32*P.deathBloom,"#e58cff",false,{source:"spore",school:"spore"});P.hp=Math.min(P.maxHp,P.hp+1.5*P.deathBloom*healingMul());}
     if(P.necroSpore&&e.infected>0){P.soulMeter+=2;for(const n of grid.within(e.x,e.y,100))n.infected=Math.max(n.infected,1.4);}
-    if(e.elite||e.type==="boss"){sound("eliteKill");shake=Math.max(shake,e.type==="boss"?12:6);haptic37?.(e.type==="boss"?40:18);}else sound("kill");
+    if(e.elite||e.type==="boss"){sound("eliteKill");requestHitStop46(e.type==="boss"?"boss":"elite");shake=Math.max(shake,e.type==="boss"?12:6);haptic37?.(e.type==="boss"?40:18);}else sound("kill");
   }
   function damagePlayer(amt) {
     if (P.inv > 0) return false;
@@ -3999,6 +4008,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     let dx = joy.dx || P.fx,
       dy = joy.dy || P.fy,
       l = Math.hypot(dx, dy) || 1;
+    P.trail46 = { x0: P.x, y0: P.y, t: 0.3 };
     if (window.SakurayoCamera) {
       const next = window.SakurayoCamera.clampPlayer(P.x + (dx / l) * 96, P.y + (dy / l) * 96, PLAYER_GEOMETRY35);
       P.x = next.x;
@@ -4159,6 +4169,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       if (rec) {
         b.style.borderColor = u.fusion ? "#ffcc70aa" : "#72efff99";
         desc += `<br><strong style="color:${u.fusion ? "#ffd36b" : "#72efff"}">推荐：${rec}</strong>`;
+        b.dataset.rec = "1";
       }
       b.style.borderLeft = `5px solid ${special ? u.c : SCHOOL[u.s]?.c || SCHOOL[u.school]?.c || "#ffb2d4"}`;
       b.innerHTML = `<img src="${iconData(u)}"><div><div class="meta"><span style="color:${special ? u.c : SCHOOL[u.s]?.c || "#fff"}">${school}</span><span class="${u.r}">${u.career?`职业${u.rank}阶`:u.fusion?"唯一融合":u.asc?"唯一飞升":u.r}</span></div><b>${u.n}</b><p>${desc}</p><div class="dots">${special ? "◆ 选择后改变战斗规则" : "●".repeat(Math.min(6, (lv(u.id) || 0) + 1))}</div></div>`;
@@ -4574,8 +4585,82 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 
   /* ================= COMBAT UPDATE ================= */
   function update(dt) { return fixedUpdate(dt); }
+  var props46 = null;
+  // World boundary: a soft mist band instead of a hard cut, tinted per chapter.
+  var EDGE_TINT46 = { 1: "38,10,30", 2: "6,14,34", 3: "16,12,30", 4: "10,10,34" };
+  function drawWorldEdge46() {
+    const size = window.SakurayoCamera?.size(); if (!size || !EDGE_TINT46) return;
+    const tint = EDGE_TINT46[stage()?.id] || "8,6,20", band = 150, w = size.worldW, h = size.worldH;
+    const g = (x0, y0, x1, y1) => { const gr = ctx.createLinearGradient(x0, y0, x1, y1); gr.addColorStop(0, `rgba(${tint},.92)`); gr.addColorStop(1, `rgba(${tint},0)`); return gr; };
+    ctx.save();
+    ctx.fillStyle = g(0, 0, band, 0); ctx.fillRect(0, 0, band, h);
+    ctx.fillStyle = g(w, 0, w - band, 0); ctx.fillRect(w - band, 0, band, h);
+    ctx.fillStyle = g(0, 0, 0, band); ctx.fillRect(0, 0, w, band);
+    ctx.fillStyle = g(0, h, 0, h - band); ctx.fillRect(0, h - band, w, band);
+    ctx.restore();
+  }
+  // Foreground parallax: petals / dust that drift faster than the ground (depth cue).
+  var fore46 = Array.from({ length: 26 }, (_, i) => ({ x: (i * 197) % 1000 / 1000, y: (i * 373) % 1000 / 1000, s: 0.6 + (i % 5) * 0.18, r: (i * 53) % 360 }));
+  function drawForeground46() {
+    if (state !== "play" || quality < 0.62 || !fore46) return;
+    const cam = window.SakurayoCamera?.current(); if (!cam) return;
+    const col = stage()?.id === 2 ? "120,230,255" : stage()?.id === 4 ? "200,210,255" : "255,170,210";
+    ctx.save();
+    for (const p of fore46) {
+      const px = cam.x + ((p.x * cam.viewW * 1.4 - cam.x * 0.35 * p.s + runTime * 18 * p.s) % (cam.viewW * 1.4) + cam.viewW * 1.4) % (cam.viewW * 1.4) - cam.viewW * 0.2;
+      const py = cam.y + ((p.y * cam.viewH * 1.4 - cam.y * 0.35 * p.s + runTime * 26 * p.s) % (cam.viewH * 1.4) + cam.viewH * 1.4) % (cam.viewH * 1.4) - cam.viewH * 0.2;
+      ctx.globalAlpha = 0.18 + p.s * 0.16; ctx.fillStyle = `rgb(${col})`;
+      ctx.beginPath(); ctx.ellipse(px, py, 3.2 * p.s, 1.6 * p.s, (p.r + runTime * 40 * p.s) * Math.PI / 180, 0, TAU); ctx.fill();
+    }
+    ctx.restore();
+  }
+  var propArt46 = kind => { const img = artImage(`props/${kind}.webp`); return artReady(img) ? img : null; };
+  function propsEnabled46() { return !!globalThis.SakurayoProps && !(typeof isMainGodRun36 === "function" && isMainGodRun36()) && runMode36 !== "testimony"; }
+  function updateProps46(dt, moving) {
+    if (!propsEnabled46()) return;
+    if (!props46) {
+      const size = window.SakurayoCamera ? window.SakurayoCamera.size() : { worldW: W, worldH: H };
+      const world = window.SakurayoLifecycle ? lifecycleWorld44() : null;
+      const blocked = world ? (x, y, r) => { const o = window.SakurayoLifecycle.resolvePlayer(x, y, r, world); return o.x !== x || o.y !== y || o.slow < 1; } : null;
+      props46 = globalThis.SakurayoProps.create(stage().id, size.worldW, size.worldH, P.x, P.y, (stage().id * 7919 + (save.runs || 0)) >>> 0, blocked);
+    }
+    globalThis.SakurayoProps.update(props46, P, dt, {
+      gems(x, y, n, v) { for (let i = 0; i < n && gems.length < caps().g; i++) gems.push({ x: x + rnd(-16, 16), y: y + rnd(-16, 16), r: 6, v, bob: rnd(0, TAU) }); },
+      heal(f) { P.hp = Math.min(P.maxHp, P.hp + P.maxHp * f * healingMul()); },
+      shield(n) { P.sh = Math.min(P.maxSh || 0, (P.sh || 0) + n); },
+      coins(n) { P.chestCoins46 = (P.chestCoins46 || 0) + n; },
+      fx(kind, x, y) { fxStamp(kind, x, y, { size: kind === "shatter" ? 46 : 60, life: 0.4 }); },
+      toast, sound,
+    }, moving);
+  }
+  var ULT46 = { sayo: ["樱火·终夜齐射", "#ff8fc8"], aya: ["月蚀·千斩", "#9ad8ff"], rion: ["黄泉一閃", "#d6a2ff"] };
+  function castUlt46() {
+    if (state !== "play" || (P.ult46 || 0) < 100) return false;
+    const c = char35(), u = ULT46[c.id] || ULT46.sayo;
+    P.ult46 = 0; P.inv = Math.max(P.inv, 1.1); slowmo46 = Math.max(slowmo46, 0.55);
+    globalThis.SakurayoHud?.cutIn(artUrl(`characters/${c.id}/default/lobby_idle.webp`), u[0], c.short || c.name || "");
+    aoe(P.x, P.y, 290, P.dmg * 10 * (P.skillPow || 1), u[1], true, { source: "skill", school: "shrine" });
+    fxStamp("skill", P.x, P.y, { size: 300, life: 0.7 });
+    shake = Math.max(shake, 14); sound("skill"); haptic37?.(40);
+    return true;
+  }
+  window.SakurayoBattle46 = {
+    attack() { if (state === "play" && P.fire > 0 && P.fire < (P.rate || 0.5) * 0.5) P.fire = 0; },
+    ult: castUlt46,
+    state() { return { playing: state === "play", ult: P.ult46 || 0 }; },
+    minimap() {
+      const cam = window.SakurayoCamera?.current(), size = window.SakurayoCamera?.size() || { worldW: W, worldH: H };
+      return { worldW: size.worldW, worldH: size.worldH, cam: cam ? { x: cam.x, y: cam.y, w: cam.viewW, h: cam.viewH } : { x: 0, y: 0, w: W, h: H },
+        player: { x: P.x, y: P.y }, boss: boss && !boss.dead ? { x: boss.x, y: boss.y } : null,
+        elites: enemies.filter(e => e.elite && e.type !== "boss" && !e.dead).slice(0, 12).map(e => ({ x: e.x, y: e.y })),
+        chests: (props46 || []).filter(p => p.kind === "chest" && !p.done), shrines: (props46 || []).filter(p => p.kind === "shrine" && !p.done) };
+    },
+  };
   function fixedUpdate(dt) {
     if (state !== "play") return;
+    if (P.hitStop46 > 0) { P.hitStop46 -= dt; return; }
+    P.ult46 = Math.min(100, (P.ult46 || 0) + dt * 1.4);
+    if (P.trail46) { P.trail46.t -= dt; if (P.trail46.t <= 0) P.trail46 = null; }
     runTime += dt;
     banterTick += dt;
     playBanter();
@@ -4617,17 +4702,19 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     let mx =
         (keys["d"] || keys["arrowright"] ? 1 : 0) -
         (keys["a"] || keys["arrowleft"] ? 1 : 0) +
-        joy.dx,
+        (joy.mx || 0),
       my =
         (keys["s"] || keys["arrowdown"] ? 1 : 0) -
         (keys["w"] || keys["arrowup"] ? 1 : 0) +
-        joy.dy,
+        (joy.my || 0),
       l = Math.hypot(mx, my);
+    if (l > 1) { mx /= l; my /= l; }
+    // smoothed velocity: quick acceleration, faster stop, snappy reversals
+    if (globalThis.SakurayoFeel) { globalThis.SakurayoFeel.steer(P.vel46 || (P.vel46 = { x: 0, y: 0 }), mx, my, dt); mx = P.vel46.x; my = P.vel46.y; }
     if (l) {
-      mx /= l;
-      my /= l;
-      P.moveX=mx;P.moveY=my;
-      if(!P.manualAim&&(P.weaponLock||0)<=0){P.fx=mx;P.fy=my;P.weaponAngle=Math.atan2(my,mx);}
+      const aim = Math.hypot(mx, my) || 1;
+      P.moveX=mx/aim;P.moveY=my/aim;
+      if(!P.manualAim&&(P.weaponLock||0)<=0){P.fx=P.moveX;P.fy=P.moveY;P.weaponAngle=Math.atan2(P.fy,P.fx);}
     }
     P.weaponLock=Math.max(0,(P.weaponLock||0)-dt);
     let ground44 = window.SakurayoLifecycle ? window.SakurayoLifecycle.resolvePlayer(P.x, P.y, P.r, lifecycleWorld44()) : {x:P.x,y:P.y,slow:1,melee:1};
@@ -4646,6 +4733,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }
     if (window.SakurayoLifecycle) {
       ground44 = window.SakurayoLifecycle.resolvePlayer(P.x, P.y, P.r, lifecycleWorld44());
+      if (typeof updateProps46 === "function") updateProps46(dt, l > 0);
       P.x = ground44.x;
       P.y = ground44.y;
       P.groundMelee44 = ground44.melee || 1;
@@ -4654,7 +4742,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       const held = window.SakurayoCamera.clampPlayer(P.x, P.y, PLAYER_GEOMETRY35);
       P.x = held.x;
       P.y = held.y;
-      window.SakurayoCamera.follow(P.x, P.y, dt);
+      const lead = P.vel46 ? 0.11 * Math.min(W, 900) : 0;
+      window.SakurayoCamera.follow(P.x + (P.vel46?.x || 0) * lead, P.y + (P.vel46?.y || 0) * lead * 0.6, dt);
     }
     if (P.fire <= 0) shoot();
     if (state !== "play") return;
@@ -4999,6 +5088,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         e.x += Math.cos(a) * spd * dt;
         e.y += Math.sin(a) * spd * dt;
       }
+      if (globalThis.SakurayoFeel) globalThis.SakurayoFeel.applyKnock(e, dt);
       if (e.type === "disruptor" && dist < 185) P.jam = Math.max(P.jam, 0.25);
       if (e.type === "purifier") e.cleanse -= dt;
       e.shot -= dt;
@@ -5283,6 +5373,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       const world = lifecycleWorld44();
       window.SakurayoLifecycle.drawGround(ctx, world);
       window.SakurayoLifecycle.drawObstacles(ctx, world);
+      if (props46 && globalThis.SakurayoProps) globalThis.SakurayoProps.draw(ctx, props46, runTime, propArt46, window.SakurayoCamera?.current());
+      drawWorldEdge46(world);
       return;
     }
     let pal = [
@@ -5433,7 +5525,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     ctx.fillRect(27, -2, 12, 5);
     ctx.restore();
   }
-  const drawStats46 = { enemies: 0, boss: 0, frames: 0 };
+  var drawStats46 = { enemies: 0, boss: 0, frames: 0 };
+  function requestHitStop46(kind) { if (TEST_MODE && !window.__SAKURAYO_FEEL_TEST__) return; const t = globalThis.SakurayoFeel?.stopFor(kind) || 0; if (t > (P.hitStop46 || 0)) P.hitStop46 = Math.min(0.08, t); }
   function enemyDraw(e) {
     ctx.save();
     ctx.translate(e.x, e.y);
@@ -5627,7 +5720,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }
     bullets.forEach((b) => projectile(b));
     ebullets.forEach((b) => projectile(b, true));
-    drawStats46.enemies = 0; drawStats46.boss = 0; drawStats46.frames++;
+    if (drawStats46) { drawStats46.enemies = 0; drawStats46.boss = 0; drawStats46.frames++; }
     enemies.forEach(enemyDraw);
     if (P.orbit)
       for (let i = 0; i < P.orbit; i++) {
@@ -5689,10 +5782,25 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     window.SakurayoCommand?.refreshEffects();
   }
 
+  var slowmo46 = 0;
+  var pad46 = { dash: false, skill: false };
+  // Gamepad: left stick moves (with the same dead zone as touch), right stick aims, A = dash, B/X = skill.
+  function pollPad46() {
+    const nav = globalThis.navigator, pads = nav?.getGamepads ? [...nav.getGamepads()].filter(Boolean) : [];
+    const g = pads[0]; if (!g) return;
+    if (!joy.on) { const st = globalThis.SakurayoFeel ? globalThis.SakurayoFeel.stick(g.axes[0] || 0, g.axes[1] || 0) : { x: g.axes[0] || 0, y: g.axes[1] || 0 }; joy.mx = st.x; joy.my = st.y; joy.dx = st.x; joy.dy = st.y; }
+    const ax = g.axes[2] || 0, ay = g.axes[3] || 0;
+    if (Math.hypot(ax, ay) > 0.35 && typeof setAimVector36 === "function") setAimVector36(ax, ay, true); else if (aim46.id === null && P.manualAim && pads.length) P.manualAim = false;
+    const a = !!g.buttons[0]?.pressed, b = !!(g.buttons[1]?.pressed || g.buttons[2]?.pressed);
+    if (a && !pad46.dash) dash(); if (b && !pad46.skill) $("#skill")?.click();
+    pad46.dash = a; pad46.skill = b;
+  }
   function loop(now) {
     if (state !== "play") return;
     let frame = Math.min(0.08, (now - last) / 1000 || 0);
     last = now;
+    if (slowmo46 > 0) { slowmo46 = Math.max(0, slowmo46 - frame); frame *= 0.35; }
+    pollPad46();
     fpsFrames++;
     fpsClock += frame;
     if (fpsClock >= 1) {
@@ -5780,7 +5888,25 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     o.start(n);
     o.stop(n + v[1]);
   }
+  var aim46 = { id: null, sx: 0, sy: 0 };
+  function aimDown46(e) {
+    if (state !== "play" || aim46.id !== null || e.clientX < innerWidth * 0.5) return false;
+    if (e.target.closest?.(".act") || e.target.closest?.("#opsDock46") || e.target === $("#pause") || e.target.closest?.("button")) return false;
+    aim46.id = e.pointerId; aim46.sx = e.clientX; aim46.sy = e.clientY; return true;
+  }
+  function aimMove46(e) {
+    if (e.pointerId !== aim46.id) return;
+    const dx = e.clientX - aim46.sx, dy = e.clientY - aim46.sy;
+    if (Math.hypot(dx, dy) > 14 && typeof setAimVector36 === "function") setAimVector36(dx, dy, true);
+  }
+  function aimUp46(e) {
+    if (e.pointerId !== aim46.id) return;
+    aim46.id = null; P.manualAim = false;
+  }
+  addEventListener("pointermove", aimMove46, { passive: true });
+  addEventListener("pointerup", aimUp46); addEventListener("pointercancel", aimUp46);
   function down(e) {
+    if (typeof aimDown46 === "function" && aimDown46(e)) return;
     if (
       state !== "play" || joy.on ||
       e.target.closest(".act") ||
@@ -5810,6 +5936,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }
     joy.dx = dx / max;
     joy.dy = dy / max;
+    const shaped = globalThis.SakurayoFeel ? globalThis.SakurayoFeel.stick(joy.dx, joy.dy) : { x: joy.dx, y: joy.dy };
+    joy.mx = shaped.x; joy.my = shaped.y;
     $("#stick").style.transform = `translate(${dx}px,${dy}px)`;
   }
   function up(e) {
@@ -5817,6 +5945,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     joy.on = 0;
     joy.id = null;
     joy.dx = joy.dy = 0;
+    joy.mx = joy.my = 0;
     $("#stick").style.transform = "";
     let j = $("#joy");
     j.style.left = "23px";
@@ -5827,7 +5956,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     for (const key of Object.keys(keys)) delete keys[key];
     for (const key of Object.keys(exploreKeys41)) delete exploreKeys41[key];
     if (joy.id !== null) up({pointerId: joy.id});
-    joy.on = false; joy.id = null; joy.dx = joy.dy = 0;
+    joy.on = false; joy.id = null; joy.dx = joy.dy = 0; joy.mx = joy.my = 0;
     const pad = $("#explorePad41"), pointer = explorePointer41;
     explorePointer41 = null;
     if (pad && pointer !== null && pad.hasPointerCapture(pointer)) pad.releasePointerCapture(pointer);
@@ -6291,7 +6420,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if(c.id==="aya"&&P.shotCount%4===0)directionalSlash36(125,P.dmg*2.05+P.pierce*2,false,angle,1.02);
     P.fire=P.rate*(P.encoreTimer>0?.62:1);P.animAttack=.16;sound(c.id==="sayo"?"rifle":"pistol");
   }
-  shoot=function(){const c=char35(),target=P.manualAim?null:nearest(P.x,P.y,P.range);let angle=P.manualAim?(P.weaponAngle||0):(target?Math.atan2(target.y-P.y,target.x-P.x):null);if(c.id!=="rion"){if(angle==null)return;return gunShot36(angle,c);}if(angle==null){const e=nearest(P.x,P.y,176+55);if(!e)return;angle=Math.atan2(e.y-P.y,e.x-P.x);}P.fx=P.aimX=Math.cos(angle);P.fy=P.aimY=Math.sin(angle);P.weaponAngle=angle;P.weaponLock=.28;const next=(P.meleeChain+1)%3,third=next===0,radius=third?176:128,dmg=P.dmg*(third?2.35:1.48)*(1+(P.multi-1)*.12+P.pierce*.05);P.meleeChain=next;directionalSlash36(radius,dmg,third,angle,third?1.66:1.05);if(third){P.hp=Math.min(P.maxHp,P.hp+1.2*healingMul());toast("剑势·三段");}P.fire=P.rate;P.animAttack=.2;sound("slash");};
+  shoot=function(){const c=char35(),target=P.manualAim?null:aimTarget46(P.range);let angle=P.manualAim?(P.weaponAngle||0):(target?Math.atan2(target.y-P.y,target.x-P.x):null);if(c.id!=="rion"){if(angle==null)return;return gunShot36(angle,c);}if(angle==null){const e=nearest(P.x,P.y,176+55);if(!e)return;angle=Math.atan2(e.y-P.y,e.x-P.x);}P.fx=P.aimX=Math.cos(angle);P.fy=P.aimY=Math.sin(angle);P.weaponAngle=angle;P.weaponLock=.28;const next=(P.meleeChain+1)%3,third=next===0,radius=third?176:128,dmg=P.dmg*(third?2.35:1.48)*(1+(P.multi-1)*.12+P.pierce*.05);P.meleeChain=next;directionalSlash36(radius,dmg,third,angle,third?1.66:1.05);if(third){P.hp=Math.min(P.maxHp,P.hp+1.2*healingMul());toast("剑势·三段");}P.fire=P.rate;P.animAttack=.2;sound("slash");};
 
   function drawWeapon36(x,y){const c=char35(),a=P.weaponAngle??Math.atan2(P.fy,P.fx);ctx.save();ctx.translate(x,y-18);ctx.rotate(a);ctx.lineCap="round";if(c.id==="sayo"||c.id==="aya"){const long=c.id==="sayo",len=long?42:29;ctx.fillStyle="#1a2540";ctx.strokeStyle=long?"#65e7ff":"#83b7ff";ctx.lineWidth=1.5;ctx.beginPath();if(typeof ctx.roundRect==="function")ctx.roundRect(5,-5,len,10,3);else ctx.rect(5,-5,len,10);ctx.fill();ctx.stroke();ctx.fillStyle=long?"#dff8ff":"#edf4ff";ctx.fillRect(10,-3,long?23:14,6);ctx.fillStyle=long?"#55e7ff":"#78adff";ctx.fillRect(long?33:24,-2,long?16:10,4);ctx.fillStyle="#10172b";ctx.fillRect(12,5,7,7);if(P.animAttack>0){ctx.fillStyle="#fff5b7";ctx.beginPath();ctx.arc(long?52:37,0,4+P.animAttack*12,0,TAU);ctx.fill();}if(c.id==="aya"){ctx.strokeStyle="#eaf5ff";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-12,14);ctx.lineTo(32,-24);ctx.stroke();ctx.strokeStyle="#6f9fff";ctx.lineWidth=1.4;ctx.stroke();}}else{ctx.strokeStyle="#fff5f6";ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(-10,10);ctx.lineTo(46,-10);ctx.stroke();ctx.strokeStyle="#ff526f";ctx.lineWidth=2;ctx.stroke();}ctx.restore();}
   const _drawChar36=drawChar35;drawChar35=function(x,y){_drawChar36(x,y);if(!artReady(charAnimImage35(char35(),charDrawPose35(),skin35())))drawWeapon36(x,y);};hero=drawChar35;
@@ -6306,7 +6435,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     ctx.restore();
   }
   const _drawIdentifiedChar411=drawChar35;
-  drawChar35=function(x,y){drawPlayerLocator411(x,y);ctx.save();ctx.shadowColor="#ffffff";ctx.shadowBlur=4*battleGlow421(false);_drawIdentifiedChar411(x,y);ctx.restore();};
+  drawChar35=function(x,y){const tr=P.trail46;if(tr&&tr.t>0&&quality>=.5){for(let i=1;i<=4;i++){const k=i/5;ctx.save();ctx.globalAlpha=Math.min(1,tr.t/.3)*.34*(1-k*.45);ctx.globalCompositeOperation="lighter";_drawIdentifiedChar411(tr.x0+(x-tr.x0)*k,tr.y0+(y-tr.y0)*k);ctx.restore();}}drawPlayerLocator411(x,y);ctx.save();ctx.shadowColor="#ffffff";ctx.shadowBlur=4*battleGlow421(false);_drawIdentifiedChar411(x,y);ctx.restore();};
   hero=drawChar35;
 
   const CHARACTER_EGGS36={
@@ -6461,7 +6590,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function combatArtPath38(e){if(e.type==="boss"){if(isMainGodRun36())return `content-packs/maingod-void/bosses/void_phase${clamp(e.phase||1,1,4)}.webp`;return `bosses/stage${clamp(stage().id,1,4)}_phase${clamp(e.phase||1,1,4)}.webp`;}if(VOID_ART45.includes(e.type))return `content-packs/maingod-void/enemies/${e.type}.webp`;return `enemies/${e.elite?"elite":ENEMY_ART38.includes(e.type)?e.type:"normal"}.webp`;}
   function drawEnemyOverlay38(e){if(e.elite){ctx.strokeStyle="#ffd36b";ctx.lineWidth=3;ctx.shadowBlur=10*battleGlow421(false);ctx.shadowColor="#ffb24e";ctx.beginPath();ctx.arc(0,0,e.r+7,0,TAU);ctx.stroke();ctx.shadowBlur=0;}if(e.infected>0){ctx.strokeStyle="#8dff72";ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,e.r+4,0,TAU);ctx.stroke();}const marks={shield:"盾",disruptor:"扰",purifier:"净",specter:"灵",decay:"腐",seal:"封"};if(marks[e.type]){ctx.font=`900 ${Math.max(10,e.r*.55)}px system-ui`;ctx.textAlign="center";ctx.strokeStyle="#130a22";ctx.lineWidth=4;ctx.fillStyle="#fff";ctx.strokeText(marks[e.type],0,-e.r-15);ctx.fillText(marks[e.type],0,-e.r-15);}if(e.hp<e.max||e.type==="boss"){const width=e.r*2.25,ratio=clamp(e.hp/Math.max(1,e.max),0,1);ctx.fillStyle="#07050bcc";ctx.fillRect(-width/2,-e.r-10,width,5);ctx.fillStyle=e.type==="boss"?"#ff57ad":e.elite?"#ffd36b":"#69e89a";ctx.fillRect(-width/2,-e.r-10,width*ratio,5);}}
   const _enemyFallback38=enemyDraw;
-  enemyDraw=function(e){const crowd=enemies.length,screenScale=clamp(Math.sqrt(Math.max(1,W*H)/(430*932)),.82,1),crowdScale=e.type==="boss"?1:crowd>74?.66:crowd>56?.78:1,margin=e.type==="boss"?150:85;if(window.SakurayoCamera?!window.SakurayoCamera.contains(e.x,e.y,margin):(e.x<-margin||e.x>W+margin||e.y<-margin||e.y>H+margin))return;drawStats46.enemies++;if(e.type==="boss")drawStats46.boss++;const path=combatArtPath38(e);let image=path?artImage(path):null;if(e.type!=="boss"){if(VOID_ART45.includes(e.type)){const extra=artImage(`content-packs/maingod-void/enemies/${e.type}_b.webp`);if(artReady(extra)&&(Math.floor((runTime||0)*5+(e.x||0)*.02)%2))image=extra;}else{const id=e.elite?"elite":ENEMY_ART38.includes(e.type)?e.type:"normal";if(ENEMY_EXTRA38[id]){const extra=artImage(`enemies/${id}_b.webp`);if(artReady(extra)&&(Math.floor((runTime||0)*5+(e.x||0)*.02)%2))image=extra;}}}if(!artReady(image)){_enemyFallback38(e);return;}ctx.save();ctx.translate(e.x,e.y);if(e.hit)ctx.globalAlpha=.62;ctx.fillStyle="#0007";ctx.beginPath();ctx.ellipse(0,e.r*.78,e.r*1.12,e.r*.35,0,0,TAU);ctx.fill();const size=(e.type==="boss"?e.r*3.35:e.r*(e.type==="tank"?3.7:3.45))*screenScale*crowdScale,bob=e.type==="fast"?Math.sin(runTime*12)*2:Math.sin(runTime*4+e.x*.01)*1.2;drawEnemySilhouette412(e,size);drawBossSprite412(e,image,size,bob);drawEnemyOverlay38(e);ctx.restore();};
+  enemyDraw=function(e){const crowd=enemies.length,screenScale=clamp(Math.sqrt(Math.max(1,W*H)/(430*932)),.82,1),crowdScale=e.type==="boss"?1:crowd>74?.66:crowd>56?.78:1,margin=e.type==="boss"?150:85;if(window.SakurayoCamera?!window.SakurayoCamera.contains(e.x,e.y,margin):(e.x<-margin||e.x>W+margin||e.y<-margin||e.y>H+margin))return;if(drawStats46){drawStats46.enemies++;if(e.type==="boss")drawStats46.boss++;}const path=combatArtPath38(e);let image=path?artImage(path):null;if(e.type!=="boss"){if(VOID_ART45.includes(e.type)){const extra=artImage(`content-packs/maingod-void/enemies/${e.type}_b.webp`);if(artReady(extra)&&(Math.floor((runTime||0)*5+(e.x||0)*.02)%2))image=extra;}else{const id=e.elite?"elite":ENEMY_ART38.includes(e.type)?e.type:"normal";if(ENEMY_EXTRA38[id]){const extra=artImage(`enemies/${id}_b.webp`);if(artReady(extra)&&(Math.floor((runTime||0)*5+(e.x||0)*.02)%2))image=extra;}}}if(!artReady(image)){_enemyFallback38(e);return;}ctx.save();ctx.translate(e.x,e.y);if(e.hit)ctx.globalAlpha=.62;ctx.fillStyle="#0007";ctx.beginPath();ctx.ellipse(0,e.r*.78,e.r*1.12,e.r*.35,0,0,TAU);ctx.fill();const size=(e.type==="boss"?e.r*3.35:e.r*(e.type==="tank"?3.7:3.45))*screenScale*crowdScale,bob=e.type==="fast"?Math.sin(runTime*12)*2:Math.sin(runTime*4+e.x*.01)*1.2;drawEnemySilhouette412(e,size);drawBossSprite412(e,image,size,bob);if(e.hit>0&&quality>=.5){ctx.save();ctx.globalCompositeOperation="lighter";ctx.globalAlpha=Math.min(.75,e.hit*7);drawBossSprite412(e,image,size,bob);ctx.restore();}drawEnemyOverlay38(e);ctx.restore();};
   window.__SAKURAYO_COMBAT_ART__=Object.freeze({paths:()=>[...COMBAT_ART38],status:()=>COMBAT_ART38.map(path=>{const image=ART_CACHE.get(path);return {path,loaded:!!image,ready:artReady(image),width:image?.naturalWidth||0,height:image?.naturalHeight||0};})});
 
   function upgradeDelta38(id){const l=lv(id),map={damage:["伤害",`${Math.round(P.dmg)}`,`${Math.round(P.dmg*1.12)}`],rate:["射速",`${(1/P.rate).toFixed(1)}/秒`,`${(1/(P.rate*.9)).toFixed(1)}/秒`],hp:["生命",`${Math.round(P.maxHp)}`,`${Math.round(P.maxHp+18)}`],speed:["移速",`${Math.round(P.spd)}`,`${Math.round(P.spd*1.08)}`],crit:["暴击",`${Math.round(P.crit*100)}%`,`${Math.round((P.crit+.06)*100)}%`],pierce:["穿透",`${P.pierce}`,`${P.pierce+1}`],multishot:["弹丸",`${P.multi}`,`${P.multi+1}`]};const key=Object.keys(map).find(k=>id.toLowerCase().includes(k));return key?map[key]:["技能等级",`Lv.${l}`,`Lv.${l+1}`];}
@@ -6499,7 +6628,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     return !!(boss&&!boss.dead&&Math.hypot(boss.x-P.x,boss.y-P.y)<P.r+boss.r+72);
   }
   const _dash39=dash;
-  dash=function(){const ready=state==="play"&&P.dash<=0,perfect=ready&&immediateThreat39(),result=_dash39();if(ready&&perfect){P.perfectDodges++;P.dodgeFlash=.42;P.dash=Math.max(0,P.dash-.7);P.sh=Math.min(P.maxSh,P.sh+8);const c=char35();if(c.id==="rion"){directionalSlash36(132,P.dmg*1.45,true,P.weaponAngle||0,1.5);toast("黄泉返：完美格挡反击");}else if(c.id==="aya"){directionalSlash36(105,P.dmg*.88,false,P.weaponAngle||0,1.18);toast("月切：完美闪避追斩");}else{aoe(P.x,P.y,92,P.dmg*.72,"#77efff",true,{source:"skill",school:"shrine"});toast("完美闪避：护盾回充");}haptic37([12,18,26]);}return result;};
+  dash=function(){const ready=state==="play"&&P.dash<=0,perfect=ready&&immediateThreat39(),result=_dash39();if(ready&&perfect){P.perfectDodges++;slowmo46=.5;P.dodgeFlash=.42;P.dash=Math.max(0,P.dash-.7);P.sh=Math.min(P.maxSh,P.sh+8);const c=char35();if(c.id==="rion"){directionalSlash36(132,P.dmg*1.45,true,P.weaponAngle||0,1.5);toast("黄泉返：完美格挡反击");}else if(c.id==="aya"){directionalSlash36(105,P.dmg*.88,false,P.weaponAngle||0,1.18);toast("月切：完美闪避追斩");}else{aoe(P.x,P.y,92,P.dmg*.72,"#77efff",true,{source:"skill",school:"shrine"});toast("完美闪避：护盾回充");}haptic37([12,18,26]);}return result;};
 
   const _slash39=slash35;
   slash35=function(radius,dmg,big=false){const result=_slash39(radius,dmg,big);shake=Math.max(shake,big?7:4);P.dodgeFlash=Math.max(P.dodgeFlash,big?.14:.08);haptic37(big?22:10);return result;};
@@ -6936,7 +7065,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function drawEnemySilhouette412(e,size){
     if(e.type==="boss")return;
     if(e.type==="normal"&&!e.elite)return;
-    if(window.SakurayoLifecycle){window.SakurayoLifecycle.drawRoleSilhouette(ctx,e,size,runTime);return;}const r=e.r,accent={fast:"#72efff",tank:"#f1b06c",ranged:"#c990ff",bomb:"#ff6767",shield:"#74d9ff",disruptor:"#54f1ff",purifier:"#baff83",specter:"#d5b7ff",decay:"#9fdd66",seal:"#ff9ce6"}[e.type]||"#ffd36b";ctx.save();ctx.globalAlpha=.86;ctx.lineWidth=Math.max(3,r*.14);ctx.strokeStyle="#fff";ctx.fillStyle=accent+"bb";const line=(x1,y1,x2,y2)=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();};
+    if(window.SakurayoLifecycle){ctx.save();ctx.translate(0,e.r*.62);ctx.scale(.7,.38);ctx.globalAlpha=.5;window.SakurayoLifecycle.drawRoleSilhouette(ctx,e,size,runTime);ctx.restore();return;}const r=e.r,accent={fast:"#72efff",tank:"#f1b06c",ranged:"#c990ff",bomb:"#ff6767",shield:"#74d9ff",disruptor:"#54f1ff",purifier:"#baff83",specter:"#d5b7ff",decay:"#9fdd66",seal:"#ff9ce6"}[e.type]||"#ffd36b";ctx.save();ctx.globalAlpha=.86;ctx.lineWidth=Math.max(3,r*.14);ctx.strokeStyle="#fff";ctx.fillStyle=accent+"bb";const line=(x1,y1,x2,y2)=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();};
     if(e.type==="fast"){for(const s of [-1,1]){ctx.beginPath();ctx.moveTo(-r*.4,s*r*.15);ctx.lineTo(-r*1.65,s*r*.85);ctx.lineTo(-r*.95,s*r*.08);ctx.closePath();ctx.fill();ctx.stroke();}}
     else if(e.type==="tank"){for(const s of [-1,1]){ctx.fillRect(s*r*.72-r*.42,-r*.75,r*.84,r*.72);ctx.strokeRect(s*r*.72-r*.42,-r*.75,r*.84,r*.72);}}
     else if(e.type==="ranged"){line(-r*1.65,-r*.2,r*1.65,-r*.2);line(r*.55,-r*.55,r*1.65,-r*.2);}
@@ -6965,7 +7094,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   spawnBoss=function(){CONTENT41.runHooks("boss:before-spawn",{stageId:stage().id,mainGod:isMainGodRun36()});const result=CORE_LIFECYCLE42.spawnBoss();CONTENT41.runHooks("boss:after-spawn",{stageId:stage().id,bossPhase:boss?.phase||0});return result;};
   advanceBossPhase=function(e,p){CONTENT41.runHooks("boss:before-phase",{boss:e,currentPhase:e?.phase||0,nextPhase:p,stageId:stage().id});const result=CORE_LIFECYCLE42.advanceBossPhase(e,p);CONTENT41.runHooks("boss:after-phase",{boss:e,bossPhase:e?.phase||p,stageId:stage().id});return result;};
   update=function(dt){const result=CORE_LIFECYCLE42.update(dt);CONTENT41.runHooks("combat:after-update",{dt,state,bossPhase:boss?.phase||0});return result;};
-  draw=function(){CORE_LIFECYCLE42.draw();const after={state,bossPhase:boss?.phase||0,quality};if(window.SakurayoCamera){ctx.save();window.SakurayoCamera.apply(ctx);CONTENT41.runHooks("combat:after-draw",after);ctx.restore();}else CONTENT41.runHooks("combat:after-draw",after);};
+  draw=function(){CORE_LIFECYCLE42.draw();const after={state,bossPhase:boss?.phase||0,quality};if(window.SakurayoCamera){ctx.save();window.SakurayoCamera.apply(ctx);CONTENT41.runHooks("combat:after-draw",after);drawForeground46();ctx.restore();}else CONTENT41.runHooks("combat:after-draw",after);};
 
   function ensureModKitDrawer42(){
     let drawer=$("#modKitDrawer42");if(drawer)return drawer;
@@ -7128,6 +7257,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       triggerUpgrade(){if(state!=="play")throw new Error("triggerUpgrade requires play mode");const multiplier=(1+(P.baitLevel40||0)*.1)*(isMainGodRun36()?(P.lordXp||mainGodTier36().xp):1);gainXp(Math.ceil((P.next-P.xp)/multiplier));return snapshot35();},
       chooseUpgrade(index=0){const choices=[...document.querySelectorAll("#choices .choice")];const choice=choices[Number(index)];if(!choice)throw new Error(`Missing upgrade choice ${index}`);choice.click();return snapshot35();},
       drawStats(){return {...drawStats46};},
+      fieldProbe(n=6){const near=(arr)=>arr.filter(o=>o&&!o.dead).map(o=>({dx:o.x-P.x,dy:o.y-P.y,r:o.r||0,boss:o.type==="boss"})).sort((a,b)=>Math.hypot(a.dx,a.dy)-Math.hypot(b.dx,b.dy)).slice(0,n);const cam=window.SakurayoCamera?.size?.();return {enemies:near(enemies),gems:near(gems),x:P.x,y:P.y,worldW:cam?.worldW||W,worldH:cam?.worldH||H,level:P.level};},
       spawnBossNow(){if(state!=="play")throw new Error("spawnBossNow requires play mode");spawnBoss();return snapshot35();},
       setBossHpRatio(ratio){if(!boss||boss.dead)throw new Error("Boss is not active");boss.hp=clamp(Number(ratio),0,1)*boss.max;return snapshot35();},
       setBossPosition(x,y){if(!boss||boss.dead)throw new Error("Boss is not active");boss.x=Number(x);boss.y=Number(y);draw();return snapshot35();},

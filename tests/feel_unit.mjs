@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs'; import vm from 'node:vm';
+const c = {}; c.globalThis = c; vm.createContext(c); vm.runInContext(fs.readFileSync('src/runtime/sakurayo-feel.js', 'utf8'), c);
+const F = c.SakurayoFeel;
+assert.deepEqual({ ...F.stick(0.1, 0.05) }, { x: 0, y: 0, m: 0 }, 'dead zone swallows jitter');
+const half = F.stick(0.5, 0); assert.ok(half.x > 0.38 && half.x < 1, 'analog magnitude survives');
+assert.ok(Math.abs(F.stick(1, 0).x - 1) < 1e-9, 'full tilt is full speed');
+const v = { x: 0, y: 0 }; F.steer(v, 1, 0, 1 / 60); assert.ok(v.x > 0.2 && v.x < 0.4, 'accelerates over a few frames');
+for (let i = 0; i < 12; i++) F.steer(v, 1, 0, 1 / 60); assert.ok(v.x > 0.95, 'reaches top speed within 0.2s');
+const r = { ...v }; F.steer(r, -1, 0, 1 / 60); const turn = v.x - r.x;
+const f = { ...v }; F.steer(f, 0, 0, 1 / 60); assert.ok(turn > v.x - f.x, 'reversal is snappier than releasing');
+for (let i = 0; i < 30; i++) F.steer(f, 0, 0, 1 / 60); assert.deepEqual({ ...f }, { x: 0, y: 0 }, 'comes to rest');
+const e = { x: 10, y: 0, max: 100 }; F.knock(e, 0, 0, 50, false, 'blade'); assert.ok(e.kbx > 0 && e.kby === 0, 'knocked away from player');
+const b = { x: 10, y: 0, max: 100, type: 'boss' }; F.knock(b, 0, 0, 50, true, 'blade'); assert.equal(b.kbx, undefined, 'boss is immune');
+let moved = 0; const x0 = e.x; for (let i = 0; i < 60; i++) F.applyKnock(e, 1 / 60); moved = e.x - x0; assert.ok(moved > 3 && moved < 20, `short shove (${moved.toFixed(1)}px)`); assert.equal(e.kbx, 0);
+assert.ok(F.stopFor('boss') > F.stopFor('elite') && F.stopFor('elite') > F.stopFor('crit') && F.stopFor('crit') > 0 && F.stopFor('hit') === 0);
+console.log('PASS feel unit: dead zone, analog, accel/turn/stop, knockback, hit-stop tiers');
