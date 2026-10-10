@@ -1,6 +1,6 @@
 // Balance diagnostic with three player proxies (SAKURAYO_AGENTS, default "stand"):
 //   stand – original gate: no in-run upgrades, player stands still (threshold ≤1.30)
-//   kite  – moves: dodges the nearest enemies and walks to gems (no upgrades)
+//   kite  – moves: dodges the nearest enemies (keeps the boss at ~80% weapon range) and walks to gems (no upgrades)
 //   build – kite movement + takes level-up choices (recommended card first)
 // All proxies are protected from death so the metric is clear time.
 import {chromium} from 'playwright';
@@ -27,7 +27,7 @@ try{
    const keys={w:0,a:0,s:0,d:0};
    const press=(k,on)=>{if(keys[k]===on)return;keys[k]=on;window.dispatchEvent(new KeyboardEvent(on?'keydown':'keyup',{key:k,bubbles:true}));};
    const steer=()=>{const f=a.fieldProbe(8);let vx=0,vy=0;
-    for(const e of f.enemies){const d=Math.hypot(e.dx,e.dy)||1,reach=e.boss?240:150;if(d<reach){const w=(reach-d)/reach*(e.boss?3:2);vx-=e.dx/d*w;vy-=e.dy/d*w;vx+=-e.dy/d*w*.6;vy+=e.dx/d*w*.6;}}
+    for(const e of f.enemies){const d=Math.hypot(e.dx,e.dy)||1,reach=e.boss?Math.max(150,Math.min(240,(f.range||240)*.8)):150;if(d<reach){const w=(reach-d)/reach*(e.boss?3:2);vx-=e.dx/d*w;vy-=e.dy/d*w;vx+=-e.dy/d*w*.6;vy+=e.dx/d*w*.6;}}
     const g=f.gems[0];if(g){const d=Math.hypot(g.dx,g.dy)||1;if(d<420){vx+=g.dx/d*1.2;vy+=g.dy/d*1.2;}}
     const m=90;if(f.x<m)vx+=1;if(f.x>f.worldW-m)vx-=1;if(f.y<m)vy+=1;if(f.y>f.worldH-m)vy-=1;
     press('d',vx>.35);press('a',vx<-.35);press('s',vy>.35);press('w',vy<-.35);};

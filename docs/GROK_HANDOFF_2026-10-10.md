@@ -202,3 +202,9 @@ bash gradlew --no-daemon assembleDebug lintDebug
 - `src/runtime/sakurayo-hud.js`：右下弧形按钮组（攻击/技能/大招/闪避）、大招充能环与特写演出、右上小地图（视野框、Boss、宝箱、灵龛、精英）、台词条移到底部中间。
 - `src/runtime/sakurayo-props.js`：各章不同配置的可破坏箱子、宝箱（樱花币 +12，计入结算）、灵龛（站 1.5 秒回血加盾）；世界边缘雾化过渡、前景花瓣视差。素材 `art/props/*.webp` 由中转站生成。
 - 敌人职责轮廓改为脚下半透明地标，不再遮挡立绘。
+
+## 手感补完 / 节奏 / 武器构筑（2026-10-10 16:xx）
+- 新模块：`src/runtime/sakurayo-weapons.js`（7 种副武器，最多 4 把，Lv5 进化；升级卡 id `w_<name>`）、`src/runtime/sakurayo-boss.js`（破防槽/失衡/狂暴，纯逻辑）。
+- 测试：`tests/weapons_boss_unit.mjs`、`tests/props_smoke.mjs`；测试 API 新增 `giveWeapon46`、`teleport46`、`bossDebug46`。
+- 诊断：kite 档改为按武器射程保持 Boss 距离；三档三种子均 ≤1.21。
+- 待办：构筑阶段（卡面数值/稀有度/进化组合 UI）、关卡与剧情、弹珠、格斗、长线。

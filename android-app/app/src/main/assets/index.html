@@ -2522,6 +2522,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     4: { crates: 6, chests: 3, shrines: 3, cluster: 1 },   // mirror core: shrines matter most
   };
   var CHEST_COINS = 12;
+  var TRAP_REARM = 12;
   function mulberry(seed) {
     var a = seed >>> 0;
     return function () { a = (a + 0x6d2b79f5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
@@ -2552,6 +2553,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }
     for (i = 0; i < L.chests; i++) place("chest", 22, {});
     for (i = 0; i < L.shrines; i++) place("shrine", 26, { charge: 0 });
+    for (i = 0; i < (L.traps || 2); i++) place("trap", 20, { cool: 0 });
     return list;
   }
   function update(list, P, dt, api, moving) {
@@ -2566,6 +2568,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       } else if (p.kind === "chest" && touch) {
         p.done = true; api.fx("loot", p.x, p.y); api.sound("coin");
         api.gems(p.x, p.y, 6, 6); api.coins(CHEST_COINS); api.toast("宝箱 · 樱花币 +" + CHEST_COINS);
+      } else if (p.kind === "trap") {
+        // 符咒机关: stepping on the seal detonates it on nearby enemies, then it re-arms.
+        p.cool = Math.max(0, p.cool - dt);
+        if (touch && p.cool <= 0) { p.cool = TRAP_REARM; api.fx("skill", p.x, p.y); api.sound("crit"); api.aoe(p.x, p.y, 170); api.toast("符咒机关：引爆"); }
       } else if (p.kind === "shrine") {
         p.charge = touch ? Math.min(1.5, p.charge + dt) : Math.max(0, p.charge - dt * 0.5);
         if (p.charge >= 1.5) { p.done = true; api.fx("levelup", p.x, p.y); api.sound("level"); api.heal(0.25); api.shield(20); api.toast("灵龛：生命 +25%、护盾 +20"); }
@@ -2580,6 +2586,14 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }
     ctx.save();
     ctx.fillStyle = "#0008"; ctx.beginPath(); ctx.ellipse(p.x, p.y + p.r * 0.7, p.r * 1.05, p.r * 0.38, 0, 0, Math.PI * 2); ctx.fill();
+    if (p.kind === "trap") {
+      var armed = p.cool <= 0, pulse = 0.5 + Math.sin(t * 5) * 0.5;
+      ctx.strokeStyle = armed ? "rgba(255,120,190," + (0.55 + pulse * 0.4) + ")" : "rgba(160,160,190,.35)"; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.ellipse(p.x, p.y, p.r * 1.6, p.r * 0.8, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); for (var k = 0; k < 5; k++) { var a = -Math.PI / 2 + k * Math.PI * 4 / 5; ctx[k ? "lineTo" : "moveTo"](p.x + Math.cos(a) * p.r, p.y + Math.sin(a) * p.r * 0.5); } ctx.closePath(); ctx.stroke();
+      if (!armed) { ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.font = "800 11px system-ui"; ctx.textAlign = "center"; ctx.fillText(Math.ceil(p.cool) + "s", p.x, p.y - p.r); }
+      ctx.restore(); return;
+    }
     if (p.kind === "chest") { ctx.shadowColor = "#7ff3ff"; ctx.shadowBlur = 10 + Math.sin(t * 4) * 5; }
     if (img) ctx.drawImage(img, p.x - s / 2, p.y - s * 0.7, s, s);
     else { ctx.fillStyle = p.kind === "chest" ? "#c9a24a" : p.kind === "shrine" ? "#b9a8d8" : "#8a5a3a"; ctx.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 2); }
@@ -2596,7 +2610,168 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       drawProp(ctx, p, t, art);
     }
   }
-  global.SakurayoProps = Object.freeze({ LAYOUT: LAYOUT, CHEST_COINS: CHEST_COINS, create: create, update: update, draw: draw });
+  global.SakurayoProps = Object.freeze({ LAYOUT: LAYOUT, CHEST_COINS: CHEST_COINS, TRAP_REARM: TRAP_REARM, create: create, update: update, draw: draw });
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+/* Boss break ("破防") gauge: every boss phase has a visible gauge. Damage from any source fills it
+   (character-neutral), stage objectives fill it faster. A full gauge staggers the boss: it stops
+   moving and attacking and takes extra damage for a short window. Phase 4 enrages after a while
+   (more bullets, no extra damage) so fights cannot drag. Pure logic, no DOM. */
+(function (global) {
+  "use strict";
+  var BREAK_TIME = 4.5, BREAK_MUL = 1.6, DAMAGE_SHARE = 0.11, ENRAGE_AFTER = 20, HP_SCALE = 0.88;
+  var OBJECTIVE = { guard: 30, dodge: 15, lane: 10, burst: 40 };
+  function init(boss) { boss.brk46 = 0; boss.broken46 = 0; boss.breaks46 = 0; boss.enraged46 = false; boss.guardsDown46 = 0; boss.guardsTotal46 = 0; return boss; }
+  function fill(boss, amount) {
+    if (!boss || boss.dead || boss.broken46 > 0) return false;
+    boss.brk46 = Math.min(100, (boss.brk46 || 0) + Math.max(0, amount));
+    if (boss.brk46 >= 100) { boss.brk46 = 0; boss.broken46 = BREAK_TIME; boss.breaks46 = (boss.breaks46 || 0) + 1; return true; }
+    return false;
+  }
+  function fromDamage(boss, damage) { return damage / Math.max(1, boss.max * DAMAGE_SHARE) * 100; }
+  function tick(boss, dt, phaseAge) {
+    var ev = null;
+    if (boss.broken46 > 0) { boss.broken46 = Math.max(0, boss.broken46 - dt); if (!boss.broken46) ev = "recover"; }
+    if (boss.phase >= 4 && !boss.enraged46 && phaseAge >= ENRAGE_AFTER) { boss.enraged46 = true; ev = "enrage"; }
+    return ev;
+  }
+  function damageMul(boss) { return boss && boss.broken46 > 0 ? BREAK_MUL : 1; }
+  function label(boss) {
+    if (!boss) return "";
+    if (boss.broken46 > 0) return "失衡！伤害 ×" + BREAK_MUL + " · " + boss.broken46.toFixed(1) + "s";
+    var g = boss.guardsTotal46 ? " · 镜卫 " + boss.guardsDown46 + "/" + boss.guardsTotal46 : "";
+    return "破防 " + Math.floor(boss.brk46 || 0) + "%" + g + (boss.enraged46 ? " · 狂暴" : "");
+  }
+  global.SakurayoBoss = Object.freeze({ BREAK_TIME: BREAK_TIME, BREAK_MUL: BREAK_MUL, ENRAGE_AFTER: ENRAGE_AFTER, HP_SCALE: HP_SCALE, OBJECTIVE: OBJECTIVE,
+    init: init, fill: fill, fromDamage: fromDamage, tick: tick, damageMul: damageMul, label: label });
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+/* Auxiliary weapon system (构筑武器). Every character keeps her signature main attack and can stack
+   up to any mix of these sub-weapons from level-up cards; each reaches an evolution at Lv5.
+   Melee and ranged are freely mixed (Rion can take guns, Sayo can take orbit blades).
+   Pure logic + drawing; the game injects an api: { P, target(range), push(b), aoe(x,y,r,d,c), hit(e,d,src), enemiesNear(x,y,r), fx(k,x,y), sound(k) }. */
+(function (global) {
+  "use strict";
+  var TAU = Math.PI * 2;
+  // dmg is a multiple of P.dmg per hit; cd in seconds. Numbers tuned so a Lv5 weapon ≈ +35-45% of a base main-gun DPS.
+  var DEF = {
+    spread:   { n: "散射樱扇", evo: "百花缭乱", e: "🌸", s: "gun",   d: "扇形散射 {c} 发近距霰弹", cd: 1.1, dmg: 0.42 },
+    ricochet: { n: "弹射符弹", evo: "千回符链", e: "🔁", s: "gun",   d: "主武器子弹命中后弹射 {c} 次", cd: 0, dmg: 0 },
+    homing:   { n: "追踪纸鹤", evo: "群鹤夜啼", e: "🕊️", s: "magical", d: "每轮放出 {c} 只追踪纸鹤", cd: 1.5, dmg: 0.7 },
+    bomb:     { n: "爆裂樱弹", evo: "八重爆樱", e: "💥", s: "gun",   d: "投掷榴弹，范围爆炸（半径 {r}）", cd: 2.2, dmg: 1.5 },
+    laser:    { n: "月光激光", evo: "望月贯光", e: "🔆", s: "tech",  d: "沿瞄准方向照射贯穿激光 {t}s", cd: 3.4, dmg: 3.2 },
+    orbit:    { n: "环绕樱刃", evo: "落樱结界", e: "🗡️", s: "ninja", d: "{c} 把樱刃环绕自身切割", cd: 0, dmg: 0.55 },
+    boomerang:{ n: "回旋斩月", evo: "双月回天", e: "🌙", s: "ninja", d: "掷出回旋刃，往返切割（{c} 把）", cd: 1.8, dmg: 1.1 }
+  };
+  var ORDER = Object.keys(DEF);
+  function stats(id, lv) {
+    var evo = lv >= 5, k = DEF[id];
+    return {
+      c: id === "spread" ? 3 + lv + (evo ? 3 : 0) : id === "ricochet" ? lv + (evo ? 2 : 0) : id === "homing" ? lv + (evo ? 3 : 0) : id === "orbit" ? 1 + lv + (evo ? 2 : 0) : id === "boomerang" ? (evo ? 2 : 1) : 1,
+      r: id === "bomb" ? 64 + lv * 10 + (evo ? 30 : 0) : 0,
+      t: id === "laser" ? +(0.35 + lv * 0.07 + (evo ? 0.3 : 0)).toFixed(2) : 0,
+      cd: k.cd * (1 - lv * 0.06) * (evo ? 0.75 : 1),
+      dmg: k.dmg * (1 + (lv - 1) * 0.16) * (evo ? 1.35 : 1)
+    };
+  }
+  function describe(id, lv) {
+    var s = stats(id, lv), k = DEF[id];
+    return (lv >= 5 ? "【进化·" + k.evo + "】" : "") + k.d.replace("{c}", s.c).replace("{r}", s.r).replace("{t}", s.t) + (k.cd ? "｜冷却 " + s.cd.toFixed(1) + "s" : "") + (s.dmg ? "｜单次 " + Math.round(s.dmg * 100) + "%攻击" : "");
+  }
+  function state(P) { if (!P.weapons46) P.weapons46 = {}; return P.weapons46; }
+  function level(P, id) { var w = state(P)[id]; return w ? w.lv : 0; }
+  function gain(P, id) { var W = state(P); if (!W[id]) W[id] = { lv: 0, t: 0.3, a: 0 }; W[id].lv = Math.min(5, W[id].lv + 1); return W[id].lv; }
+  function aimAngle(api, range) { var t = api.target(range); var P = api.P; return t ? Math.atan2(t.y - P.y, t.x - P.x) : (P.weaponAngle || 0); }
+  function tick(dt, api) {
+    var P = api.P, W = state(P), id, w, s, i, a;
+    for (id in W) {
+      w = W[id]; if (!w.lv) continue; s = stats(id, w.lv); w.t -= dt;
+      if (id === "orbit") {
+        w.a = (w.a + dt * (w.lv >= 5 ? 4.6 : 3.4)) % TAU;
+        var rad = 62 + w.lv * 4;
+        for (i = 0; i < s.c; i++) {
+          a = w.a + i * TAU / s.c;
+          var bx = P.x + Math.cos(a) * rad, by = P.y + Math.sin(a) * rad;
+          var near = api.enemiesNear(bx, by, 16);
+          for (var j = 0; j < near.length; j++) { var e = near[j]; if ((e.orb46 || 0) > api.now) continue; e.orb46 = api.now + 0.32; api.hit(e, P.dmg * s.dmg, "orbit"); }
+        }
+        continue;
+      }
+      if (!DEF[id].cd || w.t > 0) continue;
+      w.t = s.cd;
+      if (id === "spread") {
+        a = aimAngle(api, 320); var fan = 0.9 + (w.lv >= 5 ? 0.5 : 0);
+        for (i = 0; i < s.c; i++) { var q = a - fan / 2 + fan * i / Math.max(1, s.c - 1); api.push({ x: P.x, y: P.y, vx: Math.cos(q) * 760, vy: Math.sin(q) * 760, r: 4, life: 0.42, dmg: P.dmg * s.dmg, pierce: 0, source: "shot", school: "gun", tracer46: "#ffd0e4", hit: new Set() }); }
+        api.fx("muzzle", P.x + Math.cos(a) * 24, P.y + Math.sin(a) * 24); api.sound("pistol");
+      } else if (id === "homing") {
+        for (i = 0; i < s.c; i++) { var h = (P.weaponAngle || 0) + Math.PI + (i - (s.c - 1) / 2) * 0.5; api.push({ x: P.x, y: P.y, vx: Math.cos(h) * 360, vy: Math.sin(h) * 360, r: 6, life: 2.2, dmg: P.dmg * s.dmg, pierce: 0, home: 0.16, crane46: 1, source: "star", school: "magical", tracer46: "#bfe9ff", hit: new Set() }); }
+      } else if (id === "bomb") {
+        var tg = api.target(420); a = aimAngle(api, 420);
+        api.push({ x: P.x, y: P.y, vx: Math.cos(a) * 440, vy: Math.sin(a) * 440, r: 8, life: tg ? Math.min(1, Math.hypot(tg.x - P.x, tg.y - P.y) / 440) : 0.8, dmg: P.dmg * s.dmg * 0.3, pierce: 0, boom46: s.r, boomDmg46: P.dmg * s.dmg, source: "shot", school: "gun", tracer46: "#ffb070", hit: new Set() });
+      } else if (id === "laser") {
+        w.beam = { a: aimAngle(api, 700), t: s.t, len: 640, tick: 0 };
+      } else if (id === "boomerang") {
+        a = aimAngle(api, 380);
+        for (i = 0; i < s.c; i++) { var g = a + i * Math.PI; api.push({ x: P.x, y: P.y, vx: Math.cos(g) * 620, vy: Math.sin(g) * 620, r: 14, life: 1.25, dmg: P.dmg * s.dmg, pierce: 99, rang46: 1.25, source: "blade", school: "ninja", tracer46: "#e9d4ff", hit: new Set() }); }
+      }
+    }
+    var L = W.laser;
+    if (L && L.beam) {
+      var B = L.beam; B.t -= dt; B.tick -= dt; B.a = aimAngle(api, 700) * 0.15 + B.a * 0.85;
+      if (B.tick <= 0) {
+        B.tick = 0.1; var ls = stats("laser", L.lv), cx = Math.cos(B.a), cy = Math.sin(B.a);
+        var cand = api.enemiesNear(P.x + cx * B.len / 2, P.y + cy * B.len / 2, B.len / 2 + 30);
+        for (i = 0; i < cand.length; i++) { var en = cand[i], px = en.x - P.x, py = en.y - P.y, along = px * cx + py * cy; if (along < 0 || along > B.len) continue; if (Math.abs(px * cy - py * cx) < en.r + (L.lv >= 5 ? 20 : 12)) api.hit(en, P.dmg * ls.dmg * 0.1 / ls.t * 0.6, "laser"); }
+      }
+      if (B.t <= 0) L.beam = null;
+    }
+  }
+  // Called by the bullet loop after a hit. Returns true when the bullet should stop.
+  function onHit(b, e, api) {
+    if (b.boom46) { api.aoe(b.x, b.y, b.boom46, b.boomDmg46, "#ff9a4a"); api.fx("shatter", b.x, b.y); return true; }
+    var W = state(api.P);
+    if (!b.bounced46 && b.source === "shot" && W.ricochet && W.ricochet.lv && !b.tracer46) b.bounce46 = stats("ricochet", W.ricochet.lv).c, b.bounced46 = 1;
+    if (b.bounce46 > 0) {
+      var best = null, bd = 260, list = api.enemiesNear(e.x, e.y, 260);
+      for (var i = 0; i < list.length; i++) { var o = list[i]; if (o.dead || b.hit.has(o)) continue; var d = Math.hypot(o.x - e.x, o.y - e.y); if (d < bd) { bd = d; best = o; } }
+      if (best) { var sp = Math.hypot(b.vx, b.vy), a = Math.atan2(best.y - e.y, best.x - e.x); b.x = e.x; b.y = e.y; b.vx = Math.cos(a) * sp; b.vy = Math.sin(a) * sp; b.life = Math.max(b.life, bd / sp + 0.05); b.bounce46--; b.pierce = Math.max(b.pierce, 1); b.tracer46 = "#9ff3ff"; return false; }
+    }
+    return false;
+  }
+  function update(b, dt, api) {
+    if (b.boom46 && b.life - dt <= 0) { api.aoe(b.x, b.y, b.boom46, b.boomDmg46, "#ff9a4a"); api.fx("shatter", b.x, b.y); b.boom46 = 0; }
+    if (b.rang46) { var P = api.P, t = b.rang46 - b.life; if (t > b.rang46 * 0.45) { var a = Math.atan2(P.y - b.y, P.x - b.x), sp = Math.hypot(b.vx, b.vy); b.vx += (Math.cos(a) * sp - b.vx) * Math.min(1, dt * 6); b.vy += (Math.sin(a) * sp - b.vy) * Math.min(1, dt * 6); if (Math.hypot(P.x - b.x, P.y - b.y) < 20) b.life = 0; if (t > b.rang46 * 0.5 && !b.back46) { b.back46 = 1; b.hit = new Set(); } } }
+  }
+  function draw(ctx, P, now) {
+    var W = P.weapons46; if (!W) return;
+    if (W.orbit && W.orbit.lv) {
+      var s = stats("orbit", W.orbit.lv), rad = 62 + W.orbit.lv * 4;
+      ctx.save(); ctx.globalCompositeOperation = "lighter";
+      for (var i = 0; i < s.c; i++) {
+        var a = W.orbit.a + i * TAU / s.c, x = P.x + Math.cos(a) * rad, y = P.y + Math.sin(a) * rad;
+        ctx.save(); ctx.translate(x, y); ctx.rotate(a + Math.PI / 2);
+        ctx.fillStyle = W.orbit.lv >= 5 ? "#ffd6ef" : "#ff9ccf"; ctx.shadowColor = "#ff5aa6"; ctx.shadowBlur = 14;
+        ctx.beginPath(); ctx.moveTo(0, -14); ctx.quadraticCurveTo(7, 0, 0, 14); ctx.quadraticCurveTo(-7, 0, 0, -14); ctx.fill(); ctx.restore();
+      }
+      ctx.restore();
+    }
+    var L = W.laser;
+    if (L && L.beam) {
+      var B = L.beam, w = (L.lv >= 5 ? 20 : 12) * (0.75 + Math.sin(now * 60) * 0.25);
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
+      ctx.strokeStyle = "rgba(140,220,255,.45)"; ctx.lineWidth = w * 2.2; ctx.beginPath(); ctx.moveTo(P.x, P.y); ctx.lineTo(P.x + Math.cos(B.a) * B.len, P.y + Math.sin(B.a) * B.len); ctx.stroke();
+      ctx.strokeStyle = "#f4fdff"; ctx.lineWidth = w * 0.6; ctx.stroke(); ctx.restore();
+    }
+  }
+  function choices(P) {
+    var owned = ORDER.filter(function (id) { return level(P, id) > 0; });
+    return ORDER.filter(function (id) { return level(P, id) < 5 && (level(P, id) > 0 || owned.length < 4); });
+  }
+  global.SakurayoWeapons = Object.freeze({ DEF: DEF, ORDER: ORDER, stats: stats, describe: describe, level: level, gain: gain, tick: tick, onHit: onHit, update: update, draw: draw, choices: choices, MAX_SLOTS: 4 });
 })(typeof window !== "undefined" ? window : globalThis);
 
 </script>
@@ -2628,6 +2803,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     "@keyframes ultArt46{0%{transform:translateX(40%)}20%{transform:translateX(0)}100%{transform:translateX(-6%)}}",
     "@keyframes ultText46{0%{transform:translateX(-30%);opacity:0}25%{transform:none;opacity:1}}",
     "#banter.banter{top:auto!important;bottom:max(12px,env(safe-area-inset-bottom))!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;width:min(420px,40vw)!important;max-width:none!important;padding:7px 12px!important;font-size:12px!important;opacity:.94}",
+    "#bossBreak46{position:absolute;left:50%;top:calc(max(8px,env(safe-area-inset-top)) + 112px);transform:translateX(-50%);width:min(320px,38vw);height:16px;border-radius:9px;background:#0a0716cc;border:1px solid #ffd36b66;overflow:hidden;pointer-events:none}",
+    "#bossBreak46 i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#ffb13b,#ffe27a);transition:width .15s}",
+    "#bossBreak46.broken{border-color:#fff;box-shadow:0 0 14px #ff5aa6}#bossBreak46.broken i{background:linear-gradient(90deg,#ff5aa6,#ffd0e8)}",
+    "#bossBreak46.enraged{border-color:#ff3b6b}",
+    "#bossBreak46 span{position:relative;display:block;text-align:center;font:800 10.5px/16px system-ui;color:#fff;text-shadow:0 1px 2px #000;letter-spacing:.06em}",
   ].join("\n");
   var built = false, mini = null, last = 0, ring = null;
   function api() { return global.SakurayoBattle46; }
@@ -7420,6 +7600,14 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   }
   const U = [];
   const add = (u) => U.push(u);
+  // 构筑武器：七种副武器，任意混搭（最多 4 把），Lv5 进化。
+  if (globalThis.SakurayoWeapons) for (const wid of globalThis.SakurayoWeapons.ORDER) {
+    const WD = globalThis.SakurayoWeapons.DEF[wid];
+    add({ id: "w_" + wid, n: WD.n, s: "base", tag: "武器", weapon46: wid,
+      req: () => globalThis.SakurayoWeapons.choices(P).includes(wid),
+      d: () => { const nl = globalThis.SakurayoWeapons.level(P, wid) + 1; return (nl >= 5 ? "" : "Lv" + nl + "：") + globalThis.SakurayoWeapons.describe(wid, nl); },
+      m: 5, r: "rare", e: WD.e, a: () => globalThis.SakurayoWeapons.gain(P, wid) });
+  }
   // 基础小升级
   add({
     id: "dmg",
@@ -8863,7 +9051,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     $("#ricon").textContent=win?"🌸":"☠️"; $("#rankBig").textContent=win?(P.damageTaken===0?"S":P.plan?.rank||"A"):(runTime>stage().dur*.65?"B":"C");
     $("#rtitle").textContent=win?"镜界节点已净化":"防线失守";
     $("#rsub").textContent=win?`${stage().short} 已封回证词。${stage().boss} 不再开口。${P.fusion?`「${fusionData()?.n||P.fusion}」`:"未融合"} / ${P.form?ASC.find(a=>a.id===P.form)?.n||P.form:"未飞升"}`:`${stage().short}被尸潮吞没。${window.SakurayoLifecycle?.hint?.(lifecycleWorld44())||"下次可以在暂停页看清短板，再决定补什么。"} ${runCoach45(false)}`;
-    $("#rstats").innerHTML=`坚持 <b>${fmt(runTime)}</b><br>击破 <b>${P.kills}</b> · 精英 <b>${P.eliteKills}</b> · 等级 <b>${P.level}</b><br>职业：<b>${careerSummary()}</b><br>融合：<b>${P.fusion?fusionData()?.n||P.fusion:"未融合"}</b><br>飞升：<b>${P.form?ASC.find(a=>a.id===P.form)?.n||P.form:"未飞升"}</b><br>获得樱花币 <b style="color:var(--g)">🌸 ${reward}</b>${pay44&&window.SakurayoEconomy?window.SakurayoEconomy.rewardHtml(pay44):""}`;
+    $("#rstats").innerHTML=`坚持 <b>${fmt(runTime)}</b><br>击破 <b>${P.kills}</b> · 精英 <b>${P.eliteKills}</b> · 等级 <b>${P.level}</b><br>职业：<b>${careerSummary()}</b><br>融合：<b>${P.fusion?fusionData()?.n||P.fusion:"未融合"}</b><br>飞升：<b>${P.form?ASC.find(a=>a.id===P.form)?.n||P.form:"未飞升"}</b><br>获得樱花币 <b style="color:var(--g)">🌸 ${reward}</b>${pay44&&window.SakurayoEconomy?window.SakurayoEconomy.rewardHtml(pay44):""}${P.chestCoins46?`<br><small>宝箱 +${P.chestCoins46}</small>`:""}`;
     renderRunReport(); $("#result").style.setProperty("--resultArt46",`url("${artUrl(`ui/result_${win?"win":"lose"}_v5.webp`)}")`); $("#result").classList.remove("hidden"); sound(win?"win":"over");
   }
   function pauseGame() {
@@ -9009,6 +9197,35 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     sound("bossShot");
   }
   const GUARD_KITE_SECONDS = 6;
+  var sparks46 = [];
+  function drawSparks46() {
+    if (!sparks46) return;
+    ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
+    for (const k of sparks46) { const q = k.t / 0.14; ctx.strokeStyle = k.c; ctx.globalAlpha = q; ctx.lineWidth = 2;
+      for (let i = -1; i <= 1; i++) { const a = k.a + Math.PI + i * 0.7; ctx.beginPath(); ctx.moveTo(k.x, k.y); ctx.lineTo(k.x + Math.cos(a) * 14 * (1.4 - q), k.y + Math.sin(a) * 14 * (1.4 - q)); ctx.stroke(); } }
+    ctx.globalCompositeOperation = "source-over"; ctx.fillStyle = "#e8c06a";
+    for (const c of (globalThis.casings46 || [])) { ctx.globalAlpha = Math.min(1, c.t * 3); ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.r); ctx.fillRect(-2.5, -1, 5, 2); ctx.restore(); }
+    ctx.restore();
+  }
+  function weaponApi46() {
+    return { P, now: runTime || 0, target: r => aimTarget46(r), push: pushBullet,
+      aoe: (x, y, r, d, c) => aoe(x, y, r, d, c, false, { source: "skill", school: "gun" }),
+      hit: (e, d, src) => damageEnemy(e, d, { source: src, school: "ninja" }),
+      enemiesNear: (x, y, r) => grid.within(x, y, r).filter(e => !e.dead),
+      fx: (k, x, y) => fxStamp(k, x, y, { size: k === "shatter" ? 80 : 30, life: .3 }), sound };
+  }
+  function bossBroken46(e) {
+    fxStamp("shatter", e.x, e.y, { size: 150, life: 0.6 }); shake = Math.max(shake, 10); sound("phase");
+    requestHitStop46("boss"); toast(`破防！${globalThis.SakurayoBoss.BREAK_TIME} 秒内伤害 ×${globalThis.SakurayoBoss.BREAK_MUL}`);
+  }
+  function paintBossBreak46() {
+    let n = $("#bossBreak46");
+    if (!boss || boss.dead || state !== "play" || !globalThis.SakurayoBoss) { if (n) n.classList.add("hidden"); return; }
+    if (!n) { n = document.createElement("div"); n.id = "bossBreak46"; n.innerHTML = '<i></i><span></span>'; $("#hud").appendChild(n); }
+    n.classList.remove("hidden"); n.classList.toggle("broken", boss.broken46 > 0); n.classList.toggle("enraged", !!boss.enraged46);
+    n.querySelector("i").style.width = `${boss.broken46 > 0 ? boss.broken46 / globalThis.SakurayoBoss.BREAK_TIME * 100 : boss.brk46 || 0}%`;
+    n.querySelector("span").textContent = globalThis.SakurayoBoss.label(boss);
+  }
   function spawnBossAdds(type, count, guard = false) {
     const bounds = window.SakurayoCamera ? window.SakurayoCamera.size() : {worldW:W,worldH:H};
     let made = 0;
@@ -9029,8 +9246,11 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
           bounds.worldH - n.r,
         );
         if (guard) {
+          if (boss) boss.guardsTotal46 = (boss.guardsTotal46 || 0) + 1;
           n.guardFor = 1;
           n.color = "#c879ff";
+          // Guards are an objective, not a damage sponge: fixed share of boss HP regardless of character.
+          if (boss) { n.max = n.hp = Math.min(n.max, boss.max * 0.03); n.elite = false; }
         }
       }
     }
@@ -9623,7 +9843,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     spawnClock = 999;
     let s = stage(),
       pf = planFactor(),
-      hp = (1280 + s.id * 470) * s.scale * (1 + (pf - 1) * 0.34),
+      hp = (1280 + s.id * 470) * s.scale * (1 + (pf - 1) * 0.34) * (globalThis.SakurayoBoss ? globalThis.SakurayoBoss.HP_SCALE : 1),
       traits = [
         { shot: 0.8, acid: 1.22, skill: 1.16 },
         { tech: 0.74, shot: 1.12, bio: 1.12 },
@@ -9652,7 +9872,11 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       bossRes: traits,
       dead: false,
     };
+    // Boss arena: leftover trash dissolves into XP shards so the duel is about the boss and its rule adds.
+    for (const e of enemies) if (!e.dead && !e.elite) { e.dead = true; if (gems.length < caps().g) gems.push({ x: e.x, y: e.y, r: 6, v: Math.ceil((e.xp || 1) * 0.5), bob: rnd(0, TAU) }); }
+    enemies = enemies.filter(e => !e.dead);
     enemies.push(boss);
+    globalThis.SakurayoBoss?.init(boss);
     $("#warning").textContent = `BOSS ${s.boss} 降临 · 四阶段战斗`;
     $("#warning").classList.remove("hidden");
     setTimeout(() => $("#warning").classList.add("hidden"), 2300);
@@ -9677,7 +9901,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     return best;
   }
   // Auto-aim: nearest enemy, but lock onto a boss in range unless trash is already in the player's face.
-  function aimTarget46(range){const near=nearest(P.x,P.y,range);if(!boss||boss.dead||near===boss)return near;const bd=Math.hypot(boss.x-P.x,boss.y-P.y);if(bd>range)return near;if(near&&Math.hypot(near.x-P.x,near.y-P.y)<110)return near;return boss;}
+  function aimTarget46(range){const near=nearest(P.x,P.y,range);if(!boss||boss.dead||near===boss)return near;const bd=Math.hypot(boss.x-P.x,boss.y-P.y);if(bd>range)return near;if(boss.guard>0){let g=null,gd=range;for(const e of enemies)if(!e.dead&&e.guardFor){const d=Math.hypot(e.x-P.x,e.y-P.y);if(d<gd){gd=d;g=e;}}if(g&&!(near&&Math.hypot(near.x-P.x,near.y-P.y)<70))return g;}if(near&&Math.hypot(near.x-P.x,near.y-P.y)<110)return near;return boss;}
   // Assigned once below (directional gun/blade shoot); gunWard/star/idolGun/encore live in gunShot36.
   let shoot;
   function pushBullet(b) {
@@ -9737,7 +9961,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function damageEnemy(e, amt, opt = {}) {
     if (!e || e.dead) return 0;
     if (e.type === "boss") {
-      if (e.guard > 0) amt *= 0.32;
+      if (e.guard > 0 && !(e.broken46 > 0)) amt *= 0.32;
+      amt *= globalThis.SakurayoBoss ? globalThis.SakurayoBoss.damageMul(e) : 1;
       amt *= 1 + (P.bossPierce || 0);
     }
     if (P.bloodSword && opt.source === "blade") amt *= 1 + (1 - P.hp / P.maxHp) * 1.2;
@@ -9764,6 +9989,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       (P.damageSources[opt.source || "shot"] || 0) + damage;
     e.hp -= damage;
     e.hit = 0.1;
+    if (e.type === "boss" && globalThis.SakurayoBoss && globalThis.SakurayoBoss.fill(e, globalThis.SakurayoBoss.fromDamage(e, damage) * (opt.source === "ult" ? 2 : 1))) bossBroken46(e);
     if (globalThis.SakurayoFeel && !opt.depth) globalThis.SakurayoFeel.knock(e, P.x, P.y, damage, crit, opt.source);
     if (crit && opt.source === "blade") requestHitStop46("crit");
     if (!["acid","spore"].includes(opt.source)) sound(crit ? "crit" : "hit");
@@ -9850,6 +10076,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     if (e.dead) return;
     e.dead = true;
     P.kills++;
+    if (e.guardFor && boss && !boss.dead && globalThis.SakurayoBoss) { boss.guardsDown46 = (boss.guardsDown46 || 0) + 1; if (globalThis.SakurayoBoss.fill(boss, globalThis.SakurayoBoss.OBJECTIVE.guard)) bossBroken46(boss); }
     P.ult46 = Math.min(100, (P.ult46 || 0) + (e.elite ? 6 : 1.2));
     P.killsByType[e.type]=(P.killsByType[e.type]||0)+1;
     P.combo++;
@@ -10676,7 +10903,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     }
     ctx.restore();
   }
-  var propArt46 = kind => { const img = artImage(`props/${kind}.webp`); return artReady(img) ? img : null; };
+  var propArt46 = kind => { if (kind === "trap") return null; const img = artImage(`props/${kind}.webp`); return artReady(img) ? img : null; };
   function propsEnabled46() { return !!globalThis.SakurayoProps && !(typeof isMainGodRun36 === "function" && isMainGodRun36()) && runMode36 !== "testimony"; }
   function updateProps46(dt, moving) {
     if (!propsEnabled46()) return;
@@ -10692,6 +10919,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       shield(n) { P.sh = Math.min(P.maxSh || 0, (P.sh || 0) + n); },
       coins(n) { P.chestCoins46 = (P.chestCoins46 || 0) + n; },
       fx(kind, x, y) { fxStamp(kind, x, y, { size: kind === "shatter" ? 46 : 60, life: 0.4 }); },
+      aoe(x, y, r) { aoe(x, y, r, P.dmg * 4, "#ff7ac0", true, { source: "skill", school: "shrine" }); },
       toast, sound,
     }, moving);
   }
@@ -10701,7 +10929,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     const c = char35(), u = ULT46[c.id] || ULT46.sayo;
     P.ult46 = 0; P.inv = Math.max(P.inv, 1.1); slowmo46 = Math.max(slowmo46, 0.55);
     globalThis.SakurayoHud?.cutIn(artUrl(`characters/${c.id}/default/lobby_idle.webp`), u[0], c.short || c.name || "");
-    aoe(P.x, P.y, 290, P.dmg * 10 * (P.skillPow || 1), u[1], true, { source: "skill", school: "shrine" });
+    aoe(P.x, P.y, 290, P.dmg * 10 * (P.skillPow || 1), u[1], true, { source: "ult", school: "shrine" });
     fxStamp("skill", P.x, P.y, { size: 300, life: 0.7 });
     shake = Math.max(shake, 14); sound("skill"); haptic37?.(40);
     return true;
@@ -10722,6 +10950,12 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     if (state !== "play") return;
     if (P.hitStop46 > 0) { P.hitStop46 -= dt; return; }
     P.ult46 = Math.min(100, (P.ult46 || 0) + dt * 1.4);
+    if (globalThis.SakurayoWeapons && P.weapons46) globalThis.SakurayoWeapons.tick(dt, weaponApi46());
+    if (typeof sparks46 !== "undefined" && sparks46) { for (const k of sparks46) k.t -= dt; sparks46 = sparks46.filter(k => k.t > 0); }
+    if (globalThis.casings46) { for (const c of globalThis.casings46) { c.t -= dt; c.x += c.vx * dt; c.y += c.vy * dt; c.vy += 420 * dt; c.r += dt * 14; } globalThis.casings46 = globalThis.casings46.filter(c => c.t > 0); }
+    if (boss && !boss.dead && globalThis.SakurayoBoss) { const ev = globalThis.SakurayoBoss.tick(boss, dt, runTime - (boss.phaseStarted || 0)); if (ev === "enrage") toast("镜界狂暴：弹幕加密"); if (boss.enraged46 && boss.shot > 0.42) boss.shot = 0.42; }
+    if (typeof paintBossBreak46 === "function") paintBossBreak46();
+    { const tf = P.fx < -.08 ? -1 : P.fx > .08 ? 1 : (P.face46 ?? 1); P.face46 = (P.face46 ?? tf) + (tf - (P.face46 ?? tf)) * Math.min(1, dt * 16); }
     if (P.trail46) { P.trail46.t -= dt; if (P.trail46.t <= 0) P.trail46 = null; }
     runTime += dt;
     banterTick += dt;
@@ -11007,8 +11241,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       }
     } else if (
       boss &&
-      enemies.length < 18 &&
-      chance(dt * (0.3 + 0.18 * planFactor()))
+      enemies.length < 10 &&
+      chance(dt * (0.2 + 0.12 * planFactor()))
     )
       spawnEnemy(chance(0.5) ? "fast" : "normal");
     if (!bossBorn && runTime >= stage().dur) spawnBoss();
@@ -11030,6 +11264,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
           b.vy += (Math.sin(a) * sp - b.vy) * b.home;
         }
       }
+      if (b.tracer46) { b.px46 = b.x; b.py46 = b.y; }
+      if (globalThis.SakurayoWeapons && (b.boom46 || b.rang46)) globalThis.SakurayoWeapons.update(b, dt, weaponApi46());
       b.x += b.vx * dt;
       b.y += b.vy * dt;
       if (window.SakurayoLifecycle && window.SakurayoLifecycle.deflectBullet(b, lifecycleWorld44())) {
@@ -11044,6 +11280,9 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
         if (circlesOverlap35(b.x,b.y,b.r,e.x,e.y,e.r)) {
           b.hit.add(e);
           damageEnemy(e,b.dmg,{source:b.source||(b.fireball?"spell":"shot"),school:b.school,rail:!!b.rail,bioSplit:!!b.bioSplit,pet:!!b.pet});
+          if (state !== "play") return;
+          if (b.tracer46 && typeof sparks46 !== "undefined" && sparks46.length < 80) sparks46.push({ x: b.x, y: b.y, a: Math.atan2(b.vy, b.vx), t: 0.14, c: b.tracer46 });
+          if (globalThis.SakurayoWeapons && globalThis.SakurayoWeapons.onHit(b, e, weaponApi46())) { b.life = 0; break; }
           if (state !== "play") return;
           if(b.kunaiBlast)aoe(e.x,e.y,34+b.kunaiBlast*7,P.dmg*.22*b.kunaiBlast,"#aa91ff",false,{source:"kunai",school:"ninja"});
           if (state !== "play") return;
@@ -11118,6 +11357,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       if (e.dead) continue;
       e.hit = Math.max(0, e.hit - dt);
       e.touch = Math.max(0, e.touch - dt);
+      if (e.type === "boss" && e.broken46 > 0) continue;
       e.frozen = Math.max(0, e.frozen - dt);
       if (e.acid > 0) {
         e.acid -= dt;
@@ -11694,6 +11934,11 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     ctx.restore();
   }
   function projectile(b, enemy = false) {
+    if (!enemy && b.tracer46 && b.px46 != null) {
+      const k = 2.6; ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
+      ctx.strokeStyle = b.tracer46; ctx.globalAlpha = .55; ctx.lineWidth = b.r * 1.5;
+      ctx.beginPath(); ctx.moveTo(b.x - (b.x - b.px46) * k, b.y - (b.y - b.py46) * k); ctx.lineTo(b.x, b.y); ctx.stroke(); ctx.restore();
+    }
     ctx.save();
     ctx.translate(b.x, b.y);
     ctx.shadowBlur = 12 * battleGlow421(!!(b.rail || b.fireball || b.star || b.wardShot));
@@ -11781,6 +12026,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       ctx.restore();
     }
     bullets.forEach((b) => projectile(b));
+    if (globalThis.SakurayoWeapons) globalThis.SakurayoWeapons.draw(ctx, P, runTime || 0);
+    if (typeof drawSparks46 === "function") drawSparks46();
     ebullets.forEach((b) => projectile(b, true));
     if (drawStats46) { drawStats46.enemies = 0; drawStats46.boss = 0; drawStats46.frames++; }
     enemies.forEach(enemyDraw);
@@ -12047,7 +12294,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   /* ================= V3.5 三刃协奏：角色、衣装、剧情补丁 ================= */
   const CHARACTERS35 = {
     sayo:{id:"sayo",name:"月城小夜",short:"小夜",title:"镜界巫女·月城小夜",weapon:"夜樱突击步枪",role:"远程压制",icon:"🌸",hair:"#56306f",main:"#f35aa0",light:"#fff0f7",desc:"射程与稳定输出最高。每第七发触发贯穿压制弹。",bonus:"射程 +18%｜枪弹 +8%｜暴击 +3%｜移动 -4%",bias:["gun","mech","shrine"]},
-    aya:{id:"aya",name:"神代绫",short:"绫",title:"零号追缉者·神代绫",weapon:"手枪＋月切太刀",role:"远近切换",icon:"🌙",hair:"#d9e2f3",main:"#6aa8ff",light:"#f4f8ff",desc:"手枪单发与射速均低于步枪；每第四枪自动斩击近身目标。",bonus:"移速 +8%｜手枪伤害 -18%｜射击间隔 +28%｜冲刺冷却 -12%",bias:["gun","ninja","cult"]},
+    aya:{id:"aya",name:"神代绫",short:"绫",title:"零号追缉者·神代绫",weapon:"手枪＋月切太刀",role:"远近切换",icon:"🌙",hair:"#d9e2f3",main:"#6aa8ff",light:"#f4f8ff",desc:"手枪单发与射速均低于步枪；每第四枪自动斩击近身目标。",bonus:"移速 +8%｜手枪伤害 -12%｜射击间隔 +28%｜冲刺冷却 -12%",bias:["gun","ninja","cult"]},
     rion:{id:"rion",name:"黑羽凛音",short:"凛音",title:"黄泉剑姬·黑羽凛音",weapon:"黑羽太刀",role:"纯近战爆发",icon:"🗡️",hair:"#241c36",main:"#d84b66",light:"#fff0f1",desc:"不使用枪械。第三刀扩大剑势，近战伤害和生存最高。",bonus:"生命 +20%｜移速 +12%｜减伤 10%｜无法远程普攻",bias:["cult","ninja","gene","shrine"]}
   };
   const SKINS35 = [
@@ -12302,7 +12549,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   midEvent=function(){const result=_midEventCharacter35(),key=`${stage().id}:${Math.max(0,eventIndex-1)}`,entry=CHARACTER_EVENT35[save.character]?.[key];if(entry){$("#eventTitle").textContent=entry.t;$("#eventText").textContent=entry.x;renderCharacterEventChoices35(entry);}return result;};
   const _upgradeWeight35=upgradeWeight;
   upgradeWeight=function(u){let w=_upgradeWeight35(u),s=skin35(),c=char35(),school=u.s||u.school;if(s.bias.includes(school))w*=1.3;if(c.bias.includes(school))w*=1.16;if(c.id==="rion"&&["gun","mech"].includes(school))w*=.58;if(c.id==="sayo"&&school==="cult")w*=.82;return Math.max(.05,w);};
-  function applyCharacterRun35(){let c=char35();P.character=c.id;P.skin=save.skin;P.meleeChain=0;P.charPassive=0;P.animAttack=0;P.animDash=0;P.animHit=0;P.animSkill=0;P.outfitFade=0;P.outfitReveal=0;P.outfitRevealTitle="";P.animMoving=false;if(c.id==="sayo"){P.range*=1.18;P.dmg*=1.08;P.crit+=.03;P.spd*=.96;}else if(c.id==="aya"){P.spd*=1.08;P.rate*=1.28;P.range*=.85;P.dmg*=.82;P.dashCd*=.88;P.skillCd*=.92;}else{P.maxHp*=1.2;P.hp=P.maxHp;P.spd*=1.12;P.damageReduce+=.10;P.range=178;P.dmg*=1.28;P.rate=.55;P.skillCd*=.9;}["idle","move","attack","hit","dash"].forEach(pose=>artImage(charAnimPath35(c,pose)));["idle_b","idle_c","move_b","attack_b","attack_c","skill","skill_b","dash_b","hit_b"].forEach(pose=>artImage(charAnimPath35(c,pose,{id:"default"})));["calm","mad","hurt","win","smile","serious","surprised","sad"].forEach(mood=>artImage(`characters/${c.id}/default/face_${mood}.webp`));for(const n of ["rin","kagami","swordmaster"]){["calm","serious","smile","surprised"].forEach(m=>artImage(`npc/${n}/face_${m}.webp`));artImage(`npc/${n}/portrait.webp`);}updateCharacterUI35();}
+  function applyCharacterRun35(){let c=char35();P.character=c.id;P.skin=save.skin;P.weapons46={};P.shotAcc46=0;globalThis.casings46=[];P.meleeChain=0;P.charPassive=0;P.animAttack=0;P.animDash=0;P.animHit=0;P.animSkill=0;P.outfitFade=0;P.outfitReveal=0;P.outfitRevealTitle="";P.animMoving=false;if(c.id==="sayo"){P.range*=1.18;P.dmg*=1.08;P.crit+=.03;P.spd*=.96;}else if(c.id==="aya"){P.spd*=1.08;P.rate*=1.28;P.range*=.85;P.dmg*=.88;P.dashCd*=.88;P.skillCd*=.92;}else{P.maxHp*=1.2;P.hp=P.maxHp;P.spd*=1.12;P.damageReduce+=.10;P.range=178;P.dmg*=1.28;P.rate=.55;P.skillCd*=.9;}["idle","move","attack","hit","dash"].forEach(pose=>artImage(charAnimPath35(c,pose)));["idle_b","idle_c","move_b","attack_b","attack_c","skill","skill_b","dash_b","hit_b"].forEach(pose=>artImage(charAnimPath35(c,pose,{id:"default"})));["calm","mad","hurt","win","smile","serious","surprised","sad"].forEach(mood=>artImage(`characters/${c.id}/default/face_${mood}.webp`));for(const n of ["rin","kagami","swordmaster"]){["calm","serious","smile","surprised"].forEach(m=>artImage(`npc/${n}/face_${m}.webp`));artImage(`npc/${n}/portrait.webp`);}updateCharacterUI35();}
   const PLAYER_GEOMETRY35=Object.freeze({visualSize:96,footOffset:18,collisionRadius:16,edgeX:28,edgeTop:73,edgeBottom:22});
   function circlesOverlap35(ax,ay,ar,bx,by,br){return (ax-bx)**2+(ay-by)**2<(ar+br)**2;}
   function playerMuzzle35(angle){return {x:P.x+Math.cos(angle)*26,y:P.y-18+Math.sin(angle)*8};}
@@ -12362,7 +12609,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     }
     ctx.save();ctx.translate(x,y);
     ctx.globalAlpha=(P.inv>0&&Math.floor(P.inv*15)%2===0)?.35:1;
-    ctx.scale(P.fx<-.08?-1:1,1);
+    { const f=P.face46??(P.fx<-.08?-1:1), sp=Math.hypot(P.vel46?.x||0,P.vel46?.y||0); ctx.rotate((P.vel46?.x||0)*.07); ctx.translate(0,-Math.abs(Math.sin((runTime||0)*13))*2.2*sp); ctx.scale(Math.sign(f||1)*Math.max(.18,Math.abs(f)),1); }
     ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";
     const vis=PLAYER_GEOMETRY35.visualSize*(window.SakurayoLifecycle?window.SakurayoLifecycle.heroVisualScale(W):1),ox=vis/2,oy=vis-PLAYER_GEOMETRY35.footOffset;
     if((P.animDash||0)>0){const a=ctx.globalAlpha;ctx.globalAlpha=a*.32;ctx.drawImage(image,-ox-12,-oy,vis,vis);ctx.globalAlpha=a;}
@@ -12474,15 +12721,16 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function directionalSlash36(radius,dmg,big=false,angle=P.weaponAngle||Math.atan2(P.fy,P.fx),halfArc=big?1.66:1.05){fxStamp("slash",P.x,P.y,{size:Math.max(48,radius*.42),life:.28,rot:angle});const color=char35().id==="rion"?"#ff526f":"#7db8ff";slashes.push({x:P.x,y:P.y,max:radius,life:.32,total:.32,color,dir:angle,arc:halfArc*2});for(const e of grid.near(P.x,P.y,radius+grid.maxRadius)){if(e.dead)continue;const dx=e.x-P.x,dy=e.y-P.y,d=Math.hypot(dx,dy),off=angleDelta36(Math.atan2(dy,dx),angle);if(directionalHit36(d,e.r,radius,off,halfArc))damageEnemy(e,dmg,{source:"blade",school:char35().id==="aya"?"ninja":"cult"});}particles(P.x+Math.cos(angle)*radius*.55,P.y+Math.sin(angle)*radius*.55,18,color);P.inv=Math.max(P.inv,big?.16:.07);return true;}
   slash35=function(radius,dmg,big=false){return directionalSlash36(radius,dmg,big);};
 
-  function gunShot36(angle,c){const origin=playerMuzzle35(angle);fxStamp("muzzle",origin.x,origin.y,{size:c.id==="sayo"?34:28,life:.14,rot:angle});P.fx=P.aimX=Math.cos(angle);P.fy=P.aimY=Math.sin(angle);P.weaponAngle=angle;P.weaponLock=.22;P.shotCount++;const rail=P.rail&&P.shotCount%9===0,count=P.multi,spread=.115;for(let i=0;i<count;i++){const q=angle+(i-(count-1)/2)*spread;pushBullet({x:origin.x,y:origin.y,vx:Math.cos(q)*P.bSpeed,vy:Math.sin(q)*P.bSpeed,r:rail?7:4,life:P.range/P.bSpeed,dmg:P.dmg*(rail?2.6:1),pierce:P.pierce+(rail?6:0),rail,source:rail?"tech":"shot",school:rail?"mech":"gun",bioSplit:!!P.bioGun,hit:new Set(),acid:P.acid});}
-    if(P.gunWard&&P.shotCount%10===0)pushBullet({x:origin.x,y:origin.y,vx:Math.cos(angle)*P.bSpeed*.88,vy:Math.sin(angle)*P.bSpeed*.88,r:10,life:1.35,dmg:P.dmg*1.45*P.skillPow,pierce:8,home:.025,source:"skill",school:"shrine",wardShot:1,hit:new Set()});
-    if(P.star&&P.shotCount%Math.max(3,7-P.star)===0)for(let i=0;i<P.star;i++){const q=angle+rnd(-.45,.45);pushBullet({x:origin.x,y:origin.y,vx:Math.cos(q)*P.bSpeed*.72,vy:Math.sin(q)*P.bSpeed*.72,r:5,life:1.45,dmg:P.dmg*.72*P.spellPow,pierce:1,home:.09,star:1,source:"star",school:"magical",hit:new Set()});}
-    if(P.idolGun&&P.combo>0&&P.shotCount%6===0)for(let i=0;i<3;i++){const q=angle+(i-1)*.18;pushBullet({x:origin.x,y:origin.y,vx:Math.cos(q)*P.bSpeed,vy:Math.sin(q)*P.bSpeed,r:4,life:P.range/P.bSpeed,dmg:P.dmg*.46,pierce:1,source:"music",school:"idol",hit:new Set()});}
-    if(c.id==="sayo"&&P.shotCount%7===0)pushBullet({x:origin.x,y:origin.y,vx:Math.cos(angle)*P.bSpeed*1.12,vy:Math.sin(angle)*P.bSpeed*1.12,r:7,life:P.range/P.bSpeed,dmg:P.dmg*1.7,pierce:P.pierce+4,rail:1,source:"tech",school:"gun",hit:new Set()});
-    if(c.id==="aya"&&P.shotCount%4===0)directionalSlash36(125,P.dmg*2.05+P.pierce*2,false,angle,1.02);
-    P.fire=P.rate*(P.encoreTimer>0?.62:1);P.animAttack=.16;sound(c.id==="sayo"?"rifle":"pistol");
+  function casing46(x,y,a){if(!globalThis.casings46)globalThis.casings46=[];const C=globalThis.casings46;if(C.length>60)C.shift();const b=a+Math.PI/2*(Math.random()<.5?1:-1)*.8+Math.PI;C.push({x,y,vx:Math.cos(b)*rnd(60,120),vy:Math.sin(b)*rnd(60,120)-90,t:.55,r:rnd(0,TAU)});}
+  function gunShot36(angle,c){const origin=playerMuzzle35(angle);if(c.id==="aya"){P.hand46=-(P.hand46||1);origin.x+=Math.cos(angle+1.57)*6*P.hand46;origin.y+=Math.sin(angle+1.57)*6*P.hand46;}fxStamp("muzzle",origin.x,origin.y,{size:c.id==="sayo"?34:28,life:.14,rot:angle});P.fx=P.aimX=Math.cos(angle);P.fy=P.aimY=Math.sin(angle);P.weaponAngle=angle;P.weaponLock=.22;const K46=c.id==="sayo"?.4:.5,full=(P.shotAcc46=(P.shotAcc46||0)+K46)>=1;if(full){P.shotAcc46-=1;P.shotCount++;}const rail=P.rail&&full&&P.shotCount%9===0,count=P.multi,spread=.115;for(let i=0;i<count;i++){const q=angle+(i-(count-1)/2)*spread;pushBullet({x:origin.x,y:origin.y,vx:Math.cos(q)*P.bSpeed*1.5,vy:Math.sin(q)*P.bSpeed*1.5,r:rail?7:3.5,life:P.range/(P.bSpeed*1.5),dmg:P.dmg*(rail?2.6:K46),tracer46:c.id==="sayo"?"#ffb3d6":"#b8d6ff",pierce:P.pierce+(rail?6:0),rail,source:rail?"tech":"shot",school:rail?"mech":"gun",bioSplit:!!P.bioGun,hit:new Set(),acid:P.acid});}
+    if(P.gunWard&&full&&P.shotCount%10===0)pushBullet({x:origin.x,y:origin.y,vx:Math.cos(angle)*P.bSpeed*.88,vy:Math.sin(angle)*P.bSpeed*.88,r:10,life:1.35,dmg:P.dmg*1.45*P.skillPow,pierce:8,home:.025,source:"skill",school:"shrine",wardShot:1,hit:new Set()});
+    if(P.star&&full&&P.shotCount%Math.max(3,7-P.star)===0)for(let i=0;i<P.star;i++){const q=angle+rnd(-.45,.45);pushBullet({x:origin.x,y:origin.y,vx:Math.cos(q)*P.bSpeed*.72,vy:Math.sin(q)*P.bSpeed*.72,r:5,life:1.45,dmg:P.dmg*.72*P.spellPow,pierce:1,home:.09,star:1,source:"star",school:"magical",hit:new Set()});}
+    if(P.idolGun&&P.combo>0&&full&&P.shotCount%6===0)for(let i=0;i<3;i++){const q=angle+(i-1)*.18;pushBullet({x:origin.x,y:origin.y,vx:Math.cos(q)*P.bSpeed,vy:Math.sin(q)*P.bSpeed,r:4,life:P.range/P.bSpeed,dmg:P.dmg*.46,pierce:1,source:"music",school:"idol",hit:new Set()});}
+    if(c.id==="sayo"&&full&&P.shotCount%7===0)pushBullet({x:origin.x,y:origin.y,vx:Math.cos(angle)*P.bSpeed*1.12,vy:Math.sin(angle)*P.bSpeed*1.12,r:7,life:P.range/P.bSpeed,dmg:P.dmg*1.7,pierce:P.pierce+4,rail:1,source:"tech",school:"gun",hit:new Set()});
+    if(c.id==="aya"&&full&&P.shotCount%4===0){if(nearest(P.x,P.y,140))directionalSlash36(125,P.dmg*2.05+P.pierce*2,false,angle,1.02);else pushBullet({x:origin.x,y:origin.y,vx:Math.cos(angle)*P.bSpeed*.8,vy:Math.sin(angle)*P.bSpeed*.8,r:13,life:P.range*.6/(P.bSpeed*.8),dmg:P.dmg*1.6+P.pierce*2,pierce:P.pierce+3,source:"blade",school:"ninja",crescent46:1,hit:new Set()});}
+    P.fire=P.rate*K46*(P.encoreTimer>0?.62:1);casing46(origin.x,origin.y,angle);P.animAttack=.16;sound(c.id==="sayo"?"rifle":"pistol");
   }
-  shoot=function(){const c=char35(),target=P.manualAim?null:aimTarget46(P.range);let angle=P.manualAim?(P.weaponAngle||0):(target?Math.atan2(target.y-P.y,target.x-P.x):null);if(c.id!=="rion"){if(angle==null)return;return gunShot36(angle,c);}if(angle==null){const e=nearest(P.x,P.y,176+55);if(!e)return;angle=Math.atan2(e.y-P.y,e.x-P.x);}P.fx=P.aimX=Math.cos(angle);P.fy=P.aimY=Math.sin(angle);P.weaponAngle=angle;P.weaponLock=.28;const next=(P.meleeChain+1)%3,third=next===0,radius=third?176:128,dmg=P.dmg*(third?2.35:1.48)*(1+(P.multi-1)*.12+P.pierce*.05);P.meleeChain=next;directionalSlash36(radius,dmg,third,angle,third?1.66:1.05);if(third){P.hp=Math.min(P.maxHp,P.hp+1.2*healingMul());toast("剑势·三段");}P.fire=P.rate;P.animAttack=.2;sound("slash");};
+  shoot=function(){const c=char35(),target=P.manualAim?null:aimTarget46(P.range);let angle=P.manualAim?(P.weaponAngle||0):(target?Math.atan2(target.y-P.y,target.x-P.x):null);if(c.id!=="rion"){if(angle==null)return;return gunShot36(angle,c);}if(angle==null){const e=nearest(P.x,P.y,176+55);if(!e)return;angle=Math.atan2(e.y-P.y,e.x-P.x);}P.fx=P.aimX=Math.cos(angle);P.fy=P.aimY=Math.sin(angle);P.weaponAngle=angle;P.weaponLock=.28;const next=(P.meleeChain+1)%3,third=next===0,radius=third?176:128,dmg=P.dmg*(third?2.2:1.38)*(1+(P.multi-1)*.12+P.pierce*.05);P.meleeChain=next;directionalSlash36(radius,dmg,third,angle,third?1.66:1.05);if(third){P.hp=Math.min(P.maxHp,P.hp+1.2*healingMul());toast("剑势·三段");}P.fire=P.rate;P.animAttack=.2;sound("slash");};
 
   function drawWeapon36(x,y){const c=char35(),a=P.weaponAngle??Math.atan2(P.fy,P.fx);ctx.save();ctx.translate(x,y-18);ctx.rotate(a);ctx.lineCap="round";if(c.id==="sayo"||c.id==="aya"){const long=c.id==="sayo",len=long?42:29;ctx.fillStyle="#1a2540";ctx.strokeStyle=long?"#65e7ff":"#83b7ff";ctx.lineWidth=1.5;ctx.beginPath();if(typeof ctx.roundRect==="function")ctx.roundRect(5,-5,len,10,3);else ctx.rect(5,-5,len,10);ctx.fill();ctx.stroke();ctx.fillStyle=long?"#dff8ff":"#edf4ff";ctx.fillRect(10,-3,long?23:14,6);ctx.fillStyle=long?"#55e7ff":"#78adff";ctx.fillRect(long?33:24,-2,long?16:10,4);ctx.fillStyle="#10172b";ctx.fillRect(12,5,7,7);if(P.animAttack>0){ctx.fillStyle="#fff5b7";ctx.beginPath();ctx.arc(long?52:37,0,4+P.animAttack*12,0,TAU);ctx.fill();}if(c.id==="aya"){ctx.strokeStyle="#eaf5ff";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-12,14);ctx.lineTo(32,-24);ctx.stroke();ctx.strokeStyle="#6f9fff";ctx.lineWidth=1.4;ctx.stroke();}}else{ctx.strokeStyle="#fff5f6";ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(-10,10);ctx.lineTo(46,-10);ctx.stroke();ctx.strokeStyle="#ff526f";ctx.lineWidth=2;ctx.stroke();}ctx.restore();}
   const _drawChar36=drawChar35;drawChar35=function(x,y){_drawChar36(x,y);if(!artReady(charAnimImage35(char35(),charDrawPose35(),skin35())))drawWeapon36(x,y);};hero=drawChar35;
@@ -12690,7 +12938,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     return !!(boss&&!boss.dead&&Math.hypot(boss.x-P.x,boss.y-P.y)<P.r+boss.r+72);
   }
   const _dash39=dash;
-  dash=function(){const ready=state==="play"&&P.dash<=0,perfect=ready&&immediateThreat39(),result=_dash39();if(ready&&perfect){P.perfectDodges++;slowmo46=.5;P.dodgeFlash=.42;P.dash=Math.max(0,P.dash-.7);P.sh=Math.min(P.maxSh,P.sh+8);const c=char35();if(c.id==="rion"){directionalSlash36(132,P.dmg*1.45,true,P.weaponAngle||0,1.5);toast("黄泉返：完美格挡反击");}else if(c.id==="aya"){directionalSlash36(105,P.dmg*.88,false,P.weaponAngle||0,1.18);toast("月切：完美闪避追斩");}else{aoe(P.x,P.y,92,P.dmg*.72,"#77efff",true,{source:"skill",school:"shrine"});toast("完美闪避：护盾回充");}haptic37([12,18,26]);}return result;};
+  dash=function(){const ready=state==="play"&&P.dash<=0,perfect=ready&&immediateThreat39(),result=_dash39();if(ready&&perfect){P.perfectDodges++;slowmo46=.5;if(boss&&!boss.dead&&globalThis.SakurayoBoss?.fill(boss,globalThis.SakurayoBoss.OBJECTIVE.dodge))bossBroken46(boss);P.dodgeFlash=.42;P.dash=Math.max(0,P.dash-.7);P.sh=Math.min(P.maxSh,P.sh+8);const c=char35();if(c.id==="rion"){directionalSlash36(132,P.dmg*1.45,true,P.weaponAngle||0,1.5);toast("黄泉返：完美格挡反击");}else if(c.id==="aya"){directionalSlash36(105,P.dmg*.88,false,P.weaponAngle||0,1.18);toast("月切：完美闪避追斩");}else{aoe(P.x,P.y,92,P.dmg*.72,"#77efff",true,{source:"skill",school:"shrine"});toast("完美闪避：护盾回充");}haptic37([12,18,26]);}return result;};
 
   const _slash39=slash35;
   slash35=function(radius,dmg,big=false){const result=_slash39(radius,dmg,big);shake=Math.max(shake,big?7:4);P.dodgeFlash=Math.max(P.dodgeFlash,big?.14:.08);haptic37(big?22:10);return result;};
@@ -12731,7 +12979,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   update=function(dt){const result=_update39(dt);if(state==="play"){
     P.dodgeFlash=Math.max(0,(P.dodgeFlash||0)-dt);updateEnemyRoles39(dt);
     if(boss&&!boss.dead){
-      if(stage().id===2&&boss.signalX39!=null){P.signalLane39=boss.signalX39;if(Math.abs(P.x-boss.signalX39)<42){P.jam=Math.max(0,(P.jam||0)-dt*3.8);P.healSupp=Math.max(0,(P.healSupp||0)-dt*2.4);}}
+      if(stage().id===2&&boss.signalX39!=null){P.signalLane39=boss.signalX39;if(Math.abs(P.x-boss.signalX39)<42){if(globalThis.SakurayoBoss?.fill(boss,globalThis.SakurayoBoss.OBJECTIVE.lane*dt))bossBroken46(boss);P.jam=Math.max(0,(P.jam||0)-dt*3.8);P.healSupp=Math.max(0,(P.healSupp||0)-dt*2.4);}}
       if((stage().id===4||isMainGodRun36())){boss.ruleClock39=(boss.ruleClock39||7)-dt;if(boss.ruleClock39<=0){boss.ruleClock39=7;const sources=Object.entries(P.damageSources||{}).sort((a,b)=>b[1]-a[1]);boss.adaptSource39=sources[0]?.[0]||"shot";boss.bossRes={...(boss.bossRes||{}),[boss.adaptSource39]:.58};toast(`镜像适应：${SOURCE_NAME[boss.adaptSource39]||boss.adaptSource39} 受抑制`);}}
     }
   }return result;};
@@ -13320,8 +13568,12 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       chooseUpgrade(index=0){const choices=[...document.querySelectorAll("#choices .choice")];const choice=choices[Number(index)];if(!choice)throw new Error(`Missing upgrade choice ${index}`);choice.click();return snapshot35();},
       drawStats(){return {...drawStats46};},
       chargeUlt46(){P.ult46=100;return snapshot35();},
+      bossDebug46(){if(!boss)return null;const g=enemies.filter(e=>!e.dead&&e.guardFor).map(e=>Math.round(Math.hypot(e.x-P.x,e.y-P.y)));return {t:Math.round(runTime),hp:Math.round(boss.hp),max:Math.round(boss.max),ph:boss.phase,guard:Math.round(boss.guard||0),brk:Math.round(boss.brk46||0),broken:boss.broken46,d:Math.round(Math.hypot(boss.x-P.x,boss.y-P.y)),g,n:enemies.length,shots:P.shotCount,ma:P.manualAim};},
+      giveWeapon46(id,n=1){for(let i=0;i<n;i++)globalThis.SakurayoWeapons.gain(P,id);return P.weapons46;},
+      teleport46(x,y){P.x=x;P.y=y;return snapshot35();},
+      realtime46(){manualTestClock=false;last=performance.now();scheduleLoop();return true;},
       props46(){return (props46||[]).map(p=>({kind:p.kind,x:p.x,y:p.y,done:p.done}));},
-      fieldProbe(n=6){const near=(arr)=>arr.filter(o=>o&&!o.dead).map(o=>({dx:o.x-P.x,dy:o.y-P.y,r:o.r||0,boss:o.type==="boss"})).sort((a,b)=>Math.hypot(a.dx,a.dy)-Math.hypot(b.dx,b.dy)).slice(0,n);const cam=window.SakurayoCamera?.size?.();return {enemies:near(enemies),gems:near(gems),x:P.x,y:P.y,worldW:cam?.worldW||W,worldH:cam?.worldH||H,level:P.level};},
+      fieldProbe(n=6){const near=(arr)=>arr.filter(o=>o&&!o.dead).map(o=>({dx:o.x-P.x,dy:o.y-P.y,r:o.r||0,boss:o.type==="boss"})).sort((a,b)=>Math.hypot(a.dx,a.dy)-Math.hypot(b.dx,b.dy)).slice(0,n);const cam=window.SakurayoCamera?.size?.();return {enemies:near(enemies),gems:near(gems),x:P.x,y:P.y,worldW:cam?.worldW||W,worldH:cam?.worldH||H,level:P.level,range:P.range};},
       spawnBossNow(){if(state!=="play")throw new Error("spawnBossNow requires play mode");spawnBoss();return snapshot35();},
       setBossHpRatio(ratio){if(!boss||boss.dead)throw new Error("Boss is not active");boss.hp=clamp(Number(ratio),0,1)*boss.max;return snapshot35();},
       setBossPosition(x,y){if(!boss||boss.dead)throw new Error("Boss is not active");boss.x=Number(x);boss.y=Number(y);draw();return snapshot35();},

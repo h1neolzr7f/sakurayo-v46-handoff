@@ -25,6 +25,11 @@
     "@keyframes ultArt46{0%{transform:translateX(40%)}20%{transform:translateX(0)}100%{transform:translateX(-6%)}}",
     "@keyframes ultText46{0%{transform:translateX(-30%);opacity:0}25%{transform:none;opacity:1}}",
     "#banter.banter{top:auto!important;bottom:max(12px,env(safe-area-inset-bottom))!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;width:min(420px,40vw)!important;max-width:none!important;padding:7px 12px!important;font-size:12px!important;opacity:.94}",
+    "#bossBreak46{position:absolute;left:50%;top:calc(max(8px,env(safe-area-inset-top)) + 112px);transform:translateX(-50%);width:min(320px,38vw);height:16px;border-radius:9px;background:#0a0716cc;border:1px solid #ffd36b66;overflow:hidden;pointer-events:none}",
+    "#bossBreak46 i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,#ffb13b,#ffe27a);transition:width .15s}",
+    "#bossBreak46.broken{border-color:#fff;box-shadow:0 0 14px #ff5aa6}#bossBreak46.broken i{background:linear-gradient(90deg,#ff5aa6,#ffd0e8)}",
+    "#bossBreak46.enraged{border-color:#ff3b6b}",
+    "#bossBreak46 span{position:relative;display:block;text-align:center;font:800 10.5px/16px system-ui;color:#fff;text-shadow:0 1px 2px #000;letter-spacing:.06em}",
   ].join("\n");
   var built = false, mini = null, last = 0, ring = null;
   function api() { return global.SakurayoBattle46; }
