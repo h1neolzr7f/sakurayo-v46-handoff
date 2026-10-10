@@ -1018,7 +1018,7 @@
       '<div class="wishStage46 wishV2">' +
       '<img class="wishBanner46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/banner_" + pool + ".webp") + '">' +
       '<div class="wishShade46" aria-hidden="true"></div>' +
-      '<img class="wishHero46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/up_" + hero + ".webp") + '">' +
+      '<img class="wishHero46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/up_" + (pool === "fashion" ? "crown" : hero) + ".webp") + '">' +
       '<div class="wishPetals46">' + petalMarks() + "</div>" +
       '<nav class="wishTabs46" id="gachaTabs46" aria-label="卡池">' + tabHtml + "</nav>" +
       '<div class="wishWallet46" aria-label="货币">' + coinIcon + "<b>" + info.coins + '</b><span class="wishShardPill46">' + shardIcon + '碎镜片 ' + shards + " / " + RATES.spark + "</span></div>" +
