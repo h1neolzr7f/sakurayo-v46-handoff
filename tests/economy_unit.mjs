@@ -20,7 +20,7 @@ function runtime(){
 const json=v=>JSON.parse(JSON.stringify(v));
 test('readable legacy storage remains readable even when writes throw',()=>{
  let writes=0;const raw='{"coins":12345,"unlock":4}';
- const ctx={localStorage:{getItem:()=>raw,setItem(){writes++;throw Object.assign(new Error('full'),{name:'QuotaExceededError'});}},normalizeGameSave:v=>v,DEF:{}};
+ const ctx={localStorage:{getItem:()=>raw,setItem(){writes++;throw Object.assign(new Error('full'),{name:'QuotaExceededError'});}},normalizeGameSave:v=>v,DEF:{},window:{}};
  vm.createContext(ctx);vm.runInContext(source('bootLoadSave')+'\nglobalThis.read=bootLoadSave();',ctx);
  assert.equal(ctx.read.coins,12345);assert.equal(ctx.read.unlock,4);assert.equal(writes,0,'startup never probes by writing');
 });
