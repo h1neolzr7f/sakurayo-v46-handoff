@@ -3003,6 +3003,71 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 
 </script>
 <script>
+/* 形态系统框架（docs/DESIGN_V5.md §1，路线图 P1；故事包装见 docs/STORY.md v3 §1「面具」）。纯逻辑，无 DOM。
+   - 每角色 5 形态：base / guard / speed / burst（分支，一局同时最多 1 个）+ awaken（Boss 第 4 阶段限时 10 秒）。
+   - 形态 = 规则改写（rule）+ 构筑卡兼容（compat）+ 外观（art，外观只改视觉，不进入 mods）。
+   - mods 只描述「规则参数」，由战斗侧读取 P.form46；收藏/外观永远不会写入 mods（测试断言）。
+   - 局内状态挂在 run46.form：{ id, switches:{layer:n}, gauge, awakenUntil, history } */
+(function (global) {
+  "use strict";
+  var AWAKEN_SEC = 10, GAUGE_MAX = 100, SWITCH_PER_LAYER = 1;
+  function F(ch, slot, name, mask, rule, mods, compat, ban) { return { id: ch + "_" + slot, ch: ch, slot: slot, name: name, mask: mask, rule: rule, mods: mods, compat: compat || [], ban: ban || [] }; }
+  var FORMS = [
+    F("sayo", "base", "夜樱射手", "无", "连射累积热度", {}, ["spread", "ricochet", "laser"]),
+    F("sayo", "guard", "镜盾哨兵", "狐面", "站定时展开护盾，热度转为护盾值", { standShield: 0.35, moveSpeed: 0.9 }, ["spread", "laser", "orbit"], ["dashTrail"]),
+    F("sayo", "speed", "疾风樱刃", "天狗面", "移动射击无惩罚，热度满自动冲刺", { moveSpeed: 1.18, autoDash: 1, dmg: 0.9 }, ["ricochet", "homing", "spread"], ["orbit"]),
+    F("sayo", "burst", "过载炮手", "般若面", "主动过热：弹幕翻倍，受伤翻倍", { overheat: 1, fireRate: 1.25, dmgTaken: 1.35 }, ["explosive", "laser", "burst"], ["orbit"]),
+    F("sayo", "awaken", "千樱·零式", "纸面具", "10 秒：热度锁满，全屏樱花弹", { fireRate: 2, dmg: 1.4, invuln: 1 }, []),
+    F("aya", "base", "枪刀双持", "无", "远程叠印，近身消印", {}, ["burst", "pierce", "homing"]),
+    F("aya", "guard", "证人", "狐面", "印记转为护送目标与自身的护盾", { markShield: 0.4, moveSpeed: 0.92 }, ["pierce", "orbit", "spread"], ["explosive"]),
+    F("aya", "speed", "乱舞", "天狗面", "枪刀自动交替，切换无硬直", { swapFree: 1, fireRate: 1.15 }, ["burst", "ricochet", "pierce"], ["laser"]),
+    F("aya", "burst", "连麦", "般若面", "召唤协同分身，自身生命上限减半", { clone: 1, maxHp: 0.5 }, ["homing", "explosive", "burst"], ["orbit"]),
+    F("aya", "awaken", "双生·证词", "纸面具", "10 秒：所有印记同时引爆", { markDetonate: 1, dmg: 1.4, invuln: 1 }, []),
+    F("rion", "base", "居合", "无", "静止蓄力，移动释放", {}, ["pierce", "orbit", "explosive"]),
+    F("rion", "guard", "守冢", "狐面", "插剑形成剑区：区内减速敌人、近战增伤", { swordZone: 1, moveSpeed: 0.9 }, ["orbit", "explosive", "spread"], ["homing"]),
+    F("rion", "speed", "百鬼连斩", "天狗面", "取消蓄力，改为越连越快的连段", { comboChain: 1, chargeTime: 0 }, ["pierce", "ricochet", "burst"], ["laser"]),
+    F("rion", "burst", "黄泉一闪", "般若面", "蓄力上限翻倍，蓄满前不能移动", { chargeCap: 2, rootWhileCharge: 1, dmg: 1.15 }, ["explosive", "pierce", "laser"], ["orbit"]),
+    F("rion", "awaken", "万剑归坟", "纸面具", "10 秒：每次斩击召唤剑雨", { swordRain: 1, dmg: 1.4, invuln: 1 }, [])
+  ];
+  /* 视觉：tint = 角色光环/弹幕辉光，core = 子弹核心色；line = 变身台词（STORY v3 §2 面具台词）。只影响画面。 */
+  var PAL = { base: null, guard: ["#7fd8ff", "#e9fbff"], speed: ["#6dffb4", "#effff4"], burst: ["#ff6a3d", "#fff0c8"], awaken: ["#ffd76a", "#fffbe6"] };
+  var LINES = {
+    sayo_guard: "挨打要花药钱的，所以不挨！", sayo_speed: "下一个摊位 5 分钟后收摊——让开让开！", sayo_burst: "房租的仇，今天一起报！", sayo_awaken: "……这张脸，是我七岁时画的。", sayo_base: "今天也要努力打工！",
+    aya_guard: "全程录屏，你每一拳我都截图了。", aya_speed: "下面这段请开 0.25 倍速。", aya_burst: "掉粉的怨念，接好！", aya_awaken: "……原来那次直播，第一个观众是你们。", aya_base: "回到正片。",
+    rion_guard: "我就站这里。你们过来。", rion_speed: "三分钟后睡觉。一刀一个。", rion_burst: "……谁把我吵醒的。", rion_awaken: "这一次，我想看烟花。", rion_base: "……嗯。"
+  };
+  FORMS.forEach(function (f) { var p = PAL[f.slot]; f.tint = p ? p[0] : null; f.core = p ? p[1] : null; f.line = LINES[f.id] || ""; f.art = "characters/" + f.ch + "/forms/" + f.slot + ".webp"; });
+  var BY = {}; FORMS.forEach(function (f) { BY[f.id] = f; });
+  var BRANCH = ["guard", "speed", "burst"];
+  function get(id) { return BY[id] || null; }
+  function list(ch) { return FORMS.filter(function (f) { return f.ch === ch; }); }
+  function base(ch) { return get((ch || "sayo") + "_base"); }
+  function init(st) { if (!st.form || !get(st.form.id) || get(st.form.id).ch !== (st.character || "sayo")) st.form = { id: base(st.character).id, switches: {}, gauge: 0, awakenUntil: 0, history: [] }; return st.form; }
+  /* 「面具摊」/ 镜面裂缝节点：三选一分支形态（排除当前形态，不足时补基础形态）。 */
+  function offer(st) { var f = init(st), ch = st.character || "sayo"; return BRANCH.map(function (s) { return get(ch + "_" + s); }).filter(function (x) { return x.id !== f.id; }).concat(f.id !== base(ch).id ? [base(ch)] : []).slice(0, 3); }
+  function canSwitch(st, id, src) { var f = init(st), t = get(id); if (!t || t.slot === "awaken" || t.ch !== (st.character || "sayo") || t.id === f.id) return false; if (src === "boss") return true; return (f.switches[st.layer || 1] || 0) < SWITCH_PER_LAYER; }
+  /* src: "node"（面具摊/剧情选择，计入每层 1 次）| "boss"（Boss 阶段应对，不计次）。返回被「通用化」的形态专属卡。 */
+  function switchTo(st, id, src, cards) {
+    if (!canSwitch(st, id, src)) return null; var f = init(st), t = get(id), L = st.layer || 1;
+    if (src !== "boss") f.switches[L] = (f.switches[L] || 0) + 1;
+    var lost = (cards || []).filter(function (c) { return t.ban.indexOf(c) >= 0; });
+    f.history.push({ layer: L, from: f.id, to: id, src: src || "node" }); f.id = id; return { form: t, generalized: lost };
+  }
+  function compatible(st, card) { var t = get(init(st).id); return !t || t.ban.indexOf(card) < 0; }
+  /* 觉醒槽：伤害与破防累积；Boss 第 4 阶段且满槽时可觉醒 10 秒。 */
+  function charge(st, dmg, breaks) { var f = init(st); f.gauge = Math.min(GAUGE_MAX, f.gauge + Math.max(0, dmg || 0) * 0.02 + Math.max(0, breaks || 0) * 25); return f.gauge; }
+  function canAwaken(st, bossPhase, now) { var f = init(st); return bossPhase >= 4 && f.gauge >= GAUGE_MAX && !(f.awakenUntil > now); }
+  function awaken(st, bossPhase, now) { if (!canAwaken(st, bossPhase, now)) return false; var f = init(st); f.gauge = 0; f.awakenUntil = now + AWAKEN_SEC; return true; }
+  function active(st, now) { var f = init(st); return f.awakenUntil > now ? get((st.character || "sayo") + "_awaken") : get(f.id); }
+  /* 合成规则参数：分支形态 ×（觉醒时叠加觉醒）。只读形态表，不读收藏。 */
+  function mods(st, now) { var f = init(st), out = {}, add = function (m) { for (var k in m) out[k] = (out[k] || 1) * m[k]; }; add(get(f.id).mods); if (f.awakenUntil > now) add(get((st.character || "sayo") + "_awaken").mods); return out; }
+  function apply(P, st, now) { P.form46 = { id: active(st, now).id, mods: mods(st, now) }; return P.form46; }
+  function sanitize(f, ch) { if (!f || typeof f !== "object" || !get(f.id) || get(f.id).ch !== ch || get(f.id).slot === "awaken") return null; var sw = {}; for (var k in (f.switches || {})) { var n = f.switches[k] | 0; if (n > 0 && +k >= 1 && +k <= 9) sw[k] = Math.min(n, SWITCH_PER_LAYER); } return { id: f.id, switches: sw, gauge: Math.max(0, Math.min(GAUGE_MAX, +f.gauge || 0)), awakenUntil: 0, history: Array.isArray(f.history) ? f.history.slice(-20) : [] }; }
+  global.SakurayoForms = { FORMS: FORMS, AWAKEN_SEC: AWAKEN_SEC, GAUGE_MAX: GAUGE_MAX, get: get, list: list, base: base, init: init, offer: offer, canSwitch: canSwitch, switchTo: switchTo, compatible: compatible, charge: charge, canAwaken: canAwaken, awaken: awaken, active: active, mods: mods, apply: apply, sanitize: sanitize };
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
 /* 夜行 · 肉鸽一局（docs/DESIGN_V5.md §3.2，路线图 P0）。纯逻辑，无 DOM：
    地图生成（层 × 行 × 2–3 个节点，分支连线）、节点类型、路线推进、局内资源（魂晶）、遗物、
    事件/商店/神社选项、战斗节点 → 关卡规格（复用 SakurayoLevels 的目标类型）、序列化。
@@ -3018,6 +3083,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     event: { n: "事件", i: "❔", d: "镜界里的偶遇，选项有得有失。" },
     shop: { n: "商店", i: "🏮", d: "用魂晶购买治疗、强化与遗物。" },
     shrine: { n: "神社", i: "⛩", d: "休整：回复生命或获得一次强化。" },
+    mask: { n: "面具摊", i: "🎭", d: "狸老板的面具摊：戴上面具切换形态（每层 1 次）。" },
     boss: { n: "层主", i: "👹", d: "本层 Boss。击破后进入下一层。" }
   };
   var LAYER_NAMES = ["神社外街", "雨夜商圈", "黄泉参道"];
@@ -3062,6 +3128,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         }
         for (j = 0; j < b.length; j++) if (!a.some(function (q) { return q.next.indexOf(b[j].id) >= 0; })) a[Math.min(a.length - 1, Math.round(j * (a.length - 1) / Math.max(1, b.length - 1)))].next.push(b[j].id);
       }
+      rows[2][rows[2].length - 1].type = "mask"; // 每层保证一个面具摊（形态切换，DESIGN_V5 §1.3）
       // goal node variant per layer
       rows.forEach(function (rw) { rw.forEach(function (nd) { if (nd.type === "goal") nd.goal = Math.floor(r() * GOALS[L].length); if (nd.type === "fight") nd.fight = r() < 0.5 ? "survive" : "clear"; }); });
       layers.push(rows);
@@ -3117,6 +3184,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       var rel = relicOffer(st, 1)[0];
       return [{ k: "heal", n: "伤药", d: "回复 30% 生命", cost: 30 }, { k: "level", n: "符纸", d: "获得 1 次强化", cost: 40 }].concat(rel ? [{ k: "relic", id: rel.id, n: rel.i + " " + rel.n, d: rel.d, cost: 55 }] : []).concat([{ k: "leave", n: "离开", d: "" }]);
     }
+    if (nd.type === "mask") {
+      var FM = global.SakurayoForms; if (!FM) return [{ k: "leave", n: "离开", d: "" }];
+      return FM.offer(st).map(function (f) { return { k: "form", id: f.id, n: f.mask + " · " + f.name, d: f.rule }; }).concat([{ k: "leave", n: "不换", d: "保持当前形态" }]);
+    }
     if (nd.type === "event") {
       var ev = [
         { t: "无人的手水舍", d: "水面映出的不是你。", o: [{ k: "heal", n: "掬水", d: "回复 25% 生命" }, { k: "shards", v: 35, n: "捞起水底的魂晶", d: "魂晶 +35，生命 -10%", hp: -0.1 }] },
@@ -3135,6 +3206,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (opt.k === "heal") st.pending.push({ heal: nd.type === "shrine" ? 0.35 : nd.type === "shop" ? 0.3 : 0.25 });
     else if (opt.k === "level") st.pending.push({ levels: opt.lv || 1 });
     else if (opt.k === "shards") st.shards += opt.v;
+    else if (opt.k === "form") { var FM = global.SakurayoForms, r2 = FM && FM.switchTo(st, opt.id, "node", st.build && st.build.up ? Object.keys(st.build.up) : []); if (!r2) return { ok: false, why: "本层已经换过面具了" }; return { ok: true, form: opt.id }; }
     else if (opt.k === "relic") { var id = opt.id || (relicOffer(st, 1)[0] || {}).id; if (id) gainRelic(st, id); return { ok: true, relic: id }; }
     return { ok: true };
   }
@@ -3168,6 +3240,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     st.shards = Math.max(0, Math.floor(+st.shards || 0)); st.relics = st.relics.filter(function (id) { return !!relic(id); });
     if (st.at && !node(st, st.at)) st.at = null;
     if (st.build && typeof st.build !== "object") st.build = null;
+    if (st.form) { st.form = global.SakurayoForms ? global.SakurayoForms.sanitize(st.form, st.character || "sayo") : st.form; if (!st.form) delete st.form; }
     return st;
   }
   // meta reward when the run ends (sakura coins); per-node coin rewards are paid by the normal result flow
@@ -3194,6 +3267,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     "background:linear-gradient(180deg,rgba(26,18,40,.82),rgba(12,8,22,.92));border:1px solid rgba(255,190,225,.35);box-shadow:0 10px 40px rgba(0,0,0,.5);backdrop-filter:blur(6px)}" +
     "#avg46 .a46nm{position:absolute;top:-17px;left:22px;padding:5px 18px;border-radius:999px;font-weight:800;letter-spacing:.06em;background:linear-gradient(90deg,#ff7ab8,#b07cff);font-size:15px;box-shadow:0 4px 14px rgba(255,90,170,.35)}" +
     "#avg46 .a46nm:empty{display:none}#avg46 .a46tx{font-size:clamp(15px,2.3vw,19px);line-height:1.65;min-height:3.3em;text-shadow:0 1px 2px #000}#avg46 .a46tx.narr{color:#d9d2ff;font-style:italic}" +
+    "#avg46 .a46box.epic{background:linear-gradient(180deg,#140d08f0,#0b0705f5);border:1px solid #c9a46a88;box-shadow:inset 0 0 0 4px #00000055,inset 0 0 0 5px #c9a46a33}#avg46 .a46box.epic .a46tx{font-family:SakurayoEpic,'Noto Serif CJK SC','Songti SC',serif;font-style:normal;color:#f3e3c3;letter-spacing:.12em;line-height:1.9;text-shadow:0 1px 0 #000}#avg46 .a46box.epic .a46nm{background:#5a1f17;color:#f6e2b8;font-family:SakurayoEpic,serif;letter-spacing:.2em}" +
     "#avg46 .a46tri{position:absolute;right:20px;bottom:12px;opacity:.8;animation:avgTri46 .9s infinite}@keyframes avgTri46{50%{transform:translateY(3px)}}" +
     "#avg46 .a46bar{position:absolute;top:max(10px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));display:flex;gap:8px;z-index:3}" +
     "#avg46 .a46bar button{min-width:64px;height:40px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,.28);background:rgba(16,10,28,.7);color:#fff;font-weight:700;font-size:14px}" +
@@ -3267,7 +3341,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     var who = ln.who || "", nm = ln.name != null ? ln.name : (who && cur.o.cast ? (cur.o.cast(who, ln.ex || "calm") || {}).name : "") || "";
     if (who && ln.ex) { ["L", "R"].forEach(function (side) { if (els[side].dataset.who === who) { var c = cur.o.cast(who, ln.ex); if (c && els[side].dataset.src !== c.img) { els[side].src = c.img; els[side].dataset.src = c.img; } } }); }
     ["L", "R"].forEach(function (side) { els[side].classList.toggle("talk", !!who && els[side].dataset.who === who); });
-    els.nm.textContent = nm; els.tx.classList.toggle("narr", !who);
+    els.nm.textContent = nm; els.tx.classList.toggle("narr", !who && ln.style !== "epic"); els.box.classList.toggle("epic", ln.style === "epic");
     var text = ln.t || ""; cur.full = text; cur.shown = 0; cur.typing = true; cur.line = ln;
     cur.log.push({ n: nm, t: text }); if (cur.log.length > 50) cur.log.shift();
     var id = ln.id; cur.wasRead = id ? cur.read.has(id) : false;
@@ -3307,30 +3381,36 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
    bg/cg 为 art 相对路径。行 id 用于「已读快进」（v3-*）。 */
 (function (global) {
   "use strict";
-  var B1 = "story/ch1/bg_pre.webp", B2 = "story/ch1/bg_end.webp", CG1 = "story/ch1/cg_rewind.webp", CG2 = "story/ch1/cg_ema.webp";
+  var B1 = "story/ch1/bg_v3_pre.webp", B2 = "story/ch1/bg_v3_end.webp", E = "说书 · 狸老板", CG1 = "story/ch1/cg_rewind.webp", CG2 = "story/ch1/cg_ema.webp";
   var S = {
     "1-1": {
       pre: [
-        { id: "v3-001", chap: ["第一章", "本神宣布"], bg: B1, t: "樱夜町夏祭，最后一夜。23:59，所有人抬头等最后一发烟花。" },
-        { id: "v3-00a", L: { who: "me", ex: "calm" }, who: "me", ex: "calm", t: { sayo: "最后一发了！许个愿吧——希望下个月房租能交上！", aya: "最后一发。镜头对准天空，三、二——", rion: "……放完就能回家睡觉了。" } },
+        { id: "v31-e01", chap: ["第一章", "你可听说过大食切"], bg: B2, style: "epic", name: E, t: "诸位看官——你可听说过，大食切的故事？" },
+        { id: "v31-e02", style: "epic", name: E, t: "二百年前，百夜祭。有般若自樱夜山来，身高十丈，专食夜晚。夜被它吃一口，天便永不再亮。" },
+        { id: "v31-e03", style: "epic", name: E, t: "黑羽流剑士千代，与铁炮手月城朔夜，迎战于参道。朔夜为护千代，被般若踏于足下，临终只道一句——「千代，刀要快。快到它来不及跑。」" },
+        { id: "v31-e04", style: "epic", name: E, t: "千代不哭。她跃上般若之颈，一刀，一刀，燃尽刀身。最后一斩，连同半座樱夜山，一齐斩开。" },
+        { id: "v31-e05", style: "epic", name: E, t: "斩何物，便名何刀。斩童子者名童子切，斩雷者名雷切。此刀本当名「百夜切」——" },
+        { id: "v31-e06", style: "epic", name: E, t: "然瓦版记者神代氏如实记载：般若毙命之时，口中尚塞着三十串章鱼烧。故此刀，名曰——「大食切」。" },
+        { id: "v3-001", bg: B1, t: "二百年后。樱夜町夏祭，最后一夜。23:59，所有人抬头等最后一发烟花。" },
+        { id: "v3-00a", L: { who: "me", ex: "calm" }, who: "me", ex: "calm", t: { sayo: "最后一发了！许个愿吧——希望下个月房租能交上！", aya: "最后一发。镜头对准天空，三、二——", rion: "……放完就能回家睡觉了。（背上的刀，有点沉）" } },
         { id: "v3-002", cg: CG1, t: "烟花升空——然后停住了。火光一点一点缩回去，像录像带倒带。灯笼、人群、苹果糖上的糖衣，全都往回流。" },
         { id: "v3-003", cg: null, L: { who: "me", ex: "shaken" }, who: "me", ex: "shaken", t: { sayo: "……欸？天黑……不对，天又亮了一点？现在几点？", aya: "……画面卡了？不对，是天空在倒放。我得录下来——", rion: "……又来了。" } },
         { id: "v3-004", R: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "18:00。刚才是 23:59。我的直播间——粉丝 0。……刚才明明有 312 个。" },
         { id: "v3-005", who: "sayo", ex: "shaken", t: "我头上怎么多了个狐狸面具？！还有，我刚买的章鱼烧呢？！我付了钱的！" },
-        { id: "v3-006", name: "宵", t: "咳咳——凡人们，安静！" },
-        { id: "v3-007", name: "宵", t: "本神乃樱夜町祭神，宵！本神宣布——今夜，永不散场！烟花不许放，摊位不许收，谁也不许回家睡觉！" },
+        { id: "v3-006", R: { who: "yoi", ex: "calm" }, who: "yoi", t: "咳咳——凡人们，安静！" },
+        { id: "v3-007", who: "yoi", t: "本神乃樱夜町祭神，宵！本神宣布——今夜，永不散场！烟花不许放，摊位不许收，谁也不许回家睡觉！" },
         { id: "v3-008", L: { who: "rion", ex: "calm" }, who: "rion", ex: "calm", t: "……不用回家睡觉。也就是说，明天不用上学。" },
         { id: "v3-009", who: "rion", ex: "calm", t: "……嗯，挺好。" },
         { id: "v3-010", R: { who: "aya", ex: "angry" }, who: "aya", ex: "angry", t: "一点都不好！我的粉丝！" },
-        { id: "v3-011", name: "宵", t: "戴面具的三个，本神看见你们了。想让天亮？那就来本殿找本神。路上的摊位，一个都不许跳过——鬼退治摊，开张！" },
+        { id: "v3-011", R: { who: "yoi", ex: "calm" }, who: "yoi", t: "戴面具的三个，本神看见你们了。想让天亮？那就来本殿找本神。路上的摊位，一个都不许跳过——鬼退治摊，开张！" },
         { id: "v3-012", R: { who: "rin", ex: "calm" }, who: "rin", ex: "calm", t: "这里是祭典广播站，雨宫凛。好消息：参道上的灯笼妖很弱。坏消息：有九十秒那么多。撑过去，我帮你们找路。" },
         { id: "v3-013", L: { who: "sayo", ex: "resolve" }, who: "sayo", ex: "resolve", t: "没问题没问题！打完就有奉纳钱拿对吧？——对吧？！" }
       ],
       post: [
         { id: "v3-014", bg: B1, L: { who: "sayo", ex: "calm" }, R: { who: "rin", ex: "calm" }, who: "rin", ex: "calm", t: "撑住了。灯笼妖散的时候都在喊「明年还来」……挺有礼貌的。" },
-        { id: "v3-015", name: "狸老板", t: "哟，戴狐面的。面具不错吧？本店出品。死了也别慌，回鸟居底下找我，苹果糖管够。" },
+        { id: "v3-015", R: { who: "tanuki", ex: "calm" }, who: "tanuki", t: "哟，戴狐面的。面具不错吧？本店出品。死了也别慌，回鸟居底下找我，苹果糖管够。" },
         { id: "v3-016", who: "sayo", ex: "shaken", t: "死、死了？！" },
-        { id: "v3-017", name: "狸老板", t: "在这儿，死叫「出局」。出局就回 18:00，从头逛。只有神给的奉纳钱不会倒带——好好攒着吧。" },
+        { id: "v3-017", who: "tanuki", t: "在这儿，死叫「出局」。出局就回 18:00，从头逛。只有神给的奉纳钱不会倒带——好好攒着吧。" },
         { id: "v3-018", who: "sayo", ex: "resolve", t: "……也就是说，只要一直逛，就能一直攒钱？无限刷奖品？这、这是神仙夏祭吧！" },
         { id: "v3-019", R: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "笔记：①时间倒带 ②奉纳钱不倒带 ③月城小夜没救了。……我写在手臂上，看看下次还在不在。" }
       ]
@@ -3366,7 +3446,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         { id: "v3-038", who: "sayo", ex: "calm", t: "欸？没有哦。我们是这个夏天才合租认识的。" },
         { id: "v3-039", L: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "不认识。" },
         { id: "v3-040", R: { who: "rion", ex: "calm" }, who: "rion", ex: "calm", t: "……不认识。" },
-        { id: "v3-041", R: { who: "miko", ex: "calm" }, who: "miko", ex: "calm", t: "这样啊。……嘿嘿。那，本殿见。" }
+        { id: "v3-041", R: { who: "miko", ex: "calm" }, who: "miko", ex: "calm", t: "这样啊。……嘿嘿。啊，那把刀——是大食切呀。好久不见。" },
+        { id: "v31-041", L: { who: "rion", ex: "shaken" }, who: "rion", ex: "shaken", t: "……这名字，请不要大声念。" },
+        { id: "v31-042", L: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "（打字）「大·食·切」。热搜预定。" }
       ]
     },
     "1-4": {
@@ -3376,19 +3458,19 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         { id: "v3-044", who: "sayo", ex: "resolve", t: "倒带前买的！倒带后摊主不记得我付过钱，所以又给了我一盒！这叫循环理财！" },
         { id: "v3-045", who: "aya", ex: "angry", t: "这叫白吃。" },
         { id: "v3-046", L: { who: "rion", ex: "calm" }, who: "rion", ex: "calm", t: "……好吃。（第二个也吃掉了）" },
-        { id: "v3-047", name: "宵", t: "哼哼哼——吃饱了？那就来见识本神的第一位摊主大将：百目灯笼大将！它的每一只眼睛，都盯着你们的破绽！" },
+        { id: "v3-047", R: { who: "yoi", ex: "calm" }, who: "yoi", t: "哼哼哼——吃饱了？那就来见识本神的第一位摊主大将：百目灯笼大将！它的每一只眼睛，都盯着你们的破绽！" },
         { id: "v3-048", R: { who: "rin", ex: "serious" }, who: "rin", ex: "serious", t: "它的眼睛会轮流闭上。闭眼的那一刻就是破防——打它两次破防，它就撑不住了。" }
       ],
       post: [
-        { id: "v3-049", bg: B2, t: "大将倒下，百只眼睛一齐闭上。灯笼一盏盏熄灭，只剩一块旧绘马，落在小夜脚边。" },
-        { id: "v3-050", cg: CG2, t: "木牌已经发黑，字是小孩子歪歪扭扭的笔迹：「希望今夜永远不要结束」。日期——十年前。" },
-        { id: "v3-051", cg: null, L: { who: "sayo", ex: "shaken" }, R: { who: "aya", ex: "shaken" }, who: "aya", ex: "shaken", t: "……小夜。这是你的字。和你房租信封上的「交！」一模一样。" },
-        { id: "v3-052", who: "sayo", ex: "shaken", t: "我……我不记得写过。十年前我才七岁，我、我连这个镇都——" },
-        { id: "v3-053", name: "宵", t: "…………本殿见。" },
-        { id: "v3-054", t: "宵没有再说「本神」，声音也不像刚才那样大。灯笼熄了，参道安静得能听见河水。" },
-        { id: "v3-055", L: { who: "rion", ex: "shaken" }, R: null, who: "rion", ex: "shaken", t: "（背对两人，小声）……这次，也没赶上吗。" },
-        { id: "v3-056", L: { who: "sayo", ex: "calm" }, who: "sayo", ex: "calm", t: "凛音？你说什么？" },
-        { id: "v3-057", who: "rion", ex: "calm", t: "……说我困了。走吧，下一条街。" }
+        { id: "v3-049", bg: B2, t: "大将倒下，百只眼睛一齐闭上。灯笼一盏盏熄灭，有什么东西「当」地一声，滚到小夜脚边。" },
+        { id: "v31-050", cg: CG2, t: "一颗发黑的铅弹。二百年前的铁炮弹。弹身上，刻着两个字——「月城」。" },
+        { id: "v31-051", cg: null, L: { who: "sayo", ex: "shaken" }, R: { who: "aya", ex: "calm" }, who: "sayo", ex: "shaken", t: "欸？月城……我家祖上，是打铁炮的？我还以为我们家世代都是穷人……" },
+        { id: "v31-052", who: "aya", ex: "calm", t: "两者并不矛盾。" },
+        { id: "v31-053", style: "epic", name: E, t: "……那一夜死去的铁炮手，姓月城。而般若的这只眼睛，二百年来，一直在找她。" },
+        { id: "v31-054", L: { who: "rion", ex: "shaken" }, R: null, who: "rion", ex: "shaken", t: "（刀在鞘中低鸣。凛音按住刀柄，背对两人，小声）……这次，也没赶上吗。" },
+        { id: "v31-055", L: { who: "sayo", ex: "calm" }, who: "sayo", ex: "calm", t: "凛音？你刚才说什么？" },
+        { id: "v31-056", who: "rion", ex: "calm", t: "……说我困了。走吧，下一条街。" },
+        { id: "v31-057", style: "epic", name: E, t: "第一夜，至此。欲知般若何在、大食切因何而鸣——且听下回分解。" }
       ]
     }
   };
@@ -10586,7 +10668,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function damagePlayer(amt) {
     if (P.inv > 0) return false;
     P.hits46 = (P.hits46 || 0) + 1;
-    amt *= clamp(1 - P.damageReduce, .28, 1.5);
+    amt *= clamp(1 - P.damageReduce, .28, 1.5) * (P.dmgTaken46 || 1);
     let left = amt;
     if (P.sh > 0) {
       let used = Math.min(P.sh, left);
@@ -12370,7 +12452,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     const nearMe46 = !enemy && Math.hypot(b.x - P.x, b.y - (P.y - 20)) < 70;
     if (!enemy && b.tracer46 && b.px46 != null) {
       const k = 2.6; ctx.save(); ctx.globalCompositeOperation = nearMe46 || reduceFlash46() ? "source-over" : "lighter"; ctx.lineCap = "round";
-      ctx.strokeStyle = b.tracer46; ctx.globalAlpha = nearMe46 ? .15 : reduceFlash46() ? .4 : .45; ctx.lineWidth = b.r * 1.5;
+      ctx.strokeStyle = (P.form46 && P.form46.tint) || b.tracer46; ctx.globalAlpha = nearMe46 ? .15 : reduceFlash46() ? .4 : .45; ctx.lineWidth = b.r * 1.5;
       ctx.beginPath(); ctx.moveTo(b.x - (b.x - b.px46) * k, b.y - (b.y - b.py46) * k); ctx.lineTo(b.x, b.y); ctx.stroke(); ctx.restore();
     }
     ctx.save();
@@ -12395,6 +12477,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
           : b.star
             ? "#fff1a6"
             : "#fff2f8";
+    if (!enemy && P.form46 && P.form46.tint && !b.rail && !b.fireball) { ctx.shadowColor = P.form46.tint; ctx.fillStyle = P.form46.core; }
     ctx.beginPath();
     ctx.arc(0, 0, b.r, 0, TAU);
     ctx.fill();
@@ -13073,7 +13156,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
         ctx.beginPath();ctx.arc(0,10,37+Math.sin((runTime||0)*3)*2,0,TAU);ctx.stroke();ctx.restore();
       }
     }
-    ctx.drawImage(image,-ox,-oy,vis,vis);
+    if(P.form46&&P.form46.tint){const t=P.form46.tint,aw=P.form46.slot==="awaken",pu=.5+.5*Math.sin((runTime||0)*3);ctx.save();const g=ctx.createRadialGradient(0,4,4,0,4,aw?64:50);g.addColorStop(0,t+"88");g.addColorStop(1,t+"00");ctx.fillStyle=g;ctx.globalAlpha=.55+pu*.15;ctx.beginPath();ctx.ellipse(0,4,aw?64:50,aw?22:17,0,0,TAU);ctx.fill();ctx.restore();ctx.filter=`drop-shadow(0 0 ${aw?7:4}px ${t})`;}
+    ctx.drawImage(image,-ox,-oy,vis,vis);ctx.filter="none";
     { const L=[[ATK_FRAMES46,(P.atkClock46||0)*ATK_FPS46],[RUN_FRAMES46,(P.runClock46||0)*RUN_FPS46],[IDLE_FRAMES46,(runTime||0)*IDLE_FPS46]].find(q=>q[0].includes(pose46)); const F=L&&L[0], ai=F?F.indexOf(pose46):-1; if(ai>=0){ const ph=L[1]%1; if(ph>.6){ const nx=charAnimImage35(c,F[(ai+1)%F.length],sk); if(nx&&artReady(nx)&&nx!==image){ const a0=ctx.globalAlpha; ctx.globalAlpha=a0*((ph-.6)/.4); ctx.drawImage(nx,-ox,-oy,vis,vis); ctx.globalAlpha=a0; } } } }
     if((P.outfitFade||0)>0){
       const q=clamp((P.outfitFade||0)/.42,0,1);
@@ -13865,6 +13949,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     if(who==="rin")return {name:AVG_NAMES46.rin,img:artUrl(`npc/rin/avg_${ex==="serious"?"serious":"calm"}.webp`)};
     if(who==="miko")return {name:AVG_NAMES46.miko,img:artUrl(`npc/miko/avg_${ex==="afraid"?"afraid":"calm"}.webp`)};
     if(who==="kagami")return {name:AVG_NAMES46.kagami,img:artUrl("npc/kagami/portrait.webp")};
+    if(who==="yoi"||who==="tanuki")return {name:AVG_NAMES46[who],img:artUrl(`npc/${who}/avg_calm.webp`)};
     return null;
   }
   function storyFor46(id,part){const L=window.SakurayoLevels?.find(id);return L&&window.SakurayoStory?.["ch"+L.ch]?.[id]?.[part]||null;}
@@ -14023,14 +14108,14 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       <div class="r46Layers">${[1,2,3].map(l=>`<i class="${l<run46.layer?"done":l===run46.layer?"on":""}">${l}</i>`).join("")}</div>
       <div class="r46Field"><svg viewBox="0 0 100 100" preserveAspectRatio="none">${edges.join("")}</svg>${nodes}</div>
       ${sheet}
-      <footer class="r46Foot"><span>Lv ${run46.build?.level||1} · 强化 ${Object.values(run46.build?.up||{}).reduce((a,b)=>a+(+b||0),0)} 项 · 构筑跨节点保留</span><button class="ab" data-k="abandon">放弃夜行</button></footer>
+      <footer class="r46Foot"><span>${window.SakurayoForms?`🎭 ${htmlEscape(window.SakurayoForms.get(window.SakurayoForms.init(run46).id).name)} · `:""}Lv ${run46.build?.level||1} · 强化 ${Object.values(run46.build?.up||{}).reduce((a,b)=>a+(+b||0),0)} 项 · 构筑跨节点保留</span><button class="ab" data-k="abandon">放弃夜行</button></footer>
       ${runModalHtml46()}`;
   }
   function runModalHtml46(){
     const m=runModal46;if(!m)return "";
     if(m.kind==="relic")return `<div class="rm46"><div><small>遗物 · 三选一</small><h3>${htmlEscape(m.title||"选择一件遗物")}</h3><div class="opts">${m.offer.map(q=>`<button data-k="relic" data-v="${q.id}"><i>${q.i}</i><b>${htmlEscape(q.n)}</b><span>${htmlEscape(q.d)}</span></button>`).join("")}</div><button class="skip" data-k="skip">放弃</button></div></div>`;
     const R=window.SakurayoRun,nd=R.node(run46,m.node),T=R.NODE[nd.type];
-    return `<div class="rm46"><div><small>${T.i} ${T.n}</small><h3>${htmlEscape(nd.eventTitle||T.n)}</h3><p>${htmlEscape(nd.eventText||T.d)}</p><div class="opts">${m.opts.map((o,i)=>`<button data-k="opt" data-v="${i}" ${o.cost&&run46.shards<o.cost||m.used?.includes(i)?"disabled":""}><b>${htmlEscape(o.n)}${o.cost?` <em>💠${o.cost}</em>`:""}</b><span>${htmlEscape(o.d)}</span></button>`).join("")}</div>${nd.type==="shop"?"":""}</div></div>`;
+    return `<div class="rm46"><div><small>${T.i} ${T.n}</small><h3>${htmlEscape(nd.eventTitle||T.n)}</h3><p>${htmlEscape(nd.eventText||T.d)}</p><div class="opts ${nd.type==="mask"?"forms":""}">${m.opts.map((o,i)=>`<button data-k="opt" data-v="${i}" ${o.cost&&run46.shards<o.cost||m.used?.includes(i)?"disabled":""} ${o.k==="form"?`style="--t:${window.SakurayoForms.get(o.id).tint}"`:""}>${o.k==="form"?`<img src="${artUrl(window.SakurayoForms.get(o.id).art)}" alt="">`:""}<b>${htmlEscape(o.n)}${o.cost?` <em>💠${o.cost}</em>`:""}</b><span>${htmlEscape(o.d)}</span></button>`).join("")}</div>${nd.type==="shop"?"":""}</div></div>`;
   }
   function runEnter46(id){
     const R=window.SakurayoRun;if(!run46||!R.canEnter(run46,id))return false;
@@ -14047,7 +14132,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     if(o.k==="leave"){runModal46=null;runPersist46();paintRun46();return true;}
     const r=R.choose(run46,nd,o);if(!r.ok){toast(r.why||"无法选择");return false;}
     runApplyBuildNow46();sound?.("loot");
-    if(o.k==="relic"&&r.relic){const q=R.relic(r.relic);toast(`获得遗物：${q.i} ${q.n}`);}
+    if(o.k==="relic"&&r.relic){const q=R.relic(r.relic);toast(`获得遗物：${q.i} ${q.n}`);}if(r.form){runModal46=null;runPersist46();paintRun46();formCut46(window.SakurayoForms.get(r.form));return true;}
     if(nd.type==="shop"){m.used.push(i);}else runModal46=null;
     runPersist46();paintRun46();return true;
   }
@@ -14061,15 +14146,71 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function runNodeStart46(){
     if(!run46||!runNode46||!activeLevel46?.run46)return;
     const R=window.SakurayoRun;if(run46.build)R.restore(P,run46.build);
-    const r=R.applyPending(run46,P);P.runLevels46=(P.runLevels46||0)+r.levels;P.hits46=0;P.chests46=0;
+    const r=R.applyPending(run46,P);P.runLevels46=(P.runLevels46||0)+r.levels;P.hits46=0;P.chests46=0;formSync46();
   }
+  /* ===== 形态（runtime/sakurayo-forms.js，DESIGN_V5 §1 / 路线图 P1；STORY v3「面具」） =====
+     规则参数通过 setFormMods46 叠加到 P，并在构筑快照前撤销，避免跨节点重复叠加。外观只读 tint/core/art。 */
+  style37.textContent+=`@font-face{font-family:SakurayoEpic;src:url("${artUrl("fonts/epic-serif.woff2")}") format("woff2");font-display:swap}`;
+  var formPause46=false;
+  function formSt46(){return run46&&activeLevel46?.run46&&window.SakurayoForms?run46:null;}
+  function setFormMods46(m){
+    const o=P.formMods46||{},n=m||{},g=(q,k)=>q[k]==null?1:q[k];
+    const ratio=k=>g(n,k)/g(o,k);
+    P.spd*=ratio("moveSpeed");P.dmg*=ratio("dmg");P.rate/=ratio("fireRate");
+    const hr=ratio("maxHp");if(hr!==1){P.maxHp*=hr;P.hp=Math.min(P.maxHp,Math.max(1,P.hp*hr));}
+    P.dmgTaken46=g(n,"dmgTaken")*(n.invuln?0.35:1);P.formRules46=n;P.formMods46={...n};
+  }
+  function formSync46(){const st=formSt46();if(!st)return null;const F=window.SakurayoForms;F.init(st);const f=F.active(st,runTime);setFormMods46(F.mods(st,runTime));P.form46={id:f.id,slot:f.slot,tint:f.tint,core:f.core};paintFormHud46();return f;}
+  function formCut46(f){
+    if(!f)return;let el=$("#formCut46");if(el)el.remove();el=document.createElement("div");el.id="formCut46";el.className="fc46 s-"+f.slot;el.style.setProperty("--t",f.tint||"#ff9ac8");
+    el.innerHTML=`<div class="fl"></div><img src="${artUrl(f.art)}" alt=""><div class="tx"><small>${htmlEscape(f.mask==="无"?"摘下面具":f.mask)} · 形态变化</small><b>${htmlEscape(f.name)}</b><span>「${htmlEscape(f.line)}」</span></div>`;
+    document.body.appendChild(el);setTimeout(()=>el.remove(),1700);sound?.("skill");
+    if(state==="play"){slowmo46=Math.max(slowmo46,0.6);P.inv=Math.max(P.inv,1);fxStamp?.("skill",P.x,P.y,{size:220,life:.7});shake=Math.max(shake,8);}
+  }
+  function paintFormHud46(){
+    const st=formSt46();let b=$("#awaken46");
+    if(!st||state!=="play"){b?.classList.add("hidden");return;}
+    if(!b){b=document.createElement("button");b.id="awaken46";b.type="button";b.innerHTML="<i></i><b>觉醒</b><small></small>";b.onclick=()=>formAwaken46();document.body.appendChild(b);}
+    const F=window.SakurayoForms,f=st.form,ph=boss&&!boss.dead?boss.phase:0,on=f.awakenUntil>runTime,ready=F.canAwaken(st,ph,runTime);
+    b.classList.toggle("hidden",!(boss&&!boss.dead&&ph>=3)&&!on);b.classList.toggle("ready",ready);b.classList.toggle("on",on);
+    b.style.setProperty("--g",(on?Math.max(0,(f.awakenUntil-runTime)/F.AWAKEN_SEC):f.gauge/F.GAUGE_MAX).toFixed(3));
+    b.querySelector("small").textContent=on?`${Math.ceil(f.awakenUntil-runTime)}s`:ph>=4?(ready?"F / 点击":`${Math.floor(f.gauge)}%`):"第 4 阶段";
+  }
+  function formAwaken46(){const st=formSt46();if(!st||state!=="play"||formPause46)return false;const F=window.SakurayoForms;if(!F.awaken(st,boss&&!boss.dead?boss.phase:0,runTime))return false;const f=formSync46();formCut46(f);return true;}
+  function formOffer46(src){
+    const st=formSt46();if(!st)return false;const F=window.SakurayoForms,offer=F.offer(st).filter(f=>F.canSwitch(st,f.id,src));if(!offer.length)return false;
+    formPause46=true;let el=document.createElement("div");el.id="formPick46";el.className="fp46";
+    const rec=boss&&boss.phase>=2?"guard":null;
+    el.innerHTML=`<div class="box"><small>${src==="boss"?"层主进入新阶段 · 应对形态（不占本层次数）":"面具摊 · 选择形态"}</small><h3>戴上哪一张面具？</h3><div class="cards">${offer.map(f=>`<button data-f="${f.id}" style="--t:${f.tint||"#ffb2d4"}" class="${f.slot===rec?"rec":""}"><img src="${artUrl(f.art)}" alt=""><em>${htmlEscape(f.mask)}</em><b>${htmlEscape(f.name)}</b><span>${htmlEscape(f.rule)}</span>${f.slot===rec?"<i>推荐</i>":""}</button>`).join("")}</div><button class="keep" data-f="">保持当前形态</button></div>`;
+    el.addEventListener("click",e=>{const b=e.target.closest("[data-f]");if(!b)return;el.remove();formPause46=false;if(b.dataset.f){F.switchTo(st,b.dataset.f,src,Object.keys(P.up||{}));const f=formSync46();runPersist46();formCut46(f);}});
+    document.body.appendChild(el);return true;
+  }
+  const _formUpdate46=update;update=function(dt){
+    if(formPause46&&state==="play")return;
+    const r=_formUpdate46(dt);const st=formSt46();
+    if(st&&state==="play"){
+      const F=window.SakurayoForms,f=st.form;
+      if(P.form46&&P.form46.slot==="awaken"&&!(f.awakenUntil>runTime)){formSync46();toast("觉醒结束");}
+      if(boss&&!boss.dead){const hp=boss.hp,last=P.formBossHp46??hp;if(hp<last)f.gauge=Math.min(F.GAUGE_MAX,f.gauge+(last-hp)/Math.max(1,boss.maxHp)*260);P.formBossHp46=hp;const br=boss.breaks46||0;if(br>(P.formBreaks46||0)){f.gauge=Math.min(F.GAUGE_MAX,f.gauge+25*(br-(P.formBreaks46||0)));P.formBreaks46=br;}
+        if(boss.phase>=2&&!P.formOffered46&&!P.formOfferDue46){P.formOfferDue46=runTime+.8;}
+        if(P.formOfferDue46&&runTime>=P.formOfferDue46&&!P.formOffered46){P.formOffered46=1;formOffer46("boss");}}
+      if(P.formRules46?.standShield&&!(P.moveX||P.moveY)){P.sh=Math.min(P.maxHp*.2,(P.sh||0)+P.maxHp*.04*dt);}
+      paintFormHud46();
+    }else $("#awaken46")?.classList.add("hidden");
+    return r;
+  };
+  addEventListener("keydown",e=>{if((e.key==="f"||e.key==="F")&&state==="play"&&formSt46())formAwaken46();});
+  style37.textContent+=`.fc46{position:fixed;inset:0;z-index:140;pointer-events:none;overflow:hidden}.fc46 .fl{position:absolute;inset:0;background:radial-gradient(circle at 60% 50%,var(--t) 0,transparent 62%);opacity:0;animation:fc46f 1.7s ease-out}.fc46 img{position:absolute;right:4%;bottom:-6%;height:112%;filter:drop-shadow(0 0 24px var(--t));opacity:0;transform:translateX(18%);animation:fc46i 1.7s cubic-bezier(.2,.8,.2,1)}.fc46 .tx{position:absolute;left:7%;top:50%;transform:translateY(-50%);opacity:0;animation:fc46t 1.7s ease-out}.fc46 small{display:block;color:var(--t);letter-spacing:.3em;font-size:13px}.fc46 b{display:block;font-size:clamp(34px,6vw,64px);color:#fff;text-shadow:0 0 18px var(--t),0 4px 0 #0008}.fc46 span{display:block;margin-top:8px;color:#fff3f8;font-size:clamp(14px,2.2vw,20px);text-shadow:0 2px 6px #000}.fc46.s-awaken b{color:#fff6cf}@keyframes fc46f{0%{opacity:0}18%{opacity:.42}100%{opacity:0}}@keyframes fc46i{0%{opacity:0;transform:translateX(18%)}22%{opacity:1;transform:none}82%{opacity:1;transform:translateX(-2%)}100%{opacity:0;transform:translateX(-6%)}}@keyframes fc46t{0%,10%{opacity:0;margin-left:-40px}28%{opacity:1;margin-left:0}85%{opacity:1}100%{opacity:0}}
+.fp46{position:fixed;inset:0;z-index:130;display:grid;place-items:center;background:#06040ccc;backdrop-filter:blur(3px)}.fp46 .box{width:min(860px,94vw);text-align:center}.fp46 small{color:#ffb2d4;letter-spacing:.2em}.fp46 h3{margin:6px 0 14px;color:#fff;font-size:24px}.fp46 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}.fp46 .cards button{position:relative;padding:0 0 12px;border-radius:16px;overflow:hidden;border:2px solid color-mix(in srgb,var(--t) 60%,#fff0);background:linear-gradient(180deg,#1a1230,#0c0918);color:#fff;text-align:left;transition:transform .12s}.fp46 .cards button:active{transform:scale(.97)}.fp46 .cards img{display:block;width:100%;height:min(38vh,230px);object-fit:cover;object-position:50% 12%}.fp46 em{display:block;margin:8px 12px 0;color:var(--t);font-style:normal;font-size:11px;letter-spacing:.2em}.fp46 b{display:block;margin:2px 12px;font-size:17px}.fp46 .cards span{display:block;margin:0 12px;color:#cfc4dc;font-size:11px;line-height:1.45}.fp46 .cards i{position:absolute;top:8px;right:8px;padding:3px 8px;border-radius:999px;background:var(--t);color:#120a18;font-style:normal;font-size:11px;font-weight:700}.fp46 .rec{box-shadow:0 0 0 2px var(--t),0 0 22px var(--t)}.fp46 .keep{margin-top:14px;padding:10px 22px;border-radius:999px;border:1px solid #ffffff33;background:#ffffff10;color:#ddd}
+.rm46 .opts.forms{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.rm46 .opts.forms button{padding:0 0 10px;overflow:hidden;border:2px solid var(--t,#ffffff33)}.rm46 .opts.forms button img{display:block;width:100%;height:min(34vh,210px);object-fit:cover;object-position:50% 12%;margin-bottom:6px}.rm46 .opts.forms button b,.rm46 .opts.forms button span{padding:0 10px}
+#awaken46{position:fixed;z-index:60;right:calc(16px + env(safe-area-inset-right));bottom:212px;width:74px;height:74px;border-radius:50%;border:2px solid #ffd76a88;background:conic-gradient(#ffd76a calc(var(--g,0)*360deg),#2a2034 0);color:#fff;display:grid;place-items:center;align-content:center;box-shadow:0 6px 16px #0008}#awaken46.hidden{display:none}#awaken46 i{position:absolute;inset:5px;border-radius:50%;background:#160f22}#awaken46 b,#awaken46 small{position:relative;line-height:1.1}#awaken46 b{font-size:15px}#awaken46 small{font-size:10px;color:#ffe6a3}#awaken46.ready{animation:aw46 1.2s ease-in-out infinite}#awaken46.on{border-color:#fff6cf}@keyframes aw46{50%{box-shadow:0 0 0 4px #ffd76a55,0 0 22px #ffd76a}}`;
   CONTENT41.hook("combat:after-update",()=>{if(state==="play"&&P.runLevels46>0&&activeLevel46?.run46){P.runLevels46--;gainXp(Math.max(0,P.next-P.xp)/((1+(P.baitLevel40||0)*.1)||1)+.001);}},"core.run46",55);
   const _finishRunInner46=finish;
   finish=function(win){
     const r=_finishRunInner46(win);
     if(run46&&runNode46&&activeLevel46?.run46&&state==="result"&&!runNode46.closed46){
       const R=window.SakurayoRun,nd=runNode46;nd.closed46=1;
-      const snap=win?R.snapshot(P):null,out=R.complete(run46,nd,!!win,snap);
+      const snap=win?(setFormMods46({}),R.snapshot(P)):null,out=R.complete(run46,nd,!!win,snap);
       let html=`<div class="rr46">`;
       if(out.over||out.runWin){const coins=R.runReward(run46);save.coins+=coins;html+=`<b>${out.runWin?"夜行完成 · 三层全破":"夜行中断"}</b><span>结算 🌸 ${coins}（走过 ${run46.path.length} 个节点）</span>`;save.run46=null;persist();run46=null;}
       else{html+=`<b>节点完成 · 💠 +${out.shards}</b><span>${out.nextLayer?`第 ${out.nextLayer} 层开启`:"构筑与生命已保留"}</span>`;if(out.relicOffer&&out.relicOffer.length)runModal46={kind:"relic",offer:out.relicOffer,title:nd.type==="boss"?"层主遗物":"精英遗物"};runPersist46();}
@@ -14306,7 +14447,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       forceLevelDone46(){if(levelObj46)levelObj46.done=true;},
       avgState46(){return window.SakurayoAvg?.state()||null;},
       avgNext46(n=1){for(let i=0;i<n;i++)window.SakurayoAvg?.next();return window.SakurayoAvg?.state()||null;},
-      storyPlay46(id,part){return playStory46(id,part,()=>{});},avgSkip46(){window.SakurayoAvg?.skip();return state;},
+      formState46(){const st=run46;const f=st?.form;return {form:f?{...f}:null,p:P.form46||null,spd:P.spd,dmg:P.dmg,rate:P.rate,maxHp:P.maxHp,dmgTaken:P.dmgTaken46||1,pick:!!$("#formPick46"),pause:formPause46,cut:!!$("#formCut46"),btn:$("#awaken46")&&!$("#awaken46").classList.contains("hidden")?$("#awaken46").className:null};},formPickFirst46(){const b=$("#formPick46 .cards button");if(!b)return false;b.click();return true;},formCharge46(v=100){if(run46?.form)run46.form.gauge=v;return run46?.form?.gauge;},formAwaken46(){return formAwaken46();},bossPhase46(p){advanceBossPhase(boss,p);return boss.phase;},storyPlay46(id,part){return playStory46(id,part,()=>{});},avgSkip46(){window.SakurayoAvg?.skip();return state;},
       openLevelMap46(ch){openLevelMap46(ch);return !!$("#levelMap46:not(.hidden)");},
       saveSnapshot46(){return JSON.parse(JSON.stringify({stars46:save.stars46,cg46:save.cg46,avgRead46:(save.avgRead46||[]).length,done:save.done,unlock:save.unlock,coins:save.coins}));},
       setBossHpRatio(ratio){if(!boss||boss.dead)throw new Error("Boss is not active");boss.ungate46=true;boss.hp=clamp(Number(ratio),0,1)*boss.max;return snapshot35();},

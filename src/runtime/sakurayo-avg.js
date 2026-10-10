@@ -15,6 +15,7 @@
     "background:linear-gradient(180deg,rgba(26,18,40,.82),rgba(12,8,22,.92));border:1px solid rgba(255,190,225,.35);box-shadow:0 10px 40px rgba(0,0,0,.5);backdrop-filter:blur(6px)}" +
     "#avg46 .a46nm{position:absolute;top:-17px;left:22px;padding:5px 18px;border-radius:999px;font-weight:800;letter-spacing:.06em;background:linear-gradient(90deg,#ff7ab8,#b07cff);font-size:15px;box-shadow:0 4px 14px rgba(255,90,170,.35)}" +
     "#avg46 .a46nm:empty{display:none}#avg46 .a46tx{font-size:clamp(15px,2.3vw,19px);line-height:1.65;min-height:3.3em;text-shadow:0 1px 2px #000}#avg46 .a46tx.narr{color:#d9d2ff;font-style:italic}" +
+    "#avg46 .a46box.epic{background:linear-gradient(180deg,#140d08f0,#0b0705f5);border:1px solid #c9a46a88;box-shadow:inset 0 0 0 4px #00000055,inset 0 0 0 5px #c9a46a33}#avg46 .a46box.epic .a46tx{font-family:SakurayoEpic,'Noto Serif CJK SC','Songti SC',serif;font-style:normal;color:#f3e3c3;letter-spacing:.12em;line-height:1.9;text-shadow:0 1px 0 #000}#avg46 .a46box.epic .a46nm{background:#5a1f17;color:#f6e2b8;font-family:SakurayoEpic,serif;letter-spacing:.2em}" +
     "#avg46 .a46tri{position:absolute;right:20px;bottom:12px;opacity:.8;animation:avgTri46 .9s infinite}@keyframes avgTri46{50%{transform:translateY(3px)}}" +
     "#avg46 .a46bar{position:absolute;top:max(10px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));display:flex;gap:8px;z-index:3}" +
     "#avg46 .a46bar button{min-width:64px;height:40px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,.28);background:rgba(16,10,28,.7);color:#fff;font-weight:700;font-size:14px}" +
@@ -88,7 +89,7 @@
     var who = ln.who || "", nm = ln.name != null ? ln.name : (who && cur.o.cast ? (cur.o.cast(who, ln.ex || "calm") || {}).name : "") || "";
     if (who && ln.ex) { ["L", "R"].forEach(function (side) { if (els[side].dataset.who === who) { var c = cur.o.cast(who, ln.ex); if (c && els[side].dataset.src !== c.img) { els[side].src = c.img; els[side].dataset.src = c.img; } } }); }
     ["L", "R"].forEach(function (side) { els[side].classList.toggle("talk", !!who && els[side].dataset.who === who); });
-    els.nm.textContent = nm; els.tx.classList.toggle("narr", !who);
+    els.nm.textContent = nm; els.tx.classList.toggle("narr", !who && ln.style !== "epic"); els.box.classList.toggle("epic", ln.style === "epic");
     var text = ln.t || ""; cur.full = text; cur.shown = 0; cur.typing = true; cur.line = ln;
     cur.log.push({ n: nm, t: text }); if (cur.log.length > 50) cur.log.shift();
     var id = ln.id; cur.wasRead = id ? cur.read.has(id) : false;

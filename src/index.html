@@ -7275,6 +7275,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if(who==="rin")return {name:AVG_NAMES46.rin,img:artUrl(`npc/rin/avg_${ex==="serious"?"serious":"calm"}.webp`)};
     if(who==="miko")return {name:AVG_NAMES46.miko,img:artUrl(`npc/miko/avg_${ex==="afraid"?"afraid":"calm"}.webp`)};
     if(who==="kagami")return {name:AVG_NAMES46.kagami,img:artUrl("npc/kagami/portrait.webp")};
+    if(who==="yoi"||who==="tanuki")return {name:AVG_NAMES46[who],img:artUrl(`npc/${who}/avg_calm.webp`)};
     return null;
   }
   function storyFor46(id,part){const L=window.SakurayoLevels?.find(id);return L&&window.SakurayoStory?.["ch"+L.ch]?.[id]?.[part]||null;}
@@ -7475,6 +7476,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
   /* ===== 形态（runtime/sakurayo-forms.js，DESIGN_V5 §1 / 路线图 P1；STORY v3「面具」） =====
      规则参数通过 setFormMods46 叠加到 P，并在构筑快照前撤销，避免跨节点重复叠加。外观只读 tint/core/art。 */
+  style37.textContent+=`@font-face{font-family:SakurayoEpic;src:url("${artUrl("fonts/epic-serif.woff2")}") format("woff2");font-display:swap}`;
   var formPause46=false;
   function formSt46(){return run46&&activeLevel46?.run46&&window.SakurayoForms?run46:null;}
   function setFormMods46(m){

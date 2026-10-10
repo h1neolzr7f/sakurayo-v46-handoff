@@ -28,7 +28,8 @@ async function playUntil(page, api, fn, max = 400) { let s; for (let i = 0; i < 
   assert.match(await page.locator('.lm46Sheet').innerText(), /存活 90 秒[\s\S]*打开 2 个宝箱[\s\S]*受击 ≤ 6 次/);
   await page.click('.lm46Sheet .go');
   let a = await api('avgState46'); assert.ok(a && a.index === 0 && a.total >= 6, 'pre-level AVG plays');
-  a = await api('avgNext46', 2); assert.equal(a.name, '神代绫', 'protagonist line resolves to the chosen character'); assert.equal(a.speaker, 'L', 'speaker portrait highlighted');
+  for (let i = 0; i < 12 && (a = await api('avgNext46', 2)).name !== '神代绫'; i++);
+  assert.equal(a.name, '神代绫', 'protagonist line resolves to the chosen character'); assert.equal(a.speaker, 'L', 'speaker portrait highlighted');
   await page.click('#avg46 .a46bar button:has-text("回看")'); assert.match(await page.locator('#avg46 .a46log').innerText(), /雨宫凛|神代绫/); await page.click('#avg46 .a46log .x');
   await page.click('#avg46 .a46bar button:has-text("自动")'); assert.equal((await api('avgState46')).auto, 1);
   await page.click('#avg46 .a46bar button:has-text("跳过")'); await page.click('#avg46 .a46confirm [data-k=yes]');
