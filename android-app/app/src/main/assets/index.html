@@ -2413,6 +2413,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 
   var DEFAULT_SHOWN = Object.freeze(["sayo_echo", "aya_petal"]);
   var POOL_IDS = Object.freeze(["remnant", "fashion", "weapon"]);
+  var SCHOOL_LABEL = Object.freeze({ mech: "机械师", gun: "枪斗术", alch: "炼金术", gene: "基因战士", vamp: "血族", spore: "菌群术", magical: "魔法少女", cult: "修仙", mage: "魔法师", shrine: "巫女", summon: "召唤师", ninja: "忍者", idol: "战场歌姬", necro: "死灵术士" });
   var ROSTER_TABS = Object.freeze(["scrap", "school", "job", "fusion", "fashion", "weapon"]);
   var RARITY_RANK = Object.freeze(["SSR", "SR", "R", "N"]);
 
@@ -3431,7 +3432,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       "</em><p>" +
       (locked ? "尚未回收。寻访点亮后才会露出立绘。" : loreText(card)) +
       "</p>" +
-      (locked ? "" : '<p class="collectionRule46">收藏不增加战斗属性 · ' + card.d + (card.kind === "fashion" && card.school ? " 装备时对应流派倾向 ×1.3。" : "") + "</p>") +
+      (locked ? "" : '<p class="collectionRule46">收藏不增加战斗属性 · ' + card.d + (card.kind === "fashion" && card.school ? " 装备时" + (SCHOOL_LABEL[card.school] || card.school) + "流派倾向 ×1.3。" : "") + "</p>") +
       (canEquip ? '<button type="button" class="rosterEquip46" data-equip="' + card.id + '">装备</button>' : "") +
       "</div></div>";
     overlay.onclick = function (event) {
@@ -12099,7 +12100,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       counts:{enemies:enemies.filter(e=>!e.dead).length,bullets:bullets.length,enemyBullets:ebullets.length,gems:gems.length,pets:pets.length,      ops:window.SakurayoOps?window.SakurayoOps.snapshot().units.length:0},
       live:window.SakurayoLive?window.SakurayoLive.snapshot():null,
       ops:window.SakurayoOps?window.SakurayoOps.snapshot():null,
-      boss:boss?{phase:boss.phase,hp:finite(boss.hp),maxHp:finite(boss.max),ratio:boss.max?finite(boss.hp/boss.max):0,guard:finite(boss.guard),dead:!!boss.dead,pointerVisible:bossPointerVisible38,rule:boss.rule39||"",adaptSource:boss.adaptSource39||null,x:finite(boss.x),y:finite(boss.y)}:null,
+      boss:boss?{phase:boss.phase,hp:finite(boss.hp),maxHp:finite(boss.max),ratio:boss.max?finite(boss.hp/boss.max):0,guard:finite(boss.guard),guardAdds:enemies.filter(e=>e.guardFor&&!e.dead).map(e=>({type:e.type,hp:finite(e.hp),x:finite(e.x),y:finite(e.y)})),dead:!!boss.dead,pointerVisible:bossPointerVisible38,rule:boss.rule39||"",adaptSource:boss.adaptSource39||null,x:finite(boss.x),y:finite(boss.y)}:null,
       build:{upgrades:{...(P.up||{})},fusion:P.fusion||null,form:P.form||null,upgradeOrder:[...(P.upgradeOrder||[])],fusionMechanics:{elementalBeast:!!P.elementalBeast41,plagueIdol:!!P.plagueIdol41,soulGun:!!P.soulGun41,nanoNinja:!!P.nanoNinja41,fleshShrine:!!P.fleshShrine41,bloodMage:!!P.bloodMage41},damageSources:{...damageSources},attackTotal:Object.values(damageSources).reduce((sum,value)=>sum+finite(value),0)},
       overlays:{menu:visible("#menu"),hud:visible("#hud"),level:visible("#level"),dialogue:visible("#dialogue"),event:visible("#event"),paused:visible("#paused"),result:visible("#result"),storyBeat:visible("#storyBeat44")},
       mainGod:{tier:selectedMainGodTier36,...save.mainGod},shop40:JSON.parse(JSON.stringify(save.shop40||{})),extensions:{packs:CONTENT41?.packs()||[],errors:CONTENT41?.errors()||[],state:JSON.parse(JSON.stringify(save.extensions||{})),exploration:explorationSnapshot41()},balanceSamples:save.balance40?.samples?.length||0,result:{win:!!runWin,title:$("#rtitle")?.textContent||""},devErrors:window.__SAKURAYO_DEV__?.errors.length||0,
