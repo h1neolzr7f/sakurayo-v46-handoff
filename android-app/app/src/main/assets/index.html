@@ -2663,12 +2663,15 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (boss.phase >= 4 && !boss.enraged46 && phaseAge >= ENRAGE_AFTER) { boss.enraged46 = true; ev = "enrage"; }
     return ev;
   }
-  // Phase gate: phase p cannot end before the fight is p*MIN_PHASE seconds old (HP holds at the threshold, "阶段护盾").
-  // Measured on total fight age so a slow early phase does not stack extra waiting on later ones.
+  // Phase gate ("阶段护盾"): the k-th quarter of HP (k=1..3) cannot be broken before the fight is k*MIN_PHASE
+  // seconds old. Keyed on fight age + HP quarter (not on the phase index), so a burst that skips a phase
+  // transition cannot also skip its time gate.
   function gateHp(boss, fightAge) {
-    if (!boss || boss.ungate46 || boss.phase >= 4 || fightAge >= MIN_PHASE * boss.phase) { if (boss) boss.gated46 = false; return boss ? boss.hp : 0; }
-    var floor = boss.max * (1 - 0.25 * boss.phase) + 1;
-        boss.gated46 = boss.hp < floor; return Math.max(boss.hp, floor);
+    if (!boss || boss.ungate46) { if (boss) boss.gated46 = false; return boss ? boss.hp : 0; }
+    var k = Math.floor(Math.max(0, fightAge) / MIN_PHASE) + 1;
+    if (k > 3) { boss.gated46 = false; return boss.hp; }
+    var floor = boss.max * (1 - 0.25 * k) + 1;
+    boss.gated46 = boss.hp < floor; return Math.max(boss.hp, floor);
   }
   // Overtime: past OVERTIME_AFTER seconds the mirror world cracks and the boss takes rising damage.
   function overtimeMul(fightAge) { return fightAge > OVERTIME_AFTER ? 1 + (fightAge - OVERTIME_AFTER) * OVERTIME_RATE : 1; }
@@ -2842,15 +2845,15 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     L("1-2", 1, "绘马长廊", "clear", { n: 60 }, { k: "time", v: 60, d: "60 秒内完成" }, H(6), [32, 44]),
     L("1-3", 1, "送灯", "escort", { path: [[0.18, 0.5], [0.36, 0.36], [0.55, 0.62], [0.72, 0.4], [0.86, 0.52]] }, { k: "npcHp", v: 70, d: "巫女血量 ≥ 70%" }, H(5), [55, 51], { npc: "miko" }),
     L("1-4", 1, "百目尸将", "boss", { bossAt: 22 }, { k: "breaks", v: 2, d: "触发 2 次破防" }, H(8), [84, 31]),
-    L("2-1", 2, "救护车队", "timed", { n: 4, limit: 75 }, { k: "time", v: 55, d: "55 秒内完成" }, H(6), [12, 60]),
+    L("2-1", 2, "救护车队", "timed", { n: 4, limit: 90 }, { k: "time", v: 65, d: "65 秒内完成" }, H(6), [12, 60]),
     L("2-2", 2, "监控墙", "mech", { n: 3 }, { k: "mechKills", v: 30, d: "机关击破 ≥ 30" }, H(6), [35, 40]),
     L("2-3", 2, "雨中撤离", "escort", { path: [[0.15, 0.7], [0.4, 0.55], [0.6, 0.3], [0.85, 0.42]] }, H(0), { k: "npcHp", v: 70, d: "保安血量 ≥ 70%" }, [60, 58], { npc: "guard" }),
     L("2-4", 2, "雨魇行者", "boss", { bossAt: 22 }, { k: "breaks", v: 2, d: "触发 2 次破防" }, H(8), [85, 35]),
     L("3-1", 3, "剑冢入口", "survive", { t: 100 }, { k: "chests", v: 2, d: "打开 2 个宝箱" }, H(6), [12, 50]),
-    L("3-2", 3, "拔剑", "timed", { n: 6, limit: 80, flee: 1 }, { k: "time", v: 60, d: "60 秒内完成" }, H(6), [34, 38]),
+    L("3-2", 3, "拔剑", "timed", { n: 6, limit: 110, flee: 1 }, { k: "time", v: 70, d: "70 秒内完成" }, H(6), [34, 38]),
     L("3-3", 3, "事故日志", "channel", { t: 30 }, H(2), { k: "time", v: 70, d: "70 秒内完成" }, [58, 60]),
     L("3-4", 3, "黄泉御前", "boss", { bossAt: 22 }, { k: "breaks", v: 2, d: "触发 2 次破防" }, H(8), [84, 36]),
-    L("4-1", 4, "镜廊", "timed", { n: 8, limit: 90 }, { k: "time", v: 70, d: "70 秒内完成" }, H(6), [12, 44]),
+    L("4-1", 4, "镜廊", "timed", { n: 8, limit: 100, hp: 180, kind: "mirror" }, { k: "time", v: 75, d: "75 秒内完成" }, H(6), [12, 44]),
     L("4-2", 4, "第 317 室", "survive", { t: 110 }, { k: "noUlt", d: "不使用大招" }, H(6), [36, 60]),
     L("4-3", 4, "主控门", "escort", { path: [[0.15, 0.4], [0.38, 0.62], [0.62, 0.36], [0.86, 0.5]] }, { k: "npcHp", v: 100, d: "雨宫凛 0 次受伤" }, H(6), [60, 42], { npc: "rin" }),
     L("4-4", 4, "八重镜姬", "boss", { bossAt: 22 }, { k: "breaks", v: 3, d: "触发 3 次破防" }, H(8), [86, 30])
@@ -2878,7 +2881,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     var o = { id: level.id, type: level.type, t: 0, kills0: api.kills(), done: false, fail: "", targets: [], pads: [], npc: null, chan: 0, mechKills: 0, hitsAtStart: api.P.hits46 || 0 };
     var W = api.worldW, Hh = api.worldH, i, a;
     if (level.type === "timed") {
-      for (i = 0; i < level.goal.n; i++) { a = i / level.goal.n * TAU + 0.4; var r = Math.min(W, Hh) * (0.28 + 0.1 * (i % 2)); var e = api.spawnTarget(W / 2 + Math.cos(a) * r, Hh / 2 + Math.sin(a) * r, level.goal.flee ? 420 : 900, level.goal.flee ? "sword" : "wagon"); if (e) o.targets.push(e); }
+      for (i = 0; i < level.goal.n; i++) { a = i / level.goal.n * TAU + 0.4; var r = Math.min(W, Hh) * (0.28 + 0.1 * (i % 2)); var e = api.spawnTarget(W / 2 + Math.cos(a) * r, Hh / 2 + Math.sin(a) * r, level.goal.hp || (level.goal.flee ? 220 : 420), level.goal.kind || (level.goal.flee ? "sword" : "wagon")); if (e) o.targets.push(e); }
     } else if (level.type === "mech") {
       for (i = 0; i < level.goal.n; i++) { a = i / level.goal.n * TAU + 1.1; o.pads.push({ x: W / 2 + Math.cos(a) * W * 0.26, y: Hh / 2 + Math.sin(a) * Hh * 0.26, c: 0, used: false }); }
     } else if (level.type === "escort") {
@@ -2895,7 +2898,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (level.type === "survive" && o.t >= g.t) o.done = true;
     else if (level.type === "clear" && api.kills() - o.kills0 >= g.n) o.done = true;
     else if (level.type === "timed") {
-      if (g.flee) for (i = 0; i < o.targets.length; i++) { var e = o.targets[i]; if (e.dead) continue; var dx = e.x - P.x, dy = e.y - P.y, d = Math.hypot(dx, dy) || 1; if (d < 240) { e.x = Math.max(60, Math.min(api.worldW - 60, e.x + dx / d * 95 * dt)); e.y = Math.max(60, Math.min(api.worldH - 60, e.y + dy / d * 95 * dt)); } }
+      if (g.flee) for (i = 0; i < o.targets.length; i++) { var e = o.targets[i]; if (e.dead) continue; if (e.lastHp46 != null && e.hp < e.lastHp46) e.stun46 = 1.6; e.lastHp46 = e.hp; if (e.stun46 > 0) { e.stun46 -= dt; continue; } var dx = e.x - P.x, dy = e.y - P.y, d = Math.hypot(dx, dy) || 1; if (d < 240) { e.x = Math.max(60, Math.min(api.worldW - 60, e.x + dx / d * 78 * dt)); e.y = Math.max(60, Math.min(api.worldH - 60, e.y + dy / d * 78 * dt)); } }
       if (o.targets.every(function (e) { return e.dead || e.hp <= 0; })) o.done = true;
       else if (o.t > g.limit) o.fail = "时间到";
     } else if (level.type === "mech") {
@@ -2934,7 +2937,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     switch (level.type) {
       case "survive": return "存活 " + Math.max(0, Math.ceil(g.t - o.t)) + " 秒";
       case "clear": return "击破尸潮 " + Math.min(g.n, o.killsNow || 0) + "/" + g.n;
-      case "timed": return (g.flee ? "摧毁无主飞剑 " : "摧毁回收车 ") + o.targets.filter(function (e) { return e.dead || e.hp <= 0; }).length + "/" + g.n + " · 剩余 " + Math.max(0, Math.ceil(g.limit - o.t)) + "s";
+      case "timed": return (g.flee ? "摧毁无主飞剑 " : g.kind === "mirror" ? "击碎复制镜 " : "摧毁回收车 ") + o.targets.filter(function (e) { return e.dead || e.hp <= 0; }).length + "/" + g.n + " · 剩余 " + Math.max(0, Math.ceil(g.limit - o.t)) + "s";
       case "mech": return "引爆符咒机关 " + o.pads.filter(function (q) { return q.used; }).length + "/" + g.n + "（站在机关上）";
       case "escort": return "护送 " + Math.round(o.npc.k / o.npc.path.length * 100) + "% · 血量 " + Math.ceil(o.npc.hp) + "%" + (o.npc.waiting ? " · 靠近她才会前进" : "");
       case "channel": return "读取日志 " + Math.floor(o.chan * 100) + "%" + (o.inside ? "" : " · 回到圈内");
@@ -10026,6 +10029,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       pf = planFactor(),
       sc = s.scale * hpCurve * (1 + (pf - 1) * 0.55) * (elite ? 1.92 : 1),
       dm = s.scale * (1 + (pf - 1) * 0.32);
+    if (typeof activeLevel46 !== "undefined" && activeLevel46 && !activeLevel46.boss) { const soft = (1 + (s.scale - 1) * 0.5) / s.scale; dm *= 0.6 * soft; sc *= 0.8 * (0.5 + soft * 0.5); } // 目标关：玩家要分心做目标，杂兵压力降一档
     enemies.push({
       x,
       y,
@@ -13970,7 +13974,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       spawnBossNow(){if(state!=="play")throw new Error("spawnBossNow requires play mode");spawnBoss();return snapshot35();},
       levels46(){return window.SakurayoLevels.LEVELS.map(l=>({id:l.id,type:l.type,unlocked:window.SakurayoLevels.unlocked(save,l.id),stars:window.SakurayoLevels.stars(save,l.id)}));},
       launchLevel46(id){return launchLevel46(id);},
-      levelState46(){return {active:activeLevel46?.id||null,mode:state,label:activeLevel46&&levelObj46?window.SakurayoLevels.label(activeLevel46,levelObj46):"",done:!!levelObj46?.done,fail:levelObj46?.fail||"",npc:levelObj46?.npc?{x:levelObj46.npc.x,y:levelObj46.npc.y,hp:levelObj46.npc.hp,k:levelObj46.npc.k}:null,targets:levelObj46?.targets?.filter(e=>!e.dead).length??null,pads:levelObj46?.pads?.map(q=>({x:q.x,y:q.y,used:q.used}))||[],zone:levelObj46?.zone||null,result:levelResult46?{got:levelResult46.got,stars:levelResult46.stars,coins:levelResult46.coins}:null,stars46:{...save.stars46}};},
+      levelState46(){return {active:activeLevel46?.id||null,mode:state,label:activeLevel46&&levelObj46?window.SakurayoLevels.label(activeLevel46,levelObj46):"",done:!!levelObj46?.done,fail:levelObj46?.fail||"",npc:levelObj46?.npc?{x:levelObj46.npc.x,y:levelObj46.npc.y,hp:levelObj46.npc.hp,k:levelObj46.npc.k}:null,targets:levelObj46?.targets?.filter(e=>!e.dead).length??null,targetsPos:levelObj46?.targets?.filter(e=>!e.dead&&e.hp>0).map(e=>({x:e.x,y:e.y,hp:e.hp}))||[],objTime:levelObj46?.t||0,pads:levelObj46?.pads?.map(q=>({x:q.x,y:q.y,used:q.used}))||[],zone:levelObj46?.zone||null,result:levelResult46?{got:levelResult46.got,stars:levelResult46.stars,coins:levelResult46.coins}:null,stars46:{...save.stars46}};},
       forceLevelDone46(){if(levelObj46)levelObj46.done=true;},
       avgState46(){return window.SakurayoAvg?.state()||null;},
       avgNext46(n=1){for(let i=0;i<n;i++)window.SakurayoAvg?.next();return window.SakurayoAvg?.state()||null;},
@@ -13998,7 +14002,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       setStoryFlag(name,value){P.storyFlags[name]=value;return {...P.storyFlags};},
       endingPreview(){return endingData();},
       directorProbe(time,score=75){const oldTime=runTime,oldPlan=P.plan;runTime=Math.max(0,Number(time)||0);P.plan={score:Number(score),rank:"B"};const result={time:runTime,score:Number(score),intensity:directorIntensity(),factor:planFactor()};runTime=oldTime;P.plan=oldPlan;return result;},
-      defeatBoss(){if(!boss||boss.dead)throw new Error("Boss is not active");boss.phase=4;boss.guard=0;boss.hp=1;damageEnemy(boss,boss.max*20,{source:"skill",school:"base"});return snapshot35();},
+      defeatBoss(){if(!boss||boss.dead)throw new Error("Boss is not active");boss.ungate46=true;boss.phase=4;boss.guard=0;boss.hp=1;damageEnemy(boss,boss.max*20,{source:"skill",school:"base"});return snapshot35();},
       killPlayer(){P.inv=0;P.revive=0;P.sh=0;P.hp=Math.max(1,P.hp);damagePlayer(P.maxHp*20);return snapshot35();},
       finish(win){finish(!!win);return snapshot35();},backMenu(){backMenu();return snapshot35();},
       lobby46(){return window.SakurayoLobby?window.SakurayoLobby.snapshot(save):null;},
