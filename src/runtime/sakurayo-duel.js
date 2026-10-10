@@ -1,6 +1,6 @@
 /* 镜斗（2D 格斗肉鸽节点，1v1）。独立模块：自带画布/循环/输入/HUD；只通过 start(opts)/onEnd(result) 与夜行地图交互。
    操作：←→ 移动 / ↑ 跳 / ↓ 防御（按住），J 轻攻击（三段连击）、K 重攻击（连击终结时击飞）、L 必杀（消耗 1 格气）、U 觉醒（满 3 格）。触屏有对应按钮。
-   规则：限时 60s，一局定胜负；被防住的攻击只吃 15% 伤害但积累破防值，破防时硬直 1s。
+   规则：限时 99s，一局定胜负；对手 AI 见 aiFoe（反应式+读招架防、确反、连段、破防前后撤），被防住的攻击只吃 15% 伤害但积累破防值，破防时硬直 1s。
    构筑映射（必杀技变体，取等级最高的武器）：spread=扇形符弹，bomb=抛物线爆弹，laser=贯穿光线，homing=追踪狐火，pierce=突进斩，orbit=护身樱环（反击）。
    形态：guard=防御减伤 95%+重攻击霸体；speed=移速/攻速 +25%、轻攻击 4 段；burst=伤害 ×1.35、受伤 ×1.2。 */
 (function (global) {
@@ -8,7 +8,7 @@
   var FW = 960, FH = 540, GROUND = 450;
   function rng(s) { s = (s >>> 0) || 1; return function () { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
-  var CH = { sayo: { name: "月城小夜", spd: 310, dmg: 1.1, reach: 1.1, col: "#ff9ec7" }, aya: { name: "神代绫", spd: 330, dmg: 0.92, reach: 1.15, col: "#8fc8ff" }, rion: { name: "九条凛音", spd: 290, dmg: 1.12, reach: 1.05, col: "#ff6b6b" } };
+  var CH = { sayo: { name: "月城小夜", spd: 310, dmg: 1.1, reach: 1.1, col: "#ff9ec7" }, aya: { name: "神代绫", spd: 330, dmg: 0.92, reach: 1.15, col: "#8fc8ff" }, rion: { name: "九条凛音", spd: 290, dmg: 1.22, reach: 1.05, col: "#ff6b6b" } };
   var MOVES = { L1: { d: 6, s: 0.08, a: 0.1, r: 0.14, reach: 90, kb: 60 }, L2: { d: 7, s: 0.08, a: 0.1, r: 0.15, reach: 95, kb: 70 }, L3: { d: 9, s: 0.1, a: 0.1, r: 0.2, reach: 100, kb: 120 }, L4: { d: 10, s: 0.1, a: 0.1, r: 0.22, reach: 105, kb: 160 },
     H: { d: 16, s: 0.2, a: 0.12, r: 0.32, reach: 115, kb: 260, launch: true } };
   function F(side, o) { return { x: side < 0 ? 260 : 700, y: GROUND, vx: 0, vy: 0, face: -side, hp: 100, max: 100, meter: 0, guard: 0, gbreak: 0, stun: 0, act: null, actT: 0, combo: 0, comboT: 0, block: false, air: false, inv: 0, o: o, hits: 0 }; }
@@ -17,13 +17,13 @@
     var f = o.form || {}; this.slot = f.slot || "base"; var up = o.weapons || {};
     this.lv = function (k) { return up[k] ? (up[k].lv || 1) + (up[k].evo ? 2 : 0) : 0; };
     var best = "", bl = 0; ["spread", "bomb", "laser", "homing", "pierce", "orbit"].forEach(function (k) { var l = (up[k] ? (up[k].lv || 1) + (up[k].evo ? 2 : 0) : 0); if (l > bl) { bl = l; best = k; } }); this.special = best || "base"; this.spLv = bl;
-    this.power = clamp(o.power || 1, 0.7, 2.6);
-    this.P = F(-1, { dmg: this.ch.dmg * this.power * (this.slot === "burst" ? 1.35 : 1), taken: this.slot === "burst" ? 1.2 : 1, spd: this.ch.spd * (this.slot === "speed" ? 1.25 : 1), aspd: this.slot === "speed" ? 1.25 : 1, chain: this.slot === "speed" ? 4 : 3, blockK: this.slot === "guard" ? 0.05 : 0.15, armor: this.slot === "guard" });
+    this.power = clamp(o.power || 1, 0.7, 2.6); var pw = 1 + 0.4 * (this.power - 1); // 格斗里数值成长折算为 40%：构筑主要改变必杀技的“形”，而不是把对手秒掉
+    this.P = F(-1, { dmg: this.ch.dmg * pw * (this.slot === "burst" ? 1.35 : 1), taken: this.slot === "burst" ? 1.2 : 1, spd: this.ch.spd * (this.slot === "speed" ? 1.25 : 1), aspd: this.slot === "speed" ? 1.25 : 1, chain: this.slot === "speed" ? 4 : 3, blockK: this.slot === "guard" ? 0.05 : 0.15, armor: this.slot === "guard" });
     this.P.hp = this.P.max = 100 * clamp(o.hpFrac == null ? 1 : o.hpFrac, 0.3, 1) + 0; // 生命按比例带入（最少 30%）
     var L = this.layer, boss = !!o.boss;
-    this.E = F(1, { dmg: (0.16 + 0.07 * L) * (boss ? 1.05 : 1), taken: 1, spd: 270 + 15 * L, aspd: 1, chain: 3, blockK: 0.15, armor: boss });
-    this.E.hp = this.E.max = (boss ? 460 : 340) + 80 * L; this.E.name = boss ? "镜灵 · 影武者" : "镜卫 · 剑士";
-    this.t = 0; this.limit = 60; this.done = false; this.win = false; this.shots = []; this.fx = []; this.keys = {}; this.input = {}; this.hitstop = 0;
+    this.E = F(1, { dmg: (0.12 + 0.035 * L) * (boss ? 0.9 : 1), taken: 1, spd: 270 + 15 * L, aspd: 1, chain: 3, blockK: 0.15, armor: boss });
+    this.E.hp = this.E.max = (boss ? 380 : 340) + 80 * L; this.E.name = boss ? "镜灵 · 影武者" : "镜卫 · 剑士";
+    this.t = 0; this.limit = 99; this.done = false; this.win = false; this.shots = []; this.fx = []; this.keys = {}; this.input = {}; this.hitstop = 0;
   }
   Game.prototype.startMove = function (f, k) {
     if (f.stun > 0 || f.gbreak > 0 || (f.act && f.actT < (f.act.s + f.act.a + f.act.r) / f.o.aspd * 0.8)) return false;
@@ -34,7 +34,7 @@
     f.actT = 0; f.hitDone = false; f.comboT = 0.6; return true;
   };
   Game.prototype.special_ = function (f, foe) {
-    var me = f === this.P, kind = me ? this.special : "base", lv = me ? this.spLv : 1, d = 14 * f.o.dmg * (1 + 0.12 * lv), dir = f.face;
+    var me = f === this.P, kind = me ? this.special : "base", lv = me ? this.spLv : 1, d = 14 * f.o.dmg * (1 + 0.05 * lv), dir = f.face;
     if (kind === "spread") for (var i = -1; i <= 1; i++) this.shots.push({ x: f.x + dir * 40, y: f.y - 70, vx: dir * 620, vy: i * 140, d: d * 0.55, own: f, life: 1.2, k: "s" });
     else if (kind === "bomb") this.shots.push({ x: f.x + dir * 30, y: f.y - 90, vx: dir * 380, vy: -420, g: 1100, d: d * 1.5, own: f, life: 2, k: "b", aoe: 110 });
     else if (kind === "laser") { this.fx.push({ k: "beam", x: f.x, y: f.y - 70, dir: dir, t: 0, life: 0.3 }); if ((foe.x - f.x) * dir > 0 && Math.abs(foe.y - f.y) < 90) this.hit(f, foe, { d: d * 1.3, kb: 140, unblock: false }); }
@@ -48,13 +48,13 @@
     if (b.counter > 0 && b !== a) { b.counter = 0; this.hit(b, a, { d: 12 * b.o.dmg, kb: 220 }); return false; }
     var facing = (a.x - b.x) * b.face > 0, d = m.d * (a === this.P ? 1 : 1) * b.o.taken;
     if (b.block && facing && !b.air && !m.unblock) {
-      d *= b.o.blockK; b.guard += m.d * 1.2; this.fx.push({ k: "guard", x: b.x, y: b.y - 70, t: 0, life: 0.25 });
+      d *= b.o.blockK; b.guard += 12; // 破防值按“被防住的次数”累积（5 次破防），与伤害数值脱钩，满级构筑也不能两下打穿防御 this.fx.push({ k: "guard", x: b.x, y: b.y - 70, t: 0, life: 0.25 });
       if (b.guard >= 60) { b.guard = 0; b.gbreak = 1; b.block = false; this.fx.push({ k: "txt", s: "破防!", x: b.x, y: b.y - 150, t: 0, life: 0.8 }); }
     } else {
       if (!(b.o.armor && b.act && b.act.k === "H")) { b.stun = 0.28 + (m.launch ? 0.4 : 0); b.act = null; b.vx = (b.x > a.x ? 1 : -1) * (m.kb || 60) * 1.6; if (m.launch) { b.vy = -520; b.air = true; } }
       a.hits++; this.fx.push({ k: "spark", x: b.x, y: b.y - 80, t: 0, life: 0.2 }); this.hitstop = 0.05;
     }
-    b.hp -= d; a.meter = Math.min(3, a.meter + d / 40); b.meter = Math.min(3, b.meter + d / 80);
+    var blocked = b.block && facing && !b.air && !m.unblock; b.hp -= d; a.meter = Math.min(3, a.meter + (blocked ? 0.08 : 0.2)); b.meter = Math.min(3, b.meter + 0.1); // 气按命中次数涨，与伤害数值脱钩
     this.fx.push({ k: "num", v: Math.max(1, Math.round(d)), x: b.x, y: b.y - 130, t: 0, life: 0.6 });
     if (b.hp <= 0) { b.hp = 0; this.finish(a === this.P); }
     return true;
@@ -73,6 +73,40 @@
     else if (f.combo >= 2 && r < 0.7) inp.H = true;
     else if (r < 0.85) inp.L = true; else inp.move = -Math.sign(dx);
     if (ad > 320 && f.meter >= 1 && r < 0.3) inp.S = true;
+    f.aiInp = inp; return inp;
+  };
+  /* 对手 AI（镜中倒影）：不靠堆血，靠打法——
+     ① 反应式防御：看到对手出招/飞行道具逼近，经过反应时间（0.16s→0.10s 随层数）以一定概率举防（55%→75%），远程道具同样会防；
+     ② 防住后立刻确反（对手收招硬直期间出轻→重连段）；
+     ③ 主动连段：轻·轻·轻·重 的固定连招串，中途被打断就放弃；
+     ④ 走位：残血或破防值高时后撤拉开、远距离有气就放必杀；偶尔跳跃躲飞行道具。 */
+  Game.prototype.aiFoe = function (f, foe, dt) {
+    var L = this.layer, r = this.r, dx = foe.x - f.x, ad = Math.abs(dx), inp = {}, boss = !!this.o.boss;
+    var react = Math.max(0.08, 0.17 - 0.025 * L - (boss ? 0.02 : 0)), pBlock = Math.min(0.9, 0.7 + 0.06 * L + (boss ? 0.06 : 0));
+    var atk = foe.act && foe.act.reach && foe.actT < foe.act.s + foe.act.a && ad < foe.act.reach * 1.25 + 50;
+    var shot = this.shots.some(function (q) { return q.own === foe && Math.abs(q.x - f.x) < 340 && (f.x - q.x) * q.vx > 0; });
+    var key = atk ? "a" + this.P.hits + ":" + foe.act.k + ":" + (foe.actT < 0.02 ? this.t.toFixed(1) : "") : null;
+    if ((atk || shot) && !f.act && f.stun <= 0) {
+      if (f.seenT == null) { f.seenT = 0; f.willBlock = r() < pBlock; f.willJump = shot && r() < 0.25; }
+      f.seenT += dt; if (f.seenT >= react) { if (f.willJump && !f.air) inp.jump = true; else if (f.willBlock) { inp.block = true; f.blocked = true; } }
+      if (inp.block || inp.jump) return inp;
+    } else { f.seenT = null; }
+    if (f.blocked && !atk && foe.act && f.stun <= 0) { f.blocked = false; if (ad < 120) { f.plan = ["L", "L", "H"]; } } // 确反
+    else if (!foe.act) f.blocked = false;
+    f.aiT = (f.aiT || 0) - dt;
+    if (f.plan && f.plan.length) { if (f.stun > 0 || f.gbreak > 0) f.plan = null; else if (!f.act) { if (ad > 125) inp.move = Math.sign(dx); else { inp[f.plan.shift()] = true; } return inp; } else return inp; }
+    if (f.aiT > 0) return f.aiInp || {};
+    f.aiT = 0.14 + r() * 0.12;
+    if (f.guard >= 36 && ad < 170) { inp.move = -Math.sign(dx); inp.jump = r() < 0.3; f.aiInp = inp; return inp; } // 破防值快满：后撤重置，而不是硬吃
+    // 近身读招：轻攻击起手只有 0.06–0.08s，纯反应来不及 → 贴身时按概率提前架防（持续 0.3–0.5s），对手出招中不去硬换
+    if (ad < 150 && (foe.act || foe.combo > 0 || r() < pBlock * 0.55)) { inp.block = true; f.aiT = 0.3 + r() * 0.2; f.aiInp = inp; return inp; }
+    var hurt = f.hp / f.max < 0.35;
+    if (hurt && ad < 160 && r() < 0.35) inp.move = -Math.sign(dx);
+    else if (ad > 300 && f.meter >= 1 && r() < 0.45) inp.S = true;
+    else if (ad > 115) { inp.move = Math.sign(dx); if (r() < 0.06) inp.jump = true; }
+    else if (f.meter >= 1 && r() < 0.18) inp.S = true;
+    else if (r() < 0.62) { f.plan = r() < 0.5 ? ["L", "L", "L", "H"] : ["L", "L", "H"]; }
+    else if (r() < 0.5) inp.block = true; else inp.move = -Math.sign(dx) * (r() < 0.5 ? 1 : 0);
     f.aiInp = inp; return inp;
   };
   Game.prototype.stepF = function (f, foe, inp, dt) {
@@ -96,7 +130,7 @@
     if (this.done) return; if (this.hitstop > 0) { this.hitstop -= dt; return; }
     this.t += dt; var P = this.P, E = this.E, i, self = this;
     var pin = this.auto ? this.ai(P, E, dt, true) : this.readInput();
-    this.stepF(P, E, pin, dt); if (this.done) return; this.stepF(E, P, this.ai(E, P, dt, false), dt); if (this.done) return;
+    this.stepF(P, E, pin, dt); if (this.done) return; this.stepF(E, P, this.aiFoe(E, P, dt), dt); if (this.done) return;
     if (Math.abs(P.x - E.x) < 50 && !P.air && !E.air) { var m = (50 - Math.abs(P.x - E.x)) / 2, s = P.x < E.x ? -1 : 1; P.x = clamp(P.x + s * m, 40, FW - 40); E.x = clamp(E.x - s * m, 40, FW - 40); }
     for (i = this.shots.length - 1; i >= 0; i--) { var q = this.shots[i], foe = q.own === P ? E : P; q.life -= dt;
       if (q.k === "h") { var ang = Math.atan2(foe.y - 80 - q.y, foe.x - q.x), sp = 420; q.vx += (Math.cos(ang) * sp - q.vx) * dt * 3; q.vy += (Math.sin(ang) * sp - q.vy) * dt * 3; }

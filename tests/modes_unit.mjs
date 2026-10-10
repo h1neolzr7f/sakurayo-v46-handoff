@@ -15,5 +15,12 @@ for (const slot of ['guard', 'speed', 'burst']) for (const w of ['spread', 'bomb
   assert.ok(PB.simulate(o, 80).win, `pinball ${slot}/${w}`);
   const r = D.simulate(o); assert.ok(r.win, `duel ${slot}/${w}`); assert.equal(r.special, w, 'build picks the special move');
 }
+{ // 镜斗：满级构筑面对普通对手也要有来回（AI 架防/读招/确反/连段，不靠堆血）
+  const full = { spread: { lv: 5, evo: 1 }, pierce: { lv: 5, evo: 1 }, laser: { lv: 5 }, bomb: { lv: 5, evo: 1 }, homing: { lv: 5 }, orbit: { lv: 5 } }, ks = Object.keys(full), T = [];
+  for (const ch of ['sayo', 'aya', 'rion']) for (let seed = 1; seed <= 8; seed++) { const k = ks[seed % 6]; const r = D.simulate({ character: ch, seed, layer: 3, power: 2.2, weapons: { [k]: full[k] }, form: { slot: ['speed', 'burst'][seed % 2] } }, 120); T.push(r.time); }
+  T.sort((a, b) => a - b); const med = T[T.length >> 1];
+  assert.ok(med >= 25, 'duel full-build median length ' + med.toFixed(1) + 's ≥ 25s'); assert.ok(T[0] >= 12, 'no 秒杀: shortest ' + T[0].toFixed(1));
+  console.log('duel full build vs normal foe: median', med.toFixed(1), 's, min', T[0].toFixed(1));
+}
 const g = new PB.Game({ character: 'sayo', seed: 1, form: { slot: 'guard' } }); assert.ok(g.ball.r > 26 && g.dmgTaken < 1, 'guard form = big ball + damage reduction');
 console.log('PASS modes unit: pinball/duel deterministic, layer-1 wins, ratio', rp.toFixed(2), rd.toFixed(2), 'all forms×builds clear');
