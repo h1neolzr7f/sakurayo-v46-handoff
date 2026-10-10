@@ -13,6 +13,7 @@
     event: { n: "事件", i: "❔", d: "镜界里的偶遇，选项有得有失。" },
     shop: { n: "商店", i: "🏮", d: "用魂晶购买治疗、强化与遗物。" },
     shrine: { n: "神社", i: "⛩", d: "休整：回复生命或获得一次强化。" },
+    sky: { n: "镜空", i: "✈", d: "纵版射击：乘符纸机穿越镜空裂隙。构筑与形态映射为机体武装，胜利获得魂晶与遗物。" },
     mask: { n: "面具摊", i: "🎭", d: "狸老板的面具摊：戴上面具切换形态（每层 1 次）。" },
     boss: { n: "层主", i: "👹", d: "本层 Boss。击破后进入下一层。" }
   };
@@ -59,6 +60,7 @@
         for (j = 0; j < b.length; j++) if (!a.some(function (q) { return q.next.indexOf(b[j].id) >= 0; })) a[Math.min(a.length - 1, Math.round(j * (a.length - 1) / Math.max(1, b.length - 1)))].next.push(b[j].id);
       }
       rows[2][rows[2].length - 1].type = "mask"; // 每层保证一个面具摊（形态切换，DESIGN_V5 §1.3）
+      rows[3][0].type = "sky"; // 每层保证一个镜空节点（纵版射击，DESIGN_V5 路线图 P2）
       // goal node variant per layer
       rows.forEach(function (rw) { rw.forEach(function (nd) { if (nd.type === "goal") nd.goal = Math.floor(r() * GOALS[L].length); if (nd.type === "fight") nd.fight = r() < 0.5 ? "survive" : "clear"; }); });
       layers.push(rows);
@@ -80,6 +82,7 @@
   }
   function canEnter(st, id) { return available(st).some(function (n) { return n.id === id; }); }
   function enter(st, id) { if (!canEnter(st, id)) return null; st.at = id; st.path.push(id); return node(st, id); }
+  function isSky(t) { return t === "sky"; }
   function isCombat(t) { return t === "fight" || t === "elite" || t === "goal" || t === "boss"; }
   // Spec consumed by SakurayoLevels.create/tick/rate (ids are "R…" so they never touch main-line stars).
   function levelSpec(st, nd) {
@@ -101,8 +104,8 @@
   function complete(st, nd, win, build) {
     if (!win) { st.done = true; st.win = false; return { over: true }; }
     st.nodesWon++; if (build) st.build = build;
-    var gain = Math.round(({ fight: 22, goal: 30, elite: 40, boss: 60 }[nd.type] || 0) * shardMul(st)); st.shards += gain;
-    var out = { shards: gain, relicOffer: nd.type === "elite" || nd.type === "boss" ? relicOffer(st, 3) : null };
+    var gain = Math.round(({ fight: 22, goal: 30, elite: 40, boss: 60, sky: 36 }[nd.type] || 0) * shardMul(st)); st.shards += gain;
+    var out = { shards: gain, relicOffer: nd.type === "elite" || nd.type === "boss" || nd.type === "sky" ? relicOffer(st, nd.type === "sky" ? 2 : 3) : null };
     if (nd.type === "boss") { if (st.layer >= LAYERS) { st.done = true; st.win = true; out.runWin = true; } else { st.layer++; st.at = null; out.nextLayer = st.layer; } }
     return out;
   }
@@ -175,5 +178,5 @@
   }
   // meta reward when the run ends (sakura coins); per-node coin rewards are paid by the normal result flow
   function runReward(st) { var won = st.nodesWon || 0; return st.win ? 300 + 60 * LAYERS : Math.round((300 + 60 * (st.layer - 1)) * Math.min(0.9, Math.max(0.4, won / (LAYERS * ROWS)))); }
-  global.SakurayoRun = { LAYERS: LAYERS, ROWS: ROWS, NODE: NODE, RELICS: RELICS, LAYER_NAMES: LAYER_NAMES, MOVES: MOVES, generate: generate, create: create, node: node, available: available, canEnter: canEnter, enter: enter, isCombat: isCombat, levelSpec: levelSpec, complete: complete, options: options, choose: choose, relic: relic, relicOffer: relicOffer, gainRelic: gainRelic, applyPending: applyPending, snapshot: snapshot, restore: restore, sanitize: sanitize, runReward: runReward };
+  global.SakurayoRun = { isSky: isSky, LAYERS: LAYERS, ROWS: ROWS, NODE: NODE, RELICS: RELICS, LAYER_NAMES: LAYER_NAMES, MOVES: MOVES, generate: generate, create: create, node: node, available: available, canEnter: canEnter, enter: enter, isCombat: isCombat, levelSpec: levelSpec, complete: complete, options: options, choose: choose, relic: relic, relicOffer: relicOffer, gainRelic: gainRelic, applyPending: applyPending, snapshot: snapshot, restore: restore, sanitize: sanitize, runReward: runReward };
 })(typeof window !== "undefined" ? window : globalThis);

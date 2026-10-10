@@ -188,6 +188,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 <script src="runtime/sakurayo-weapons.js"></script>
 <script src="runtime/sakurayo-levels.js"></script>
 <script src="runtime/sakurayo-forms.js"></script>
+<script src="runtime/sakurayo-shmup.js"></script>
 <script src="runtime/sakurayo-run.js"></script>
 <script src="runtime/sakurayo-avg.js"></script>
 <script src="runtime/sakurayo-story-ch1.js"></script>
@@ -7452,6 +7453,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const R=window.SakurayoRun;if(!run46||!R.canEnter(run46,id))return false;
     const nd=R.enter(run46,id);runPick46=null;
     if(R.isCombat(nd.type)){runPersist46();launchRunNode46(nd);return true;}
+    if(R.isSky&&R.isSky(nd.type)){runPersist46();launchSky46(nd);return true;}
     runModal46={node:nd.id,opts:R.options(run46,nd),used:[]};runPersist46();paintRun46();return true;
   }
   function runApplyBuildNow46(){/* event/shop effects that touch HP are shown on the map right away */
@@ -7468,6 +7470,26 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     runPersist46();paintRun46();return true;
   }
   function runTakeRelic46(id){const R=window.SakurayoRun;if(!runModal46||runModal46.kind!=="relic")return false;if(!R.gainRelic(run46,id))return false;const q=R.relic(id);toast(`获得遗物：${q.i} ${q.n}`);runModal46=null;runPersist46();paintRun46();return true;}
+  /* 镜空节点：纵版射击（runtime/sakurayo-shmup.js）。构筑武器/形态/生命带入，结束后生命写回构筑并走同一套节点结算。 */
+  let sky46=null;
+  function launchSky46(nd,opts={}){
+    const R=window.SakurayoRun,SH=window.SakurayoShmup;if(!SH)return false;
+    const b=run46.build||{},FM=window.SakurayoForms,fm=run46.form&&FM?FM.get(run46.form.id):null;
+    $("#run46")?.classList.add("hidden");runNode46=nd;
+    sky46=SH.start({character:run46.character||save.character||"sayo",seed:(run46.seed^(nd.layer*7919+nd.row*131+nd.col))>>>0,layer:nd.layer,
+      form:fm?{slot:fm.slot,name:fm.name,tint:fm.tint}:null,weapons:b.weapons46||{},hpFrac:b.maxHp?b.hp/b.maxHp:run46.hpFrac??1,power:1+0.06*(run46.nodesWon||0),
+      art:p=>artUrl(p),auto:!!opts.auto,okText:"返回夜行地图",
+      onClose:r=>skyDone46(nd,r)});
+    return true;
+  }
+  function skyDone46(nd,r){
+    const R=window.SakurayoRun;sky46=null;if(!run46)return;
+    const b=run46.build?JSON.parse(JSON.stringify(run46.build)):null;if(b&&b.maxHp)b.hp=Math.max(1,Math.round(b.maxHp*r.hpFrac));else run46.hpFrac=r.hpFrac;
+    const out=R.complete(run46,nd,!!r.win,b);runNode46=null;
+    if(out.over){const coins=R.runReward(run46);save.coins+=coins;toast(`夜行中断 · 结算 🌸 ${coins}`);save.run46=null;persist();run46=null;$("#run46")?.classList.add("hidden");return;}
+    toast(`镜空突破 · 💠 +${out.shards}`);if(out.relicOffer&&out.relicOffer.length)runModal46={kind:"relic",offer:out.relicOffer,title:"镜空遗物"};
+    runPersist46();openRun46();
+  }
   function launchRunNode46(nd){
     const R=window.SakurayoRun;runNode46=nd;activeLevel46=R.levelSpec(run46,nd);levelResult46=null;levelObj46=null;selected=nd.layer;pendingMode46="story";runMode36="story";setTrial46(null);
     $("#run46")?.classList.add("hidden");if(state==="result"){$("#result").classList.add("hidden");state="menu";}
@@ -7754,6 +7776,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       playerScreen46(){const c=window.SakurayoCamera;const p=c&&c.worldToScreen?c.worldToScreen(P.x,P.y):{x:P.x,y:P.y};return {x:p.x,y:p.y};},
       openEvoCodex46(){return openEvoCodex46();},
       rebootSave46(){return JSON.parse(JSON.stringify(bootLoadSave()));},
+      skyEnter46(auto=true){if(!run46)return null;const R=window.SakurayoRun;let nd=R.available(run46).find(n=>n.type==="sky")||null;
+        if(!nd){/* 测试捷径：把当前位置放到通往本层镜空节点的上一行 */const rows=run46.map[run46.layer-1],sk=rows.flat().find(n=>n.type==="sky"),pre=sk&&rows[sk.row-1].find(n=>n.next.includes(sk.id));if(!pre)return null;run46.at=pre.id;nd=sk;}R.enter(run46,nd.id);launchSky46(nd,{auto});return nd.id;},
+      skyState46(){const g=window.SakurayoShmup?.current();return g?g.snapshot():null;},
+      skyStep46(sec=1,dt=1/60){const SH=window.SakurayoShmup,g=SH?.current();if(!g)return null;for(let t=0;t<sec&&!g.done;t+=dt)SH.step(dt);return g.snapshot();},
+      skyClose46(){const ok=document.querySelector("#shm46 .res .ok");if(ok){ok.click();return true;}return false;},
       takeUpgrade46(id){const u=U.find(x=>x.id===id);if(!u)throw new Error("no upgrade "+id);state="level";chooseUpgrade(u);return {lv:lv(id),weapons:P.weapons46,evo:save.evo46};},
       cardHtml46(){return [...document.querySelectorAll("#choices .choice")].map(b=>({id:b.dataset.upgradeId,cls:b.className,text:b.textContent}));},
       poseLog46(){return (P.poseLog46||[]).slice();},
