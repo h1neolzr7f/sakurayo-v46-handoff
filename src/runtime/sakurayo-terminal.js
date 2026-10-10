@@ -9,6 +9,7 @@
   shop:'<path d="M4 8h10l8 32h31l8-24H21l2 8h27l-3 8H28L20 8z"/><circle cx="29" cy="52" r="6"/><circle cx="49" cy="52" r="6"/>',
   stage:'<path d="M32 5l28 51H4zm0 16L18 47h28z" fill-rule="evenodd"/><path d="M32 30l7 13H25z"/>',
   archive:'<path d="M14 5h33l9 9v40H14zm8 9v32h26V19l-5-5z" fill-rule="evenodd"/><path d="M26 24h17v4H26zm0 10h17v4H26zM5 17h5v43h34v4H5z"/>',
+  trials:'<path d="M32 4l24 9v17c0 15-10 26-24 31C18 56 8 45 8 30V13zm0 8l-16 6v12c0 10 6 18 16 22 10-4 16-12 16-22V18z" fill-rule="evenodd"/><path d="M29 20h6v14h-6zm0 18h6v6h-6z"/>',
   records:'<path d="M8 37h9v22H8zm15-14h9v36h-9zm15-16h9v52h-9zm15 39h7v13h-7z"/>',
   mail:'<path d="M6 13h52v38H6zm6 6l20 16 20-16zM12 27v18h40V27L32 42z" fill-rule="evenodd"/>',
   notice:'<path d="M12 6h29l12 12v41H12zm8 8v37h25V23H36v-9z" fill-rule="evenodd"/><path d="M24 28h17v4H24zm0 9h17v4H24z"/>',
@@ -72,7 +73,7 @@
  #menu.homeDock46.terminalLobby48 .start .terminalIcon48{width:72px;height:72px;color:#92eaff}#menu.homeDock46.terminalLobby48 .start .terminalLabel48 b{font-size:clamp(25px,3.2vw,42px)}
  html.landscape46 #menu.homeDock46.terminalLobby48 .stageMini{position:relative;width:100%;min-height:40px;margin:0;padding:5px 8px;display:grid;grid-template-columns:1fr auto;gap:6px;border:0;border-bottom:2px solid #65dced;border-radius:0;background:#1c30487d;backdrop-filter:none;cursor:pointer}
  #menu.homeDock46.terminalLobby48 .stageMini img,#menu.homeDock46.terminalLobby48 .stageMini p{display:none}#menu.homeDock46.terminalLobby48 .stageMini h3{font-size:12px;line-height:1.4;color:#e8f5fa;font-weight:500}#menu.homeDock46.terminalLobby48 .stageMini strong{font-size:13px;color:#a9ecff;font-weight:500}
- html.landscape46 #menu.homeDock46.terminalLobby48 .homeNav46{position:absolute;bottom:4.5%;right:3%;display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;width:51%;max-width:740px;padding:0;margin:0;border:0;border-radius:0;background:none;gap:3px;pointer-events:auto;z-index:6}
+ html.landscape46 #menu.homeDock46.terminalLobby48 .homeNav46{position:absolute;bottom:4.5%;right:3%;display:grid!important;grid-template-columns:repeat(7,minmax(0,1fr))!important;width:51%;max-width:740px;padding:0;margin:0;border:0;border-radius:0;background:none;gap:3px;pointer-events:auto;z-index:6}
  #menu.homeDock46.terminalLobby48 .homeNav46 button{position:relative;min-height:66px;min-width:0;padding:4px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;border-right:1px solid #d5e8f13b;border-radius:0;background:linear-gradient(0deg,#1427388a,transparent);color:#fff;font-weight:500;font-size:12px;letter-spacing:.05em;text-shadow:0 2px 5px #101e2e;box-shadow:none}
  #menu.homeDock46.terminalLobby48 .homeNav46 .terminalLabel48{display:flex;width:auto!important;height:auto!important;margin:0!important;background:none!important;border-radius:0}
  #menu.homeDock46.terminalLobby48 .homeNav46 button:last-child{border-right:0}#menu.homeDock46.terminalLobby48 .homeNav46 .terminalIcon48{width:30px;height:30px}#menu.homeDock46.terminalLobby48 .homeNav46 .terminalLabel48{align-items:center;gap:1px}#menu.homeDock46.terminalLobby48 .homeNav46 b{font-size:12px;font-weight:500}#menu.homeDock46.terminalLobby48 .homeNav46 small{font-size:6px;letter-spacing:.1em}
@@ -140,7 +141,7 @@
   }
   var title=d.getElementById('coverTitle36');if(title&&!title.querySelector('.terminalLogo48')){var logo=d.createElement('div');logo.className='terminalLogo48';logo.innerHTML=icon('logo');title.appendChild(logo);}
   // Legacy menu refresh also rewrites nav art. Decorate the real existing buttons afterwards.
-  var navLabels={gacha:['寻访','HEADHUNT'],roster:['仓库','DEPOT'],shop:['采购','STORE'],stage:['关卡','MISSIONS'],archive:['档案','ARCHIVES']};
+  var navLabels={gacha:['寻访','HEADHUNT'],roster:['仓库','DEPOT'],shop:['采购','STORE'],stage:['关卡','MISSIONS'],trials:['试炼','TRIALS'],archive:['档案','ARCHIVES']};
   dock.querySelectorAll('.homeNav46 [data-open]').forEach(function(b){var key=b.dataset.open,row=navLabels[key];if(row)b.innerHTML=label(key,row[0],row[1]);});
   root.querySelectorAll('.charCard[data-character]').forEach(function(b){
    var id=b.dataset.character,img=b.querySelector('img');if(!img||img.dataset.terminalPortrait===id)return;

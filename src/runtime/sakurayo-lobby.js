@@ -572,6 +572,7 @@
       services: global.SakurayoServices ? global.SakurayoServices.normalize(incoming.services) : (incoming.services || {}),
       fashion: normalizePool(incoming.fashion, FASHION_CARDS),
       weapon: normalizePool(incoming.weapon, WEAPON_CARDS),
+      trials: global.SakurayoTrials ? global.SakurayoTrials.normalize(incoming.trials) : (incoming.trials || { receipts: {}, best: {} }),
     };
     return shop;
   }

@@ -9,7 +9,8 @@
     gachaDrawer: "左侧切换卡池，右下单抽/十连；“详情”可看概率与保底。",
     shopDrawer: "左侧切换分类；第一笔建议先买初始核心。",
     rosterDrawer: "点卡片看详情，时装/武器可在详情里装备。",
-    commandDrawer47: "上方切换角色，下方查看衣装与出击配置。"
+    commandDrawer47: "上方切换角色，下方查看衣装与出击配置。",
+    trialsDrawer: "试炼有首通奖励；选好试炼后回大厅出击，返回大厅会取消。"
   };
   var CSS = [
     /* tap targets >= 44px */
@@ -30,8 +31,17 @@
     /* red dot */
     ".syDot46{position:relative}.syDot46:after{content:'';position:absolute;top:4px;right:10px;width:9px;height:9px;border-radius:50%;background:#ff4d6d;box-shadow:0 0 0 2px #0b1326,0 0 8px #ff4d6d}",
     /* one-time hint bubble (non-blocking) */
-    ".syHint46{position:fixed;z-index:200;left:50%;top:calc(10px + env(safe-area-inset-top));transform:translateX(-50%);max-width:min(560px,86vw);padding:10px 16px;border-radius:12px;background:rgba(9,15,30,.94);border:1px solid rgba(170,240,255,.6);color:#eef6ff;font:600 13px/1.5 system-ui;letter-spacing:.04em;box-shadow:0 10px 28px rgba(0,6,20,.5);pointer-events:none;animation:syFade46 .2s ease-out}",
-    ".syHint46 b{color:#8fe6f5;margin-right:6px}"
+    ".syHint46{position:fixed;z-index:200;left:50%;bottom:calc(12px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:min(560px,86vw);padding:10px 16px;border-radius:12px;background:rgba(9,15,30,.94);border:1px solid rgba(170,240,255,.6);color:#eef6ff;font:600 13px/1.5 system-ui;letter-spacing:.04em;box-shadow:0 10px 28px rgba(0,6,20,.5);pointer-events:none;animation:syFade46 .2s ease-out}",
+    ".syHint46 b{color:#8fe6f5;margin-right:6px}",
+    /* skill / dash cooldown seconds */
+    "#skill,#dash{position:relative}",
+    "#skill:not(.ready44)[data-cd]:not([data-cd=''])::after,#dash:not(.ready44)[data-cd]:not([data-cd=''])::after{content:attr(data-cd);position:absolute;inset:0;display:grid;place-items:center;border-radius:inherit;background:rgba(4,8,18,.55);color:#fff;font:900 18px/1 system-ui;text-shadow:0 1px 4px #000;pointer-events:none}",
+    "#dash:not(.ready44)[data-cd]:not([data-cd=''])::after{font-size:14px}",
+    /* trial badge + result */
+    ".trialBadge46{position:absolute;z-index:5;right:max(16px,env(safe-area-inset-right));bottom:calc(var(--trialBadgeBottom,120px));display:flex;align-items:center;gap:8px;padding:4px 4px 4px 12px;border-radius:999px;background:rgba(9,15,30,.9);border:1px solid #ffb3d1;color:#ffe3ef;font:800 12px/1 system-ui;box-shadow:0 6px 18px rgba(255,90,160,.3)}",
+    ".trialBadge46 b{color:#ff9cc6;letter-spacing:.12em}.trialBadge46 button{min-width:32px!important;min-height:32px!important;border-radius:50%;border:0;background:#ffffff1a;color:#fff;font:800 14px/1 system-ui}",
+    ".trialResult46{margin:6px 0 10px;padding:10px 14px;border-radius:12px;border:1px solid #9ff0c066;background:rgba(40,120,80,.18);display:flex;flex-direction:column;gap:4px}.trialResult46 b{color:#9ff0c0;font:900 14px/1.2 system-ui}.trialResult46 span{color:#d6e4f4;font:600 12px/1.4 system-ui}",
+    ".trialResult46.fail{border-color:#ff9cc666;background:rgba(140,40,80,.18)}.trialResult46.fail b{color:#ff9cc6}"
   ].join("\n");
   function style() {
     if (doc.getElementById("sakurayoUx46")) return;
@@ -66,14 +76,16 @@
     });
   }
   function coins() { try { return (JSON.parse(root.localStorage.getItem("sakurayoV3")) || {}).coins || 0; } catch (e) { return 0; } }
+  var NAV_KEY = { "寻访": "gacha", "试炼": "trials" };
   function navButton(label) {
-    var list = doc.querySelectorAll("#menu .homeNav46 button");
-    for (var i = 0; i < list.length; i++) if ((list[i].textContent || "").trim() === label) return list[i];
-    return null;
+    return doc.querySelector('#menu .homeNav46 [data-open="' + NAV_KEY[label] + '"]');
   }
+
   function dots() {
     var g = navButton("寻访");
     if (g) g.classList.toggle("syDot46", coins() >= 160);
+    var t = navButton("试炼"), T = root.SakurayoTrials;
+    if (t && T) { var sv = null; try { sv = JSON.parse(root.localStorage.getItem("sakurayoV3")); } catch (e) {} t.classList.toggle("syDot46", !!sv && T.claimable(sv) > 0); }
   }
   function sfx(e) {
     var b = e.target && e.target.closest && e.target.closest("button");

@@ -15,7 +15,7 @@ function world(names){
   const noop=()=>{};
   const c={console,Math,Set,Object,Number,Array,Date,performance:{now:()=>0},P:{},W:932,H:430,
     window:{},save:{tal:{flow:0,hp:0,atk:0,mag:0,luck:0},ach:{},character:'sayo',skin:'default',storyChoices38:{},shop40:{starter:{},items:{}},mainGod:new Proxy({challenges:{}},{get:(o,k)=>o[k]??0})},
-    state:'play',runMode36:'story',pendingMode46:'story',selected:2,selectedMainGodTier36:1,levelRerolls:2,pets:[],
+    state:'play',runMode36:'story',pendingMode46:'story',activeTrial46:null,selected:2,selectedMainGodTier36:1,levelRerolls:2,pets:[],
     $:s=>{if(!nodes.has(s))nodes.set(s,{classList:{add:noop,remove:noop},textContent:'',innerHTML:''});return nodes.get(s);},
     setForm:noop,refreshPlan:noop,storyMemory38:()=>({}),char35:()=>({id:'sayo'}),charAnimPath35:()=>'',artImage:noop,updateCharacterUI35:noop,
     isMainGodRun36:()=>c.runMode36==='mainGod',mainGodTier36:()=>({xp:1}),randomOffers37:xs=>xs.slice(0,1),MAIN_GOD_CHALLENGES37:[{id:'test',ok:()=>true}],syncPets:noop,
@@ -86,7 +86,7 @@ test('finish rejects duplicate challenge credit and balance sample at the entry'
  for(const mode of ['story','mainGod']){
   const c=world(['finish','applyChallengeFinish37','applyFinishAwards40','applyFinishReport40','recordBalance40']);c.runMode36=mode;c.runTime=1;
   Object.assign(c.P,{mgChallenge:{id:'test',bonus:3,ok:()=>true},kills:0,level:1,damageTaken:0});Object.assign(c.save,{balance40:{samples:[]},runHistory:[],runs:0});
-  c.setMusic37=()=>{};c.paintOutfitModal45=()=>{};c.persist=()=>{};
+  c.setMusic37=()=>{};c.paintOutfitModal45=()=>{};c.paintTrialResult46=()=>{};c.persist=()=>{};
   c.finishStoryRun=c.finishMainGod36=()=>{c.state='result';c.save.runs++;};
   c.finish(true);const count=c.save.balance40.samples.length,challenge=c.save.mainGod.challenges.test;
   c.finish(true);assert.equal(c.save.runs,1);assert.equal(c.save.balance40.samples.length,count);assert.equal(c.save.mainGod.challenges.test,challenge);

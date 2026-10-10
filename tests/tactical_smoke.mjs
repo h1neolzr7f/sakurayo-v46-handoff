@@ -54,7 +54,7 @@ try{
    assert.ok(box.width>=40&&box.height>=40,id+' has touch area');
    assert.equal(await page.locator('#'+id).evaluate(b=>{const r=b.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return hit===b||b.contains(hit);}),true,id+' is not covered');
   }
-  assert.equal(await page.locator('#menu .homeNav46 button').count(),6,'six primary feature tiles');
+  assert.equal(await page.locator('#menu .homeNav46 button').count(),7,'seven primary feature tiles (incl. trials)');
   assert.equal(await page.locator('.tacticalDeck48 > button').count(),3,'three floating right controls');
   for(const button of await page.locator('#menu .homeNav46 button').all()){
    const box=await button.boundingBox(),name=(await button.textContent()).trim();

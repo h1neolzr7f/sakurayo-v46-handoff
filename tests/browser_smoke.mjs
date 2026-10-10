@@ -180,7 +180,7 @@ try {
   assert.equal(artStatus.length, 20);
   assert.equal(artStatus.filter(item => item.ready).length, 12);
   assert.equal(artStatus.filter(item => !item.loaded).length, 8);
-  assert.equal(await page.locator("#menu .homeNav46 .terminalIcon48 svg").count(), 6);
+  assert.equal(await page.locator("#menu .homeNav46 .terminalIcon48 svg").count(), 7);
   assert.ok(await page.locator("#characterList .charCard img").evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0)));
   await page.waitForFunction(() => {
     const image = document.querySelector("#menu .menuBrand35");
