@@ -103,7 +103,7 @@
       ctx.save(); ctx.globalAlpha = 0.85;
       for (var i = 0; i < s.c; i++) {
         var a = W.orbit.a + i * TAU / s.c, x = P.x + Math.cos(a) * rad, y = P.y + Math.sin(a) * rad;
-        ctx.save(); if (global.__reduceFlash46 !== false) { var up = Math.max(0, -Math.sin(a)); ctx.globalAlpha = 0.6 * (1 - 0.85 * up * up); } ctx.translate(x, y); ctx.rotate(a + Math.PI / 2);
+        ctx.save(); var up = Math.max(0, -Math.sin(a)); ctx.globalAlpha = (global.__reduceFlash46 !== false ? 0.6 : 0.8) * (1 - 0.85 * up * up); ctx.translate(x, y); ctx.rotate(a + Math.PI / 2);
         ctx.fillStyle = W.orbit.evo ? "#ffd6ef" : "#ff9ccf"; ctx.shadowColor = "#ff5aa6"; ctx.shadowBlur = 6;
         ctx.beginPath(); ctx.moveTo(0, -14); ctx.quadraticCurveTo(7, 0, 0, 14); ctx.quadraticCurveTo(-7, 0, 0, -14); ctx.fill(); ctx.restore();
       }

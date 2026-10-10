@@ -31,9 +31,20 @@
     "#bossBreak46.enraged{border-color:#ff3b6b}",
     "#bossBreak46 span{position:relative;display:block;text-align:center;font:800 10.5px/16px system-ui;color:#fff;text-shadow:0 1px 2px #000;letter-spacing:.06em}",
     "#level{align-items:flex-end!important;background:linear-gradient(180deg,#05030c22,#05030ccc 60%)!important;backdrop-filter:none!important}",
-    "#level .modal{max-height:66vh;overflow:auto;border-radius:20px 20px 0 0;margin-bottom:0}",
+    "#level .modal{max-height:94vh;overflow:auto;border-radius:20px 20px 0 0;margin-bottom:0}",
     "#levelBar46{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:8px;font:700 12px system-ui;color:#ffe3f0}",
-    "#levelBar46 button{min-height:40px;padding:0 16px}#levelBar46 label{display:flex;gap:6px;align-items:center;opacity:.85}",
+    "#levelBar46 button{min-height:38px;padding:0 16px;width:auto!important;flex:0 0 auto;margin:0!important}#levelBar46 label{display:flex;gap:6px;align-items:center;opacity:.85}",
+    ".choice.rar46-common{box-shadow:inset 0 0 0 1px #ffffff1c}",
+    ".choice.rar46-rare{box-shadow:inset 0 0 0 1px #6fb7ff88,0 0 10px #3d8bff33}",
+    ".choice.rar46-epic{box-shadow:inset 0 0 0 1px #c58cff99,0 0 12px #9b5cff44}",
+    ".choice.rar46-legend{box-shadow:inset 0 0 0 1px #ffd36baa,0 0 14px #ffb13b55}",
+    ".choice.rar46-evo{box-shadow:inset 0 0 0 2px #ffd36b,0 0 18px #ff8ac7aa;background:linear-gradient(120deg,#2a1636,#3b1f2e)!important}",
+    ".meta .evo{color:#ffd36b;font-weight:900}.meta .epic{color:#d6a8ff}.evoName46{color:#ffd36b;font-style:normal}",
+    "#evoCodex46{z-index:9999!important;position:fixed!important;inset:0!important;display:flex!important;align-items:center;justify-content:center}#evoCodex46.hidden{display:none!important}.evoModal46{max-width:min(760px,94vw);max-height:86vh;overflow:auto}",
+    ".evoGrid46{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;margin:12px 0}",
+    ".evoRow46{display:flex;gap:10px;align-items:center;padding:8px;border-radius:12px;background:#ffffff0d;border:1px solid #ffffff1a}",
+    ".evoRow46.live{border-color:#ffd36b;box-shadow:0 0 12px #ffb13b44}.evoRow46 img{width:56px;height:56px;border-radius:10px}",
+    ".evoRow46 b{display:block;font-size:14px}.evoRow46 b em{color:#ffd36b;font-style:normal}.evoRow46 small{display:block;opacity:.75;font-size:11.5px;margin-top:2px}",
   ].join("\n");
   var built = false, mini = null, last = 0, ring = null;
   function api() { return global.SakurayoBattle46; }
