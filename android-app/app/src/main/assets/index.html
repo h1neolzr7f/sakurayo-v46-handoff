@@ -2822,7 +2822,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   var GACHA_V2_CSS =
     ".wishV2 .wishBanner46{filter:saturate(1.08) brightness(.82)}" +
     ".wishV2 .wishShade46{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,#070b1ae6 0,#070b1a66 16%,transparent 34%,transparent 52%,#070b1acc 74%,#070b1af2 100%),linear-gradient(0deg,#070b1acc,transparent 30%)}" +
-    "html.landscape46 #gachaDrawer .wishV2 .wishHero46{left:9%;width:56%;height:132%;bottom:-20%;filter:drop-shadow(0 0 28px #ff9bcc55)}" +
+    "html.landscape46 #gachaDrawer .wishV2 .wishHero46{left:13%;width:44%;height:118%;bottom:-14%;-webkit-mask-image:none;mask-image:none;filter:drop-shadow(0 0 28px #ff9bcc55)}" +
     "#gachaDrawer .wishV2 .wishTabs46{top:max(64px,calc(env(safe-area-inset-top) + 56px));left:max(12px,env(safe-area-inset-left));flex-direction:column;gap:8px;width:clamp(92px,12vw,132px)}" +
     "#gachaDrawer .wishV2 .wishTabs46 button{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;min-height:52px;padding:6px 12px;border-radius:12px;border:1px solid #96e4f555;background:#0b1326cc;color:#dbe9f8;text-align:left;font:800 14px/1 system-ui;letter-spacing:.12em;backdrop-filter:blur(8px)}" +
     "#gachaDrawer .wishV2 .wishTabs46 button small{font:600 9px/1 system-ui;letter-spacing:.08em;color:#a9bed6}" +
@@ -2830,8 +2830,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     "#gachaDrawer .wishV2 .wishTabs46 button.on small{color:#0b2233}" +
     "#gachaDrawer .wishV2 .wishWallet46{position:absolute;z-index:7;top:max(14px,calc(env(safe-area-inset-top) + 6px));right:64px;display:flex;align-items:center;gap:8px;height:36px;padding:0 6px 0 10px;border-radius:999px;background:#09101ee6;border:1px solid #96e4f566;color:#ffd77a;font:800 14px/1 system-ui}" +
     "#gachaDrawer .wishV2 .wishShardPill46{padding:5px 9px;border-radius:999px;background:#ffffff12;color:#cfe6f5;font:700 10px/1 system-ui;letter-spacing:.06em}" +
-    ".wishCoin46{display:inline-block;width:16px;height:16px;border-radius:50%;vertical-align:-3px;margin-right:4px;background:radial-gradient(circle at 35% 30%,#fff6d0,#ffd77a 45%,#d8892b);box-shadow:0 0 8px #ffd77a88;position:relative}" +
-    ".wishCoin46:after{content:'\u273f';position:absolute;inset:0;display:grid;place-items:center;font-size:10px;color:#a4441e}" +
+    ".wishCoin46{display:inline-block;width:18px;height:18px;object-fit:contain;vertical-align:-4px;margin-right:4px;filter:drop-shadow(0 0 4px #ffd77a88)}" +
     "#gachaDrawer .wishV2 .wishTitle46{top:max(60px,calc(env(safe-area-inset-top) + 52px));right:max(18px,env(safe-area-inset-right));max-width:40%;text-align:right}" +
     "#gachaDrawer .wishV2 .wishTag46{display:inline-block;padding:3px 10px;border-radius:4px;background:#ff8fc4;color:#2a0b1c;font:800 10px/1.2 system-ui;letter-spacing:.2em}" +
     "#gachaDrawer .wishV2 .wishTitle46 h3{margin:6px 0 4px;font-size:clamp(24px,3.6vw,38px);letter-spacing:.22em;line-height:1.1}" +
@@ -3394,7 +3393,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     var sub = "收藏不增加战斗属性 · " + (pool === "fashion" ? "时装装备保留展示与标注倾向" : pool === "weapon" ? "武器装备仅作收藏展示" : "职业卡仅影响标注流派倾向");
     var meta = POOL_META[pool] || POOL_META.remnant;
     var up = featuredCard(pool);
-    var coinIcon = '<i class="wishCoin46" aria-hidden="true"></i>';
+    var coinIcon = '<img class="wishCoin46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/icon_coin.webp") + '">';
+    var shardIcon = '<img class="wishCoin46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/icon_shard.webp") + '">';
     var tabHtml = "";
     for (var pi = 0; pi < POOL_IDS.length; pi++) {
       var pid = POOL_IDS[pi], pm = POOL_META[pid];
@@ -3402,12 +3402,12 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }
     host.innerHTML =
       '<div class="wishStage46 wishV2">' +
-      '<img class="wishBanner46" data-art alt="" src="' + artSrc(handlers, "ui/tactical/gacha-" + pool + "-v3.webp") + '">' +
+      '<img class="wishBanner46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/banner_" + pool + ".webp") + '">' +
       '<div class="wishShade46" aria-hidden="true"></div>' +
-      '<img class="wishHero46" data-art alt="" src="' + artSrc(handlers, "gacha/hero_" + hero + ".webp") + '">' +
+      '<img class="wishHero46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/up_" + hero + ".webp") + '">' +
       '<div class="wishPetals46">' + petalMarks() + "</div>" +
       '<nav class="wishTabs46" id="gachaTabs46" aria-label="卡池">' + tabHtml + "</nav>" +
-      '<div class="wishWallet46" aria-label="货币">' + coinIcon + "<b>" + info.coins + '</b><span class="wishShardPill46">碎镜片 ' + shards + " / " + RATES.spark + "</span></div>" +
+      '<div class="wishWallet46" aria-label="货币">' + coinIcon + "<b>" + info.coins + '</b><span class="wishShardPill46">' + shardIcon + '碎镜片 ' + shards + " / " + RATES.spark + "</span></div>" +
       '<div class="wishTitle46"><span class="wishTag46">' + meta.kind + "</span><h3>" + meta.name + "</h3>" +
       (up ? '<div class="wishUp46"><em>UP</em><b>' + escapeHtml(up.n) + "</b><i>" + up.r + "</i></div>" : "") +
       "<p>" + sub + '</p><small class="wishTime46">' + meta.time + "</small></div>" +
@@ -3655,6 +3655,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     var overlay = global.document.createElement("div");
     overlay.id = "gachaReveal46";
     if (instant) overlay.className = "isTest";
+    var revealBg = artSrc(handlers, "gacha/v4/reveal_bg.webp");
+    if (revealBg) overlay.style.backgroundImage = "linear-gradient(#05030bb3,#05030bcc),url(\"" + revealBg + "\")";
+    overlay.style.backgroundSize = "cover";
+    overlay.style.backgroundPosition = "center";
     var gridClass = items.length > 1 ? "revealGrid46 ten" : "revealGrid46 one";
     overlay.innerHTML =
       '<div class="' +
