@@ -175,3 +175,10 @@ bash gradlew --no-daemon assembleDebug lintDebug
 - `c80b049` 时装卡池 UP「终夜樱冠」专属立绘 `gacha/v4/up_crown.webp`（三张候选挑一张，isnet-anime 抠图）。注意 rembg 默认模型会拉 1GB 的 bria 模型并被 OOM 杀，需显式 `new_session('isnet-anime')`。
 - `6fdedf7` 新增 `src/runtime/sakurayo-sfx.js`：24 种分层程序化音效（命中/暴击/击杀/精英击杀、技能、冲刺、升级、Boss、胜负；界面开/关/确认/错误/金币；寻访启动、翻卡、SR/SSR 揭示；试炼选择），带同类去抖；`sound(k)` 优先走此库，不依赖音频文件。战斗反馈：精英/Boss 击杀震屏 + 振动、暴击单独音色、低血量红色脉冲暗角、每 10 连击数字弹跳；尊重“减少动态效果”。新增 `tests/sfx_smoke.mjs`（离线渲染每个配方，检查有声且不削波，校验抽屉/寻访路由和低血量暗角）。
 - Android：box 上装了 OpenJDK 21（Debian 13 无 17）、Android cmdline-tools、platform 36、build-tools 36/35（SDK 在 `/workspace/android-sdk`，已接受 SDK 许可）。`ANDROID_HOME=/workspace/android-sdk ./gradlew assembleDebug lintDebug` 成功，debug APK 约 125MB（未发布、未签 release），lint 0 error / 2 warning（AGP 版本提示、DiscouragedApi）。未跑 instrumentation/模拟器（/dev/kvm 存在但当前用户无权限）。
+
+### 第五阶段（2026-10-10 13:42 起 Asia/Shanghai）：背景音乐
+
+- 中转站 `/v1/models` 13:42–13:58 持续返回 530（Cloudflare Tunnel 宕机），无法确认是否有音乐/TTS 模型；改用代码作曲。
+- `06fbd2e`：`tools/bgm/songs.py` 用 mido 写 MIDI、FluidSynth + FluidR3_GM（MIT）渲染，混响尾音折回循环起点保证无缝，RMS 统一到 −17 dBFS，`oggenc -q 2.5` 输出到 `art/bgm/`（6 首共约 2.3MB）。
+- `src/runtime/sakurayo-bgm.js`：按场景切曲（大厅/寻访/战斗/Boss），淡入淡出 0.6–1.4 秒，结算播放胜利/失败短乐句后回到大厅曲；音量 = 总音量 × 音乐音量，设为 0 时停止；页面隐藏时暂停。能 fetch 时用 WebAudio 无缝循环，file:// 或 WebView 资源用 `<audio loop>` 兜底。原振荡器底噪已移除，`setMusic37` 保留零音量语义（platform_unit 通过）。
+- 新增 `tests/bgm_smoke.mjs`（本地 http，校验切场景、Boss、胜利乐句、音量公式和 OGG 可解码）。来源与许可见 `CREDITS.md`。试听：`/workspace/sakurayo-bgm-preview/*.mp3`（box 本地）。
