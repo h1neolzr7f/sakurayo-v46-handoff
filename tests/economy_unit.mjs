@@ -21,8 +21,7 @@ const json=v=>JSON.parse(JSON.stringify(v));
 test('readable legacy storage remains readable even when writes throw',()=>{
  let writes=0;const raw='{"coins":12345,"unlock":4}';
  const ctx={localStorage:{getItem:()=>raw,setItem(){writes++;throw Object.assign(new Error('full'),{name:'QuotaExceededError'});}},normalizeGameSave:v=>v,DEF:{}};
- vm.createContext(ctx);const begin=html.indexOf('  let save;'),end=html.indexOf('  try {\n    window.SakurayoContent?.finalize()',begin);
- vm.runInContext(html.slice(begin,end)+'\nglobalThis.read=save;',ctx);
+ vm.createContext(ctx);vm.runInContext(source('bootLoadSave')+'\nglobalThis.read=bootLoadSave();',ctx);
  assert.equal(ctx.read.coins,12345);assert.equal(ctx.read.unlock,4);assert.equal(writes,0,'startup never probes by writing');
 });
 test('every pool preserves high balances, including cheat and snapshot',()=>{
