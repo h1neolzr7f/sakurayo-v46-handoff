@@ -24,6 +24,14 @@
     F("rion", "burst", "黄泉一闪", "般若面", "蓄力上限翻倍，蓄满前不能移动", { chargeCap: 2, rootWhileCharge: 1, dmg: 1.15 }, ["explosive", "pierce", "laser"], ["orbit"]),
     F("rion", "awaken", "万剑归坟", "纸面具", "10 秒：每次斩击召唤剑雨", { swordRain: 1, dmg: 1.4, invuln: 1 }, [])
   ];
+  /* 视觉：tint = 角色光环/弹幕辉光，core = 子弹核心色；line = 变身台词（STORY v3 §2 面具台词）。只影响画面。 */
+  var PAL = { base: null, guard: ["#7fd8ff", "#e9fbff"], speed: ["#6dffb4", "#effff4"], burst: ["#ff6a3d", "#fff0c8"], awaken: ["#ffd76a", "#fffbe6"] };
+  var LINES = {
+    sayo_guard: "挨打要花药钱的，所以不挨！", sayo_speed: "下一个摊位 5 分钟后收摊——让开让开！", sayo_burst: "房租的仇，今天一起报！", sayo_awaken: "……这张脸，是我七岁时画的。", sayo_base: "今天也要努力打工！",
+    aya_guard: "全程录屏，你每一拳我都截图了。", aya_speed: "下面这段请开 0.25 倍速。", aya_burst: "掉粉的怨念，接好！", aya_awaken: "……原来那次直播，第一个观众是你们。", aya_base: "回到正片。",
+    rion_guard: "我就站这里。你们过来。", rion_speed: "三分钟后睡觉。一刀一个。", rion_burst: "……谁把我吵醒的。", rion_awaken: "这一次，我想看烟花。", rion_base: "……嗯。"
+  };
+  FORMS.forEach(function (f) { var p = PAL[f.slot]; f.tint = p ? p[0] : null; f.core = p ? p[1] : null; f.line = LINES[f.id] || ""; f.art = "characters/" + f.ch + "/forms/" + f.slot + ".webp"; });
   var BY = {}; FORMS.forEach(function (f) { BY[f.id] = f; });
   var BRANCH = ["guard", "speed", "burst"];
   function get(id) { return BY[id] || null; }

@@ -13,6 +13,7 @@
     event: { n: "事件", i: "❔", d: "镜界里的偶遇，选项有得有失。" },
     shop: { n: "商店", i: "🏮", d: "用魂晶购买治疗、强化与遗物。" },
     shrine: { n: "神社", i: "⛩", d: "休整：回复生命或获得一次强化。" },
+    mask: { n: "面具摊", i: "🎭", d: "狸老板的面具摊：戴上面具切换形态（每层 1 次）。" },
     boss: { n: "层主", i: "👹", d: "本层 Boss。击破后进入下一层。" }
   };
   var LAYER_NAMES = ["神社外街", "雨夜商圈", "黄泉参道"];
@@ -57,6 +58,7 @@
         }
         for (j = 0; j < b.length; j++) if (!a.some(function (q) { return q.next.indexOf(b[j].id) >= 0; })) a[Math.min(a.length - 1, Math.round(j * (a.length - 1) / Math.max(1, b.length - 1)))].next.push(b[j].id);
       }
+      rows[2][rows[2].length - 1].type = "mask"; // 每层保证一个面具摊（形态切换，DESIGN_V5 §1.3）
       // goal node variant per layer
       rows.forEach(function (rw) { rw.forEach(function (nd) { if (nd.type === "goal") nd.goal = Math.floor(r() * GOALS[L].length); if (nd.type === "fight") nd.fight = r() < 0.5 ? "survive" : "clear"; }); });
       layers.push(rows);
@@ -112,6 +114,10 @@
       var rel = relicOffer(st, 1)[0];
       return [{ k: "heal", n: "伤药", d: "回复 30% 生命", cost: 30 }, { k: "level", n: "符纸", d: "获得 1 次强化", cost: 40 }].concat(rel ? [{ k: "relic", id: rel.id, n: rel.i + " " + rel.n, d: rel.d, cost: 55 }] : []).concat([{ k: "leave", n: "离开", d: "" }]);
     }
+    if (nd.type === "mask") {
+      var FM = global.SakurayoForms; if (!FM) return [{ k: "leave", n: "离开", d: "" }];
+      return FM.offer(st).map(function (f) { return { k: "form", id: f.id, n: f.mask + " · " + f.name, d: f.rule }; }).concat([{ k: "leave", n: "不换", d: "保持当前形态" }]);
+    }
     if (nd.type === "event") {
       var ev = [
         { t: "无人的手水舍", d: "水面映出的不是你。", o: [{ k: "heal", n: "掬水", d: "回复 25% 生命" }, { k: "shards", v: 35, n: "捞起水底的魂晶", d: "魂晶 +35，生命 -10%", hp: -0.1 }] },
@@ -130,6 +136,7 @@
     if (opt.k === "heal") st.pending.push({ heal: nd.type === "shrine" ? 0.35 : nd.type === "shop" ? 0.3 : 0.25 });
     else if (opt.k === "level") st.pending.push({ levels: opt.lv || 1 });
     else if (opt.k === "shards") st.shards += opt.v;
+    else if (opt.k === "form") { var FM = global.SakurayoForms, r2 = FM && FM.switchTo(st, opt.id, "node", st.build && st.build.up ? Object.keys(st.build.up) : []); if (!r2) return { ok: false, why: "本层已经换过面具了" }; return { ok: true, form: opt.id }; }
     else if (opt.k === "relic") { var id = opt.id || (relicOffer(st, 1)[0] || {}).id; if (id) gainRelic(st, id); return { ok: true, relic: id }; }
     return { ok: true };
   }
@@ -163,6 +170,7 @@
     st.shards = Math.max(0, Math.floor(+st.shards || 0)); st.relics = st.relics.filter(function (id) { return !!relic(id); });
     if (st.at && !node(st, st.at)) st.at = null;
     if (st.build && typeof st.build !== "object") st.build = null;
+    if (st.form) { st.form = global.SakurayoForms ? global.SakurayoForms.sanitize(st.form, st.character || "sayo") : st.form; if (!st.form) delete st.form; }
     return st;
   }
   // meta reward when the run ends (sakura coins); per-node coin rewards are paid by the normal result flow
