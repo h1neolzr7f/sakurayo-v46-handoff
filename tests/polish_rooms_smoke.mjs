@@ -62,7 +62,7 @@ try{
     assert.equal(await page.locator('#rosterPeek46').getAttribute('role'),'dialog');assert.equal(await page.locator('#rosterPeek46').getAttribute('aria-modal'),'true');
     const close=page.locator('#rosterPeekClose46'),box=await close.boundingBox();
     assert.ok(box&&box.width>=40&&box.height>=40,'detail provides a 40px close target');
-    await panel.locator('p').click();assert.equal(await page.locator('#rosterPeek46').count(),1,'reading detail text keeps it open');
+    await panel.locator('p:not(.collectionRule46)').first().click();assert.equal(await page.locator('#rosterPeek46').count(),1,'reading detail text keeps it open');
     for(const key of ['Tab','Shift+Tab','Tab']){await page.keyboard.press(key);assert.equal(await page.evaluate(()=>!!document.activeElement.closest('#rosterPeek46')),true,'keyboard focus stays in detail');}
     await page.keyboard.press('Escape');assert.equal(await page.locator('#rosterPeek46').count(),0);
     assert.equal(await card.evaluate(b=>document.activeElement===b),true,'Escape returns focus to the source card');
