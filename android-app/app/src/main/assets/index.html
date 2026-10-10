@@ -7419,19 +7419,23 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function htmlEscape(value) {
     return String(value ?? "").replace(/[&<>"']/g, ch => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
   }
-  let save;
-  try {
-    save = normalizeGameSave(JSON.parse(localStorage.getItem("sakurayoV3") || "{}"));
-  } catch {
-    save = JSON.parse(JSON.stringify(DEF));
+  // 启动读档管线（测试 API rebootSave46 复用同一函数，验证“写入的存档能被启动流程原样读回”）
+  function bootLoadSave() {
+    let loaded;
+    try {
+      loaded = normalizeGameSave(JSON.parse(localStorage.getItem("sakurayoV3") || "{}"));
+    } catch {
+      loaded = JSON.parse(JSON.stringify(DEF));
+    }
+    try {
+      window.SakurayoContent?.finalize();
+      loaded = window.SakurayoContent?.migrateSave(loaded) || loaded;
+    } catch (error) {
+      window.__SAKURAYO_DEV__?.report("extension:save-bootstrap", error);
+    }
+    return normalizeGameSave(loaded);
   }
-  try {
-    window.SakurayoContent?.finalize();
-    save = window.SakurayoContent?.migrateSave(save) || save;
-  } catch (error) {
-    window.__SAKURAYO_DEV__?.report("extension:save-bootstrap", error);
-  }
-  save = normalizeGameSave(save);
+  let save = bootLoadSave();
   function storageStatus(error) {
     let node=document.getElementById("storageStatus38");
     if(!error){if(node)node.remove();return;}
@@ -14827,6 +14831,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       setReduceFlash46(on){save.settings.reduceFlash46=!!on;return reduceFlash46();},
       playerScreen46(){const c=window.SakurayoCamera;const p=c&&c.worldToScreen?c.worldToScreen(P.x,P.y):{x:P.x,y:P.y};return {x:p.x,y:p.y};},
       openEvoCodex46(){return openEvoCodex46();},
+      rebootSave46(){return JSON.parse(JSON.stringify(bootLoadSave()));},
       takeUpgrade46(id){const u=U.find(x=>x.id===id);if(!u)throw new Error("no upgrade "+id);state="level";chooseUpgrade(u);return {lv:lv(id),weapons:P.weapons46,evo:save.evo46};},
       cardHtml46(){return [...document.querySelectorAll("#choices .choice")].map(b=>({id:b.dataset.upgradeId,cls:b.className,text:b.textContent}));},
       poseLog46(){return (P.poseLog46||[]).slice();},

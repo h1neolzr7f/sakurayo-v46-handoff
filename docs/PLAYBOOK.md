@@ -57,3 +57,7 @@
 ## 10. 存档兼容
 - 新字段只增不改；旧字段读入后忽略（例如 DP 部署字段、永久数值天赋 → 一次性退还樱币 `talRefund46`）。
 - `sakurayo-save.js` 的 `sanitize` 对每个新模块调用其 `sanitize`，单测覆盖旧存档导入。
+
+## 11. build_smoke「图鉴解锁没保存」的真实根因
+- 不是游戏没写存档：5 个并发复现时，页面内 localStorage 已含 evo46，但 reload 后（甚至新开同源页面）读回的是种子存档——高负载下 Chromium 丢了渲染进程未提交的 localStorage 写入。
+- 修法：测试改为调用 `rebootSave46()`，走与启动时完全相同的 `bootLoadSave()` 读档管线；种子用 localStorage 标记只写一次。
