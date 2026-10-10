@@ -33,8 +33,9 @@ const codex = await api('openEvoCodex46');
 assert.equal(codex.total, 7); assert.ok(codex.seen >= 1);
 assert.match(await page.locator('#evoCodex46').innerText(), /百花缭乱/);
 await page.waitForFunction(() => (localStorage.getItem('sakurayoV3') || '').includes('"evo46":["spread"'), null, { timeout: 5000 }); await page.waitForTimeout(800); await page.waitForFunction(() => (localStorage.getItem("sakurayoV3") || "").includes("\"evo46\":[\"spread\""), null, { timeout: 5000 });
-await page.reload(); await page.locator('.bootArt35').waitFor({ state: 'detached' });
-assert.deepEqual((await api('saveSnapshot')).evo46.includes('spread'), true, 'codex unlock persists');
+await page.reload({ waitUntil: 'load' }); await page.waitForFunction(() => window.__SAKURAYO_TEST__?.saveSnapshot && !document.querySelector('.bootArt35'), null, { timeout: 60000 });
+{ const sn = await api('saveSnapshot'), ls = await page.evaluate(() => (JSON.parse(localStorage.getItem('sakurayoV3') || '{}').evo46));
+  assert.deepEqual(sn.evo46.includes('spread'), true, `codex unlock persists (memory ${JSON.stringify(sn.evo46)}, storage ${JSON.stringify(ls)})`); }
 await browser.close();
 assert.deepEqual(errors, []);
 console.log('PASS build: evolution needs Lv5+partner, rarity frames/labels, evolution card, codex persists');
