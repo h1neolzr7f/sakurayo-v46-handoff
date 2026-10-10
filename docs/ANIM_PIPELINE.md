@@ -49,3 +49,7 @@ python tools/anim-pipeline/run.py rig --name sayo --base art/characters/sayo/def
 - 剧情立绘：用 AVG 的 `avg_*.webp` 生成 rig，说话时由 `say()` 驱动口型。
 - 战斗精灵和敌人：同一网格运行时加关键帧参数曲线，例如呼吸、受击后仰、攻击前倾，可以替代或补充 RIFE 补帧。全身大动作后续可以引入 AnimatedDrawings 风格的骨架和 ARAP。
 - 分层：GPU 可用时接入 See-through，用拆出的 PSD 图层替代颜色 mask，补全被遮挡的后发，做出真正的多层视差。
+
+## 兼容与降级
+- WebGL1 用 `failIfMajorPerformanceCaveat` 创建；若创建失败（无 WebGL、软件渲染被拒）或发生 `webglcontextlost`，就切换到 Canvas2D：不做网格，只保留以脚底为锚的呼吸缩放、眨眼和表情补丁。加上 `?rig=2d` 可以强制使用 2D。rig 数据加载失败时退回原来的 `lobby_idle.webp` 静态层。
+- `tests/mascot_sizes_smoke.mjs` 覆盖三角色 × 三种尺寸（1280×720、390×844@2x、1024×768）× 两种渲染路径（WebGL/2D）。

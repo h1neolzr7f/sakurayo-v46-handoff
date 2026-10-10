@@ -51,8 +51,12 @@
     this.gl = this.opts.no3d ? null : this.initGL();
   }
   Rig.prototype.initGL = function () {
-    var gl = this.c.getContext("webgl", { premultipliedAlpha: true, alpha: true, antialias: true });
+    // 降级：软件渲染（failIfMajorPerformanceCaveat）/ 无 WebGL / ?rig=2d → Canvas2D
+    if (/[?&]rig=2d/.test((global.location && global.location.search) || "")) return null;
+    var gl = this.c.getContext("webgl", { premultipliedAlpha: true, alpha: true, antialias: true, failIfMajorPerformanceCaveat: true });
     if (!gl) return null;
+    var self0 = this;
+    this.c.addEventListener("webglcontextlost", function (e) { e.preventDefault(); self0.lost = 1; }, false);
     function sh(t, s) { var o = gl.createShader(t); gl.shaderSource(o, s); gl.compileShader(o); return o; }
     var pr = gl.createProgram();
     gl.attachShader(pr, sh(gl.VERTEX_SHADER, "attribute vec2 p;attribute vec2 u;uniform vec4 m;varying vec2 v;void main(){v=u;gl_Position=vec4(p.x*m.x+m.z,p.y*m.y+m.w,0.,1.);}"));
@@ -160,6 +164,7 @@
   };
   Rig.prototype.toImage = function (clientX, clientY) { var r = this.c.getBoundingClientRect(), v = this.view || this.fit(); return [((clientX - r.left) * v.dpr - v.ox) / v.sc, ((clientY - r.top) * v.dpr - v.oy) / v.sc]; };
   Rig.prototype.render = function () {
+    if (this.lost && this.gl) { var n = this.c.cloneNode(); this.c.parentNode && this.c.parentNode.replaceChild(n, this.c); this.c = n; this.gl = null; }
     var v = this.fit(), gl = this.gl;
     if (!gl) return this.render2d(v);
     gl.viewport(0, 0, v.W, v.H); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
@@ -174,9 +179,13 @@
     }
   };
   Rig.prototype.render2d = function (v) {
-    var g = this.c.getContext("2d"); g.clearRect(0, 0, v.W, v.H); g.drawImage(this.base, v.ox, v.oy, this.d.w * v.sc, this.d.h * v.sc);
+    // 2D 降级：不做网格，只做以脚底为锚的轻微呼吸缩放（无平移/弹跳）+ 眨眼/表情补丁
+    var g = this.c.getContext("2d"), b = 1 + this.s.breath * 0.004 + this.s.stretch * 0.02, fy = v.oy + this.d.bbox[3] * v.sc;
+    g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, v.W, v.H); g.setTransform(1, 0, 0, b, 0, fy * (1 - b));
+    g.drawImage(this.base, v.ox, v.oy, this.d.w * v.sc, this.d.h * v.sc);
     for (var k in this.d.patches) { var p = this.d.patches[k], al = this.s.ex[k] || 0; if (al < 0.01 || !this.atlas) continue; g.globalAlpha = al;
       g.drawImage(this.atlas, p.ax, p.ay, p.w, p.h, v.ox + p.x * v.sc, v.oy + p.y * v.sc, p.w * v.sc, p.h * v.sc); g.globalAlpha = 1; }
+    g.setTransform(1, 0, 0, 1, 0, 0);
   };
   Rig.prototype.snapshot = function () { var s = this.s; return { gl: !!this.gl, act: s.act, hx: +s.hx.toFixed(3), hy: +s.hy.toFixed(3), hair: +s.hair.toFixed(3), skirt: +s.skirt.toFixed(3), breath: +s.breath.toFixed(3), stretch: +s.stretch.toFixed(3), ex: { closed: +s.ex.closed.toFixed(2), talk: +s.ex.talk.toFixed(2), happy: +s.ex.happy.toFixed(2), shy: +s.ex.shy.toFixed(2) }, meshes: this.meshes.length }; };
 
