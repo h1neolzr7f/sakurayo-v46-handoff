@@ -1,10 +1,33 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import http from 'node:http';
 import {fileURLToPath,pathToFileURL} from 'node:url';
 
+const REPO_ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const MIME={'.html':'text/html; charset=utf-8','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.json':'application/json','.webp':'image/webp','.png':'image/png','.jpg':'image/jpeg','.svg':'image/svg+xml','.ogg':'audio/ogg','.mp3':'audio/mpeg','.wav':'audio/wav','.woff2':'font/woff2'};
+
+// Desktop Chromium may drop localStorage of a file:// origin across reload, so the
+// reload assertions need a stable origin. Serve repo files from 127.0.0.1 (test-only).
+async function stableOrigin(url){
+  if(!/^file:/i.test(url))return {url,close:async()=>{}};
+  const u=new URL(url),file=fileURLToPath(u);
+  const server=http.createServer((req,res)=>{
+    const rel=decodeURIComponent(new URL(req.url,'http://x').pathname);
+    const abs=path.resolve(REPO_ROOT,'.'+rel);
+    if(abs!==REPO_ROOT&&!abs.startsWith(REPO_ROOT+path.sep)){res.writeHead(403);return res.end();}
+    fs.readFile(abs,(err,buf)=>{if(err){res.writeHead(404);return res.end();}res.writeHead(200,{'content-type':MIME[path.extname(abs).toLowerCase()]||'application/octet-stream'});res.end(buf);});
+  });
+  await new Promise((ok,bad)=>{server.once('error',bad);server.listen(0,'127.0.0.1',ok);});
+  const rel=path.relative(REPO_ROOT,file);
+  if(rel.startsWith('..')||path.isAbsolute(rel)){server.close();throw new Error('entry outside repo: '+file);}
+  const httpUrl='http://127.0.0.1:'+server.address().port+'/'+rel.split(path.sep).map(encodeURIComponent).join('/')+u.search;
+  return {url:httpUrl,close:()=>new Promise(r=>{server.closeAllConnections?.();server.close(()=>r());})};
+}
+
 // Shared by browser_smoke and the focused source/offline receipt regression.
-export async function verifyContentReceipts(browser,url){
+export async function verifyContentReceipts(browser,inputUrl){
+  const origin=await stableOrigin(inputUrl),url=origin.url;
   const context=await browser.newContext({viewport:{width:932,height:430},isMobile:true,hasTouch:true});
   const errors=[];
   try{
@@ -48,7 +71,7 @@ export async function verifyContentReceipts(browser,url){
     save=await readStored();assert.equal(save.coins,505);assert.equal(save.extensions['official.framework-example'].data.purchases.observer_manual,1);assert.equal(save.extensions['official.story-exploration'].data.visits['shrine-outskirts'],2);
     assert.deepEqual(errors,[]);
     return {coins:save.coins,purchases:save.extensions['official.framework-example'].data.purchases,exploration:save.extensions['official.story-exploration'].data,pageErrors:errors};
-  }finally{await context.close();}
+  }finally{try{await context.close();}finally{await origin.close();}}
 }
 
 if(process.argv[1]&&path.resolve(process.argv[1])===fileURLToPath(import.meta.url)){
