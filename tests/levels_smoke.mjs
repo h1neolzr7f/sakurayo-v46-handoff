@@ -87,7 +87,7 @@ async function playUntil(page, api, fn, max = 400) { let s; for (let i = 0; i < 
   assert.ok(s.result.got[0] || /时间到/.test(s.fail || ''), 'timed ends in win or timeout');
   { // 每一位剧本说话人都要能解析出名字与立绘（第二章新增老保安时曾漏掉）
     const miss = await page.evaluate(() => { const T = window.__SAKURAYO_TEST__, S = window.SakurayoStory, out = [];
-      for (const ch of ['ch1', 'ch2']) for (const lv of Object.values(S[ch] || {})) for (const part of ['pre', 'post', 'awaken']) for (const l of lv[part] || [])
+      for (const ch of ['ch1', 'ch2', 'ch3', 'ch4']) for (const lv of Object.values(S[ch] || {})) for (const part of ['pre', 'post', 'awaken']) for (const l of lv[part] || [])
         for (const w of [l.who, l.L?.who, l.R?.who]) if (w && w !== 'me' && !T.avgCast46(w, 'calm')) out.push(l.id + ':' + w);
       return out; });
     assert.deepEqual(miss, [], 'every story speaker resolves to a portrait');

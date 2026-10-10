@@ -3,9 +3,9 @@ import assert from 'node:assert/strict'; import fs from 'node:fs'; import vm fro
 const ctx = {}; ctx.globalThis = ctx; vm.createContext(ctx);
 for (const f of fs.readdirSync('src/runtime').filter(f => /^sakurayo-story-ch\d\.js$/.test(f)).sort()) vm.runInContext(fs.readFileSync('src/runtime/' + f, 'utf8'), ctx);
 const S = ctx.SakurayoStory, ART = 'android-app/app/src/main/assets/game/art/', ids = new Set();
-const who = new Set(['me', 'sayo', 'aya', 'rion', 'rin', 'miko', 'kagami', 'yoi', 'tanuki', 'guard']);
+const who = new Set(['me', 'sayo', 'aya', 'rion', 'rin', 'miko', 'kagami', 'yoi', 'tanuki', 'guard', 'soichi', 'sakuya']);
 let lines = 0;
-for (const ch of ['ch1', 'ch2']) {
+for (const ch of ['ch1', 'ch2', 'ch3', 'ch4']) {
   const n = ch.slice(2); assert.ok(S[ch], ch + ' loaded');
   for (let i = 1; i <= 4; i++) {
     const L = S[ch][`${n}-${i}`]; assert.ok(L && L.pre?.length && L.post?.length, `${n}-${i} has pre/post`);
@@ -19,4 +19,4 @@ for (const ch of ['ch1', 'ch2']) {
   }
 }
 for (const c of S.CG) assert.ok(fs.existsSync(ART + c.id), 'gallery CG exists ' + c.id);
-console.log('PASS story unit: ch1+ch2 complete,', lines, 'lines, assets present');
+console.log('PASS story unit: ch1–ch4 complete,', lines, 'lines, assets present');

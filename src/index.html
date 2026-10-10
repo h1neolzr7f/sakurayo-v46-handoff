@@ -195,6 +195,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 <script src="runtime/sakurayo-avg.js"></script>
 <script src="runtime/sakurayo-story-ch1.js"></script>
 <script src="runtime/sakurayo-story-ch2.js"></script>
+<script src="runtime/sakurayo-story-ch3.js"></script>
+<script src="runtime/sakurayo-story-ch4.js"></script>
 <script src="runtime/sakurayo-hud.js"></script>
 <script src="runtime/sakurayo-bgm.js"></script>
 <script src="runtime/sakurayo-trials.js"></script>
@@ -7284,13 +7286,13 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 
   /* ===== 主线关卡（runtime/sakurayo-levels.js）+ AVG（runtime/sakurayo-avg.js） ===== */
   var activeLevel46=null,levelObj46=null,levelResult46=null;
-  const AVG_NAMES46={sayo:"月城小夜",aya:"神代绫",rion:"黑羽凛音",rin:"雨宫凛",miko:"小灯",kagami:"镜零",yoi:"宵",tanuki:"狸老板",guard:"老保安"};
+  const AVG_NAMES46={sayo:"月城小夜",aya:"神代绫",rion:"黑羽凛音",rin:"雨宫凛",miko:"小灯",kagami:"镜零",yoi:"宵",tanuki:"狸老板",guard:"老保安",soichi:"黑羽宗一",sakuya:"月城朔夜"};
   function avgCast46(who,ex){
     if(["sayo","aya","rion"].includes(who))return {name:AVG_NAMES46[who],img:artUrl(`characters/${who}/default/avg_${["calm","resolve","shaken","angry"].includes(ex)?ex:"calm"}.webp`)};
     if(who==="rin")return {name:AVG_NAMES46.rin,img:artUrl(`npc/rin/avg_${ex==="serious"?"serious":"calm"}.webp`)};
     if(who==="miko")return {name:AVG_NAMES46.miko,img:artUrl(`npc/miko/avg_${ex==="afraid"?"afraid":"calm"}.webp`)};
     if(who==="kagami")return {name:AVG_NAMES46.kagami,img:artUrl("npc/kagami/portrait.webp")};
-    if(who==="yoi"||who==="tanuki"||who==="guard")return {name:AVG_NAMES46[who],img:artUrl(`npc/${who}/avg_calm.webp`)};
+    if(["yoi","tanuki","guard","soichi","sakuya"].includes(who))return {name:AVG_NAMES46[who],img:artUrl(`npc/${who}/avg_calm.webp`)};
     return null;
   }
   function storyFor46(id,part){const L=window.SakurayoLevels?.find(id);return L&&window.SakurayoStory?.["ch"+L.ch]?.[id]?.[part]||null;}
