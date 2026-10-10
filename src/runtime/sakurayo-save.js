@@ -5,7 +5,7 @@
   var SETTINGS = {master:.8,sfx:.8,music:.45,vibration:1,fx:1,hudSize:'standard',damageText:'compact',contrast:1,uiCalm:1,glow:'off',glowVersion:2,mascot:'follow'};
   var MAIN_GOD = {points:0,unlockedTier:1,bestTier:0,clears:0,runs:0,deepest:0,contracts:{},challenges:{},power:0,vitality:0,tempo:0,resonance:0,fortune:0,regenBlood:0,psiLink:0,gunBlade:0,mageCircuit:0,summonPage:0,spaceRing:0,rebirthDoll:0,sideKey:0,cursedHeart:0};
   var SHOP = {starter:{assault:0,bastion:0,flow:0,arcane:0},equippedStarter:null,items:{bait:0,ammo:0,whetstone:0,mirror:0},equippedWeapon:null,baitEquipped:false,ownedTalismans:[],bannedSchools:[],noUpgradeChallenge:false,lastTab:'skins',ops:{pity:0,pitySR:0,pulls:0,tenPulls:0,owned:{},last:[],cheatUsed:0}};
-  var DEFAULTS = {coins:0,unlock:1,done:[],kills:0,bosses:0,best:0,runs:0,tal:{atk:0,hp:0,luck:0,mag:0,flow:0},ach:{},claim:{},story:[0],forms:[],fusions:[],evo46:[],endings:[],runHistory:[],banter:1,tutorialDone:false,settings:SETTINGS,character:'sayo',skin:'default',ownedSkins:['default'],mainGod:MAIN_GOD,storyChoices38:{sayo:{},aya:{},rion:{}},storySeen38:{},shop40:SHOP,balance40:{samples:[],betaSessions:0},hiddenStory40:{},pendingLoneStory40:null,extensions:{}};
+  var DEFAULTS = {coins:0,unlock:1,done:[],kills:0,bosses:0,best:0,runs:0,tal:{atk:0,hp:0,luck:0,mag:0,flow:0},ach:{},claim:{},story:[0],forms:[],fusions:[],evo46:[],stars46:{},avgRead46:[],cg46:[],endings:[],runHistory:[],banter:1,tutorialDone:false,settings:SETTINGS,character:'sayo',skin:'default',ownedSkins:['default'],mainGod:MAIN_GOD,storyChoices38:{sayo:{},aya:{},rion:{}},storySeen38:{},shop40:SHOP,balance40:{samples:[],betaSessions:0},hiddenStory40:{},pendingLoneStory40:null,extensions:{}};
   // Lifetime counters have no gameplay cap; keep earned values within safe integer precision.
   var COUNT_MAX = Number.MAX_SAFE_INTEGER || 9007199254740991;
   var SCHOOLS = ['mech','gun','alch','gene','vamp','spore','magical','cult','mage','shrine','summon','ninja','idol','necro'];
@@ -60,7 +60,9 @@
     clean.runs = integer(clean.runs,0,COUNT_MAX,0);clean.best = number(clean.best,0,COUNT_MAX,0);
     clean.done = list(clean.done).map(Number).filter(function (id,index,ids) {return [1,2,3,4].indexOf(id) >= 0 && ids.indexOf(id) === index;});
     clean.runHistory = list(clean.runHistory).filter(object).slice(0,30);
-    ['story','forms','fusions','endings','evo46'].forEach(function (key) {if (!Array.isArray(clean[key])) clean[key] = copy(DEFAULTS[key]);});
+    ['story','forms','fusions','endings','evo46','avgRead46','cg46'].forEach(function (key) {if (!Array.isArray(clean[key])) clean[key] = copy(DEFAULTS[key]);});
+    clean.stars46 = {}; if (object(incoming.stars46)) Object.keys(incoming.stars46).forEach(function (id) {if (/^[1-4]-[1-4]$/.test(id)) clean.stars46[id] = integer(incoming.stars46[id],0,3,0);});
+    clean.avgRead46 = clean.avgRead46.filter(function (id) {return typeof id === 'string';}).slice(-3000); clean.cg46 = clean.cg46.filter(function (id) {return typeof id === 'string' && /^story\//.test(id);});
     clean.character = ['sayo','aya','rion'].indexOf(clean.character) >= 0 ? clean.character : 'sayo';
     clean.ownedSkins = list(clean.ownedSkins).filter(function (id,index,ids) {return typeof id === 'string' && !forbidden(id) && ids.indexOf(id) === index && (!options.skins || options.skins.indexOf(id) >= 0);});
     if (clean.ownedSkins.indexOf('default') < 0) clean.ownedSkins.unshift('default');

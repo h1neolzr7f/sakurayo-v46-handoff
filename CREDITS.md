@@ -27,3 +27,7 @@
 | 中转站 gpt-image-2 | 关键帧/图标原图 | 生成素材归项目使用 |
 
 关键帧对齐、亮度统一、去亮边由自写脚本 `sakurayo-gen/animfix/fix.py`（numpy/Pillow/scipy）完成。
+
+### 2026-10-10 第一章 / 动画补帧追加
+- 跑动循环关键帧（三角色各 4 张）、AVG 立绘表情差分（三角色 × 4、雨宫凛 × 2、小灯 × 2）、小灯 Q 版、第一章背景 2 张、CG 2 张、关卡地图：中转站 gpt-image-2 生成。
+- 抠图：rembg（MIT）isnet-anime 模型（Apache-2.0）。中间帧：Practical-RIFE v4.25（MIT，经 vs-rife 网络定义加载）。
