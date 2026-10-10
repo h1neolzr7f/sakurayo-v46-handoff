@@ -42,7 +42,7 @@ def motion(base, img, alpha_b, alpha_i):
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--name', required=True); ap.add_argument('--act', required=True); ap.add_argument('--keys', required=True)
     ap.add_argument('--inbetween', type=int, default=3, help='每段递归二分次数 → 2^n-1 个中间帧'); ap.add_argument('--hold', type=int, default=0)
-    ap.add_argument('--scale', type=float, default=0.65); ap.add_argument('--side', choices=['l', 'r']); ap.add_argument('--auto-order', action='store_true', help='按动作进度自动排序/挑选关键帧'); ap.add_argument('--largest', action='store_true', help='运动区只保留最大连通块（手臂）：链式生成的关键帧在脸/头发上有细微漂移，若一起贴上会盖住 rig 的眨眼/表情形成“半透明眼睛”'); ap.add_argument('--chain', action='store_true', help='最短路选关键帧链：相邻关键帧差异平方和最小（RIFE 只在小位移下不出双影）'); a = ap.parse_args()
+    ap.add_argument('--scale', type=float, default=0.65); ap.add_argument('--side', choices=['l', 'r']); ap.add_argument('--auto-order', action='store_true', help='按动作进度自动排序/挑选关键帧'); ap.add_argument('--pose-hold', type=int, default=0, help='>0：不做 RIFE 中间帧，每张关键帧定格 N 帧（日式有限动画“三拍一”），用于关键帧间拓扑变化大、光流必然叠影的动作'); ap.add_argument('--ghost-sharp', type=float, default=0.0, help='中间帧运动区锐度低于两端均值的该比例 → 判为叠影'); ap.add_argument('--largest', action='store_true', help='运动区只保留最大连通块（手臂）：链式生成的关键帧在脸/头发上有细微漂移，若一起贴上会盖住 rig 的眨眼/表情形成“半透明眼睛”'); ap.add_argument('--chain', action='store_true', help='最短路选关键帧链：相邻关键帧差异平方和最小（RIFE 只在小位移下不出双影）'); a = ap.parse_args()
     work = os.path.join(R.GEN, 'live'); name = a.name
     base = np.asarray(Image.open(os.path.join(work, f'{name}_base.png')).convert('RGB')); H, W = base.shape[:2]
     from rembg import remove, new_session; sess = new_session('isnet-anime')
@@ -150,17 +150,33 @@ def main():
     if (y1 - y0) % 64: y0 = max(0, y1 - ((y1 - y0 + 63) // 64) * 64)
     crop = lambda a: np.ascontiguousarray(a[y0:y1, x0:x1])
     kst = [crop(k) for k in kst]; masks = [crop(m) for m in masks]; base_c = kst[0]
-    frames = [kst[0]]
+    frames = [kst[0]]; ghosts = [0]
     def rec(f0, f1, depth, out):
         if depth == 0: return
         mid = RI_uncomp(RI.mid(RI_comp(f0), RI_comp(f1), 0.5))
         rec(f0, mid, depth - 1, out); out.append(mid); rec(mid, f1, depth - 1, out)
     for i in range(1, len(kst)):
+        if a.pose_hold:
+            for _ in range(a.pose_hold - 1): frames.append(kst[i - 1])
+            frames.append(kst[i]); continue
         mids = []; rec(kst[i - 1], kst[i], a.inbetween, mids)
         f = cv2.GaussianBlur(np.maximum(masks[i - 1], masks[i]).astype(np.float32), (0, 0), 6)[..., None]
-        for m in mids: frames.append(np.clip(m.astype(np.float32) * f + base_c.astype(np.float32) * (1 - f), 0, 255).astype(np.uint8))
+        # 双影闸门：RIFE 在两张关键帧拓扑不同（袖子翻转、手肘外摆）时会退化成“两张叠加”。
+        # 判定：在运动区里，中间帧与按时间线性混合的 (1-t)A+tB 几乎一样 → 这是叠影不是运动 → 改为“定格”（前半段停在 A、后半段切到 B），
+        # 即日式有限动画的 pose-to-pose 切换，一帧换姿势没有任何半透明残影。
+        A = kst[i - 1].astype(np.float32); Bk = kst[i].astype(np.float32); M = np.abs(A - Bk).mean(2) > 25; nm = len(mids)
+        for j, m in enumerate(mids):
+            t = (j + 1) / (nm + 1); mm = m.astype(np.float32)
+            if M.sum() > 500:
+                gap = np.abs(A - Bk).mean(2)[M].mean(); eb = np.abs(mm - ((1 - t) * A + t * Bk)).mean(2)[M].mean()
+                lap = lambda x: float(np.abs(cv2.Laplacian(cv2.cvtColor(x[..., :3].astype(np.uint8), cv2.COLOR_RGB2GRAY), cv2.CV_32F))[M].mean())
+                sharp = lap(mm) / max(1e-3, 0.5 * (lap(A) + lap(Bk)))
+                ghost = (eb < 0.45 * gap or sharp < a.ghost_sharp) and 0.2 < t < 0.8
+                R.log(f'  seg {i} t={t:.2f} gap {gap:.1f} blend-err {eb / gap:.2f} sharp {sharp:.2f}' + (' GHOST→hold' if ghost else ''))
+                if ghost: mm = A if t < 0.5 else Bk; ghosts[0] += 1
+            frames.append(np.clip(mm * f + base_c.astype(np.float32) * (1 - f), 0, 255).astype(np.uint8))
         frames.append(kst[i])
-    union_c = crop(union); ab_c = crop(ab)
+    R.log(f'ghost gate: {ghosts[0]} in-betweens replaced by pose holds'); union_c = crop(union); ab_c = crop(ab)
     # 闪烁检测
     st = (union_c == 0) & (ab_c > 0.5); lum = [float(f[..., :3].mean(2)[st].mean()) for f in frames]
     md = [float(np.abs(frames[i].astype(np.float32) - frames[i - 1].astype(np.float32)).mean()) for i in range(1, len(frames))]
@@ -175,7 +191,7 @@ def main():
         cx, cy = (i % cols) * tw, (i // cols) * th
         atlas.paste(Image.fromarray(f, 'RGBA').resize((tw, th), Image.LANCZOS), (cx, cy)); fr.append([cx, cy])
     out = os.path.join(R.ART, 'live', name); atlas.save(os.path.join(out, f'act_{a.act}.webp'), quality=88, method=5)
-    meta = dict(rect=[int(x0), int(y0), int(x1 - x0), int(y1 - y0)], tw=tw, th=th, frames=fr, keys=[0] + [ (i + 1) * (2 ** a.inbetween) for i in range(len(keys))], fps=24, side=a.side)
+    meta = dict(rect=[int(x0), int(y0), int(x1 - x0), int(y1 - y0)], tw=tw, th=th, frames=fr, keys=[0] + [ (i + 1) * (2 ** a.inbetween) for i in range(len(keys))], fps=24, side=a.side, **({'step': True} if a.pose_hold else {}))
     rp = os.path.join(out, 'rig.js'); key = '(window.SakurayoRigData[%s].actions=' % json.dumps(name)
     lines = [l for l in open(rp).read().splitlines() if not (l.startswith(key) and ('))[%s]=' % json.dumps(a.act)) in l)]
     lines.append('%s(window.SakurayoRigData[%s].actions||{}))[%s]=%s;' % (key, json.dumps(name), json.dumps(a.act), json.dumps(meta, separators=(',', ':'))))

@@ -181,7 +181,7 @@
     }
   };
   Rig.prototype.drawSeq = function (gl, m, fr) {
-    var i0 = Math.floor(fr.pos), i1 = Math.min(fr.n - 1, i0 + 1), k = fr.pos - i0, A = m.A, self = this;
+    var i0 = Math.floor(fr.pos), i1 = Math.min(fr.n - 1, i0 + 1), k = m.A.step ? 0 : fr.pos - i0, A = m.A, self = this;
     function uv(dst, i) { var o = A.frames[i]; for (var q = 0; q < m.n; q++) { dst[q * 2] = (o[0] + m.uv0[q * 2] * A.tw) / m.iw; dst[q * 2 + 1] = (o[1] + m.uv0[q * 2 + 1] * A.th) / m.ih; } }
     gl.bindTexture(gl.TEXTURE_2D, this.tex[m.tex0]);
     gl.bindBuffer(gl.ARRAY_BUFFER, m.pb); gl.bufferData(gl.ARRAY_BUFFER, m.out, gl.DYNAMIC_DRAW); gl.enableVertexAttribArray(this.loc.p); gl.vertexAttribPointer(this.loc.p, 2, gl.FLOAT, false, 0, 0);
@@ -199,7 +199,7 @@
     g.drawImage(this.base, v.ox, v.oy, this.d.w * v.sc, this.d.h * v.sc);
     var fr2 = this.v2 && this.s.seq ? this.seqFrame() : null;
     if (fr2) { var Aq = fr2.A, im = this.texImgs["act_" + this.s.seq.name], i0 = Math.floor(fr2.pos), r = Aq.rect;
-      [[i0, 1], [Math.min(fr2.n - 1, i0 + 1), fr2.pos - i0]].forEach(function (p) { if (p[1] < 0.01) return; g.globalAlpha = p[1]; var o = Aq.frames[p[0]]; g.drawImage(im, o[0], o[1], Aq.tw, Aq.th, v.ox + r[0] * v.sc, v.oy + r[1] * v.sc, r[2] * v.sc, r[3] * v.sc); }); g.globalAlpha = 1; }
+      [[i0, 1], [Math.min(fr2.n - 1, i0 + 1), Aq.step ? 0 : fr2.pos - i0]].forEach(function (p) { if (p[1] < 0.01) return; g.globalAlpha = p[1]; var o = Aq.frames[p[0]]; g.drawImage(im, o[0], o[1], Aq.tw, Aq.th, v.ox + r[0] * v.sc, v.oy + r[1] * v.sc, r[2] * v.sc, r[3] * v.sc); }); g.globalAlpha = 1; }
     else if (this.v2 && this.texImgs.arms) for (var sd in this.d.arms) { var A = this.d.arms[sd]; g.drawImage(this.texImgs.arms, A.ax, A.ay, A.w, A.h, v.ox + A.x * v.sc, v.oy + A.y * v.sc, A.w * v.sc, A.h * v.sc); }
     for (var k in this.d.patches) { var p = this.d.patches[k], al = this.s.ex[k] || 0; if (al < 0.01 || !this.atlas) continue; g.globalAlpha = al;
       g.drawImage(this.atlas, p.ax, p.ay, p.w, p.h, v.ox + p.x * v.sc, v.oy + p.y * v.sc, p.w * v.sc, p.h * v.sc); g.globalAlpha = 1; }
