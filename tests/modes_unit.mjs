@@ -22,5 +22,10 @@ for (const slot of ['guard', 'speed', 'burst']) for (const w of ['spread', 'bomb
   assert.ok(med >= 25, 'duel full-build median length ' + med.toFixed(1) + 's ≥ 25s'); assert.ok(T[0] >= 12, 'no 秒杀: shortest ' + T[0].toFixed(1));
   console.log('duel full build vs normal foe: median', med.toFixed(1), 's, min', T[0].toFixed(1));
 }
+{ // 镜斗 Boss：前摇提示（红色「!」）+ 连段后「破绽」窗口；满级构筑胜率目标 75–85%
+  const full = { spread: { lv: 5, evo: 1 }, pierce: { lv: 5, evo: 1 }, laser: { lv: 5 }, bomb: { lv: 5, evo: 1 }, homing: { lv: 5 }, orbit: { lv: 5 } }, ks = Object.keys(full); let w = 0, n = 0;
+  for (const ch of ['sayo', 'aya', 'rion']) for (let seed = 1; seed <= 16; seed++) for (const slot of ['base', 'speed', 'burst', 'guard']) { const k = ks[seed % 6]; w += D.simulate({ character: ch, seed, layer: 3, power: 2.2, boss: true, weapons: { [k]: full[k] }, form: { slot } }, 120).win ? 1 : 0; n++; }
+  assert.ok(w / n >= 0.75 && w / n <= 0.85, 'duel boss full-build win rate ' + (w / n).toFixed(3)); console.log('duel boss full-build win rate', (w / n).toFixed(3));
+}
 const g = new PB.Game({ character: 'sayo', seed: 1, form: { slot: 'guard' } }); assert.ok(g.ball.r > 26 && g.dmgTaken < 1, 'guard form = big ball + damage reduction');
 console.log('PASS modes unit: pinball/duel deterministic, layer-1 wins, ratio', rp.toFixed(2), rd.toFixed(2), 'all forms×builds clear');

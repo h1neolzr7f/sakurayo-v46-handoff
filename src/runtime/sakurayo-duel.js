@@ -21,7 +21,7 @@
     this.P = F(-1, { dmg: this.ch.dmg * pw * (this.slot === "burst" ? 1.35 : 1), taken: this.slot === "burst" ? 1.2 : 1, spd: this.ch.spd * (this.slot === "speed" ? 1.25 : 1), aspd: this.slot === "speed" ? 1.25 : 1, chain: this.slot === "speed" ? 4 : 3, blockK: this.slot === "guard" ? 0.05 : 0.15, armor: this.slot === "guard" });
     this.P.hp = this.P.max = 100 * clamp(o.hpFrac == null ? 1 : o.hpFrac, 0.3, 1) + 0; // 生命按比例带入（最少 30%）
     var L = this.layer, boss = !!o.boss;
-    this.E = F(1, { dmg: (0.12 + 0.035 * L) * (boss ? 0.9 : 1), taken: 1, spd: 270 + 15 * L, aspd: 1, chain: 3, blockK: 0.15, armor: boss });
+    this.E = F(1, { dmg: (0.12 + 0.035 * L) * (boss ? 1.5 : 1), taken: 1, spd: 270 + 15 * L, aspd: 1, chain: 3, blockK: 0.15, armor: boss });
     this.E.hp = this.E.max = (boss ? 380 : 340) + 80 * L; this.E.name = boss ? "镜灵 · 影武者" : "镜卫 · 剑士";
     this.t = 0; this.limit = 99; this.done = false; this.win = false; this.shots = []; this.fx = []; this.keys = {}; this.input = {}; this.hitstop = 0;
   }
@@ -31,6 +31,8 @@
     else if (k === "H") { f.act = Object.assign({ k: "H" }, MOVES.H, f.combo >= 2 ? { d: 20, kb: 320 } : {}); f.combo = 0; }
     else if (k === "S") { if (f.meter < 1) return false; f.meter -= 1; f.act = { k: "S", d: 0, s: 0.18, a: 0.1, r: 0.3, reach: 0 }; }
     else return false;
+    // Boss 的重击/必杀带攻击前摇提示：起手多 0.1s，头顶亮红色「!」，给玩家看清并架防/闪开的时间
+    if (f === this.E && this.o.boss && (k === "H" || k === "S")) { f.act.s += 0.1; f.tele = f.act.s; this.fx.push({ k: "txt", s: "!", x: f.x, y: f.y - 170, t: 0, life: f.act.s + 0.1 }); }
     f.actT = 0; f.hitDone = false; f.comboT = 0.6; return true;
   };
   Game.prototype.special_ = function (f, foe) {
@@ -82,6 +84,8 @@
      ④ 走位：残血或破防值高时后撤拉开、远距离有气就放必杀；偶尔跳跃躲飞行道具。 */
   Game.prototype.aiFoe = function (f, foe, dt) {
     var L = this.layer, r = this.r, dx = foe.x - f.x, ad = Math.abs(dx), inp = {}, boss = !!this.o.boss;
+    // 破绽窗口：Boss 打完一整串连段后收招 0.25s 不会防御（显示「破绽」），这是玩家反打的时机
+    if (f.open > 0) { f.open -= dt; return {}; }
     var react = Math.max(0.08, 0.17 - 0.025 * L - (boss ? 0.02 : 0)), pBlock = Math.min(0.9, 0.7 + 0.06 * L + (boss ? 0.06 : 0));
     var atk = foe.act && foe.act.reach && foe.actT < foe.act.s + foe.act.a && ad < foe.act.reach * 1.25 + 50;
     var shot = this.shots.some(function (q) { return q.own === foe && Math.abs(q.x - f.x) < 340 && (f.x - q.x) * q.vx > 0; });
@@ -94,6 +98,7 @@
     if (f.blocked && !atk && foe.act && f.stun <= 0) { f.blocked = false; if (ad < 120) { f.plan = ["L", "L", "H"]; } } // 确反
     else if (!foe.act) f.blocked = false;
     f.aiT = (f.aiT || 0) - dt;
+    if (boss && f.plan && !f.plan.length && !f.act) { f.plan = null; f.open = 0.25; this.fx.push({ k: "txt", s: "破绽", x: f.x, y: f.y - 160, t: 0, life: 0.25 }); return {}; }
     if (f.plan && f.plan.length) { if (f.stun > 0 || f.gbreak > 0) f.plan = null; else if (!f.act) { if (ad > 125) inp.move = Math.sign(dx); else { inp[f.plan.shift()] = true; } return inp; } else return inp; }
     if (f.aiT > 0) return f.aiInp || {};
     f.aiT = 0.14 + r() * 0.12;
