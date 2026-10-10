@@ -2926,6 +2926,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }
     sound("bossShot");
   }
+  const GUARD_KITE_SECONDS = 6;
   function spawnBossAdds(type, count, guard = false) {
     const bounds = window.SakurayoCamera ? window.SakurayoCamera.size() : {worldW:W,worldH:H};
     let made = 0;
@@ -5042,7 +5043,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         dist = Math.hypot(P.x - e.x, P.y - e.y),
         spd = e.spd * (e.frozen > 0 ? 0.42 : 1),
         shooter = ["ranged", "decay", "seal", "disruptor", "noisecaller"].includes(e.type);
-      if (shooter && dist < 230) {
+      // Mirror guards stop kiting after a few seconds so every character can break the boss shield.
+      if (e.guardFor) e.guardAge = (e.guardAge || 0) + dt;
+      if (shooter && dist < 230 && !(e.guardAge > GUARD_KITE_SECONDS)) {
         e.x -= Math.cos(a) * spd * 0.42 * dt;
         e.y -= Math.sin(a) * spd * 0.42 * dt;
       } else {
