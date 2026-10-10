@@ -431,13 +431,74 @@
     "html.landscape46 #menu.homeDock46 .stageMini,html.landscape46 #menu.homeDock46 .start,html.landscape46 #menu.homeDock46 .nav{width:100%;margin-left:0;margin-right:0}" +
     "@media(prefers-reduced-motion:reduce){.heroLive46.hasBlink .heroLiveBlink46,.heroLive46.hasBlink .heroLiveBase46{animation:none}}";
 
+
+  var GACHA_V2_CSS =
+    ".wishV2 .wishBanner46{filter:saturate(1.08) brightness(.82)}" +
+    ".wishV2 .wishShade46{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(90deg,#070b1ae6 0,#070b1a66 16%,transparent 34%,transparent 52%,#070b1acc 74%,#070b1af2 100%),linear-gradient(0deg,#070b1acc,transparent 30%)}" +
+    "html.landscape46 #gachaDrawer .wishV2 .wishHero46{left:9%;width:56%;height:132%;bottom:-20%;filter:drop-shadow(0 0 28px #ff9bcc55)}" +
+    "#gachaDrawer .wishV2 .wishTabs46{top:max(64px,calc(env(safe-area-inset-top) + 56px));left:max(12px,env(safe-area-inset-left));flex-direction:column;gap:8px;width:clamp(92px,12vw,132px)}" +
+    "#gachaDrawer .wishV2 .wishTabs46 button{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:3px;min-height:52px;padding:6px 12px;border-radius:12px;border:1px solid #96e4f555;background:#0b1326cc;color:#dbe9f8;text-align:left;font:800 14px/1 system-ui;letter-spacing:.12em;backdrop-filter:blur(8px)}" +
+    "#gachaDrawer .wishV2 .wishTabs46 button small{font:600 9px/1 system-ui;letter-spacing:.08em;color:#a9bed6}" +
+    "#gachaDrawer .wishV2 .wishTabs46 button.on{background:linear-gradient(120deg,#ff6fae,#ff9fcf 50%,#8fe6f5);color:#081426;border-color:#fff8;box-shadow:0 8px 22px #ff8fc455}" +
+    "#gachaDrawer .wishV2 .wishTabs46 button.on small{color:#0b2233}" +
+    "#gachaDrawer .wishV2 .wishWallet46{position:absolute;z-index:7;top:max(14px,calc(env(safe-area-inset-top) + 6px));right:64px;display:flex;align-items:center;gap:8px;height:36px;padding:0 6px 0 10px;border-radius:999px;background:#09101ee6;border:1px solid #96e4f566;color:#ffd77a;font:800 14px/1 system-ui}" +
+    "#gachaDrawer .wishV2 .wishShardPill46{padding:5px 9px;border-radius:999px;background:#ffffff12;color:#cfe6f5;font:700 10px/1 system-ui;letter-spacing:.06em}" +
+    ".wishCoin46{display:inline-block;width:16px;height:16px;border-radius:50%;vertical-align:-3px;margin-right:4px;background:radial-gradient(circle at 35% 30%,#fff6d0,#ffd77a 45%,#d8892b);box-shadow:0 0 8px #ffd77a88;position:relative}" +
+    ".wishCoin46:after{content:'\u273f';position:absolute;inset:0;display:grid;place-items:center;font-size:10px;color:#a4441e}" +
+    "#gachaDrawer .wishV2 .wishTitle46{top:max(60px,calc(env(safe-area-inset-top) + 52px));right:max(18px,env(safe-area-inset-right));max-width:40%;text-align:right}" +
+    "#gachaDrawer .wishV2 .wishTag46{display:inline-block;padding:3px 10px;border-radius:4px;background:#ff8fc4;color:#2a0b1c;font:800 10px/1.2 system-ui;letter-spacing:.2em}" +
+    "#gachaDrawer .wishV2 .wishTitle46 h3{margin:6px 0 4px;font-size:clamp(24px,3.6vw,38px);letter-spacing:.22em;line-height:1.1}" +
+    "#gachaDrawer .wishV2 .wishUp46{display:inline-flex;align-items:center;gap:8px;margin:2px 0 6px;padding:5px 6px 5px 5px;border-radius:999px;background:#09101ee0;border:1px solid #ffd77a88}" +
+    "#gachaDrawer .wishV2 .wishUp46 em{padding:3px 7px;border-radius:999px;background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;font:900 10px/1 system-ui;font-style:normal}" +
+    "#gachaDrawer .wishV2 .wishUp46 b{color:#fff;font-size:13px;letter-spacing:.08em}" +
+    "#gachaDrawer .wishV2 .wishUp46 i{font-style:normal;color:#ffd77a;font:900 11px/1 system-ui;padding-right:6px}" +
+    "#gachaDrawer .wishV2 .wishTitle46 p{display:block;margin:0;padding:0;background:none;border:0;color:#e4eef9;font-size:10px;letter-spacing:.1em;text-shadow:0 1px 6px #000}" +
+    "#gachaDrawer .wishV2 .wishTime46{display:block;margin-top:4px;color:#8fe6f5;font:700 10px/1.2 system-ui;letter-spacing:.12em}" +
+    "html.landscape46 #gachaDrawer .wishV2 .wishPity46{top:auto;bottom:max(150px,calc(env(safe-area-inset-bottom) + 142px));left:auto;right:max(18px,env(safe-area-inset-right));width:min(38%,380px);background:#09101ed9;border-color:#96e4f544}" +
+    "#gachaDrawer .wishV2 .pityRow46 span{min-width:9.5em;color:#e4eef9}" +
+    "html.landscape46 #gachaDrawer .wishV2 .wishDock46{left:auto;right:0;width:min(44%,460px);padding:0 max(18px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) 0;background:none}" +
+    "#gachaDrawer .wishV2 .wishLinks46{display:flex;align-items:center;gap:6px;margin:0 0 8px}" +
+    "#gachaDrawer .wishV2 .wishLinks46 button{min-height:28px;padding:0 12px;border-radius:999px;border:1px solid #96e4f566;background:#09101ee0;color:#dbe9f8;font:700 11px/1 system-ui;letter-spacing:.12em}" +
+    "#gachaDrawer .wishV2 .wishLinks46 .wishPills46{margin:0 0 0 auto;gap:6px}" +
+    "#gachaDrawer .wishV2 .wishPills46 b{background:#09101ee0;border-color:#96e4f544;color:#cfe6f5}" +
+    "#gachaDrawer .wishV2 .gachaActions46 button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:62px;border-radius:14px;font-size:17px;letter-spacing:.2em;border:1px solid #fff5;background:linear-gradient(180deg,#2a3f5f,#162338)}" +
+    "#gachaDrawer .wishV2 .gachaActions46 #gachaPull10{background:linear-gradient(120deg,#ff6fae,#ff9fcf 50%,#8fe6f5);color:#081426;box-shadow:0 10px 26px #ff8fc466}" +
+    "#gachaDrawer .wishV2 .gachaActions46 small{display:flex;align-items:center;justify-content:center;padding:3px 10px;border-radius:999px;background:#0005;color:#ffe9a8;font-size:12px;letter-spacing:.04em;opacity:1}" +
+    "#gachaDrawer .wishV2 .gachaActions46 #gachaPull10 small{background:#08142633;color:#081426}" +
+    "#gachaDrawer .wishV2 .wishSpark46{margin-top:8px;max-height:30px;overflow-x:auto;overflow-y:hidden;flex-wrap:nowrap}" +
+    "#gachaDrawer .wishV2 .wishSpark46 button{flex:0 0 auto;background:#09101ee0;border-color:#ff8fc466;color:#ffe3f0}" +
+    "@media (max-height:420px){" +
+    "#gachaDrawer .wishV2 .wishTitle46{top:56px}" +
+    "#gachaDrawer .wishV2 .wishTag46{display:none}" +
+    "#gachaDrawer .wishV2 .wishTitle46 h3{margin:0 0 2px;font-size:22px}" +
+    "#gachaDrawer .wishV2 .wishUp46{margin:0 0 2px;padding:3px 5px 3px 3px}" +
+    "#gachaDrawer .wishV2 .wishTime46{display:inline;margin-left:6px}" +
+    "#gachaDrawer .wishV2 .wishTitle46 p{display:inline}" +
+    "html.landscape46 #gachaDrawer .wishV2 .wishPity46{bottom:max(116px,calc(env(safe-area-inset-bottom) + 108px));padding:5px 10px}" +
+    "#gachaDrawer .wishV2 .pityRow46{margin-top:3px}" +
+    "#gachaDrawer .wishV2 .wishLinks46{margin-bottom:5px}" +
+    "#gachaDrawer .wishV2 .wishLinks46 button{min-height:24px}" +
+    "#gachaDrawer .wishV2 .gachaActions46 button{min-height:46px;flex-direction:row;gap:10px;font-size:15px}" +
+    "#gachaDrawer .wishV2 .wishSpark46{margin-top:5px;max-height:26px}" +
+    "#gachaDrawer .wishV2 .wishSpark46 button{min-height:24px}" +
+    "}" +
+    "@media (max-width:700px){#gachaDrawer .wishV2 .wishLinks46 .wishPills46{display:none}html.landscape46 #gachaDrawer .wishV2 .wishDock46{width:48%}}" +
+    "@media (max-width:560px){html.landscape46 #gachaDrawer .wishV2 .wishDock46{left:0;width:auto;padding-left:12px}html.landscape46 #gachaDrawer .wishV2 .wishPity46{left:12px;right:12px;width:auto;bottom:calc(190px + env(safe-area-inset-bottom))}#gachaDrawer .wishV2 .wishTitle46{max-width:70%}#gachaDrawer .wishV2 .wishTabs46{top:auto;bottom:calc(330px + env(safe-area-inset-bottom));flex-direction:row;width:auto}}" +
+    ".wishSheet46{position:absolute;inset:0;z-index:20;display:grid;place-items:center;background:#03060fb3;backdrop-filter:blur(4px)}" +
+    ".wishSheet46.hidden{display:none}" +
+    ".wishSheetCard46{width:min(460px,88vw);max-height:80%;overflow:auto;padding:18px 20px;border-radius:14px;background:#0b1326f2;border:1px solid #96e4f566;color:#e4eef9;box-shadow:0 18px 40px #0009}" +
+    ".wishSheetCard46 h4{margin:0 0 10px;letter-spacing:.2em;color:#fff}" +
+    ".wishSheetCard46 ul{margin:0;padding-left:18px;font-size:12px;line-height:1.8}" +
+    ".wishSheetCard46 p{font-size:12px;line-height:1.7}" +
+    ".wishSheetClose46{display:block;margin:14px 0 0 auto;min-height:34px;padding:0 18px;border-radius:999px;border:0;background:linear-gradient(120deg,#ff6fae,#8fe6f5);color:#081426;font:800 12px/1 system-ui}";
+
   function injectStyle() {
     if (!global.document) return;
     var style = global.document.getElementById("sakurayo-lobby-css");
     if (style) return;
     style = global.document.createElement("style");
     style.id = "sakurayo-lobby-css";
-    style.textContent = LOBBY_CSS + ROOM_CSS;
+    style.textContent = LOBBY_CSS + ROOM_CSS + GACHA_V2_CSS;
     (global.document.head || global.document.documentElement).appendChild(style);
   }
 
@@ -885,6 +946,46 @@
     return html;
   }
 
+  var POOL_META = Object.freeze({
+    remnant: { tab: "残片", kind: "常驻寻访", name: "镜界寻访", time: "常驻卡池 · 不限时" },
+    fashion: { tab: "时装", kind: "时装寻访", name: "衣橱回响", time: "常驻卡池 · 不限时" },
+    weapon: { tab: "武器", kind: "武器寻访", name: "兵装回收", time: "常驻卡池 · 不限时" }
+  });
+
+  function featuredCard(pool) {
+    var list = cardsForPool(pool) || [];
+    for (var i = 0; i < list.length; i++) if (list[i].legend) return list[i];
+    for (var j = 0; j < list.length; j++) if (list[j].r === "SSR") return list[j];
+    return list[0] || null;
+  }
+
+  function escapeHtml(v) {
+    return String(v == null ? "" : v).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; });
+  }
+
+  function bindWishSheet(host, pool, state) {
+    var sheet = host.querySelector("#gachaSheet46");
+    if (!sheet) return;
+    function open(html) {
+      sheet.innerHTML = '<div class="wishSheetCard46">' + html + '<button type="button" class="wishSheetClose46">知道了</button></div>';
+      sheet.classList.remove("hidden");
+      sheet.querySelector(".wishSheetClose46").onclick = function () { sheet.classList.add("hidden"); };
+    }
+    sheet.onclick = function (e) { if (e.target === sheet) sheet.classList.add("hidden"); };
+    var info = host.querySelector("#gachaInfo46"), log = host.querySelector("#gachaLog46");
+    if (info) info.onclick = function () {
+      open("<h4>寻访详情</h4><ul>" +
+        "<li>证人（SSR）基础概率 " + (RATES.SSR * 100).toFixed(1) + "%，第 " + RATES.softPity + " 抽起提升，" + RATES.pitySSR + " 抽必出</li>" +
+        "<li>稀有（SR）基础概率 " + (RATES.SR * 100).toFixed(1) + "%，每 " + RATES.pitySR + " 抽至少一张</li>" +
+        "<li>R " + (RATES.R * 100).toFixed(0) + "% · N " + (RATES.N * 100).toFixed(0) + "%</li>" +
+        "<li>每抽获得碎镜片 " + RATES.shardPull + "，重复卡 +" + RATES.shardDupe + "；集满 " + RATES.spark + " 可兑换指定卡</li>" +
+        "<li>收藏不增加战斗属性</li></ul>");
+    };
+    if (log) log.onclick = function () {
+      open("<h4>寻访记录</h4><p>" + (POOL_META[pool] || POOL_META.remnant).name + " 累计 " + ((state && state.pulls) || 0) + " 次 · 当前保底计数 " + ((state && state.pity) || 0) + " / " + RATES.pitySSR + "</p>");
+    };
+  }
+
   function renderGacha(host, save, handlers) {
     injectStyle();
     if (!host) return snapshot(save);
@@ -904,56 +1005,33 @@
     var poor1 = info.coins < RATES.single || empty;
     var poor10 = info.coins < RATES.ten || empty;
     var sub = "收藏不增加战斗属性 · " + (pool === "fashion" ? "时装装备保留展示与标注倾向" : pool === "weapon" ? "武器装备仅作收藏展示" : "职业卡仅影响标注流派倾向");
+    var meta = POOL_META[pool] || POOL_META.remnant;
+    var up = featuredCard(pool);
+    var coinIcon = '<i class="wishCoin46" aria-hidden="true"></i>';
+    var tabHtml = "";
+    for (var pi = 0; pi < POOL_IDS.length; pi++) {
+      var pid = POOL_IDS[pi], pm = POOL_META[pid];
+      tabHtml += '<button type="button" data-pool="' + pid + '"' + (pool === pid ? ' class="on" aria-current="true"' : "") + "><b>" + pm.tab + "</b><small>" + pm.kind + "</small></button>";
+    }
     host.innerHTML =
-      '<div class="wishStage46">' +
-      '<img class="wishBanner46" data-art alt="" src="' +
-      artSrc(handlers, "ui/tactical/gacha-" + pool + "-v3.webp") +
-      '">' +
-      '<img class="wishHero46" data-art alt="" src="' +
-      artSrc(handlers, "gacha/hero_" + hero + ".webp") +
-      '">' +
-      '<div class="wishPetals46">' +
-      petalMarks() +
-      "</div>" +
-      '<div class="wishTabs46" id="gachaTabs46">' +
-      '<button type="button" data-pool="remnant"' + (pool === "remnant" ? ' class="on"' : "") + ">残片</button>" +
-      '<button type="button" data-pool="fashion"' + (pool === "fashion" ? ' class="on"' : "") + ">时装</button>" +
-      '<button type="button" data-pool="weapon"' + (pool === "weapon" ? ' class="on"' : "") + ">武器</button>" +
-      "</div>" +
-      '<div class="wishTitle46"><h3>镜界寻访</h3><p>' +
-      sub +
-      "</p></div>" +
-      '<div class="wishPity46"><div class="pityRow46"><span>距证人保底还有 ' +
-      ssrLeft +
-      ' 抽</span><div class="pityRail46"><i style="width:' +
-      ssrPct +
-      '%"></i></div></div><div class="pityRow46 sr"><span>距稀有保底还有 ' +
-      srLeft +
-      ' 抽</span><div class="pityRail46"><i style="width:' +
-      srPct +
-      '%"></i></div></div></div>' +
-      '<div class="wishDock46"><div class="wishPills46"><b>樱花币 ' +
-      info.coins +
-      "</b><b>寻访 " +
-      pulls +
-      "</b><b>软保 " +
-      RATES.softPity +
-      "</b><b>碎镜片 " +
-      shards +
-      " / " +
-      RATES.spark +
-      "</b></div>" +
-      '<div class="gachaActions46"><button type="button" id="gachaPull1"' +
-      (poor1 ? ' class="poor"' : "") +
-      ">单次寻访<small>" +
-      RATES.single +
-      '</small></button><button type="button" id="gachaPull10"' +
-      (poor10 ? ' class="poor"' : "") +
-      ">十连寻访<small>" +
-      RATES.ten +
-      "</small></button></div>" +
+      '<div class="wishStage46 wishV2">' +
+      '<img class="wishBanner46" data-art alt="" src="' + artSrc(handlers, "ui/tactical/gacha-" + pool + "-v3.webp") + '">' +
+      '<div class="wishShade46" aria-hidden="true"></div>' +
+      '<img class="wishHero46" data-art alt="" src="' + artSrc(handlers, "gacha/hero_" + hero + ".webp") + '">' +
+      '<div class="wishPetals46">' + petalMarks() + "</div>" +
+      '<nav class="wishTabs46" id="gachaTabs46" aria-label="卡池">' + tabHtml + "</nav>" +
+      '<div class="wishWallet46" aria-label="货币">' + coinIcon + "<b>" + info.coins + '</b><span class="wishShardPill46">碎镜片 ' + shards + " / " + RATES.spark + "</span></div>" +
+      '<div class="wishTitle46"><span class="wishTag46">' + meta.kind + "</span><h3>" + meta.name + "</h3>" +
+      (up ? '<div class="wishUp46"><em>UP</em><b>' + escapeHtml(up.n) + "</b><i>" + up.r + "</i></div>" : "") +
+      "<p>" + sub + '</p><small class="wishTime46">' + meta.time + "</small></div>" +
+      '<div class="wishPity46"><div class="pityRow46"><span>距证人保底还有 ' + ssrLeft + ' 抽</span><div class="pityRail46"><i style="width:' + ssrPct + '%"></i></div></div><div class="pityRow46 sr"><span>距稀有保底还有 ' + srLeft + ' 抽</span><div class="pityRail46"><i style="width:' + srPct + '%"></i></div></div></div>' +
+      '<div class="wishDock46"><div class="wishLinks46"><button type="button" id="gachaInfo46">详情</button><button type="button" id="gachaLog46">记录</button><span class="wishPills46"><b>已寻访 ' + pulls + "</b><b>软保 " + RATES.softPity + "</b></span></div>" +
+      '<div class="gachaActions46"><button type="button" id="gachaPull1"' + (poor1 ? ' class="poor"' : "") + "><span>单次寻访</span><small>" + coinIcon + RATES.single + '</small></button><button type="button" id="gachaPull10"' + (poor10 ? ' class="poor"' : "") + "><span>十连寻访</span><small>" + coinIcon + RATES.ten + "</small></button></div>" +
       sparkRow(pool, state, shards) +
-      "</div></div>";
+      "</div>" +
+      '<div class="wishSheet46 hidden" id="gachaSheet46" role="dialog" aria-modal="true"></div>' +
+      "</div>";
+    bindWishSheet(host, pool, state);
     hideBrokenArt(host);
     var tabs = host.querySelectorAll("#gachaTabs46 [data-pool]");
     for (var t = 0; t < tabs.length; t++) {
