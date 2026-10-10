@@ -19,7 +19,7 @@ function world(names){
     $:s=>{if(!nodes.has(s))nodes.set(s,{classList:{add:noop,remove:noop},textContent:'',innerHTML:''});return nodes.get(s);},
     setForm:noop,refreshPlan:noop,storyMemory38:()=>({}),char35:()=>({id:'sayo'}),charAnimPath35:()=>'',artImage:noop,updateCharacterUI35:noop,
     isMainGodRun36:()=>c.runMode36==='mainGod',mainGodTier36:()=>({xp:1}),randomOffers37:xs=>xs.slice(0,1),MAIN_GOD_CHALLENGES37:[{id:'test',ok:()=>true}],syncPets:noop,
-    starterChapterMul40:()=>1,STARTERS40:{},fxStamp:noop,updateCareerFormation:noop,hideTransient:noop,renderChoices:()=>c.choices++,choices:0,sound:noop,toast:noop,
+    starterChapterMul40:()=>1,STARTERS40:{},fxStamp:noop,updateCareerFormation:noop,hideTransient:noop,renderChoices:()=>c.choices++,choices:0,sound:noop,toast:noop,dailyMod46:()=>false,abyssMul46:()=>1,look46:{},
   };
   vm.createContext(c);vm.runInContext(names.map(fn).join('\n'),c);return c;
 }

@@ -42,29 +42,47 @@ def motion(base, img, alpha_b, alpha_i):
 def main():
     ap = argparse.ArgumentParser(); ap.add_argument('--name', required=True); ap.add_argument('--act', required=True); ap.add_argument('--keys', required=True)
     ap.add_argument('--inbetween', type=int, default=3, help='每段递归二分次数 → 2^n-1 个中间帧'); ap.add_argument('--hold', type=int, default=0)
-    ap.add_argument('--scale', type=float, default=0.65); ap.add_argument('--side', choices=['l', 'r']); a = ap.parse_args()
+    ap.add_argument('--scale', type=float, default=0.65); ap.add_argument('--side', choices=['l', 'r']); ap.add_argument('--auto-order', action='store_true', help='按动作进度自动排序/挑选关键帧'); a = ap.parse_args()
     work = os.path.join(R.GEN, 'live'); name = a.name
     base = np.asarray(Image.open(os.path.join(work, f'{name}_base.png')).convert('RGB')); H, W = base.shape[:2]
     from rembg import remove, new_session; sess = new_session('isnet-anime')
     cut = lambda rgb: np.asarray(remove(Image.fromarray(rgb), session=sess))[..., 3].astype(np.float32) / 255
     ab = cut(base)
     keys = []  # (rgb, alpha)
-    for slot in a.keys.split(','):
+    def progress(m):  # 动作进度 = 运动区最高点（抬手越高，运动区顶端越靠上）。gpt-image-2 常把“刚抬手”画成“已到胸前”，槽位名不可信。
+        rows = np.where((m > 0).sum(1) > 12)[0]; return 0.0 if not len(rows) else float(H - rows.min()) / H
+    pool = []
+    slots = a.keys.split(',')
+    for slot in slots:
         cands = sorted(glob.glob(os.path.join(work, 'act', f'{name}_{a.act}_{slot}_*.png')))
-        best = None
+        if not cands: raise SystemExit('no candidates for ' + slot)
         for p in cands:
             img = np.asarray(Image.open(p).convert('RGB').resize((W, H), Image.LANCZOS))
             m0 = motion(base, img, ab, ab); static = (m0 == 0) & (ab > 0.5)
             al = ecc(base, img, static); al = colmatch(al, base, static)
             m1 = motion(base, al, ab, ab); st = (m1 == 0) & (ab > 0.5)
             res = float(np.abs(base.astype(np.float32) - al.astype(np.float32)).mean(2)[st].mean())
-            R.log(f'{slot} {os.path.basename(p)} static residual {res:.2f} motion {m1.mean():.3f}')
-            prev = keys[-1] if keys else base  # 时间连续性：与上一关键帧差异过大（姿态跳跃/画风漂移）的候选扣分
-            cont = float(np.abs(prev.astype(np.float32) - al.astype(np.float32)).mean()) / 4
-            score = res + cont; R.log(f'   continuity {cont:.2f} score {score:.2f}')
-            if best is None or score < best[0]: best = (score, al)
-        if best is None: raise SystemExit('no candidates for ' + slot)
-        keys.append(best[1])
+            pr = progress(m1); R.log(f'{slot} {os.path.basename(p)} static residual {res:.2f} motion {m1.mean():.3f} progress {pr:.3f}')
+            pool.append(dict(slot=slot, p=p, al=al, res=res, pr=pr))
+    if a.auto_order:
+        # 终点 = 最后一个槽位里残差最小的候选；其余关键帧按“进度”均匀取样，每个目标进度挑 残差+进度偏差+与上一帧连续性 最小者，保证单调、不回跳。
+        last = min([c for c in pool if c['slot'] == slots[-1]], key=lambda c: c['res']); P1 = last['pr']
+        n = len(slots) - 1; used = {last['p']}; prev = base; prog = 0.0
+        for i in range(n):
+            tgt = P1 * (i + 1) / (n + 1)
+            ok = [c for c in pool if c['p'] not in used and prog < c['pr'] < P1 - 0.01]
+            if not ok: continue
+            def sc(c): return c['res'] + 60 * abs(c['pr'] - tgt) + float(np.abs(prev.astype(np.float32) - c['al'].astype(np.float32)).mean()) / 4
+            b = min(ok, key=sc); used.add(b['p']); keys.append(b['al']); prev = b['al']; prog = b['pr']
+            R.log(f'  key {i + 1}: {os.path.basename(b["p"])} progress {b["pr"]:.3f} (target {tgt:.3f})')
+        keys.append(last['al']); R.log(f'  key end: {os.path.basename(last["p"])} progress {P1:.3f}')
+    else:
+        for slot in slots:
+            best = None; prev = keys[-1] if keys else base  # 时间连续性：与上一关键帧差异过大（姿态跳跃/画风漂移）的候选扣分
+            for c in [c for c in pool if c['slot'] == slot]:
+                cont = float(np.abs(prev.astype(np.float32) - c['al'].astype(np.float32)).mean()) / 4; score = c['res'] + cont
+                if best is None or score < best[0]: best = (score, c['al'])
+            keys.append(best[1])
     seq_keys = [base] + keys
     if a.hold: pass
     # 关键帧 alpha + 运动 mask，静止区回填原图
