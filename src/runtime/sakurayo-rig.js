@@ -68,7 +68,7 @@
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE); return t; }
-    this.tex = { base: tex(this.base), atlas: this.atlas ? tex(this.atlas) : null };
+    this.tex = {}; var ti = this.texImgs || { base: this.base, atlas: this.atlas }; for (var tk in ti) this.tex[tk] = ti[tk] ? tex(ti[tk]) : null;
     var self = this;
     this.meshes.forEach(function (m) {
       m.pb = gl.createBuffer(); m.tb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, m.tb); gl.bufferData(gl.ARRAY_BUFFER, m.tex, gl.STATIC_DRAW);
@@ -183,11 +183,148 @@
     var g = this.c.getContext("2d"), b = 1 + this.s.breath * 0.004 + this.s.stretch * 0.02, fy = v.oy + this.d.bbox[3] * v.sc;
     g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, v.W, v.H); g.setTransform(1, 0, 0, b, 0, fy * (1 - b));
     g.drawImage(this.base, v.ox, v.oy, this.d.w * v.sc, this.d.h * v.sc);
+    if (this.v2 && this.texImgs.arms) for (var sd in this.d.arms) { var A = this.d.arms[sd]; g.drawImage(this.texImgs.arms, A.ax, A.ay, A.w, A.h, v.ox + A.x * v.sc, v.oy + A.y * v.sc, A.w * v.sc, A.h * v.sc); }
     for (var k in this.d.patches) { var p = this.d.patches[k], al = this.s.ex[k] || 0; if (al < 0.01 || !this.atlas) continue; g.globalAlpha = al;
       g.drawImage(this.atlas, p.ax, p.ay, p.w, p.h, v.ox + p.x * v.sc, v.oy + p.y * v.sc, p.w * v.sc, p.h * v.sc); g.globalAlpha = 1; }
     g.setTransform(1, 0, 0, 1, 0, 0);
   };
   Rig.prototype.snapshot = function () { var s = this.s; return { gl: !!this.gl, act: s.act, hx: +s.hx.toFixed(3), hy: +s.hy.toFixed(3), hair: +s.hair.toFixed(3), skirt: +s.skirt.toFixed(3), breath: +s.breath.toFixed(3), stretch: +s.stretch.toFixed(3), ex: { closed: +s.ex.closed.toFixed(2), talk: +s.ex.talk.toFixed(2), happy: +s.ex.happy.toFixed(2), shy: +s.ex.shy.toFixed(2) }, meshes: this.meshes.length }; };
+
+  /* ===== rig v2：拆层 + 骨骼 + 蒙皮（全身联动） =====
+     骨骼：pelvis → waist → chest → neck → head（层级），腿以脚为根随骨盆剪切；双臂 upper/fore 挂在 chest 上。
+     转头联动：头 100% / 颈 60% / 胸 30% / 腰 15%，越往下延迟越大。呼吸带胸口/肩/手臂；重心左右交替。
+     二级物理：头发←头部运动，裙摆←骨盆运动，饰品←胸部运动（弹簧，非独立正弦）。 */
+  var KEYS2 = ["head", "neck", "chest", "waist", "pelvis", "leg", "hair", "skirt", "chestw", "acc", "depth", "eyes", "headf"];
+  function M(a, b, c, d, e, f) { return [a, b, c, d, e, f]; }
+  function mul(m, n) { return [m[0] * n[0] + m[2] * n[1], m[1] * n[0] + m[3] * n[1], m[0] * n[2] + m[2] * n[3], m[1] * n[2] + m[3] * n[3], m[0] * n[4] + m[2] * n[5] + m[4], m[1] * n[4] + m[3] * n[5] + m[5]]; }
+  function rotAt(th, px, py, sx, sy) { var c = Math.cos(th), s = Math.sin(th); sx = sx || 1; sy = sy || 1; var a = c * sx, b = s * sx, cc = -s * sy, d = c * sy; return [a, b, cc, d, px - a * px - cc * py, py - b * px - d * py]; }
+  function tr(x, y) { return [1, 0, 0, 1, x, y]; }
+  function ap(m, x, y) { return [m[0] * x + m[2] * y + m[4], m[1] * x + m[3] * y + m[5]]; }
+  function Rig2(canvas, d, imgs, opts) {
+    this.c = canvas; this.d = d; this.opts = opts || {}; this.t = 0; this.lm = d.landmarks; this.v2 = 1;
+    this.base = imgs.body; this.atlas = imgs.atlas; this.texImgs = { body: imgs.body, arms: imgs.arms, atlas: imgs.atlas };
+    this.s = { hx: 0, hy: 0, tx: 0, ty: 0, tilt: 0, gaze: 0, gazeY: 0, hair: 0, hairV: 0, skirt: 0, skirtV: 0, acc: 0, accV: 0, breath: 0, stretch: 0,
+      ex: { closed: 0, talk: 0, happy: 0, shy: 0 }, blinkT: -1, blinkWait: 1.6, act: null, actT: 0, talkUntil: 0, prevHx: 0, idleWait: 9,
+      lag: { neck: 0, chest: 0, waist: 0, neckY: 0, chestY: 0 }, pin: 0, wave: 0, prev: {} };
+    var gx = d.grid[0], gy = d.grid[1], n = gx * gy, bb = d.bbox, W = {}, k; this.gx = gx; this.gy = gy;
+    for (k = 0; k < KEYS2.length; k++) W[KEYS2[k]] = d.weights[KEYS2[k]] ? dec(d.weights[KEYS2[k]], n) : new Float32Array(n);
+    this.W = W; W.head = W.head; // for part()/at()
+    function sample(arr, x, y) {
+      var fx = clamp((x - bb[0]) / (bb[2] - bb[0]) * (gx - 1), 0, gx - 1), fy = clamp((y - bb[1]) / (bb[3] - bb[1]) * (gy - 1), 0, gy - 1);
+      var x0 = Math.floor(fx), y0 = Math.floor(fy), x1 = Math.min(gx - 1, x0 + 1), y1 = Math.min(gy - 1, y0 + 1), u = fx - x0, v = fy - y0;
+      return (arr[y0 * gx + x0] * (1 - u) + arr[y0 * gx + x1] * u) * (1 - v) + (arr[y1 * gx + x0] * (1 - u) + arr[y1 * gx + x1] * u) * v;
+    }
+    function grid(x0, y0, x1, y1, nx, ny, uv, wsrc) {
+      var pos = new Float32Array(nx * ny * 2), w = {}, tex = new Float32Array(nx * ny * 2), idx = [], i, j, q, keys = Object.keys(wsrc);
+      keys.forEach(function (kk) { w[kk] = new Float32Array(nx * ny); });
+      for (j = 0; j < ny; j++) for (i = 0; i < nx; i++) {
+        q = j * nx + i; var x = x0 + (x1 - x0) * i / (nx - 1), y = y0 + (y1 - y0) * j / (ny - 1);
+        pos[q * 2] = x; pos[q * 2 + 1] = y; var t = uv(x, y); tex[q * 2] = t[0]; tex[q * 2 + 1] = t[1];
+        keys.forEach(function (kk) { w[kk][q] = wsrc[kk](x, y, i, j); });
+        if (i < nx - 1 && j < ny - 1) idx.push(q, q + 1, q + nx, q + 1, q + nx + 1, q + nx);
+      }
+      return { pos: pos, tex: tex, w: w, idx: new Uint16Array(idx), out: new Float32Array(nx * ny * 2), n: nx * ny };
+    }
+    var bodySrc = {}; KEYS2.forEach(function (kk) { bodySrc[kk] = function (x, y, i, j) { return W[kk][j * gx + i]; }; });
+    var body = grid(bb[0], bb[1], bb[2], bb[3], gx, gy, function (x, y) { return [x / d.w, y / d.h]; }, bodySrc); body.tex0 = "body"; body.kind = "body";
+    this.meshes = [body];
+    var aw = imgs.arms ? imgs.arms.width : 1, ah = imgs.arms ? imgs.arms.height : 1, self = this;
+    Object.keys(d.arms || {}).forEach(function (sd) {
+      var A = d.arms[sd], g2 = A.grid, n2 = g2[0] * g2[1], AW = {};
+      Object.keys(A.weights).forEach(function (kk) { AW[kk] = dec(A.weights[kk], n2); });
+      var src = {}; Object.keys(AW).forEach(function (kk) { src[kk] = function (x, y, i, j) { return AW[kk][j * g2[0] + i]; }; });
+      var m = grid(A.x, A.y, A.x + A.w, A.y + A.h, g2[0], g2[1], function (x, y) { return [(A.ax + x - A.x) / aw, (A.ay + y - A.y) / ah]; }, src);
+      m.tex0 = "arms"; m.kind = "arm"; m.side = sd; m.A = A; self.meshes.push(m);
+    });
+    var pw = imgs.atlas ? imgs.atlas.width : 1, ph = imgs.atlas ? imgs.atlas.height : 1;
+    Object.keys(d.patches || {}).forEach(function (name) {
+      var p = d.patches[name];
+      var m = grid(p.x, p.y, p.x + p.w, p.y + p.h, 10, 10, function (x, y) { return [(p.ax + x - p.x) / pw, (p.ay + y - p.y) / ph]; }, (function () { var o = {}; KEYS2.forEach(function (kk) { o[kk] = function (x, y) { return sample(W[kk], x, y); }; }); return o; })());
+      m.tex0 = "atlas"; m.expr = name; m.kind = "body"; self.meshes.push(m);
+    });
+    // arms are drawn after body, expression patches last
+    this.meshes.sort(function (a, b) { return (a.expr ? 2 : a.kind === "arm" ? 1 : 0) - (b.expr ? 2 : b.kind === "arm" ? 1 : 0); });
+    this.gl = this.opts.no3d ? null : this.initGL();
+  }
+  Rig2.prototype = Object.create(Rig.prototype);
+  Rig2.prototype.at = function (x, y) { var r = Rig.prototype.at.call(this, x, y); if (r) { r.hair = r.hair; r.skirt = r.skirt; } return r; };
+  /* 两骨 IK：返回 [θu, θf]（相对静止姿态的旋转量） */
+  function ik2(S, E, Wr, T, bendSign) {
+    var L1 = Math.hypot(E[0] - S[0], E[1] - S[1]), L2 = Math.hypot(Wr[0] - E[0], Wr[1] - E[1]);
+    var dx = T[0] - S[0], dy = T[1] - S[1], dd = clamp(Math.hypot(dx, dy), Math.abs(L1 - L2) + 1, L1 + L2 - 1);
+    var base = Math.atan2(dy, dx), a = Math.acos(clamp((L1 * L1 + dd * dd - L2 * L2) / (2 * L1 * dd), -1, 1));
+    var up = base + bendSign * a, ex = S[0] + Math.cos(up) * L1, ey = S[1] + Math.sin(up) * L1, fore = Math.atan2(T[1] - ey, T[0] - ex);
+    var restU = Math.atan2(E[1] - S[1], E[0] - S[0]), restF = Math.atan2(Wr[1] - E[1], Wr[0] - E[0]);
+    var du = up - restU, df = fore - restF - du; while (du > Math.PI) du -= 2 * Math.PI; while (du < -Math.PI) du += 2 * Math.PI; while (df > Math.PI) df -= 2 * Math.PI; while (df < -Math.PI) df += 2 * Math.PI;
+    return [du, df];
+  }
+  Rig2.prototype.deform = function () {
+    var s = this.s, d = this.d, B = d.bones, sc = d.w / 1024, t = this.t, dt = this.dtLast || 1 / 60, L = s.lag;
+    // 转头联动：每级按比例 + 逐级延迟
+    L.neck = damp(L.neck, s.hx, dt, 0.18); L.chest = damp(L.chest, s.hx, dt, 0.32); L.waist = damp(L.waist, s.hx, dt, 0.5);
+    L.neckY = damp(L.neckY, s.hy, dt, 0.2); L.chestY = damp(L.chestY, s.hy, dt, 0.4);
+    var sw = Math.sin(t * Math.PI * 2 / 7.5) + 0.25 * Math.sin(t * Math.PI * 2 / 3.1), b = s.breath, st = s.stretch;
+    var yaw = 0.05; // rad per unit look
+    var pel = mul(tr(7 * sw * sc, 0), rotAt(0.010 * sw + L.waist * 0.006, B.pelvis[0], B.pelvis[1]));
+    var wai = mul(pel, rotAt(-0.008 * sw + L.waist * yaw * 0.15 - st * 0.02, B.waist[0], B.waist[1]));
+    var che = mul(wai, mul(rotAt(-0.004 * sw + L.chest * yaw * 0.3 + s.tilt * 0.3, B.chest[0], B.chest[1]), rotAt(0, B.waist[0], B.waist[1], 1 - 0.004 * b, 1 + 0.010 * b + 0.04 * st)));
+    che = mul(tr(0, -1.6 * b * sc), che);
+    var nec = mul(che, mul(tr(L.neck * 3 * sc, L.neckY * 1.5 * sc), rotAt(L.neck * yaw * 0.6 + s.tilt * 0.6, B.neck[0], B.neck[1])));
+    var hea = mul(nec, rotAt(s.hx * yaw + s.tilt, B.neck[0], B.neck[1]));
+    // 二级物理：由骨骼运动驱动
+    var hp = ap(hea, B.neck[0], B.neck[1] - 200), pp = ap(pel, B.pelvis[0], B.pelvis[1]), cp = ap(che, B.chest[0], B.chest[1]), P = s.prev;
+    function vel(k, p) { var v = P[k] ? (p[0] - P[k][0]) / dt : 0; P[k] = p; return v; }
+    var hv = vel("h", hp), pv = vel("p", pp), cv = vel("c", cp), wind = 0.12 * Math.sin(t * 0.9) + 0.05 * Math.sin(t * 2.3 + 1.3);
+    s.hairV += (-(s.hair - wind) * 16 - s.hairV * 3.0 - hv * 0.035) * dt; s.hair += s.hairV * dt;
+    s.skirtV += (-(s.skirt - wind * 0.5) * 20 - s.skirtV * 3.4 - pv * 0.05) * dt; s.skirt += s.skirtV * dt;
+    s.accV += (-(s.acc - wind * 0.7) * 24 - s.accV * 2.4 - cv * 0.06) * dt; s.acc += s.accV * dt;
+    // 手臂：呼吸微动 + 整理发夹 IK
+    var arms = {};
+    for (var sd in d.arms) {
+      var A = d.arms[sd], sign = A.S[0] > B.chest[0] ? 1 : -1, tu = 0.012 * b * sign + 0.008 * Math.sin(t * 0.7 + (sign > 0 ? 0 : 2)), tf = 0.01 * Math.sin(t * 0.9 + 1);
+      tu += -sign * 0.05 * st; // 伸懒腰：手臂外展
+      if (sd === B.pinSide && s.pin > 0.001) { var fc = this.lm.face, k = s.pin, L1 = Math.hypot(A.E[0] - A.S[0], A.E[1] - A.S[1]), goal = [A.S[0] + sign * 0.22 * L1, Math.max(fc[1] + fc[3] * 0.1, A.S[1] - 0.9 * L1)], tgt = [A.Wr[0] + (goal[0] - A.Wr[0]) * k, A.Wr[1] + (goal[1] - A.Wr[1]) * k]; var q = ik2(A.S, A.E, A.Wr, tgt, sign), q0 = ik2(A.S, A.E, A.Wr, A.Wr, sign); tu += q[0] - q0[0]; tf += q[1] - q0[1]; }
+      if (s.wave > 0.001 && sd !== B.pinSide) { tu += -sign * 0.5 * s.wave; tf += -sign * (0.6 + 0.25 * Math.sin(t * 9)) * s.wave; }
+      var up = mul(che, rotAt(tu, A.S[0], A.S[1])), fo = mul(up, rotAt(tf, A.E[0], A.E[1]));
+      arms[sd] = { up: up, fo: fo };
+    }
+    var hipY = B.hip, ed = this.lm.eyeDist;
+    for (var mi = 0; mi < this.meshes.length; mi++) {
+      var m = this.meshes[mi], Pp = m.pos, O = m.out, w = m.w;
+      for (var qi = 0; qi < m.n; qi++) {
+        var x = Pp[qi * 2], y = Pp[qi * 2 + 1], X = 0, Y = 0, r;
+        if (m.kind === "arm") {
+          var a = arms[m.side], fw = w.fore[qi], ro = w.root[qi], r1 = ap(a.up, x, y), r2 = ap(a.fo, x, y), rc = ap(che, x, y);
+          X = (r1[0] * (1 - fw) + r2[0] * fw) * (1 - ro) + rc[0] * ro; Y = (r1[1] * (1 - fw) + r2[1] * fw) * (1 - ro) + rc[1] * ro;
+          var dxa = (s.acc * w.acc[qi] * 12 + s.hair * w.hair[qi] * 10) * sc; X += dxa;
+        } else {
+          var wh = w.head[qi], wn = w.neck[qi], wc = w.chest[qi], ww = w.waist[qi], wp = w.pelvis[qi], lg = y < hipY ? 1 : w.leg[qi];
+          r = ap(hea, x, y); X += r[0] * wh; Y += r[1] * wh;
+          r = ap(nec, x, y); X += r[0] * wn; Y += r[1] * wn;
+          r = ap(che, x, y); X += r[0] * wc; Y += r[1] * wc;
+          r = ap(wai, x, y); X += r[0] * ww; Y += r[1] * ww;
+          r = ap(pel, x, y); X += (x + (r[0] - x) * lg) * wp; Y += (y + (r[1] - y) * lg) * wp;
+          var ws = wh + wn + wc + ww + wp; if (ws > 1e-4) { X /= ws; Y /= ws; } else { X = x; Y = y; }
+          var D = w.depth[qi], hf = w.headf[qi];
+          X += s.hx * (2 + 6 * D) * hf * sc; Y += s.hy * (2 + 4 * D) * hf * sc;   // 头部视差（克制）
+          X += s.gaze * w.eyes[qi] * 3 * sc; Y += s.gazeY * w.eyes[qi] * 2 * sc;
+          Y += -b * 1.6 * w.chestw[qi] * sc;                                      // 胸口起伏
+          var hl = w.hair[qi]; X += s.hair * hl * 20 * sc; Y += -Math.abs(s.hair) * hl * 2 * sc;
+          var sk = w.skirt[qi]; X += s.skirt * sk * 14 * sc + (x - B.pelvis[0]) * Math.abs(s.skirt) * 0.02 * sk;
+          X += s.acc * w.acc[qi] * 12 * sc;
+        }
+        O[qi * 2] = X; O[qi * 2 + 1] = Y;
+      }
+    }
+  };
+  var _upd = Rig.prototype.update;
+  Rig2.prototype.update = function (dt) {
+    this.dtLast = dt; var s = this.s, a = s.act ? s.actT / ({ pin: 3.2, wave: 2.4 }[s.act] || 1) : 0;
+    s.pin = damp(s.pin, s.act === "pin" ? bump(a, 0.3, 0.3) : 0, dt, 0.12);
+    s.wave = damp(s.wave, s.act === "wave" ? bump(a, 0.25, 0.3) : 0, dt, 0.12);
+    return _upd.call(this, dt);
+  };
+  ACTS.pin.dur = 3.2; ACTS.wave = { dur: 2.4 };
 
   /* —— 加载 / 挂载 —— */
   var loading = {};
@@ -196,6 +333,7 @@
   function load(id, url) {
     return loadScript(url("live/" + id + "/rig.js")).then(function () {
       var d = DATA[id]; if (!d) throw new Error("no rig " + id);
+      if (d.v === 2) return Promise.all([loadImg(url("live/" + id + "/body.webp")), loadImg(url("live/" + id + "/arms.webp")), loadImg(url("live/" + id + "/atlas.webp"))]).then(function (r) { return { d: d, imgs: { body: r[0], arms: r[1], atlas: r[2] } }; });
       return Promise.all([loadImg(url("live/" + id + "/base.webp")), Object.keys(d.patches || {}).length ? loadImg(url("live/" + id + "/atlas.webp")) : null]).then(function (r) { return { d: d, base: r[0], atlas: r[1] }; });
     });
   }
@@ -203,7 +341,7 @@
   function mount(canvas, id, url, opts) {
     opts = opts || {};
     return load(id, url).then(function (L) {
-      var r = new Rig(canvas, L.d, L.base, L.atlas, opts); r.id = id; cur = r;
+      var r = L.imgs ? new Rig2(canvas, L.d, L.imgs, opts) : new Rig(canvas, L.d, L.base, L.atlas, opts); r.id = id; cur = r;
       if (!raf) { last = performance.now(); var loop = function (now) { raf = requestAnimationFrame(loop); var dt = Math.min(0.05, (now - last) / 1000); last = now; if (!cur || global.__rigManual || (opts.hidden && opts.hidden())) return; cur.update(opts.reducedMotion && opts.reducedMotion() ? dt * 0.4 : dt); cur.render(); }; raf = requestAnimationFrame(loop); }
       return r;
     });
@@ -214,7 +352,7 @@
     global.addEventListener("deviceorientation", function (e) { if (!cur || e.gamma == null) return; cur.lookAt(clamp(e.gamma / 30, -1, 1), clamp(((e.beta || 45) - 45) / 30, -1, 1)); }, { passive: true });
   }
   global.SakurayoRig = {
-    Rig: Rig, mount: mount, bindInput: bindInput, current: function () { return cur; },
+    Rig: Rig, Rig2: Rig2, mount: mount, bindInput: bindInput, current: function () { return cur; },
     touch: function (clientX, clientY) { if (!cur) return null; var p = cur.toImage(clientX, clientY), part = cur.part(p[0], p[1]); cur.play(part); return part; },
     play: function (n) { return cur ? cur.play(n) : false; }, say: function (s) { cur && cur.say(s); },
     step: function (dt) { if (cur) { cur.update(dt); cur.render(); } }, // 离线录制：window.__rigManual=1 后逐帧推进

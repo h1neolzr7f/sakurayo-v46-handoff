@@ -16,16 +16,16 @@ const idle = async (frames, fn) => { for (let i = 0; i < frames; i++) { if (fn) 
 const snap = await api('rigSnapshot46'); console.log('rig', JSON.stringify(snap)); if (!snap) process.exit(2);
 const box = await page.locator('#heroLive46 canvas.heroRig46').boundingBox();
 const P = (fx, fy) => [box.x + box.width * fx, box.y + box.height * fy];
-await idle(60);
-await idle(90, async i => { const a = i / 90 * Math.PI * 2; await page.mouse.move(...P(0.5 + Math.cos(a) * 0.5, 0.3 + Math.sin(a) * 0.35)); });
+// 20 s：待机呼吸+重心 3s → 转头联动 5s → 整理发夹 3.5s → 摸头 2s → 点胸口 2s → 裙摆 2s → 招手 2.5s
+await idle(90);
+await idle(150, async i => { const a = i / 150 * Math.PI * 2; await page.mouse.move(...P(0.5 + Math.sin(a) * 0.6, 0.25 + Math.cos(a * 2) * 0.12)); });
 await page.screenshot({ path: `${shots}/mascot-${ch}-look.png` });
-const lm = await page.evaluate(() => window.SakurayoRig.current().lm), d = await page.evaluate(() => { const r = window.SakurayoRig.current(); r.fit(); return { v: r.view, w: r.d.w, h: r.d.h }; });
+await api('rigPlay46', 'pin'); await idle(55); await page.screenshot({ path: `${shots}/mascot-${ch}-pin.png` }); await idle(50);
+const lm = await page.evaluate(() => window.SakurayoRig.current().lm), d = await page.evaluate(() => { const r = window.SakurayoRig.current(); r.fit(); return { v: r.view }; });
 const I = (x, y) => [box.x + (d.v.ox + x * d.v.sc) / d.v.dpr, box.y + (d.v.oy + y * d.v.sc) / d.v.dpr];
 const tap = async (x, y) => console.log('touch', await api('rigTouch46', ...I(x, y)));
-await tap(lm.head[0], lm.head[1]); await idle(50); await page.screenshot({ path: `${shots}/mascot-${ch}-pat.png` });
-await idle(10);
-await tap(lm.chest[0], lm.chest[1]); await idle(60); 
-await api('rigPlay46', 'skirt'); await idle(55);
-await api('rigPlay46', 'stretch'); await idle(40); await page.screenshot({ path: `${shots}/mascot-${ch}-stretch.png` }); await idle(50);
-await api('rigPlay46', 'pin'); await idle(80);
+await tap(lm.head[0], lm.head[1]); await idle(60); 
+await tap(lm.chest[0], lm.chest[1]); await idle(60);
+await api('rigPlay46', 'skirt'); await idle(60);
+await api('rigPlay46', 'wave'); await idle(75);
 await browser.close(); console.log('frames', n);

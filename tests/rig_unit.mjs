@@ -5,10 +5,11 @@ ctx.globalThis = ctx; ctx.window = ctx; vm.createContext(ctx);
 vm.runInContext(fs.readFileSync('src/runtime/sakurayo-rig.js', 'utf8'), ctx);
 for (const id of ['sayo', 'aya', 'rion']) {
   const dir = `android-app/app/src/main/assets/game/art/live/${id}/`;
-  for (const f of ['rig.js', 'base.webp', 'atlas.webp']) assert.ok(fs.existsSync(dir + f), `${id} ${f}`);
   vm.runInContext(fs.readFileSync(dir + 'rig.js', 'utf8'), ctx);
-  const d = ctx.SakurayoRigData[id]; assert.deepEqual(Object.keys(d.patches).sort(), ['closed', 'happy', 'shy', 'talk']);
-  const r = new ctx.SakurayoRig.Rig({}, d, { width: d.w, height: d.h }, { width: 2000, height: 600 }, { no3d: true, test: true });
+  const d = ctx.SakurayoRigData[id];
+  for (const f of d.v === 2 ? ['rig.js', 'body.webp', 'arms.webp', 'atlas.webp'] : ['rig.js', 'base.webp', 'atlas.webp']) assert.ok(fs.existsSync(dir + f), `${id} ${f}`); assert.deepEqual(Object.keys(d.patches).sort(), ['closed', 'happy', 'shy', 'talk']);
+  const r = d.v === 2 ? new ctx.SakurayoRig.Rig2({}, d, { body: { width: d.w, height: d.h }, arms: { width: 1, height: 1 }, atlas: { width: 2000, height: 600 } }, { no3d: true, test: true })
+    : new ctx.SakurayoRig.Rig({}, d, { width: d.w, height: d.h }, { width: 2000, height: 600 }, { no3d: true, test: true });
   const m = r.meshes[0], gx = d.grid[0], gy = d.grid[1];
   let maxFoot = 0, maxHead = 0, maxHair = 0, closed = 0;
   const head = (() => { let b = 0, q = 0; for (let i = 0; i < m.n; i++) if (m.w.head[i] > b) { b = m.w.head[i]; q = i; } return q; })();
@@ -29,3 +30,18 @@ for (const id of ['sayo', 'aya', 'rion']) {
   console.log('ok', id, maxHead.toFixed(1), maxFoot.toFixed(2));
 }
 console.log('rig_unit ok');
+
+// rig v2：全身层级联动 + 手臂 IK
+for (const id of ['sayo', 'aya', 'rion']) {
+  const d = ctx.SakurayoRigData[id];
+  if (!d || d.v !== 2) continue;
+  const R = ctx.SakurayoRig;
+  const r = new R.Rig2({}, d, { body: { width: 1, height: 1 }, arms: { width: 1, height: 1 }, atlas: { width: 1, height: 1 } }, { no3d: 1, test: 1 });
+  r.lookAt(1, 0); for (let i = 0; i < 6; i++) r.update(1 / 30);
+  const L = r.s.lag; if (!(Math.abs(L.neck) > Math.abs(L.chest) && Math.abs(L.chest) > Math.abs(L.waist) && L.waist > 0)) throw new Error(id + ' spine chain should lag head→neck→chest→waist ' + JSON.stringify(L));
+  const A = d.arms[d.bones.pinSide], m = r.meshes.find(m => m.side === d.bones.pinSide);
+  let bi = 0, best = 1e9; for (let q = 0; q < m.n; q++) { const dd = Math.hypot(m.pos[2 * q] - A.Wr[0], m.pos[2 * q + 1] - A.Wr[1]); if (dd < best) { best = dd; bi = q; } }
+  const y0 = m.out[2 * bi + 1]; r.play('pin'); for (let i = 0; i < 45; i++) r.update(1 / 30);
+  if (!(m.out[2 * bi + 1] < y0 - (A.Wr[1] - d.landmarks.face[1]) * 0.6)) throw new Error(id + ' pin: hand must really lift toward the head');
+  console.log('ok v2', id, 'lag', L.neck.toFixed(2), L.chest.toFixed(2), L.waist.toFixed(2), 'wrist', y0.toFixed(0), '->', m.out[2 * bi + 1].toFixed(0));
+}
