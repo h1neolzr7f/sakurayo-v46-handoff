@@ -13,3 +13,17 @@
 
 ## 图片
 - 角色立绘、卡池/试炼横幅、图标等：通过项目使用的图像生成服务（gpt-image-2）按项目原有人设生成，参见 `docs/GROK_HANDOFF_2026-10-10.md`。
+
+## 动画补帧与抠图工具（2026-10-10，仅离线生成素材，未打包进游戏）
+
+工具与模型放在仓库外 `/workspace/sakurayo-tools/`；仓库只包含生成后的 webp 帧。
+
+| 项目 | 用途 | 许可证 |
+| --- | --- | --- |
+| [hzwer/Practical-RIFE](https://github.com/hzwer/Practical-RIFE) — RIFE v4.25 权重 | 攻击动画中间帧 `anim_attack_ab/_bc/_ca.webp`（CPU 推理） | MIT |
+| [HolyWu/vs-rife](https://github.com/HolyWu/vs-rife) — `IFNet_HDv3_v4_25.py`/`warplayer.py` 网络定义与权重镜像 | 加载 RIFE 模型（未用 VapourSynth） | MIT |
+| [PyTorch](https://pytorch.org)（CPU 版） | 推理运行时 | BSD-3-Clause |
+| [danielgatis/rembg](https://github.com/danielgatis/rembg)（u2net） | 生成图抠图 | MIT（u2net 模型 Apache-2.0） |
+| 中转站 gpt-image-2 | 关键帧/图标原图 | 生成素材归项目使用 |
+
+关键帧对齐、亮度统一、去亮边由自写脚本 `sakurayo-gen/animfix/fix.py`（numpy/Pillow/scipy）完成。

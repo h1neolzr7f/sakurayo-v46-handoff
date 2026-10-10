@@ -40,8 +40,11 @@ async function measure(reduce) {
       return s / (d.length / 4);
     }, shot.toString('base64')));
   }
+  const poses = await page.evaluate(() => window.__SAKURAYO_TEST__.poseLog46());
   await ctx.close();
   assert.deepEqual(errors, []);
+  for (const f of ['attack', 'attack_ab', 'attack_b', 'attack_bc', 'attack_c', 'attack_ca']) assert.ok(poses.includes(f), `连射时攻击动画必须循环全部帧，缺少 ${f}`);
+  { let changes = 0; for (let i = 1; i < poses.length; i++) if (poses[i] !== poses[i - 1] && poses[i].startsWith('attack') && poses[i - 1].startsWith('attack')) changes++; assert.ok(changes >= 6, `攻击帧应持续切换（${changes}）`); }
   let flips = 0, last = 0;
   for (let i = 1; i < lum.length; i++) {
     const dl = lum[i] - lum[i - 1];
@@ -52,8 +55,9 @@ async function measure(reduce) {
   return { flashesPerSec: +(flips / 2 / (FRAMES / 30)).toFixed(2), p90Jump: +jumps[Math.floor(jumps.length * 0.1)].toFixed(1), maxJump: +jumps[0].toFixed(1) };
 }
 const on = await measure(true);
-const off = process.env.SAKURAYO_FLICKER_COMPARE ? await measure(false) : null;
+const off = await measure(false);
 await browser.close();
-console.log('flicker reduce=on', JSON.stringify(on), off ? 'reduce=off ' + JSON.stringify(off) : '');
+console.log('flicker reduce=on', JSON.stringify(on), 'reduce=off', JSON.stringify(off));
 assert.ok(on.flashesPerSec <= 3, `减弱闪烁开启时玩家区域闪烁 ${on.flashesPerSec} 次/秒 > 3`);
-console.log(`PASS flicker: player-area ${on.flashesPerSec}/s flashes (≤3), p90 jump ${on.p90Jump}`);
+assert.ok(off.flashesPerSec <= 3, `减弱闪烁关闭时玩家区域闪烁 ${off.flashesPerSec} 次/秒 > 3`);
+console.log(`PASS flicker (off ${off.flashesPerSec}/s): player-area ${on.flashesPerSec}/s flashes (≤3), p90 jump ${on.p90Jump}`);

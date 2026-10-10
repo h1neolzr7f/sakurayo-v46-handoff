@@ -2959,11 +2959,22 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function drawSparks46() {
     if (!sparks46) return;
     ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
-    const rf46 = reduceFlash46(); if (rf46) ctx.globalCompositeOperation = "source-over";
-    for (const k of sparks46) { const q = k.t / 0.14; ctx.strokeStyle = k.c; ctx.globalAlpha = q * (rf46 ? .45 : 1); ctx.lineWidth = rf46 ? 1.2 : 2;
+    const rf46 = reduceFlash46(); ctx.globalCompositeOperation = "source-over";
+    for (const k of sparks46) { const q = k.t / 0.14, ez = q * q * (3 - 2 * q); ctx.strokeStyle = k.c; ctx.globalAlpha = ez * (rf46 ? .55 : .7); ctx.lineWidth = 1.6;
       for (let i = -1; i <= 1; i++) { const a = k.a + Math.PI + i * 0.7; ctx.beginPath(); ctx.moveTo(k.x, k.y); ctx.lineTo(k.x + Math.cos(a) * 14 * (1.4 - q), k.y + Math.sin(a) * 14 * (1.4 - q)); ctx.stroke(); } }
     ctx.globalCompositeOperation = "source-over"; ctx.fillStyle = "#e8c06a";
     for (const c of (globalThis.casings46 || [])) { ctx.globalAlpha = Math.min(1, c.t * 3); ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.r); ctx.fillRect(-2.5, -1, 5, 2); ctx.restore(); }
+    ctx.restore();
+  }
+  // 枪口火光：每发都有，形状随机抖动；亮度走 easeOutCubic 包络，并在连射时保留底光，避免整屏亮/暗跳变；峰值受限，不叠加在角色身上。
+  function drawMuzzle46() {
+    const m = P.muzzle46; if (!m || !((P.animAttack || 0) > 0)) return;
+    const f = P.flash46 || 0, e = 1 - Math.pow(1 - f, 3), soft = reduceFlash46();
+    const peak = soft ? .62 : .8, base = soft ? .34 : .4, a = base + (peak - base) * e;
+    const len = (soft ? 16 : 20) + 10 * e, wid = 6 + 3 * e, x = P.x + m.x + Math.cos(m.a) * 6, y = P.y + m.y + Math.sin(m.a) * 6;
+    ctx.save(); ctx.translate(x, y); ctx.rotate(m.a + (m.j - .5) * .25); ctx.globalAlpha = a;
+    const g = ctx.createLinearGradient(0, 0, len, 0); g.addColorStop(0, "#fff4d6"); g.addColorStop(.35, "#ffc76a"); g.addColorStop(1, "#ff8a3a00");
+    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, -wid / 2); ctx.quadraticCurveTo(len * .55, -wid * (0.6 + m.j * .4), len, 0); ctx.quadraticCurveTo(len * .55, wid * (0.6 + (1 - m.j) * .4), 0, wid / 2); ctx.closePath(); ctx.fill();
     ctx.restore();
   }
   function weaponApi46() {
@@ -2976,6 +2987,20 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   // 独行回收：只用初始武器（不出现副武器卡），每击破 25 只敌人全伤害 +2%，上限 +30%。
   // 减弱闪烁（默认开）：任何元素闪烁 ≤3 次/秒；受击/无敌改为柔和透明+慢速描边。
   function reduceFlash46() { const on = !(typeof save !== "undefined" && save.settings && save.settings.reduceFlash46 === false); globalThis.__reduceFlash46 = on; return on; }
+  const RAR46 = { common: "普通", rare: "稀有", epic: "史诗", legend: "传说", evo: "进化" };
+  function evolvesNext46(u) { const SW = globalThis.SakurayoWeapons; return !!(SW && u.weapon46 && SW.level(P, u.weapon46) === 4 && lv(SW.PAIR[u.weapon46]) > 0); }
+  function rar46(u) { return u.weapon46 && evolvesNext46(u) ? "evo" : u.weapon46 && globalThis.SakurayoWeapons.level(P, u.weapon46) >= 2 ? "epic" : u.r || "common"; }
+  // 进化图鉴：七把副武器的进化条件、本局进度与历史解锁。
+  function openEvoCodex46() {
+    const SW = globalThis.SakurayoWeapons; if (!SW) return null;
+    let n = $("#evoCodex46");
+    if (!n) { n = document.createElement("div"); n.id = "evoCodex46"; n.className = "overlay"; document.body.appendChild(n); n.addEventListener("click", e => { if (e.target === n || e.target.closest("[data-close46]")) n.classList.add("hidden"); }); }
+    const seen = save.evo46 || [];
+    const rows = SW.ORDER.map(id => { const d = SW.DEF[id], pu = U.find(x => x.id === SW.PAIR[id]), w = (P.weapons46 || {})[id], got = seen.includes(id);
+      return `<div class="evoRow46 ${w && w.evo ? "live" : ""}"><img src="${artUrl(`skills/w_${id}.webp`)}" alt=""><div><b>${d.n} <span>→</span> <em>${got || (w && w.evo) ? d.evo : "？？？"}</em></b><small>进化条件：Lv5 +「${pu ? pu.n : SW.PAIR[id]}」</small><small>本局：${w ? `Lv${w.lv}${w.evo ? " · 已进化" : ""}` : "未持有"}${lv(SW.PAIR[id]) > 0 ? " · 搭档已拥有" : ""}</small></div></div>`; }).join("");
+    n.innerHTML = `<div class="modal evoModal46"><h2>进化图鉴</h2><p class="sub">已解锁 ${seen.length}/${SW.ORDER.length} · 副武器最多 4 把，Lv5 + 搭档强化即可进化</p><div class="evoGrid46">${rows}</div><button class="secondary" data-close46>关闭</button></div>`;
+    n.classList.remove("hidden"); return { seen: seen.length, total: SW.ORDER.length };
+  }
   function soloBonus46() { return typeof activeTrial46 !== "undefined" && activeTrial46 === "solo" ? 1 + Math.min(0.3, Math.floor((P.kills || 0) / 25) * 0.02) : 1; }
   function bossBroken46(e) {
     fxStamp("shatter", e.x, e.y, { size: 150, life: 0.6 }); shake = Math.max(shake, 10); sound("phase");
@@ -3664,7 +3689,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     return best;
   }
   // Auto-aim: nearest enemy, but lock onto a boss in range unless trash is already in the player's face.
-  function aimTarget46(range){const near=nearest(P.x,P.y,range);if(!boss||boss.dead||near===boss)return near;const bd=Math.hypot(boss.x-P.x,boss.y-P.y);if(bd>range)return near;if(boss.guard>0){let g=null,gd=range;for(const e of enemies)if(!e.dead&&e.guardFor){const d=Math.hypot(e.x-P.x,e.y-P.y);if(d<gd){gd=d;g=e;}}if(g&&!(near&&Math.hypot(near.x-P.x,near.y-P.y)<70))return g;}if(near&&Math.hypot(near.x-P.x,near.y-P.y)<75)return near;return boss;}
+  function aimTarget46(range){const pick=aimPick46(range),L=P.lock46;if(L&&!L.dead&&pick&&pick!==L){const dl=Math.hypot(L.x-P.x,L.y-P.y),dp=Math.hypot(pick.x-P.x,pick.y-P.y);if(dl<range&&dp>dl*.6&&!(pick.guardFor&&!L.guardFor)&&(P.lockAge46=(P.lockAge46||0))<1.5)return L;}if(pick!==L){P.lock46=pick;P.lockAge46=0;}return pick;}
+  function aimPick46(range){const near=nearest(P.x,P.y,range);if(!boss||boss.dead||near===boss)return near;const bd=Math.hypot(boss.x-P.x,boss.y-P.y);if(bd>range)return near;if(boss.guard>0){let g=null,gd=range;for(const e of enemies)if(!e.dead&&e.guardFor){const d=Math.hypot(e.x-P.x,e.y-P.y);if(d<gd){gd=d;g=e;}}if(g&&!(near&&Math.hypot(near.x-P.x,near.y-P.y)<70))return g;}if(near&&Math.hypot(near.x-P.x,near.y-P.y)<75)return near;return boss;}
   // Assigned once below (directional gun/blade shoot); gunWard/star/idolGun/encore live in gunShot36.
   let shoot;
   function pushBullet(b) {
@@ -3752,7 +3778,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     P.damageSources[opt.source || "shot"] =
       (P.damageSources[opt.source || "shot"] || 0) + damage;
     e.hp -= damage;
-    if (typeof reduceFlash46 !== "function" || !reduceFlash46() || !(e.flashAt46 > (runTime || 0) - 0.34)) { e.hit = 0.1; e.flashAt46 = runTime || 0; }
+    e.hit = 0.1;
     if (e.type === "boss" && globalThis.SakurayoBoss) e.hp = globalThis.SakurayoBoss.gateHp(e, runTime - (e.phaseStarted || 0), e.hp + damage);
     if (e.type === "boss" && globalThis.SakurayoBoss && globalThis.SakurayoBoss.fill(e, globalThis.SakurayoBoss.fromDamage(e, damage) * (opt.source === "ult" ? 2 : 1))) bossBroken46(e);
     if (globalThis.SakurayoFeel && !opt.depth) globalThis.SakurayoFeel.knock(e, P.x, P.y, damage, crit, opt.source);
@@ -4121,6 +4147,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (has("cyber") && ["regen", "steal", "qi"].includes(u.id)) w *= 0.35;
     if (has("transform") && ["dmg", "multi", "pierce"].includes(u.id))
       w *= 0.45;
+    if (u.weapon46 && globalThis.SakurayoWeapons) { if (evolvesNext46(u)) w += 6; else if (globalThis.SakurayoWeapons.level(P, u.weapon46) > 0) w = Math.max(w, 2.2); }
     return Math.max(0.08, w);
   }
   function pickWeighted(arr) {
@@ -4231,7 +4258,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         b.dataset.rec = "1";
       }
       b.style.borderLeft = `5px solid ${special ? u.c : SCHOOL[u.s]?.c || SCHOOL[u.school]?.c || "#ffb2d4"}`;
-      b.innerHTML = `<img src="${iconData(u)}"><div><div class="meta"><span style="color:${special ? u.c : SCHOOL[u.s]?.c || "#fff"}">${school}</span><span class="${u.r}">${u.career?`职业${u.rank}阶`:u.fusion?"唯一融合":u.asc?"唯一飞升":u.r}</span></div><b>${u.n}</b><p>${desc}</p><div class="dots">${special ? "◆ 选择后改变战斗规则" : "●".repeat(Math.min(6, (lv(u.id) || 0) + 1))}</div></div>`;
+      b.innerHTML = `<img src="${iconData(u)}"><div><div class="meta"><span style="color:${special ? u.c : SCHOOL[u.s]?.c || "#fff"}">${school}</span><span class="${rar46(u)}">${u.career?`职业${u.rank}阶`:u.fusion?"唯一融合":u.asc?"唯一飞升":RAR46[rar46(u)]||u.r}</span></div><b>${u.n}${u.weapon46&&evolvesNext46(u)?` → <em class="evoName46">${globalThis.SakurayoWeapons.DEF[u.weapon46].evo}</em>`:""}</b><p>${desc}</p><div class="dots">${special ? "◆ 选择后改变战斗规则" : "●".repeat(Math.min(u.m||6, (lv(u.id) || 0) + 1)) + "○".repeat(Math.max(0, Math.min(6, u.m||6) - (lv(u.id) || 0) - 1))}</div></div>`;
+      b.classList.add("rar46-" + rar46(u));
       const choiceImage = b.querySelector("img"), fallbackIcon = choiceImage.src;
       choiceImage.onerror = () => {
         choiceImage.onerror = null;
@@ -4259,8 +4287,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       `构筑稳定度 <b style="color:${a.rank === "S" || a.rank === "A" ? "#78ffb0" : a.rank === "D" ? "#ff6b85" : "#ffd36b"}">${a.rank} ${a.score}</b> · 职业可进阶至 3 阶，并与其他职业融合`;
     { let xp = P.xp, nx = P.next, more = 0; while (xp >= nx && more < 20) { xp -= nx; nx = Math.floor(nx * 1.24 + 5); more++; }
       let bar = $("#levelBar46");
-      if (!bar) { bar = document.createElement("div"); bar.id = "levelBar46"; bar.innerHTML = '<span></span><button class="secondary" id="pickAll46">一键推荐</button><label><input type="checkbox" id="autoPick46"> 之后自动选推荐（不暂停）</label>'; $("#level .modal").appendChild(bar);
+      if (!bar) { bar = document.createElement("div"); bar.id = "levelBar46"; bar.innerHTML = '<span></span><button class="secondary" id="pickAll46">一键推荐</button><button class="secondary" id="codex46">进化图鉴</button><label><input type="checkbox" id="autoPick46"> 之后自动选推荐（不暂停）</label>'; $("#level .modal").appendChild(bar);
         bar.querySelector("#pickAll46").onclick = () => { let guard = 0; while (state === "level" && guard++ < 25) { const c = [...document.querySelectorAll("#choices .choice")]; (c.find(b => b.dataset.rec === "1") || c[0])?.click(); } };
+        bar.querySelector("#codex46").onclick = () => openEvoCodex46();
         bar.querySelector("#autoPick46").onchange = e => { save.settings = save.settings || {}; save.settings.autoPick46 = e.target.checked; persist(); }; }
       bar.querySelector("span").textContent = more ? `本次共 ${more + 1} 次强化，选完自动接续` : "本次 1 次强化";
       bar.querySelector("#autoPick46").checked = !!save.settings?.autoPick46; }
@@ -4291,7 +4320,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       toast(`获得「${u.n}」`);
     }
     P.upgradeOrder.push(u.id);
-    if (globalThis.SakurayoWeapons) for (const wid of globalThis.SakurayoWeapons.evolve(P, id => lv(id) > 0)) { toast(`武器进化：${globalThis.SakurayoWeapons.DEF[wid].evo}`); sound("ach"); }
+    if (globalThis.SakurayoWeapons) for (const wid of globalThis.SakurayoWeapons.evolve(P, id => lv(id) > 0)) { toast(`武器进化：${globalThis.SakurayoWeapons.DEF[wid].evo}`); sound("ach"); save.evo46 = save.evo46 || []; if (!save.evo46.includes(wid)) { save.evo46.push(wid); persist(); } }
     if(!u.career)upgradeBanter(u);
     updateCareerFormation();
     checkSynergy();
@@ -4728,12 +4757,15 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (state !== "play") return;
     if (P.hitStop46 > 0) { P.hitStop46 -= dt; return; }
     P.ult46 = Math.min(100, (P.ult46 || 0) + dt * 1.4);
+    P.lockAge46 = (P.lockAge46 || 0) + dt;
+    if ((P.animAttack || 0) > 0) P.atkClock46 = (P.atkClock46 || 0) + dt; else P.atkClock46 = 0;
+    P.recoil46 = (P.recoil46 || 0) * Math.exp(-dt * 16); P.flash46 = Math.max(0, (P.flash46 || 0) - dt / 0.11);
     if (globalThis.SakurayoWeapons && P.weapons46) globalThis.SakurayoWeapons.tick(dt, weaponApi46());
     if (typeof sparks46 !== "undefined" && sparks46) { for (const k of sparks46) k.t -= dt; sparks46 = sparks46.filter(k => k.t > 0); }
     if (globalThis.casings46) { for (const c of globalThis.casings46) { c.t -= dt; c.x += c.vx * dt; c.y += c.vy * dt; c.vy += 420 * dt; c.r += dt * 14; } globalThis.casings46 = globalThis.casings46.filter(c => c.t > 0); }
-    if (boss && !boss.dead && globalThis.SakurayoBoss) { const ev = globalThis.SakurayoBoss.tick(boss, dt, runTime - (boss.phaseStarted || 0)); if (ev === "enrage") toast("镜界狂暴：弹幕加密"); if (boss.enraged46 && boss.shot > 0.42) boss.shot = 0.42; }
+    if (boss && !boss.dead && globalThis.SakurayoBoss) { const ev = globalThis.SakurayoBoss.tick(boss, dt, runTime - (boss.phaseStarted || 0)); boss.ot46 = globalThis.SakurayoBoss.overtimeMul(runTime - (boss.born46 ?? runTime)); if (ev === "enrage") toast("镜界狂暴：弹幕加密"); if (boss.enraged46 && boss.shot > 0.42) boss.shot = 0.42; }
     if (typeof paintBossBreak46 === "function") paintBossBreak46();
-    { let tf = P.fx < -.3 ? -1 : P.fx > .3 ? 1 : (P.faceT46 ?? 1); if (tf !== (P.faceT46 ?? tf)) { P.faceHold46 = (P.faceHold46 || 0) + dt; if (P.faceHold46 < (reduceFlash46() ? 0.25 : 0.08)) tf = P.faceT46; else P.faceHold46 = 0; } else P.faceHold46 = 0; P.faceT46 = tf; P.face46 = (P.face46 ?? tf) + (tf - (P.face46 ?? tf)) * Math.min(1, dt * 16); }
+    { const tf = P.fx < -.08 ? -1 : P.fx > .08 ? 1 : (P.face46 ?? 1); P.face46 = (P.face46 ?? tf) + (tf - (P.face46 ?? tf)) * Math.min(1, dt * 16); }
     if (P.trail46) { P.trail46.t -= dt; if (P.trail46.t <= 0) P.trail46 = null; }
     runTime += dt;
     banterTick += dt;
@@ -5059,7 +5091,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
           b.hit.add(e);
           damageEnemy(e,b.dmg,{source:b.source||(b.fireball?"spell":"shot"),school:b.school,rail:!!b.rail,bioSplit:!!b.bioSplit,pet:!!b.pet});
           if (state !== "play") return;
-          if (b.tracer46 && typeof sparks46 !== "undefined" && sparks46.length < (reduceFlash46() ? 14 : 80)) sparks46.push({ x: b.x, y: b.y, a: Math.atan2(b.vy, b.vx), t: 0.14, c: b.tracer46 });
+          if (b.tracer46 && typeof sparks46 !== "undefined" && sparks46.length < 80) sparks46.push({ x: b.x, y: b.y, a: Math.atan2(b.vy, b.vx), t: 0.14, c: b.tracer46 });
           if (globalThis.SakurayoWeapons && globalThis.SakurayoWeapons.onHit(b, e, weaponApi46())) { b.life = 0; break; }
           if (state !== "play") return;
           if(b.kunaiBlast)aoe(e.x,e.y,34+b.kunaiBlast*7,P.dmg*.22*b.kunaiBlast,"#aa91ff",false,{source:"kunai",school:"ninja"});
@@ -5135,6 +5167,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       if (e.dead) continue;
       e.hit = Math.max(0, e.hit - dt);
       e.touch = Math.max(0, e.touch - dt);
+      { const tg = e.hit > 0 ? 1 : 0; e.hitGlow46 = (e.hitGlow46 || 0) + (tg - (e.hitGlow46 || 0)) * Math.min(1, dt * (tg ? 30 : 8)); }
       if (e.type === "boss" && e.broken46 > 0) continue;
       e.frozen = Math.max(0, e.frozen - dt);
       if (e.acid > 0) {
@@ -5408,7 +5441,6 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
   function fxStamp(kind, x, y, opt = {}) {
     if (quality < 0.62 && kind === "hit") return;
-    if (kind === "hit" && typeof reduceFlash46 === "function" && reduceFlash46()) { const now = runTime || 0; if (fxStamp.lastHit46 > now - 0.06 && fxStamp.lastHit46 <= now) return; fxStamp.lastHit46 = now; opt = { ...opt, size: (opt.size || 40) * 0.7 }; }
     partsPush({
       x,
       y,
@@ -5611,7 +5643,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function enemyDraw(e) {
     ctx.save();
     ctx.translate(e.x, e.y);
-    if (e.hit) ctx.globalAlpha = 0.55;
+    ctx.globalAlpha = 1 - 0.45 * (e.hitGlow46 || 0);
     ctx.fillStyle = "#0005";
     ctx.beginPath();
     ctx.ellipse(0, e.r * 0.7, e.r * 1.05, e.r * 0.34, 0, 0, TAU);
@@ -5713,10 +5745,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     ctx.restore();
   }
   function projectile(b, enemy = false) {
-    const nearMe46 = !enemy && reduceFlash46() && Math.hypot(b.x - P.x, b.y - (P.y - 20)) < 70;
+    const nearMe46 = !enemy && Math.hypot(b.x - P.x, b.y - (P.y - 20)) < 70;
     if (!enemy && b.tracer46 && b.px46 != null) {
       const k = 2.6; ctx.save(); ctx.globalCompositeOperation = nearMe46 || reduceFlash46() ? "source-over" : "lighter"; ctx.lineCap = "round";
-      ctx.strokeStyle = b.tracer46; ctx.globalAlpha = nearMe46 ? .15 : reduceFlash46() ? .4 : .55; ctx.lineWidth = b.r * 1.5;
+      ctx.strokeStyle = b.tracer46; ctx.globalAlpha = nearMe46 ? .15 : reduceFlash46() ? .4 : .45; ctx.lineWidth = b.r * 1.5;
       ctx.beginPath(); ctx.moveTo(b.x - (b.x - b.px46) * k, b.y - (b.y - b.py46) * k); ctx.lineTo(b.x, b.y); ctx.stroke(); ctx.restore();
     }
     ctx.save();
@@ -5809,7 +5841,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     bullets.forEach((b) => projectile(b));
     if (globalThis.SakurayoWeapons) globalThis.SakurayoWeapons.draw(ctx, P, runTime || 0);
     if (typeof drawSparks46 === "function") drawSparks46();
-    if (P.muzzle46 && (P.animAttack || 0) > 0 && typeof reduceFlash46 === "function" && reduceFlash46()) { const m = P.muzzle46; ctx.save(); ctx.globalAlpha = .32; const gr = ctx.createRadialGradient(P.x + m.x, P.y + m.y, 0, P.x + m.x, P.y + m.y, 11); gr.addColorStop(0, "#ffe9c4"); gr.addColorStop(1, "#ffb07000"); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(P.x + m.x, P.y + m.y, 11, 0, TAU); ctx.fill(); ctx.restore(); }
+    if (typeof drawMuzzle46 === "function") drawMuzzle46();
     ebullets.forEach((b) => projectile(b, true));
     if (drawStats46) { drawStats46.enemies = 0; drawStats46.boss = 0; drawStats46.frames++; }
     enemies.forEach(enemyDraw);
@@ -5823,6 +5855,13 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     for (const p of parts) {
       ctx.save();
       ctx.globalAlpha = Math.max(0, p.life / p.total);
+      if (p.stamp) {
+        // 特效包络：前 20% 平滑淡入、之后 easeOut 淡出，峰值受限；落在角色身上的特效不使用 screen 高亮。
+        const k = 1 - Math.max(0, p.life / p.total), up = Math.min(1, k / 0.2), env = (up * up * (3 - 2 * up)) * (1 - Math.pow(Math.max(0, (k - 0.2) / 0.8), 2));
+        const onMe = Math.hypot(p.x - P.x, p.y - (P.y - 20)) < 60;
+        ctx.globalAlpha = env * (onMe ? .45 : .8);
+        if (onMe) p.comp = "source-over";
+      }
       ctx.translate(p.x, p.y);
       if (p.stamp) {
         const late = p.total > 0 && p.life / p.total < 0.48;
@@ -6338,30 +6377,32 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function slash35(radius,dmg,big=false){let col=char35().id==="rion"?"#ff526f":"#7db8ff";aoe(P.x,P.y,radius,dmg,col,big,{source:"blade",school:char35().id==="aya"?"ninja":"cult"});P.inv=Math.max(P.inv,big?.16:.07);}
   const _skill35=skill;
   skill=function(){let c=char35();if(c.id==="sayo")return _skill35();if(state!=="play"||P.skill>0)return;P.skill=P.skillCd;if(c.id==="aya"){slash35(150,P.skillD*P.skillPow*1.15,true);P.ayaSlashDelay35=.12;for(let i=0;i<6;i++){let a=i*TAU/6;pushBullet({x:P.x,y:P.y,vx:Math.cos(a)*P.bSpeed,vy:Math.sin(a)*P.bSpeed,r:4,life:1,dmg:P.dmg*.65,pierce:2,source:"shot",school:"gun",hit:new Set()});}}else{P.inv=Math.max(P.inv,.45);slash35(230,P.skillD*P.skillPow*1.85,true);for(const e of grid.within(P.x,P.y,260))e.frozen=Math.max(e.frozen,.55);}sound("skill");};
-  function drawChar35(x,y){let c=char35(),sk=skin35(),m=sk.id==="default"?c.main:sk.c1,h=c.hair,light=c.light,a=Math.atan2(P.fy,P.fx);ctx.save();ctx.translate(x,y);if(P.inv>0)ctx.globalAlpha=reduceFlash46()?.78:(Math.floor(P.inv*6)%2===0?.45:1);ctx.fillStyle="#0006";ctx.beginPath();ctx.ellipse(0,23,25,8,0,0,TAU);ctx.fill();if(P.form||P.fusion){ctx.strokeStyle=m;ctx.lineWidth=2;ctx.globalAlpha=.55;ctx.beginPath();ctx.arc(0,0,31+Math.sin(runTime*4)*3,0,TAU);ctx.stroke();ctx.globalAlpha=1;}ctx.fillStyle=h;ctx.beginPath();ctx.ellipse(0,-4,21,27,0,0,TAU);ctx.fill();if(c.id==="sayo"){for(const s of [-1,1]){ctx.beginPath();ctx.moveTo(s*15,-7);ctx.quadraticCurveTo(s*35,5,s*20,31);ctx.quadraticCurveTo(s*7,20,s*8,0);ctx.fill();}}else if(c.id==="aya"){ctx.beginPath();ctx.ellipse(-20,-2,10,30,-.35,0,TAU);ctx.fill();}else{ctx.beginPath();ctx.moveTo(-17,-4);ctx.quadraticCurveTo(-28,20,-13,35);ctx.lineTo(0,15);ctx.lineTo(14,35);ctx.quadraticCurveTo(29,18,17,-5);ctx.fill();}ctx.fillStyle=m;ctx.beginPath();ctx.moveTo(-14,9);ctx.lineTo(14,9);ctx.lineTo(18,29);ctx.lineTo(-18,29);ctx.fill();ctx.fillStyle=light;ctx.fillRect(-11,10,22,5);ctx.fillStyle="#ffe1d5";ctx.beginPath();ctx.arc(0,-8,14,0,TAU);ctx.fill();ctx.fillStyle=h;ctx.beginPath();ctx.arc(0,-12,14,Math.PI,TAU);ctx.fill();ctx.beginPath();ctx.moveTo(-13,-11);ctx.lineTo(-5,0);ctx.lineTo(0,-17);ctx.lineTo(5,-1);ctx.lineTo(13,-11);ctx.fill();ctx.fillStyle=c.id==="rion"?"#b92849":"#6c347c";ctx.beginPath();ctx.ellipse(-5,-7,2.1,3,0,0,TAU);ctx.ellipse(5,-7,2.1,3,0,0,TAU);ctx.fill();ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(-4.3,-8,.8,0,TAU);ctx.arc(5.7,-8,.8,0,TAU);ctx.fill();ctx.rotate(a);if(c.id==="sayo"){ctx.fillStyle="#e8f8ff";ctx.fillRect(10,-3,25,7);ctx.fillStyle="#5be1ff";ctx.fillRect(28,-2,13,5);}else if(c.id==="aya"){ctx.fillStyle="#eef8ff";ctx.fillRect(10,-3,18,6);ctx.strokeStyle="#a6c8ff";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-8,13);ctx.lineTo(33,-25);ctx.stroke();}else{ctx.strokeStyle="#fff5f6";ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(-8,14);ctx.lineTo(38,-27);ctx.stroke();ctx.strokeStyle="#ff526f";ctx.lineWidth=2;ctx.stroke();}ctx.restore();}
+  function drawChar35(x,y){let c=char35(),sk=skin35(),m=sk.id==="default"?c.main:sk.c1,h=c.hair,light=c.light,a=Math.atan2(P.fy,P.fx);ctx.save();ctx.translate(x,y);if(P.inv>0)ctx.globalAlpha=reduceFlash46()?.78:(.72+Math.sin((runTime||0)*TAU*1.5)*.2);ctx.fillStyle="#0006";ctx.beginPath();ctx.ellipse(0,23,25,8,0,0,TAU);ctx.fill();if(P.form||P.fusion){ctx.strokeStyle=m;ctx.lineWidth=2;ctx.globalAlpha=.55;ctx.beginPath();ctx.arc(0,0,31+Math.sin(runTime*4)*3,0,TAU);ctx.stroke();ctx.globalAlpha=1;}ctx.fillStyle=h;ctx.beginPath();ctx.ellipse(0,-4,21,27,0,0,TAU);ctx.fill();if(c.id==="sayo"){for(const s of [-1,1]){ctx.beginPath();ctx.moveTo(s*15,-7);ctx.quadraticCurveTo(s*35,5,s*20,31);ctx.quadraticCurveTo(s*7,20,s*8,0);ctx.fill();}}else if(c.id==="aya"){ctx.beginPath();ctx.ellipse(-20,-2,10,30,-.35,0,TAU);ctx.fill();}else{ctx.beginPath();ctx.moveTo(-17,-4);ctx.quadraticCurveTo(-28,20,-13,35);ctx.lineTo(0,15);ctx.lineTo(14,35);ctx.quadraticCurveTo(29,18,17,-5);ctx.fill();}ctx.fillStyle=m;ctx.beginPath();ctx.moveTo(-14,9);ctx.lineTo(14,9);ctx.lineTo(18,29);ctx.lineTo(-18,29);ctx.fill();ctx.fillStyle=light;ctx.fillRect(-11,10,22,5);ctx.fillStyle="#ffe1d5";ctx.beginPath();ctx.arc(0,-8,14,0,TAU);ctx.fill();ctx.fillStyle=h;ctx.beginPath();ctx.arc(0,-12,14,Math.PI,TAU);ctx.fill();ctx.beginPath();ctx.moveTo(-13,-11);ctx.lineTo(-5,0);ctx.lineTo(0,-17);ctx.lineTo(5,-1);ctx.lineTo(13,-11);ctx.fill();ctx.fillStyle=c.id==="rion"?"#b92849":"#6c347c";ctx.beginPath();ctx.ellipse(-5,-7,2.1,3,0,0,TAU);ctx.ellipse(5,-7,2.1,3,0,0,TAU);ctx.fill();ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(-4.3,-8,.8,0,TAU);ctx.arc(5.7,-8,.8,0,TAU);ctx.fill();ctx.rotate(a);if(c.id==="sayo"){ctx.fillStyle="#e8f8ff";ctx.fillRect(10,-3,25,7);ctx.fillStyle="#5be1ff";ctx.fillRect(28,-2,13,5);}else if(c.id==="aya"){ctx.fillStyle="#eef8ff";ctx.fillRect(10,-3,18,6);ctx.strokeStyle="#a6c8ff";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-8,13);ctx.lineTo(33,-25);ctx.stroke();}else{ctx.strokeStyle="#fff5f6";ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(-8,14);ctx.lineTo(38,-27);ctx.stroke();ctx.strokeStyle="#ff526f";ctx.lineWidth=2;ctx.stroke();}ctx.restore();}
   hero=drawChar35;
   const _vectorDrawChar35=drawChar35;
   function charPose35(){return P.animHit>0?"hit":P.animDash>0?"dash":P.animSkill>0?"skill":P.animAttack>0?"attack":P.animMoving?"move":"idle";}
+  // 攻击动画按自身节奏（ATK_FPS46）循环全部帧，不随每发子弹重置；帧间做短交叉淡入。
+  var ATK_FPS46=12,ATK_FRAMES46=["attack","attack_ab","attack_b","attack_bc","attack_c","attack_ca"];/* _ab/_bc/_ca：RIFE v4.25 补出的中间帧 */
   function charDrawPose35(){
     const pose=charPose35(),t=runTime||0,extraOk=(skin35().id||"default")==="default"&&!liveOutfitLayer35();
     if(!extraOk)return pose;
     if(pose==="idle"){const n=Math.floor(t/.32)%3;return n===1?"idle_b":n===2?"idle_c":"idle";}
     if(pose==="move")return (Math.floor(t/.16)%2)?"move_b":"move";
-    if(pose==="attack"){if(reduceFlash46())return "attack";const a=P.animAttack||0;return a>.1?"attack":a>.05?"attack_b":"attack_c";}
+    if(pose==="attack")return ATK_FRAMES46[Math.floor((P.atkClock46||0)*ATK_FPS46)%ATK_FRAMES46.length];
     if(pose==="skill")return (P.animSkill||0)>.2?"skill":"skill_b";
     if(pose==="dash")return (P.animDash||0)>.16?"dash":"dash_b";
     if(pose==="hit")return (P.animHit||0)>.12?"hit":"hit_b";
     return pose;
   }
   function charAnimImage35(c,pose,sk){
-    const extra={idle_b:1,idle_c:1,move_b:1,attack_b:1,attack_c:1,skill_b:1,dash_b:1,hit_b:1};
+    const extra={idle_b:1,idle_c:1,move_b:1,attack_b:1,attack_c:1,attack_ab:1,attack_bc:1,attack_ca:1,skill_b:1,dash_b:1,hit_b:1};
     const order=[];
     const add=p=>{if(p&&!order.includes(p))order.push(p);};
     add(pose);
     if(pose==="idle_c")add("idle_b");
     if(pose==="idle_b"||pose==="idle_c")add("idle");
     if(pose==="move_b")add("move");
-    if(pose==="attack_c")add("attack_b");
+    if(/^attack_(ab|bc|ca)$/.test(pose))add({attack_ab:"attack_b",attack_bc:"attack_c",attack_ca:"attack"}[pose]);if(pose==="attack_c")add("attack_b");
     if(pose==="attack_b"||pose==="attack_c")add("attack");
     if(pose==="skill"||pose==="skill_b"){add("skill");add("attack");}
     if(pose==="dash"||pose==="dash_b"){add("dash");add("move");}
@@ -6382,16 +6423,17 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     return null;
   }
   drawChar35=function(x,y){
-    const c=char35(),sk=skin35(),image=charAnimImage35(c,charDrawPose35(),sk);
+    const c=char35(),sk=skin35(),pose46=charDrawPose35(),image=charAnimImage35(c,pose46,sk);
+    if(!P.poseLog46)P.poseLog46=[];P.poseLog46.push(pose46);if(P.poseLog46.length>240)P.poseLog46.shift();
     if(!artReady(image)){
       const inv=P.inv,form=P.form,fusion=P.fusion;
       P.inv=0;P.form=null;P.fusion=null;
       try{return _vectorDrawChar35(x,y);}finally{P.inv=inv;P.form=form;P.fusion=fusion;}
     }
     ctx.save();ctx.translate(x,y);
-    ctx.globalAlpha=P.inv>0?(reduceFlash46()?.78:(Math.floor(P.inv*6)%2===0?.45:1)):1;
+    ctx.globalAlpha=P.inv>0?(reduceFlash46()?.78:(.72+Math.sin((runTime||0)*TAU*1.5)*.2)):1;
     if(P.inv>0&&reduceFlash46()){ctx.save();ctx.globalAlpha=.3;ctx.strokeStyle="#bfe8ff";ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,-20,30,42,0,0,TAU);ctx.stroke();ctx.restore();}
-    { const f=P.face46??(P.fx<-.08?-1:1), sp=Math.hypot(P.vel46?.x||0,P.vel46?.y||0); ctx.rotate((P.vel46?.x||0)*.07); ctx.translate(0,-Math.abs(Math.sin((runTime||0)*13))*2.2*sp); ctx.scale(Math.sign(f||1)*Math.max(.18,Math.abs(f)),1); }
+    { const f=P.face46??(P.fx<-.08?-1:1), sp=Math.hypot(P.vel46?.x||0,P.vel46?.y||0); ctx.rotate((P.vel46?.x||0)*.07); ctx.translate(0,-Math.abs(Math.sin((runTime||0)*13))*2.2*sp); { const rc=P.recoil46||0, wa=P.weaponAngle||0; ctx.translate(-Math.cos(wa)*3.5*rc,-Math.sin(wa)*2*rc); ctx.scale(1-.035*rc,1+.025*rc); } ctx.scale(Math.sign(f||1)*Math.max(.18,Math.abs(f)),1); }
     ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";
     const vis=PLAYER_GEOMETRY35.visualSize*(window.SakurayoLifecycle?window.SakurayoLifecycle.heroVisualScale(W):1),ox=vis/2,oy=vis-PLAYER_GEOMETRY35.footOffset;
     if((P.animDash||0)>0){const a=ctx.globalAlpha;ctx.globalAlpha=a*.32;ctx.drawImage(image,-ox-12,-oy,vis,vis);ctx.globalAlpha=a;}
@@ -6407,6 +6449,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       }
     }
     ctx.drawImage(image,-ox,-oy,vis,vis);
+    { const ai=ATK_FRAMES46.indexOf(pose46); if(ai>=0){ const ph=((P.atkClock46||0)*ATK_FPS46)%1; if(ph>.6){ const nx=charAnimImage35(c,ATK_FRAMES46[(ai+1)%ATK_FRAMES46.length],sk); if(nx&&artReady(nx)&&nx!==image){ const a0=ctx.globalAlpha; ctx.globalAlpha=a0*((ph-.6)/.4); ctx.drawImage(nx,-ox,-oy,vis,vis); ctx.globalAlpha=a0; } } } }
     if((P.outfitFade||0)>0){
       const q=clamp((P.outfitFade||0)/.42,0,1);
       ctx.save();ctx.globalCompositeOperation="screen";ctx.globalAlpha=q*.5;
@@ -6504,13 +6547,13 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   slash35=function(radius,dmg,big=false){return directionalSlash36(radius,dmg,big);};
 
   function casing46(x,y,a){if(!globalThis.casings46)globalThis.casings46=[];const C=globalThis.casings46;if(C.length>60)C.shift();const b=a+Math.PI/2*(Math.random()<.5?1:-1)*.8+Math.PI;C.push({x,y,vx:Math.cos(b)*rnd(60,120),vy:Math.sin(b)*rnd(60,120)-90,t:.55,r:rnd(0,TAU)});}
-  function gunShot36(angle,c){const origin=playerMuzzle35(angle);if(c.id==="aya"){P.hand46=-(P.hand46||1);origin.x+=Math.cos(angle+1.57)*6*P.hand46;origin.y+=Math.sin(angle+1.57)*6*P.hand46;}if(!reduceFlash46()&&!((P.muzzleAt46||-9)>(runTime||0)-.34)&&(P.muzzleAt46=runTime||0,1))fxStamp("muzzle",origin.x,origin.y,{size:c.id==="sayo"?34:28,life:.14,rot:angle});else P.muzzle46={x:origin.x-P.x,y:origin.y-P.y,a:angle};P.fx=P.aimX=Math.cos(angle);P.fy=P.aimY=Math.sin(angle);P.weaponAngle=angle;P.weaponLock=.22;const K46=c.id==="sayo"?.4:.5,full=(P.shotAcc46=(P.shotAcc46||0)+K46)>=1;if(full){P.shotAcc46-=1;P.shotCount++;}const rail=P.rail&&full&&P.shotCount%9===0,count=P.multi,spread=.115;for(let i=0;i<count;i++){const q=angle+(i-(count-1)/2)*spread;pushBullet({x:origin.x,y:origin.y,vx:Math.cos(q)*P.bSpeed*1.5,vy:Math.sin(q)*P.bSpeed*1.5,r:rail?7:3.5,life:P.range/(P.bSpeed*1.5),dmg:P.dmg*(rail?2.6:K46),tracer46:c.id==="sayo"?"#ffb3d6":"#b8d6ff",pierce:P.pierce+(rail?6:0),rail,source:rail?"tech":"shot",school:rail?"mech":"gun",bioSplit:!!P.bioGun,hit:new Set(),acid:P.acid});}
+  function gunShot36(angle,c){const origin=playerMuzzle35(angle);if(c.id==="aya"){P.hand46=-(P.hand46||1);origin.x+=Math.cos(angle+1.57)*6*P.hand46;origin.y+=Math.sin(angle+1.57)*6*P.hand46;}P.muzzle46={x:origin.x-P.x,y:origin.y-P.y,a:angle,j:Math.random()};P.flash46=1;P.recoil46=1;P.fx=P.aimX=Math.cos(angle);P.fy=P.aimY=Math.sin(angle);P.weaponAngle=angle;P.weaponLock=.22;const K46=c.id==="sayo"?.4:.5,full=(P.shotAcc46=(P.shotAcc46||0)+K46)>=1;if(full){P.shotAcc46-=1;P.shotCount++;}const rail=P.rail&&full&&P.shotCount%9===0,count=P.multi,spread=.115;for(let i=0;i<count;i++){const q=angle+(i-(count-1)/2)*spread;pushBullet({x:origin.x,y:origin.y,vx:Math.cos(q)*P.bSpeed*1.5,vy:Math.sin(q)*P.bSpeed*1.5,r:rail?7:3.5,life:P.range/(P.bSpeed*1.5),dmg:P.dmg*(rail?2.6:K46),tracer46:c.id==="sayo"?"#ffb3d6":"#b8d6ff",pierce:P.pierce+(rail?6:0),rail,source:rail?"tech":"shot",school:rail?"mech":"gun",bioSplit:!!P.bioGun,hit:new Set(),acid:P.acid});}
     if(P.gunWard&&full&&P.shotCount%10===0)pushBullet({x:origin.x,y:origin.y,vx:Math.cos(angle)*P.bSpeed*.88,vy:Math.sin(angle)*P.bSpeed*.88,r:10,life:1.35,dmg:P.dmg*1.45*P.skillPow,pierce:8,home:.025,source:"skill",school:"shrine",wardShot:1,hit:new Set()});
     if(P.star&&full&&P.shotCount%Math.max(3,7-P.star)===0)for(let i=0;i<P.star;i++){const q=angle+rnd(-.45,.45);pushBullet({x:origin.x,y:origin.y,vx:Math.cos(q)*P.bSpeed*.72,vy:Math.sin(q)*P.bSpeed*.72,r:5,life:1.45,dmg:P.dmg*.72*P.spellPow,pierce:1,home:.09,star:1,source:"star",school:"magical",hit:new Set()});}
     if(P.idolGun&&P.combo>0&&full&&P.shotCount%6===0)for(let i=0;i<3;i++){const q=angle+(i-1)*.18;pushBullet({x:origin.x,y:origin.y,vx:Math.cos(q)*P.bSpeed,vy:Math.sin(q)*P.bSpeed,r:4,life:P.range/P.bSpeed,dmg:P.dmg*.46,pierce:1,source:"music",school:"idol",hit:new Set()});}
     if(c.id==="sayo"&&full&&P.shotCount%7===0)pushBullet({x:origin.x,y:origin.y,vx:Math.cos(angle)*P.bSpeed*1.12,vy:Math.sin(angle)*P.bSpeed*1.12,r:7,life:P.range/P.bSpeed,dmg:P.dmg*1.7,pierce:P.pierce+4,rail:1,source:"tech",school:"gun",hit:new Set()});
     if(c.id==="aya"&&full&&P.shotCount%4===0){if(nearest(P.x,P.y,140))directionalSlash36(125,P.dmg*2.05+P.pierce*2,false,angle,1.02);else pushBullet({x:origin.x,y:origin.y,vx:Math.cos(angle)*P.bSpeed*.8,vy:Math.sin(angle)*P.bSpeed*.8,r:13,life:P.range*.6/(P.bSpeed*.8),dmg:P.dmg*1.6+P.pierce*2,pierce:P.pierce+3,source:"blade",school:"ninja",crescent46:1,hit:new Set()});}
-    P.fire=P.rate*K46*(P.encoreTimer>0?.62:1);casing46(origin.x,origin.y,angle);P.animAttack=reduceFlash46()?Math.max(.16,P.fire+.08):.16;sound(c.id==="sayo"?"rifle":"pistol");
+    P.fire=P.rate*K46*(P.encoreTimer>0?.62:1);casing46(origin.x,origin.y,angle);P.animAttack=Math.max(.16,P.fire+.08);sound(c.id==="sayo"?"rifle":"pistol");
   }
   shoot=function(){const c=char35(),target=P.manualAim?null:aimTarget46(P.range);let angle=P.manualAim?(P.weaponAngle||0):(target?Math.atan2(target.y-P.y,target.x-P.x):null);if(c.id!=="rion"){if(angle==null)return;return gunShot36(angle,c);}if(angle==null){const e=nearest(P.x,P.y,176+55);if(!e)return;angle=Math.atan2(e.y-P.y,e.x-P.x);}P.fx=P.aimX=Math.cos(angle);P.fy=P.aimY=Math.sin(angle);P.weaponAngle=angle;P.weaponLock=.28;const next=(P.meleeChain+1)%3,third=next===0,radius=third?176:128,dmg=P.dmg*(third?2.2:1.38)*(1+(P.multi-1)*.12+P.pierce*.05);P.meleeChain=next;directionalSlash36(radius,dmg,third,angle,third?1.66:1.05);if(third){P.hp=Math.min(P.maxHp,P.hp+1.2*healingMul());toast("剑势·三段");}P.fire=P.rate;P.animAttack=.2;sound("slash");};
 
@@ -6539,7 +6582,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 
   function applyMainGodRun36(){P.aimX=P.fx;P.aimY=P.fy;P.weaponAngle=Math.atan2(P.fy,P.fx);P.manualAim=false;P.weaponLock=0;P.moveX=P.moveY=0;P.banterSeen.add("lowhp");P.banterSeen.add("combo80");P.banterSeen.add("rankD");P.eggPrevKills=0;P.eggPrevBossPhase=0;P.eggFusion=null;P.eggForm=null;if(isMainGodRun36()){const m=save.mainGod,t=mainGodTier36();P.lordMode=1;P.dmg*=1.15*(1+m.power*.06)*(1+m.gunBlade*.05);P.maxHp*=1+m.vitality*.08+m.regenBlood*.06;P.hp=P.maxHp;P.regen+=m.regenBlood*.35;P.maxSh+=28+m.psiLink*22;P.sh=P.maxSh;P.skillPow*=1+m.psiLink*.08+m.mageCircuit*.1;P.spellPow*=1+m.mageCircuit*.1;P.rate/=(1.12+m.tempo*.04);P.skillCd*=.88*(1-m.tempo*.04);P.dashCd*=.9*(1-m.tempo*.04);P.bSpeed*=1+m.gunBlade*.05;P.bladePower*=1+m.gunBlade*.05;P.multi=Math.max(P.multi,2)+(m.spaceRing?1:0);P.pierce+=1+(m.spaceRing?1:0);P.next=Math.max(5,Math.floor(P.next*.68));P.lordXp=t.xp*(1+m.resonance*.12);P.mag*=m.spaceRing?2.1:1.55;P.revive=Math.max(P.revive,m.rebirthDoll?1:0);if(m.summonPage){P.familiar+=1;P.petPow*=1+m.summonPage*.15;syncPets();}levelRerolls+=2+m.fortune;}}
   function applyLevelGain36(){if(isMainGodRun36()){P.dmg*=1.025;P.hp=Math.min(P.maxHp,P.hp+P.maxHp*.08);if(P.level%3===0)P.pierce=Math.min(12,P.pierce+1);if(P.level%5===0)P.multi=Math.min(7,P.multi+1);toast(`主神灌注 · Lv.${P.level}`);}}
-  const _update36=update;update=function(dt){const result=_update36(dt);if(state==="play"){if(!P.manualAim){const target=nearest(P.x,P.y,P.range);if(target)setAimVector36(target.x-P.x,target.y-P.y,false);else if(P.moveX||P.moveY)setAimVector36(P.moveX,P.moveY,false);}if(isMainGodRun36()){if($("#mission"))$("#mission").textContent=`轮回 T${selectedMainGodTier36} · ${mainGodTier36().xp.toFixed(1)}×`;if(runTime>.3)triggerEgg36("entry");}if(P.kills>0)triggerEgg36("firstKill",false);if(P.hp/P.maxHp<.23)triggerEgg36("lowhp");if(P.combo>=80)triggerEgg36("combo",false);if(P.plan?.rank==="D")triggerEgg36("rankD");if(boss?.phase===4)triggerEgg36("boss4");if(P.fusion&&P.fusion!==P.eggFusion){P.eggFusion=P.fusion;triggerEgg36("fusion");}if(P.form&&P.form!==P.eggForm){P.eggForm=P.form;triggerEgg36("asc");}}return result;};
+  const _update36=update;update=function(dt){const result=_update36(dt);if(state==="play"){if(!P.manualAim){const target=aimTarget46(P.range);if(target)setAimVector36(target.x-P.x,target.y-P.y,false);else if(P.moveX||P.moveY)setAimVector36(P.moveX,P.moveY,false);}if(isMainGodRun36()){if($("#mission"))$("#mission").textContent=`轮回 T${selectedMainGodTier36} · ${mainGodTier36().xp.toFixed(1)}×`;if(runTime>.3)triggerEgg36("entry");}if(P.kills>0)triggerEgg36("firstKill",false);if(P.hp/P.maxHp<.23)triggerEgg36("lowhp");if(P.combo>=80)triggerEgg36("combo",false);if(P.plan?.rank==="D")triggerEgg36("rankD");if(boss?.phase===4)triggerEgg36("boss4");if(P.fusion&&P.fusion!==P.eggFusion){P.eggFusion=P.fusion;triggerEgg36("fusion");}if(P.form&&P.form!==P.eggForm){P.eggForm=P.form;triggerEgg36("asc");}}return result;};
 
   function renderMainGodEvent36(){const idx=eventIndex++;hideTransient();state="event";$("#hud").classList.add("hidden");$("#event").classList.remove("hidden");const data=idx===0?{t:"主神契约 · 第一次结算",x:"光球允许你在安全和收益之间选择。它强调：自愿只代表你按下过按钮。",o:[["修复轮回体","生命与护盾回满",()=>{P.hp=P.maxHp;P.sh=P.maxSh;}],["签署高危条款","全伤害 +25%，受到伤害 +18%",()=>{P.dmg*=1.25;P.lordRisk=1.18;}]]}:{t:"主神契约 · 预测删除",x:"监管层开始用上一轮死亡数据预测你的构筑。你只能删除一部分未来。",o:[["灌注战斗经验","伤害 +10%，立即获得两级强度",()=>{P.dmg*=1.1;P.maxHp+=12;P.hp+=12;}],["删除 Boss 适应","Boss 抗性穿透 +18%，失去一次重抽",()=>{P.bossPierce+=.18;levelRerolls=Math.max(0,levelRerolls-1);}]]};$("#eventTitle").textContent=data.t;$("#eventText").textContent=data.x;const box=$("#eventChoices");box.innerHTML="";for(const [name,desc,effect] of data.o){const b=document.createElement("button");b.className="eventChoice";b.innerHTML=`<b>${name}</b><p>${desc}</p>`;b.onclick=()=>{effect();refreshPlan();$("#event").classList.add("hidden");$("#hud").classList.remove("hidden");state="play";toast(`主神契约：${name}`);showBanter([["主神",`选择已记录：${name}。代价不会退款。`],[char35().short,"你们连退款条款都省了？"]],true);last=performance.now();scheduleLoop();};box.appendChild(b);}}
   const _midEvent36=midEvent;midEvent=function(){if(isMainGodRun36())return renderMainGodEvent36();return _midEvent36();};
@@ -6682,7 +6725,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function combatArtPath38(e){if(e.type==="boss"){if(isMainGodRun36())return `content-packs/maingod-void/bosses/void_phase${clamp(e.phase||1,1,4)}.webp`;return `bosses/stage${clamp(stage().id,1,4)}_phase${clamp(e.phase||1,1,4)}.webp`;}if(VOID_ART45.includes(e.type))return `content-packs/maingod-void/enemies/${e.type}.webp`;return `enemies/${e.elite?"elite":ENEMY_ART38.includes(e.type)?e.type:"normal"}.webp`;}
   function drawEnemyOverlay38(e){if(e.elite){ctx.strokeStyle="#ffd36b";ctx.lineWidth=3;ctx.shadowBlur=10*battleGlow421(false);ctx.shadowColor="#ffb24e";ctx.beginPath();ctx.arc(0,0,e.r+7,0,TAU);ctx.stroke();ctx.shadowBlur=0;}if(e.infected>0){ctx.strokeStyle="#8dff72";ctx.lineWidth=2;ctx.beginPath();ctx.arc(0,0,e.r+4,0,TAU);ctx.stroke();}const marks={shield:"盾",disruptor:"扰",purifier:"净",specter:"灵",decay:"腐",seal:"封"};if(marks[e.type]){ctx.font=`900 ${Math.max(10,e.r*.55)}px system-ui`;ctx.textAlign="center";ctx.strokeStyle="#130a22";ctx.lineWidth=4;ctx.fillStyle="#fff";ctx.strokeText(marks[e.type],0,-e.r-15);ctx.fillText(marks[e.type],0,-e.r-15);}if(e.hp<e.max||e.type==="boss"){const width=e.r*2.25,ratio=clamp(e.hp/Math.max(1,e.max),0,1);ctx.fillStyle="#07050bcc";ctx.fillRect(-width/2,-e.r-10,width,5);ctx.fillStyle=e.type==="boss"?"#ff57ad":e.elite?"#ffd36b":"#69e89a";ctx.fillRect(-width/2,-e.r-10,width*ratio,5);}}
   const _enemyFallback38=enemyDraw;
-  enemyDraw=function(e){const crowd=enemies.length,screenScale=clamp(Math.sqrt(Math.max(1,W*H)/(430*932)),.82,1),crowdScale=e.type==="boss"?1:crowd>74?.66:crowd>56?.78:1,margin=e.type==="boss"?150:85;if(window.SakurayoCamera?!window.SakurayoCamera.contains(e.x,e.y,margin):(e.x<-margin||e.x>W+margin||e.y<-margin||e.y>H+margin))return;if(drawStats46){drawStats46.enemies++;if(e.type==="boss")drawStats46.boss++;}const path=combatArtPath38(e);let image=path?artImage(path):null;if(e.type!=="boss"){if(VOID_ART45.includes(e.type)){const extra=artImage(`content-packs/maingod-void/enemies/${e.type}_b.webp`);if(artReady(extra)&&(Math.floor((runTime||0)*5+(e.x||0)*.02)%2))image=extra;}else{const id=e.elite?"elite":ENEMY_ART38.includes(e.type)?e.type:"normal";if(ENEMY_EXTRA38[id]){const extra=artImage(`enemies/${id}_b.webp`);if(artReady(extra)&&(Math.floor((runTime||0)*5+(e.x||0)*.02)%2))image=extra;}}}if(!artReady(image)){_enemyFallback38(e);return;}ctx.save();ctx.translate(e.x,e.y);if(e.hit)ctx.globalAlpha=.62;ctx.fillStyle="#0007";ctx.beginPath();ctx.ellipse(0,e.r*.78,e.r*1.12,e.r*.35,0,0,TAU);ctx.fill();const size=(e.type==="boss"?e.r*3.35:e.r*(e.type==="tank"?3.7:3.45))*screenScale*crowdScale,bob=e.type==="fast"?Math.sin(runTime*12)*2:Math.sin(runTime*4+e.x*.01)*1.2;drawEnemySilhouette412(e,size);drawBossSprite412(e,image,size,bob);if(e.hit>0&&quality>=.5){ctx.save();ctx.globalCompositeOperation="lighter";ctx.globalAlpha=Math.min(.75,e.hit*7);drawBossSprite412(e,image,size,bob);ctx.restore();}drawEnemyOverlay38(e);ctx.restore();};
+  enemyDraw=function(e){const crowd=enemies.length,screenScale=clamp(Math.sqrt(Math.max(1,W*H)/(430*932)),.82,1),crowdScale=e.type==="boss"?1:crowd>74?.66:crowd>56?.78:1,margin=e.type==="boss"?150:85;if(window.SakurayoCamera?!window.SakurayoCamera.contains(e.x,e.y,margin):(e.x<-margin||e.x>W+margin||e.y<-margin||e.y>H+margin))return;if(drawStats46){drawStats46.enemies++;if(e.type==="boss")drawStats46.boss++;}const path=combatArtPath38(e);let image=path?artImage(path):null;if(e.type!=="boss"){if(VOID_ART45.includes(e.type)){const extra=artImage(`content-packs/maingod-void/enemies/${e.type}_b.webp`);if(artReady(extra)&&(Math.floor((runTime||0)*5+(e.x||0)*.02)%2))image=extra;}else{const id=e.elite?"elite":ENEMY_ART38.includes(e.type)?e.type:"normal";if(ENEMY_EXTRA38[id]){const extra=artImage(`enemies/${id}_b.webp`);if(artReady(extra)&&(Math.floor((runTime||0)*5+(e.x||0)*.02)%2))image=extra;}}}if(!artReady(image)){_enemyFallback38(e);return;}ctx.save();ctx.translate(e.x,e.y);ctx.globalAlpha=1-.38*(e.hitGlow46||0);ctx.fillStyle="#0007";ctx.beginPath();ctx.ellipse(0,e.r*.78,e.r*1.12,e.r*.35,0,0,TAU);ctx.fill();const size=(e.type==="boss"?e.r*3.35:e.r*(e.type==="tank"?3.7:3.45))*screenScale*crowdScale,bob=e.type==="fast"?Math.sin(runTime*12)*2:Math.sin(runTime*4+e.x*.01)*1.2;drawEnemySilhouette412(e,size);drawBossSprite412(e,image,size,bob);if(e.hit>0&&quality>=.5){ctx.save();ctx.globalCompositeOperation="lighter";ctx.globalAlpha=Math.min(.75,e.hit*7);drawBossSprite412(e,image,size,bob);ctx.restore();}drawEnemyOverlay38(e);ctx.restore();};
   window.__SAKURAYO_COMBAT_ART__=Object.freeze({paths:()=>[...COMBAT_ART38],status:()=>COMBAT_ART38.map(path=>{const image=ART_CACHE.get(path);return {path,loaded:!!image,ready:artReady(image),width:image?.naturalWidth||0,height:image?.naturalHeight||0};})});
 
   function upgradeDelta38(id){const l=lv(id),map={damage:["伤害",`${Math.round(P.dmg)}`,`${Math.round(P.dmg*1.12)}`],rate:["射速",`${(1/P.rate).toFixed(1)}/秒`,`${(1/(P.rate*.9)).toFixed(1)}/秒`],hp:["生命",`${Math.round(P.maxHp)}`,`${Math.round(P.maxHp+18)}`],speed:["移速",`${Math.round(P.spd)}`,`${Math.round(P.spd*1.08)}`],crit:["暴击",`${Math.round(P.crit*100)}%`,`${Math.round((P.crit+.06)*100)}%`],pierce:["穿透",`${P.pierce}`,`${P.pierce+1}`],multishot:["弹丸",`${P.multi}`,`${P.multi+1}`]};const key=Object.keys(map).find(k=>id.toLowerCase().includes(k));return key?map[key]:["技能等级",`Lv.${l}`,`Lv.${l+1}`];}
@@ -7357,6 +7400,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       setInv46(t=3){P.inv=t;return P.inv;},
       setReduceFlash46(on){save.settings.reduceFlash46=!!on;return reduceFlash46();},
       playerScreen46(){const c=window.SakurayoCamera;const p=c&&c.worldToScreen?c.worldToScreen(P.x,P.y):{x:P.x,y:P.y};return {x:p.x,y:p.y};},
+      openEvoCodex46(){return openEvoCodex46();},
+      takeUpgrade46(id){const u=U.find(x=>x.id===id);if(!u)throw new Error("no upgrade "+id);state="level";chooseUpgrade(u);return {lv:lv(id),weapons:P.weapons46,evo:save.evo46};},
+      cardHtml46(){return [...document.querySelectorAll("#choices .choice")].map(b=>({id:b.dataset.upgradeId,cls:b.className,text:b.textContent}));},
+      poseLog46(){return (P.poseLog46||[]).slice();},
       teleport46(x,y){P.x=x;P.y=y;return snapshot35();},
       realtime46(){manualTestClock=false;last=performance.now();scheduleLoop();return true;},
       props46(){return (props46||[]).map(p=>({kind:p.kind,x:p.x,y:p.y,done:p.done}));},
