@@ -2621,7 +2621,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
    (more bullets, no extra damage) so fights cannot drag. Pure logic, no DOM. */
 (function (global) {
   "use strict";
-  var BREAK_TIME = 4.5, BREAK_MUL = 1.6, DAMAGE_SHARE = 0.11, ENRAGE_AFTER = 20, HP_SCALE = 0.88, HP_PER_PICK = 0.02, MIN_PHASE = 9, OVERTIME_AFTER = 36, OVERTIME_RATE = 0.25;
+  var BREAK_TIME = 4.5, BREAK_MUL = 1.6, DAMAGE_SHARE = 0.11, ENRAGE_AFTER = 20, HP_SCALE = 0.88, HP_PER_PICK = 0.02, MIN_PHASE = 13.5, OVERTIME_AFTER = 32, OVERTIME_RATE = 0.6;
   var OBJECTIVE = { guard: 30, dodge: 15, lane: 10, burst: 40 };
   function init(boss) { boss.brk46 = 0; boss.broken46 = 0; boss.breaks46 = 0; boss.enraged46 = false; boss.guardsDown46 = 0; boss.guardsTotal46 = 0; return boss; }
   function fill(boss, amount) {
@@ -2637,12 +2637,12 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (boss.phase >= 4 && !boss.enraged46 && phaseAge >= ENRAGE_AFTER) { boss.enraged46 = true; ev = "enrage"; }
     return ev;
   }
-  // Phase gate: a phase cannot be skipped faster than MIN_PHASE seconds (HP holds at the threshold, "阶段护盾").
-  function gateHp(boss, phaseAge, hpBefore) {
-    if (!boss || boss.phase >= 4 || phaseAge >= MIN_PHASE) { if (boss) boss.gated46 = false; return boss ? boss.hp : 0; }
+  // Phase gate: phase p cannot end before the fight is p*MIN_PHASE seconds old (HP holds at the threshold, "阶段护盾").
+  // Measured on total fight age so a slow early phase does not stack extra waiting on later ones.
+  function gateHp(boss, fightAge) {
+    if (!boss || boss.ungate46 || boss.phase >= 4 || fightAge >= MIN_PHASE * boss.phase) { if (boss) boss.gated46 = false; return boss ? boss.hp : 0; }
     var floor = boss.max * (1 - 0.25 * boss.phase) + 1;
-    if (hpBefore != null && hpBefore < floor) { boss.gated46 = false; return boss.hp; }
-    boss.gated46 = boss.hp < floor; return Math.max(boss.hp, floor);
+        boss.gated46 = boss.hp < floor; return Math.max(boss.hp, floor);
   }
   // Overtime: past OVERTIME_AFTER seconds the mirror world cracks and the boss takes rising damage.
   function overtimeMul(fightAge) { return fightAge > OVERTIME_AFTER ? 1 + (fightAge - OVERTIME_AFTER) * OVERTIME_RATE : 1; }
@@ -9703,7 +9703,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   }
   // Auto-aim: nearest enemy, but lock onto a boss in range unless trash is already in the player's face.
   function aimTarget46(range){const pick=aimPick46(range),L=P.lock46;if(L&&!L.dead&&pick&&pick!==L){const dl=Math.hypot(L.x-P.x,L.y-P.y),dp=Math.hypot(pick.x-P.x,pick.y-P.y);if(dl<range&&dp>dl*.6&&!(pick.guardFor&&!L.guardFor)&&(P.lockAge46=(P.lockAge46||0))<1.5)return L;}if(pick!==L){P.lock46=pick;P.lockAge46=0;}return pick;}
-  function aimPick46(range){const near=nearest(P.x,P.y,range);if(!boss||boss.dead||near===boss)return near;const bd=Math.hypot(boss.x-P.x,boss.y-P.y);if(bd>range)return near;if(boss.guard>0){let g=null,gd=range;for(const e of enemies)if(!e.dead&&e.guardFor){const d=Math.hypot(e.x-P.x,e.y-P.y);if(d<gd){gd=d;g=e;}}if(g&&!(near&&Math.hypot(near.x-P.x,near.y-P.y)<70))return g;}if(near&&Math.hypot(near.x-P.x,near.y-P.y)<75)return near;return boss;}
+  function aimPick46(range){const near=nearest(P.x,P.y,range);if(!boss||boss.dead||near===boss)return near;const bd=Math.hypot(boss.x-P.x,boss.y-P.y)-(boss.r||0)*.6;if(bd>range)return near;if(boss.guard>0){let g=null,gd=range;for(const e of enemies)if(!e.dead&&e.guardFor){const d=Math.hypot(e.x-P.x,e.y-P.y);if(d<gd){gd=d;g=e;}}if(g&&!(near&&Math.hypot(near.x-P.x,near.y-P.y)<70))return g;}if(near&&Math.hypot(near.x-P.x,near.y-P.y)<75)return near;return boss;}
   // Assigned once below (directional gun/blade shoot); gunWard/star/idolGun/encore live in gunShot36.
   let shoot;
   function pushBullet(b) {
@@ -9792,7 +9792,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       (P.damageSources[opt.source || "shot"] || 0) + damage;
     e.hp -= damage;
     e.hit = 0.1;
-    if (e.type === "boss" && globalThis.SakurayoBoss) e.hp = globalThis.SakurayoBoss.gateHp(e, runTime - (e.phaseStarted || 0), e.hp + damage);
+    if (e.type === "boss") e.hurtAt46 = runTime;
+    if (e.type === "boss" && globalThis.SakurayoBoss) e.hp = globalThis.SakurayoBoss.gateHp(e, runTime - (e.born46 ?? runTime));
     if (e.type === "boss" && globalThis.SakurayoBoss && globalThis.SakurayoBoss.fill(e, globalThis.SakurayoBoss.fromDamage(e, damage) * (opt.source === "ult" ? 2 : 1))) bossBroken46(e);
     if (globalThis.SakurayoFeel && !opt.depth) globalThis.SakurayoFeel.knock(e, P.x, P.y, damage, crit, opt.source);
     if (crit && opt.source === "blade") requestHitStop46("crit");
@@ -10772,11 +10773,12 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     P.ult46 = Math.min(100, (P.ult46 || 0) + dt * 1.4);
     P.lockAge46 = (P.lockAge46 || 0) + dt;
     if ((P.animAttack || 0) > 0) P.atkClock46 = (P.atkClock46 || 0) + dt; else P.atkClock46 = 0;
+    { const v = P.vel46 ? Math.hypot(P.vel46.x, P.vel46.y) : 0; P.runClock46 = (P.runClock46 || 0) + dt * Math.max(0.55, Math.min(1.25, v)); } // 跑动步频随实际速度变化
     P.recoil46 = (P.recoil46 || 0) * Math.exp(-dt * 16); P.flash46 = Math.max(0, (P.flash46 || 0) - dt / 0.11);
     if (globalThis.SakurayoWeapons && P.weapons46) globalThis.SakurayoWeapons.tick(dt, weaponApi46());
     if (typeof sparks46 !== "undefined" && sparks46) { for (const k of sparks46) k.t -= dt; sparks46 = sparks46.filter(k => k.t > 0); }
     if (globalThis.casings46) { for (const c of globalThis.casings46) { c.t -= dt; c.x += c.vx * dt; c.y += c.vy * dt; c.vy += 420 * dt; c.r += dt * 14; } globalThis.casings46 = globalThis.casings46.filter(c => c.t > 0); }
-    if (boss && !boss.dead && globalThis.SakurayoBoss) { const ev = globalThis.SakurayoBoss.tick(boss, dt, runTime - (boss.phaseStarted || 0)); boss.ot46 = globalThis.SakurayoBoss.overtimeMul(runTime - (boss.born46 ?? runTime)); if (ev === "enrage") toast("镜界狂暴：弹幕加密"); if (boss.enraged46 && boss.shot > 0.42) boss.shot = 0.42; }
+    if (boss && !boss.dead && globalThis.SakurayoBoss) { if (boss.hp > 0) boss.hp = globalThis.SakurayoBoss.gateHp(boss, runTime - (boss.born46 ?? runTime)); /* 追猎：Boss 2 秒没挨打就主动逼近玩家，被拉开的战斗不会拖长 */ if (!(boss.broken46 > 0) && runTime - (boss.hurtAt46 ?? boss.born46 ?? runTime) > 2) { const dx = P.x - boss.x, dy = P.y - boss.y, d = Math.hypot(dx, dy) || 1; if (d > 170) { const v = Math.min(d - 170, 240 * dt); boss.x += dx / d * v; boss.y += dy / d * v; boss.hunt46 = 1; } } else boss.hunt46 = 0; const ev = globalThis.SakurayoBoss.tick(boss, dt, runTime - (boss.phaseStarted || 0)); boss.ot46 = globalThis.SakurayoBoss.overtimeMul(runTime - (boss.born46 ?? runTime)); if (ev === "enrage") toast("镜界狂暴：弹幕加密"); if (boss.enraged46 && boss.shot > 0.42) boss.shot = 0.42; }
     if (typeof paintBossBreak46 === "function") paintBossBreak46();
     { const tf = P.fx < -.08 ? -1 : P.fx > .08 ? 1 : (P.face46 ?? 1); P.face46 = (P.face46 ?? tf) + (tf - (P.face46 ?? tf)) * Math.min(1, dt * 16); }
     if (P.trail46) { P.trail46.t -= dt; if (P.trail46.t <= 0) P.trail46 = null; }
@@ -12395,32 +12397,35 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   const _vectorDrawChar35=drawChar35;
   function charPose35(){return P.animHit>0?"hit":P.animDash>0?"dash":P.animSkill>0?"skill":P.animAttack>0?"attack":P.animMoving?"move":"idle";}
   // 攻击动画按自身节奏（ATK_FPS46）循环全部帧，不随每发子弹重置；帧间做短交叉淡入。
-  var ATK_FPS46=12,ATK_FRAMES46=["attack","attack_ab","attack_b","attack_bc","attack_c","attack_ca"];/* _ab/_bc/_ca：RIFE v4.25 补出的中间帧 */
+  /* 待机 6 帧 / 跑动 8 帧（gpt-image-2 关键帧 + RIFE 中间帧，统一锚点与色调） */var IDLE_FPS46=6,IDLE_FRAMES46=["idle","idle_ab","idle_b","idle_bc","idle_c","idle_ca"],RUN_FPS46=12,RUN_FRAMES46=["run_0","run_1","run_2","run_3","run_4","run_5","run_6","run_7"];var ATK_FPS46=12,ATK_FRAMES46=["attack","attack_ab","attack_b","attack_bc","attack_c","attack_ca"];/* _ab/_bc/_ca：RIFE v4.25 补出的中间帧 */
   function charDrawPose35(){
     const pose=charPose35(),t=runTime||0,extraOk=(skin35().id||"default")==="default"&&!liveOutfitLayer35();
     if(!extraOk)return pose;
-    if(pose==="idle"){const n=Math.floor(t/.32)%3;return n===1?"idle_b":n===2?"idle_c":"idle";}
-    if(pose==="move")return (Math.floor(t/.16)%2)?"move_b":"move";
+    if(pose==="idle")return IDLE_FRAMES46[Math.floor(t*IDLE_FPS46)%IDLE_FRAMES46.length];
+    if(pose==="move"){P.runClock46=(P.runClock46||0);return RUN_FRAMES46[Math.floor(P.runClock46*RUN_FPS46)%RUN_FRAMES46.length];}
     if(pose==="attack")return ATK_FRAMES46[Math.floor((P.atkClock46||0)*ATK_FPS46)%ATK_FRAMES46.length];
     if(pose==="skill")return (P.animSkill||0)>.2?"skill":"skill_b";
     if(pose==="dash")return (P.animDash||0)>.16?"dash":"dash_b";
-    if(pose==="hit")return (P.animHit||0)>.12?"hit":"hit_b";
+    if(pose==="hit"){const h=P.animHit||0;return h>.16?"hit":h>.08?"hit_m":"hit_b";}
     return pose;
   }
   function charAnimImage35(c,pose,sk){
-    const extra={idle_b:1,idle_c:1,move_b:1,attack_b:1,attack_c:1,attack_ab:1,attack_bc:1,attack_ca:1,skill_b:1,dash_b:1,hit_b:1};
+    const extra={idle_b:1,idle_c:1,idle_ab:1,idle_bc:1,idle_ca:1,hit_m:1,run_0:1,run_1:1,run_2:1,run_3:1,run_4:1,run_5:1,run_6:1,run_7:1,move_b:1,attack_b:1,attack_c:1,attack_ab:1,attack_bc:1,attack_ca:1,skill_b:1,dash_b:1,hit_b:1};
     const order=[];
     const add=p=>{if(p&&!order.includes(p))order.push(p);};
     add(pose);
     if(pose==="idle_c")add("idle_b");
     if(pose==="idle_b"||pose==="idle_c")add("idle");
     if(pose==="move_b")add("move");
+    if(/^run_\d$/.test(pose)){add(+pose[4]>=4?"move_b":"move");add("move");}
+    if(/^idle_(ab|bc|ca)$/.test(pose))add({idle_ab:"idle_b",idle_bc:"idle_c",idle_ca:"idle"}[pose]);
+    if(pose==="hit_m")add("hit");
     if(/^attack_(ab|bc|ca)$/.test(pose))add({attack_ab:"attack_b",attack_bc:"attack_c",attack_ca:"attack"}[pose]);if(pose==="attack_c")add("attack_b");
     if(pose==="attack_b"||pose==="attack_c")add("attack");
     if(pose==="skill"||pose==="skill_b"){add("skill");add("attack");}
     if(pose==="dash"||pose==="dash_b"){add("dash");add("move");}
     if(pose==="hit"||pose==="hit_b"){add("hit");add("idle");}
-    if(pose!=="idle"&&pose!=="idle_b"&&pose!=="idle_c")add("idle");
+    if(!/^idle/.test(pose))add("idle");
     const layers=outfitLayers35();
     for(const p of order){
       const isExtra=!!extra[p];
@@ -12462,7 +12467,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       }
     }
     ctx.drawImage(image,-ox,-oy,vis,vis);
-    { const ai=ATK_FRAMES46.indexOf(pose46); if(ai>=0){ const ph=((P.atkClock46||0)*ATK_FPS46)%1; if(ph>.6){ const nx=charAnimImage35(c,ATK_FRAMES46[(ai+1)%ATK_FRAMES46.length],sk); if(nx&&artReady(nx)&&nx!==image){ const a0=ctx.globalAlpha; ctx.globalAlpha=a0*((ph-.6)/.4); ctx.drawImage(nx,-ox,-oy,vis,vis); ctx.globalAlpha=a0; } } } }
+    { const L=[[ATK_FRAMES46,(P.atkClock46||0)*ATK_FPS46],[RUN_FRAMES46,(P.runClock46||0)*RUN_FPS46],[IDLE_FRAMES46,(runTime||0)*IDLE_FPS46]].find(q=>q[0].includes(pose46)); const F=L&&L[0], ai=F?F.indexOf(pose46):-1; if(ai>=0){ const ph=L[1]%1; if(ph>.6){ const nx=charAnimImage35(c,F[(ai+1)%F.length],sk); if(nx&&artReady(nx)&&nx!==image){ const a0=ctx.globalAlpha; ctx.globalAlpha=a0*((ph-.6)/.4); ctx.drawImage(nx,-ox,-oy,vis,vis); ctx.globalAlpha=a0; } } } }
     if((P.outfitFade||0)>0){
       const q=clamp((P.outfitFade||0)/.42,0,1);
       ctx.save();ctx.globalCompositeOperation="screen";ctx.globalAlpha=q*.5;
@@ -13422,7 +13427,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       props46(){return (props46||[]).map(p=>({kind:p.kind,x:p.x,y:p.y,done:p.done}));},
       fieldProbe(n=6){const near=(arr)=>arr.filter(o=>o&&!o.dead).map(o=>({dx:o.x-P.x,dy:o.y-P.y,r:o.r||0,boss:o.type==="boss"})).sort((a,b)=>Math.hypot(a.dx,a.dy)-Math.hypot(b.dx,b.dy)).slice(0,n);const cam=window.SakurayoCamera?.size?.();return {enemies:near(enemies),gems:near(gems),x:P.x,y:P.y,worldW:cam?.worldW||W,worldH:cam?.worldH||H,level:P.level,range:P.range};},
       spawnBossNow(){if(state!=="play")throw new Error("spawnBossNow requires play mode");spawnBoss();return snapshot35();},
-      setBossHpRatio(ratio){if(!boss||boss.dead)throw new Error("Boss is not active");boss.hp=clamp(Number(ratio),0,1)*boss.max;return snapshot35();},
+      setBossHpRatio(ratio){if(!boss||boss.dead)throw new Error("Boss is not active");boss.ungate46=true;boss.hp=clamp(Number(ratio),0,1)*boss.max;return snapshot35();},
       setBossPosition(x,y){if(!boss||boss.dead)throw new Error("Boss is not active");boss.x=Number(x);boss.y=Number(y);draw();return snapshot35();},
       storyMemory(){return JSON.parse(JSON.stringify(save.storyChoices38||{}));},
       combatArtStatus(){return window.__SAKURAYO_COMBAT_ART__.status();},
