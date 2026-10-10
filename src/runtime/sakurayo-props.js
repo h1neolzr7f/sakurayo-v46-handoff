@@ -12,6 +12,7 @@
     4: { crates: 6, chests: 3, shrines: 3, cluster: 1 },   // mirror core: shrines matter most
   };
   var CHEST_COINS = 12;
+  var TRAP_REARM = 12;
   function mulberry(seed) {
     var a = seed >>> 0;
     return function () { a = (a + 0x6d2b79f5) >>> 0; var t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
@@ -42,6 +43,7 @@
     }
     for (i = 0; i < L.chests; i++) place("chest", 22, {});
     for (i = 0; i < L.shrines; i++) place("shrine", 26, { charge: 0 });
+    for (i = 0; i < (L.traps || 2); i++) place("trap", 20, { cool: 0 });
     return list;
   }
   function update(list, P, dt, api, moving) {
@@ -56,6 +58,10 @@
       } else if (p.kind === "chest" && touch) {
         p.done = true; api.fx("loot", p.x, p.y); api.sound("coin");
         api.gems(p.x, p.y, 6, 6); api.coins(CHEST_COINS); api.toast("宝箱 · 樱花币 +" + CHEST_COINS);
+      } else if (p.kind === "trap") {
+        // 符咒机关: stepping on the seal detonates it on nearby enemies, then it re-arms.
+        p.cool = Math.max(0, p.cool - dt);
+        if (touch && p.cool <= 0) { p.cool = TRAP_REARM; api.fx("skill", p.x, p.y); api.sound("crit"); api.aoe(p.x, p.y, 170); api.toast("符咒机关：引爆"); }
       } else if (p.kind === "shrine") {
         p.charge = touch ? Math.min(1.5, p.charge + dt) : Math.max(0, p.charge - dt * 0.5);
         if (p.charge >= 1.5) { p.done = true; api.fx("levelup", p.x, p.y); api.sound("level"); api.heal(0.25); api.shield(20); api.toast("灵龛：生命 +25%、护盾 +20"); }
@@ -70,6 +76,14 @@
     }
     ctx.save();
     ctx.fillStyle = "#0008"; ctx.beginPath(); ctx.ellipse(p.x, p.y + p.r * 0.7, p.r * 1.05, p.r * 0.38, 0, 0, Math.PI * 2); ctx.fill();
+    if (p.kind === "trap") {
+      var armed = p.cool <= 0, pulse = 0.5 + Math.sin(t * 5) * 0.5;
+      ctx.strokeStyle = armed ? "rgba(255,120,190," + (0.55 + pulse * 0.4) + ")" : "rgba(160,160,190,.35)"; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.ellipse(p.x, p.y, p.r * 1.6, p.r * 0.8, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); for (var k = 0; k < 5; k++) { var a = -Math.PI / 2 + k * Math.PI * 4 / 5; ctx[k ? "lineTo" : "moveTo"](p.x + Math.cos(a) * p.r, p.y + Math.sin(a) * p.r * 0.5); } ctx.closePath(); ctx.stroke();
+      if (!armed) { ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.font = "800 11px system-ui"; ctx.textAlign = "center"; ctx.fillText(Math.ceil(p.cool) + "s", p.x, p.y - p.r); }
+      ctx.restore(); return;
+    }
     if (p.kind === "chest") { ctx.shadowColor = "#7ff3ff"; ctx.shadowBlur = 10 + Math.sin(t * 4) * 5; }
     if (img) ctx.drawImage(img, p.x - s / 2, p.y - s * 0.7, s, s);
     else { ctx.fillStyle = p.kind === "chest" ? "#c9a24a" : p.kind === "shrine" ? "#b9a8d8" : "#8a5a3a"; ctx.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 2); }
@@ -86,5 +100,5 @@
       drawProp(ctx, p, t, art);
     }
   }
-  global.SakurayoProps = Object.freeze({ LAYOUT: LAYOUT, CHEST_COINS: CHEST_COINS, create: create, update: update, draw: draw });
+  global.SakurayoProps = Object.freeze({ LAYOUT: LAYOUT, CHEST_COINS: CHEST_COINS, TRAP_REARM: TRAP_REARM, create: create, update: update, draw: draw });
 })(typeof window !== "undefined" ? window : globalThis);
