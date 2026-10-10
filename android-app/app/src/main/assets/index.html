@@ -3871,7 +3871,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   'use strict';
   // Pure save boundary shared by startup and text import. No storage or UI effects.
   var CATALOG = global.SakurayoCatalog;
-  var SETTINGS = {master:.8,sfx:.8,music:.45,vibration:1,fx:1,hudSize:'standard',damageText:'compact',contrast:1,uiCalm:1,glow:'off',glowVersion:2};
+  var SETTINGS = {master:.8,sfx:.8,music:.45,vibration:1,fx:1,hudSize:'standard',damageText:'compact',contrast:1,uiCalm:1,glow:'off',glowVersion:2,mascot:'follow'};
   var MAIN_GOD = {points:0,unlockedTier:1,bestTier:0,clears:0,runs:0,deepest:0,contracts:{},challenges:{},power:0,vitality:0,tempo:0,resonance:0,fortune:0,regenBlood:0,psiLink:0,gunBlade:0,mageCircuit:0,summonPage:0,spaceRing:0,rebirthDoll:0,sideKey:0,cursedHeart:0};
   var SHOP = {starter:{assault:0,bastion:0,flow:0,arcane:0},equippedStarter:null,items:{bait:0,ammo:0,whetstone:0,mirror:0},equippedWeapon:null,baitEquipped:false,ownedTalismans:[],bannedSchools:[],noUpgradeChallenge:false,lastTab:'skins',ops:{pity:0,pitySR:0,pulls:0,tenPulls:0,owned:{},last:[],cheatUsed:0}};
   var DEFAULTS = {coins:0,unlock:1,done:[],kills:0,bosses:0,best:0,runs:0,tal:{atk:0,hp:0,luck:0,mag:0,flow:0},ach:{},claim:{},story:[0],forms:[],fusions:[],endings:[],runHistory:[],banter:1,tutorialDone:false,settings:SETTINGS,character:'sayo',skin:'default',ownedSkins:['default'],mainGod:MAIN_GOD,storyChoices38:{sayo:{},aya:{},rion:{}},storySeen38:{},shop40:SHOP,balance40:{samples:[],betaSessions:0},hiddenStory40:{},pendingLoneStory40:null,extensions:{}};
@@ -3908,6 +3908,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     ['master','sfx','music'].forEach(function (key) {s[key] = number(s[key],0,1,SETTINGS[key]);});
     ['vibration','fx','contrast','uiCalm'].forEach(function (key) {s[key] = flag(s[key],SETTINGS[key]);});
     s.hudSize = ['standard','compact'].indexOf(s.hudSize) >= 0 ? s.hudSize : 'standard';
+    s.mascot = ['follow','sayo','aya','rion'].indexOf(s.mascot) >= 0 ? s.mascot : 'follow';
     s.damageText = ['off','compact','full'].indexOf(s.damageText) >= 0 ? s.damageText : 'compact';
     // Version 2 deliberately removed the old always-on glow default.
     s.glow = number(object(raw) ? raw.glowVersion : 0,0,999,0) >= 2 && ['off','soft','vivid'].indexOf(s.glow) >= 0 ? s.glow : 'off';
@@ -5192,7 +5193,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if(kind==='character'){
       var c=model.characters.filter(function(x){return x.id===panelCharacter;})[0]||model.character;
       var active=c.id===model.character.id;
-      body.innerHTML='<div class="cmdSplit47"><div class="cmdPortrait47"><img src="'+esc(options.art('characters/'+c.id+'/default/live_idle.webp'))+'" alt="'+esc(c.name)+'"><small>SAKURAYO / '+esc(c.id.toUpperCase())+'</small></div><div class="cmdSheet47"><div class="cmdTabs47">'+model.characters.map(function(x){return '<button data-character="'+esc(x.id)+'" class="'+(x.id===c.id?'on':'')+'">'+esc(x.name)+'</button>';}).join('')+'</div><h3>'+esc(c.name)+'</h3><div class="cmdRole47">'+esc(c.role)+' / '+esc(c.weapon)+'</div><p>'+esc(c.desc)+'</p><div class="cmdNotes47">'+esc(c.bonus)+'</div><div class="cmdTags47">'+c.schools.map(function(x){return '<span>'+esc(x)+'</span>';}).join('')+'</div>'+ (active?loadout(model):'<p>选择为出击角色后可查看当前装备。</p>')+'<div class="cmdActions47"><button class="primary47" id="commandSelect47">'+(active?'当前出击角色':'选择出击')+'</button><button id="commandWardrobe47">衣装与装备</button><button id="commandTalent47">永久天赋</button></div></div></div>';
+      body.innerHTML='<div class="cmdSplit47"><div class="cmdPortrait47"><img src="'+esc(options.art('characters/'+c.id+'/default/lobby_idle.webp'))+'" data-fallback="'+esc(options.art('characters/'+c.id+'/default/live_idle.webp'))+'" onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.removeAttribute(\'data-fallback\');this.classList.add(\'fullBody47\')}" alt="'+esc(c.name)+'"><small>SAKURAYO / '+esc(c.id.toUpperCase())+'</small></div><div class="cmdSheet47"><div class="cmdTabs47">'+model.characters.map(function(x){return '<button data-character="'+esc(x.id)+'" class="'+(x.id===c.id?'on':'')+'">'+esc(x.name)+'</button>';}).join('')+'</div><h3>'+esc(c.name)+'</h3><div class="cmdRole47">'+esc(c.role)+' / '+esc(c.weapon)+'</div><p>'+esc(c.desc)+'</p><div class="cmdNotes47">'+esc(c.bonus)+'</div><div class="cmdTags47">'+c.schools.map(function(x){return '<span>'+esc(x)+'</span>';}).join('')+'</div>'+ (active?loadout(model):'<p>选择为出击角色后可查看当前装备。</p>')+'<div class="cmdActions47"><button class="primary47" id="commandSelect47">'+(active?'当前出击角色':'选择出击')+'</button><button id="commandWardrobe47">衣装与装备</button><button id="commandTalent47">永久天赋</button></div></div></div>';
     }else if(kind==='prepare'){
       var m=model.mission;
       body.innerHTML='<div class="cmdSplit47"><div><div class="cmdMission47" style="background-image:linear-gradient(0deg,#080e1cf5,#080e1c20),url(&quot;'+esc(m.art)+'&quot;)"><small>'+esc(model.mode)+'</small><h3>'+esc(m.name)+'</h3><p>'+esc(m.boss)+' · 预计 '+esc(m.minutes)+' 分钟</p><p style="margin-top:8px;color:#ead4a1">'+esc(model.tactic)+'</p></div><div class="cmdActions47"><button id="commandStage47">更换模式 / 关卡</button></div><div class="cmdNotes47">'+esc(model.modeId==='testimony'?'证词模式：跟随剧情，不发放随机升级卡，也不部署干员。':'肉鸽战斗：自动攻击，移动避险；升级三选一构筑职业，局内完成转职、融合与三相飞升。')+'</div></div><div class="cmdSheet47"><div class="cmdRole47">当前出击角色</div><h3>'+esc(model.character.name)+'</h3><p>'+esc(model.character.weapon)+' · '+esc(model.character.role)+'</p>'+loadout(model)+'<div class="cmdActions47"><button id="commandLoadout47">调整装备</button><button id="commandCards47">寻访装备</button><button id="commandRole47">切换角色</button><button class="primary47" id="commandLaunch47">开始出击 →</button></div><p>移动：摇杆 / WASD　冲刺：Shift　主动：空格 / 技能按钮<br>另外两名角色可在肉鸽模式使用 DP 部署支援。</p></div></div>';
@@ -5408,6 +5409,114 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (root.document.readyState === "loading") root.document.addEventListener("DOMContentLoaded", function () { apply(); });
     else apply();
   }
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+/* Sakurayo lobby mascot ("看板娘"): large framing, face-safe placement,
+ * tap speech bubbles and the per-save mascot choice. Presentation only. */
+(function (root) {
+  "use strict";
+  var doc = root.document;
+  var IDS = ["follow", "sayo", "aya", "rion"];
+  var LABEL = { follow: "跟随出战角色", sayo: "月城小夜", aya: "神代绫", rion: "黑羽凛音" };
+  var LINES = {
+    sayo: {
+      tapHead: ["……头发会乱的。好吧，就一下。", "别摸了，监控那边的凛在笑。", "嗯？你也睡不着吗。"],
+      tapBody: ["枪已经校准好了，随时可以出发。", "今晚的神社，好像比昨天安静。", "要去回收证词吗？我陪你。", "樱花落在枪管上了……不用擦，挺好看的。"]
+    },
+    aya: {
+      tapHead: ["请、请不要突然这样……", "发带歪了吗？谢谢提醒。", "这种接触不在作战规程里。"],
+      tapBody: ["装备检查完毕，左轮六发、太刀一振。", "指挥官，今天也请多指教。", "我会守住你的侧翼。", "补给清单我已经核对过两遍了。"]
+    },
+    rion: {
+      tapHead: ["哼，胆子不小嘛。", "再碰一下，刀鞘可不长眼。", "……就当你在给我整理红绳。"],
+      tapBody: ["夜还长，刀还没饮够。", "别站那么近，会被血溅到。", "想看我拔刀？先活过下一波尸潮。", "黑羽家的刀，只为认可的人出鞘。"]
+    }
+  };
+  var CSS = [
+    /* big hero, bleeding off the bottom; head sits at ~x50% / y12-22% (UI-free band) */
+    "html.landscape46 #menu.homeDock46 .heroLive46{position:absolute!important;top:-3vh!important;bottom:auto!important;right:auto!important;height:152vh!important;width:152vh!important;max-width:none!important;left:calc(var(--mascotX,50%) - 152vh * var(--mascotHead,.53))!important;overflow:visible!important;-webkit-mask-image:none!important;mask-image:none!important}",
+    "html.landscape46 #menu.homeDock46 .heroLive46 .heroLiveBase46,html.landscape46 #menu.homeDock46 .heroLive46 .heroLiveBlink46{width:100%!important;height:100%!important;object-fit:contain!important;object-position:50% 0!important;inset:0!important}",
+    "html.landscape46 #menu.homeDock46 .heroLive46 .heroLiveLook46,html.landscape46 #menu.homeDock46 .heroLive46 .heroLivePhys46{place-items:start center!important}",
+    "html.landscape46 #menu.homeDock46 .heroLive46 .heroLiveBreath46:after{display:none}",
+    "html.landscape46 #menu.homeDock46 .heroLive46 .heroHead46{left:43%!important;width:20%!important;top:2%!important;height:15%!important;bottom:auto!important}",
+    "html.landscape46 #menu.homeDock46 .heroLive46 .heroTap46{left:34%!important;width:36%!important;top:17%!important;bottom:auto!important;height:46%!important}",
+    "#menu.homeDock46>.heroLiveName46{position:absolute;z-index:6;left:calc(env(safe-area-inset-left) + 4.4vw);bottom:33vh;top:auto;max-width:34vw;margin:0;display:flex;flex-direction:column;gap:3px;padding:6px 40px 6px 14px;border-left:2px solid #b9eaf4;background:linear-gradient(90deg,rgba(8,16,30,.8),rgba(8,16,30,.5) 60%,rgba(8,16,30,0));color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.6);pointer-events:none}",
+    "#menu.homeDock46>.heroLiveName46 b{font:600 clamp(21px,2.7vw,35px)/1.1 system-ui;letter-spacing:.14em}",
+    "#menu.homeDock46>.heroLiveName46 small{font:700 10px/1.2 system-ui;letter-spacing:.1em;color:#cfe3f1}",
+    "@media (max-height:380px){#menu.homeDock46>.heroLiveName46{bottom:36vh}#menu.homeDock46>.heroLiveName46 b{font-size:22px}}",
+    "html:not(.landscape46) #menu.homeDock46>.heroLiveName46{bottom:36%;left:4%;max-width:75%}",
+    /* hi-res three-quarter lobby art (2:3): bigger, face at x50% y8-20% */
+    "html.landscape46 #menu.homeDock46 .heroLive46.lobbyArt46{top:0!important;height:134vh!important;width:89.3vh!important;left:calc(var(--mascotX,50%) - 44.65vh)!important}",
+    "html.landscape46 #menu.homeDock46 .heroLive46.lobbyArt46 .heroHead46{left:30%!important;width:40%!important;top:3%!important;height:18%!important}",
+    "html.landscape46 #menu.homeDock46 .heroLive46.lobbyArt46 .heroTap46{left:15%!important;width:70%!important;top:22%!important;height:50%!important}",
+    "html:not(.landscape46) #menu.homeDock46 .heroLive46.lobbyArt46 .heroLiveBase46{object-fit:contain;object-position:50% 0}",
+    "html.landscape46 #menu.homeDock46 .heroLive46.lobbyArt46 .heroLiveSway46,html.landscape46 #menu.homeDock46 .heroLive46.lobbyArt46 .heroLivePhys46,html.landscape46 #menu.homeDock46 .heroLive46.lobbyArt46 .heroLiveBreath46,html.landscape46 #menu.homeDock46 .heroLive46.lobbyArt46 .heroLiveLook46{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-width:0!important;max-width:none!important;margin:0!important}",
+    ".heroLive46 .heroLiveExpr46{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:50% 0;opacity:0;transition:opacity .22s ease;pointer-events:none}",
+    ".heroLive46.expr46 .heroLiveExpr46{opacity:1}.heroLive46.expr46 .heroLiveBase46{opacity:0!important;transition:opacity .22s ease}",
+    ".heroLive46.lobbyArt46 .heroLiveBlink46{display:none!important}",
+    /* character file portrait: hi-res three-quarter art, face anchored to top */
+    "#commandDrawer47 .cmdPortrait47{overflow:hidden}",
+    "#commandDrawer47 .cmdPortrait47 img:not(.fullBody47){width:100%!important;height:100%!important;max-height:none!important;object-fit:cover!important;object-position:50% 6%!important}",
+    /* gacha pull buttons: never wrap the label on narrow phones */
+    "#gachaDrawer .wishV2 .wishDock46 button b,#gachaDrawer .wishV2 .wishDock46 button>span:first-child{white-space:nowrap}",
+    "@media (max-width:700px) and (orientation:landscape){#gachaPull1,#gachaPull10{font-size:14px!important;letter-spacing:.04em!important;padding-left:10px!important;padding-right:8px!important;gap:6px!important;min-width:0!important;overflow:hidden!important}#gachaPull1 small,#gachaPull10 small{padding-left:6px!important;padding-right:8px!important}}",
+    /* bubble */
+    ".mascotBubble46{position:absolute;z-index:7;right:calc(100% - var(--mascotX,50%) + 11vh);top:8vh;max-width:min(220px,26vw);padding:9px 14px;border-radius:14px 14px 4px 14px;background:rgba(255,255,255,.95);color:#2a1c33;font:700 13px/1.5 system-ui;box-shadow:0 8px 22px rgba(10,6,30,.35);pointer-events:none;opacity:0;transform:translateY(6px) scale(.96);transition:opacity .18s,transform .18s}",
+    ".mascotBubble46.on{opacity:1;transform:none}",
+    ".mascotBubble46 b{display:block;color:#d0487f;font:900 11px/1.2 system-ui;letter-spacing:.1em;margin-bottom:2px}",
+    "@media (max-height:380px){.mascotBubble46{font-size:12px;padding:7px 11px}}"
+  ].join("\n");
+  function pick(list, last) {
+    if (!list || !list.length) return "";
+    var i = Math.floor(Math.random() * list.length);
+    if (list.length > 1 && list[i] === last) i = (i + 1) % list.length;
+    return list[i];
+  }
+  function normalize(v) { return IDS.indexOf(v) >= 0 ? v : "follow"; }
+  function resolve(setting, selected) { setting = normalize(setting); return setting === "follow" ? selected : setting; }
+  function next(setting) { var i = IDS.indexOf(normalize(setting)); return IDS[(i + 1) % IDS.length]; }
+  var lastLine = "", timer = 0;
+  function say(menu, id, name, kind) {
+    if (!menu) return "";
+    var b = menu.querySelector(".mascotBubble46");
+    if (!b) { b = doc.createElement("div"); b.className = "mascotBubble46"; b.setAttribute("role", "status"); menu.appendChild(b); }
+    var set = LINES[id] || LINES.sayo;
+    var line = pick(kind === "tapHead" ? set.tapHead : set.tapBody, lastLine);
+    lastLine = line;
+    b.innerHTML = "<b>" + String(name || "").replace(/[<>&]/g, "") + "</b>" + line;
+    b.classList.add("on");
+    clearTimeout(timer);
+    timer = setTimeout(function () { b.classList.remove("on"); }, 2600);
+    return line;
+  }
+  var exprTimer = 0;
+  function express(root, id, kind, art) {
+    if (!root || !root.classList.contains("lobbyArt46")) return "";
+    var look = root.querySelector(".heroLiveLook46");
+    if (!look) return "";
+    var img = look.querySelector(".heroLiveExpr46");
+    if (!img) { img = doc.createElement("img"); img.className = "heroLiveExpr46"; img.alt = ""; look.appendChild(img); }
+    var e = kind === "tapHead" ? "shy" : "happy";
+    var src = art("characters/" + id + "/default/lobby_" + e + ".webp");
+    var show = function () { root.classList.add("expr46"); };
+    if (img.getAttribute("src") !== src) { img.onload = show; img.src = src; } else show();
+    clearTimeout(exprTimer);
+    exprTimer = setTimeout(function () { root.classList.remove("expr46"); }, 2600);
+    return e;
+  }
+  function adopt(menu) {
+    var n = menu && menu.querySelector(".heroLive46 .heroLiveName46");
+    if (n) menu.appendChild(n);
+  }
+  function style() {
+    if (!doc || doc.getElementById("sakurayoMascot46")) return;
+    var st = doc.createElement("style"); st.id = "sakurayoMascot46"; st.textContent = CSS;
+    (doc.head || doc.documentElement).appendChild(st);
+  }
+  if (doc) { if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", style); else style(); }
+  root.SakurayoMascot = Object.freeze({ IDS: IDS, LABEL: LABEL, LINES: LINES, normalize: normalize, resolve: resolve, next: next, say: say, adopt: adopt, express: express });
 })(typeof window !== "undefined" ? window : globalThis);
 
 </script>
@@ -11834,7 +11943,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   const mission38=$("#mission");if(mission38){mission38.setAttribute("role","button");mission38.setAttribute("aria-label","展开或收起构筑信息");mission38.onclick=()=>mission38.classList.toggle("expanded38");}
   function applyUiSize38(){document.body.classList.toggle("compactHud38",save.settings?.hudSize==="compact");}
   const _openSettings38=openSettings37;
-  openSettings37=function(){_openSettings38();const body=$("#settingsBody37");if(!body||$("#hudSize38"))return;const button=document.createElement("button");button.id="hudSize38";button.className="settingToggle37";button.textContent=`战斗界面大小：${save.settings?.hudSize==="compact"?"紧凑":"标准"}`;button.onclick=()=>{save.settings.hudSize=save.settings.hudSize==="compact"?"standard":"compact";applyUiSize38();persist();openSettings37();};body.appendChild(button);};
+  openSettings37=function(){_openSettings38();const body=$("#settingsBody37");if(!body||$("#hudSize38"))return;const button=document.createElement("button");button.id="hudSize38";button.className="settingToggle37";button.textContent=`战斗界面大小：${save.settings?.hudSize==="compact"?"紧凑":"标准"}`;button.onclick=()=>{save.settings.hudSize=save.settings.hudSize==="compact"?"standard":"compact";applyUiSize38();persist();openSettings37();};body.appendChild(button);
+    const M=window.SakurayoMascot;if(M&&!$("#mascotSetting46")){const mb=document.createElement("button");mb.id="mascotSetting46";mb.className="settingToggle37";const paint=()=>{mb.textContent=`看板娘：${M.LABEL[M.normalize(save.settings.mascot)]}`;};paint();mb.onclick=()=>{save.settings.mascot=M.next(save.settings.mascot);persist();paint();updateHeroLive46();toast(`看板娘：${M.LABEL[save.settings.mascot]}`);};body.appendChild(mb);}};
   applyUiSize38();
   style37.textContent+=`.mission{cursor:pointer;max-height:34px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding-right:28px;background:linear-gradient(90deg,#120e25e8,#21133be8);border:1px solid #ffffff18}.mission:after{content:"⌄";position:absolute;right:10px;color:#ffb2d4}.mission.expanded38{max-height:82px;white-space:normal}.mission.expanded38:after{content:"⌃"}.choiceReadout38{margin-top:8px;padding:7px 9px;border-radius:10px;background:#08071399;border:1px solid #ffffff16;display:grid;grid-template-columns:1fr auto;gap:3px 8px;font-size:11px}.choiceReadout38 b{color:#76efff}.choiceReadout38 em{grid-column:1/-1;color:#bdb4cc;font-style:normal}.banter{background:#0b0818f2!important;border:1px solid #ff82bd66!important;box-shadow:0 8px 26px #000b!important}.utilityButtons37 button{font-size:11px;white-space:nowrap;padding:8px 4px}#saveText38{width:100%;height:280px;resize:none;background:#080713;color:#bff5dd;border:1px solid #6d5292;border-radius:12px;padding:10px;font:11px/1.5 ui-monospace,Consolas,monospace}.saveActions38{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.saveActions38 button{padding:11px;border-radius:11px;background:#261b3c;border:1px solid #8768b1;color:#fff}.filterTabs38{position:sticky;top:0;z-index:5;display:flex;gap:6px;overflow-x:auto;padding:8px 2px;margin-bottom:8px;background:#100c20ee}.filterTabs38 button{white-space:nowrap;padding:8px 11px;border-radius:999px;border:1px solid #695287;background:#1d1631;color:#cfc5df}.filterTabs38 button.on{background:linear-gradient(135deg,#d83b91,#6d5be9);border-color:#ff9ac9;color:#fff}.compactHud38 .hudtop{transform:scale(.88);transform-origin:top left;width:113.6%}.compactHud38 .wave{top:66px;height:12px}.compactHud38 .mission{top:82px;max-height:27px;font-size:9px}.compactHud38 .perf{top:82px;transform:scale(.85);transform-origin:top right}.compactHud38 #pause{transform:scale(.88);transform-origin:top right}@media(max-height:720px){.mission{max-height:28px;font-size:10px}.hero{transform:scale(.9);transform-origin:top left}.wave{top:74px}.banter{bottom:110px!important}}`;
   /* ================= V3.5 补丁结束 ================= */
@@ -12624,21 +12734,29 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function updateHeroLive46() {
     const root = $("#heroLive46");
     if (!root) return;
-    const c = char35(),
-      sk = skin35(),
+    const mid = window.SakurayoMascot ? window.SakurayoMascot.resolve(save.settings?.mascot, save.character) : save.character;
+    const own = mid === save.character;
+    const c = CHARACTERS35[mid] || char35(),
+      sk = own ? skin35() : { id: "default" },
       skinId = sk.id || "default";
-    const name = root.querySelector(".heroLiveName46 b");
-    const weapon = root.querySelector(".heroLiveName46 small");
+    root.dataset.mascot = c.id;
+    window.SakurayoMascot?.adopt($("#menu"));
+    const name = $("#menu .heroLiveName46 b");
+    const weapon = $("#menu .heroLiveName46 small");
     if (name) name.textContent = c.name;
     if (weapon) weapon.textContent = c.weapon;
-    const livePath = skinId === "default" ? `characters/${c.id}/default/live_idle.webp` : "";
+    const livePath = skinId === "default" ? `characters/${c.id}/default/lobby_idle.webp` : "";
     const key = `${c.id}|${skinId}|${livePath || charArtPath35(c, "dialogue", sk)}`;
     if (key === heroLiveKey46) return;
     heroLiveKey46 = key;
     const base = root.querySelector(".heroLiveBase46");
+    root.classList.remove("lobbyArt46", "expr46");
     if (livePath) {
       setLiveLayer46(base, livePath, ok => {
-        if (!ok) setCharacterImage35(base, c, "dialogue", sk);
+        if (ok) { root.classList.add("lobbyArt46"); return; }
+        setLiveLayer46(base, `characters/${c.id}/default/live_idle.webp`, ok2 => {
+          if (!ok2) setCharacterImage35(base, c, "dialogue", sk);
+        });
       });
     } else {
       setCharacterImage35(base, c, "dialogue", sk);
@@ -12667,7 +12785,11 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     const L = window.SakurayoLobby;
     const root = $("#heroLive46");
     if (!root) return;
-    if (L) L.bindHeroTap(root, () => grantCheat46(), kind => Live && Live.trigger(kind));
+    if (L) L.bindHeroTap(root, () => grantCheat46(), kind => {
+      if (Live) Live.trigger(kind);
+      const M = window.SakurayoMascot, id = root.dataset.mascot || save.character;
+      if (M) { M.say($("#menu"), id, CHARACTERS35[id]?.name, kind); M.express(root, id, kind, artUrl); }
+    });
     if (Live) Live.attach(root, {
       test: TEST_MODE,
       reducedMotion() { return save.settings.fx === 0; },

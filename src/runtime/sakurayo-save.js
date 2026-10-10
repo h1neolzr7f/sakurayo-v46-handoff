@@ -2,7 +2,7 @@
   'use strict';
   // Pure save boundary shared by startup and text import. No storage or UI effects.
   var CATALOG = global.SakurayoCatalog;
-  var SETTINGS = {master:.8,sfx:.8,music:.45,vibration:1,fx:1,hudSize:'standard',damageText:'compact',contrast:1,uiCalm:1,glow:'off',glowVersion:2};
+  var SETTINGS = {master:.8,sfx:.8,music:.45,vibration:1,fx:1,hudSize:'standard',damageText:'compact',contrast:1,uiCalm:1,glow:'off',glowVersion:2,mascot:'follow'};
   var MAIN_GOD = {points:0,unlockedTier:1,bestTier:0,clears:0,runs:0,deepest:0,contracts:{},challenges:{},power:0,vitality:0,tempo:0,resonance:0,fortune:0,regenBlood:0,psiLink:0,gunBlade:0,mageCircuit:0,summonPage:0,spaceRing:0,rebirthDoll:0,sideKey:0,cursedHeart:0};
   var SHOP = {starter:{assault:0,bastion:0,flow:0,arcane:0},equippedStarter:null,items:{bait:0,ammo:0,whetstone:0,mirror:0},equippedWeapon:null,baitEquipped:false,ownedTalismans:[],bannedSchools:[],noUpgradeChallenge:false,lastTab:'skins',ops:{pity:0,pitySR:0,pulls:0,tenPulls:0,owned:{},last:[],cheatUsed:0}};
   var DEFAULTS = {coins:0,unlock:1,done:[],kills:0,bosses:0,best:0,runs:0,tal:{atk:0,hp:0,luck:0,mag:0,flow:0},ach:{},claim:{},story:[0],forms:[],fusions:[],endings:[],runHistory:[],banter:1,tutorialDone:false,settings:SETTINGS,character:'sayo',skin:'default',ownedSkins:['default'],mainGod:MAIN_GOD,storyChoices38:{sayo:{},aya:{},rion:{}},storySeen38:{},shop40:SHOP,balance40:{samples:[],betaSessions:0},hiddenStory40:{},pendingLoneStory40:null,extensions:{}};
@@ -39,6 +39,7 @@
     ['master','sfx','music'].forEach(function (key) {s[key] = number(s[key],0,1,SETTINGS[key]);});
     ['vibration','fx','contrast','uiCalm'].forEach(function (key) {s[key] = flag(s[key],SETTINGS[key]);});
     s.hudSize = ['standard','compact'].indexOf(s.hudSize) >= 0 ? s.hudSize : 'standard';
+    s.mascot = ['follow','sayo','aya','rion'].indexOf(s.mascot) >= 0 ? s.mascot : 'follow';
     s.damageText = ['off','compact','full'].indexOf(s.damageText) >= 0 ? s.damageText : 'compact';
     // Version 2 deliberately removed the old always-on glow default.
     s.glow = number(object(raw) ? raw.glowVersion : 0,0,999,0) >= 2 && ['off','soft','vivid'].indexOf(s.glow) >= 0 ? s.glow : 'off';

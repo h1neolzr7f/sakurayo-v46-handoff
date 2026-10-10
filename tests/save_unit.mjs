@@ -15,7 +15,7 @@ test('discard invalid run entries before the 30-record cap; preserve actual run 
  assert.deepEqual(json(S.normalize({...legacy,runHistory:[null,record,42,[],false]}).runHistory),[record]);
  assert.equal(S.normalize({...legacy,runHistory:[...Array(30).fill(null),...Array(35).fill(record)]}).runHistory.length,30);
 });
-test('old volume settings gain current defaults without overriding player volume',()=>assert.deepEqual(json(S.normalize(legacy).settings),{master:.3,sfx:.2,music:.1,vibration:1,fx:1,hudSize:'standard',damageText:'compact',contrast:1,uiCalm:1,glow:'off',glowVersion:2}));
+test('old volume settings gain current defaults without overriding player volume',()=>assert.deepEqual(json(S.normalize(legacy).settings),{master:.3,sfx:.2,music:.1,vibration:1,fx:1,hudSize:'standard',damageText:'compact',contrast:1,uiCalm:1,glow:'off',glowVersion:2,mascot:'follow'}));
 test('normalize is pure, idempotent and preserves valid progress and receipts',()=>{
  const value={...legacy,done:[1,4],ownedSkins:['default','haori'],skin:'haori',character:'rion',claim:{chapter4:true},shop40:{starter:{assault:3},ops:{pity:19,owned:{fusion_magitech:2},services:{welcomeClaimed:true,mailRead:{welcome:true},loginDates:['2026-10-05']}}},extensions:{'example.pack':{version:2,data:{claimed:true}}}};
  const before=JSON.stringify(value),a=S.normalize(value);assert.equal(JSON.stringify(value),before);assert.deepEqual(json(S.normalize(a)),json(a));assert.equal(a.skin,'haori');assert.equal(a.tal.atk,2);assert.equal(a.mainGod.points,42);assert.deepEqual(json(a.shop40.ops.services),value.shop40.ops.services);assert.deepEqual(json(a.extensions),value.extensions);
@@ -36,6 +36,8 @@ test('defaults are fresh, missing startup fields migrate, and glow migration res
  assert.equal(second.settings.master,.8);assert.equal(second.shop40.starter.assault,0);
  assert.equal(S.normalize({}).mainGod.unlockedTier,1);
  assert.equal(S.normalize({...legacy,settings:{glow:'vivid',glowVersion:1}}).settings.glow,'off');
+ assert.equal(S.normalize({...legacy,settings:{mascot:'rion'}}).settings.mascot,'rion');
+ assert.equal(S.normalize({...legacy,settings:{mascot:'boss'}}).settings.mascot,'follow');
  assert.equal(S.normalize({...legacy,settings:{glow:'soft',glowVersion:2}}).settings.glow,'soft');
 });
 test('collection migration retains receipts and balances and shares no references with input',()=>{
