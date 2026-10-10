@@ -87,7 +87,7 @@
     "#menu.terminalLobby48 .top .coins,#menu.terminalLobby48 .terminalTop48 button{background:transparent!important;border:0!important;box-shadow:none!important;border-radius:999px!important}",
     "#menu.terminalLobby48 .top .coins{color:var(--sy-gold);font-weight:800;border-right:1px solid var(--sy-rim)!important;border-radius:999px 0 0 999px!important}",
     /* lobby: tactical deck = two tiles + hero CTA */
-    "#menu.terminalLobby48 .tacticalDeck48{grid-template-columns:1fr 1fr;grid-template-rows:minmax(64px,1fr) minmax(78px,1.25fr) 38px;gap:8px}",
+    "#menu.terminalLobby48 .tacticalDeck48{grid-template-columns:1fr 1fr;grid-template-rows:minmax(64px,1fr) minmax(78px,1.25fr) 44px;gap:8px}",
     "#menu.terminalLobby48 .tacticalDeck48>#commandCharacter47,#menu.terminalLobby48 .tacticalDeck48>#commandPrepare47{margin:0;width:100%;flex-direction:column;justify-content:center;gap:4px;padding:8px;border:1px solid var(--sy-rim);border-radius:var(--sy-radius);background:var(--sy-glass);backdrop-filter:blur(8px);text-align:center}",
     "#menu.terminalLobby48 .tacticalDeck48>#commandCharacter47:after,#menu.terminalLobby48 .tacticalDeck48>#commandPrepare47:after{display:none}",
     "#menu.terminalLobby48 .tacticalDeck48>#commandCharacter47 .terminalLabel48,#menu.terminalLobby48 .tacticalDeck48>#commandPrepare47 .terminalLabel48{align-items:center;text-align:center}",

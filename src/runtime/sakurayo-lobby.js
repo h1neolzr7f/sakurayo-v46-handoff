@@ -456,9 +456,9 @@
     "html.landscape46 #gachaDrawer .wishV2 .wishPity46{top:auto;bottom:max(150px,calc(env(safe-area-inset-bottom) + 142px));left:auto;right:max(18px,env(safe-area-inset-right));width:min(38%,380px);background:#09101ed9;border-color:#96e4f544}" +
     "#gachaDrawer .wishV2 .pityRow46 span{min-width:9.5em;color:#e4eef9}" +
     "html.landscape46 #gachaDrawer .wishV2 .wishDock46{left:auto;right:0;width:min(44%,460px);padding:0 max(18px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) 0;background:none}" +
-    "#gachaDrawer .wishV2 .wishLinks46{display:flex;align-items:center;gap:6px;margin:0 0 8px}" +
+    "#gachaDrawer .wishV2 .wishLinks46{position:absolute;z-index:6;left:max(12px,env(safe-area-inset-left));bottom:calc(12px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:6px;margin:0}" +
     "#gachaDrawer .wishV2 .wishLinks46 button{min-height:28px;padding:0 12px;border-radius:999px;border:1px solid #96e4f566;background:#09101ee0;color:#dbe9f8;font:700 11px/1 system-ui;letter-spacing:.12em}" +
-    "#gachaDrawer .wishV2 .wishLinks46 .wishPills46{margin:0 0 0 auto;gap:6px}" +
+    "#gachaDrawer .wishV2 .wishLinks46 .wishPills46{margin:0 0 0 4px;gap:6px}" +
     "#gachaDrawer .wishV2 .wishPills46 b{background:#09101ee0;border-color:#96e4f544;color:#cfe6f5}" +
     "#gachaDrawer .wishV2 .gachaActions46 button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:62px;border-radius:14px;font-size:17px;letter-spacing:.2em;border:1px solid #fff5;background:linear-gradient(180deg,#2a3f5f,#162338)}" +
     "#gachaDrawer .wishV2 .gachaActions46 #gachaPull10{background:linear-gradient(120deg,#ff6fae,#ff9fcf 50%,#8fe6f5);color:#081426;box-shadow:0 10px 26px #ff8fc466}" +
@@ -471,17 +471,15 @@
     "#gachaDrawer .wishV2 .wishTag46{display:none}" +
     "#gachaDrawer .wishV2 .wishTitle46 h3{margin:0 0 2px;font-size:22px}" +
     "#gachaDrawer .wishV2 .wishUp46{margin:0 0 2px;padding:3px 5px 3px 3px}" +
-    "#gachaDrawer .wishV2 .wishTime46{display:inline;margin-left:6px}" +
-    "#gachaDrawer .wishV2 .wishTitle46 p{display:inline}" +
+    "#gachaDrawer .wishV2 .wishTime46{margin-top:2px}" +
     "html.landscape46 #gachaDrawer .wishV2 .wishPity46{bottom:max(116px,calc(env(safe-area-inset-bottom) + 108px));padding:5px 10px}" +
     "#gachaDrawer .wishV2 .pityRow46{margin-top:3px}" +
-    "#gachaDrawer .wishV2 .wishLinks46{margin-bottom:5px}" +
     "#gachaDrawer .wishV2 .wishLinks46 button{min-height:24px}" +
     "#gachaDrawer .wishV2 .gachaActions46 button{min-height:46px;flex-direction:row;gap:10px;font-size:15px}" +
     "#gachaDrawer .wishV2 .wishSpark46{margin-top:5px;max-height:26px}" +
     "#gachaDrawer .wishV2 .wishSpark46 button{min-height:24px}" +
     "}" +
-    "@media (max-width:700px){#gachaDrawer .wishV2 .wishLinks46 .wishPills46{display:none}html.landscape46 #gachaDrawer .wishV2 .wishDock46{width:48%}}" +
+    "@media (max-width:700px){#gachaDrawer .wishV2 .wishLinks46 .wishPills46{display:none}#gachaDrawer .wishV2 .wishLinks46{bottom:auto;top:calc(250px + env(safe-area-inset-top))}html.landscape46 #gachaDrawer .wishV2 .wishDock46{width:48%}}" +
     "@media (max-width:560px){html.landscape46 #gachaDrawer .wishV2 .wishDock46{left:0;width:auto;padding-left:12px}html.landscape46 #gachaDrawer .wishV2 .wishPity46{left:12px;right:12px;width:auto;bottom:calc(190px + env(safe-area-inset-bottom))}#gachaDrawer .wishV2 .wishTitle46{max-width:70%}#gachaDrawer .wishV2 .wishTabs46{top:auto;bottom:calc(330px + env(safe-area-inset-bottom));flex-direction:row;width:auto}}" +
     ".wishSheet46{position:absolute;inset:0;z-index:20;display:grid;place-items:center;background:#03060fb3;backdrop-filter:blur(4px)}" +
     ".wishSheet46.hidden{display:none}" +
@@ -489,7 +487,9 @@
     ".wishSheetCard46 h4{margin:0 0 10px;letter-spacing:.2em;color:#fff}" +
     ".wishSheetCard46 ul{margin:0;padding-left:18px;font-size:12px;line-height:1.8}" +
     ".wishSheetCard46 p{font-size:12px;line-height:1.7}" +
-    ".wishSheetClose46{display:block;margin:14px 0 0 auto;min-height:34px;padding:0 18px;border-radius:999px;border:0;background:linear-gradient(120deg,#ff6fae,#8fe6f5);color:#081426;font:800 12px/1 system-ui}";
+    ".wishSheetActions46{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}.wishSheetActions46 .wishSheetClose46{margin:0}" +
+    ".wishSheetCancel46{min-height:44px;padding:0 18px;border-radius:999px;border:1px solid #96e4f566;background:#09101ee0;color:#dbe9f8;font:800 12px/1 system-ui}" +
+    ".wishSheetClose46{min-height:44px!important;display:block;margin:14px 0 0 auto;min-height:34px;padding:0 18px;border-radius:999px;border:0;background:linear-gradient(120deg,#ff6fae,#8fe6f5);color:#081426;font:800 12px/1 system-ui}";
 
   function injectStyle() {
     if (!global.document) return;
@@ -1025,7 +1025,8 @@
       (up ? '<div class="wishUp46"><em>UP</em><b>' + escapeHtml(up.n) + "</b><i>" + up.r + "</i></div>" : "") +
       "<p>" + sub + '</p><small class="wishTime46">' + meta.time + "</small></div>" +
       '<div class="wishPity46"><div class="pityRow46"><span>距证人保底还有 ' + ssrLeft + ' 抽</span><div class="pityRail46"><i style="width:' + ssrPct + '%"></i></div></div><div class="pityRow46 sr"><span>距稀有保底还有 ' + srLeft + ' 抽</span><div class="pityRail46"><i style="width:' + srPct + '%"></i></div></div></div>' +
-      '<div class="wishDock46"><div class="wishLinks46"><button type="button" id="gachaInfo46">详情</button><button type="button" id="gachaLog46">记录</button><span class="wishPills46"><b>已寻访 ' + pulls + "</b><b>软保 " + RATES.softPity + "</b></span></div>" +
+      '<div class="wishLinks46"><button type="button" id="gachaInfo46">详情</button><button type="button" id="gachaLog46">记录</button><span class="wishPills46"><b>已寻访 ' + pulls + "</b><b>软保 " + RATES.softPity + "</b></span></div>" +
+      '<div class="wishDock46">' +
       '<div class="gachaActions46"><button type="button" id="gachaPull1"' + (poor1 ? ' class="poor"' : "") + "><span>单次寻访</span><small>" + coinIcon + RATES.single + '</small></button><button type="button" id="gachaPull10"' + (poor10 ? ' class="poor"' : "") + "><span>十连寻访</span><small>" + coinIcon + RATES.ten + "</small></button></div>" +
       sparkRow(pool, state, shards) +
       "</div>" +
@@ -1050,11 +1051,21 @@
     for (var s = 0; s < sparks.length; s++) {
       sparks[s].onclick = function () {
         var id = this.getAttribute("data-spark");
-        if (handlers && typeof handlers.spark === "function") handlers.spark(id);
-        else {
-          spark(save, pool, id);
-          renderGacha(host, save, handlers);
-        }
+        var go = function () {
+          if (handlers && typeof handlers.spark === "function") handlers.spark(id);
+          else {
+            spark(save, pool, id);
+            renderGacha(host, save, handlers);
+          }
+        };
+        var sheet = host.querySelector("#gachaSheet46");
+        var card = cardOf(id);
+        if (!sheet || shards < RATES.spark || !card) return go();
+        sheet.innerHTML = '<div class="wishSheetCard46"><h4>确认兑换</h4><p>消耗碎镜片 ' + RATES.spark + " 兑换「" + escapeHtml(card.n) + "」？此操作不可撤销。</p>" +
+          '<div class="wishSheetActions46"><button type="button" class="wishSheetCancel46">取消</button><button type="button" class="wishSheetClose46">确认兑换</button></div></div>';
+        sheet.classList.remove("hidden");
+        sheet.querySelector(".wishSheetCancel46").onclick = function () { sheet.classList.add("hidden"); };
+        sheet.querySelector(".wishSheetClose46").onclick = function () { sheet.classList.add("hidden"); go(); };
       };
     }
     return info;

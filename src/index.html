@@ -163,6 +163,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 <script src="runtime/sakurayo-terminal.js"></script>
 <script src="runtime/sakurayo-command.js"></script>
 <script src="runtime/sakurayo-theme.js"></script>
+<script src="runtime/sakurayo-ux.js"></script>
 <script src="content/extensions.manifest.js"></script>
 <script>
 (() => {
@@ -5693,6 +5694,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
 
   function toast(s){toastQueue.push(s);playToast();}
+  window.SakurayoSfx=k=>sound(k);window.SakurayoToast=s=>toast(s);
   function placeToast46(){
     const e=$("#toast");
     if(!e)return;
@@ -5738,6 +5740,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         boss: [85, 0.75, 0.08, "sawtooth"],
         bossShot: [130, 0.16, 0.025, "square"],
         ach: [720, 0.35, 0.06, "sine"],
+        tap: [980, 0.045, 0.018, "sine"],
       }[k] || [220, 0.08, 0.03, "sine"],
       o = audio.createOscillator(),
       g = audio.createGain(),
@@ -7411,7 +7414,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if(!L)return {ok:false,reason:"lobby",results:[]};
     const result=L.pull(save,count);
     if(!result.ok){
-      toast(result.reason==="coins"?"樱花币不足":result.reason==="empty"?"本池尚未写入":"寻访失败");
+      toast(result.reason==="coins"?"樱花币不足：通关关卡、每日签到与任务补给可获得":result.reason==="empty"?"本池尚未写入":"寻访失败");
       refreshLobby46();
       return result;
     }
