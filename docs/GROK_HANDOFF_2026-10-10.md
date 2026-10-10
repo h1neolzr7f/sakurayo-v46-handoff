@@ -191,3 +191,14 @@ bash gradlew --no-daemon assembleDebug lintDebug
 - 截图：/workspace/sakurayo-shots/v5-*.png。
 - 补充：普通敌人改为“幽魂小怪”文生图重做；第 1 章地面改为低对比石板+零散花瓣，平铺重复感明显降低；敌人/Boss 立绘统一按旧版占比重新排版（主体 476px、脚底 y=494）。
 - 修复严重渲染 bug：`enemyDraw` 用屏幕尺寸 W/H 做视野裁剪，但敌人坐标是世界坐标（世界 4×2 屏），导致玩家离开左上一屏后敌人和 Boss 全部不画。改为 `SakurayoCamera.contains()` 裁剪。
+
+## 第七阶段：手感（2026-10-10 下午）
+
+- 渲染回归测试 `tests/render_camera_smoke.mjs`（测试 API `drawStats`）：玩家离开左上一屏后敌人和 Boss 必须被绘制，镜头外仍裁剪。旧裁剪逻辑下该测试失败。
+- `tests/balance_diagnostic.mjs` 三档代理：`SAKURAYO_AGENTS=stand,kite,build`。stand 为门槛口径；kite 绕敌走位捡宝石；build 走位并选推荐强化。测试 API `fieldProbe`。
+- 自动瞄准：Boss 在射程内且身边 110px 内没有小怪时优先锁 Boss（`aimTarget46`）。
+- `src/runtime/sakurayo-feel.js`：摇杆死区/模拟量、速度惯性（起步/急停/反向）、击退、命中停顿档位；单测 `tests/feel_unit.mjs`。命中停顿和子弹时间在 `?test=1` 下默认关闭，不影响固定步测试。
+- 冲刺残影、完美闪避子弹时间（真实时钟 0.35 倍 0.5 秒）、右半屏拖动手动瞄准、手柄（左摇杆移动、右摇杆瞄准、A 冲刺、B/X 技能）、镜头前瞻、DPR 上限 2.5。
+- `src/runtime/sakurayo-hud.js`：右下弧形按钮组（攻击/技能/大招/闪避）、大招充能环与特写演出、右上小地图（视野框、Boss、宝箱、灵龛、精英）、台词条移到底部中间。
+- `src/runtime/sakurayo-props.js`：各章不同配置的可破坏箱子、宝箱（樱花币 +12，计入结算）、灵龛（站 1.5 秒回血加盾）；世界边缘雾化过渡、前景花瓣视差。素材 `art/props/*.webp` 由中转站生成。
+- 敌人职责轮廓改为脚下半透明地标，不再遮挡立绘。

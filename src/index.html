@@ -7258,6 +7258,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       chooseUpgrade(index=0){const choices=[...document.querySelectorAll("#choices .choice")];const choice=choices[Number(index)];if(!choice)throw new Error(`Missing upgrade choice ${index}`);choice.click();return snapshot35();},
       drawStats(){return {...drawStats46};},
       chargeUlt46(){P.ult46=100;return snapshot35();},
+      realtime46(){manualTestClock=false;last=performance.now();scheduleLoop();return true;},
       props46(){return (props46||[]).map(p=>({kind:p.kind,x:p.x,y:p.y,done:p.done}));},
       fieldProbe(n=6){const near=(arr)=>arr.filter(o=>o&&!o.dead).map(o=>({dx:o.x-P.x,dy:o.y-P.y,r:o.r||0,boss:o.type==="boss"})).sort((a,b)=>Math.hypot(a.dx,a.dy)-Math.hypot(b.dx,b.dy)).slice(0,n);const cam=window.SakurayoCamera?.size?.();return {enemies:near(enemies),gems:near(gems),x:P.x,y:P.y,worldW:cam?.worldW||W,worldH:cam?.worldH||H,level:P.level};},
       spawnBossNow(){if(state!=="play")throw new Error("spawnBossNow requires play mode");spawnBoss();return snapshot35();},
