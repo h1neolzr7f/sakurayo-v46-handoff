@@ -23,3 +23,7 @@ console.log('PASS weapons+boss unit');
   assert.deepEqual(W.evolve(Q, () => false), [], 'no evolution without partner');
   assert.deepEqual(W.evolve(Q, id => id === 'multi'), ['spread'], 'partner unlocks evolution');
   assert.equal(W.stats('spread', 5, true).c > W.stats('spread', 5, false).c, true); console.log('PASS evolution pairs'); }
+{ const b = B.init({ max: 1000, hp: 100, phase: 1 }); assert.equal(B.gateHp(b, 2), 751, 'phase gate holds HP'); assert.equal(b.gated46, true);
+  b.hp = 100; assert.equal(B.gateHp(b, B.MIN_PHASE + 1), 100, 'gate releases after min time');
+  assert.equal(B.overtimeMul(30), 1); assert.ok(B.overtimeMul(60) > 1.5); b.hp = 5; assert.equal(B.gateHp(b, 1, 10), 5, 'already below threshold (debug/test set) is not gated');
+  console.log('PASS phase gate + overtime'); }

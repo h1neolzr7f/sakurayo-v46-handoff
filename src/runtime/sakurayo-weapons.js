@@ -100,20 +100,20 @@
     var W = P.weapons46; if (!W) return;
     if (W.orbit && W.orbit.lv) {
       var s = stats("orbit", W.orbit.lv, W.orbit.evo), rad = 62 + W.orbit.lv * 4;
-      ctx.save(); ctx.globalCompositeOperation = "lighter";
+      ctx.save(); ctx.globalAlpha = 0.85;
       for (var i = 0; i < s.c; i++) {
         var a = W.orbit.a + i * TAU / s.c, x = P.x + Math.cos(a) * rad, y = P.y + Math.sin(a) * rad;
-        ctx.save(); ctx.translate(x, y); ctx.rotate(a + Math.PI / 2);
-        ctx.fillStyle = W.orbit.evo ? "#ffd6ef" : "#ff9ccf"; ctx.shadowColor = "#ff5aa6"; ctx.shadowBlur = 14;
+        ctx.save(); if (global.__reduceFlash46 !== false) { var up = Math.max(0, -Math.sin(a)); ctx.globalAlpha = 0.6 * (1 - 0.85 * up * up); } ctx.translate(x, y); ctx.rotate(a + Math.PI / 2);
+        ctx.fillStyle = W.orbit.evo ? "#ffd6ef" : "#ff9ccf"; ctx.shadowColor = "#ff5aa6"; ctx.shadowBlur = 6;
         ctx.beginPath(); ctx.moveTo(0, -14); ctx.quadraticCurveTo(7, 0, 0, 14); ctx.quadraticCurveTo(-7, 0, 0, -14); ctx.fill(); ctx.restore();
       }
       ctx.restore();
     }
     var L = W.laser;
     if (L && L.beam) {
-      var B = L.beam, w = (L.evo ? 20 : 12) * (0.75 + Math.sin(now * 60) * 0.25);
+      var B = L.beam, w = (L.evo ? 20 : 12) * (0.9 + Math.sin(now * TAU * 1.5) * 0.1);
       ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
-      ctx.strokeStyle = "rgba(140,220,255,.45)"; ctx.lineWidth = w * 2.2; ctx.beginPath(); ctx.moveTo(P.x, P.y); ctx.lineTo(P.x + Math.cos(B.a) * B.len, P.y + Math.sin(B.a) * B.len); ctx.stroke();
+      ctx.strokeStyle = "rgba(140,220,255,.45)"; ctx.lineWidth = w * 2.2; var o = global.__reduceFlash46 !== false ? 38 : 0; ctx.beginPath(); ctx.moveTo(P.x + Math.cos(B.a) * o, P.y + Math.sin(B.a) * o); ctx.lineTo(P.x + Math.cos(B.a) * B.len, P.y + Math.sin(B.a) * B.len); ctx.stroke();
       ctx.strokeStyle = "#f4fdff"; ctx.lineWidth = w * 0.6; ctx.stroke(); ctx.restore();
     }
   }

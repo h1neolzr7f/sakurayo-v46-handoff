@@ -2621,7 +2621,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
    (more bullets, no extra damage) so fights cannot drag. Pure logic, no DOM. */
 (function (global) {
   "use strict";
-  var BREAK_TIME = 4.5, BREAK_MUL = 1.6, DAMAGE_SHARE = 0.11, ENRAGE_AFTER = 20, HP_SCALE = 0.88, HP_PER_PICK = 0.025;
+  var BREAK_TIME = 4.5, BREAK_MUL = 1.6, DAMAGE_SHARE = 0.11, ENRAGE_AFTER = 20, HP_SCALE = 0.88, HP_PER_PICK = 0.02, MIN_PHASE = 9, OVERTIME_AFTER = 45, OVERTIME_RATE = 0.05;
   var OBJECTIVE = { guard: 30, dodge: 15, lane: 10, burst: 40 };
   function init(boss) { boss.brk46 = 0; boss.broken46 = 0; boss.breaks46 = 0; boss.enraged46 = false; boss.guardsDown46 = 0; boss.guardsTotal46 = 0; return boss; }
   function fill(boss, amount) {
@@ -2637,15 +2637,24 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (boss.phase >= 4 && !boss.enraged46 && phaseAge >= ENRAGE_AFTER) { boss.enraged46 = true; ev = "enrage"; }
     return ev;
   }
+  // Phase gate: a phase cannot be skipped faster than MIN_PHASE seconds (HP holds at the threshold, "阶段护盾").
+  function gateHp(boss, phaseAge, hpBefore) {
+    if (!boss || boss.phase >= 4 || phaseAge >= MIN_PHASE) { if (boss) boss.gated46 = false; return boss ? boss.hp : 0; }
+    var floor = boss.max * (1 - 0.25 * boss.phase) + 1;
+    if (hpBefore != null && hpBefore < floor) { boss.gated46 = false; return boss.hp; }
+    boss.gated46 = boss.hp < floor; return Math.max(boss.hp, floor);
+  }
+  // Overtime: past OVERTIME_AFTER seconds the mirror world cracks and the boss takes rising damage.
+  function overtimeMul(fightAge) { return fightAge > OVERTIME_AFTER ? 1 + (fightAge - OVERTIME_AFTER) * OVERTIME_RATE : 1; }
   function damageMul(boss) { return boss && boss.broken46 > 0 ? BREAK_MUL : 1; }
   function label(boss) {
     if (!boss) return "";
     if (boss.broken46 > 0) return "失衡！伤害 ×" + BREAK_MUL + " · " + boss.broken46.toFixed(1) + "s";
     var g = boss.guardsTotal46 ? " · 镜卫 " + boss.guardsDown46 + "/" + boss.guardsTotal46 : "";
-    return "破防 " + Math.floor(boss.brk46 || 0) + "%" + g + (boss.enraged46 ? " · 狂暴" : "");
+    return (boss.gated46 ? "阶段护盾 · " : "") + "破防 " + Math.floor(boss.brk46 || 0) + "%" + g + (boss.enraged46 ? " · 狂暴" : "");
   }
   global.SakurayoBoss = Object.freeze({ BREAK_TIME: BREAK_TIME, BREAK_MUL: BREAK_MUL, ENRAGE_AFTER: ENRAGE_AFTER, HP_SCALE: HP_SCALE, HP_PER_PICK: HP_PER_PICK, OBJECTIVE: OBJECTIVE,
-    init: init, fill: fill, fromDamage: fromDamage, tick: tick, damageMul: damageMul, label: label });
+    init: init, gateHp: gateHp, overtimeMul: overtimeMul, MIN_PHASE: MIN_PHASE, OVERTIME_AFTER: OVERTIME_AFTER, fill: fill, fromDamage: fromDamage, tick: tick, damageMul: damageMul, label: label });
 })(typeof window !== "undefined" ? window : globalThis);
 
 </script>
@@ -2752,20 +2761,20 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     var W = P.weapons46; if (!W) return;
     if (W.orbit && W.orbit.lv) {
       var s = stats("orbit", W.orbit.lv, W.orbit.evo), rad = 62 + W.orbit.lv * 4;
-      ctx.save(); ctx.globalCompositeOperation = "lighter";
+      ctx.save(); ctx.globalAlpha = 0.85;
       for (var i = 0; i < s.c; i++) {
         var a = W.orbit.a + i * TAU / s.c, x = P.x + Math.cos(a) * rad, y = P.y + Math.sin(a) * rad;
-        ctx.save(); ctx.translate(x, y); ctx.rotate(a + Math.PI / 2);
-        ctx.fillStyle = W.orbit.evo ? "#ffd6ef" : "#ff9ccf"; ctx.shadowColor = "#ff5aa6"; ctx.shadowBlur = 14;
+        ctx.save(); if (global.__reduceFlash46 !== false) { var up = Math.max(0, -Math.sin(a)); ctx.globalAlpha = 0.6 * (1 - 0.85 * up * up); } ctx.translate(x, y); ctx.rotate(a + Math.PI / 2);
+        ctx.fillStyle = W.orbit.evo ? "#ffd6ef" : "#ff9ccf"; ctx.shadowColor = "#ff5aa6"; ctx.shadowBlur = 6;
         ctx.beginPath(); ctx.moveTo(0, -14); ctx.quadraticCurveTo(7, 0, 0, 14); ctx.quadraticCurveTo(-7, 0, 0, -14); ctx.fill(); ctx.restore();
       }
       ctx.restore();
     }
     var L = W.laser;
     if (L && L.beam) {
-      var B = L.beam, w = (L.evo ? 20 : 12) * (0.75 + Math.sin(now * 60) * 0.25);
+      var B = L.beam, w = (L.evo ? 20 : 12) * (0.9 + Math.sin(now * TAU * 1.5) * 0.1);
       ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
-      ctx.strokeStyle = "rgba(140,220,255,.45)"; ctx.lineWidth = w * 2.2; ctx.beginPath(); ctx.moveTo(P.x, P.y); ctx.lineTo(P.x + Math.cos(B.a) * B.len, P.y + Math.sin(B.a) * B.len); ctx.stroke();
+      ctx.strokeStyle = "rgba(140,220,255,.45)"; ctx.lineWidth = w * 2.2; var o = global.__reduceFlash46 !== false ? 38 : 0; ctx.beginPath(); ctx.moveTo(P.x + Math.cos(B.a) * o, P.y + Math.sin(B.a) * o); ctx.lineTo(P.x + Math.cos(B.a) * B.len, P.y + Math.sin(B.a) * B.len); ctx.stroke();
       ctx.strokeStyle = "#f4fdff"; ctx.lineWidth = w * 0.6; ctx.stroke(); ctx.restore();
     }
   }
@@ -8952,7 +8961,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function drawSparks46() {
     if (!sparks46) return;
     ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
-    for (const k of sparks46) { const q = k.t / 0.14; ctx.strokeStyle = k.c; ctx.globalAlpha = q; ctx.lineWidth = 2;
+    const rf46 = reduceFlash46(); if (rf46) ctx.globalCompositeOperation = "source-over";
+    for (const k of sparks46) { const q = k.t / 0.14; ctx.strokeStyle = k.c; ctx.globalAlpha = q * (rf46 ? .45 : 1); ctx.lineWidth = rf46 ? 1.2 : 2;
       for (let i = -1; i <= 1; i++) { const a = k.a + Math.PI + i * 0.7; ctx.beginPath(); ctx.moveTo(k.x, k.y); ctx.lineTo(k.x + Math.cos(a) * 14 * (1.4 - q), k.y + Math.sin(a) * 14 * (1.4 - q)); ctx.stroke(); } }
     ctx.globalCompositeOperation = "source-over"; ctx.fillStyle = "#e8c06a";
     for (const c of (globalThis.casings46 || [])) { ctx.globalAlpha = Math.min(1, c.t * 3); ctx.save(); ctx.translate(c.x, c.y); ctx.rotate(c.r); ctx.fillRect(-2.5, -1, 5, 2); ctx.restore(); }
@@ -8966,6 +8976,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       fx: (k, x, y) => fxStamp(k, x, y, { size: k === "shatter" ? 80 : 30, life: .3 }), sound };
   }
   // 独行回收：只用初始武器（不出现副武器卡），每击破 25 只敌人全伤害 +2%，上限 +30%。
+  // 减弱闪烁（默认开）：任何元素闪烁 ≤3 次/秒；受击/无敌改为柔和透明+慢速描边。
+  function reduceFlash46() { const on = !(typeof save !== "undefined" && save.settings && save.settings.reduceFlash46 === false); globalThis.__reduceFlash46 = on; return on; }
   function soloBonus46() { return typeof activeTrial46 !== "undefined" && activeTrial46 === "solo" ? 1 + Math.min(0.3, Math.floor((P.kills || 0) / 25) * 0.02) : 1; }
   function bossBroken46(e) {
     fxStamp("shatter", e.x, e.y, { size: 150, life: 0.6 }); shake = Math.max(shake, 10); sound("phase");
@@ -9629,7 +9641,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     enemies = enemies.filter(e => !e.dead);
     if (globalThis.SakurayoBoss) { const k = 1 + Math.min(20, P.upgradeChoices40 || 0) * globalThis.SakurayoBoss.HP_PER_PICK; boss.hp *= k; boss.max *= k; }
     enemies.push(boss);
-    globalThis.SakurayoBoss?.init(boss);
+    globalThis.SakurayoBoss?.init(boss); boss.born46 = runTime;
     $("#warning").textContent = `BOSS ${s.boss} 降临 · 四阶段战斗`;
     $("#warning").classList.remove("hidden");
     setTimeout(() => $("#warning").classList.add("hidden"), 2300);
@@ -9716,7 +9728,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     amt *= typeof soloBonus46 === "function" ? soloBonus46() : 1;
     if (e.type === "boss") {
       if (e.guard > 0 && !(e.broken46 > 0)) amt *= 0.32;
-      amt *= globalThis.SakurayoBoss ? globalThis.SakurayoBoss.damageMul(e) : 1;
+      amt *= globalThis.SakurayoBoss ? globalThis.SakurayoBoss.damageMul(e) * globalThis.SakurayoBoss.overtimeMul(runTime - (e.born46 ?? runTime)) : 1;
       amt *= 1 + (P.bossPierce || 0);
     }
     if (P.bloodSword && opt.source === "blade") amt *= 1 + (1 - P.hp / P.maxHp) * 1.2;
@@ -9742,7 +9754,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     P.damageSources[opt.source || "shot"] =
       (P.damageSources[opt.source || "shot"] || 0) + damage;
     e.hp -= damage;
-    e.hit = 0.1;
+    if (typeof reduceFlash46 !== "function" || !reduceFlash46() || !(e.flashAt46 > (runTime || 0) - 0.34)) { e.hit = 0.1; e.flashAt46 = runTime || 0; }
+    if (e.type === "boss" && globalThis.SakurayoBoss) e.hp = globalThis.SakurayoBoss.gateHp(e, runTime - (e.phaseStarted || 0), e.hp + damage);
     if (e.type === "boss" && globalThis.SakurayoBoss && globalThis.SakurayoBoss.fill(e, globalThis.SakurayoBoss.fromDamage(e, damage) * (opt.source === "ult" ? 2 : 1))) bossBroken46(e);
     if (globalThis.SakurayoFeel && !opt.depth) globalThis.SakurayoFeel.knock(e, P.x, P.y, damage, crit, opt.source);
     if (crit && opt.source === "blade") requestHitStop46("crit");
@@ -10722,7 +10735,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     if (globalThis.casings46) { for (const c of globalThis.casings46) { c.t -= dt; c.x += c.vx * dt; c.y += c.vy * dt; c.vy += 420 * dt; c.r += dt * 14; } globalThis.casings46 = globalThis.casings46.filter(c => c.t > 0); }
     if (boss && !boss.dead && globalThis.SakurayoBoss) { const ev = globalThis.SakurayoBoss.tick(boss, dt, runTime - (boss.phaseStarted || 0)); if (ev === "enrage") toast("镜界狂暴：弹幕加密"); if (boss.enraged46 && boss.shot > 0.42) boss.shot = 0.42; }
     if (typeof paintBossBreak46 === "function") paintBossBreak46();
-    { const tf = P.fx < -.08 ? -1 : P.fx > .08 ? 1 : (P.face46 ?? 1); P.face46 = (P.face46 ?? tf) + (tf - (P.face46 ?? tf)) * Math.min(1, dt * 16); }
+    { let tf = P.fx < -.3 ? -1 : P.fx > .3 ? 1 : (P.faceT46 ?? 1); if (tf !== (P.faceT46 ?? tf)) { P.faceHold46 = (P.faceHold46 || 0) + dt; if (P.faceHold46 < (reduceFlash46() ? 0.25 : 0.08)) tf = P.faceT46; else P.faceHold46 = 0; } else P.faceHold46 = 0; P.faceT46 = tf; P.face46 = (P.face46 ?? tf) + (tf - (P.face46 ?? tf)) * Math.min(1, dt * 16); }
     if (P.trail46) { P.trail46.t -= dt; if (P.trail46.t <= 0) P.trail46 = null; }
     runTime += dt;
     banterTick += dt;
@@ -11007,7 +11020,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
         for (let n = 0; n < extra; n++) spawnEnemy();
       }
     } else if (
-      boss &&
+      boss && !boss.dead &&
       enemies.length < 10 &&
       chance(dt * (0.2 + 0.12 * planFactor()))
     )
@@ -11048,7 +11061,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
           b.hit.add(e);
           damageEnemy(e,b.dmg,{source:b.source||(b.fireball?"spell":"shot"),school:b.school,rail:!!b.rail,bioSplit:!!b.bioSplit,pet:!!b.pet});
           if (state !== "play") return;
-          if (b.tracer46 && typeof sparks46 !== "undefined" && sparks46.length < 80) sparks46.push({ x: b.x, y: b.y, a: Math.atan2(b.vy, b.vx), t: 0.14, c: b.tracer46 });
+          if (b.tracer46 && typeof sparks46 !== "undefined" && sparks46.length < (reduceFlash46() ? 14 : 80)) sparks46.push({ x: b.x, y: b.y, a: Math.atan2(b.vy, b.vx), t: 0.14, c: b.tracer46 });
           if (globalThis.SakurayoWeapons && globalThis.SakurayoWeapons.onHit(b, e, weaponApi46())) { b.life = 0; break; }
           if (state !== "play") return;
           if(b.kunaiBlast)aoe(e.x,e.y,34+b.kunaiBlast*7,P.dmg*.22*b.kunaiBlast,"#aa91ff",false,{source:"kunai",school:"ninja"});
@@ -11257,10 +11270,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     for (const g of gems) {
       g.bob += dt * 4;
       let d = Math.hypot(P.x - g.x, P.y - g.y);
-      // Boss arena vacuum: during the duel every shard flies to the player so nobody has to leave the fight to collect.
-      const vac = bossBorn && boss && !boss.dead;
-      if (d < P.mag || vac) {
-        let sp = vac ? Math.max(420, 180 + (P.mag - d) * 2.5) : 180 + (P.mag - d) * 2.5;
+      if (d < P.mag) {
+        let sp = 180 + (P.mag - d) * 2.5;
         g.x += ((P.x - g.x) / (d || 1)) * sp * dt;
         g.y += ((P.y - g.y) / (d || 1)) * sp * dt;
       }
@@ -11399,6 +11410,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   }
   function fxStamp(kind, x, y, opt = {}) {
     if (quality < 0.62 && kind === "hit") return;
+    if (kind === "hit" && typeof reduceFlash46 === "function" && reduceFlash46()) { const now = runTime || 0; if (fxStamp.lastHit46 > now - 0.06 && fxStamp.lastHit46 <= now) return; fxStamp.lastHit46 = now; opt = { ...opt, size: (opt.size || 40) * 0.7 }; }
     partsPush({
       x,
       y,
@@ -11703,14 +11715,16 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     ctx.restore();
   }
   function projectile(b, enemy = false) {
+    const nearMe46 = !enemy && reduceFlash46() && Math.hypot(b.x - P.x, b.y - (P.y - 20)) < 70;
     if (!enemy && b.tracer46 && b.px46 != null) {
-      const k = 2.6; ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
-      ctx.strokeStyle = b.tracer46; ctx.globalAlpha = .55; ctx.lineWidth = b.r * 1.5;
+      const k = 2.6; ctx.save(); ctx.globalCompositeOperation = nearMe46 || reduceFlash46() ? "source-over" : "lighter"; ctx.lineCap = "round";
+      ctx.strokeStyle = b.tracer46; ctx.globalAlpha = nearMe46 ? .15 : reduceFlash46() ? .4 : .55; ctx.lineWidth = b.r * 1.5;
       ctx.beginPath(); ctx.moveTo(b.x - (b.x - b.px46) * k, b.y - (b.y - b.py46) * k); ctx.lineTo(b.x, b.y); ctx.stroke(); ctx.restore();
     }
     ctx.save();
+    if (nearMe46) ctx.globalAlpha = .3;
     ctx.translate(b.x, b.y);
-    ctx.shadowBlur = 12 * battleGlow421(!!(b.rail || b.fireball || b.star || b.wardShot));
+    ctx.shadowBlur = (nearMe46 ? 0 : 12) * battleGlow421(!!(b.rail || b.fireball || b.star || b.wardShot));
     ctx.shadowColor = enemy
       ? b.c
       : b.rail
@@ -11797,6 +11811,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     bullets.forEach((b) => projectile(b));
     if (globalThis.SakurayoWeapons) globalThis.SakurayoWeapons.draw(ctx, P, runTime || 0);
     if (typeof drawSparks46 === "function") drawSparks46();
+    if (P.muzzle46 && (P.animAttack || 0) > 0 && typeof reduceFlash46 === "function" && reduceFlash46()) { const m = P.muzzle46; ctx.save(); ctx.globalAlpha = .32; const gr = ctx.createRadialGradient(P.x + m.x, P.y + m.y, 0, P.x + m.x, P.y + m.y, 11); gr.addColorStop(0, "#ffe9c4"); gr.addColorStop(1, "#ffb07000"); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(P.x + m.x, P.y + m.y, 11, 0, TAU); ctx.fill(); ctx.restore(); }
     ebullets.forEach((b) => projectile(b, true));
     if (drawStats46) { drawStats46.enemies = 0; drawStats46.boss = 0; drawStats46.frames++; }
     enemies.forEach(enemyDraw);
@@ -12325,7 +12340,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function slash35(radius,dmg,big=false){let col=char35().id==="rion"?"#ff526f":"#7db8ff";aoe(P.x,P.y,radius,dmg,col,big,{source:"blade",school:char35().id==="aya"?"ninja":"cult"});P.inv=Math.max(P.inv,big?.16:.07);}
   const _skill35=skill;
   skill=function(){let c=char35();if(c.id==="sayo")return _skill35();if(state!=="play"||P.skill>0)return;P.skill=P.skillCd;if(c.id==="aya"){slash35(150,P.skillD*P.skillPow*1.15,true);P.ayaSlashDelay35=.12;for(let i=0;i<6;i++){let a=i*TAU/6;pushBullet({x:P.x,y:P.y,vx:Math.cos(a)*P.bSpeed,vy:Math.sin(a)*P.bSpeed,r:4,life:1,dmg:P.dmg*.65,pierce:2,source:"shot",school:"gun",hit:new Set()});}}else{P.inv=Math.max(P.inv,.45);slash35(230,P.skillD*P.skillPow*1.85,true);for(const e of grid.within(P.x,P.y,260))e.frozen=Math.max(e.frozen,.55);}sound("skill");};
-  function drawChar35(x,y){let c=char35(),sk=skin35(),m=sk.id==="default"?c.main:sk.c1,h=c.hair,light=c.light,a=Math.atan2(P.fy,P.fx);ctx.save();ctx.translate(x,y);if(P.inv>0&&Math.floor(P.inv*15)%2===0)ctx.globalAlpha=.35;ctx.fillStyle="#0006";ctx.beginPath();ctx.ellipse(0,23,25,8,0,0,TAU);ctx.fill();if(P.form||P.fusion){ctx.strokeStyle=m;ctx.lineWidth=2;ctx.globalAlpha=.55;ctx.beginPath();ctx.arc(0,0,31+Math.sin(runTime*4)*3,0,TAU);ctx.stroke();ctx.globalAlpha=1;}ctx.fillStyle=h;ctx.beginPath();ctx.ellipse(0,-4,21,27,0,0,TAU);ctx.fill();if(c.id==="sayo"){for(const s of [-1,1]){ctx.beginPath();ctx.moveTo(s*15,-7);ctx.quadraticCurveTo(s*35,5,s*20,31);ctx.quadraticCurveTo(s*7,20,s*8,0);ctx.fill();}}else if(c.id==="aya"){ctx.beginPath();ctx.ellipse(-20,-2,10,30,-.35,0,TAU);ctx.fill();}else{ctx.beginPath();ctx.moveTo(-17,-4);ctx.quadraticCurveTo(-28,20,-13,35);ctx.lineTo(0,15);ctx.lineTo(14,35);ctx.quadraticCurveTo(29,18,17,-5);ctx.fill();}ctx.fillStyle=m;ctx.beginPath();ctx.moveTo(-14,9);ctx.lineTo(14,9);ctx.lineTo(18,29);ctx.lineTo(-18,29);ctx.fill();ctx.fillStyle=light;ctx.fillRect(-11,10,22,5);ctx.fillStyle="#ffe1d5";ctx.beginPath();ctx.arc(0,-8,14,0,TAU);ctx.fill();ctx.fillStyle=h;ctx.beginPath();ctx.arc(0,-12,14,Math.PI,TAU);ctx.fill();ctx.beginPath();ctx.moveTo(-13,-11);ctx.lineTo(-5,0);ctx.lineTo(0,-17);ctx.lineTo(5,-1);ctx.lineTo(13,-11);ctx.fill();ctx.fillStyle=c.id==="rion"?"#b92849":"#6c347c";ctx.beginPath();ctx.ellipse(-5,-7,2.1,3,0,0,TAU);ctx.ellipse(5,-7,2.1,3,0,0,TAU);ctx.fill();ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(-4.3,-8,.8,0,TAU);ctx.arc(5.7,-8,.8,0,TAU);ctx.fill();ctx.rotate(a);if(c.id==="sayo"){ctx.fillStyle="#e8f8ff";ctx.fillRect(10,-3,25,7);ctx.fillStyle="#5be1ff";ctx.fillRect(28,-2,13,5);}else if(c.id==="aya"){ctx.fillStyle="#eef8ff";ctx.fillRect(10,-3,18,6);ctx.strokeStyle="#a6c8ff";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-8,13);ctx.lineTo(33,-25);ctx.stroke();}else{ctx.strokeStyle="#fff5f6";ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(-8,14);ctx.lineTo(38,-27);ctx.stroke();ctx.strokeStyle="#ff526f";ctx.lineWidth=2;ctx.stroke();}ctx.restore();}
+  function drawChar35(x,y){let c=char35(),sk=skin35(),m=sk.id==="default"?c.main:sk.c1,h=c.hair,light=c.light,a=Math.atan2(P.fy,P.fx);ctx.save();ctx.translate(x,y);if(P.inv>0)ctx.globalAlpha=reduceFlash46()?.78:(Math.floor(P.inv*6)%2===0?.45:1);ctx.fillStyle="#0006";ctx.beginPath();ctx.ellipse(0,23,25,8,0,0,TAU);ctx.fill();if(P.form||P.fusion){ctx.strokeStyle=m;ctx.lineWidth=2;ctx.globalAlpha=.55;ctx.beginPath();ctx.arc(0,0,31+Math.sin(runTime*4)*3,0,TAU);ctx.stroke();ctx.globalAlpha=1;}ctx.fillStyle=h;ctx.beginPath();ctx.ellipse(0,-4,21,27,0,0,TAU);ctx.fill();if(c.id==="sayo"){for(const s of [-1,1]){ctx.beginPath();ctx.moveTo(s*15,-7);ctx.quadraticCurveTo(s*35,5,s*20,31);ctx.quadraticCurveTo(s*7,20,s*8,0);ctx.fill();}}else if(c.id==="aya"){ctx.beginPath();ctx.ellipse(-20,-2,10,30,-.35,0,TAU);ctx.fill();}else{ctx.beginPath();ctx.moveTo(-17,-4);ctx.quadraticCurveTo(-28,20,-13,35);ctx.lineTo(0,15);ctx.lineTo(14,35);ctx.quadraticCurveTo(29,18,17,-5);ctx.fill();}ctx.fillStyle=m;ctx.beginPath();ctx.moveTo(-14,9);ctx.lineTo(14,9);ctx.lineTo(18,29);ctx.lineTo(-18,29);ctx.fill();ctx.fillStyle=light;ctx.fillRect(-11,10,22,5);ctx.fillStyle="#ffe1d5";ctx.beginPath();ctx.arc(0,-8,14,0,TAU);ctx.fill();ctx.fillStyle=h;ctx.beginPath();ctx.arc(0,-12,14,Math.PI,TAU);ctx.fill();ctx.beginPath();ctx.moveTo(-13,-11);ctx.lineTo(-5,0);ctx.lineTo(0,-17);ctx.lineTo(5,-1);ctx.lineTo(13,-11);ctx.fill();ctx.fillStyle=c.id==="rion"?"#b92849":"#6c347c";ctx.beginPath();ctx.ellipse(-5,-7,2.1,3,0,0,TAU);ctx.ellipse(5,-7,2.1,3,0,0,TAU);ctx.fill();ctx.fillStyle="#fff";ctx.beginPath();ctx.arc(-4.3,-8,.8,0,TAU);ctx.arc(5.7,-8,.8,0,TAU);ctx.fill();ctx.rotate(a);if(c.id==="sayo"){ctx.fillStyle="#e8f8ff";ctx.fillRect(10,-3,25,7);ctx.fillStyle="#5be1ff";ctx.fillRect(28,-2,13,5);}else if(c.id==="aya"){ctx.fillStyle="#eef8ff";ctx.fillRect(10,-3,18,6);ctx.strokeStyle="#a6c8ff";ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(-8,13);ctx.lineTo(33,-25);ctx.stroke();}else{ctx.strokeStyle="#fff5f6";ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(-8,14);ctx.lineTo(38,-27);ctx.stroke();ctx.strokeStyle="#ff526f";ctx.lineWidth=2;ctx.stroke();}ctx.restore();}
   hero=drawChar35;
   const _vectorDrawChar35=drawChar35;
   function charPose35(){return P.animHit>0?"hit":P.animDash>0?"dash":P.animSkill>0?"skill":P.animAttack>0?"attack":P.animMoving?"move":"idle";}
@@ -12334,7 +12349,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     if(!extraOk)return pose;
     if(pose==="idle"){const n=Math.floor(t/.32)%3;return n===1?"idle_b":n===2?"idle_c":"idle";}
     if(pose==="move")return (Math.floor(t/.16)%2)?"move_b":"move";
-    if(pose==="attack"){const a=P.animAttack||0;return a>.1?"attack":a>.05?"attack_b":"attack_c";}
+    if(pose==="attack"){if(reduceFlash46())return "attack";const a=P.animAttack||0;return a>.1?"attack":a>.05?"attack_b":"attack_c";}
     if(pose==="skill")return (P.animSkill||0)>.2?"skill":"skill_b";
     if(pose==="dash")return (P.animDash||0)>.16?"dash":"dash_b";
     if(pose==="hit")return (P.animHit||0)>.12?"hit":"hit_b";
@@ -12376,7 +12391,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       try{return _vectorDrawChar35(x,y);}finally{P.inv=inv;P.form=form;P.fusion=fusion;}
     }
     ctx.save();ctx.translate(x,y);
-    ctx.globalAlpha=(P.inv>0&&Math.floor(P.inv*15)%2===0)?.35:1;
+    ctx.globalAlpha=P.inv>0?(reduceFlash46()?.78:(Math.floor(P.inv*6)%2===0?.45:1)):1;
+    if(P.inv>0&&reduceFlash46()){ctx.save();ctx.globalAlpha=.3;ctx.strokeStyle="#bfe8ff";ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,-20,30,42,0,0,TAU);ctx.stroke();ctx.restore();}
     { const f=P.face46??(P.fx<-.08?-1:1), sp=Math.hypot(P.vel46?.x||0,P.vel46?.y||0); ctx.rotate((P.vel46?.x||0)*.07); ctx.translate(0,-Math.abs(Math.sin((runTime||0)*13))*2.2*sp); ctx.scale(Math.sign(f||1)*Math.max(.18,Math.abs(f)),1); }
     ctx.imageSmoothingEnabled=true;ctx.imageSmoothingQuality="high";
     const vis=PLAYER_GEOMETRY35.visualSize*(window.SakurayoLifecycle?window.SakurayoLifecycle.heroVisualScale(W):1),ox=vis/2,oy=vis-PLAYER_GEOMETRY35.footOffset;
@@ -12490,13 +12506,13 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   slash35=function(radius,dmg,big=false){return directionalSlash36(radius,dmg,big);};
 
   function casing46(x,y,a){if(!globalThis.casings46)globalThis.casings46=[];const C=globalThis.casings46;if(C.length>60)C.shift();const b=a+Math.PI/2*(Math.random()<.5?1:-1)*.8+Math.PI;C.push({x,y,vx:Math.cos(b)*rnd(60,120),vy:Math.sin(b)*rnd(60,120)-90,t:.55,r:rnd(0,TAU)});}
-  function gunShot36(angle,c){const origin=playerMuzzle35(angle);if(c.id==="aya"){P.hand46=-(P.hand46||1);origin.x+=Math.cos(angle+1.57)*6*P.hand46;origin.y+=Math.sin(angle+1.57)*6*P.hand46;}fxStamp("muzzle",origin.x,origin.y,{size:c.id==="sayo"?34:28,life:.14,rot:angle});P.fx=P.aimX=Math.cos(angle);P.fy=P.aimY=Math.sin(angle);P.weaponAngle=angle;P.weaponLock=.22;const K46=c.id==="sayo"?.4:.5,full=(P.shotAcc46=(P.shotAcc46||0)+K46)>=1;if(full){P.shotAcc46-=1;P.shotCount++;}const rail=P.rail&&full&&P.shotCount%9===0,count=P.multi,spread=.115;for(let i=0;i<count;i++){const q=angle+(i-(count-1)/2)*spread;pushBullet({x:origin.x,y:origin.y,vx:Math.cos(q)*P.bSpeed*1.5,vy:Math.sin(q)*P.bSpeed*1.5,r:rail?7:3.5,life:P.range/(P.bSpeed*1.5),dmg:P.dmg*(rail?2.6:K46),tracer46:c.id==="sayo"?"#ffb3d6":"#b8d6ff",pierce:P.pierce+(rail?6:0),rail,source:rail?"tech":"shot",school:rail?"mech":"gun",bioSplit:!!P.bioGun,hit:new Set(),acid:P.acid});}
+  function gunShot36(angle,c){const origin=playerMuzzle35(angle);if(c.id==="aya"){P.hand46=-(P.hand46||1);origin.x+=Math.cos(angle+1.57)*6*P.hand46;origin.y+=Math.sin(angle+1.57)*6*P.hand46;}if(!reduceFlash46()&&!((P.muzzleAt46||-9)>(runTime||0)-.34)&&(P.muzzleAt46=runTime||0,1))fxStamp("muzzle",origin.x,origin.y,{size:c.id==="sayo"?34:28,life:.14,rot:angle});else P.muzzle46={x:origin.x-P.x,y:origin.y-P.y,a:angle};P.fx=P.aimX=Math.cos(angle);P.fy=P.aimY=Math.sin(angle);P.weaponAngle=angle;P.weaponLock=.22;const K46=c.id==="sayo"?.4:.5,full=(P.shotAcc46=(P.shotAcc46||0)+K46)>=1;if(full){P.shotAcc46-=1;P.shotCount++;}const rail=P.rail&&full&&P.shotCount%9===0,count=P.multi,spread=.115;for(let i=0;i<count;i++){const q=angle+(i-(count-1)/2)*spread;pushBullet({x:origin.x,y:origin.y,vx:Math.cos(q)*P.bSpeed*1.5,vy:Math.sin(q)*P.bSpeed*1.5,r:rail?7:3.5,life:P.range/(P.bSpeed*1.5),dmg:P.dmg*(rail?2.6:K46),tracer46:c.id==="sayo"?"#ffb3d6":"#b8d6ff",pierce:P.pierce+(rail?6:0),rail,source:rail?"tech":"shot",school:rail?"mech":"gun",bioSplit:!!P.bioGun,hit:new Set(),acid:P.acid});}
     if(P.gunWard&&full&&P.shotCount%10===0)pushBullet({x:origin.x,y:origin.y,vx:Math.cos(angle)*P.bSpeed*.88,vy:Math.sin(angle)*P.bSpeed*.88,r:10,life:1.35,dmg:P.dmg*1.45*P.skillPow,pierce:8,home:.025,source:"skill",school:"shrine",wardShot:1,hit:new Set()});
     if(P.star&&full&&P.shotCount%Math.max(3,7-P.star)===0)for(let i=0;i<P.star;i++){const q=angle+rnd(-.45,.45);pushBullet({x:origin.x,y:origin.y,vx:Math.cos(q)*P.bSpeed*.72,vy:Math.sin(q)*P.bSpeed*.72,r:5,life:1.45,dmg:P.dmg*.72*P.spellPow,pierce:1,home:.09,star:1,source:"star",school:"magical",hit:new Set()});}
     if(P.idolGun&&P.combo>0&&full&&P.shotCount%6===0)for(let i=0;i<3;i++){const q=angle+(i-1)*.18;pushBullet({x:origin.x,y:origin.y,vx:Math.cos(q)*P.bSpeed,vy:Math.sin(q)*P.bSpeed,r:4,life:P.range/P.bSpeed,dmg:P.dmg*.46,pierce:1,source:"music",school:"idol",hit:new Set()});}
     if(c.id==="sayo"&&full&&P.shotCount%7===0)pushBullet({x:origin.x,y:origin.y,vx:Math.cos(angle)*P.bSpeed*1.12,vy:Math.sin(angle)*P.bSpeed*1.12,r:7,life:P.range/P.bSpeed,dmg:P.dmg*1.7,pierce:P.pierce+4,rail:1,source:"tech",school:"gun",hit:new Set()});
     if(c.id==="aya"&&full&&P.shotCount%4===0){if(nearest(P.x,P.y,140))directionalSlash36(125,P.dmg*2.05+P.pierce*2,false,angle,1.02);else pushBullet({x:origin.x,y:origin.y,vx:Math.cos(angle)*P.bSpeed*.8,vy:Math.sin(angle)*P.bSpeed*.8,r:13,life:P.range*.6/(P.bSpeed*.8),dmg:P.dmg*1.6+P.pierce*2,pierce:P.pierce+3,source:"blade",school:"ninja",crescent46:1,hit:new Set()});}
-    P.fire=P.rate*K46*(P.encoreTimer>0?.62:1);casing46(origin.x,origin.y,angle);P.animAttack=.16;sound(c.id==="sayo"?"rifle":"pistol");
+    P.fire=P.rate*K46*(P.encoreTimer>0?.62:1);casing46(origin.x,origin.y,angle);P.animAttack=reduceFlash46()?Math.max(.16,P.fire+.08):.16;sound(c.id==="sayo"?"rifle":"pistol");
   }
   shoot=function(){const c=char35(),target=P.manualAim?null:aimTarget46(P.range);let angle=P.manualAim?(P.weaponAngle||0):(target?Math.atan2(target.y-P.y,target.x-P.x):null);if(c.id!=="rion"){if(angle==null)return;return gunShot36(angle,c);}if(angle==null){const e=nearest(P.x,P.y,176+55);if(!e)return;angle=Math.atan2(e.y-P.y,e.x-P.x);}P.fx=P.aimX=Math.cos(angle);P.fy=P.aimY=Math.sin(angle);P.weaponAngle=angle;P.weaponLock=.28;const next=(P.meleeChain+1)%3,third=next===0,radius=third?176:128,dmg=P.dmg*(third?2.2:1.38)*(1+(P.multi-1)*.12+P.pierce*.05);P.meleeChain=next;directionalSlash36(radius,dmg,third,angle,third?1.66:1.05);if(third){P.hp=Math.min(P.maxHp,P.hp+1.2*healingMul());toast("剑势·三段");}P.fire=P.rate;P.animAttack=.2;sound("slash");};
 
@@ -12832,9 +12848,10 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   openSettings37=function(){
     _openSettings39();const body=$("#settingsBody37");if(!body||$("#damageText39"))return;
     const options=document.createElement("div");options.className="settingGroup39";
-    options.innerHTML=`<button id="damageText39" class="settingToggle37">伤害数字：${{off:"关闭",compact:"精简",full:"完整"}[save.settings.damageText]}</button><button id="contrast39" class="settingToggle37">角色高对比轮廓：${save.settings.contrast?"开":"关"}</button><button id="calmUi39" class="settingToggle37">界面减法模式：${save.settings.uiCalm?"开":"关"}</button><button id="battleGlow421" class="settingToggle37">普通战斗发光：${{off:"关闭",soft:"柔和",vivid:"鲜明"}[save.settings.glow]}</button>`;
+    options.innerHTML=`<button id="damageText39" class="settingToggle37">伤害数字：${{off:"关闭",compact:"精简",full:"完整"}[save.settings.damageText]}</button><button id="contrast39" class="settingToggle37">角色高对比轮廓：${save.settings.contrast?"开":"关"}</button><button id="calmUi39" class="settingToggle37">界面减法模式：${save.settings.uiCalm?"开":"关"}</button><button id="reduceFlash46" class="settingToggle37">减弱闪烁：${reduceFlash46()?"开":"关"}</button><button id="battleGlow421" class="settingToggle37">普通战斗发光：${{off:"关闭",soft:"柔和",vivid:"鲜明"}[save.settings.glow]}</button>`;
     body.appendChild(options);
     options.querySelector("#damageText39").onclick=()=>{save.settings.damageText=save.settings.damageText==="compact"?"full":save.settings.damageText==="full"?"off":"compact";persist();openSettings37();};
+    options.querySelector("#reduceFlash46").onclick=()=>{save.settings.reduceFlash46=!reduceFlash46();persist();openSettings37();};
     options.querySelector("#contrast39").onclick=()=>{save.settings.contrast=save.settings.contrast?0:1;persist();document.body.classList.toggle("noContrast39",!save.settings.contrast);openSettings37();};
     options.querySelector("#calmUi39").onclick=()=>{save.settings.uiCalm=save.settings.uiCalm?0:1;persist();document.body.classList.toggle("richUi39",!save.settings.uiCalm);openSettings37();};
     options.querySelector("#battleGlow421").onclick=()=>{save.settings.glow=save.settings.glow==="off"?"soft":save.settings.glow==="soft"?"vivid":"off";persist();openSettings37();};
@@ -13339,6 +13356,9 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       giveWeapon46(id,n=1){for(let i=0;i<n;i++)globalThis.SakurayoWeapons.gain(P,id);return P.weapons46;},
       poolIds46(n=12){const out=new Set();for(let i=0;i<n;i++)for(const u of getPool())out.add(u.id);return [...out];},
       soloBonus46(){return soloBonus46();},
+      setInv46(t=3){P.inv=t;return P.inv;},
+      setReduceFlash46(on){save.settings.reduceFlash46=!!on;return reduceFlash46();},
+      playerScreen46(){const c=window.SakurayoCamera;const p=c&&c.worldToScreen?c.worldToScreen(P.x,P.y):{x:P.x,y:P.y};return {x:p.x,y:p.y};},
       teleport46(x,y){P.x=x;P.y=y;return snapshot35();},
       realtime46(){manualTestClock=false;last=performance.now();scheduleLoop();return true;},
       props46(){return (props46||[]).map(p=>({kind:p.kind,x:p.x,y:p.y,done:p.done}));},
