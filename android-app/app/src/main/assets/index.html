@@ -14306,7 +14306,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       forceLevelDone46(){if(levelObj46)levelObj46.done=true;},
       avgState46(){return window.SakurayoAvg?.state()||null;},
       avgNext46(n=1){for(let i=0;i<n;i++)window.SakurayoAvg?.next();return window.SakurayoAvg?.state()||null;},
-      avgSkip46(){window.SakurayoAvg?.skip();return state;},
+      storyPlay46(id,part){return playStory46(id,part,()=>{});},avgSkip46(){window.SakurayoAvg?.skip();return state;},
       openLevelMap46(ch){openLevelMap46(ch);return !!$("#levelMap46:not(.hidden)");},
       saveSnapshot46(){return JSON.parse(JSON.stringify({stars46:save.stars46,cg46:save.cg46,avgRead46:(save.avgRead46||[]).length,done:save.done,unlock:save.unlock,coins:save.coins}));},
       setBossHpRatio(ratio){if(!boss||boss.dead)throw new Error("Boss is not active");boss.ungate46=true;boss.hp=clamp(Number(ratio),0,1)*boss.max;return snapshot35();},
