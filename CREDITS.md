@@ -39,3 +39,15 @@
 - lbpcascade_animeface — nagadomi，MIT（工具链使用，不打包进游戏）
 - OpenCV — Apache-2.0；rembg (isnet-anime) — MIT；Depth Anything V2 Small — Apache-2.0（仅离线工具链）
 - 运行时 src/runtime/sakurayo-rig.js 为本项目自写，无第三方代码。
+
+## 看板娘全身绑定与大幅动作（rig v2 / action 序列）
+
+| 项目 | 用途 | 许可证 |
+|---|---|---|
+| [Tau-J/rtmlib](https://github.com/Tau-J/rtmlib) + RTMPose-m（OpenMMLab [mmpose](https://github.com/open-mmlab/mmpose)） | 立绘人体 17 关键点 → 自动生成骨骼（肩/肘/腕/髋/膝） | Apache-2.0 |
+| [hzwer/Practical-RIFE](https://github.com/hzwer/Practical-RIFE) v4.25（经 [HolyWu/vs-rife](https://github.com/HolyWu/vs-rife) 网络定义加载） | 动作关键帧之间的中间帧（CPU，仅离线工具链） | MIT |
+| [danielgatis/rembg](https://github.com/danielgatis/rembg) isnet-anime | 关键帧/拆层抠图 | MIT（模型 Apache-2.0） |
+| OpenCV ECC (`findTransformECC`) | 关键帧与原立绘静止区对齐 | Apache-2.0 |
+| gpt-image-2（中转站） | 去手臂补全躯干层、动作关键帧、语义 mask | 生成内容归本项目 |
+| 评估未采用：[Doubiiu/ToonCrafter](https://github.com/Doubiiu/ToonCrafter) | 官方 HF Space（ZeroGPU）匿名调用返回错误；本机无 GPU，权重约 10 GB、CPU 推理需 >20 GB 内存，盒子仅 15 GB 且与其它进程共享，不可行 | Apache-2.0（代码）|
+| 评估未采用：GMFSS / AnimeInterp | 需 CUDA 自定义算子（GMFSS 的 softsplat / AnimeInterp 的 cupy），CPU 不可运行 | MIT / — |

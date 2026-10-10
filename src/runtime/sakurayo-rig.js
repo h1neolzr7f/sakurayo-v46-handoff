@@ -170,7 +170,9 @@
     gl.viewport(0, 0, v.W, v.H); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
     gl.uniform4f(this.loc.m, 2 * v.sc / v.W, -2 * v.sc / v.H, 2 * v.ox / v.W - 1, 1 - 2 * v.oy / v.H);
     for (var i = 0; i < this.meshes.length; i++) {
-      var m = this.meshes[i], al = m.expr ? this.s.ex[m.expr] || 0 : 1;
+      var m = this.meshes[i], al = m.expr ? this.s.ex[m.expr] || 0 : 1, fr = this.v2 && this.s.seq ? this.seqFrame() : null;
+      if (m.action) { if (!fr || fr.A !== m.A || !this.tex[m.tex0]) continue; this.drawSeq(gl, m, fr); continue; }
+      if (fr && m.kind === "arm" && m.side === (fr.A.side || this.d.bones.pinSide) && fr.fade > 0.99) continue; // 序列帧里已包含手臂（首帧与静止姿态逐像素一致，切换无跳变）
       if (al < 0.01 || !this.tex[m.tex0]) continue;
       gl.bindTexture(gl.TEXTURE_2D, this.tex[m.tex0]); gl.uniform1f(this.loc.a, al);
       gl.bindBuffer(gl.ARRAY_BUFFER, m.pb); gl.bufferData(gl.ARRAY_BUFFER, m.out, gl.DYNAMIC_DRAW); gl.enableVertexAttribArray(this.loc.p); gl.vertexAttribPointer(this.loc.p, 2, gl.FLOAT, false, 0, 0);
@@ -178,12 +180,27 @@
       gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, m.ib); gl.drawElements(gl.TRIANGLES, m.idx.length, gl.UNSIGNED_SHORT, 0);
     }
   };
+  Rig.prototype.drawSeq = function (gl, m, fr) {
+    var i0 = Math.floor(fr.pos), i1 = Math.min(fr.n - 1, i0 + 1), k = fr.pos - i0, A = m.A, self = this;
+    function uv(dst, i) { var o = A.frames[i]; for (var q = 0; q < m.n; q++) { dst[q * 2] = (o[0] + m.uv0[q * 2] * A.tw) / m.iw; dst[q * 2 + 1] = (o[1] + m.uv0[q * 2 + 1] * A.th) / m.ih; } }
+    gl.bindTexture(gl.TEXTURE_2D, this.tex[m.tex0]);
+    gl.bindBuffer(gl.ARRAY_BUFFER, m.pb); gl.bufferData(gl.ARRAY_BUFFER, m.out, gl.DYNAMIC_DRAW); gl.enableVertexAttribArray(this.loc.p); gl.vertexAttribPointer(this.loc.p, 2, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, m.ib);
+    [[i0, 1], [i1, k]].forEach(function (p) {
+      if (p[1] * fr.fade < 0.01) return; uv(m.tex2, p[0]); gl.uniform1f(self.loc.a, p[1] * fr.fade);
+      gl.bindBuffer(gl.ARRAY_BUFFER, m.tb); gl.bufferData(gl.ARRAY_BUFFER, m.tex2, gl.DYNAMIC_DRAW); gl.enableVertexAttribArray(self.loc.u); gl.vertexAttribPointer(self.loc.u, 2, gl.FLOAT, false, 0, 0);
+      gl.drawElements(gl.TRIANGLES, m.idx.length, gl.UNSIGNED_SHORT, 0);
+    });
+  };
   Rig.prototype.render2d = function (v) {
     // 2D 降级：不做网格，只做以脚底为锚的轻微呼吸缩放（无平移/弹跳）+ 眨眼/表情补丁
     var g = this.c.getContext("2d"), b = 1 + this.s.breath * 0.004 + this.s.stretch * 0.02, fy = v.oy + this.d.bbox[3] * v.sc;
     g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, v.W, v.H); g.setTransform(1, 0, 0, b, 0, fy * (1 - b));
     g.drawImage(this.base, v.ox, v.oy, this.d.w * v.sc, this.d.h * v.sc);
-    if (this.v2 && this.texImgs.arms) for (var sd in this.d.arms) { var A = this.d.arms[sd]; g.drawImage(this.texImgs.arms, A.ax, A.ay, A.w, A.h, v.ox + A.x * v.sc, v.oy + A.y * v.sc, A.w * v.sc, A.h * v.sc); }
+    var fr2 = this.v2 && this.s.seq ? this.seqFrame() : null;
+    if (fr2) { var Aq = fr2.A, im = this.texImgs["act_" + this.s.seq.name], i0 = Math.floor(fr2.pos), r = Aq.rect;
+      [[i0, 1], [Math.min(fr2.n - 1, i0 + 1), fr2.pos - i0]].forEach(function (p) { if (p[1] < 0.01) return; g.globalAlpha = p[1]; var o = Aq.frames[p[0]]; g.drawImage(im, o[0], o[1], Aq.tw, Aq.th, v.ox + r[0] * v.sc, v.oy + r[1] * v.sc, r[2] * v.sc, r[3] * v.sc); }); g.globalAlpha = 1; }
+    else if (this.v2 && this.texImgs.arms) for (var sd in this.d.arms) { var A = this.d.arms[sd]; g.drawImage(this.texImgs.arms, A.ax, A.ay, A.w, A.h, v.ox + A.x * v.sc, v.oy + A.y * v.sc, A.w * v.sc, A.h * v.sc); }
     for (var k in this.d.patches) { var p = this.d.patches[k], al = this.s.ex[k] || 0; if (al < 0.01 || !this.atlas) continue; g.globalAlpha = al;
       g.drawImage(this.atlas, p.ax, p.ay, p.w, p.h, v.ox + p.x * v.sc, v.oy + p.y * v.sc, p.w * v.sc, p.h * v.sc); g.globalAlpha = 1; }
     g.setTransform(1, 0, 0, 1, 0, 0);
@@ -205,7 +222,7 @@
     this.base = imgs.body; this.atlas = imgs.atlas; this.texImgs = { body: imgs.body, arms: imgs.arms, atlas: imgs.atlas };
     this.s = { hx: 0, hy: 0, tx: 0, ty: 0, tilt: 0, gaze: 0, gazeY: 0, hair: 0, hairV: 0, skirt: 0, skirtV: 0, acc: 0, accV: 0, breath: 0, stretch: 0,
       ex: { closed: 0, talk: 0, happy: 0, shy: 0 }, blinkT: -1, blinkWait: 1.6, act: null, actT: 0, talkUntil: 0, prevHx: 0, idleWait: 9,
-      lag: { neck: 0, chest: 0, waist: 0, neckY: 0, chestY: 0 }, pin: 0, wave: 0, prev: {} };
+      lag: { neck: 0, chest: 0, waist: 0, neckY: 0, chestY: 0 }, pin: 0, wave: 0, prev: {}, seq: null, armHold: 1 };
     var gx = d.grid[0], gy = d.grid[1], n = gx * gy, bb = d.bbox, W = {}, k; this.gx = gx; this.gy = gy;
     for (k = 0; k < KEYS2.length; k++) W[KEYS2[k]] = d.weights[KEYS2[k]] ? dec(d.weights[KEYS2[k]], n) : new Float32Array(n);
     this.W = W; W.head = W.head; // for part()/at()
@@ -242,8 +259,15 @@
       var m = grid(p.x, p.y, p.x + p.w, p.y + p.h, 10, 10, function (x, y) { return [(p.ax + x - p.x) / pw, (p.ay + y - p.y) / ph]; }, (function () { var o = {}; KEYS2.forEach(function (kk) { o[kk] = function (x, y) { return sample(W[kk], x, y); }; }); return o; })());
       m.tex0 = "atlas"; m.expr = name; m.kind = "body"; self.meshes.push(m);
     });
-    // arms are drawn after body, expression patches last
-    this.meshes.sort(function (a, b) { return (a.expr ? 2 : a.kind === "arm" ? 1 : 0) - (b.expr ? 2 : b.kind === "arm" ? 1 : 0); });
+    /* 大幅动作：gpt-image-2 关键帧 + RIFE 补帧的序列（tools/anim-pipeline/action.py）。网格只负责让它继续跟随呼吸/重心，不再硬拉手臂。 */
+    Object.keys(d.actions || {}).forEach(function (an) {
+      var A = d.actions[an], img = imgs["act_" + an]; if (!img) return;
+      self.texImgs["act_" + an] = img; var r = A.rect;
+      var m = grid(r[0], r[1], r[0] + r[2], r[1] + r[3], 16, 22, function (x, y) { return [(x - r[0]) / r[2], (y - r[1]) / r[3]]; }, (function () { var o = {}; KEYS2.forEach(function (kk) { o[kk] = function (x, y) { return sample(W[kk], x, y); }; }); return o; })());
+      m.tex0 = "act_" + an; m.kind = "body"; m.action = an; m.A = A; m.uv0 = m.tex.slice(); m.iw = img.width; m.ih = img.height; m.tex2 = new Float32Array(m.tex.length); self.meshes.push(m);
+    });
+    // arms are drawn after body, action sequences above arms, expression patches last
+    this.meshes.sort(function (a, b) { return (a.expr ? 3 : a.action ? 2 : a.kind === "arm" ? 1 : 0) - (b.expr ? 3 : b.action ? 2 : b.kind === "arm" ? 1 : 0); });
     this.gl = this.opts.no3d ? null : this.initGL();
   }
   Rig2.prototype = Object.create(Rig.prototype);
@@ -281,8 +305,8 @@
     // 手臂：呼吸微动 + 整理发夹 IK
     var arms = {};
     for (var sd in d.arms) {
-      var A = d.arms[sd], sign = A.S[0] > B.chest[0] ? 1 : -1, tu = 0.012 * b * sign + 0.008 * Math.sin(t * 0.7 + (sign > 0 ? 0 : 2)), tf = 0.01 * Math.sin(t * 0.9 + 1);
-      tu += -sign * 0.05 * st; // 伸懒腰：手臂外展
+      var A = d.arms[sd], sign = A.S[0] > B.chest[0] ? 1 : -1, ah = s.armHold, tu = (0.012 * b * sign + 0.008 * Math.sin(t * 0.7 + (sign > 0 ? 0 : 2))) * ah, tf = 0.01 * Math.sin(t * 0.9 + 1) * ah;
+      tu += -sign * 0.05 * st * ah; // 伸懒腰：手臂外展
       if (sd === B.pinSide && s.pin > 0.001) { var fc = this.lm.face, k = s.pin, L1 = Math.hypot(A.E[0] - A.S[0], A.E[1] - A.S[1]), goal = [A.S[0] + sign * 0.22 * L1, Math.max(fc[1] + fc[3] * 0.1, A.S[1] - 0.9 * L1)], tgt = [A.Wr[0] + (goal[0] - A.Wr[0]) * k, A.Wr[1] + (goal[1] - A.Wr[1]) * k]; var q = ik2(A.S, A.E, A.Wr, tgt, sign), q0 = ik2(A.S, A.E, A.Wr, A.Wr, sign); tu += q[0] - q0[0]; tf += q[1] - q0[1]; }
       if (s.wave > 0.001 && sd !== B.pinSide) { tu += -sign * 0.5 * s.wave; tf += -sign * (0.6 + 0.25 * Math.sin(t * 9)) * s.wave; }
       var up = mul(che, rotAt(tu, A.S[0], A.S[1])), fo = mul(up, rotAt(tf, A.E[0], A.E[1]));
@@ -318,9 +342,21 @@
     }
   };
   var _upd = Rig.prototype.update;
+  /* 序列播放：先把手臂待机摆动收到 0（0.25s，静止姿态 == 序列首帧），再 正放 → 停顿 → 倒放，最后一帧 == 原图，再放开手臂摆动。 */
+  Rig2.prototype.seqFrame = function () {
+    var q = this.s.seq; if (!q) return null; var A = this.d.actions[q.name], n = A.frames.length, f = A.fps, t = q.t - 0.25;
+    var up = (n - 1) / f, hold = q.hold, pos;
+    if (t < 0) pos = 0; else if (t < up) pos = t * f; else if (t < up + hold) pos = n - 1; else pos = Math.max(0, (n - 1) - (t - up - hold) * f);
+    var fade = Math.min(1, Math.max(0, (q.t) / 0.25), Math.max(0, (up * 2 + hold + 0.25 - t) / 0.25));
+    return { pos: pos, done: t > up * 2 + hold + 0.25, A: A, n: n, fade: fade };
+  };
   Rig2.prototype.update = function (dt) {
-    this.dtLast = dt; var s = this.s, a = s.act ? s.actT / ({ pin: 3.2, wave: 2.4 }[s.act] || 1) : 0;
-    s.pin = damp(s.pin, s.act === "pin" ? bump(a, 0.3, 0.3) : 0, dt, 0.12);
+    this.dtLast = dt; var s = this.s;
+    if (s.act && this.d.actions && this.d.actions[s.act] && this.texImgs["act_" + s.act] && !s.seq && s.actT < 0.05) s.seq = { name: s.act, t: 0, hold: s.act === "pin" ? 1.4 : 0.8 };
+    if (s.seq) { s.seq.t += dt; var fr = this.seqFrame(); s.armHold = Math.max(0, s.armHold - dt / 0.25); if (fr.done) { s.seq = null; } }
+    else s.armHold = Math.min(1, s.armHold + dt / 0.4);
+    var a = s.act && !s.seq ? s.actT / ({ pin: 3.2, wave: 2.4 }[s.act] || 1) : 0;
+    s.pin = damp(s.pin, s.act === "pin" && !s.seq && !(this.d.actions && this.d.actions.pin) ? bump(a, 0.3, 0.3) : 0, dt, 0.12);
     s.wave = damp(s.wave, s.act === "wave" ? bump(a, 0.25, 0.3) : 0, dt, 0.12);
     return _upd.call(this, dt);
   };
@@ -333,7 +369,11 @@
   function load(id, url) {
     return loadScript(url("live/" + id + "/rig.js")).then(function () {
       var d = DATA[id]; if (!d) throw new Error("no rig " + id);
-      if (d.v === 2) return Promise.all([loadImg(url("live/" + id + "/body.webp")), loadImg(url("live/" + id + "/arms.webp")), loadImg(url("live/" + id + "/atlas.webp"))]).then(function (r) { return { d: d, imgs: { body: r[0], arms: r[1], atlas: r[2] } }; });
+      if (d.v === 2) {
+        var acts = Object.keys(d.actions || {});
+        return Promise.all([loadImg(url("live/" + id + "/body.webp")), loadImg(url("live/" + id + "/arms.webp")), loadImg(url("live/" + id + "/atlas.webp"))].concat(acts.map(function (a) { return loadImg(url("live/" + id + "/act_" + a + ".webp")).catch(function () { return null; }); })))
+          .then(function (r) { var im = { body: r[0], arms: r[1], atlas: r[2] }; acts.forEach(function (a, i) { if (r[3 + i]) im["act_" + a] = r[3 + i]; }); return { d: d, imgs: im }; });
+      }
       return Promise.all([loadImg(url("live/" + id + "/base.webp")), Object.keys(d.patches || {}).length ? loadImg(url("live/" + id + "/atlas.webp")) : null]).then(function (r) { return { d: d, base: r[0], atlas: r[1] }; });
     });
   }

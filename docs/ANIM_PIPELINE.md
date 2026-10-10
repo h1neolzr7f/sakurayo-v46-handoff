@@ -53,3 +53,10 @@ python tools/anim-pipeline/run.py rig --name sayo --base art/characters/sayo/def
 ## 兼容与降级
 - WebGL1 用 `failIfMajorPerformanceCaveat` 创建；若创建失败（无 WebGL、软件渲染被拒）或发生 `webglcontextlost`，就切换到 Canvas2D：不做网格，只保留以脚底为锚的呼吸缩放、眨眼和表情补丁。加上 `?rig=2d` 可以强制使用 2D。rig 数据加载失败时退回原来的 `lobby_idle.webp` 静态层。
 - `tests/mascot_sizes_smoke.mjs` 覆盖三角色 × 三种尺寸（1280×720、390×844@2x、1024×768）× 两种渲染路径（WebGL/2D）。
+
+
+## v2 更新：全身绑定 + 大幅动作走关键帧序列（2026-10-11）
+- `body.py`：gpt-image-2 生成“去手臂并补全躯干”的 body 层（3 个候选，按“骨段覆盖率 + 重绘彻底度 − 静止区残差”自动挑），base 与 body 做差得到手臂层，再并上肩→肘→腕的骨段胶囊，扣除武器 mask；rtmlib RTMPose 出 17 关键点 → 骨盆/腰/胸/颈/头 + 双臂上臂/前臂；脊柱按 y 方向的帽函数做单位分解权重，腿以脚为根随骨盆剪切，肘部 smoothstep 过渡。
+- 运行时 `Rig2`：线性混合蒙皮；转头按 头100%/颈60%/胸30%/腰15% 逐级带延迟；呼吸驱动胸口、肩、手臂；重心左右交替；头发/裙摆/饰品由头/骨盆/胸的速度驱动弹簧。
+- 大幅动作 `action.py`：gpt-image-2 以原立绘为参考生成 3 个关键帧（1/3、2/3、到位），ECC 对齐 + 静止区配色 + 静止区回填 → Practical-RIFE 每段递归补 7 帧（共 25 帧，24 fps）→ 运动区图集 `act_<name>.webp`。ToonCrafter 评估：HF Space 匿名 ZeroGPU 调用失败，本机无 GPU 且内存不足（见 CREDITS），故选 RIFE + 更密的 AI 关键帧。
+- 无缝切换：手臂待机摆动 0.25 s 收为 0 → 序列淡入（首帧 = 待机）→ 正放 → 停 1.4 s（继续呼吸）→ 倒放 → 淡出。录像逐帧差：接缝处无尖峰（最大 3.1，出现在动作中段）。
