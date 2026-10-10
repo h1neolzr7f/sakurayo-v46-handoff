@@ -7473,7 +7473,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function setTrial46(id){
     const T=window.SakurayoTrials;
     activeTrial46=T&&id&&T.available(save,id)?id:null;
-    const b=$("#trialBadge46");
+    const b=$("#trialBadge46"),mini=$("#menu .stageMini");
+    if(b&&mini&&b.parentElement!==mini)mini.appendChild(b);
     if(b){const t=activeTrial46&&T.find(activeTrial46);b.classList.toggle("hidden",!t);b.innerHTML=t?`<b>试炼</b>${t.name}<button type="button" aria-label="取消试炼">×</button>`:"";const x=b.querySelector("button");if(x)x.onclick=()=>{setTrial46(null);toast("已取消试炼");};}
     return activeTrial46;
   }

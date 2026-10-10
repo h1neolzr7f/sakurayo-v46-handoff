@@ -157,3 +157,14 @@ bash gradlew --no-daemon assembleDebug lintDebug
 - 删除冗余：两层 `shoot` 包装（`_shoot35`、`_shootAnim35`）被后续方向射击/斩击 `shoot` 完全覆盖且不被调用，已删除。原始 `shoot()`（约 3596 行，含 idolGun 等分支）同样被覆盖，属于死代码但较大，留待确认相关机制是否需要迁移后再删。
 - 验证：`bash tools/verify.sh` 完整流程 VERIFY PASS（含 1.30 门槛）；打包版 collection_smoke 与 content_receipts_smoke PASS。
 - 未做：三项离线试炼、表现/音频、Android 编译/模拟器 instrumentation、实机验收。
+
+### 第三阶段（2026-10-10 10:10–12:30 Asia/Shanghai）：二游化重设计、看板娘、试炼
+
+- 界面重做：`4249499` 大厅层级/战斗 HUD；`8e3a64d` 寻访页（卡池页签、UP 主视觉、钱包、详情/记录、消耗按钮）；`685ddf1` 商店分类栏 + 两列卡、角色/整备立绘舞台；`fb05b3f` 中转站 gpt-image-2 生成 UP 立绘、卡池横幅、货币图标、结果背景。
+- 友好度 `80169ce`：44px 点击区、按压反馈 + 点击音、面板过渡、红点、首次引导、Spark 二次确认、货币不足提示与获取途径、已装备按钮置灰。
+- 看板娘 `322683f`：三角色 idle/happy/shy 1024×1536 三分身立绘（`characters/<id>/default/lobby_*.webp`），脸部锚定大尺寸构图、呼吸浮动、点头/身体触发台词气泡与表情切换，设置里可切换（跟随/小夜/绫/凛音）；角色档案立绘同步改用新图。
+- 图片自查 `3d45836`：十连结果在 640×360 原先底部按钮被裁、卡片压到关闭键，现按屏高自适应卡片尺寸；结果页 toast/引导移到不遮卡的位置。横幅、图标、角色/商店卡图均无变形（检测脚本：object-fit=fill 且比例偏差 >5% 或放大 >1.15× 即报警，0 项）。
+- 试炼与冷却 `32613c0` + 本提交：`src/runtime/sakurayo-trials.js`。独行回收（第 2 章，禁 DP 干员，120 币）、封印试炼（第 3 章，升级不弹强化，180 币）、无伤终夜（第 4 章，受生命伤害即失败，护盾不算，240 币）。大厅底栏「试炼」图标页签 + 红点（有可领首通时）；左侧页签 + 右侧大横幅详情页；选中后出击按钮旁显示试炼徽章（可 ×取消），返回大厅/换模式/换关自动取消；结算页显示成功/失败、首通奖励、用时与最佳。首通奖励只发一次（收据存 `shop40.ops.trials`，导入/重载保持）。技能/冲刺按钮冷却时显示剩余秒数。
+- 测试：新增 `tests/trials_unit.mjs`、`tests/trials_smoke.mjs`（改用本地 http 服务，避免 file:// localStorage 在负载下重载丢失）、`tests/mascot_smoke.mjs`；`browser_smoke`/`tactical_smoke` 底栏图标数 6→7（新增试炼入口，非放宽）；`state_unit` 夹具补 `activeTrial46`/`paintTrialResult46`。`bash tools/verify.sh` 完整 VERIFY PASS（含 1.30 门槛、打包版重跑）。
+- 截图：`/workspace/sakurayo-shots/v3-*.png`（box 本地，未入库）。
+- 仍未做：试炼专属横幅仍复用章节主视觉；Android Gradle 编译/实机验收；音乐与更多表现。

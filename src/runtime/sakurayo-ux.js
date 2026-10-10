@@ -37,6 +37,8 @@
     "#skill,#dash{position:relative}",
     "#skill:not(.ready44)[data-cd]:not([data-cd=''])::after,#dash:not(.ready44)[data-cd]:not([data-cd=''])::after{content:attr(data-cd);position:absolute;inset:0;display:grid;place-items:center;border-radius:inherit;background:rgba(4,8,18,.55);color:#fff;font:900 18px/1 system-ui;text-shadow:0 1px 4px #000;pointer-events:none}",
     "#dash:not(.ready44)[data-cd]:not([data-cd=''])::after{font-size:14px}",
+    /* trial badge rides on the stage strip so it never covers 出击 */
+    "#menu .stageMini:has(>.trialBadge46){position:relative;overflow:visible!important}#menu .stageMini>.trialBadge46{right:44px;bottom:auto;top:50%;transform:translateY(-50%);padding:3px 3px 3px 10px;font-size:11px}#menu .stageMini>.trialBadge46 button{min-width:28px!important;min-height:28px!important}",
     /* trial badge + result */
     ".trialBadge46{position:absolute;z-index:5;right:max(16px,env(safe-area-inset-right));bottom:calc(var(--trialBadgeBottom,120px));display:flex;align-items:center;gap:8px;padding:4px 4px 4px 12px;border-radius:999px;background:rgba(9,15,30,.9);border:1px solid #ffb3d1;color:#ffe3ef;font:800 12px/1 system-ui;box-shadow:0 6px 18px rgba(255,90,160,.3)}",
     ".trialBadge46 b{color:#ff9cc6;letter-spacing:.12em}.trialBadge46 button{min-width:32px!important;min-height:32px!important;border-radius:50%;border:0;background:#ffffff1a;color:#fff;font:800 14px/1 system-ui}",
