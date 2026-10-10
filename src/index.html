@@ -156,6 +156,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 <script src="runtime/sakurayo-services.js"></script>
 <script src="runtime/sakurayo-ui.js"></script>
 <script src="runtime/sakurayo-sfx.js"></script>
+<script src="runtime/sakurayo-bgm.js"></script>
 <script src="runtime/sakurayo-trials.js"></script>
 <script src="runtime/sakurayo-lobby.js"></script>
 <script src="runtime/sakurayo-save.js"></script>
@@ -2765,6 +2766,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (state === "result") return;
     win = !!win;
     setMusic37(false);
+    window.SakurayoBGM?.sting(win ? "win" : "lose");
     applyChallengeFinish37(win);
     const lone = applyFinishAwards40(win);
     trialResult46 = null;
@@ -6374,16 +6376,20 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 
   let music37=null,musicGain37=null,musicMode37="",hapticAt37=0;
   function haptic37(pattern){if(!save.settings?.vibration||!navigator.vibrate)return;const now=performance.now();if(now-hapticAt37<45)return;hapticAt37=now;try{navigator.vibrate(pattern);}catch{}}
-  function ensureMusic37(){if(platformSuspended48||(save.settings?.master??.8)*(save.settings?.music??.45)<=0)return;ensureAudio();if(!audio||music37)return;try{musicGain37=audio.createGain();musicGain37.gain.value=0;musicGain37.connect(audio.destination);const filter=audio.createBiquadFilter();filter.type="lowpass";filter.frequency.value=240;filter.connect(musicGain37);music37=[55,82.5].map((hz,i)=>{const o=audio.createOscillator();o.type=i?"triangle":"sine";o.frequency.value=hz;o.connect(filter);o.start();return o;});}catch(error){window.__SAKURAYO_DEV__?.report("music",error);music37=null;}}
-  function setMusic37(active,bossLevel=0,force=false){ensureMusic37();if(!musicGain37||!audio)return;const mode=`${active?1:0}:${bossLevel}:${save.settings?.master}:${save.settings?.music}`;if(!force&&mode===musicMode37)return;musicMode37=mode;const target=active?clamp((save.settings?.master??.8)*(save.settings?.music??.45)*.035,0,.04):0;musicGain37.gain.cancelScheduledValues(audio.currentTime);musicGain37.gain.linearRampToValueAtTime(target,audio.currentTime+.22);if(music37){music37[0].frequency.setTargetAtTime(55+bossLevel*5,audio.currentTime,.15);music37[1].frequency.setTargetAtTime(82.5+bossLevel*8,audio.currentTime,.15);}}
+  function musicVolume37(){return clamp((save.settings?.master??.8)*(save.settings?.music??.45),0,1);}
+  function ensureMusic37(){if(platformSuspended48||(save.settings?.master??.8)*(save.settings?.music??.45)<=0)return;ensureAudio();if(!audio||music37)return;try{musicGain37=audio.createGain();musicGain37.gain.value=0;musicGain37.connect(audio.destination);music37=true;window.SakurayoBGM?.attach(audio,musicGain37,artUrl,musicVolume37);}catch(error){window.__SAKURAYO_DEV__?.report("music",error);music37=null;}}
+  function setMusic37(active,bossLevel=0,force=false){ensureMusic37();globalThis.SakurayoBGM?.scene(active?(bossLevel>0?"boss":"battle"):"lobby");if(!musicGain37||!audio)return;const mode=`${active?1:0}:${bossLevel}:${save.settings?.master}:${save.settings?.music}`;if(!force&&mode===musicMode37)return;musicMode37=mode;const target=clamp((save.settings?.master??.8)*(save.settings?.music??.45),0,1)*.8;musicGain37.gain.cancelScheduledValues(audio.currentTime);musicGain37.gain.linearRampToValueAtTime(target,audio.currentTime+.4);}
   function ensureSettings37(){let d=$("#settingsDrawer37");if(d)return d;d=document.createElement("section");d.id="settingsDrawer37";d.className="drawer hidden";d.innerHTML='<div class="dhead"><h2>声音、震动与画面</h2><button class="close">×</button></div><div class="dbody" id="settingsBody37"></div>';d.querySelector(".close").onclick=()=>window.SakurayoUI.close(d);document.body.appendChild(d);return d;}
+  window.SakurayoMusicScene=()=>["play","pause","level","dialogue","event"].includes(state)?(boss?"boss":"battle"):"lobby";
+  window.SakurayoMusicKick=()=>setMusic37(state==="play",boss?Math.max(1,(boss.phase||0)+1):0,true);
+  addEventListener("pointerdown",()=>window.SakurayoMusicKick(),{capture:true});
   function openSettings37(){const d=ensureSettings37(),s=save.settings;$("#settingsBody37").innerHTML=`<label class="settingRow37"><span>总音量 <b>${Math.round(s.master*100)}%</b></span><input data-setting="master" type="range" min="0" max="1" step=".05" value="${s.master}"></label><label class="settingRow37"><span>战斗音效 <b>${Math.round(s.sfx*100)}%</b></span><input data-setting="sfx" type="range" min="0" max="1" step=".05" value="${s.sfx}"></label><label class="settingRow37"><span>氛围音乐 <b>${Math.round(s.music*100)}%</b></span><input data-setting="music" type="range" min="0" max="1" step=".05" value="${s.music}"></label><button class="settingToggle37" data-toggle="vibration">震动反馈：${s.vibration?"开":"关"}</button><button class="settingToggle37" data-toggle="fx">特效强度：${s.fx?"完整":"精简"}</button><p class="routeNote">步枪、手枪、太刀和Boss阶段使用不同音色。省电设备可关闭震动并使用精简特效。</p>`;d.querySelectorAll("input").forEach(input=>input.oninput=()=>{s[input.dataset.setting]=Number(input.value);input.previousElementSibling.querySelector("b").textContent=`${Math.round(input.value*100)}%`;persist();setMusic37(state==="play",boss?.phase||0,true);});d.querySelectorAll("[data-toggle]").forEach(b=>b.onclick=()=>{const k=b.dataset.toggle;s[k]=s[k]?0:1;if(k==="fx")applyFxPreference48();persist();openSettings37();if(k==="vibration"&&s[k])haptic37(18);});window.SakurayoUI.open(d);}
   const _backMenuSensory37=backMenu;backMenu=function(){setMusic37(false);return _backMenuSensory37();};
   const _advanceBossPhase37=advanceBossPhase;advanceBossPhase=function(e,p){sound("phase");haptic37([45,30,70]);setMusic37(true,p);return _advanceBossPhase37(e,p);};
   const _damagePlayerSensory37=damagePlayer;damagePlayer=function(amount){const before=P.hp,result=_damagePlayerSensory37(amount);if(P.hp<before)haptic37(20);return result;};
   const _dashSensory37=dash;dash=function(){const before=P.dash,result=_dashSensory37();if(P.dash>before)haptic37(10);return result;};
   const _skillSensory37=skill;skill=function(){const before=P.skill,result=_skillSensory37();if(P.skill>before)haptic37([12,18,24]);return result;};
-  const _updateSensory37=update;update=function(dt){const result=_updateSensory37(dt);if(state==="play")setMusic37(true,boss?.phase||0);return result;};
+  const _updateSensory37=update;update=function(dt){const result=_updateSensory37(dt);if(state==="play")setMusic37(true,boss?Math.max(1,(boss.phase||0)+1):0);return result;};
 
   function drawBossIdentity37(e){if(e.type!=="boss")return;const sid=stage().id,p=e.phase||1,t=runTime;ctx.save();ctx.translate(e.x,e.y);ctx.globalAlpha=.82;ctx.lineWidth=2;if(isMainGodRun36()){ctx.strokeStyle="#f2deff";for(let i=0;i<6+p;i++){const a=t*.35+i*TAU/(6+p),r=e.r+16+p*4;ctx.beginPath();ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r);ctx.lineTo(Math.cos(a+.16)*(r+13),Math.sin(a+.16)*(r+13));ctx.stroke();}ctx.fillStyle="#fff";ctx.font=`bold ${18+p*3}px system-ui`;ctx.textAlign="center";ctx.fillText("◈",0,7);ctx.restore();return;}if(sid===1){ctx.fillStyle="#ff8bc8";for(let i=0;i<3+p*2;i++){const a=t*.25+i*TAU/(3+p*2),r=e.r+12+p*3;ctx.beginPath();ctx.ellipse(Math.cos(a)*r,Math.sin(a)*r,6,3,a,0,TAU);ctx.fill();}}else if(sid===2){ctx.strokeStyle="#62eaff";for(let i=0;i<p+2;i++){const y=-e.r-12+i*11,off=Math.sin(t*8+i)*8;ctx.strokeRect(-e.r-10+off,y,e.r*2+20,5);}}else if(sid===3){ctx.strokeStyle="#e5d4ff";ctx.lineWidth=4;for(let i=0;i<p+1;i++){const a=-.8+i*1.6/Math.max(1,p);ctx.beginPath();ctx.moveTo(Math.cos(a)*(e.r+6),Math.sin(a)*(e.r+6));ctx.lineTo(Math.cos(a)*(e.r+36),Math.sin(a)*(e.r+36));ctx.stroke();}}else{ctx.strokeStyle="#ff9fe6";for(let i=0;i<4+p;i++){const a=t*.18+i*TAU/(4+p),r=e.r+15;ctx.beginPath();ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r);ctx.lineTo(Math.cos(a+.22)*(r+18),Math.sin(a+.22)*(r+18));ctx.lineTo(Math.cos(a+.4)*r,Math.sin(a+.4)*r);ctx.stroke();}}ctx.restore();}
   const _enemyDrawIdentity37=enemyDraw;enemyDraw=function(e){_enemyDrawIdentity37(e);drawBossIdentity37(e);};
@@ -6591,7 +6597,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     document.body.classList.toggle("noContrast39", !save.settings.contrast);
     document.body.classList.toggle("richUi39", !save.settings.uiCalm);
     applyFxPreference48();
-    setMusic37(state === "play", boss?.phase || 0, true);
+    setMusic37(state === "play", boss ? Math.max(1, (boss.phase || 0) + 1) : 0, true);
     renderCharacters35();
     updateCharacterUI35();
   }
