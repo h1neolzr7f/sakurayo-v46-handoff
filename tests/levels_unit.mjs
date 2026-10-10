@@ -22,5 +22,5 @@ const l12 = L.find('1-2'); o = L.create(l12, api); kills = 59; L.tick(l12, o, 0.
 const l33 = L.find('3-3'); o = L.create(l33, api); P.x = o.zone.x + 300; L.tick(l33, o, 10, api); assert.equal(o.chan, 0, 'outside the circle no progress'); P.x = o.zone.x; P.y = o.zone.y; for (let i = 0; i < 31; i++) L.tick(l33, o, 1, api); assert.ok(o.done);
 const l22 = L.find('2-2'); o = L.create(l22, api); enemies.push({ x: 0, y: 0, r: 10 }, { x: 1, y: 1, r: 10 });
 for (const p of o.pads) { P.x = p.x; P.y = p.y; L.tick(l22, o, 1.3, api); } assert.ok(o.done); assert.equal(o.mechKills, 2);
-const l21 = L.find('2-1'); o = L.create(l21, api); assert.equal(o.targets.length, 4); L.tick(l21, o, 80, api); assert.equal(o.fail, '时间到');
+const l21 = L.find('2-1'); o = L.create(l21, api); assert.equal(o.targets.length, 4); L.tick(l21, o, l21.goal.limit + 1, api); assert.equal(o.fail, '时间到');
 console.log('PASS levels unit: 16 nodes / 7 types, unlock + legacy, star rating, survive/clear/channel/mech/timed logic');

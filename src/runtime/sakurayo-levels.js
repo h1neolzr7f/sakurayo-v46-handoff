@@ -21,15 +21,15 @@
     L("1-2", 1, "绘马长廊", "clear", { n: 60 }, { k: "time", v: 60, d: "60 秒内完成" }, H(6), [32, 44]),
     L("1-3", 1, "送灯", "escort", { path: [[0.18, 0.5], [0.36, 0.36], [0.55, 0.62], [0.72, 0.4], [0.86, 0.52]] }, { k: "npcHp", v: 70, d: "巫女血量 ≥ 70%" }, H(5), [55, 51], { npc: "miko" }),
     L("1-4", 1, "百目尸将", "boss", { bossAt: 22 }, { k: "breaks", v: 2, d: "触发 2 次破防" }, H(8), [84, 31]),
-    L("2-1", 2, "救护车队", "timed", { n: 4, limit: 75 }, { k: "time", v: 55, d: "55 秒内完成" }, H(6), [12, 60]),
+    L("2-1", 2, "救护车队", "timed", { n: 4, limit: 90 }, { k: "time", v: 65, d: "65 秒内完成" }, H(6), [12, 60]),
     L("2-2", 2, "监控墙", "mech", { n: 3 }, { k: "mechKills", v: 30, d: "机关击破 ≥ 30" }, H(6), [35, 40]),
     L("2-3", 2, "雨中撤离", "escort", { path: [[0.15, 0.7], [0.4, 0.55], [0.6, 0.3], [0.85, 0.42]] }, H(0), { k: "npcHp", v: 70, d: "保安血量 ≥ 70%" }, [60, 58], { npc: "guard" }),
     L("2-4", 2, "雨魇行者", "boss", { bossAt: 22 }, { k: "breaks", v: 2, d: "触发 2 次破防" }, H(8), [85, 35]),
     L("3-1", 3, "剑冢入口", "survive", { t: 100 }, { k: "chests", v: 2, d: "打开 2 个宝箱" }, H(6), [12, 50]),
-    L("3-2", 3, "拔剑", "timed", { n: 6, limit: 80, flee: 1 }, { k: "time", v: 60, d: "60 秒内完成" }, H(6), [34, 38]),
+    L("3-2", 3, "拔剑", "timed", { n: 6, limit: 110, flee: 1 }, { k: "time", v: 70, d: "70 秒内完成" }, H(6), [34, 38]),
     L("3-3", 3, "事故日志", "channel", { t: 30 }, H(2), { k: "time", v: 70, d: "70 秒内完成" }, [58, 60]),
     L("3-4", 3, "黄泉御前", "boss", { bossAt: 22 }, { k: "breaks", v: 2, d: "触发 2 次破防" }, H(8), [84, 36]),
-    L("4-1", 4, "镜廊", "timed", { n: 8, limit: 90 }, { k: "time", v: 70, d: "70 秒内完成" }, H(6), [12, 44]),
+    L("4-1", 4, "镜廊", "timed", { n: 8, limit: 100, hp: 180, kind: "mirror" }, { k: "time", v: 75, d: "75 秒内完成" }, H(6), [12, 44]),
     L("4-2", 4, "第 317 室", "survive", { t: 110 }, { k: "noUlt", d: "不使用大招" }, H(6), [36, 60]),
     L("4-3", 4, "主控门", "escort", { path: [[0.15, 0.4], [0.38, 0.62], [0.62, 0.36], [0.86, 0.5]] }, { k: "npcHp", v: 100, d: "雨宫凛 0 次受伤" }, H(6), [60, 42], { npc: "rin" }),
     L("4-4", 4, "八重镜姬", "boss", { bossAt: 22 }, { k: "breaks", v: 3, d: "触发 3 次破防" }, H(8), [86, 30])
@@ -57,7 +57,7 @@
     var o = { id: level.id, type: level.type, t: 0, kills0: api.kills(), done: false, fail: "", targets: [], pads: [], npc: null, chan: 0, mechKills: 0, hitsAtStart: api.P.hits46 || 0 };
     var W = api.worldW, Hh = api.worldH, i, a;
     if (level.type === "timed") {
-      for (i = 0; i < level.goal.n; i++) { a = i / level.goal.n * TAU + 0.4; var r = Math.min(W, Hh) * (0.28 + 0.1 * (i % 2)); var e = api.spawnTarget(W / 2 + Math.cos(a) * r, Hh / 2 + Math.sin(a) * r, level.goal.flee ? 420 : 900, level.goal.flee ? "sword" : "wagon"); if (e) o.targets.push(e); }
+      for (i = 0; i < level.goal.n; i++) { a = i / level.goal.n * TAU + 0.4; var r = Math.min(W, Hh) * (0.28 + 0.1 * (i % 2)); var e = api.spawnTarget(W / 2 + Math.cos(a) * r, Hh / 2 + Math.sin(a) * r, level.goal.hp || (level.goal.flee ? 220 : 420), level.goal.kind || (level.goal.flee ? "sword" : "wagon")); if (e) o.targets.push(e); }
     } else if (level.type === "mech") {
       for (i = 0; i < level.goal.n; i++) { a = i / level.goal.n * TAU + 1.1; o.pads.push({ x: W / 2 + Math.cos(a) * W * 0.26, y: Hh / 2 + Math.sin(a) * Hh * 0.26, c: 0, used: false }); }
     } else if (level.type === "escort") {
@@ -74,7 +74,7 @@
     if (level.type === "survive" && o.t >= g.t) o.done = true;
     else if (level.type === "clear" && api.kills() - o.kills0 >= g.n) o.done = true;
     else if (level.type === "timed") {
-      if (g.flee) for (i = 0; i < o.targets.length; i++) { var e = o.targets[i]; if (e.dead) continue; var dx = e.x - P.x, dy = e.y - P.y, d = Math.hypot(dx, dy) || 1; if (d < 240) { e.x = Math.max(60, Math.min(api.worldW - 60, e.x + dx / d * 95 * dt)); e.y = Math.max(60, Math.min(api.worldH - 60, e.y + dy / d * 95 * dt)); } }
+      if (g.flee) for (i = 0; i < o.targets.length; i++) { var e = o.targets[i]; if (e.dead) continue; if (e.lastHp46 != null && e.hp < e.lastHp46) e.stun46 = 1.6; e.lastHp46 = e.hp; if (e.stun46 > 0) { e.stun46 -= dt; continue; } var dx = e.x - P.x, dy = e.y - P.y, d = Math.hypot(dx, dy) || 1; if (d < 240) { e.x = Math.max(60, Math.min(api.worldW - 60, e.x + dx / d * 78 * dt)); e.y = Math.max(60, Math.min(api.worldH - 60, e.y + dy / d * 78 * dt)); } }
       if (o.targets.every(function (e) { return e.dead || e.hp <= 0; })) o.done = true;
       else if (o.t > g.limit) o.fail = "时间到";
     } else if (level.type === "mech") {
@@ -113,7 +113,7 @@
     switch (level.type) {
       case "survive": return "存活 " + Math.max(0, Math.ceil(g.t - o.t)) + " 秒";
       case "clear": return "击破尸潮 " + Math.min(g.n, o.killsNow || 0) + "/" + g.n;
-      case "timed": return (g.flee ? "摧毁无主飞剑 " : "摧毁回收车 ") + o.targets.filter(function (e) { return e.dead || e.hp <= 0; }).length + "/" + g.n + " · 剩余 " + Math.max(0, Math.ceil(g.limit - o.t)) + "s";
+      case "timed": return (g.flee ? "摧毁无主飞剑 " : g.kind === "mirror" ? "击碎复制镜 " : "摧毁回收车 ") + o.targets.filter(function (e) { return e.dead || e.hp <= 0; }).length + "/" + g.n + " · 剩余 " + Math.max(0, Math.ceil(g.limit - o.t)) + "s";
       case "mech": return "引爆符咒机关 " + o.pads.filter(function (q) { return q.used; }).length + "/" + g.n + "（站在机关上）";
       case "escort": return "护送 " + Math.round(o.npc.k / o.npc.path.length * 100) + "% · 血量 " + Math.ceil(o.npc.hp) + "%" + (o.npc.waiting ? " · 靠近她才会前进" : "");
       case "channel": return "读取日志 " + Math.floor(o.chan * 100) + "%" + (o.inside ? "" : " · 回到圈内");

@@ -3632,6 +3632,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       pf = planFactor(),
       sc = s.scale * hpCurve * (1 + (pf - 1) * 0.55) * (elite ? 1.92 : 1),
       dm = s.scale * (1 + (pf - 1) * 0.32);
+    if (typeof activeLevel46 !== "undefined" && activeLevel46 && !activeLevel46.boss) { const soft = (1 + (s.scale - 1) * 0.5) / s.scale; dm *= 0.6 * soft; sc *= 0.8 * (0.5 + soft * 0.5); } // 目标关：玩家要分心做目标，杂兵压力降一档
     enemies.push({
       x,
       y,
@@ -7576,7 +7577,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       spawnBossNow(){if(state!=="play")throw new Error("spawnBossNow requires play mode");spawnBoss();return snapshot35();},
       levels46(){return window.SakurayoLevels.LEVELS.map(l=>({id:l.id,type:l.type,unlocked:window.SakurayoLevels.unlocked(save,l.id),stars:window.SakurayoLevels.stars(save,l.id)}));},
       launchLevel46(id){return launchLevel46(id);},
-      levelState46(){return {active:activeLevel46?.id||null,mode:state,label:activeLevel46&&levelObj46?window.SakurayoLevels.label(activeLevel46,levelObj46):"",done:!!levelObj46?.done,fail:levelObj46?.fail||"",npc:levelObj46?.npc?{x:levelObj46.npc.x,y:levelObj46.npc.y,hp:levelObj46.npc.hp,k:levelObj46.npc.k}:null,targets:levelObj46?.targets?.filter(e=>!e.dead).length??null,pads:levelObj46?.pads?.map(q=>({x:q.x,y:q.y,used:q.used}))||[],zone:levelObj46?.zone||null,result:levelResult46?{got:levelResult46.got,stars:levelResult46.stars,coins:levelResult46.coins}:null,stars46:{...save.stars46}};},
+      levelState46(){return {active:activeLevel46?.id||null,mode:state,label:activeLevel46&&levelObj46?window.SakurayoLevels.label(activeLevel46,levelObj46):"",done:!!levelObj46?.done,fail:levelObj46?.fail||"",npc:levelObj46?.npc?{x:levelObj46.npc.x,y:levelObj46.npc.y,hp:levelObj46.npc.hp,k:levelObj46.npc.k}:null,targets:levelObj46?.targets?.filter(e=>!e.dead).length??null,targetsPos:levelObj46?.targets?.filter(e=>!e.dead&&e.hp>0).map(e=>({x:e.x,y:e.y,hp:e.hp}))||[],objTime:levelObj46?.t||0,pads:levelObj46?.pads?.map(q=>({x:q.x,y:q.y,used:q.used}))||[],zone:levelObj46?.zone||null,result:levelResult46?{got:levelResult46.got,stars:levelResult46.stars,coins:levelResult46.coins}:null,stars46:{...save.stars46}};},
       forceLevelDone46(){if(levelObj46)levelObj46.done=true;},
       avgState46(){return window.SakurayoAvg?.state()||null;},
       avgNext46(n=1){for(let i=0;i<n;i++)window.SakurayoAvg?.next();return window.SakurayoAvg?.state()||null;},
@@ -7604,7 +7605,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       setStoryFlag(name,value){P.storyFlags[name]=value;return {...P.storyFlags};},
       endingPreview(){return endingData();},
       directorProbe(time,score=75){const oldTime=runTime,oldPlan=P.plan;runTime=Math.max(0,Number(time)||0);P.plan={score:Number(score),rank:"B"};const result={time:runTime,score:Number(score),intensity:directorIntensity(),factor:planFactor()};runTime=oldTime;P.plan=oldPlan;return result;},
-      defeatBoss(){if(!boss||boss.dead)throw new Error("Boss is not active");boss.phase=4;boss.guard=0;boss.hp=1;damageEnemy(boss,boss.max*20,{source:"skill",school:"base"});return snapshot35();},
+      defeatBoss(){if(!boss||boss.dead)throw new Error("Boss is not active");boss.ungate46=true;boss.phase=4;boss.guard=0;boss.hp=1;damageEnemy(boss,boss.max*20,{source:"skill",school:"base"});return snapshot35();},
       killPlayer(){P.inv=0;P.revive=0;P.sh=0;P.hp=Math.max(1,P.hp);damagePlayer(P.maxHp*20);return snapshot35();},
       finish(win){finish(!!win);return snapshot35();},backMenu(){backMenu();return snapshot35();},
       lobby46(){return window.SakurayoLobby?window.SakurayoLobby.snapshot(save):null;},
