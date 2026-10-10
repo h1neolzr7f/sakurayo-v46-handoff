@@ -2849,18 +2849,18 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     L("2-2", 2, "射的屋", "mech", { n: 3 }, { k: "mechKills", v: 30, d: "机关击破 ≥ 30" }, H(6), [35, 40]),
     L("2-3", 2, "雨伞送箱", "escort", { path: [[0.15, 0.7], [0.4, 0.55], [0.6, 0.3], [0.85, 0.42]] }, H(0), { k: "npcHp", v: 70, d: "保安血量 ≥ 70%" }, [60, 58], { npc: "guard" }),
     L("2-4", 2, "射的屋大将", "boss", { bossAt: 22 }, { k: "breaks", v: 2, d: "触发 2 次破防" }, H(8), [85, 35]),
-    L("3-1", 3, "剑冢入口", "survive", { t: 100 }, { k: "chests", v: 2, d: "打开 2 个宝箱" }, H(6), [12, 50]),
-    L("3-2", 3, "拔剑", "timed", { n: 6, limit: 110, flee: 1 }, { k: "time", v: 70, d: "70 秒内完成" }, H(6), [34, 38]),
-    L("3-3", 3, "事故日志", "channel", { t: 30 }, H(2), { k: "time", v: 70, d: "70 秒内完成" }, [58, 60]),
-    L("3-4", 3, "黄泉御前", "boss", { bossAt: 22 }, { k: "breaks", v: 2, d: "触发 2 次破防" }, H(8), [84, 36]),
-    L("4-1", 4, "镜廊", "timed", { n: 8, limit: 115, hp: 180, kind: "mirror" }, { k: "time", v: 75, d: "75 秒内完成" }, H(6), [12, 44]),
-    L("4-2", 4, "第 317 室", "survive", { t: 110 }, { k: "noUlt", d: "不使用大招" }, H(6), [36, 60]),
-    L("4-3", 4, "主控门", "escort", { path: [[0.15, 0.4], [0.38, 0.62], [0.62, 0.36], [0.86, 0.5]] }, { k: "npcHp", v: 100, d: "雨宫凛 0 次受伤" }, H(6), [60, 42], { npc: "rin" }),
-    L("4-4", 4, "八重镜姬", "boss", { bossAt: 22 }, { k: "breaks", v: 3, d: "触发 3 次破防" }, H(8), [86, 30])
+    L("3-1", 3, "河岸灯会", "survive", { t: 100 }, { k: "chests", v: 2, d: "打开 2 个宝箱" }, H(6), [12, 50]),
+    L("3-2", 3, "宗一的飞剑", "timed", { n: 6, limit: 110, flee: 1 }, { k: "time", v: 70, d: "70 秒内完成" }, H(6), [34, 38]),
+    L("3-3", 3, "花火筒", "channel", { t: 30 }, H(2), { k: "time", v: 70, d: "70 秒内完成" }, [58, 60]),
+    L("3-4", 3, "鬼宗一", "boss", { bossAt: 22 }, { k: "breaks", v: 2, d: "触发 2 次破防" }, H(8), [84, 36]),
+    L("4-1", 4, "本殿回廊", "timed", { n: 8, limit: 115, hp: 180, kind: "mirror" }, { k: "time", v: 75, d: "75 秒内完成" }, H(6), [12, 44]),
+    L("4-2", 4, "第 412 夜", "survive", { t: 110 }, { k: "noUlt", d: "不使用大招" }, H(6), [36, 60]),
+    L("4-3", 4, "散场广播", "escort", { path: [[0.15, 0.4], [0.38, 0.62], [0.62, 0.36], [0.86, 0.5]] }, { k: "npcHp", v: 100, d: "雨宫凛 0 次受伤" }, H(6), [60, 42], { npc: "rin" }),
+    L("4-4", 4, "鬼·朔夜", "boss", { bossAt: 22 }, { k: "breaks", v: 3, d: "触发 3 次破防" }, H(8), [86, 30])
   ];
   var CHAPTERS = [
     { ch: 1, n: "第一章 · 神社外街", theme: "门认出了你。" }, { ch: 2, n: "第二章 · 夜店街", theme: "瓦版不说谎。" },
-    { ch: 3, n: "第三章 · 黄泉参道", theme: "记住不等于继承痛苦。" }, { ch: 4, n: "第四章 · 碎镜地砖", theme: "像你不等于是你。" }
+    { ch: 3, n: "第三章 · 河边花火会场", theme: "觊觎鬼力的人。" }, { ch: 4, n: "终章 · 本殿", theme: "千夜一闪。" }
   ];
   function find(id) { for (var i = 0; i < LEVELS.length; i++) if (LEVELS[i].id === id) return LEVELS[i]; return null; }
   function chapter(ch) { return LEVELS.filter(function (l) { return l.ch === ch; }); }
@@ -3541,7 +3541,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 <script>
 /* 镜斗（2D 格斗肉鸽节点，1v1）。独立模块：自带画布/循环/输入/HUD；只通过 start(opts)/onEnd(result) 与夜行地图交互。
    操作：←→ 移动 / ↑ 跳 / ↓ 防御（按住），J 轻攻击（三段连击）、K 重攻击（连击终结时击飞）、L 必杀（消耗 1 格气）、U 觉醒（满 3 格）。触屏有对应按钮。
-   规则：限时 60s，一局定胜负；被防住的攻击只吃 15% 伤害但积累破防值，破防时硬直 1s。
+   规则：限时 99s，一局定胜负；对手 AI 见 aiFoe（反应式+读招架防、确反、连段、破防前后撤），被防住的攻击只吃 15% 伤害但积累破防值，破防时硬直 1s。
    构筑映射（必杀技变体，取等级最高的武器）：spread=扇形符弹，bomb=抛物线爆弹，laser=贯穿光线，homing=追踪狐火，pierce=突进斩，orbit=护身樱环（反击）。
    形态：guard=防御减伤 95%+重攻击霸体；speed=移速/攻速 +25%、轻攻击 4 段；burst=伤害 ×1.35、受伤 ×1.2。 */
 (function (global) {
@@ -3549,7 +3549,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   var FW = 960, FH = 540, GROUND = 450;
   function rng(s) { s = (s >>> 0) || 1; return function () { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
-  var CH = { sayo: { name: "月城小夜", spd: 310, dmg: 1.1, reach: 1.1, col: "#ff9ec7" }, aya: { name: "神代绫", spd: 330, dmg: 0.92, reach: 1.15, col: "#8fc8ff" }, rion: { name: "九条凛音", spd: 290, dmg: 1.12, reach: 1.05, col: "#ff6b6b" } };
+  var CH = { sayo: { name: "月城小夜", spd: 310, dmg: 1.1, reach: 1.1, col: "#ff9ec7" }, aya: { name: "神代绫", spd: 330, dmg: 0.92, reach: 1.15, col: "#8fc8ff" }, rion: { name: "九条凛音", spd: 290, dmg: 1.22, reach: 1.05, col: "#ff6b6b" } };
   var MOVES = { L1: { d: 6, s: 0.08, a: 0.1, r: 0.14, reach: 90, kb: 60 }, L2: { d: 7, s: 0.08, a: 0.1, r: 0.15, reach: 95, kb: 70 }, L3: { d: 9, s: 0.1, a: 0.1, r: 0.2, reach: 100, kb: 120 }, L4: { d: 10, s: 0.1, a: 0.1, r: 0.22, reach: 105, kb: 160 },
     H: { d: 16, s: 0.2, a: 0.12, r: 0.32, reach: 115, kb: 260, launch: true } };
   function F(side, o) { return { x: side < 0 ? 260 : 700, y: GROUND, vx: 0, vy: 0, face: -side, hp: 100, max: 100, meter: 0, guard: 0, gbreak: 0, stun: 0, act: null, actT: 0, combo: 0, comboT: 0, block: false, air: false, inv: 0, o: o, hits: 0 }; }
@@ -3558,13 +3558,13 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     var f = o.form || {}; this.slot = f.slot || "base"; var up = o.weapons || {};
     this.lv = function (k) { return up[k] ? (up[k].lv || 1) + (up[k].evo ? 2 : 0) : 0; };
     var best = "", bl = 0; ["spread", "bomb", "laser", "homing", "pierce", "orbit"].forEach(function (k) { var l = (up[k] ? (up[k].lv || 1) + (up[k].evo ? 2 : 0) : 0); if (l > bl) { bl = l; best = k; } }); this.special = best || "base"; this.spLv = bl;
-    this.power = clamp(o.power || 1, 0.7, 2.6);
-    this.P = F(-1, { dmg: this.ch.dmg * this.power * (this.slot === "burst" ? 1.35 : 1), taken: this.slot === "burst" ? 1.2 : 1, spd: this.ch.spd * (this.slot === "speed" ? 1.25 : 1), aspd: this.slot === "speed" ? 1.25 : 1, chain: this.slot === "speed" ? 4 : 3, blockK: this.slot === "guard" ? 0.05 : 0.15, armor: this.slot === "guard" });
+    this.power = clamp(o.power || 1, 0.7, 2.6); var pw = 1 + 0.4 * (this.power - 1); // 格斗里数值成长折算为 40%：构筑主要改变必杀技的“形”，而不是把对手秒掉
+    this.P = F(-1, { dmg: this.ch.dmg * pw * (this.slot === "burst" ? 1.35 : 1), taken: this.slot === "burst" ? 1.2 : 1, spd: this.ch.spd * (this.slot === "speed" ? 1.25 : 1), aspd: this.slot === "speed" ? 1.25 : 1, chain: this.slot === "speed" ? 4 : 3, blockK: this.slot === "guard" ? 0.05 : 0.15, armor: this.slot === "guard" });
     this.P.hp = this.P.max = 100 * clamp(o.hpFrac == null ? 1 : o.hpFrac, 0.3, 1) + 0; // 生命按比例带入（最少 30%）
     var L = this.layer, boss = !!o.boss;
-    this.E = F(1, { dmg: (0.16 + 0.07 * L) * (boss ? 1.05 : 1), taken: 1, spd: 270 + 15 * L, aspd: 1, chain: 3, blockK: 0.15, armor: boss });
-    this.E.hp = this.E.max = (boss ? 460 : 340) + 80 * L; this.E.name = boss ? "镜灵 · 影武者" : "镜卫 · 剑士";
-    this.t = 0; this.limit = 60; this.done = false; this.win = false; this.shots = []; this.fx = []; this.keys = {}; this.input = {}; this.hitstop = 0;
+    this.E = F(1, { dmg: (0.12 + 0.035 * L) * (boss ? 0.9 : 1), taken: 1, spd: 270 + 15 * L, aspd: 1, chain: 3, blockK: 0.15, armor: boss });
+    this.E.hp = this.E.max = (boss ? 380 : 340) + 80 * L; this.E.name = boss ? "镜灵 · 影武者" : "镜卫 · 剑士";
+    this.t = 0; this.limit = 99; this.done = false; this.win = false; this.shots = []; this.fx = []; this.keys = {}; this.input = {}; this.hitstop = 0;
   }
   Game.prototype.startMove = function (f, k) {
     if (f.stun > 0 || f.gbreak > 0 || (f.act && f.actT < (f.act.s + f.act.a + f.act.r) / f.o.aspd * 0.8)) return false;
@@ -3575,7 +3575,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     f.actT = 0; f.hitDone = false; f.comboT = 0.6; return true;
   };
   Game.prototype.special_ = function (f, foe) {
-    var me = f === this.P, kind = me ? this.special : "base", lv = me ? this.spLv : 1, d = 14 * f.o.dmg * (1 + 0.12 * lv), dir = f.face;
+    var me = f === this.P, kind = me ? this.special : "base", lv = me ? this.spLv : 1, d = 14 * f.o.dmg * (1 + 0.05 * lv), dir = f.face;
     if (kind === "spread") for (var i = -1; i <= 1; i++) this.shots.push({ x: f.x + dir * 40, y: f.y - 70, vx: dir * 620, vy: i * 140, d: d * 0.55, own: f, life: 1.2, k: "s" });
     else if (kind === "bomb") this.shots.push({ x: f.x + dir * 30, y: f.y - 90, vx: dir * 380, vy: -420, g: 1100, d: d * 1.5, own: f, life: 2, k: "b", aoe: 110 });
     else if (kind === "laser") { this.fx.push({ k: "beam", x: f.x, y: f.y - 70, dir: dir, t: 0, life: 0.3 }); if ((foe.x - f.x) * dir > 0 && Math.abs(foe.y - f.y) < 90) this.hit(f, foe, { d: d * 1.3, kb: 140, unblock: false }); }
@@ -3589,13 +3589,13 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (b.counter > 0 && b !== a) { b.counter = 0; this.hit(b, a, { d: 12 * b.o.dmg, kb: 220 }); return false; }
     var facing = (a.x - b.x) * b.face > 0, d = m.d * (a === this.P ? 1 : 1) * b.o.taken;
     if (b.block && facing && !b.air && !m.unblock) {
-      d *= b.o.blockK; b.guard += m.d * 1.2; this.fx.push({ k: "guard", x: b.x, y: b.y - 70, t: 0, life: 0.25 });
+      d *= b.o.blockK; b.guard += 12; // 破防值按“被防住的次数”累积（5 次破防），与伤害数值脱钩，满级构筑也不能两下打穿防御 this.fx.push({ k: "guard", x: b.x, y: b.y - 70, t: 0, life: 0.25 });
       if (b.guard >= 60) { b.guard = 0; b.gbreak = 1; b.block = false; this.fx.push({ k: "txt", s: "破防!", x: b.x, y: b.y - 150, t: 0, life: 0.8 }); }
     } else {
       if (!(b.o.armor && b.act && b.act.k === "H")) { b.stun = 0.28 + (m.launch ? 0.4 : 0); b.act = null; b.vx = (b.x > a.x ? 1 : -1) * (m.kb || 60) * 1.6; if (m.launch) { b.vy = -520; b.air = true; } }
       a.hits++; this.fx.push({ k: "spark", x: b.x, y: b.y - 80, t: 0, life: 0.2 }); this.hitstop = 0.05;
     }
-    b.hp -= d; a.meter = Math.min(3, a.meter + d / 40); b.meter = Math.min(3, b.meter + d / 80);
+    var blocked = b.block && facing && !b.air && !m.unblock; b.hp -= d; a.meter = Math.min(3, a.meter + (blocked ? 0.08 : 0.2)); b.meter = Math.min(3, b.meter + 0.1); // 气按命中次数涨，与伤害数值脱钩
     this.fx.push({ k: "num", v: Math.max(1, Math.round(d)), x: b.x, y: b.y - 130, t: 0, life: 0.6 });
     if (b.hp <= 0) { b.hp = 0; this.finish(a === this.P); }
     return true;
@@ -3614,6 +3614,40 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     else if (f.combo >= 2 && r < 0.7) inp.H = true;
     else if (r < 0.85) inp.L = true; else inp.move = -Math.sign(dx);
     if (ad > 320 && f.meter >= 1 && r < 0.3) inp.S = true;
+    f.aiInp = inp; return inp;
+  };
+  /* 对手 AI（镜中倒影）：不靠堆血，靠打法——
+     ① 反应式防御：看到对手出招/飞行道具逼近，经过反应时间（0.16s→0.10s 随层数）以一定概率举防（55%→75%），远程道具同样会防；
+     ② 防住后立刻确反（对手收招硬直期间出轻→重连段）；
+     ③ 主动连段：轻·轻·轻·重 的固定连招串，中途被打断就放弃；
+     ④ 走位：残血或破防值高时后撤拉开、远距离有气就放必杀；偶尔跳跃躲飞行道具。 */
+  Game.prototype.aiFoe = function (f, foe, dt) {
+    var L = this.layer, r = this.r, dx = foe.x - f.x, ad = Math.abs(dx), inp = {}, boss = !!this.o.boss;
+    var react = Math.max(0.08, 0.17 - 0.025 * L - (boss ? 0.02 : 0)), pBlock = Math.min(0.9, 0.7 + 0.06 * L + (boss ? 0.06 : 0));
+    var atk = foe.act && foe.act.reach && foe.actT < foe.act.s + foe.act.a && ad < foe.act.reach * 1.25 + 50;
+    var shot = this.shots.some(function (q) { return q.own === foe && Math.abs(q.x - f.x) < 340 && (f.x - q.x) * q.vx > 0; });
+    var key = atk ? "a" + this.P.hits + ":" + foe.act.k + ":" + (foe.actT < 0.02 ? this.t.toFixed(1) : "") : null;
+    if ((atk || shot) && !f.act && f.stun <= 0) {
+      if (f.seenT == null) { f.seenT = 0; f.willBlock = r() < pBlock; f.willJump = shot && r() < 0.25; }
+      f.seenT += dt; if (f.seenT >= react) { if (f.willJump && !f.air) inp.jump = true; else if (f.willBlock) { inp.block = true; f.blocked = true; } }
+      if (inp.block || inp.jump) return inp;
+    } else { f.seenT = null; }
+    if (f.blocked && !atk && foe.act && f.stun <= 0) { f.blocked = false; if (ad < 120) { f.plan = ["L", "L", "H"]; } } // 确反
+    else if (!foe.act) f.blocked = false;
+    f.aiT = (f.aiT || 0) - dt;
+    if (f.plan && f.plan.length) { if (f.stun > 0 || f.gbreak > 0) f.plan = null; else if (!f.act) { if (ad > 125) inp.move = Math.sign(dx); else { inp[f.plan.shift()] = true; } return inp; } else return inp; }
+    if (f.aiT > 0) return f.aiInp || {};
+    f.aiT = 0.14 + r() * 0.12;
+    if (f.guard >= 36 && ad < 170) { inp.move = -Math.sign(dx); inp.jump = r() < 0.3; f.aiInp = inp; return inp; } // 破防值快满：后撤重置，而不是硬吃
+    // 近身读招：轻攻击起手只有 0.06–0.08s，纯反应来不及 → 贴身时按概率提前架防（持续 0.3–0.5s），对手出招中不去硬换
+    if (ad < 150 && (foe.act || foe.combo > 0 || r() < pBlock * 0.55)) { inp.block = true; f.aiT = 0.3 + r() * 0.2; f.aiInp = inp; return inp; }
+    var hurt = f.hp / f.max < 0.35;
+    if (hurt && ad < 160 && r() < 0.35) inp.move = -Math.sign(dx);
+    else if (ad > 300 && f.meter >= 1 && r() < 0.45) inp.S = true;
+    else if (ad > 115) { inp.move = Math.sign(dx); if (r() < 0.06) inp.jump = true; }
+    else if (f.meter >= 1 && r() < 0.18) inp.S = true;
+    else if (r() < 0.62) { f.plan = r() < 0.5 ? ["L", "L", "L", "H"] : ["L", "L", "H"]; }
+    else if (r() < 0.5) inp.block = true; else inp.move = -Math.sign(dx) * (r() < 0.5 ? 1 : 0);
     f.aiInp = inp; return inp;
   };
   Game.prototype.stepF = function (f, foe, inp, dt) {
@@ -3637,7 +3671,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (this.done) return; if (this.hitstop > 0) { this.hitstop -= dt; return; }
     this.t += dt; var P = this.P, E = this.E, i, self = this;
     var pin = this.auto ? this.ai(P, E, dt, true) : this.readInput();
-    this.stepF(P, E, pin, dt); if (this.done) return; this.stepF(E, P, this.ai(E, P, dt, false), dt); if (this.done) return;
+    this.stepF(P, E, pin, dt); if (this.done) return; this.stepF(E, P, this.aiFoe(E, P, dt), dt); if (this.done) return;
     if (Math.abs(P.x - E.x) < 50 && !P.air && !E.air) { var m = (50 - Math.abs(P.x - E.x)) / 2, s = P.x < E.x ? -1 : 1; P.x = clamp(P.x + s * m, 40, FW - 40); E.x = clamp(E.x - s * m, 40, FW - 40); }
     for (i = this.shots.length - 1; i >= 0; i--) { var q = this.shots[i], foe = q.own === P ? E : P; q.life -= dt;
       if (q.k === "h") { var ang = Math.atan2(foe.y - 80 - q.y, foe.x - q.x), sp = 420; q.vx += (Math.cos(ang) * sp - q.vx) * dt * 3; q.vy += (Math.sin(ang) * sp - q.vy) * dt * 3; }
@@ -4223,6 +4257,171 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   global.SakurayoStory = global.SakurayoStory || {};
   global.SakurayoStory.ch2 = S;
   (global.SakurayoStory.CG = global.SakurayoStory.CG || []).push({ id: "story/ch2/cg_kawaraban.webp", n: "神代家的瓦版" }, { id: "story/ch2/cg_ashes.webp", n: "未尝化灰" });
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+/* 第三章「河边花火会场 —— 觊觎鬼力的人」（docs/STORY.md v3 §3 第 3 层）。
+   新说话人：soichi（黑羽宗一，凛音的堂兄 → 鬼宗一）、sakuya（月城朔夜，二百年前的铁炮手 / 般若的真身）。 */
+(function (global) {
+  "use strict";
+  var B1 = "story/ch3/bg_river.webp", E = "说书 · 狸老板", CG1 = "story/ch3/cg_reveal.webp";
+  var S = {
+    "3-1": {
+      pre: [
+        { id: "v33-e01", chap: ["第三章", "觊觎鬼力的人"], bg: B1, style: "epic", name: E, t: "上回书说到：瓦版最后一页写着——般若之躯，未尝化灰。" },
+        { id: "v33-e02", style: "epic", name: E, t: "二百年来，总有人想把那具身躯挖出来。鬼的力气，能让人不老，能让夜不散，能让输过一次的人，再也不输。" },
+        { id: "v33-e03", style: "epic", name: E, t: "黑羽家有两支。一支守刀，一支守不住自己。" },
+        { id: "v33-001", bg: B1, L: { who: "sayo", ex: "resolve" }, who: "sayo", ex: "resolve", t: "河边花火会场！这里的炒面是全祭典最便宜的，一盒两百！" },
+        { id: "v33-002", R: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "你已经吃了三盒了。按循环理财，你现在欠祭典六百。" },
+        { id: "v33-003", who: "sayo", ex: "calm", t: "倒带一次就清零！这叫——时间的利息！" },
+        { id: "v33-004", L: { who: "rion", ex: "calm" }, who: "rion", ex: "calm", t: "……今晚，不要离我太远。" },
+        { id: "v33-005", R: { who: "aya", ex: "shaken" }, who: "aya", ex: "shaken", t: "凛音主动说了一句超过五个字的话。小夜，录下来，这是新闻。" },
+        { id: "v33-006", R: { who: "rin", ex: "serious" }, who: "rin", ex: "serious", t: "广播站。河面上的灯笼妖正往岸上爬，像涨潮一样。撑过这一波——上游有人在放它们下来。" }
+      ],
+      post: [
+        { id: "v33-010", bg: B1, L: { who: "rion", ex: "shaken" }, who: "rion", ex: "shaken", t: "（凛音盯着上游的桥。桥上站着一个穿黑羽织的男人，正朝她举杯。）" },
+        { id: "v33-011", R: { who: "soichi", ex: "calm" }, who: "soichi", t: "好久不见，凛音。……不对，对你来说，是「又见面了」吧？这是第几次了——四百次？" }
+      ]
+    },
+    "3-2": {
+      pre: [
+        { id: "v33-020", L: { who: "sayo", ex: "shaken" }, R: { who: "soichi", ex: "calm" }, who: "sayo", ex: "shaken", t: "凛音，这位帅哥是谁？你亲戚？长得好像——像坏版的你。" },
+        { id: "v33-021", who: "soichi", t: "黑羽宗一。分家的长子，凛音的堂兄。也是这二百年来，唯一一个想明白了的黑羽。" },
+        { id: "v33-022", who: "soichi", t: "本家守着一把刀，守着一个笑话，守着一个吃章鱼烧的般若。而我——在喂它。" },
+        { id: "v33-023", L: { who: "aya", ex: "angry" }, who: "aya", ex: "angry", t: "所以每一夜被吃掉，是你干的。" },
+        { id: "v33-024", who: "soichi", t: "夜晚而已。人们本来就会把夜晚浪费掉。我只是把它们……存起来。" },
+        { id: "v33-025", who: "soichi", t: "我的剑，替我招待你们。——它们不太听话，会逃。追得上的话，就来桥上找我。" }
+      ],
+      post: [
+        { id: "v33-030", bg: B1, L: { who: "rion", ex: "calm" }, who: "rion", ex: "calm", t: "……他以前不是这样的。小时候，他教我第一式。他说：「凛音，刀要快。」" },
+        { id: "v33-031", R: { who: "sayo", ex: "shaken" }, who: "sayo", ex: "shaken", t: "刀要快……这句话，说书的狸老板好像也讲过？" },
+        { id: "v33-032", who: "rion", ex: "calm", t: "……嗯。是黑羽家的家训。最早说这句话的人，不姓黑羽。" }
+      ]
+    },
+    "3-3": {
+      pre: [
+        { id: "v33-040", bg: B1, t: "河中央，第一号花火筒。只要点燃它，被宗一「存起来」的夜晚就会一齐放回天上。" },
+        { id: "v33-041", L: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "点火需要三十秒。我们守着，谁上来就打谁。" },
+        { id: "v33-042", R: { who: "rion", ex: "calm" }, who: "rion", ex: "calm", t: "……我有话要说。等这个点完。" }
+      ],
+      post: [
+        { id: "v33-050", bg: B1, L: { who: "rion", ex: "calm" }, R: { who: "sayo", ex: "calm" }, who: "rion", ex: "calm", t: "这一夜，我已经过了四百一十二次。" },
+        { id: "v33-051", who: "rion", ex: "calm", t: "第一次，我一个人追般若，输了。第二次也输了。第一百次，我学会了哪个摊位的章鱼烧最好吃。第三百次，我不再数了。" },
+        { id: "v33-052", R: { who: "aya", ex: "shaken" }, who: "aya", ex: "shaken", t: "……所以你总知道「左边」。所以你总是困。" },
+        { id: "v33-053", who: "rion", ex: "calm", t: "第四百一十二次，你们戴着面具出现了。……这是第一次，我不是一个人。" },
+        { id: "v33-054", L: { who: "sayo", ex: "resolve" }, who: "sayo", ex: "resolve", t: "那从今晚开始，房租……不对，夜晚，我们三个人分摊！" },
+        { id: "v33-055", who: "rion", ex: "calm", t: "（凛音笑了。很短，像烟花。）……嗯。" }
+      ]
+    },
+    "3-4": {
+      pre: [
+        { id: "v33-060", bg: B1, L: { who: "sayo", ex: "calm" }, R: { who: "aya", ex: "calm" }, who: "sayo", ex: "calm", t: "补给！刨冰四碗——凛音一碗什么都不加，我的加两倍炼乳，绫的——" },
+        { id: "v33-061", who: "aya", ex: "calm", t: "第四碗给谁？" },
+        { id: "v33-062", who: "sayo", ex: "calm", t: "……不知道。手自己点的。总觉得，好像一直有第四个人跟我们一起逛。" },
+        { id: "v33-063", R: { who: "yoi", ex: "calm" }, who: "yoi", t: "（宵没有像往常那样大笑。她只是看着那碗刨冰。）……上吧。本神的第三位大将——不对。这一位，不是本神的。" },
+        { id: "v33-064", R: { who: "soichi", ex: "calm" }, who: "soichi", t: "凛音。你有四百次可以学会。我只要一次——就够把它的力气全部拿走。" },
+        { id: "v33-065", R: { who: "rin", ex: "serious" }, who: "rin", ex: "serious", t: "他戴上了般若的碎片！鬼面每次裂开都会露出破绽——打碎两次！" }
+      ],
+      awaken: [
+        { id: "v33-070", who: "rion", ex: "resolve", t: { sayo: "宗一哥哥，你教我的第一式——我现在还给你。", aya: "宗一哥哥，你教我的第一式——我现在还给你。", rion: "宗一哥哥，你教我的第一式——我现在还给你。" } }
+      ],
+      post: [
+        { id: "v33-080", bg: B1, L: { who: "rion", ex: "calm" }, R: { who: "soichi", ex: "calm" }, who: "soichi", t: "……快了。比我教你的时候，快多了。" },
+        { id: "v33-081", who: "soichi", t: "凛音……我只是不想再输了。本家赢了二百年，分家输了二百年。我想要一次，哪怕一次……" },
+        { id: "v33-082", who: "rion", ex: "calm", t: "我也输了四百一十一次。……下次来我家吃饭。" },
+        { id: "v33-083", t: "鬼面碎片从宗一脸上剥落，飞向夜空，和天上所有冻住的烟花一起，汇向本殿。" },
+        { id: "v33-084", cg: CG1, t: "夜空里，一张巨大的般若面具裂开了。面具后面，是一张哭着的、年轻女人的脸。" },
+        { id: "v33-085", cg: null, L: { who: "sayo", ex: "shaken" }, R: { who: "sakuya", ex: "calm" }, who: "sayo", ex: "shaken", t: "……那是，我的脸？" },
+        { id: "v33-086", who: "sakuya", t: "…………千代？……不对。你不是千代。你是——" },
+        { id: "v33-087", style: "epic", name: E, t: "般若之躯，未尝化灰。因为般若，从来就不是从樱夜山来的鬼。" },
+        { id: "v33-088", style: "epic", name: E, t: "那一夜，被踏于足下的铁炮手月城朔夜，没有死。她只是——太想把那场祭典逛完了。第三夜，至此。" }
+      ]
+    }
+  };
+  global.SakurayoStory = global.SakurayoStory || {};
+  global.SakurayoStory.ch3 = S;
+  (global.SakurayoStory.CG = global.SakurayoStory.CG || []).push({ id: "story/ch3/cg_reveal.webp", n: "面具之后" });
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+/* 第四章「本殿 —— 千夜一闪」（终章，docs/STORY.md v3 §3 第 4 层）。结局回扣序章：
+   23:59 的最后一发烟花、小夜的房租愿望、绫的「粉丝 0」、凛音的「不用上学……挺好」、朔夜的遗言「刀要快」、刀名「大食切」。 */
+(function (global) {
+  "use strict";
+  var B1 = "story/ch4/bg_honden.webp", B0 = "story/ch1/bg_v3_pre.webp", E = "说书 · 狸老板", CG1 = "story/ch4/cg_dawn.webp", CG0 = "story/ch1/cg_rewind.webp";
+  var S = {
+    "4-1": {
+      pre: [
+        { id: "v34-e01", chap: ["终章", "千夜一闪"], bg: B1, style: "epic", name: E, t: "诸位看官——这是最后一回了。" },
+        { id: "v34-e02", style: "epic", name: E, t: "二百年前，千代斩开半座山，以为斩的是鬼。她没看见，鬼面之下，是谁的脸。" },
+        { id: "v34-001", bg: B1, L: { who: "sayo", ex: "shaken" }, who: "sayo", ex: "shaken", t: "所以……般若就是我家祖宗？我家祖宗吃了二百年的夜晚？！还吃了三十串章鱼烧？！" },
+        { id: "v34-002", R: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "穷，但胃口很好。确实是你家的人。" },
+        { id: "v34-003", R: { who: "yoi", ex: "calm" }, who: "yoi", t: "……凡人们。本神有话要说。不是神谕，是——坦白。" },
+        { id: "v34-004", who: "yoi", t: "本神宣布「永不散场」，是骗你们的。本神从来不想留住这一夜。是她不肯走，祭典就散不了。本神一个祭神，散不了自己的祭典……很丢脸吧？" },
+        { id: "v34-005", who: "yoi", t: "所以本神把面具，一张一张，放在了月城、神代、黑羽的后人头上。——对不起。还有，谢谢。" },
+        { id: "v34-006", L: { who: "rion", ex: "calm" }, who: "rion", ex: "calm", t: "……本殿回廊里全是镜子。每一面都映着她那一夜没逛完的摊位。打碎它们，路才会开。" }
+      ],
+      post: [
+        { id: "v34-010", bg: B1, L: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "（最后一面镜子里，是二百年前的参道。一个铁炮手和一个剑士，分着同一盒章鱼烧。）" },
+        { id: "v34-011", R: { who: "sayo", ex: "calm" }, who: "sayo", ex: "calm", t: "她们看起来……好开心。" }
+      ]
+    },
+    "4-2": {
+      pre: [
+        { id: "v34-020", bg: B1, t: "第四百一十二夜，最后一个小时。本殿外，所有被吃掉的夜晚一齐涌了回来。" },
+        { id: "v34-021", L: { who: "rion", ex: "calm" }, who: "rion", ex: "calm", t: "这一段，我一个人守过一百次。每次都没守住。" },
+        { id: "v34-022", R: { who: "sayo", ex: "resolve" }, who: "sayo", ex: "resolve", t: "那这次三个人守！不许用大招——留着给祖宗！" }
+      ],
+      post: [
+        { id: "v34-030", bg: B1, L: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "我开播了。观众——零。……没关系。今晚这段，我是为一个人播的。" }
+      ]
+    },
+    "4-3": {
+      pre: [
+        { id: "v34-040", bg: B1, R: { who: "rin", ex: "calm" }, who: "rin", ex: "calm", t: "广播站雨宫凛，最后一条广播——我要亲自走到本殿，把「祭典结束」的通知念出来。护送我。" },
+        { id: "v34-041", L: { who: "sayo", ex: "calm" }, who: "sayo", ex: "calm", t: "凛姐要是受一点伤，散场通知就念不完了对吧？好，一根头发都不许掉！" }
+      ],
+      post: [
+        { id: "v34-050", R: { who: "rin", ex: "calm" }, who: "rin", ex: "calm", t: "……到了。那么——各位来宾，本届百夜祭，即将——" },
+        { id: "v34-051", R: { who: "sakuya", ex: "calm" }, who: "sakuya", t: "不要。" },
+        { id: "v34-052", who: "sakuya", t: "我还没逛完。我和千代说好了，放完最后一发烟花，一起去吃章鱼烧。她说「刀要快」，我说「你先走，我马上来」。……我还没去。" }
+      ]
+    },
+    "4-4": {
+      pre: [
+        { id: "v34-060", bg: B1, L: { who: "sayo", ex: "calm" }, R: { who: "sakuya", ex: "calm" }, who: "sayo", ex: "calm", t: "……祖宗。不对，朔夜小姐。我叫月城小夜，穷，但是很能吃。和你一样。" },
+        { id: "v34-061", who: "sakuya", t: "你笑起来……也像我。" },
+        { id: "v34-062", who: "sayo", ex: "resolve", t: "所以我知道你想要什么。不是二百年的夜晚——是一场逛完的祭典，和一个等你的人。" },
+        { id: "v34-063", who: "sayo", ex: "resolve", t: "我们陪你逛完。但在那之前……得先把你打醒！" },
+        { id: "v34-064", R: { who: "rin", ex: "serious" }, who: "rin", ex: "serious", t: "鬼·朔夜，四个阶段。每一个阶段都是她那一夜的一段回忆——破开三次，她才听得见你们！" }
+      ],
+      awaken: [
+        { id: "v34-070", who: "me", ex: "resolve", t: { sayo: "没问题没问题——这次，换我保护你。", aya: "这一段，我直播给全镇看。第一个观众，是你。", rion: "千代，刀要快。——这次，够快了。" } }
+      ],
+      post: [
+        { id: "v34-080", bg: B1, style: "epic", name: E, t: "凛音拔刀。这一刀，斩的不是鬼，是二百年没散场的夜。" },
+        { id: "v34-081", style: "epic", name: E, t: "刀光过处，冻在天上的千发烟花一齐炸开；本殿的屋檐、樱夜山、整片夜空，像幕布一样被一刀两断——" },
+        { id: "v34-082", style: "epic", name: E, t: "后世称这一刀为「千夜一闪」。（目击者神代绫补充：斩完之后，她说了一句「好困」。）" },
+        { id: "v34-083", bg: B0, t: "23:59。樱夜町夏祭，最后一夜。所有人抬头，等最后一发烟花。" },
+        { id: "v34-084", cg: CG0, t: "烟花升空。这一次——它没有停。" },
+        { id: "v34-085", cg: CG1, t: "烟花炸开，天亮了。本殿台阶上，四个人分着一盒章鱼烧。第四个人的身影，正一点一点变成樱花瓣。" },
+        { id: "v34-086", cg: null, L: { who: "sayo", ex: "calm" }, R: { who: "sakuya", ex: "calm" }, who: "sakuya", t: "……好吃。和那年一样。小夜，这个给你——我的钱袋。二百年前的铜钱，大概……够交一个月房租？" },
+        { id: "v34-087", who: "sayo", ex: "shaken", t: "欸——？！我在最后一发烟花前许的愿……真的实现了？！" },
+        { id: "v34-088", R: { who: "aya", ex: "calm" }, who: "aya", ex: "calm", t: "（绫看着手机。直播间观众：312……313。多出来的那一个，头像是一张狐狸面具。）……欢迎回来。不对——欢迎来过。" },
+        { id: "v34-089", who: "sakuya", t: "千代在前面等我了。……谢谢你们，陪我逛完。" },
+        { id: "v34-090", L: { who: "rion", ex: "calm" }, R: { who: "yoi", ex: "calm" }, who: "yoi", t: "咳咳——凡人们！本神宣布：本届百夜祭，圆满散场！……明年，也要来。" },
+        { id: "v34-091", L: { who: "rion", ex: "calm" }, R: null, who: "rion", ex: "calm", t: "……明天，要上学。" },
+        { id: "v34-092", who: "rion", ex: "calm", t: "……嗯。想去。" },
+        { id: "v34-093", style: "epic", name: E, t: "至于那把刀——神代家的新一期瓦版写道：「斩何物，便名何刀。此刀斩开千夜，本当更名——」" },
+        { id: "v34-094", style: "epic", name: E, t: "「——然散场之时，鬼尚在吃章鱼烧。故此刀，仍名『大食切』。」诸位看官，百夜祭，至此散场。" }
+      ]
+    }
+  };
+  global.SakurayoStory = global.SakurayoStory || {};
+  global.SakurayoStory.ch4 = S;
+  (global.SakurayoStory.CG = global.SakurayoStory.CG || []).push({ id: "story/ch4/cg_dawn.webp", n: "天亮了" });
 })(typeof window !== "undefined" ? window : globalThis);
 
 </script>
@@ -7078,7 +7277,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }
   };
   Rig.prototype.drawSeq = function (gl, m, fr) {
-    var i0 = Math.floor(fr.pos), i1 = Math.min(fr.n - 1, i0 + 1), k = fr.pos - i0, A = m.A, self = this;
+    var i0 = Math.floor(fr.pos), i1 = Math.min(fr.n - 1, i0 + 1), k = m.A.step ? 0 : fr.pos - i0, A = m.A, self = this;
     function uv(dst, i) { var o = A.frames[i]; for (var q = 0; q < m.n; q++) { dst[q * 2] = (o[0] + m.uv0[q * 2] * A.tw) / m.iw; dst[q * 2 + 1] = (o[1] + m.uv0[q * 2 + 1] * A.th) / m.ih; } }
     gl.bindTexture(gl.TEXTURE_2D, this.tex[m.tex0]);
     gl.bindBuffer(gl.ARRAY_BUFFER, m.pb); gl.bufferData(gl.ARRAY_BUFFER, m.out, gl.DYNAMIC_DRAW); gl.enableVertexAttribArray(this.loc.p); gl.vertexAttribPointer(this.loc.p, 2, gl.FLOAT, false, 0, 0);
@@ -7096,7 +7295,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     g.drawImage(this.base, v.ox, v.oy, this.d.w * v.sc, this.d.h * v.sc);
     var fr2 = this.v2 && this.s.seq ? this.seqFrame() : null;
     if (fr2) { var Aq = fr2.A, im = this.texImgs["act_" + this.s.seq.name], i0 = Math.floor(fr2.pos), r = Aq.rect;
-      [[i0, 1], [Math.min(fr2.n - 1, i0 + 1), fr2.pos - i0]].forEach(function (p) { if (p[1] < 0.01) return; g.globalAlpha = p[1]; var o = Aq.frames[p[0]]; g.drawImage(im, o[0], o[1], Aq.tw, Aq.th, v.ox + r[0] * v.sc, v.oy + r[1] * v.sc, r[2] * v.sc, r[3] * v.sc); }); g.globalAlpha = 1; }
+      [[i0, 1], [Math.min(fr2.n - 1, i0 + 1), Aq.step ? 0 : fr2.pos - i0]].forEach(function (p) { if (p[1] < 0.01) return; g.globalAlpha = p[1]; var o = Aq.frames[p[0]]; g.drawImage(im, o[0], o[1], Aq.tw, Aq.th, v.ox + r[0] * v.sc, v.oy + r[1] * v.sc, r[2] * v.sc, r[3] * v.sc); }); g.globalAlpha = 1; }
     else if (this.v2 && this.texImgs.arms) for (var sd in this.d.arms) { var A = this.d.arms[sd]; g.drawImage(this.texImgs.arms, A.ax, A.ay, A.w, A.h, v.ox + A.x * v.sc, v.oy + A.y * v.sc, A.w * v.sc, A.h * v.sc); }
     for (var k in this.d.patches) { var p = this.d.patches[k], al = this.s.ex[k] || 0; if (al < 0.01 || !this.atlas) continue; g.globalAlpha = al;
       g.drawImage(this.atlas, p.ax, p.ay, p.w, p.h, v.ox + p.x * v.sc, v.oy + p.y * v.sc, p.w * v.sc, p.h * v.sc); g.globalAlpha = 1; }
@@ -15213,13 +15412,13 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
 
   /* ===== 主线关卡（runtime/sakurayo-levels.js）+ AVG（runtime/sakurayo-avg.js） ===== */
   var activeLevel46=null,levelObj46=null,levelResult46=null;
-  const AVG_NAMES46={sayo:"月城小夜",aya:"神代绫",rion:"黑羽凛音",rin:"雨宫凛",miko:"小灯",kagami:"镜零",yoi:"宵",tanuki:"狸老板",guard:"老保安"};
+  const AVG_NAMES46={sayo:"月城小夜",aya:"神代绫",rion:"黑羽凛音",rin:"雨宫凛",miko:"小灯",kagami:"镜零",yoi:"宵",tanuki:"狸老板",guard:"老保安",soichi:"黑羽宗一",sakuya:"月城朔夜"};
   function avgCast46(who,ex){
     if(["sayo","aya","rion"].includes(who))return {name:AVG_NAMES46[who],img:artUrl(`characters/${who}/default/avg_${["calm","resolve","shaken","angry"].includes(ex)?ex:"calm"}.webp`)};
     if(who==="rin")return {name:AVG_NAMES46.rin,img:artUrl(`npc/rin/avg_${ex==="serious"?"serious":"calm"}.webp`)};
     if(who==="miko")return {name:AVG_NAMES46.miko,img:artUrl(`npc/miko/avg_${ex==="afraid"?"afraid":"calm"}.webp`)};
     if(who==="kagami")return {name:AVG_NAMES46.kagami,img:artUrl("npc/kagami/portrait.webp")};
-    if(who==="yoi"||who==="tanuki"||who==="guard")return {name:AVG_NAMES46[who],img:artUrl(`npc/${who}/avg_calm.webp`)};
+    if(["yoi","tanuki","guard","soichi","sakuya"].includes(who))return {name:AVG_NAMES46[who],img:artUrl(`npc/${who}/avg_calm.webp`)};
     return null;
   }
   function storyFor46(id,part){const L=window.SakurayoLevels?.find(id);return L&&window.SakurayoStory?.["ch"+L.ch]?.[id]?.[part]||null;}
