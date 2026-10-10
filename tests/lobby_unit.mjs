@@ -560,6 +560,18 @@ collect(rosterHost).find(n => n.getAttribute("data-card") === "school_shrine").o
 assert.match(document.getElementById("rosterPeek46").innerHTML, /巫女倾向 ×1.3/);
 assert.match(document.getElementById("rosterPeek46").innerHTML, /收藏不增加战斗属性/);
 
+for (const [id, label] of [["fashion_sayo_night", "巫女"], ["fashion_aya_veil", "枪斗术"], ["fashion_rion_bloom", "修仙"], ["fashion_sayo_crown", "巫女"], ["fashion_aya_funeral", "枪斗术"], ["fashion_rion_bride", "修仙"]]) {
+  save.shop40.ops.fashion = save.shop40.ops.fashion || { owned: {} };
+  save.shop40.ops.fashion.owned = save.shop40.ops.fashion.owned || {};
+  save.shop40.ops.fashion.owned[id] = 1;
+  V.setRosterTab(save, "fashion");
+  V.renderRoster(rosterHost, save, {});
+  collect(rosterHost).find(n => n.getAttribute("data-card") === id).onclick();
+  const html = document.getElementById("rosterPeek46").innerHTML;
+  assert.match(html, new RegExp("装备时" + label + "流派倾向 ×1\\.3"), id);
+  assert.match(html, /收藏不增加战斗属性/, id);
+}
+
 const heroRoot = fakeEl("div");
 body.appendChild(heroRoot);
 V.bindHeroTap(heroRoot, () => {});

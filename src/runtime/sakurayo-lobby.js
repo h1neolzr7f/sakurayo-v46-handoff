@@ -26,6 +26,7 @@
 
   var DEFAULT_SHOWN = Object.freeze(["sayo_echo", "aya_petal"]);
   var POOL_IDS = Object.freeze(["remnant", "fashion", "weapon"]);
+  var SCHOOL_LABEL = Object.freeze({ mech: "机械师", gun: "枪斗术", alch: "炼金术", gene: "基因战士", vamp: "血族", spore: "菌群术", magical: "魔法少女", cult: "修仙", mage: "魔法师", shrine: "巫女", summon: "召唤师", ninja: "忍者", idol: "战场歌姬", necro: "死灵术士" });
   var ROSTER_TABS = Object.freeze(["scrap", "school", "job", "fusion", "fashion", "weapon"]);
   var RARITY_RANK = Object.freeze(["SSR", "SR", "R", "N"]);
 
@@ -1044,7 +1045,7 @@
       "</em><p>" +
       (locked ? "尚未回收。寻访点亮后才会露出立绘。" : loreText(card)) +
       "</p>" +
-      (locked ? "" : '<p class="collectionRule46">收藏不增加战斗属性 · ' + card.d + (card.kind === "fashion" && card.school ? " 装备时对应流派倾向 ×1.3。" : "") + "</p>") +
+      (locked ? "" : '<p class="collectionRule46">收藏不增加战斗属性 · ' + card.d + (card.kind === "fashion" && card.school ? " 装备时" + (SCHOOL_LABEL[card.school] || card.school) + "流派倾向 ×1.3。" : "") + "</p>") +
       (canEquip ? '<button type="button" class="rosterEquip46" data-equip="' + card.id + '">装备</button>' : "") +
       "</div></div>";
     overlay.onclick = function (event) {
