@@ -47,6 +47,10 @@
     /* gacha pull buttons: never wrap the label on narrow phones */
     "#gachaDrawer .wishV2 .wishDock46 button b,#gachaDrawer .wishV2 .wishDock46 button>span:first-child{white-space:nowrap}",
     "@media (max-width:700px) and (orientation:landscape){#gachaPull1,#gachaPull10{font-size:14px!important;letter-spacing:.04em!important;padding-left:10px!important;padding-right:8px!important;gap:6px!important;min-width:0!important;overflow:hidden!important}#gachaPull1 small,#gachaPull10 small{padding-left:6px!important;padding-right:8px!important}}",
+    /* gacha result: toast must not cover cards; ten-pull fits short phones */
+    "body:has(#gachaReveal46:not(.hidden)) #toast,body:has(#gachaReveal46:not(.hidden)) #toast.show{top:calc(14px + env(safe-area-inset-top))!important;transform:translate(-50%,0)!important;z-index:260!important}",
+    "@media (max-height:440px){#gachaReveal46 .revealGrid46.ten{max-width:calc(((100vh - 104px) / 2) * .712 * 5 + 40px)!important;gap:6px 8px!important}#gachaReveal46 .revealGrid46.ten .revealCard46{height:calc((100vh - 104px) / 2)!important;width:calc((100vh - 104px) / 2 * .712)!important}}",
+    "body:has(#gachaReveal46:not(.hidden)) .syHint46{display:none!important}",
     /* bubble */
     ".mascotBubble46{position:absolute;z-index:7;right:calc(100% - var(--mascotX,50%) + 11vh);top:8vh;max-width:min(220px,26vw);padding:9px 14px;border-radius:14px 14px 4px 14px;background:rgba(255,255,255,.95);color:#2a1c33;font:700 13px/1.5 system-ui;box-shadow:0 8px 22px rgba(10,6,30,.35);pointer-events:none;opacity:0;transform:translateY(6px) scale(.96);transition:opacity .18s,transform .18s}",
     ".mascotBubble46.on{opacity:1;transform:none}",
