@@ -182,3 +182,10 @@ bash gradlew --no-daemon assembleDebug lintDebug
 - `06fbd2e`：`tools/bgm/songs.py` 用 mido 写 MIDI、FluidSynth + FluidR3_GM（MIT）渲染，混响尾音折回循环起点保证无缝，RMS 统一到 −17 dBFS，`oggenc -q 2.5` 输出到 `art/bgm/`（6 首共约 2.3MB）。
 - `src/runtime/sakurayo-bgm.js`：按场景切曲（大厅/寻访/战斗/Boss），淡入淡出 0.6–1.4 秒，结算播放胜利/失败短乐句后回到大厅曲；音量 = 总音量 × 音乐音量，设为 0 时停止；页面隐藏时暂停。能 fetch 时用 WebAudio 无缝循环，file:// 或 WebView 资源用 `<audio loop>` 兜底。原振荡器底噪已移除，`setMusic37` 保留零音量语义（platform_unit 通过）。
 - 新增 `tests/bgm_smoke.mjs`（本地 http，校验切场景、Boss、胜利乐句、音量公式和 OGG 可解码）。来源与许可见 `CREDITS.md`。试听：`/workspace/sakurayo-bgm-preview/*.mp3`（box 本地）。
+
+## 第六阶段：v5 全量图片素材（2026-10-10）
+
+- 中转站 gpt-image-2 并发生成 95 项（原图在 /workspace/sakurayo-gen/raw/v5，未入库）。被内容审核拦截且未替换：`enemies/normal.webp`（保留旧图）。
+- 已替换：四章关卡主视觉 `chapter_keyart_v2`、可平铺战斗地面 `battle_floor_v2`（偏移融合法做无缝，768x512）、四章剧情 CG `cg.webp`（改为横版）、16 张 Boss 阶段立绘、15 种敌人立绘（`_b` 帧由新图做轻微压缩倾斜，保持两帧动画一致）。
+- 新增：`ui/tactical/lobby-night-v5.webp`（大厅背景，旧 v3 保留以符合 tactical manifest）、`ui/loading_v5.webp`（启动载入背景）、`ui/result_{win,lose}_v5.webp`（结算背景）、`ui/{mail,notice}_banner_v5.webp`（邮箱/公告横幅）、`icons/{item,core,tal}_*.webp` 13 个图标替换商店道具、初始强化与天赋的 emoji（加载失败回退 emoji）。
+- 截图：/workspace/sakurayo-shots/v5-*.png。

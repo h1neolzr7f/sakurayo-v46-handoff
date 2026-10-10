@@ -187,6 +187,7 @@
     }else{
       body.innerHTML=model.history.length?'<div class="cmdHistory47">'+model.history.slice(0,12).map(function(r){return '<article class="cmdRun47"><b>'+esc(r.win?'回收成功':'战斗结束')+'</b><div><strong>'+esc(r.character)+' · '+esc(r.stage)+'</strong><p>'+esc(r.mode)+' / Lv.'+esc(r.level)+' / '+esc(r.kills)+' 击破 / '+esc(r.duration)+'</p></div><span>'+esc(r.date)+'</span></article>';}).join('')+'</div>':'<div class="cmdEmpty47">暂无战绩。完成第一次出击后，回收记录会显示在这里。</div>';
     }
+    if(kind==='mail'||kind==='notice')body.insertAdjacentHTML('afterbegin','<div class="cmdBanner5" aria-hidden="true" style="background-image:linear-gradient(90deg,#080e1cee,#080e1c55 55%,#080e1c00),url(&quot;'+esc(options.art('ui/'+kind+'_banner_v5.webp'))+'&quot;)"><small>'+(kind==='mail'?'DISPATCH INBOX':'TERMINAL NOTICE')+'</small><b>'+(kind==='mail'?'行动邮件':'终端公告')+'</b></div>');
     var next=focusId&&d.getElementById(focusId);
     if(focusCharacter)next=Array.from(body.querySelectorAll('[data-character]')).find(function(b){return b.dataset.character===focusCharacter;});
     if(!refresh||!next||next.disabled)next=drawer.querySelector('.close');

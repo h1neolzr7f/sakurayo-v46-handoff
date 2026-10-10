@@ -45,6 +45,13 @@
     "@keyframes syLow46{0%,100%{opacity:.45}50%{opacity:1}}",
     "#combo.pop46{animation:syPop46 .38s cubic-bezier(.2,1.6,.4,1)}@keyframes syPop46{0%{transform:scale(1.6);filter:brightness(1.8)}100%{transform:none}}",
     "@media (prefers-reduced-motion:reduce){#hud.lowHp46:before{animation:none;opacity:.7}#combo.pop46{animation:none}}",
+    /* v5 art: item/core/talent icons, loading, result, mail/notice banners */
+    ".iconArt46{width:100%;height:100%;object-fit:contain;display:block;filter:drop-shadow(0 3px 6px rgba(0,0,0,.45))}",
+    ".shopIcon40:has(.iconArt46),.ticon:has(.iconArt46){padding:4px!important;font-size:0!important;overflow:visible}",
+    "#bootArt35{background:linear-gradient(0deg,rgba(9,7,19,.82),rgba(9,7,19,.25) 55%,rgba(9,7,19,.55)),var(--bootArt46,none) center 35%/cover no-repeat,radial-gradient(circle at 50% 42%,#35174d 0,#150d29 34%,#090713 72%)!important}",
+    "#result{background:radial-gradient(circle at 50% 30%,rgba(5,4,14,.35),rgba(5,4,14,.86) 70%),var(--resultArt46,none) center/cover no-repeat,#05040e!important}",
+    ".cmdBanner5{position:relative;height:clamp(84px,22vh,128px);margin:0 0 12px;border-radius:14px;overflow:hidden;background-size:cover;background-position:center 40%;border:1px solid rgba(150,228,245,.28);display:flex;flex-direction:column;justify-content:flex-end;padding:12px 16px}",
+    ".cmdBanner5 small{font:800 10px/1.2 system-ui;letter-spacing:.18em;color:#8fe6f5}.cmdBanner5 b{font:800 20px/1.25 system-ui;letter-spacing:.12em;color:#fff;text-shadow:0 2px 8px #000}",
     /* trial badge + result */
     ".trialBadge46{position:absolute;z-index:5;right:max(16px,env(safe-area-inset-right));bottom:calc(var(--trialBadgeBottom,120px));display:flex;align-items:center;gap:8px;padding:4px 4px 4px 12px;border-radius:999px;background:rgba(9,15,30,.9);border:1px solid #ffb3d1;color:#ffe3ef;font:800 12px/1 system-ui;box-shadow:0 6px 18px rgba(255,90,160,.3)}",
     ".trialBadge46 b{color:#ff9cc6;letter-spacing:.12em}.trialBadge46 button{min-width:32px!important;min-height:32px!important;border-radius:50%;border:0;background:#ffffff1a;color:#fff;font:800 14px/1 system-ui}",

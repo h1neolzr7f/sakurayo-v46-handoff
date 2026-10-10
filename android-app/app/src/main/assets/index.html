@@ -5528,6 +5528,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }else{
       body.innerHTML=model.history.length?'<div class="cmdHistory47">'+model.history.slice(0,12).map(function(r){return '<article class="cmdRun47"><b>'+esc(r.win?'回收成功':'战斗结束')+'</b><div><strong>'+esc(r.character)+' · '+esc(r.stage)+'</strong><p>'+esc(r.mode)+' / Lv.'+esc(r.level)+' / '+esc(r.kills)+' 击破 / '+esc(r.duration)+'</p></div><span>'+esc(r.date)+'</span></article>';}).join('')+'</div>':'<div class="cmdEmpty47">暂无战绩。完成第一次出击后，回收记录会显示在这里。</div>';
     }
+    if(kind==='mail'||kind==='notice')body.insertAdjacentHTML('afterbegin','<div class="cmdBanner5" aria-hidden="true" style="background-image:linear-gradient(90deg,#080e1cee,#080e1c55 55%,#080e1c00),url(&quot;'+esc(options.art('ui/'+kind+'_banner_v5.webp'))+'&quot;)"><small>'+(kind==='mail'?'DISPATCH INBOX':'TERMINAL NOTICE')+'</small><b>'+(kind==='mail'?'行动邮件':'终端公告')+'</b></div>');
     var next=focusId&&d.getElementById(focusId);
     if(focusCharacter)next=Array.from(body.querySelectorAll('[data-character]')).find(function(b){return b.dataset.character===focusCharacter;});
     if(!refresh||!next||next.disabled)next=drawer.querySelector('.close');
@@ -5885,6 +5886,13 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     "@keyframes syLow46{0%,100%{opacity:.45}50%{opacity:1}}",
     "#combo.pop46{animation:syPop46 .38s cubic-bezier(.2,1.6,.4,1)}@keyframes syPop46{0%{transform:scale(1.6);filter:brightness(1.8)}100%{transform:none}}",
     "@media (prefers-reduced-motion:reduce){#hud.lowHp46:before{animation:none;opacity:.7}#combo.pop46{animation:none}}",
+    /* v5 art: item/core/talent icons, loading, result, mail/notice banners */
+    ".iconArt46{width:100%;height:100%;object-fit:contain;display:block;filter:drop-shadow(0 3px 6px rgba(0,0,0,.45))}",
+    ".shopIcon40:has(.iconArt46),.ticon:has(.iconArt46){padding:4px!important;font-size:0!important;overflow:visible}",
+    "#bootArt35{background:linear-gradient(0deg,rgba(9,7,19,.82),rgba(9,7,19,.25) 55%,rgba(9,7,19,.55)),var(--bootArt46,none) center 35%/cover no-repeat,radial-gradient(circle at 50% 42%,#35174d 0,#150d29 34%,#090713 72%)!important}",
+    "#result{background:radial-gradient(circle at 50% 30%,rgba(5,4,14,.35),rgba(5,4,14,.86) 70%),var(--resultArt46,none) center/cover no-repeat,#05040e!important}",
+    ".cmdBanner5{position:relative;height:clamp(84px,22vh,128px);margin:0 0 12px;border-radius:14px;overflow:hidden;background-size:cover;background-position:center 40%;border:1px solid rgba(150,228,245,.28);display:flex;flex-direction:column;justify-content:flex-end;padding:12px 16px}",
+    ".cmdBanner5 small{font:800 10px/1.2 system-ui;letter-spacing:.18em;color:#8fe6f5}.cmdBanner5 b{font:800 20px/1.25 system-ui;letter-spacing:.12em;color:#fff;text-shadow:0 2px 8px #000}",
     /* trial badge + result */
     ".trialBadge46{position:absolute;z-index:5;right:max(16px,env(safe-area-inset-right));bottom:calc(var(--trialBadgeBottom,120px));display:flex;align-items:center;gap:8px;padding:4px 4px 4px 12px;border-radius:999px;background:rgba(9,15,30,.9);border:1px solid #ffb3d1;color:#ffe3ef;font:800 12px/1 system-ui;box-shadow:0 6px 18px rgba(255,90,160,.3)}",
     ".trialBadge46 b{color:#ff9cc6;letter-spacing:.12em}.trialBadge46 button{min-width:32px!important;min-height:32px!important;border-radius:50%;border:0;background:#ffffff1a;color:#fff;font:800 14px/1 system-ui}",
@@ -6029,6 +6037,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       "ui/nav/gacha.webp","ui/nav/roster.webp","ui/nav/archive.webp","gacha/banner_bg.webp","ui/lobby_wide.webp"
     ];
   function artUrl(path) { return `${ART_ROOT}/${path}`; }
+  { const boot=document.getElementById("bootArt35"); if(boot) boot.style.setProperty("--bootArt46",`url("${artUrl("ui/loading_v5.webp")}")`); }
   function artImage(path) {
     if (!ART_CACHE.has(path)) {
       const image = new Image();
@@ -8315,7 +8324,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
         max = l >= a.max,
         d = document.createElement("div");
       d.className = "talent";
-      d.innerHTML = `<div class="ticon">${a.i}</div><div><h3>${a.n} <small>Lv.${l}/${a.max}</small></h3><p>${a.d}</p><small>${max ? "已满级" : `升级消耗 🌸 ${cost}`}</small></div><button ${max || save.coins < cost ? "disabled" : ""}>${max ? "MAX" : "升级"}</button>`;
+      d.innerHTML = `<div class="ticon">${iconHtml46(iconArt46("tal",id,a.i))}</div><div><h3>${a.n} <small>Lv.${l}/${a.max}</small></h3><p>${a.d}</p><small>${max ? "已满级" : `升级消耗 🌸 ${cost}`}</small></div><button ${max || save.coins < cost ? "disabled" : ""}>${max ? "MAX" : "升级"}</button>`;
       d.querySelector("button").onclick = () => {
         if (!max && save.coins >= cost) {
           save.coins -= cost;
@@ -8630,7 +8639,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     $("#rtitle").textContent=win?"镜界节点已净化":"防线失守";
     $("#rsub").textContent=win?`${stage().short} 已封回证词。${stage().boss} 不再开口。${P.fusion?`「${fusionData()?.n||P.fusion}」`:"未融合"} / ${P.form?ASC.find(a=>a.id===P.form)?.n||P.form:"未飞升"}`:`${stage().short}被尸潮吞没。${window.SakurayoLifecycle?.hint?.(lifecycleWorld44())||"下次可以在暂停页看清短板，再决定补什么。"} ${runCoach45(false)}`;
     $("#rstats").innerHTML=`坚持 <b>${fmt(runTime)}</b><br>击破 <b>${P.kills}</b> · 精英 <b>${P.eliteKills}</b> · 等级 <b>${P.level}</b><br>职业：<b>${careerSummary()}</b><br>融合：<b>${P.fusion?fusionData()?.n||P.fusion:"未融合"}</b><br>飞升：<b>${P.form?ASC.find(a=>a.id===P.form)?.n||P.form:"未飞升"}</b><br>获得樱花币 <b style="color:var(--g)">🌸 ${reward}</b>${pay44&&window.SakurayoEconomy?window.SakurayoEconomy.rewardHtml(pay44):""}`;
-    renderRunReport(); $("#result").classList.remove("hidden"); sound(win?"win":"over");
+    renderRunReport(); $("#result").style.setProperty("--resultArt46",`url("${artUrl(`ui/result_${win?"win":"lose"}_v5.webp`)}")`); $("#result").classList.remove("hidden"); sound(win?"win":"over");
   }
   function pauseGame() {
     if (state !== "play") return;
@@ -12522,9 +12531,11 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
 
   function buyStarter40(id){const u=STARTERS40[id],lv=save.shop40.starter[id]||0,cost=starterCost40(id);if(!u||lv>=u.max||save.coins<cost)return false;save.coins-=cost;save.shop40.starter[id]=lv+1;if(!save.shop40.equippedStarter)save.shop40.equippedStarter=id;persist();renderShop35();toast(`${u.n} 提升至 Lv.${lv+1}`);return true;}
   function buyItem40(id){const u=ITEMS40[id],lv=save.shop40.items[id]||0,cost=itemCost40(id);if(!u||lv>=u.max||save.coins<cost)return false;save.coins-=cost;save.shop40.items[id]=lv+1;if(id==="bait")save.shop40.baitEquipped=true;else if(!save.shop40.equippedWeapon)save.shop40.equippedWeapon=id;persist();renderShop35();toast(`购入：${u.n}`);return true;}
-  function shopCard40(icon,title,desc,buttonText,disabled,onClick,extra=""){const d=document.createElement("div");d.className="shopItem40";d.innerHTML=`<div class="shopIcon40">${htmlEscape(icon)}</div><div><h3>${htmlEscape(title)}</h3><p>${desc}</p>${extra}</div><button ${disabled?"disabled":""}>${htmlEscape(buttonText)}</button>`;d.querySelector("button").onclick=onClick;return d;}
-  function renderStarterShop40(section){for(const [id,u] of Object.entries(STARTERS40)){const lv=save.shop40.starter[id]||0,eq=save.shop40.equippedStarter===id,cost=starterCost40(id),mul=starterChapterMul40();const card=shopCard40(u.i,`${u.n} · Lv.${lv}/${u.max}`,`${u.d}<br><b>当前章节同步倍率 ${mul.toFixed(2)}×</b>`,eq?"已装备":lv?"装备":save.coins>=cost?`购买 🌸 ${cost}`:`还差 🌸 ${cost-save.coins}`,!lv&&save.coins<cost,()=>{if(lv){save.shop40.equippedStarter=id;persist();renderShop35();}else buyStarter40(id);},`<small>${lv<u.max?`下一级费用 🌸 ${cost}`:"已满级"}</small>`);if(lv>0&&lv<u.max){const up=document.createElement("button");up.className="shopUpgrade40";up.textContent=`升级 🌸 ${cost}`;up.disabled=save.coins<cost;up.onclick=()=>buyStarter40(id);card.appendChild(up);}if(window.SakurayoEconomy?.recommend(save.character).starterId===id)card.classList.add("shopRecommend44");if(!lv&&save.coins<cost)card.classList.add("shopShort44");section.appendChild(card);}}
-  function renderItemShop40(section){for(const [id,u] of Object.entries(ITEMS40)){const lv=save.shop40.items[id]||0,cost=itemCost40(id),active=id==="bait"?save.shop40.baitEquipped:save.shop40.equippedWeapon===id;const card=shopCard40(u.i,`${u.n} · Lv.${lv}/${u.max}`,u.d,active?"使用中":lv?(id==="bait"?"启用":"装备"):save.coins>=cost?`🌸 ${cost}`:`还差 🌸 ${cost-save.coins}`,!lv&&save.coins<cost,()=>{if(lv){if(id==="bait")save.shop40.baitEquipped=!save.shop40.baitEquipped;else save.shop40.equippedWeapon=id;persist();renderShop35();}else buyItem40(id);});if(lv>0&&lv<u.max){const up=document.createElement("button");up.className="shopUpgrade40";up.textContent=`升级 🌸 ${cost}`;up.disabled=save.coins<cost;up.onclick=()=>buyItem40(id);card.appendChild(up);}if(window.SakurayoEconomy?.recommend(save.character).itemId===id)card.classList.add("shopRecommend44");if(!lv&&save.coins<cost)card.classList.add("shopShort44");section.appendChild(card);}}
+  function iconArt46(kind,id,fallback){const map={item:["bait","ammo","whetstone","mirror"],core:["assault","bastion","flow","arcane"],tal:["atk","hp","luck","mag","flow"]};return map[kind]?.includes(id)?{img:artUrl(`icons/${kind}_${id}.webp`),alt:fallback}:fallback;}
+  function iconHtml46(icon){return icon&&icon.img?`<img class="iconArt46" src="${htmlEscape(icon.img)}" alt="" draggable="false" onerror="this.replaceWith(document.createTextNode(${htmlEscape(JSON.stringify(icon.alt||""))}))">`:htmlEscape(icon);}
+  function shopCard40(icon,title,desc,buttonText,disabled,onClick,extra=""){const d=document.createElement("div");d.className="shopItem40";d.innerHTML=`<div class="shopIcon40">${typeof iconHtml46==="function"?iconHtml46(icon):htmlEscape(icon)}</div><div><h3>${htmlEscape(title)}</h3><p>${desc}</p>${extra}</div><button ${disabled?"disabled":""}>${htmlEscape(buttonText)}</button>`;d.querySelector("button").onclick=onClick;return d;}
+  function renderStarterShop40(section){for(const [id,u0] of Object.entries(STARTERS40)){const u={...u0,i:typeof iconArt46==="function"?iconArt46("core",id,u0.i):u0.i};const lv=save.shop40.starter[id]||0,eq=save.shop40.equippedStarter===id,cost=starterCost40(id),mul=starterChapterMul40();const card=shopCard40(u.i,`${u.n} · Lv.${lv}/${u.max}`,`${u.d}<br><b>当前章节同步倍率 ${mul.toFixed(2)}×</b>`,eq?"已装备":lv?"装备":save.coins>=cost?`购买 🌸 ${cost}`:`还差 🌸 ${cost-save.coins}`,!lv&&save.coins<cost,()=>{if(lv){save.shop40.equippedStarter=id;persist();renderShop35();}else buyStarter40(id);},`<small>${lv<u.max?`下一级费用 🌸 ${cost}`:"已满级"}</small>`);if(lv>0&&lv<u.max){const up=document.createElement("button");up.className="shopUpgrade40";up.textContent=`升级 🌸 ${cost}`;up.disabled=save.coins<cost;up.onclick=()=>buyStarter40(id);card.appendChild(up);}if(window.SakurayoEconomy?.recommend(save.character).starterId===id)card.classList.add("shopRecommend44");if(!lv&&save.coins<cost)card.classList.add("shopShort44");section.appendChild(card);}}
+  function renderItemShop40(section){for(const [id,u0] of Object.entries(ITEMS40)){const u={...u0,i:typeof iconArt46==="function"?iconArt46("item",id,u0.i):u0.i};const lv=save.shop40.items[id]||0,cost=itemCost40(id),active=id==="bait"?save.shop40.baitEquipped:save.shop40.equippedWeapon===id;const card=shopCard40(u.i,`${u.n} · Lv.${lv}/${u.max}`,u.d,active?"使用中":lv?(id==="bait"?"启用":"装备"):save.coins>=cost?`🌸 ${cost}`:`还差 🌸 ${cost-save.coins}`,!lv&&save.coins<cost,()=>{if(lv){if(id==="bait")save.shop40.baitEquipped=!save.shop40.baitEquipped;else save.shop40.equippedWeapon=id;persist();renderShop35();}else buyItem40(id);});if(lv>0&&lv<u.max){const up=document.createElement("button");up.className="shopUpgrade40";up.textContent=`升级 🌸 ${cost}`;up.disabled=save.coins<cost;up.onclick=()=>buyItem40(id);card.appendChild(up);}if(window.SakurayoEconomy?.recommend(save.character).itemId===id)card.classList.add("shopRecommend44");if(!lv&&save.coins<cost)card.classList.add("shopShort44");section.appendChild(card);}}
   function buyTalisman40(id){if(!TALISMAN_SCHOOLS40.includes(id)||save.shop40.ownedTalismans.includes(id)||save.coins<80)return false;save.coins-=80;save.shop40.ownedTalismans.push(id);persist();renderShop35();return true;}
   function equipTalisman40(id){if(!save.shop40.ownedTalismans.includes(id))return false;const list=save.shop40.bannedSchools,pos=list.indexOf(id);if(pos>=0)list.splice(pos,1);else if(list.length<talismanSlots40())list.push(id);else{toast(`最多装备 ${talismanSlots40()} 枚排除符`);return false;}persist();renderShop35();return true;}
   function renderTalismanShop40(section){const note=document.createElement("p");note.className="routeNote";note.textContent=`当前可排除 ${talismanSlots40()} 个职业学校；通用生存升级不会被排除。`;section.appendChild(note);for(const id of TALISMAN_SCHOOLS40){const owned=save.shop40.ownedTalismans.includes(id),on=save.shop40.bannedSchools.includes(id),u=SCHOOL[id],card=shopCard40("符",`${u?.n||id}排除符`,on?"已从普通职业技能刷新池排除。":"购买后可装备，排除该学校技能刷新。",on?"卸下":owned?"装备":save.coins>=80?`购买 🌸 80`:`还差 🌸 ${80-save.coins}`,!owned&&save.coins<80,owned?()=>equipTalisman40(id):()=>buyTalisman40(id));section.appendChild(card);}}
@@ -13309,7 +13320,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function paintHomeBg46(){
     const bg=$("#menu .bg");
     if(!bg)return;
-    bg.style.backgroundImage=`url('${artUrl("ui/tactical/lobby-outpost-v3.webp")}')`;
+    bg.style.backgroundImage=`url('${artUrl("ui/tactical/lobby-night-v5.webp")}')`;
     bg.style.backgroundPosition="center 30%";
     bg.style.backgroundSize="cover";
     $("#menu")?.classList.add("lobbyWide46");
