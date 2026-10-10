@@ -6,7 +6,8 @@ import path from 'node:path';
 const target = process.argv[2] || 'src/index.html';
 const browser = await chromium.launch();
 const ctx = await browser.newContext({ viewport: { width: 844, height: 390 } });
-await ctx.addInitScript(() => { if (!sessionStorage.getItem('b46')) { sessionStorage.setItem('b46', 1); localStorage.setItem('sakurayoV3', JSON.stringify({ coins: 0, unlock: 4, done: [1, 2, 3], tutorialDone: true })); } });
+// 种子只写一次：用 localStorage 自身做标记（file:// 下 reload 偶发丢 sessionStorage → 旧写法会把种子存档重新盖回去，表现为“图鉴解锁没保存”）
+await ctx.addInitScript(() => { if (!localStorage.getItem('b46seed')) { localStorage.setItem('b46seed', '1'); localStorage.setItem('sakurayoV3', JSON.stringify({ coins: 0, unlock: 4, done: [1, 2, 3], tutorialDone: true })); } });
 const page = await ctx.newPage(); const errors = []; page.on('pageerror', e => errors.push(String(e)));
 const url = pathToFileURL(path.resolve(target)).href + '?test=1';
 await page.goto(url); await page.locator('.bootArt35').waitFor({ state: 'detached' });
