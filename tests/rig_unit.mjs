@@ -62,3 +62,12 @@ for (const id of ['sayo', 'aya', 'rion']) {
     console.log('ok seq', id, an, A.frames.length, 'frames');
   }
 }
+{ // 负/超大 dt 不得让表情阻尼发散（rAF 首帧时间戳可能早于 performance.now()）
+  for (const id of ['sayo', 'aya', 'rion']) {
+    const d = ctx.SakurayoRigData[id];
+    const r = new ctx.SakurayoRig.Rig2({}, d, { body: { width: d.w, height: d.h }, arms: { width: 1, height: 1 }, atlas: { width: 1, height: 1 } }, { no3d: true, test: true });
+    r.say(3); r.update(-0.5); r.update(-3); r.update(5); for (let i = 0; i < 30; i++) r.update(1 / 60);
+    for (const k in r.s.ex) assert.ok(Number.isFinite(r.s.ex[k]) && Math.abs(r.s.ex[k]) <= 1.01, `${id} ex.${k} bounded (${r.s.ex[k]})`);
+  }
+  console.log('ok rig dt guard');
+}

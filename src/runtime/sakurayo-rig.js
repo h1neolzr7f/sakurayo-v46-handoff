@@ -96,7 +96,7 @@
     if (i < 0 || j < 0 || i >= gx || j >= gy) return null; var q = j * gx + i, o = {}; for (var k in this.W) o[k] = this.W[k][q]; return o; };
   Rig.prototype.lookAt = function (x, y) { this.s.tx = clamp(x, -1, 1); this.s.ty = clamp(y, -1, 1); this.s.lookHold = 2.5; };
   Rig.prototype.say = function (sec) { this.s.talkUntil = this.t + (sec || 1.6); };
-  Rig.prototype.update = function (dt) {
+  Rig.prototype.update = function (dt) { dt = dt > 0 ? Math.min(dt, 0.1) : 0; // rAF 时间戳可能早于 performance.now()：负 dt 会让指数阻尼发散
     var s = this.s, t = (this.t += dt), a = s.act ? s.actT / ACTS[s.act].dur : 0, ex = { closed: 0, talk: 0, happy: 0, shy: 0 }, tilt = 0, hy = 0, hx = 0, st = 0;
     if (s.act) { s.actT += dt; if (s.actT >= ACTS[s.act].dur) { s.act = null; a = 0; } }
     // 闲置小动作（伸懒腰 / 整理发夹 / 东张西望）
@@ -350,7 +350,7 @@
     var fade = Math.min(1, Math.max(0, (q.t) / 0.25), Math.max(0, (up * 2 + hold + 0.25 - t) / 0.25));
     return { pos: pos, done: t > up * 2 + hold + 0.25, A: A, n: n, fade: fade };
   };
-  Rig2.prototype.update = function (dt) {
+  Rig2.prototype.update = function (dt) { dt = dt > 0 ? Math.min(dt, 0.1) : 0;
     this.dtLast = dt; var s = this.s;
     if (s.act && this.d.actions && this.d.actions[s.act] && this.texImgs["act_" + s.act] && !s.seq && s.actT < 0.05) s.seq = { name: s.act, t: 0, hold: s.act === "pin" ? 1.4 : 0.8 };
     if (s.seq) { s.seq.t += dt; var fr = this.seqFrame(); s.armHold = Math.max(0, s.armHold - dt / 0.25); if (fr.done) { s.seq = null; } }
@@ -382,7 +382,7 @@
     opts = opts || {};
     return load(id, url).then(function (L) {
       var r = L.imgs ? new Rig2(canvas, L.d, L.imgs, opts) : new Rig(canvas, L.d, L.base, L.atlas, opts); r.id = id; cur = r;
-      if (!raf) { last = performance.now(); var loop = function (now) { raf = requestAnimationFrame(loop); var dt = Math.min(0.05, (now - last) / 1000); last = now; if (!cur || global.__rigManual || (opts.hidden && opts.hidden())) return; cur.update(opts.reducedMotion && opts.reducedMotion() ? dt * 0.4 : dt); cur.render(); }; raf = requestAnimationFrame(loop); }
+      if (!raf) { last = performance.now(); var loop = function (now) { raf = requestAnimationFrame(loop); var dt = Math.max(0, Math.min(0.05, (now - last) / 1000)); last = now; if (!cur || global.__rigManual || (opts.hidden && opts.hidden())) return; cur.update(opts.reducedMotion && opts.reducedMotion() ? dt * 0.4 : dt); cur.render(); }; raf = requestAnimationFrame(loop); }
       return r;
     });
   }
