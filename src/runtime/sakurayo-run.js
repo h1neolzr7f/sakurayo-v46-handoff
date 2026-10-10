@@ -176,6 +176,7 @@
     ["path", "relics", "pending"].forEach(function (k) { if (!Array.isArray(st[k])) st[k] = []; });
     st.shards = Math.max(0, Math.floor(+st.shards || 0)); st.relics = st.relics.filter(function (id) { return !!relic(id); });
     if (st.at && !node(st, st.at)) st.at = null;
+    st.abyss = Math.max(0, Math.min(10, st.abyss | 0)); if (st.daily && (typeof st.daily !== "object" || !(st.daily.day > 0))) st.daily = null;
     if (st.build && typeof st.build !== "object") st.build = null;
     if (st.form) { st.form = global.SakurayoForms ? global.SakurayoForms.sanitize(st.form, st.character || "sayo") : st.form; if (!st.form) delete st.form; }
     return st;

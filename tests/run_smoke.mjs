@@ -20,7 +20,7 @@ assert.deepEqual([saved.tal.atk, saved.tal.hp, saved.tal.flow], [2, 3, 1], 'lega
 await api('selectCharacter', 'sayo');
 assert.equal((await page.evaluate(() => { window.__SAKURAYO_TEST__.protectPlayer; return 1; })), 1);
 // start a run
-await page.click('#runBtn46'); st = await api('runState46');
+await page.click('#runBtn46'); await page.locator('#night46 [data-ngo]').click(); st = await api('runState46'); // 入口先弹出 常夜/深渊/每日 选择
 assert.ok(st.active && st.screen && st.layer === 1 && st.available.length === 1 && st.available[0].type === 'fight', 'run map opens at layer 1');
 assert.equal(await page.locator('#run46 .rn46').count() >= 10, true, 'layer map shows its nodes');
 async function play(ms, n) { for (let i = 0; i < n; i++) await page.evaluate(ms => { const a = window.__SAKURAYO_TEST__, m = a.snapshot().mode; if (m === 'level') a.chooseUpgrade(0); else if (m === 'event') a.chooseEvent(0); else if (m === 'play') window.advanceTime(ms); }, ms); }
