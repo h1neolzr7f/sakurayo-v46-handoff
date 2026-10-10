@@ -27,7 +27,8 @@ async function play(ms, n) { for (let i = 0; i < n; i++) await page.evaluate(ms 
 // node 1: fight, grow the build
 await api('runEnter46', st.available[0].id); await api('protectPlayer');
 st = await api('runState46'); assert.equal(st.mode, 'play'); assert.ok(/^R1-0-0$/.test(st.node));
-await play(250, 120); st = await api('runState46'); const grown = st.player; assert.ok(grown.level >= 2, 'levelled during node ' + grown.level);
+// 站桩玩家拾取经验靠随机掉落位置，30s 内不一定升级（高负载时尤其）→ 以 30s 为单位推进，最多 120s 游戏时间
+for (let k = 0; k < 4; k++) { await play(250, 120); st = await api('runState46'); if (st.player.level >= 2 || st.mode !== 'play') break; } const grown = st.player; assert.ok(grown.level >= 2, 'levelled during node ' + grown.level);
 await api('runWinNode46'); st = await api('runState46');
 assert.equal(st.mode, 'result'); assert.ok(st.shards >= 22, 'shards for the fight'); assert.equal(st.build.level, grown.level, 'build snapshot taken');
 assert.ok(await page.locator('#runCont46').isVisible()); assert.equal(await page.locator('#again').isVisible(), false, 'normal replay hidden in a run');
