@@ -4,11 +4,11 @@
   "use strict";
   var CATALOG = Object.freeze([
     Object.freeze({ id: "solo", name: "独行回收", sub: "SOLO", gate: 2, reward: 120,
-      rule: "禁用 DP 干员部署；局内随机构筑照常。", tip: "全程只能靠自己清场。", art: "stages/stage_2/chapter_keyart_v2.webp" }),
+      rule: "禁用 DP 干员部署；局内随机构筑照常。", tip: "全程只能靠自己清场。", art: "trials/banner_solo.webp" }),
     Object.freeze({ id: "sealed", name: "封印试炼", sub: "SEALED", gate: 3, reward: 180,
-      rule: "升级不弹出局内强化选择；保留自己的开局核心与永久成长。", tip: "等级只回复少量生命。", art: "stages/stage_3/chapter_keyart_v2.webp" }),
+      rule: "升级不弹出局内强化选择；保留自己的开局核心与永久成长。", tip: "等级只回复少量生命。", art: "trials/banner_sealed.webp" }),
     Object.freeze({ id: "flawless", name: "无伤终夜", sub: "FLAWLESS", gate: 4, reward: 240,
-      rule: "正常战斗；必须在不受生命伤害的情况下通关。", tip: "护盾吸收的伤害不算受伤。", art: "stages/stage_4/chapter_keyart_v2.webp" })
+      rule: "正常战斗；必须在不受生命伤害的情况下通关。", tip: "护盾吸收的伤害不算受伤。", art: "trials/banner_flawless.webp" })
   ]);
   function find(id) {
     for (var i = 0; i < CATALOG.length; i++) if (CATALOG[i].id === id) return CATALOG[i];
@@ -71,7 +71,7 @@
     ".trialTab46.on{border-color:#ffb3d1;box-shadow:0 0 0 1px #ffb3d1,0 8px 22px rgba(255,90,160,.28)}" +
     ".trialTab46.lock{filter:grayscale(.85) brightness(.7)}" +
     ".trialTab46 .dot46{position:absolute;top:8px;right:8px;width:9px;height:9px;border-radius:50%;background:#ff4d6d;box-shadow:0 0 8px #ff4d6d}" +
-    ".trialMain46{position:relative;border-radius:18px;overflow:hidden;border:1px solid rgba(150,228,245,.3);background:#0a1224 var(--art) center/cover;min-height:0}" +
+    ".trialMain46{position:relative;border-radius:18px;overflow:hidden;border:1px solid rgba(150,228,245,.3);background:#0a1224 var(--art) 72% 30%/cover;min-height:0}" +
     ".trialMain46:before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,10,22,.94) 0%,rgba(6,10,22,.78) 42%,rgba(6,10,22,.08) 75%)}" +
     ".trialInfo46{position:relative;z-index:1;display:flex;flex-direction:column;gap:8px;height:100%;box-sizing:border-box;padding:18px 20px;max-width:min(470px,62%)}" +
     ".trialInfo46 em{font:900 11px/1 system-ui;letter-spacing:.32em;color:#8fe6f5;font-style:normal}" +
@@ -98,7 +98,7 @@
     var cur = find(render.pick) || CATALOG[0];
     var tabs = CATALOG.map(function (t) {
       var s = status(save, t.id);
-      return '<button type="button" class="trialTab46' + (t.id === cur.id ? " on" : "") + (s.open ? "" : " lock") + '" data-trial="' + t.id + '" style="--art:url(\'' + art(t.art) + '\')">' +
+      return '<button type="button" class="trialTab46' + (t.id === cur.id ? " on" : "") + (s.open ? "" : " lock") + '" data-trial="' + t.id + '" style="--art:url(\'' + art(t.art.replace("banner_", "tab_")) + '\')">' +
         esc(t.name) + "<small>" + t.sub + "</small>" + (s.open && !s.claimed ? '<i class="dot46"></i>' : "") + "</button>";
     }).join("");
     var s = status(save, cur.id);

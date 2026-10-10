@@ -7475,6 +7475,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     activeTrial46=T&&id&&T.available(save,id)?id:null;
     const b=$("#trialBadge46"),mini=$("#menu .stageMini");
     if(b&&mini&&b.parentElement!==mini)mini.appendChild(b);
+    const placeBadge=()=>{const n=$("#sname");if(!mini||!n)return;const r=document.createRange();r.selectNodeContents(n);mini.style.setProperty("--trialBadgeX",Math.round(r.getBoundingClientRect().right-mini.getBoundingClientRect().left+10)+"px");};placeBadge();setTimeout(placeBadge,60);
     if(b){const t=activeTrial46&&T.find(activeTrial46);b.classList.toggle("hidden",!t);b.innerHTML=t?`<b>试炼</b>${t.name}<button type="button" aria-label="取消试炼">×</button>`:"";const x=b.querySelector("button");if(x)x.onclick=()=>{setTrial46(null);toast("已取消试炼");};}
     return activeTrial46;
   }
