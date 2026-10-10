@@ -59,7 +59,10 @@ def main():
             m1 = motion(base, al, ab, ab); st = (m1 == 0) & (ab > 0.5)
             res = float(np.abs(base.astype(np.float32) - al.astype(np.float32)).mean(2)[st].mean())
             R.log(f'{slot} {os.path.basename(p)} static residual {res:.2f} motion {m1.mean():.3f}')
-            if best is None or res < best[0]: best = (res, al)
+            prev = keys[-1] if keys else base  # 时间连续性：与上一关键帧差异过大（姿态跳跃/画风漂移）的候选扣分
+            cont = float(np.abs(prev.astype(np.float32) - al.astype(np.float32)).mean()) / 4
+            score = res + cont; R.log(f'   continuity {cont:.2f} score {score:.2f}')
+            if best is None or score < best[0]: best = (score, al)
         if best is None: raise SystemExit('no candidates for ' + slot)
         keys.append(best[1])
     seq_keys = [base] + keys
@@ -105,7 +108,11 @@ def main():
     st = (union_c == 0) & (ab_c > 0.5); lum = [float(f[..., :3].mean(2)[st].mean()) for f in frames]
     md = [float(np.abs(frames[i].astype(np.float32) - frames[i - 1].astype(np.float32)).mean()) for i in range(1, len(frames))]
     R.log('frames', len(frames), 'static lum span %.3f' % (max(lum) - min(lum)), 'max adjacent motion diff %.2f mean %.2f' % (max(md), np.mean(md)))
-    sc = a.scale; tw, th = int((x1 - x0) * sc), int((y1 - y0) * sc); cols = max(1, 4096 // tw); rows = (len(frames) + cols - 1) // cols
+    sc = a.scale
+    while True:  # 图集不超过 4096（部分 Android WebView 的最大纹理）
+        tw, th = int((x1 - x0) * sc), int((y1 - y0) * sc); cols = max(1, 4096 // tw); rows = (len(frames) + cols - 1) // cols
+        if rows * th <= 4096: break
+        sc *= 0.95
     atlas = Image.new('RGBA', (cols * tw, rows * th), (0, 0, 0, 0)); fr = []
     for i, f in enumerate(frames):
         cx, cy = (i % cols) * tw, (i // cols) * th
