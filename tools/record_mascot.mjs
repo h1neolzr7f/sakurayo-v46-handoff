@@ -6,13 +6,13 @@ fs.mkdirSync(out, { recursive: true }); for (const f of fs.readdirSync(out)) fs.
 const browser = await chromium.launch({ args: ['--allow-file-access-from-files', '--use-gl=angle', '--use-angle=swiftshader'] });
 const ctx = await browser.newContext({ viewport: { width: 1280, height: 720 } });
 await ctx.addInitScript(ch => { if (!sessionStorage.getItem('x')) { sessionStorage.setItem('x', 1); localStorage.setItem('sakurayoV3', JSON.stringify({ coins: 0, unlock: 2, done: [1], tutorialDone: true, character: ch })); } }, ch);
-const page = await ctx.newPage(); await page.clock.install();
+const page = await ctx.newPage();
 await page.goto(pathToFileURL(path.resolve('src/index.html')).href + '?test=1');
-for (let i = 0; i < 100 && await page.locator('.bootArt35').count(); i++) await page.clock.runFor(100);
+await page.waitForFunction(() => window.__SAKURAYO_TEST__?.rigSnapshot46?.(), null, { timeout: 180000 });
+await page.evaluate(() => { window.__rigManual = 1; });
 const api = (fn, ...a) => page.evaluate(([fn, a]) => window.__SAKURAYO_TEST__[fn](...a), [fn, a]);
-let n = 0; const shot = async () => page.screenshot({ timeout: 180000, path: `${out}/${String(n++).padStart(5, '0')}.png` });
-const idle = async (frames, fn) => { for (let i = 0; i < frames; i++) { if (fn) await fn(i); await page.clock.runFor(33); await shot(); } };
-for (let i = 0; i < 40 && !(await api('rigSnapshot46')); i++) await page.clock.runFor(100);
+let n = 0; const shot = async () => page.screenshot({ timeout: 180000, type: 'jpeg', quality: 90, path: `${out}/${String(n++).padStart(5, '0')}.jpg` });
+const idle = async (frames, fn) => { for (let i = 0; i < frames; i++) { if (fn) await fn(i); await page.evaluate(() => window.SakurayoRig.step(1 / 30)); await shot(); } };
 const snap = await api('rigSnapshot46'); console.log('rig', JSON.stringify(snap)); if (!snap) process.exit(2);
 const box = await page.locator('#heroLive46 canvas.heroRig46').boundingBox();
 const P = (fx, fy) => [box.x + box.width * fx, box.y + box.height * fy];

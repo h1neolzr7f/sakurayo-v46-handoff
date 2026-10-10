@@ -195,7 +195,7 @@
     opts = opts || {};
     return load(id, url).then(function (L) {
       var r = new Rig(canvas, L.d, L.base, L.atlas, opts); r.id = id; cur = r;
-      if (!raf) { last = performance.now(); var loop = function (now) { raf = requestAnimationFrame(loop); var dt = Math.min(0.05, (now - last) / 1000); last = now; if (!cur || (opts.hidden && opts.hidden())) return; cur.update(opts.reducedMotion && opts.reducedMotion() ? dt * 0.4 : dt); cur.render(); }; raf = requestAnimationFrame(loop); }
+      if (!raf) { last = performance.now(); var loop = function (now) { raf = requestAnimationFrame(loop); var dt = Math.min(0.05, (now - last) / 1000); last = now; if (!cur || global.__rigManual || (opts.hidden && opts.hidden())) return; cur.update(opts.reducedMotion && opts.reducedMotion() ? dt * 0.4 : dt); cur.render(); }; raf = requestAnimationFrame(loop); }
       return r;
     });
   }
@@ -208,6 +208,7 @@
     Rig: Rig, mount: mount, bindInput: bindInput, current: function () { return cur; },
     touch: function (clientX, clientY) { if (!cur) return null; var p = cur.toImage(clientX, clientY), part = cur.part(p[0], p[1]); cur.play(part); return part; },
     play: function (n) { return cur ? cur.play(n) : false; }, say: function (s) { cur && cur.say(s); },
+    step: function (dt) { if (cur) { cur.update(dt); cur.render(); } }, // 离线录制：window.__rigManual=1 后逐帧推进
     snapshot: function () { return cur ? cur.snapshot() : null; },
     unmount: function () { cur = null; }
   };
