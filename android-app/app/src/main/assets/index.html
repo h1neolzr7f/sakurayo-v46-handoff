@@ -2937,7 +2937,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     switch (level.type) {
       case "survive": return "存活 " + Math.max(0, Math.ceil(g.t - o.t)) + " 秒";
       case "clear": return "击破尸潮 " + Math.min(g.n, o.killsNow || 0) + "/" + g.n;
-      case "timed": return (g.flee ? "摧毁无主飞剑 " : g.kind === "mirror" ? "击碎复制镜 " : g.kind === "elite" ? "击破精英镜卫 " : "摧毁回收车 ") + o.targets.filter(function (e) { return e.dead || e.hp <= 0; }).length + "/" + g.n + " · 剩余 " + Math.max(0, Math.ceil(g.limit - o.t)) + "s";
+      case "timed": return (g.flee ? "摧毁无主飞剑 " : g.kind === "mirror" ? "击碎复制镜 " : g.kind === "elite" ? "击破精英镜卫 " : "拦下瓦版摊车 ") + o.targets.filter(function (e) { return e.dead || e.hp <= 0; }).length + "/" + g.n + " · 剩余 " + Math.max(0, Math.ceil(g.limit - o.t)) + "s";
       case "mech": return "引爆符咒机关 " + o.pads.filter(function (q) { return q.used; }).length + "/" + g.n + "（站在机关上）";
       case "escort": return "护送 " + Math.round(o.npc.k / o.npc.path.length * 100) + "% · 血量 " + Math.ceil(o.npc.hp) + "%" + (o.npc.waiting ? " · 靠近她才会前进" : "");
       case "channel": return "读取日志 " + Math.floor(o.chan * 100) + "%" + (o.inside ? "" : " · 回到圈内");
@@ -4155,11 +4155,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         { id: "v32-003", R: { who: "rion", ex: "angry" }, who: "rion", ex: "angry", t: "……是斩般若的。章鱼烧是般若吃的。" },
         { id: "v32-004", who: "sayo", ex: "calm", t: "对对对，斩般若的！刀名字是章鱼烧起的！" },
         { id: "v32-005", who: "rion", ex: "calm", t: "……算了。" },
-        { id: "v32-006", R: { who: "rin", ex: "calm" }, who: "rin", ex: "calm", t: "广播站雨宫凛。夜店街起风了，旧瓦版满街飞——每一张都写着二百年前那一夜的一段。抓住四张，越快越好，不然风会把它们吹进河里。" },
+        { id: "v32-006", R: { who: "rin", ex: "calm" }, who: "rin", ex: "calm", t: "广播站雨宫凛。夜店街起风了，四辆装满旧瓦版的摊车自己跑了起来——每一张都写着二百年前那一夜的一段。拦下四辆，越快越好，不然它们会冲进河里。" },
         { id: "v32-007", L: { who: "aya", ex: "resolve" }, who: "aya", ex: "resolve", t: "追新闻？这个我熟。三位观众朋友——哦，现在是零位——跟紧了。" }
       ],
       post: [
-        { id: "v32-010", cg: CG1, t: "第四张瓦版落进绫的手里。木刻的般若嘴里塞满了章鱼烧，脖子上骑着一个拿刀的女孩。" },
+        { id: "v32-010", cg: CG1, t: "第四辆摊车翻倒，瓦版漫天飞。最后一张落进绫的手里。木刻的般若嘴里塞满了章鱼烧，脖子上骑着一个拿刀的女孩。" },
         { id: "v32-011", cg: null, L: { who: "aya", ex: "shaken" }, who: "aya", ex: "shaken", t: "……这一张的落款，是「神代千寻」。我奶奶的奶奶的……反正很多个奶奶。" },
         { id: "v32-012", R: { who: "sayo", ex: "calm" }, who: "sayo", ex: "calm", t: "画得好可爱！般若的脸鼓鼓的。" },
         { id: "v32-013", who: "aya", ex: "calm", t: "……这是一份事故报告，小夜。" }
@@ -6993,7 +6993,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (i < 0 || j < 0 || i >= gx || j >= gy) return null; var q = j * gx + i, o = {}; for (var k in this.W) o[k] = this.W[k][q]; return o; };
   Rig.prototype.lookAt = function (x, y) { this.s.tx = clamp(x, -1, 1); this.s.ty = clamp(y, -1, 1); this.s.lookHold = 2.5; };
   Rig.prototype.say = function (sec) { this.s.talkUntil = this.t + (sec || 1.6); };
-  Rig.prototype.update = function (dt) {
+  Rig.prototype.update = function (dt) { dt = dt > 0 ? Math.min(dt, 0.1) : 0; // rAF 时间戳可能早于 performance.now()：负 dt 会让指数阻尼发散
     var s = this.s, t = (this.t += dt), a = s.act ? s.actT / ACTS[s.act].dur : 0, ex = { closed: 0, talk: 0, happy: 0, shy: 0 }, tilt = 0, hy = 0, hx = 0, st = 0;
     if (s.act) { s.actT += dt; if (s.actT >= ACTS[s.act].dur) { s.act = null; a = 0; } }
     // 闲置小动作（伸懒腰 / 整理发夹 / 东张西望）
@@ -7247,7 +7247,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     var fade = Math.min(1, Math.max(0, (q.t) / 0.25), Math.max(0, (up * 2 + hold + 0.25 - t) / 0.25));
     return { pos: pos, done: t > up * 2 + hold + 0.25, A: A, n: n, fade: fade };
   };
-  Rig2.prototype.update = function (dt) {
+  Rig2.prototype.update = function (dt) { dt = dt > 0 ? Math.min(dt, 0.1) : 0;
     this.dtLast = dt; var s = this.s;
     if (s.act && this.d.actions && this.d.actions[s.act] && this.texImgs["act_" + s.act] && !s.seq && s.actT < 0.05) s.seq = { name: s.act, t: 0, hold: s.act === "pin" ? 1.4 : 0.8 };
     if (s.seq) { s.seq.t += dt; var fr = this.seqFrame(); s.armHold = Math.max(0, s.armHold - dt / 0.25); if (fr.done) { s.seq = null; } }
@@ -7279,7 +7279,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     opts = opts || {};
     return load(id, url).then(function (L) {
       var r = L.imgs ? new Rig2(canvas, L.d, L.imgs, opts) : new Rig(canvas, L.d, L.base, L.atlas, opts); r.id = id; cur = r;
-      if (!raf) { last = performance.now(); var loop = function (now) { raf = requestAnimationFrame(loop); var dt = Math.min(0.05, (now - last) / 1000); last = now; if (!cur || global.__rigManual || (opts.hidden && opts.hidden())) return; cur.update(opts.reducedMotion && opts.reducedMotion() ? dt * 0.4 : dt); cur.render(); }; raf = requestAnimationFrame(loop); }
+      if (!raf) { last = performance.now(); var loop = function (now) { raf = requestAnimationFrame(loop); var dt = Math.max(0, Math.min(0.05, (now - last) / 1000)); last = now; if (!cur || global.__rigManual || (opts.hidden && opts.hidden())) return; cur.update(opts.reducedMotion && opts.reducedMotion() ? dt * 0.4 : dt); cur.render(); }; raf = requestAnimationFrame(loop); }
       return r;
     });
   }
@@ -15219,7 +15219,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     if(who==="rin")return {name:AVG_NAMES46.rin,img:artUrl(`npc/rin/avg_${ex==="serious"?"serious":"calm"}.webp`)};
     if(who==="miko")return {name:AVG_NAMES46.miko,img:artUrl(`npc/miko/avg_${ex==="afraid"?"afraid":"calm"}.webp`)};
     if(who==="kagami")return {name:AVG_NAMES46.kagami,img:artUrl("npc/kagami/portrait.webp")};
-    if(who==="yoi"||who==="tanuki")return {name:AVG_NAMES46[who],img:artUrl(`npc/${who}/avg_calm.webp`)};
+    if(who==="yoi"||who==="tanuki"||who==="guard")return {name:AVG_NAMES46[who],img:artUrl(`npc/${who}/avg_calm.webp`)};
     return null;
   }
   function storyFor46(id,part){const L=window.SakurayoLevels?.find(id);return L&&window.SakurayoStory?.["ch"+L.ch]?.[id]?.[part]||null;}
@@ -15794,6 +15794,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       skyClose46(){const ok=document.querySelector("#shm46 .res .ok,#pin46 .res .ok,#duel46 .res .ok");if(ok){ok.click();return true;}return false;},
       openWardrobe46(tab){return openWardrobe46(tab);},
       openNight46(){return openNight46();},
+      avgCast46(who,ex){return avgCast46(who,ex);},
       seasonState46(){const s=season46();return s?JSON.parse(JSON.stringify(Object.assign({},s,{level:window.SakurayoSeason.level(s),daily:window.SakurayoSeason.daily(),coins:save.coins}))):null;},
       seasonClaim46(){return seasonClaim46();},
       seasonXp46(kind,n=1){let g=0;for(let i=0;i<n;i++)g+=seasonXp46(kind);persist();return g;},
