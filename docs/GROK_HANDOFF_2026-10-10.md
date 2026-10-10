@@ -148,3 +148,12 @@ bash gradlew --no-daemon assembleDebug lintDebug
 轨迹显示：第四章镜姬第三阶段刷 3 个镜卫（`counterType(4)||"seal"`，随机类型），镜卫存活期间 Boss 受伤 ×0.32。tank 型镜卫会贴近被斩击清掉 → 快局；seal 型镜卫停在 ~230px 外，绫自动瞄准 `nearest()` 总选与玩家重叠的 Boss，手枪子弹（pierce 0）出膛即被 Boss 吃掉 → 镜卫一直不破，第三阶段拖约 45s → 慢局。小夜（射程/穿透）与凛音（近战范围）不受同等影响。
 
 已试但撤回：镜卫存活时优先瞄准镜卫 + 子弹穿过受护 Boss。结果更慢（子弹被路上杂兵挡、Boss 不再掉血），说明需要配合设计决策（例如镜卫靠近、斩击/技能可破卫、或自动瞄准规则），交由下一步按证据决定。门槛与断言均保持原样。
+
+### 第二阶段（2026-10-10 09:52 起）
+
+- `2c99065` 问题 4 修复：镜卫（`guardFor`）存活满 `GUARD_KITE_SECONDS=6` 秒后不再后撤风筝，会逼近角色。对三角色一视同仁，门槛未放宽。七种子（40c0de/1234/beef/5eed1/777/2026/a11ce）max/min 为 1.13/1.17/1.13/1.20/1.16/1.17/1.13，最大 1.204 ≤ 1.30。
+- `cbf2d50` polish_rooms_smoke 卡片详情点击改定位到传记段落（新增收藏政策段落导致 strict 冲突）。
+- `692740a` 新增 `src/runtime/sakurayo-theme.js`：统一玻璃风格（深海军蓝半透明面板、冰青描边、樱粉强调），覆盖商店/寻访/战斗 HUD；纯样式，无逻辑。截图 `/workspace/sakurayo-shots/before-*.png` 与 `after-*.png`（box 本地，未入库）。
+- 删除冗余：两层 `shoot` 包装（`_shoot35`、`_shootAnim35`）被后续方向射击/斩击 `shoot` 完全覆盖且不被调用，已删除。原始 `shoot()`（约 3596 行，含 idolGun 等分支）同样被覆盖，属于死代码但较大，留待确认相关机制是否需要迁移后再删。
+- 验证：`bash tools/verify.sh` 完整流程 VERIFY PASS（含 1.30 门槛）；打包版 collection_smoke 与 content_receipts_smoke PASS。
+- 未做：三项离线试炼、表现/音频、Android 编译/模拟器 instrumentation、实机验收。
