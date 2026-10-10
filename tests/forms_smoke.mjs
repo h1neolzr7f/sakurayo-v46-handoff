@@ -16,7 +16,11 @@ async function win() { await api('protectPlayer'); await api('runWinNode46'); aw
 // row 0 fight → row 1 last → row 2 mask
 let st = await api('runState46'); await api('runEnter46', st.available[0].id); await win();
 st = await api('runState46'); const r1 = st.available.at(-1); await api('runEnter46', r1.id); st = await api('runState46');
-if (st.mode === 'play') await win(); else { await api('runChoose46', 0); st = await api('runState46'); if (st.modal) await api('runSkipModal46'); }
+if (['pin', 'sky', 'duel'].includes(r1.type)) { /* 玩法节点（弹珠/射击/格斗）：自动驾驶打完再回地图 */
+  await page.evaluate(() => { window.__shmManual = 1; window.__pinManual = 1; window.__duelManual = 1; });
+  let s = await api('skyState46'); for (let i = 0; i < 60 && s && !s.done; i++) s = await api('skyStep46', 10);
+  assert.ok(s && s.win, r1.type + ' node cleared'); await api('skyClose46'); st = await api('runState46'); if (st.modal) await api('runSkipModal46');
+} else if (st.mode === 'play') await win(); else { await api('runChoose46', 0); st = await api('runState46'); if (st.modal) await api('runSkipModal46'); }
 st = await api('runState46'); const mask = st.available.find(n => n.type === 'mask'); assert.ok(mask, 'mask stall reachable ' + JSON.stringify(st.available));
 await api('runEnter46', mask.id);
 assert.equal(await page.locator('#run46 .rm46 .opts.forms button img').count(), 3, 'three form cards with portraits');

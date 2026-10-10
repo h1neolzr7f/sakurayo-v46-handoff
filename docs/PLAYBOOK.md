@@ -2,6 +2,18 @@
 
 > 面向接手的人/agent。每条都是踩过坑后留下的“怎么做才对”。
 
+## 0. 速查目录
+| 场景 | 入口 |
+|---|---|
+| 出图（中转站） | `/workspace/sakurayo-gen/gen.py jobs_xxx.json`，§1 |
+| 看板娘：小幅动作（网格+骨骼） | `tools/anim-pipeline/body.py`，§6 |
+| 看板娘：大幅动作（关键帧+RIFE） | `tools/anim-pipeline/action.py`，§4–§6 |
+| 纵版射击背景平铺 | `tools/shmup_tiles.py`，§12 |
+| 弹珠/格斗/射击节点 | `src/runtime/sakurayo-{pinball,duel,shmup}.js`，§13 |
+| 衣橱（外观） | `src/runtime/sakurayo-wardrobe.js`，§14 |
+| 全量回归 | `bash tools/verify.sh`（约 25–40 分钟，后台跑），§8 |
+| 录像 | `tools/record_mascot.mjs` / `record_sky.mjs` / `record_sky_boss.mjs`，§7 |
+
 ## 1. 中转站出图（gpt-image-2）
 - 脚本：`/workspace/sakurayo-gen/gen.py`，凭据在 `/workspace/.secrets/sakurayo-relay.env`（不要入库）。
 - **必须带浏览器 UA**（`User-Agent: Mozilla/5.0 …`），否则中转站的 WAF 会直接 403/断连。
@@ -61,3 +73,34 @@
 ## 11. build_smoke「图鉴解锁没保存」的真实根因
 - 不是游戏没写存档：5 个并发复现时，页面内 localStorage 已含 evo46，但 reload 后（甚至新开同源页面）读回的是种子存档——高负载下 Chromium 丢了渲染进程未提交的 localStorage 写入。
 - 修法：测试改为调用 `rebootSave46()`，走与启动时完全相同的 `bootLoadSave()` 读档管线；种子用 localStorage 标记只写一次。
+
+
+## 12. 纵版射击背景：周期化平铺，而不是镜像
+- 根因：旧实现把一张带月亮的背景上下镜像拼接 → 接缝一目了然，月亮出现两次。
+- 做法：让 gpt-image-2 生成“俯视、无天空/无地标、上下密度均匀”的地面图，再用 `tools/shmup_tiles.py` 把末尾 B 行与开头 B 行线性交叉淡化，输出高度 H−B 的严格周期图（第 0 行与最后一行像素连续）。
+- 自检：脚本打印“接缝行差 vs 图内相邻行差”，两者应接近（实测 12.5 vs 13.1、8.6 vs 8.1、4.4 vs 4.5）。
+- 天空元素（月亮）拆成单独精灵，作为远景层以 1/20 速度漂移，全程只出现一次。
+
+## 13. 玩法节点模块（射击/弹珠/格斗）的统一写法
+- 每个玩法是独立模块：`Game`（纯逻辑，可在 Node 里跑）+ `start(opts)`（自带画布、输入、HUD、结算框）+ `simulate()`（无 DOM 自动驾驶，用于平衡与单测）。
+- 与夜行地图只有两个接口：`opts`（角色、形态、`weapons`、`hpFrac`、`power`、`layer`、`seed`）和 `onClose(result)`（`win`、`hpFrac`…）；`index.html` 的 `launchSky46/skyDone46` 统一处理三种节点，生命写回构筑，魂晶+遗物与普通节点同一套 `SakurayoRun.complete`。
+- 平衡：三角色用时/回合比 ≤1.30（`tests/shmup_unit.mjs`、`tests/modes_unit.mjs`），所有形态×武器组合都要能通关。
+- 坑：自动驾驶遇到“段间三选一”会永远暂停——`auto` 模式下必须自动选择（射击模块已修）。录 Boss 战时先按 0.5 s 步进跳到 Boss 出现，再按 1/30 s 逐帧截图。
+- 新节点会改变地图结构，旧测试里“走某一行最后一个节点”的路径可能进入玩法节点 → 测试要能处理三种玩法节点（`forms_smoke` 已示范）。
+
+## 14. 外观（衣橱）只改视觉
+- 物品数据里不允许出现任何战斗字段（单测逐项断言）；运行时只通过 `look46`（光环色、子弹色、火花色、数字色、传说立绘）影响绘制。
+- 冒烟测试：装备前后进入同一关卡，`dmg/maxHp/speed/crit/fireRate` 必须完全相等。
+- 镜屑周上限 120（ISO 周一为界），传说外观需“该形态夜行中使用 3 局 + 120 镜屑 + 4500 樱花币”，不存在真实付费。
+- 新存档字段 `cosmetics46` 走 `SakurayoWardrobe.sanitize`：未知 id、未拥有却装备、跨角色装备都会被丢弃；旧存档得到空衣橱。
+
+## 15. 大幅动作补帧的经验数字
+- ToonCrafter：官方 HF Space（ZeroGPU）匿名调用直接报错；本机无 GPU、权重约 10 GB，不可行。GMFSS/AnimeInterp 依赖 CUDA 算子。→ 用 Practical-RIFE + 更密的 AI 关键帧。
+- 关键帧间距越大，RIFE 拖影越重：小夜 3 个关键帧够用；绫的长袖需要 6–8 个（`--keys k0q,k0h,k0r,k1h,k1q,k1r,k1m,k2 --inbetween 2`）。
+- gpt-image-2 不擅长“刚开始抬手”的极早期姿态（会直接画成抬到胸前）；早期姿态宁可用更多中段关键帧补。
+- 候选挑选 = 静止区残差 + 与上一关键帧的连续性；图集上限 4096（部分 Android WebView 的最大纹理），脚本会自动缩放。
+- 运行时：序列网格仍采样身体权重（呼吸不停），首尾帧 = 待机姿态；切入/切出各 0.25 s 淡化，录像逐帧差无尖峰。
+
+## 16. 中转站不可用时
+- 症状：`HTTP 530 … error code: 1033`（Cloudflare 隧道断开）或 `503 no_available_account`。gen.py 会以 90–120 s 间隔重试 80 次，不要并发加码。
+- 期间先写逻辑与测试；素材缺失由 `tests/story_unit.mjs` 这类“引用的文件必须存在”的测试兜住，不要用占位图蒙混过关。
