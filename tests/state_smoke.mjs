@@ -33,12 +33,11 @@ try {
  }
  for(const mode of ['story','mainGod','testimony']){
   await start(mode);
-  if(mode!=='testimony') {assert.equal((await api('deployOp46','aya')).ok,true);await api('grantDp46',8);}
   await api('pauseNow');await page.locator('#retryP').click();await api('dismissDialogue');
-  assert.equal((await snap()).ops.units.length,0);assert.equal((await snap()).ops.dp,10);assert.equal((await snap()).runMode,mode);
+  assert.equal((await snap()).ops,undefined,'DP deployment removed');assert.equal((await snap()).runMode,mode);
   await api('finish',true);const before=await api('saveSnapshot');await api('finish',true);const after=await api('saveSnapshot');
   assert.equal(after.runs,before.runs);assert.deepEqual(after.balance40.samples,before.balance40.samples);assert.deepEqual(after.mainGod.challenges,before.mainGod.challenges);
-  await page.locator('#again').click();await api('dismissDialogue');assert.equal((await snap()).ops.dp,10);assert.equal((await snap()).ops.units.length,0);
+  await page.locator('#again').click();await api('dismissDialogue');
  }
  // The single-choice seam must compensate real XP bonuses; overflow itself is tested in state_unit.
  await start('mainGod');
@@ -46,18 +45,11 @@ try {
   await api('triggerUpgrade');assert.equal((await snap()).mode,'level');assert.equal((await snap()).player.level,level);
   await api('chooseUpgrade',0);assert.equal((await snap()).mode,'play');assert.equal((await snap()).player.level,level);
  }
- await start();await api('deployOp46','aya');
- await page.evaluate(()=>{window.stateDockButton=document.querySelector('#opsDock46 [data-op="aya"]');window.stateDockRecords=[];window.stateDockObserver=new MutationObserver(rs=>window.stateDockRecords.push(...rs));window.stateDockObserver.observe(document.querySelector('#opsDock46'),{subtree:true,childList:true,attributes:true,characterData:true});});
- await page.evaluate(()=>window.advanceTime(100));
- assert.equal(await page.evaluate(()=>window.stateDockRecords.length),0,'unchanged data must not mutate HUD');
- await api('grantDp46',8);assert.equal(await page.evaluate(()=>window.stateDockButton===document.querySelector('#opsDock46 [data-op="aya"]')),true);
- await api('retreatOp46','aya');assert.equal(await page.evaluate(()=>window.stateDockButton===document.querySelector('#opsDock46 [data-op="aya"]')),true);
- await page.evaluate(()=>window.stateDockObserver.disconnect());
  await start();await api('clearCombat');await api('spawnBossNow');await api('dismissDialogue');
  const player=(await snap()).player;await api('setBossHpRatio',0.000001);await api('setBossPosition',player.x+26,player.y-18);await api('spawnEnemyRelative','normal',1,0);await api('setPlayerHpRatio',0.01);
  await api('attackNow');await page.evaluate(()=>window.advanceTime(17));let won=await snap();
  assert.equal(won.mode,'dialogue','Boss death must stop before ordinary enemy contact');assert.ok(won.player.hp>0);
  await api('dismissDialogue');won=await snap();assert.equal(won.result.win,true);assert.equal(won.mode,'result');
  assert.deepEqual(errors,[]);
- console.log('PASS state smoke: tutorial, opening skill grid reset, six fusion resets, three mode retry/again, idempotent finish, stable ops DOM, Boss victory');
+ console.log('PASS state smoke: tutorial, opening skill grid reset, six fusion resets, three mode retry/again, idempotent finish, Boss victory');
 } finally {await browser.close();}

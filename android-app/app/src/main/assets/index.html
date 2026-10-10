@@ -2621,7 +2621,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
    (more bullets, no extra damage) so fights cannot drag. Pure logic, no DOM. */
 (function (global) {
   "use strict";
-  var BREAK_TIME = 4.5, BREAK_MUL = 1.6, DAMAGE_SHARE = 0.11, ENRAGE_AFTER = 20, HP_SCALE = 0.88;
+  var BREAK_TIME = 4.5, BREAK_MUL = 1.6, DAMAGE_SHARE = 0.11, ENRAGE_AFTER = 20, HP_SCALE = 0.88, HP_PER_PICK = 0.025;
   var OBJECTIVE = { guard: 30, dodge: 15, lane: 10, burst: 40 };
   function init(boss) { boss.brk46 = 0; boss.broken46 = 0; boss.breaks46 = 0; boss.enraged46 = false; boss.guardsDown46 = 0; boss.guardsTotal46 = 0; return boss; }
   function fill(boss, amount) {
@@ -2644,7 +2644,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     var g = boss.guardsTotal46 ? " · 镜卫 " + boss.guardsDown46 + "/" + boss.guardsTotal46 : "";
     return "破防 " + Math.floor(boss.brk46 || 0) + "%" + g + (boss.enraged46 ? " · 狂暴" : "");
   }
-  global.SakurayoBoss = Object.freeze({ BREAK_TIME: BREAK_TIME, BREAK_MUL: BREAK_MUL, ENRAGE_AFTER: ENRAGE_AFTER, HP_SCALE: HP_SCALE, OBJECTIVE: OBJECTIVE,
+  global.SakurayoBoss = Object.freeze({ BREAK_TIME: BREAK_TIME, BREAK_MUL: BREAK_MUL, ENRAGE_AFTER: ENRAGE_AFTER, HP_SCALE: HP_SCALE, HP_PER_PICK: HP_PER_PICK, OBJECTIVE: OBJECTIVE,
     init: init, fill: fill, fromDamage: fromDamage, tick: tick, damageMul: damageMul, label: label });
 })(typeof window !== "undefined" ? window : globalThis);
 
@@ -2667,9 +2667,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     orbit:    { n: "环绕樱刃", evo: "落樱结界", e: "🗡️", s: "ninja", d: "{c} 把樱刃环绕自身切割", cd: 0, dmg: 0.55 },
     boomerang:{ n: "回旋斩月", evo: "双月回天", e: "🌙", s: "ninja", d: "掷出回旋刃，往返切割（{c} 把）", cd: 1.8, dmg: 1.1 }
   };
+  // Evolution needs Lv5 + the paired base upgrade (Vampire-Survivors style).
+  var PAIR = { spread: "multi", ricochet: "pierce", homing: "star", bomb: "blast", laser: "rail", orbit: "sword", boomerang: "speed" };
   var ORDER = Object.keys(DEF);
-  function stats(id, lv) {
-    var evo = lv >= 5, k = DEF[id];
+  function stats(id, lv, evo) {
+    evo = !!evo && lv >= 5; var k = DEF[id];
     return {
       c: id === "spread" ? 3 + lv + (evo ? 3 : 0) : id === "ricochet" ? lv + (evo ? 2 : 0) : id === "homing" ? lv + (evo ? 3 : 0) : id === "orbit" ? 1 + lv + (evo ? 2 : 0) : id === "boomerang" ? (evo ? 2 : 1) : 1,
       r: id === "bomb" ? 64 + lv * 10 + (evo ? 30 : 0) : 0,
@@ -2678,9 +2680,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       dmg: k.dmg * (1 + (lv - 1) * 0.16) * (evo ? 1.35 : 1)
     };
   }
-  function describe(id, lv) {
-    var s = stats(id, lv), k = DEF[id];
-    return (lv >= 5 ? "【进化·" + k.evo + "】" : "") + k.d.replace("{c}", s.c).replace("{r}", s.r).replace("{t}", s.t) + (k.cd ? "｜冷却 " + s.cd.toFixed(1) + "s" : "") + (s.dmg ? "｜单次 " + Math.round(s.dmg * 100) + "%攻击" : "");
+  function describe(id, lv, evo) {
+    var s = stats(id, lv, evo), k = DEF[id];
+    return (evo ? "【进化·" + k.evo + "】" : "") + k.d.replace("{c}", s.c).replace("{r}", s.r).replace("{t}", s.t) + (k.cd ? "｜冷却 " + s.cd.toFixed(1) + "s" : "") + (s.dmg ? "｜单次 " + Math.round(s.dmg * 100) + "%攻击" : "");
   }
   function state(P) { if (!P.weapons46) P.weapons46 = {}; return P.weapons46; }
   function level(P, id) { var w = state(P)[id]; return w ? w.lv : 0; }
@@ -2689,9 +2691,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function tick(dt, api) {
     var P = api.P, W = state(P), id, w, s, i, a;
     for (id in W) {
-      w = W[id]; if (!w.lv) continue; s = stats(id, w.lv); w.t -= dt;
+      w = W[id]; if (!w.lv) continue; s = stats(id, w.lv, w.evo); w.t -= dt;
       if (id === "orbit") {
-        w.a = (w.a + dt * (w.lv >= 5 ? 4.6 : 3.4)) % TAU;
+        w.a = (w.a + dt * (w.evo ? 4.6 : 3.4)) % TAU;
         var rad = 62 + w.lv * 4;
         for (i = 0; i < s.c; i++) {
           a = w.a + i * TAU / s.c;
@@ -2704,7 +2706,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       if (!DEF[id].cd || w.t > 0) continue;
       w.t = s.cd;
       if (id === "spread") {
-        a = aimAngle(api, 320); var fan = 0.9 + (w.lv >= 5 ? 0.5 : 0);
+        a = aimAngle(api, 320); var fan = 0.9 + (w.evo ? 0.5 : 0);
         for (i = 0; i < s.c; i++) { var q = a - fan / 2 + fan * i / Math.max(1, s.c - 1); api.push({ x: P.x, y: P.y, vx: Math.cos(q) * 760, vy: Math.sin(q) * 760, r: 4, life: 0.42, dmg: P.dmg * s.dmg, pierce: 0, source: "shot", school: "gun", tracer46: "#ffd0e4", hit: new Set() }); }
         api.fx("muzzle", P.x + Math.cos(a) * 24, P.y + Math.sin(a) * 24); api.sound("pistol");
       } else if (id === "homing") {
@@ -2723,9 +2725,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (L && L.beam) {
       var B = L.beam; B.t -= dt; B.tick -= dt; B.a = aimAngle(api, 700) * 0.15 + B.a * 0.85;
       if (B.tick <= 0) {
-        B.tick = 0.1; var ls = stats("laser", L.lv), cx = Math.cos(B.a), cy = Math.sin(B.a);
+        B.tick = 0.1; var ls = stats("laser", L.lv, L.evo), cx = Math.cos(B.a), cy = Math.sin(B.a);
         var cand = api.enemiesNear(P.x + cx * B.len / 2, P.y + cy * B.len / 2, B.len / 2 + 30);
-        for (i = 0; i < cand.length; i++) { var en = cand[i], px = en.x - P.x, py = en.y - P.y, along = px * cx + py * cy; if (along < 0 || along > B.len) continue; if (Math.abs(px * cy - py * cx) < en.r + (L.lv >= 5 ? 20 : 12)) api.hit(en, P.dmg * ls.dmg * 0.1 / ls.t * 0.6, "laser"); }
+        for (i = 0; i < cand.length; i++) { var en = cand[i], px = en.x - P.x, py = en.y - P.y, along = px * cx + py * cy; if (along < 0 || along > B.len) continue; if (Math.abs(px * cy - py * cx) < en.r + (L.evo ? 20 : 12)) api.hit(en, P.dmg * ls.dmg * 0.1 / ls.t * 0.6, "laser"); }
       }
       if (B.t <= 0) L.beam = null;
     }
@@ -2734,7 +2736,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function onHit(b, e, api) {
     if (b.boom46) { api.aoe(b.x, b.y, b.boom46, b.boomDmg46, "#ff9a4a"); api.fx("shatter", b.x, b.y); return true; }
     var W = state(api.P);
-    if (!b.bounced46 && b.source === "shot" && W.ricochet && W.ricochet.lv && !b.tracer46) b.bounce46 = stats("ricochet", W.ricochet.lv).c, b.bounced46 = 1;
+    if (!b.bounced46 && b.source === "shot" && W.ricochet && W.ricochet.lv && !b.tracer46) b.bounce46 = stats("ricochet", W.ricochet.lv, W.ricochet.evo).c, b.bounced46 = 1;
     if (b.bounce46 > 0) {
       var best = null, bd = 260, list = api.enemiesNear(e.x, e.y, 260);
       for (var i = 0; i < list.length; i++) { var o = list[i]; if (o.dead || b.hit.has(o)) continue; var d = Math.hypot(o.x - e.x, o.y - e.y); if (d < bd) { bd = d; best = o; } }
@@ -2749,29 +2751,35 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function draw(ctx, P, now) {
     var W = P.weapons46; if (!W) return;
     if (W.orbit && W.orbit.lv) {
-      var s = stats("orbit", W.orbit.lv), rad = 62 + W.orbit.lv * 4;
+      var s = stats("orbit", W.orbit.lv, W.orbit.evo), rad = 62 + W.orbit.lv * 4;
       ctx.save(); ctx.globalCompositeOperation = "lighter";
       for (var i = 0; i < s.c; i++) {
         var a = W.orbit.a + i * TAU / s.c, x = P.x + Math.cos(a) * rad, y = P.y + Math.sin(a) * rad;
         ctx.save(); ctx.translate(x, y); ctx.rotate(a + Math.PI / 2);
-        ctx.fillStyle = W.orbit.lv >= 5 ? "#ffd6ef" : "#ff9ccf"; ctx.shadowColor = "#ff5aa6"; ctx.shadowBlur = 14;
+        ctx.fillStyle = W.orbit.evo ? "#ffd6ef" : "#ff9ccf"; ctx.shadowColor = "#ff5aa6"; ctx.shadowBlur = 14;
         ctx.beginPath(); ctx.moveTo(0, -14); ctx.quadraticCurveTo(7, 0, 0, 14); ctx.quadraticCurveTo(-7, 0, 0, -14); ctx.fill(); ctx.restore();
       }
       ctx.restore();
     }
     var L = W.laser;
     if (L && L.beam) {
-      var B = L.beam, w = (L.lv >= 5 ? 20 : 12) * (0.75 + Math.sin(now * 60) * 0.25);
+      var B = L.beam, w = (L.evo ? 20 : 12) * (0.75 + Math.sin(now * 60) * 0.25);
       ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
       ctx.strokeStyle = "rgba(140,220,255,.45)"; ctx.lineWidth = w * 2.2; ctx.beginPath(); ctx.moveTo(P.x, P.y); ctx.lineTo(P.x + Math.cos(B.a) * B.len, P.y + Math.sin(B.a) * B.len); ctx.stroke();
       ctx.strokeStyle = "#f4fdff"; ctx.lineWidth = w * 0.6; ctx.stroke(); ctx.restore();
     }
   }
+  // Marks Lv5 weapons whose partner is owned as evolved; returns the ids that just evolved.
+  function evolve(P, owns) {
+    var W = state(P), out = [];
+    for (var id in W) if (W[id].lv >= 5 && !W[id].evo && owns(PAIR[id])) { W[id].evo = true; out.push(id); }
+    return out;
+  }
   function choices(P) {
     var owned = ORDER.filter(function (id) { return level(P, id) > 0; });
     return ORDER.filter(function (id) { return level(P, id) < 5 && (level(P, id) > 0 || owned.length < 4); });
   }
-  global.SakurayoWeapons = Object.freeze({ DEF: DEF, ORDER: ORDER, stats: stats, describe: describe, level: level, gain: gain, tick: tick, onHit: onHit, update: update, draw: draw, choices: choices, MAX_SLOTS: 4 });
+  global.SakurayoWeapons = Object.freeze({ DEF: DEF, ORDER: ORDER, stats: stats, describe: describe, level: level, gain: gain, tick: tick, onHit: onHit, update: update, draw: draw, choices: choices, evolve: evolve, PAIR: PAIR, MAX_SLOTS: 4 });
 })(typeof window !== "undefined" ? window : globalThis);
 
 </script>
@@ -2808,6 +2816,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     "#bossBreak46.broken{border-color:#fff;box-shadow:0 0 14px #ff5aa6}#bossBreak46.broken i{background:linear-gradient(90deg,#ff5aa6,#ffd0e8)}",
     "#bossBreak46.enraged{border-color:#ff3b6b}",
     "#bossBreak46 span{position:relative;display:block;text-align:center;font:800 10.5px/16px system-ui;color:#fff;text-shadow:0 1px 2px #000;letter-spacing:.06em}",
+    "#level{align-items:flex-end!important;background:linear-gradient(180deg,#05030c22,#05030ccc 60%)!important;backdrop-filter:none!important}",
+    "#level .modal{max-height:66vh;overflow:auto;border-radius:20px 20px 0 0;margin-bottom:0}",
+    "#levelBar46{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:8px;font:700 12px system-ui;color:#ffe3f0}",
+    "#levelBar46 button{min-height:40px;padding:0 16px}#levelBar46 label{display:flex;gap:6px;align-items:center;opacity:.85}",
   ].join("\n");
   var built = false, mini = null, last = 0, ring = null;
   function api() { return global.SakurayoBattle46; }
@@ -2967,12 +2979,12 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 </script>
 <script>
 /* Sakurayo offline trials: finite first-clear receipts + personal best.
- * Pure rules; index.html wires the real start/level/DP/finish entries. */
+ * Pure rules; index.html wires the real start/level/finish entries. */
 (function (root) {
   "use strict";
   var CATALOG = Object.freeze([
     Object.freeze({ id: "solo", name: "独行回收", sub: "SOLO", gate: 2, reward: 120,
-      rule: "禁用 DP 干员部署；局内随机构筑照常。", tip: "全程只能靠自己清场。", art: "trials/banner_solo.webp" }),
+      rule: "只用初始武器：副武器卡不会出现；每击破 25 只敌人伤害 +2%（上限 +30%）。", tip: "越打越强，前期稳住，后期靠成长碾压。", art: "trials/banner_solo.webp" }),
     Object.freeze({ id: "sealed", name: "封印试炼", sub: "SEALED", gate: 3, reward: 180,
       rule: "升级不弹出局内强化选择；保留自己的开局核心与永久成长。", tip: "等级只回复少量生命。", art: "trials/banner_sealed.webp" }),
     Object.freeze({ id: "flawless", name: "无伤终夜", sub: "FLAWLESS", gate: 4, reward: 240,
@@ -5314,266 +5326,6 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 
 </script>
 <script>
-(function (global) {
-  "use strict";
-
-  var VERSION = "4.6.0";
-  var MAX = 2;
-  var COST = 8;
-  var REFUND = 4;
-  var CAP = 20;
-  var START = 10;
-  var REGEN = 0.4;
-  var RANGE = 220;
-  var BLADE_RANGE = 78;
-  var RATE = 1.15;
-  var DMG = 0.32;
-  var IDS = Object.freeze(["sayo", "aya", "rion"]);
-  var NAMES = Object.freeze({ sayo: "小夜", aya: "绫", rion: "凛音" });
-  var WEAPON = Object.freeze({ sayo: "rifle", aya: "pistol", rion: "blade" });
-
-  var CSS =
-    "#opsDock46{position:absolute;z-index:6;left:max(8px,env(safe-area-inset-left));bottom:max(168px,calc(env(safe-area-inset-bottom) + 150px));width:min(168px,42vw);padding:8px;border-radius:16px;background:#0b0818d8;border:1px solid #ffe6a344;pointer-events:auto}" +
-    "#opsDock46[hidden]{display:none!important}" +
-    ".opsDp46{display:flex;align-items:center;gap:8px;margin:0 0 8px}" +
-    ".opsDp46 b{color:#ffe7a3;font:800 11px/1 system-ui;letter-spacing:.08em;white-space:nowrap}" +
-    ".opsRail46{flex:1;height:7px;border-radius:99px;background:#ffe6a322;overflow:hidden}" +
-    ".opsRail46 i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#ffe08a,#ff74c8)}" +
-    ".opsSlots46{display:grid;grid-template-columns:1fr 1fr;gap:6px}" +
-    ".opsSlots46 button{min-height:58px;padding:6px 4px;border-radius:12px;border:1px solid #ff9bcc55;background:linear-gradient(180deg,#221436,#120c20);color:#fff7fb;font:800 11px/1.15 system-ui}" +
-    ".opsSlots46 button img{display:block;width:28px;height:28px;margin:0 auto 4px;border-radius:50%;object-fit:cover;background:#100b22}" +
-    ".opsSlots46 button.on{border-color:#ffe6a3aa;box-shadow:0 0 12px #ffd36b44}" +
-    ".opsSlots46 button.poor{opacity:.42}" +
-    ".opsSlots46 button small{display:block;margin-top:2px;color:#ffe7a3;font:700 9px/1 system-ui}" +
-    "@media(orientation:landscape){#opsDock46{left:max(12px,env(safe-area-inset-left));bottom:max(168px,calc(env(safe-area-inset-bottom) + 150px));width:196px}}" +
-    "html.landscape46 #opsDock46{left:max(12px,env(safe-area-inset-left));bottom:max(168px,calc(env(safe-area-inset-bottom) + 150px));width:196px}";
-
-  var state = emptyState();
-
-  function emptyState() {
-    return { dp: START, regen: 0, units: [] };
-  }
-
-  function clamp(n, min, max) {
-    n = Math.floor(Number(n) || 0);
-    if (n < min) return min;
-    if (n > max) return max;
-    return n;
-  }
-
-  function reset() {
-    state = emptyState();
-    return snapshot();
-  }
-
-  function snapshot() {
-    return {
-      version: VERSION,
-      dp: state.dp,
-      cap: CAP,
-      cost: COST,
-      max: MAX,
-      units: state.units.map(function (u) {
-        return { id: u.id, x: u.x, y: u.y, n: NAMES[u.id] || u.id };
-      }),
-    };
-  }
-
-  function roster(playerId) {
-    return IDS.filter(function (id) {
-      return id !== playerId;
-    });
-  }
-
-  function find(id) {
-    for (var i = 0; i < state.units.length; i++) {
-      if (state.units[i].id === id) return state.units[i];
-    }
-    return null;
-  }
-
-  function enabled(mode) {
-    return mode !== "testimony";
-  }
-
-  function canDeploy(id, playerId) {
-    if (IDS.indexOf(id) < 0) return { ok: false, reason: "id" };
-    if (id === playerId) return { ok: false, reason: "self" };
-    if (find(id)) return { ok: false, reason: "out" };
-    if (state.units.length >= MAX) return { ok: false, reason: "full" };
-    if (state.dp < COST) return { ok: false, reason: "dp" };
-    return { ok: true, reason: "" };
-  }
-
-  function pinAt(index, px, py, w, h) {
-    var side = index % 2 === 0 ? -1 : 1;
-    var x = Math.max(36, Math.min((w || 430) - 36, (Number(px) || 0) + side * 72));
-    var y = Math.max(64, Math.min((h || 932) - 80, (Number(py) || 0) + 18));
-    return { x: x, y: y };
-  }
-
-  function deploy(id, playerId, px, py, w, h) {
-    var gate = canDeploy(id, playerId);
-    if (!gate.ok) return { ok: false, reason: gate.reason, snapshot: snapshot() };
-    var pin = pinAt(state.units.length, px, py, w, h);
-    state.dp -= COST;
-    state.units.push({
-      id: id,
-      x: pin.x,
-      y: pin.y,
-      clock: 0.2,
-      weapon: WEAPON[id] || "rifle",
-    });
-    return { ok: true, reason: "", snapshot: snapshot() };
-  }
-
-  function retreat(id) {
-    var next = [];
-    var found = false;
-    for (var i = 0; i < state.units.length; i++) {
-      if (state.units[i].id === id) found = true;
-      else next.push(state.units[i]);
-    }
-    if (!found) return { ok: false, reason: "missing", snapshot: snapshot() };
-    state.units = next;
-    state.dp = clamp(state.dp + REFUND, 0, CAP);
-    return { ok: true, reason: "", snapshot: snapshot() };
-  }
-
-  function grant(n) {
-    state.dp = clamp(state.dp + n, 0, CAP);
-    return snapshot();
-  }
-
-  function tick(dt, world) {
-    var play = world && world.play;
-    var shots = [];
-    if (!play || !enabled(world.mode)) return { shots: shots, snapshot: snapshot() };
-    state.regen += Number(dt) || 0;
-    var step = 1 / REGEN;
-    while (state.regen >= step && state.dp < CAP) {
-      state.dp += 1;
-      state.regen -= step;
-    }
-    if (state.dp >= CAP) state.regen = 0;
-    var dmg = Math.max(1, (Number(world.dmg) || 8) * DMG);
-    for (var i = 0; i < state.units.length; i++) {
-      var u = state.units[i];
-      u.clock -= dt;
-      if (u.clock > 0) continue;
-      u.clock = RATE;
-      var target = typeof world.nearest === "function" ? world.nearest(u.x, u.y, u.weapon === "blade" ? BLADE_RANGE : RANGE) : null;
-      if (!target) continue;
-      shots.push({
-        id: u.id,
-        weapon: u.weapon,
-        x: u.x,
-        y: u.y,
-        tx: target.x,
-        ty: target.y,
-        dmg: dmg,
-      });
-    }
-    return { shots: shots, snapshot: snapshot() };
-  }
-
-  function fireShots(shots, world) {
-    if (!shots || !world) return 0;
-    var n = 0;
-    for (var i = 0; i < shots.length; i++) {
-      var s = shots[i];
-      if (s.weapon === "blade" && typeof world.aoe === "function") {
-        world.aoe(s.x, s.y, BLADE_RANGE, s.dmg, "#ff8fa5", false, { source: "summon", school: "summon", pet: true });
-        n += 1;
-        continue;
-      }
-      if (typeof world.pushBullet !== "function") continue;
-      var ang = Math.atan2(s.ty - s.y, s.tx - s.x);
-      var spd = s.weapon === "pistol" ? 390 : 430;
-      world.pushBullet({
-        x: s.x,
-        y: s.y,
-        vx: Math.cos(ang) * spd,
-        vy: Math.sin(ang) * spd,
-        r: 4,
-        life: 1.1,
-        dmg: s.dmg,
-        pierce: 0,
-        home: 0,
-        source: "summon",
-        pet: true,
-        school: "summon",
-        hit: new Set(),
-      });
-      n += 1;
-    }
-    return n;
-  }
-
-  function renderDock(host, playerId, art) {
-    if (!host) return snapshot();
-    var ids = roster(playerId);
-    // Keep interactive nodes alive: regeneration must not replace a pressed button.
-    if (host._opsPlayer46 !== playerId || !host.querySelector(".opsDp46 b")) {
-      host._opsPlayer46 = playerId;
-      host.innerHTML = '<div class="opsDp46"><b></b><span class="opsRail46"><i></i></span></div><div class="opsSlots46">' + ids.map(function (id) {
-        return '<button type="button" data-op="' + id + '"><img alt="" src="' +
-          (typeof art === "function" ? art("characters/" + id + "/default/portrait.webp") : "") +
-          '">' + (NAMES[id] || id) + '<small></small></button>';
-      }).join("") + '</div>';
-      host._opsData46 = "";
-    }
-    var data = state.dp + ":" + state.units.map(function (u) { return u.id; }).join(",");
-    if (host._opsData46 === data) return snapshot();
-    host._opsData46 = data;
-    host.querySelector(".opsDp46 b").textContent = "DP " + state.dp + "/" + CAP;
-    host.querySelector(".opsRail46 i").style.width = Math.round((state.dp / CAP) * 100) + "%";
-    ids.forEach(function (id) {
-      var button = host.querySelector('[data-op="' + id + '"]');
-      var out = !!find(id);
-      var gate = canDeploy(id, playerId);
-      button.classList.toggle("on", out);
-      button.classList.toggle("poor", !out && (gate.reason === "dp" || gate.reason === "full"));
-      button.querySelector("small").textContent = out ? "撤回 +4" : "部署 " + COST;
-    });
-    return snapshot();
-  }
-
-  function injectStyle() {
-    if (!global.document) return;
-    var style = global.document.getElementById("sakurayo-ops-css");
-    if (style && style.parentNode) style.parentNode.removeChild(style);
-    style = global.document.createElement("style");
-    style.id = "sakurayo-ops-css";
-    style.textContent = CSS;
-    (global.document.head || global.document.documentElement).appendChild(style);
-  }
-
-  global.SakurayoOps = {
-    version: VERSION,
-    MAX: MAX,
-    COST: COST,
-    CAP: CAP,
-    START: START,
-    IDS: IDS,
-    NAMES: NAMES,
-    injectStyle: injectStyle,
-    reset: reset,
-    snapshot: snapshot,
-    roster: roster,
-    enabled: enabled,
-    canDeploy: canDeploy,
-    deploy: deploy,
-    retreat: retreat,
-    grant: grant,
-    tick: tick,
-    fireShots: fireShots,
-    renderDock: renderDock,
-  };
-})(typeof window !== "undefined" ? window : globalThis);
-
-</script>
-<script>
 (function(global){
  'use strict';
  var PATHS={
@@ -5913,7 +5665,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       body.innerHTML='<div class="cmdSplit47"><div class="cmdPortrait47"><img src="'+esc(options.art('characters/'+c.id+'/default/lobby_idle.webp'))+'" data-fallback="'+esc(options.art('characters/'+c.id+'/default/live_idle.webp'))+'" onerror="if(this.dataset.fallback){this.src=this.dataset.fallback;this.removeAttribute(\'data-fallback\');this.classList.add(\'fullBody47\')}" alt="'+esc(c.name)+'"><small>SAKURAYO / '+esc(c.id.toUpperCase())+'</small></div><div class="cmdSheet47"><div class="cmdTabs47">'+model.characters.map(function(x){return '<button data-character="'+esc(x.id)+'" class="'+(x.id===c.id?'on':'')+'">'+esc(x.name)+'</button>';}).join('')+'</div><h3>'+esc(c.name)+'</h3><div class="cmdRole47">'+esc(c.role)+' / '+esc(c.weapon)+'</div><p>'+esc(c.desc)+'</p><div class="cmdNotes47">'+esc(c.bonus)+'</div><div class="cmdTags47">'+c.schools.map(function(x){return '<span>'+esc(x)+'</span>';}).join('')+'</div>'+ (active?loadout(model):'<p>选择为出击角色后可查看当前装备。</p>')+'<div class="cmdActions47"><button class="primary47" id="commandSelect47">'+(active?'当前出击角色':'选择出击')+'</button><button id="commandWardrobe47">衣装与装备</button><button id="commandTalent47">永久天赋</button></div></div></div>';
     }else if(kind==='prepare'){
       var m=model.mission;
-      body.innerHTML='<div class="cmdSplit47"><div><div class="cmdMission47" style="background-image:linear-gradient(0deg,#080e1cf5,#080e1c20),url(&quot;'+esc(m.art)+'&quot;)"><small>'+esc(model.mode)+'</small><h3>'+esc(m.name)+'</h3><p>'+esc(m.boss)+' · 预计 '+esc(m.minutes)+' 分钟</p><p style="margin-top:8px;color:#ead4a1">'+esc(model.tactic)+'</p></div><div class="cmdActions47"><button id="commandStage47">更换模式 / 关卡</button></div><div class="cmdNotes47">'+esc(model.modeId==='testimony'?'证词模式：跟随剧情，不发放随机升级卡，也不部署干员。':'肉鸽战斗：自动攻击，移动避险；升级三选一构筑职业，局内完成转职、融合与三相飞升。')+'</div></div><div class="cmdSheet47"><div class="cmdRole47">当前出击角色</div><h3>'+esc(model.character.name)+'</h3><p>'+esc(model.character.weapon)+' · '+esc(model.character.role)+'</p>'+loadout(model)+'<div class="cmdActions47"><button id="commandLoadout47">调整装备</button><button id="commandCards47">寻访装备</button><button id="commandRole47">切换角色</button><button class="primary47" id="commandLaunch47">开始出击 →</button></div><p>移动：摇杆 / WASD　冲刺：Shift　主动：空格 / 技能按钮<br>另外两名角色可在肉鸽模式使用 DP 部署支援。</p></div></div>';
+      body.innerHTML='<div class="cmdSplit47"><div><div class="cmdMission47" style="background-image:linear-gradient(0deg,#080e1cf5,#080e1c20),url(&quot;'+esc(m.art)+'&quot;)"><small>'+esc(model.mode)+'</small><h3>'+esc(m.name)+'</h3><p>'+esc(m.boss)+' · 预计 '+esc(m.minutes)+' 分钟</p><p style="margin-top:8px;color:#ead4a1">'+esc(model.tactic)+'</p></div><div class="cmdActions47"><button id="commandStage47">更换模式 / 关卡</button></div><div class="cmdNotes47">'+esc(model.modeId==='testimony'?'证词模式：跟随剧情，不发放随机升级卡。':'肉鸽战斗：自动攻击，移动避险；升级三选一构筑职业，局内完成转职、融合与三相飞升。')+'</div></div><div class="cmdSheet47"><div class="cmdRole47">当前出击角色</div><h3>'+esc(model.character.name)+'</h3><p>'+esc(model.character.weapon)+' · '+esc(model.character.role)+'</p>'+loadout(model)+'<div class="cmdActions47"><button id="commandLoadout47">调整装备</button><button id="commandCards47">寻访装备</button><button id="commandRole47">切换角色</button><button class="primary47" id="commandLaunch47">开始出击 →</button></div><p>移动：摇杆 / WASD　冲刺：Shift　主动：空格 / 技能按钮<br>另外两名角色可在肉鸽模式使用 DP 部署支援。</p></div></div>';
     }else if(kind==='supplies'){
       body.innerHTML='<p class="cmdNotes47">战斗与章节回收留下的补给。每份仅领取一次，完成记录保存在本机。</p><div class="cmdSupplies47">'+inbox(model.save).map(function(r){return '<article class="cmdSupply47"><span>'+ (r.claimed?'✓':r.ready?'✦':'◇')+'</span><div><b>'+esc(r.title)+'</b><p>'+esc(r.desc)+'</p><small>樱花币 +'+r.reward+'</small></div><button data-supply="'+r.id+'" '+(r.claimed||!r.ready?'disabled':'')+'>'+ (r.claimed?'已领取':r.ready?'领取':'待完成')+'</button></article>';}).join('')+'</div>';
     }else if(kind==='mail'){
@@ -7604,8 +7356,9 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   if (globalThis.SakurayoWeapons) for (const wid of globalThis.SakurayoWeapons.ORDER) {
     const WD = globalThis.SakurayoWeapons.DEF[wid];
     add({ id: "w_" + wid, n: WD.n, s: "base", tag: "武器", weapon46: wid,
-      req: () => globalThis.SakurayoWeapons.choices(P).includes(wid),
-      d: () => { const nl = globalThis.SakurayoWeapons.level(P, wid) + 1; return (nl >= 5 ? "" : "Lv" + nl + "：") + globalThis.SakurayoWeapons.describe(wid, nl); },
+      req: () => globalThis.SakurayoWeapons.choices(P).includes(wid) && !(typeof activeTrial46 !== "undefined" && activeTrial46 === "solo"),
+      d: () => { const SW = globalThis.SakurayoWeapons, cur = SW.level(P, wid), nl = cur + 1, pair = SW.PAIR[wid], pu = U.find(x => x.id === pair), ok = lv(pair) > 0;
+        return `<b>Lv${cur}→${nl}</b>：` + SW.describe(wid, nl, nl >= 5 && ok) + (nl >= 5 ? `<br><small>进化条件：Lv5 + 「${pu ? pu.n : pair}」${ok ? "✔ 已满足" : "（未拥有）"}</small>` : ""); },
       m: 5, r: "rare", e: WD.e, a: () => globalThis.SakurayoWeapons.gain(P, wid) });
   }
   // 基础小升级
@@ -8940,7 +8693,6 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     prepareStageEconomy40();
     adaptiveQuality48 = 1; updateQuality48();
     ensureMusic37();
-    window.SakurayoOps?.reset();
     window.SakurayoCutscene?.stopVictory?.();
     window.SakurayoCutscene?.stopType?.();
     ensureAudio();
@@ -8987,7 +8739,6 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     if (runMode36 !== "story") setTrial46(null);
     $("#stageHud").textContent = (activeTrial46 ? `${window.SakurayoTrials?.find(activeTrial46)?.name || "试炼"} · ` : runMode36 === "testimony" ? "证词 · " : "") + stage().short;
     preferLandscape46();
-    opsPaint46();
     showDialogue(openingDialogue(), () => {
       state = "play";
       const radio44 = window.SakurayoLifecycle?.radio?.(lifecycleWorld44(), save.character);
@@ -9214,6 +8965,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       enemiesNear: (x, y, r) => grid.within(x, y, r).filter(e => !e.dead),
       fx: (k, x, y) => fxStamp(k, x, y, { size: k === "shatter" ? 80 : 30, life: .3 }), sound };
   }
+  // 独行回收：只用初始武器（不出现副武器卡），每击破 25 只敌人全伤害 +2%，上限 +30%。
+  function soloBonus46() { return typeof activeTrial46 !== "undefined" && activeTrial46 === "solo" ? 1 + Math.min(0.3, Math.floor((P.kills || 0) / 25) * 0.02) : 1; }
   function bossBroken46(e) {
     fxStamp("shatter", e.x, e.y, { size: 150, life: 0.6 }); shake = Math.max(shake, 10); sound("phase");
     requestHitStop46("boss"); toast(`破防！${globalThis.SakurayoBoss.BREAK_TIME} 秒内伤害 ×${globalThis.SakurayoBoss.BREAK_MUL}`);
@@ -9610,7 +9363,6 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       let cb = dialogueDone;
       dialogueDone = null;
       cb?.();
-      if (typeof opsPaint46 === "function") opsPaint46();
       return;
     }
     let l = dialogueQueue.shift();
@@ -9875,6 +9627,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     // Boss arena: leftover trash dissolves into XP shards so the duel is about the boss and its rule adds.
     for (const e of enemies) if (!e.dead && !e.elite) { e.dead = true; if (gems.length < caps().g) gems.push({ x: e.x, y: e.y, r: 6, v: Math.ceil((e.xp || 1) * 0.5), bob: rnd(0, TAU) }); }
     enemies = enemies.filter(e => !e.dead);
+    if (globalThis.SakurayoBoss) { const k = 1 + Math.min(20, P.upgradeChoices40 || 0) * globalThis.SakurayoBoss.HP_PER_PICK; boss.hp *= k; boss.max *= k; }
     enemies.push(boss);
     globalThis.SakurayoBoss?.init(boss);
     $("#warning").textContent = `BOSS ${s.boss} 降临 · 四阶段战斗`;
@@ -9901,7 +9654,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     return best;
   }
   // Auto-aim: nearest enemy, but lock onto a boss in range unless trash is already in the player's face.
-  function aimTarget46(range){const near=nearest(P.x,P.y,range);if(!boss||boss.dead||near===boss)return near;const bd=Math.hypot(boss.x-P.x,boss.y-P.y);if(bd>range)return near;if(boss.guard>0){let g=null,gd=range;for(const e of enemies)if(!e.dead&&e.guardFor){const d=Math.hypot(e.x-P.x,e.y-P.y);if(d<gd){gd=d;g=e;}}if(g&&!(near&&Math.hypot(near.x-P.x,near.y-P.y)<70))return g;}if(near&&Math.hypot(near.x-P.x,near.y-P.y)<110)return near;return boss;}
+  function aimTarget46(range){const near=nearest(P.x,P.y,range);if(!boss||boss.dead||near===boss)return near;const bd=Math.hypot(boss.x-P.x,boss.y-P.y);if(bd>range)return near;if(boss.guard>0){let g=null,gd=range;for(const e of enemies)if(!e.dead&&e.guardFor){const d=Math.hypot(e.x-P.x,e.y-P.y);if(d<gd){gd=d;g=e;}}if(g&&!(near&&Math.hypot(near.x-P.x,near.y-P.y)<70))return g;}if(near&&Math.hypot(near.x-P.x,near.y-P.y)<75)return near;return boss;}
   // Assigned once below (directional gun/blade shoot); gunWard/star/idolGun/encore live in gunShot36.
   let shoot;
   function pushBullet(b) {
@@ -9960,6 +9713,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   }
   function damageEnemy(e, amt, opt = {}) {
     if (!e || e.dead) return 0;
+    amt *= typeof soloBonus46 === "function" ? soloBonus46() : 1;
     if (e.type === "boss") {
       if (e.guard > 0 && !(e.broken46 > 0)) amt *= 0.32;
       amt *= globalThis.SakurayoBoss ? globalThis.SakurayoBoss.damageMul(e) : 1;
@@ -10436,6 +10190,11 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       toast(`${runMode36 === "testimony" ? "证词模式" : activeTrial46 === "sealed" ? "封印试炼" : "孤证试炼"} · Lv.${P.level}（不获取局内强化）`);
       return;
     }
+    if (save.settings?.autoPick46) {
+      // 自动推荐：不暂停，直接拿推荐项并提示。
+      state = "level"; const pool = getPool(); const pick = pool.find(x => solutionReason(x)) || pool[0];
+      $("#level").classList.add("hidden"); chooseUpgrade(pick); return;
+    }
     hideTransient();state = "level";
     $("#hud").classList.add("hidden");
     $("#level").classList.remove("hidden");
@@ -10487,6 +10246,13 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     });
     $("#level .sub").innerHTML =
       `构筑稳定度 <b style="color:${a.rank === "S" || a.rank === "A" ? "#78ffb0" : a.rank === "D" ? "#ff6b85" : "#ffd36b"}">${a.rank} ${a.score}</b> · 职业可进阶至 3 阶，并与其他职业融合`;
+    { let xp = P.xp, nx = P.next, more = 0; while (xp >= nx && more < 20) { xp -= nx; nx = Math.floor(nx * 1.24 + 5); more++; }
+      let bar = $("#levelBar46");
+      if (!bar) { bar = document.createElement("div"); bar.id = "levelBar46"; bar.innerHTML = '<span></span><button class="secondary" id="pickAll46">一键推荐</button><label><input type="checkbox" id="autoPick46"> 之后自动选推荐（不暂停）</label>'; $("#level .modal").appendChild(bar);
+        bar.querySelector("#pickAll46").onclick = () => { let guard = 0; while (state === "level" && guard++ < 25) { const c = [...document.querySelectorAll("#choices .choice")]; (c.find(b => b.dataset.rec === "1") || c[0])?.click(); } };
+        bar.querySelector("#autoPick46").onchange = e => { save.settings = save.settings || {}; save.settings.autoPick46 = e.target.checked; persist(); }; }
+      bar.querySelector("span").textContent = more ? `本次共 ${more + 1} 次强化，选完自动接续` : "本次 1 次强化";
+      bar.querySelector("#autoPick46").checked = !!save.settings?.autoPick46; }
     $("#reroll").textContent = `重抽（本局剩余 ${levelRerolls} 次）`;
     $("#reroll").disabled = levelRerolls <= 0;
   }
@@ -10514,6 +10280,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       toast(`获得「${u.n}」`);
     }
     P.upgradeOrder.push(u.id);
+    if (globalThis.SakurayoWeapons) for (const wid of globalThis.SakurayoWeapons.evolve(P, id => lv(id) > 0)) { toast(`武器进化：${globalThis.SakurayoWeapons.DEF[wid].evo}`); sound("ach"); }
     if(!u.career)upgradeBanter(u);
     updateCareerFormation();
     checkSynergy();
@@ -11490,8 +11257,10 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     for (const g of gems) {
       g.bob += dt * 4;
       let d = Math.hypot(P.x - g.x, P.y - g.y);
-      if (d < P.mag) {
-        let sp = 180 + (P.mag - d) * 2.5;
+      // Boss arena vacuum: during the duel every shard flies to the player so nobody has to leave the fight to collect.
+      const vac = bossBorn && boss && !boss.dead;
+      if (d < P.mag || vac) {
+        let sp = vac ? Math.max(420, 180 + (P.mag - d) * 2.5) : 180 + (P.mag - d) * 2.5;
         g.x += ((P.x - g.x) / (d || 1)) * sp * dt;
         g.y += ((P.y - g.y) / (d || 1)) * sp * dt;
       }
@@ -12200,7 +11969,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   var aim46 = { id: null, sx: 0, sy: 0 };
   function aimDown46(e) {
     if (state !== "play" || aim46.id !== null || e.clientX < innerWidth * 0.5) return false;
-    if (e.target.closest?.(".act") || e.target.closest?.("#opsDock46") || e.target === $("#pause") || e.target.closest?.("button")) return false;
+    if (e.target.closest?.(".act") || e.target === $("#pause") || e.target.closest?.("button")) return false;
     aim46.id = e.pointerId; aim46.sx = e.clientX; aim46.sy = e.clientY; return true;
   }
   function aimMove46(e) {
@@ -12219,7 +11988,6 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     if (
       state !== "play" || joy.on ||
       e.target.closest(".act") ||
-      e.target.closest("#opsDock46") ||
       e.target === $("#pause")
     )
       return;
@@ -13432,9 +13200,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     return {
       mode:state,runMode:runMode36,stageKey:isMainGodRun36()?stage().key:`story-${selected}`,stageDuration:finite(stage().dur),stage44:window.SakurayoLifecycle?window.SakurayoLifecycle.snapshot(lifecycleWorld44()):null,viewport:{width:W,height:H,coordinates:"origin top-left; +x right; +y down"},camera:window.SakurayoCamera?window.SakurayoCamera.snapshot():null,stage:selected,runTime:finite(runTime),
       player:{character:P.character||save.character||"sayo",skin:save.skin||"default",outfit:liveOutfitLayer35()?.id||null,careerBranch:careerBranchId35(),outfitFade:finite(P.outfitFade),outfitReveal:finite(P.outfitReveal),outfitTitle:P.outfitRevealTitle||"",animation:state==="play"?charPose35():"idle",portraitMode:"static",direction:facingName36(),aim:{x:finite(P.aimX,P.fx),y:finite(P.aimY,P.fy),angle:finite(P.weaponAngle)},manualAim:!!P.manualAim,x:finite(P.x),y:finite(P.y),radius:finite(P.r),visualSize:PLAYER_GEOMETRY35.visualSize,footOffset:PLAYER_GEOMETRY35.footOffset,hp:finite(P.hp),maxHp:finite(P.maxHp),shield:finite(P.sh),maxShield:finite(P.maxSh),level:finite(P.level),xp:finite(P.xp),nextXp:finite(P.next),attackDamage:finite(P.dmg),criticalChance:finite(P.crit),moveSpeed:finite(P.spd),baseSkillCooldown:finite(P.skillCd),damageReduction:finite(P.damageReduce),bladePower:finite(P.bladePower),attackInterval:finite(P.rate),attackRange:finite(P.range),multishot:finite(P.multi),pierce:finite(P.pierce),skillCooldown:finite(P.skill),dashCooldown:finite(P.dash),shotCount:finite(P.shotCount),meleeChain:finite(P.meleeChain),perfectDodges:finite(P.perfectDodges),initialCore:P.initialCore40||null,initialCoreLevel:finite(P.initialCoreLevel40),noUpgradeChallenge:!!P.noUpgradeChallenge40,upgradeChoices:finite(P.upgradeChoices40),baitLevel:finite(P.baitLevel40),baitSpawns:finite(P.baitSpawns40)},
-      counts:{enemies:enemies.filter(e=>!e.dead).length,bullets:bullets.length,enemyBullets:ebullets.length,gems:gems.length,pets:pets.length,      ops:window.SakurayoOps?window.SakurayoOps.snapshot().units.length:0},
+      counts:{enemies:enemies.filter(e=>!e.dead).length,bullets:bullets.length,enemyBullets:ebullets.length,gems:gems.length,pets:pets.length},
       live:window.SakurayoLive?window.SakurayoLive.snapshot():null,
-      ops:window.SakurayoOps?window.SakurayoOps.snapshot():null,
       boss:boss?{phase:boss.phase,hp:finite(boss.hp),maxHp:finite(boss.max),ratio:boss.max?finite(boss.hp/boss.max):0,guard:finite(boss.guard),guardAdds:enemies.filter(e=>e.guardFor&&!e.dead).map(e=>({type:e.type,hp:finite(e.hp),x:finite(e.x),y:finite(e.y)})),dead:!!boss.dead,pointerVisible:bossPointerVisible38,rule:boss.rule39||"",adaptSource:boss.adaptSource39||null,x:finite(boss.x),y:finite(boss.y)}:null,
       build:{upgrades:{...(P.up||{})},fusion:P.fusion||null,form:P.form||null,upgradeOrder:[...(P.upgradeOrder||[])],fusionMechanics:{elementalBeast:!!P.elementalBeast41,plagueIdol:!!P.plagueIdol41,soulGun:!!P.soulGun41,nanoNinja:!!P.nanoNinja41,fleshShrine:!!P.fleshShrine41,bloodMage:!!P.bloodMage41},damageSources:{...damageSources},attackTotal:Object.values(damageSources).reduce((sum,value)=>sum+finite(value),0)},
       overlays:{menu:visible("#menu"),hud:visible("#hud"),level:visible("#level"),dialogue:visible("#dialogue"),event:visible("#event"),paused:visible("#paused"),result:visible("#result"),storyBeat:visible("#storyBeat44")},
@@ -13570,6 +13337,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       chargeUlt46(){P.ult46=100;return snapshot35();},
       bossDebug46(){if(!boss)return null;const g=enemies.filter(e=>!e.dead&&e.guardFor).map(e=>Math.round(Math.hypot(e.x-P.x,e.y-P.y)));return {t:Math.round(runTime),hp:Math.round(boss.hp),max:Math.round(boss.max),ph:boss.phase,guard:Math.round(boss.guard||0),brk:Math.round(boss.brk46||0),broken:boss.broken46,d:Math.round(Math.hypot(boss.x-P.x,boss.y-P.y)),g,n:enemies.length,shots:P.shotCount,ma:P.manualAim};},
       giveWeapon46(id,n=1){for(let i=0;i<n;i++)globalThis.SakurayoWeapons.gain(P,id);return P.weapons46;},
+      poolIds46(n=12){const out=new Set();for(let i=0;i<n;i++)for(const u of getPool())out.add(u.id);return [...out];},
+      soloBonus46(){return soloBonus46();},
       teleport46(x,y){P.x=x;P.y=y;return snapshot35();},
       realtime46(){manualTestClock=false;last=performance.now();scheduleLoop();return true;},
       props46(){return (props46||[]).map(p=>({kind:p.kind,x:p.x,y:p.y,done:p.done}));},
@@ -13599,10 +13368,6 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       defeatBoss(){if(!boss||boss.dead)throw new Error("Boss is not active");boss.phase=4;boss.guard=0;boss.hp=1;damageEnemy(boss,boss.max*20,{source:"skill",school:"base"});return snapshot35();},
       killPlayer(){P.inv=0;P.revive=0;P.sh=0;P.hp=Math.max(1,P.hp);damagePlayer(P.maxHp*20);return snapshot35();},
       finish(win){finish(!!win);return snapshot35();},backMenu(){backMenu();return snapshot35();},
-      opsSnapshot46(){return window.SakurayoOps?window.SakurayoOps.snapshot():null;},
-      deployOp46(id){return opsToggle46(id);},
-      retreatOp46(id){const O=window.SakurayoOps;if(!O)return {ok:false,reason:"missing"};const r=O.retreat(id);opsPaint46();return r;},
-      grantDp46(n=8){const O=window.SakurayoOps;if(!O)return null;const snap=O.grant(n);opsPaint46();return snap;},
       lobby46(){return window.SakurayoLobby?window.SakurayoLobby.snapshot(save):null;},
       setPool46(id){const L=window.SakurayoLobby;if(!L)return null;L.setPool(save,id);persist();refreshLobby46();return L.snapshot(save);},
       setRosterTab46(id){const L=window.SakurayoLobby;if(!L)return null;L.setRosterTab(save,id);persist();refreshLobby46();return L.snapshot(save);},
@@ -14035,109 +13800,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       return result;
     };
   }
-  function opsDock46(){
-    let n=$("#opsDock46");
-    if(n)return n;
-    n=document.createElement("div");
-    n.id="opsDock46";
-    n.hidden=true;
-    $("#hud")?.appendChild(n);
-    n.addEventListener("click",ev=>{
-      const btn=ev.target.closest?.("[data-op]");
-      if(!btn)return;
-      opsToggle46(btn.getAttribute("data-op"));
-    });
-    return n;
-  }
-  function opsPaint46(){
-    const O=window.SakurayoOps;
-    const dock=opsDock46();
-    if(!O||!dock)return null;
-    const hudOn=!!$("#hud")&&!$("#hud").classList.contains("hidden");
-    const on=hudOn&&O.enabled(runMode36)&&state==="play";
-    dock.hidden=!on;
-    if(on)O.renderDock(dock,save.character||P.character||"sayo",artUrl);
-    return O.snapshot();
-  }
-  function opsToggle46(id){
-    const O=window.SakurayoOps;
-    if(!O)return {ok:false,reason:"missing"};
-    if(state!=="play")return {ok:false,reason:"play",snapshot:O.snapshot()};
-    if(!O.enabled(runMode36))return {ok:false,reason:"mode",snapshot:O.snapshot()};
-    if(activeTrial46==="solo"){toast("独行回收 · 禁用干员部署");return {ok:false,reason:"trial",snapshot:O.snapshot()};}
-    const name=O.NAMES[id]||id;
-    if(O.snapshot().units.some(u=>u.id===id)){
-      const r=O.retreat(id);
-      if(r.ok)toast(`${name} 已撤回`);
-      opsPaint46();
-      return r;
-    }
-    const bound=window.SakurayoCamera?window.SakurayoCamera.size():{worldW:W,worldH:H};
-    const r=O.deploy(id,save.character||P.character,P.x,P.y,bound.worldW,bound.worldH);
-    if(r.ok)toast(`${name} 已部署`);
-    else if(r.reason==="dp")toast("部署点不足");
-    else if(r.reason==="full")toast("最多两名干员");
-    else if(r.reason==="self")toast("不能部署当前角色");
-    opsPaint46();
-    return r;
-  }
-  function installOps46(){
-    const O=window.SakurayoOps;
-    if(!O||!CONTENT41||installOps46.done)return;
-    installOps46.done=true;
-    O.injectStyle();
-    opsDock46();
-    CONTENT41.hook("combat:after-update",payload=>{
-      if(state==="play"&&O.enabled(runMode36)){
-        const world={play:true,mode:runMode36,dmg:P.dmg,petPow:P.petPow||1,nearest,pushBullet,aoe};
-        const out=O.tick(payload?.dt||0,world);
-        O.fireShots(out.shots,world);
-      }
-      opsPaint46();
-    },"core.ops46",50);
-    CONTENT41.hook("combat:after-draw",()=>{
-      if(state!=="play"||!O.enabled(runMode36))return;
-      const units=O.snapshot().units;
-      for(const u of units){
-        ctx.save();
-        ctx.translate(u.x,u.y);
-        ctx.fillStyle="#0008";
-        ctx.beginPath();
-        ctx.ellipse(0,16,13,5,0,0,Math.PI*2);
-        ctx.fill();
-        const img=artImage(`characters/${u.id}/default/portrait.webp`);
-        if(artReady(img))ctx.drawImage(img,-16,-30,32,36);
-        else{
-          ctx.fillStyle="#ffe6a3";
-          ctx.beginPath();
-          ctx.arc(0,-8,11,0,Math.PI*2);
-          ctx.fill();
-        }
-        ctx.strokeStyle="#ffe6a366";
-        ctx.lineWidth=2;
-        ctx.beginPath();
-        ctx.arc(0,2,20,0,Math.PI*2);
-        ctx.stroke();
-        ctx.restore();
-      }
-    },"core.ops46",15);
-    const _backOps46=backMenu;
-    backMenu=function(){
-      const result=_backOps46();
-      const dock=$("#opsDock46");
-      if(dock)dock.hidden=true;
-      return result;
-    };
-    addEventListener("keydown",e=>{
-      if(state!=="play"||!O.enabled(runMode36))return;
-      if(e.target&&(e.target.tagName==="INPUT"||e.target.tagName==="TEXTAREA"))return;
-      const roster=O.roster(save.character||P.character||"sayo");
-      if(e.key==="1"&&roster[0])opsToggle46(roster[0]);
-      if(e.key==="2"&&roster[1])opsToggle46(roster[1]);
-    });
-  }
   installLobby46();
-  installOps46();
   const _terminalSettings48=openSettings37;
   openSettings37=function(){
     const result=_terminalSettings48();

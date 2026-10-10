@@ -30,6 +30,10 @@
     "#bossBreak46.broken{border-color:#fff;box-shadow:0 0 14px #ff5aa6}#bossBreak46.broken i{background:linear-gradient(90deg,#ff5aa6,#ffd0e8)}",
     "#bossBreak46.enraged{border-color:#ff3b6b}",
     "#bossBreak46 span{position:relative;display:block;text-align:center;font:800 10.5px/16px system-ui;color:#fff;text-shadow:0 1px 2px #000;letter-spacing:.06em}",
+    "#level{align-items:flex-end!important;background:linear-gradient(180deg,#05030c22,#05030ccc 60%)!important;backdrop-filter:none!important}",
+    "#level .modal{max-height:66vh;overflow:auto;border-radius:20px 20px 0 0;margin-bottom:0}",
+    "#levelBar46{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:8px;font:700 12px system-ui;color:#ffe3f0}",
+    "#levelBar46 button{min-height:40px;padding:0 16px}#levelBar46 label{display:flex;gap:6px;align-items:center;opacity:.85}",
   ].join("\n");
   var built = false, mini = null, last = 0, ring = null;
   function api() { return global.SakurayoBattle46; }

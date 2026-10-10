@@ -1,10 +1,10 @@
 /* Sakurayo offline trials: finite first-clear receipts + personal best.
- * Pure rules; index.html wires the real start/level/DP/finish entries. */
+ * Pure rules; index.html wires the real start/level/finish entries. */
 (function (root) {
   "use strict";
   var CATALOG = Object.freeze([
     Object.freeze({ id: "solo", name: "独行回收", sub: "SOLO", gate: 2, reward: 120,
-      rule: "禁用 DP 干员部署；局内随机构筑照常。", tip: "全程只能靠自己清场。", art: "trials/banner_solo.webp" }),
+      rule: "只用初始武器：副武器卡不会出现；每击破 25 只敌人伤害 +2%（上限 +30%）。", tip: "越打越强，前期稳住，后期靠成长碾压。", art: "trials/banner_solo.webp" }),
     Object.freeze({ id: "sealed", name: "封印试炼", sub: "SEALED", gate: 3, reward: 180,
       rule: "升级不弹出局内强化选择；保留自己的开局核心与永久成长。", tip: "等级只回复少量生命。", art: "trials/banner_sealed.webp" }),
     Object.freeze({ id: "flawless", name: "无伤终夜", sub: "FLAWLESS", gate: 4, reward: 240,

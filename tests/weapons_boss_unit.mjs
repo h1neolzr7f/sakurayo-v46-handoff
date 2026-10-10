@@ -4,7 +4,7 @@ import '../src/runtime/sakurayo-boss.js';
 const W = globalThis.SakurayoWeapons, B = globalThis.SakurayoBoss;
 assert.equal(W.ORDER.length, 7);
 const P = { x: 0, y: 0, dmg: 10, weaponAngle: 0 };
-for (const id of W.ORDER) { assert.ok(W.stats(id, 5).dmg >= W.stats(id, 1).dmg); assert.match(W.describe(id, 5), /进化/); }
+for (const id of W.ORDER) { assert.ok(W.stats(id, 5).dmg >= W.stats(id, 1).dmg); assert.match(W.describe(id, 5, true), /进化/); assert.doesNotMatch(W.describe(id, 5, false), /进化/); }
 W.gain(P, 'spread'); W.gain(P, 'orbit'); W.gain(P, 'laser'); W.gain(P, 'bomb');
 assert.deepEqual(W.choices(P).sort(), ['bomb', 'laser', 'orbit', 'spread'], 'four weapon slots max');
 for (let i = 0; i < 9; i++) W.gain(P, 'spread'); assert.equal(W.level(P, 'spread'), 5, 'caps at Lv5');
@@ -19,3 +19,7 @@ B.tick(boss, B.BREAK_TIME + .1, 0); assert.equal(B.damageMul(boss), 1);
 boss.phase = 4; assert.equal(B.tick(boss, .1, B.ENRAGE_AFTER + 1), 'enrage');
 assert.match(B.label(boss), /狂暴/);
 console.log('PASS weapons+boss unit');
+{ const Q = { weapons46: {} }; for (let i = 0; i < 5; i++) W.gain(Q, 'spread');
+  assert.deepEqual(W.evolve(Q, () => false), [], 'no evolution without partner');
+  assert.deepEqual(W.evolve(Q, id => id === 'multi'), ['spread'], 'partner unlocks evolution');
+  assert.equal(W.stats('spread', 5, true).c > W.stats('spread', 5, false).c, true); console.log('PASS evolution pairs'); }

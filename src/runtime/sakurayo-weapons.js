@@ -15,9 +15,11 @@
     orbit:    { n: "环绕樱刃", evo: "落樱结界", e: "🗡️", s: "ninja", d: "{c} 把樱刃环绕自身切割", cd: 0, dmg: 0.55 },
     boomerang:{ n: "回旋斩月", evo: "双月回天", e: "🌙", s: "ninja", d: "掷出回旋刃，往返切割（{c} 把）", cd: 1.8, dmg: 1.1 }
   };
+  // Evolution needs Lv5 + the paired base upgrade (Vampire-Survivors style).
+  var PAIR = { spread: "multi", ricochet: "pierce", homing: "star", bomb: "blast", laser: "rail", orbit: "sword", boomerang: "speed" };
   var ORDER = Object.keys(DEF);
-  function stats(id, lv) {
-    var evo = lv >= 5, k = DEF[id];
+  function stats(id, lv, evo) {
+    evo = !!evo && lv >= 5; var k = DEF[id];
     return {
       c: id === "spread" ? 3 + lv + (evo ? 3 : 0) : id === "ricochet" ? lv + (evo ? 2 : 0) : id === "homing" ? lv + (evo ? 3 : 0) : id === "orbit" ? 1 + lv + (evo ? 2 : 0) : id === "boomerang" ? (evo ? 2 : 1) : 1,
       r: id === "bomb" ? 64 + lv * 10 + (evo ? 30 : 0) : 0,
@@ -26,9 +28,9 @@
       dmg: k.dmg * (1 + (lv - 1) * 0.16) * (evo ? 1.35 : 1)
     };
   }
-  function describe(id, lv) {
-    var s = stats(id, lv), k = DEF[id];
-    return (lv >= 5 ? "【进化·" + k.evo + "】" : "") + k.d.replace("{c}", s.c).replace("{r}", s.r).replace("{t}", s.t) + (k.cd ? "｜冷却 " + s.cd.toFixed(1) + "s" : "") + (s.dmg ? "｜单次 " + Math.round(s.dmg * 100) + "%攻击" : "");
+  function describe(id, lv, evo) {
+    var s = stats(id, lv, evo), k = DEF[id];
+    return (evo ? "【进化·" + k.evo + "】" : "") + k.d.replace("{c}", s.c).replace("{r}", s.r).replace("{t}", s.t) + (k.cd ? "｜冷却 " + s.cd.toFixed(1) + "s" : "") + (s.dmg ? "｜单次 " + Math.round(s.dmg * 100) + "%攻击" : "");
   }
   function state(P) { if (!P.weapons46) P.weapons46 = {}; return P.weapons46; }
   function level(P, id) { var w = state(P)[id]; return w ? w.lv : 0; }
@@ -37,9 +39,9 @@
   function tick(dt, api) {
     var P = api.P, W = state(P), id, w, s, i, a;
     for (id in W) {
-      w = W[id]; if (!w.lv) continue; s = stats(id, w.lv); w.t -= dt;
+      w = W[id]; if (!w.lv) continue; s = stats(id, w.lv, w.evo); w.t -= dt;
       if (id === "orbit") {
-        w.a = (w.a + dt * (w.lv >= 5 ? 4.6 : 3.4)) % TAU;
+        w.a = (w.a + dt * (w.evo ? 4.6 : 3.4)) % TAU;
         var rad = 62 + w.lv * 4;
         for (i = 0; i < s.c; i++) {
           a = w.a + i * TAU / s.c;
@@ -52,7 +54,7 @@
       if (!DEF[id].cd || w.t > 0) continue;
       w.t = s.cd;
       if (id === "spread") {
-        a = aimAngle(api, 320); var fan = 0.9 + (w.lv >= 5 ? 0.5 : 0);
+        a = aimAngle(api, 320); var fan = 0.9 + (w.evo ? 0.5 : 0);
         for (i = 0; i < s.c; i++) { var q = a - fan / 2 + fan * i / Math.max(1, s.c - 1); api.push({ x: P.x, y: P.y, vx: Math.cos(q) * 760, vy: Math.sin(q) * 760, r: 4, life: 0.42, dmg: P.dmg * s.dmg, pierce: 0, source: "shot", school: "gun", tracer46: "#ffd0e4", hit: new Set() }); }
         api.fx("muzzle", P.x + Math.cos(a) * 24, P.y + Math.sin(a) * 24); api.sound("pistol");
       } else if (id === "homing") {
@@ -71,9 +73,9 @@
     if (L && L.beam) {
       var B = L.beam; B.t -= dt; B.tick -= dt; B.a = aimAngle(api, 700) * 0.15 + B.a * 0.85;
       if (B.tick <= 0) {
-        B.tick = 0.1; var ls = stats("laser", L.lv), cx = Math.cos(B.a), cy = Math.sin(B.a);
+        B.tick = 0.1; var ls = stats("laser", L.lv, L.evo), cx = Math.cos(B.a), cy = Math.sin(B.a);
         var cand = api.enemiesNear(P.x + cx * B.len / 2, P.y + cy * B.len / 2, B.len / 2 + 30);
-        for (i = 0; i < cand.length; i++) { var en = cand[i], px = en.x - P.x, py = en.y - P.y, along = px * cx + py * cy; if (along < 0 || along > B.len) continue; if (Math.abs(px * cy - py * cx) < en.r + (L.lv >= 5 ? 20 : 12)) api.hit(en, P.dmg * ls.dmg * 0.1 / ls.t * 0.6, "laser"); }
+        for (i = 0; i < cand.length; i++) { var en = cand[i], px = en.x - P.x, py = en.y - P.y, along = px * cx + py * cy; if (along < 0 || along > B.len) continue; if (Math.abs(px * cy - py * cx) < en.r + (L.evo ? 20 : 12)) api.hit(en, P.dmg * ls.dmg * 0.1 / ls.t * 0.6, "laser"); }
       }
       if (B.t <= 0) L.beam = null;
     }
@@ -82,7 +84,7 @@
   function onHit(b, e, api) {
     if (b.boom46) { api.aoe(b.x, b.y, b.boom46, b.boomDmg46, "#ff9a4a"); api.fx("shatter", b.x, b.y); return true; }
     var W = state(api.P);
-    if (!b.bounced46 && b.source === "shot" && W.ricochet && W.ricochet.lv && !b.tracer46) b.bounce46 = stats("ricochet", W.ricochet.lv).c, b.bounced46 = 1;
+    if (!b.bounced46 && b.source === "shot" && W.ricochet && W.ricochet.lv && !b.tracer46) b.bounce46 = stats("ricochet", W.ricochet.lv, W.ricochet.evo).c, b.bounced46 = 1;
     if (b.bounce46 > 0) {
       var best = null, bd = 260, list = api.enemiesNear(e.x, e.y, 260);
       for (var i = 0; i < list.length; i++) { var o = list[i]; if (o.dead || b.hit.has(o)) continue; var d = Math.hypot(o.x - e.x, o.y - e.y); if (d < bd) { bd = d; best = o; } }
@@ -97,27 +99,33 @@
   function draw(ctx, P, now) {
     var W = P.weapons46; if (!W) return;
     if (W.orbit && W.orbit.lv) {
-      var s = stats("orbit", W.orbit.lv), rad = 62 + W.orbit.lv * 4;
+      var s = stats("orbit", W.orbit.lv, W.orbit.evo), rad = 62 + W.orbit.lv * 4;
       ctx.save(); ctx.globalCompositeOperation = "lighter";
       for (var i = 0; i < s.c; i++) {
         var a = W.orbit.a + i * TAU / s.c, x = P.x + Math.cos(a) * rad, y = P.y + Math.sin(a) * rad;
         ctx.save(); ctx.translate(x, y); ctx.rotate(a + Math.PI / 2);
-        ctx.fillStyle = W.orbit.lv >= 5 ? "#ffd6ef" : "#ff9ccf"; ctx.shadowColor = "#ff5aa6"; ctx.shadowBlur = 14;
+        ctx.fillStyle = W.orbit.evo ? "#ffd6ef" : "#ff9ccf"; ctx.shadowColor = "#ff5aa6"; ctx.shadowBlur = 14;
         ctx.beginPath(); ctx.moveTo(0, -14); ctx.quadraticCurveTo(7, 0, 0, 14); ctx.quadraticCurveTo(-7, 0, 0, -14); ctx.fill(); ctx.restore();
       }
       ctx.restore();
     }
     var L = W.laser;
     if (L && L.beam) {
-      var B = L.beam, w = (L.lv >= 5 ? 20 : 12) * (0.75 + Math.sin(now * 60) * 0.25);
+      var B = L.beam, w = (L.evo ? 20 : 12) * (0.75 + Math.sin(now * 60) * 0.25);
       ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
       ctx.strokeStyle = "rgba(140,220,255,.45)"; ctx.lineWidth = w * 2.2; ctx.beginPath(); ctx.moveTo(P.x, P.y); ctx.lineTo(P.x + Math.cos(B.a) * B.len, P.y + Math.sin(B.a) * B.len); ctx.stroke();
       ctx.strokeStyle = "#f4fdff"; ctx.lineWidth = w * 0.6; ctx.stroke(); ctx.restore();
     }
   }
+  // Marks Lv5 weapons whose partner is owned as evolved; returns the ids that just evolved.
+  function evolve(P, owns) {
+    var W = state(P), out = [];
+    for (var id in W) if (W[id].lv >= 5 && !W[id].evo && owns(PAIR[id])) { W[id].evo = true; out.push(id); }
+    return out;
+  }
   function choices(P) {
     var owned = ORDER.filter(function (id) { return level(P, id) > 0; });
     return ORDER.filter(function (id) { return level(P, id) < 5 && (level(P, id) > 0 || owned.length < 4); });
   }
-  global.SakurayoWeapons = Object.freeze({ DEF: DEF, ORDER: ORDER, stats: stats, describe: describe, level: level, gain: gain, tick: tick, onHit: onHit, update: update, draw: draw, choices: choices, MAX_SLOTS: 4 });
+  global.SakurayoWeapons = Object.freeze({ DEF: DEF, ORDER: ORDER, stats: stats, describe: describe, level: level, gain: gain, tick: tick, onHit: onHit, update: update, draw: draw, choices: choices, evolve: evolve, PAIR: PAIR, MAX_SLOTS: 4 });
 })(typeof window !== "undefined" ? window : globalThis);

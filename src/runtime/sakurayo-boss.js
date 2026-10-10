@@ -4,7 +4,7 @@
    (more bullets, no extra damage) so fights cannot drag. Pure logic, no DOM. */
 (function (global) {
   "use strict";
-  var BREAK_TIME = 4.5, BREAK_MUL = 1.6, DAMAGE_SHARE = 0.11, ENRAGE_AFTER = 20, HP_SCALE = 0.88;
+  var BREAK_TIME = 4.5, BREAK_MUL = 1.6, DAMAGE_SHARE = 0.11, ENRAGE_AFTER = 20, HP_SCALE = 0.88, HP_PER_PICK = 0.025;
   var OBJECTIVE = { guard: 30, dodge: 15, lane: 10, burst: 40 };
   function init(boss) { boss.brk46 = 0; boss.broken46 = 0; boss.breaks46 = 0; boss.enraged46 = false; boss.guardsDown46 = 0; boss.guardsTotal46 = 0; return boss; }
   function fill(boss, amount) {
@@ -27,6 +27,6 @@
     var g = boss.guardsTotal46 ? " · 镜卫 " + boss.guardsDown46 + "/" + boss.guardsTotal46 : "";
     return "破防 " + Math.floor(boss.brk46 || 0) + "%" + g + (boss.enraged46 ? " · 狂暴" : "");
   }
-  global.SakurayoBoss = Object.freeze({ BREAK_TIME: BREAK_TIME, BREAK_MUL: BREAK_MUL, ENRAGE_AFTER: ENRAGE_AFTER, HP_SCALE: HP_SCALE, OBJECTIVE: OBJECTIVE,
+  global.SakurayoBoss = Object.freeze({ BREAK_TIME: BREAK_TIME, BREAK_MUL: BREAK_MUL, ENRAGE_AFTER: ENRAGE_AFTER, HP_SCALE: HP_SCALE, HP_PER_PICK: HP_PER_PICK, OBJECTIVE: OBJECTIVE,
     init: init, fill: fill, fromDamage: fromDamage, tick: tick, damageMul: damageMul, label: label });
 })(typeof window !== "undefined" ? window : globalThis);

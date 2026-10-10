@@ -58,11 +58,11 @@ await page.reload(); await page.locator('.bootArt35').waitFor({ state: 'detached
 st = await api('trialState');
 assert.equal(st.store.receipts.sealed, 1);
 assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('sakurayoV3')).coins), coins);
-// solo: DP deploy blocked; stage change clears
+// solo: initial weapon only (no sub-weapon cards), damage grows with kills; stage change clears
 assert.equal(await api('trial', 'solo'), 'solo');
-await api('start'); await api('dismissDialogue'); await api('grantDp46', 20);
-const dep = await api('deployOp46', 'aya');
-assert.equal(dep.reason, 'trial');
+await api('start'); await api('dismissDialogue');
+assert.equal((await api('poolIds46', 30)).some(id => id.startsWith('w_')), false, 'solo offers no sub-weapon cards');
+assert.equal(await api('soloBonus46'), 1);
 await api('finish', false);
 st = await api('trialState'); assert.equal(st.result.success, false); assert.equal(st.store.receipts.solo, undefined);
 await page.locator('#back').click();
@@ -86,6 +86,6 @@ await api('finish', true);
 st = await api('trialState');
 assert.equal(st.result.success, true); assert.equal(st.result.reward, 240);
 assert.equal(errors.length, 0, errors.join('\n'));
-console.log('PASS trials smoke: entry, gate, sealed no cards, receipt once, retry keeps, back/mode clear, solo no DP, reload receipt', JSON.stringify(st.result));
+console.log('PASS trials smoke: entry, gate, sealed no cards, receipt once, retry keeps, back/mode clear, solo initial-weapon only, reload receipt', JSON.stringify(st.result));
 await browser.close();
 server.close();
