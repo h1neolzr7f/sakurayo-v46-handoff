@@ -1322,18 +1322,26 @@
       "</div>";
     drawer.appendChild(overlay);
     hideBrokenArt(overlay);
+    if (typeof global.SakurayoSfx === "function") {
+      global.SakurayoSfx("pull");
+      if (instant) { var best = overlay.querySelector(".r-SSR,.r-LEGEND") ? "revealSSR" : overlay.querySelector(".r-SR") ? "revealSR" : "flip"; global.SakurayoSfx(best); }
+    }
     var cards = overlay.querySelectorAll(".revealCard46");
     function flipAll() {
       for (var c = 0; c < cards.length; c++) cards[c].classList.add("flipped");
     }
     for (var i = 0; i < cards.length; i++) {
       (function (node, delay) {
-        node.onclick = function () {
+        function flip() {
+          if (node.classList.contains("flipped")) return;
           node.classList.add("flipped");
-        };
+          var sfx = global.SakurayoSfx;
+          if (typeof sfx === "function") sfx(/r-(SSR|LEGEND)/.test(node.className) ? "revealSSR" : /r-SR/.test(node.className) ? "revealSR" : "flip");
+        }
+        node.onclick = flip;
         if (!instant) {
           setTimeout(function () {
-            if (node.isConnected) node.classList.add("flipped");
+            if (node.isConnected) flip();
           }, 240 + delay * 110);
         }
       })(cards[i], i);

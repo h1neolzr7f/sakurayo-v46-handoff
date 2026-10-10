@@ -40,6 +40,11 @@
     /* trial badge rides on the stage strip so it never covers 出击 */
     "#menu .stageMini:has(>.trialBadge46){position:relative;overflow:visible!important}#menu .stageMini:has(>.trialBadge46:not(.hidden)) #sno{visibility:hidden}#menu .stageMini>.trialBadge46{white-space:nowrap;left:var(--trialBadgeX,auto);right:auto;bottom:auto;top:50%;transform:translateY(-50%);padding:3px 3px 3px 10px;font-size:11px}#menu .stageMini>.trialBadge46 button{min-width:28px!important;min-height:28px!important}",
     "@media (max-width:900px){#menu .stageMini>.trialBadge46>b{display:none}#menu .stageMini>.trialBadge46{padding-left:12px}}",
+    /* combat feedback: low-HP pulse vignette, combo pop */
+    "#hud.lowHp46:before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;box-shadow:inset 0 0 90px 18px rgba(255,30,70,.55);animation:syLow46 1s ease-in-out infinite}",
+    "@keyframes syLow46{0%,100%{opacity:.45}50%{opacity:1}}",
+    "#combo.pop46{animation:syPop46 .38s cubic-bezier(.2,1.6,.4,1)}@keyframes syPop46{0%{transform:scale(1.6);filter:brightness(1.8)}100%{transform:none}}",
+    "@media (prefers-reduced-motion:reduce){#hud.lowHp46:before{animation:none;opacity:.7}#combo.pop46{animation:none}}",
     /* trial badge + result */
     ".trialBadge46{position:absolute;z-index:5;right:max(16px,env(safe-area-inset-right));bottom:calc(var(--trialBadgeBottom,120px));display:flex;align-items:center;gap:8px;padding:4px 4px 4px 12px;border-radius:999px;background:rgba(9,15,30,.9);border:1px solid #ffb3d1;color:#ffe3ef;font:800 12px/1 system-ui;box-shadow:0 6px 18px rgba(255,90,160,.3)}",
     ".trialBadge46 b{color:#ff9cc6;letter-spacing:.12em}.trialBadge46 button{min-width:32px!important;min-height:32px!important;border-radius:50%;border:0;background:#ffffff1a;color:#fff;font:800 14px/1 system-ui}",
@@ -96,8 +101,22 @@
     if (b.id === "skill" || b.id === "dash") return; /* combat buttons have their own sounds */
     if (typeof root.SakurayoSfx === "function") root.SakurayoSfx("tap");
   }
+  /* every drawer: whoosh on open / soft close */
+  function watchDrawers() {
+    var list = doc.querySelectorAll("section.drawer");
+    for (var i = 0; i < list.length; i++) (function (el) {
+      if (el.__sySfx) return; el.__sySfx = true;
+      var open = !el.classList.contains("hidden");
+      new MutationObserver(function () {
+        var now = !el.classList.contains("hidden");
+        if (now === open) return; open = now;
+        if (typeof root.SakurayoSfx === "function") root.SakurayoSfx(now ? "open" : "close");
+      }).observe(el, { attributes: true, attributeFilter: ["class"] });
+    })(list[i]);
+  }
   function init() {
     style();
+    watchDrawers();
     watchPanels();
     dots();
     doc.addEventListener("pointerdown", sfx, true);

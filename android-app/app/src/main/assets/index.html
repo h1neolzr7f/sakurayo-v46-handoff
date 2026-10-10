@@ -2385,17 +2385,94 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 
 </script>
 <script>
+/* Sakurayo procedural SFX: layered WebAudio recipes (no audio files).
+ * index.html's sound(k) hands its AudioContext + gain here; unknown keys fall back
+ * to the legacy single-oscillator table. Recipes are short and quiet by design. */
+(function (root) {
+  "use strict";
+  var noiseBuf = null, last = {};
+  function noise(ctx) {
+    if (noiseBuf && noiseBuf.sampleRate === ctx.sampleRate) return noiseBuf;
+    var len = Math.floor(ctx.sampleRate * 0.6), b = ctx.createBuffer(1, len, ctx.sampleRate), d = b.getChannelData(0);
+    for (var i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    return (noiseBuf = b);
+  }
+  function env(ctx, out, t, vol, a, dur) {
+    var g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.0002, vol), t + a);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    g.connect(out); return g;
+  }
+  function tone(ctx, out, t, f, dur, vol, type, f2, a) {
+    var o = ctx.createOscillator(); o.type = type || "sine";
+    o.frequency.setValueAtTime(f, t);
+    if (f2) o.frequency.exponentialRampToValueAtTime(Math.max(30, f2), t + dur);
+    o.connect(env(ctx, out, t, vol, a || 0.005, dur)); o.start(t); o.stop(t + dur + 0.02);
+  }
+  function hiss(ctx, out, t, dur, vol, type, f, f2, q) {
+    var s = ctx.createBufferSource(); s.buffer = noise(ctx);
+    var fl = ctx.createBiquadFilter(); fl.type = type || "bandpass"; fl.Q.value = q || 1;
+    fl.frequency.setValueAtTime(f || 1200, t);
+    if (f2) fl.frequency.exponentialRampToValueAtTime(f2, t + dur);
+    s.connect(fl); fl.connect(env(ctx, out, t, vol, 0.004, dur)); s.start(t); s.stop(t + dur + 0.02);
+  }
+  function chord(ctx, out, t, fs, step, dur, vol, type) {
+    for (var i = 0; i < fs.length; i++) tone(ctx, out, t + i * step, fs[i], dur, vol, type || "triangle", 0, 0.01);
+  }
+  /* min gap (s) per key so dense combat does not turn into static */
+  var GAP = { hit: 0.035, crit: 0.06, kill: 0.04, shot: 0.03, rifle: 0.03, pistol: 0.03, bossShot: 0.06, tap: 0.03, flip: 0.05 };
+  var R = {
+    tap: function (c, o, t) { tone(c, o, t, 1480, 0.05, 0.05, "sine", 1100); },
+    open: function (c, o, t) { hiss(c, o, t, 0.16, 0.05, "bandpass", 600, 2600, 1.4); tone(c, o, t + 0.02, 660, 0.12, 0.035, "sine", 990); },
+    close: function (c, o, t) { hiss(c, o, t, 0.12, 0.04, "bandpass", 2400, 700, 1.4); tone(c, o, t, 880, 0.1, 0.03, "sine", 560); },
+    confirm: function (c, o, t) { chord(c, o, t, [784, 1175], 0.06, 0.18, 0.06, "sine"); },
+    error: function (c, o, t) { tone(c, o, t, 220, 0.09, 0.07, "square", 180); tone(c, o, t + 0.1, 196, 0.12, 0.06, "square", 160); },
+    coin: function (c, o, t) { tone(c, o, t, 1568, 0.08, 0.06, "square"); tone(c, o, t + 0.07, 2093, 0.22, 0.06, "square"); },
+    hit: function (c, o, t) { hiss(c, o, t, 0.06, 0.09, "bandpass", 1800, 600, 0.8); tone(c, o, t, 180, 0.07, 0.07, "sine", 70); },
+    crit: function (c, o, t) { hiss(c, o, t, 0.09, 0.12, "highpass", 3000, 1500, 0.7); tone(c, o, t, 1320, 0.12, 0.05, "triangle", 2200); tone(c, o, t, 140, 0.1, 0.09, "sine", 55); },
+    kill: function (c, o, t) { tone(c, o, t, 520, 0.09, 0.06, "triangle", 260); hiss(c, o, t, 0.08, 0.06, "lowpass", 1400, 300, 0.7); },
+    eliteKill: function (c, o, t) { tone(c, o, t, 90, 0.35, 0.16, "sine", 38); hiss(c, o, t, 0.3, 0.12, "lowpass", 900, 120, 0.7); chord(c, o, t + 0.05, [659, 988], 0.05, 0.25, 0.05, "triangle"); },
+    hurt: function (c, o, t) { tone(c, o, t, 150, 0.16, 0.12, "square", 70); hiss(c, o, t, 0.12, 0.08, "lowpass", 900, 200, 0.8); },
+    dash: function (c, o, t) { hiss(c, o, t, 0.18, 0.09, "bandpass", 500, 3200, 2); },
+    skill: function (c, o, t) { tone(c, o, t, 220, 0.4, 0.08, "sawtooth", 660, 0.02); hiss(c, o, t + 0.03, 0.35, 0.07, "bandpass", 800, 4000, 1.5); chord(c, o, t + 0.08, [523, 784, 1047], 0.04, 0.3, 0.04, "triangle"); },
+    level: function (c, o, t) { chord(c, o, t, [523, 659, 784, 1047], 0.07, 0.35, 0.06, "triangle"); },
+    phase: function (c, o, t) { tone(c, o, t, 70, 0.8, 0.14, "sawtooth", 45); hiss(c, o, t, 0.7, 0.08, "lowpass", 600, 80, 0.7); },
+    boss: function (c, o, t) { tone(c, o, t, 55, 1.0, 0.16, "sawtooth", 41); tone(c, o, t + 0.25, 82, 0.8, 0.1, "square", 61); },
+    win: function (c, o, t) { chord(c, o, t, [523, 659, 784, 1047, 1319], 0.09, 0.7, 0.07, "triangle"); },
+    over: function (c, o, t) { chord(c, o, t, [392, 330, 262, 196], 0.14, 0.5, 0.06, "sine"); },
+    ach: function (c, o, t) { chord(c, o, t, [880, 1109, 1319], 0.06, 0.4, 0.05, "sine"); },
+    pull: function (c, o, t) { hiss(c, o, t, 0.6, 0.07, "bandpass", 400, 5000, 2.5); tone(c, o, t, 330, 0.6, 0.05, "triangle", 990, 0.05); },
+    flip: function (c, o, t) { hiss(c, o, t, 0.07, 0.06, "highpass", 2500, 4000, 0.8); },
+    revealSR: function (c, o, t) { chord(c, o, t, [784, 988, 1175], 0.05, 0.45, 0.06, "triangle"); },
+    revealSSR: function (c, o, t) { tone(c, o, t, 98, 0.9, 0.12, "sine", 65); chord(c, o, t + 0.05, [523, 659, 784, 1047, 1319, 1568], 0.07, 1.1, 0.06, "triangle"); hiss(c, o, t, 1.0, 0.05, "highpass", 4000, 9000, 0.5); },
+    trial: function (c, o, t) { tone(c, o, t, 196, 0.5, 0.09, "sawtooth", 392, 0.03); chord(c, o, t + 0.12, [587, 880], 0.08, 0.4, 0.05, "triangle"); }
+  };
+  function play(ctx, k, gain) {
+    var fn = R[k]; if (!fn || !ctx || gain <= 0) return false;
+    var t = ctx.currentTime;
+    if (GAP[k] && last[k] && t - last[k] < GAP[k]) return true;
+    last[k] = t;
+    var out = ctx.createGain(); out.gain.value = Math.min(1, gain * 1.6); out.connect(ctx.destination);
+    try { fn(ctx, out, t + 0.002); } catch (e) { return false; }
+    return true;
+  }
+  root.SakurayoSfxLib = Object.freeze({ play: play, keys: Object.keys(R) });
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
 /* Sakurayo offline trials: finite first-clear receipts + personal best.
  * Pure rules; index.html wires the real start/level/DP/finish entries. */
 (function (root) {
   "use strict";
   var CATALOG = Object.freeze([
     Object.freeze({ id: "solo", name: "独行回收", sub: "SOLO", gate: 2, reward: 120,
-      rule: "禁用 DP 干员部署；局内随机构筑照常。", tip: "全程只能靠自己清场。", art: "stages/stage_2/chapter_keyart_v2.webp" }),
+      rule: "禁用 DP 干员部署；局内随机构筑照常。", tip: "全程只能靠自己清场。", art: "trials/banner_solo.webp" }),
     Object.freeze({ id: "sealed", name: "封印试炼", sub: "SEALED", gate: 3, reward: 180,
-      rule: "升级不弹出局内强化选择；保留自己的开局核心与永久成长。", tip: "等级只回复少量生命。", art: "stages/stage_3/chapter_keyart_v2.webp" }),
+      rule: "升级不弹出局内强化选择；保留自己的开局核心与永久成长。", tip: "等级只回复少量生命。", art: "trials/banner_sealed.webp" }),
     Object.freeze({ id: "flawless", name: "无伤终夜", sub: "FLAWLESS", gate: 4, reward: 240,
-      rule: "正常战斗；必须在不受生命伤害的情况下通关。", tip: "护盾吸收的伤害不算受伤。", art: "stages/stage_4/chapter_keyart_v2.webp" })
+      rule: "正常战斗；必须在不受生命伤害的情况下通关。", tip: "护盾吸收的伤害不算受伤。", art: "trials/banner_flawless.webp" })
   ]);
   function find(id) {
     for (var i = 0; i < CATALOG.length; i++) if (CATALOG[i].id === id) return CATALOG[i];
@@ -2458,7 +2535,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     ".trialTab46.on{border-color:#ffb3d1;box-shadow:0 0 0 1px #ffb3d1,0 8px 22px rgba(255,90,160,.28)}" +
     ".trialTab46.lock{filter:grayscale(.85) brightness(.7)}" +
     ".trialTab46 .dot46{position:absolute;top:8px;right:8px;width:9px;height:9px;border-radius:50%;background:#ff4d6d;box-shadow:0 0 8px #ff4d6d}" +
-    ".trialMain46{position:relative;border-radius:18px;overflow:hidden;border:1px solid rgba(150,228,245,.3);background:#0a1224 var(--art) center/cover;min-height:0}" +
+    ".trialMain46{position:relative;border-radius:18px;overflow:hidden;border:1px solid rgba(150,228,245,.3);background:#0a1224 var(--art) 72% 30%/cover;min-height:0}" +
     ".trialMain46:before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(6,10,22,.94) 0%,rgba(6,10,22,.78) 42%,rgba(6,10,22,.08) 75%)}" +
     ".trialInfo46{position:relative;z-index:1;display:flex;flex-direction:column;gap:8px;height:100%;box-sizing:border-box;padding:18px 20px;max-width:min(470px,62%)}" +
     ".trialInfo46 em{font:900 11px/1 system-ui;letter-spacing:.32em;color:#8fe6f5;font-style:normal}" +
@@ -2485,7 +2562,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     var cur = find(render.pick) || CATALOG[0];
     var tabs = CATALOG.map(function (t) {
       var s = status(save, t.id);
-      return '<button type="button" class="trialTab46' + (t.id === cur.id ? " on" : "") + (s.open ? "" : " lock") + '" data-trial="' + t.id + '" style="--art:url(\'' + art(t.art) + '\')">' +
+      return '<button type="button" class="trialTab46' + (t.id === cur.id ? " on" : "") + (s.open ? "" : " lock") + '" data-trial="' + t.id + '" style="--art:url(\'' + art(t.art.replace("banner_", "tab_")) + '\')">' +
         esc(t.name) + "<small>" + t.sub + "</small>" + (s.open && !s.claimed ? '<i class="dot46"></i>' : "") + "</button>";
     }).join("");
     var s = status(save, cur.id);
@@ -3531,7 +3608,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       '<div class="wishStage46 wishV2">' +
       '<img class="wishBanner46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/banner_" + pool + ".webp") + '">' +
       '<div class="wishShade46" aria-hidden="true"></div>' +
-      '<img class="wishHero46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/up_" + hero + ".webp") + '">' +
+      '<img class="wishHero46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/up_" + (pool === "fashion" ? "crown" : hero) + ".webp") + '">' +
       '<div class="wishPetals46">' + petalMarks() + "</div>" +
       '<nav class="wishTabs46" id="gachaTabs46" aria-label="卡池">' + tabHtml + "</nav>" +
       '<div class="wishWallet46" aria-label="货币">' + coinIcon + "<b>" + info.coins + '</b><span class="wishShardPill46">' + shardIcon + '碎镜片 ' + shards + " / " + RATES.spark + "</span></div>" +
@@ -3835,18 +3912,26 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       "</div>";
     drawer.appendChild(overlay);
     hideBrokenArt(overlay);
+    if (typeof global.SakurayoSfx === "function") {
+      global.SakurayoSfx("pull");
+      if (instant) { var best = overlay.querySelector(".r-SSR,.r-LEGEND") ? "revealSSR" : overlay.querySelector(".r-SR") ? "revealSR" : "flip"; global.SakurayoSfx(best); }
+    }
     var cards = overlay.querySelectorAll(".revealCard46");
     function flipAll() {
       for (var c = 0; c < cards.length; c++) cards[c].classList.add("flipped");
     }
     for (var i = 0; i < cards.length; i++) {
       (function (node, delay) {
-        node.onclick = function () {
+        function flip() {
+          if (node.classList.contains("flipped")) return;
           node.classList.add("flipped");
-        };
+          var sfx = global.SakurayoSfx;
+          if (typeof sfx === "function") sfx(/r-(SSR|LEGEND)/.test(node.className) ? "revealSSR" : /r-SR/.test(node.className) ? "revealSR" : "flip");
+        }
+        node.onclick = flip;
         if (!instant) {
           setTimeout(function () {
-            if (node.isConnected) node.classList.add("flipped");
+            if (node.isConnected) flip();
           }, 240 + delay * 110);
         }
       })(cards[i], i);
@@ -5693,7 +5778,13 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     "#skill:not(.ready44)[data-cd]:not([data-cd=''])::after,#dash:not(.ready44)[data-cd]:not([data-cd=''])::after{content:attr(data-cd);position:absolute;inset:0;display:grid;place-items:center;border-radius:inherit;background:rgba(4,8,18,.55);color:#fff;font:900 18px/1 system-ui;text-shadow:0 1px 4px #000;pointer-events:none}",
     "#dash:not(.ready44)[data-cd]:not([data-cd=''])::after{font-size:14px}",
     /* trial badge rides on the stage strip so it never covers 出击 */
-    "#menu .stageMini:has(>.trialBadge46){position:relative;overflow:visible!important}#menu .stageMini>.trialBadge46{right:44px;bottom:auto;top:50%;transform:translateY(-50%);padding:3px 3px 3px 10px;font-size:11px}#menu .stageMini>.trialBadge46 button{min-width:28px!important;min-height:28px!important}",
+    "#menu .stageMini:has(>.trialBadge46){position:relative;overflow:visible!important}#menu .stageMini:has(>.trialBadge46:not(.hidden)) #sno{visibility:hidden}#menu .stageMini>.trialBadge46{white-space:nowrap;left:var(--trialBadgeX,auto);right:auto;bottom:auto;top:50%;transform:translateY(-50%);padding:3px 3px 3px 10px;font-size:11px}#menu .stageMini>.trialBadge46 button{min-width:28px!important;min-height:28px!important}",
+    "@media (max-width:900px){#menu .stageMini>.trialBadge46>b{display:none}#menu .stageMini>.trialBadge46{padding-left:12px}}",
+    /* combat feedback: low-HP pulse vignette, combo pop */
+    "#hud.lowHp46:before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;box-shadow:inset 0 0 90px 18px rgba(255,30,70,.55);animation:syLow46 1s ease-in-out infinite}",
+    "@keyframes syLow46{0%,100%{opacity:.45}50%{opacity:1}}",
+    "#combo.pop46{animation:syPop46 .38s cubic-bezier(.2,1.6,.4,1)}@keyframes syPop46{0%{transform:scale(1.6);filter:brightness(1.8)}100%{transform:none}}",
+    "@media (prefers-reduced-motion:reduce){#hud.lowHp46:before{animation:none;opacity:.7}#combo.pop46{animation:none}}",
     /* trial badge + result */
     ".trialBadge46{position:absolute;z-index:5;right:max(16px,env(safe-area-inset-right));bottom:calc(var(--trialBadgeBottom,120px));display:flex;align-items:center;gap:8px;padding:4px 4px 4px 12px;border-radius:999px;background:rgba(9,15,30,.9);border:1px solid #ffb3d1;color:#ffe3ef;font:800 12px/1 system-ui;box-shadow:0 6px 18px rgba(255,90,160,.3)}",
     ".trialBadge46 b{color:#ff9cc6;letter-spacing:.12em}.trialBadge46 button{min-width:32px!important;min-height:32px!important;border-radius:50%;border:0;background:#ffffff1a;color:#fff;font:800 14px/1 system-ui}",
@@ -5750,8 +5841,22 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (b.id === "skill" || b.id === "dash") return; /* combat buttons have their own sounds */
     if (typeof root.SakurayoSfx === "function") root.SakurayoSfx("tap");
   }
+  /* every drawer: whoosh on open / soft close */
+  function watchDrawers() {
+    var list = doc.querySelectorAll("section.drawer");
+    for (var i = 0; i < list.length; i++) (function (el) {
+      if (el.__sySfx) return; el.__sySfx = true;
+      var open = !el.classList.contains("hidden");
+      new MutationObserver(function () {
+        var now = !el.classList.contains("hidden");
+        if (now === open) return; open = now;
+        if (typeof root.SakurayoSfx === "function") root.SakurayoSfx(now ? "open" : "close");
+      }).observe(el, { attributes: true, attributeFilter: ["class"] });
+    })(list[i]);
+  }
   function init() {
     style();
+    watchDrawers();
     watchPanels();
     dots();
     doc.addEventListener("pointerdown", sfx, true);
@@ -9322,6 +9427,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       (P.damageSources[opt.source || "shot"] || 0) + damage;
     e.hp -= damage;
     e.hit = 0.1;
+    if (!["acid","spore"].includes(opt.source)) sound(crit ? "crit" : "hit");
     if (quality >= 0.7 && (e.fxHit44 || 0) < runTime) {
       e.fxHit44 = runTime + 0.09;
       fxStamp("hit", e.x, e.y, { size: 16 + Math.min(20, damage * 0.08), life: 0.16 });
@@ -9498,7 +9604,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     if(P.soul){P.soulMeter+=1+(e.elite?2:0);if(P.soulMeter>=P.soulNeed){P.soulMeter=0;aoe(e.x,e.y,115+P.soul*10,P.dmg*(1.05+P.soul*.22)*P.spellPow,"#85c8ff",false,{source:"soul",school:"necro"});toast("魂潮爆发");}}
     if(P.deathBloom&&e.infected>0){aoe(e.x,e.y,48+P.deathBloom*8,P.dmg*.32*P.deathBloom,"#e58cff",false,{source:"spore",school:"spore"});P.hp=Math.min(P.maxHp,P.hp+1.5*P.deathBloom*healingMul());}
     if(P.necroSpore&&e.infected>0){P.soulMeter+=2;for(const n of grid.within(e.x,e.y,100))n.infected=Math.max(n.infected,1.4);}
-    sound("hit");
+    if(e.elite||e.type==="boss"){sound("eliteKill");shake=Math.max(shake,e.type==="boss"?12:6);haptic37?.(e.type==="boss"?40:18);}else sound("kill");
   }
   function damagePlayer(amt) {
     if (P.inv > 0) return false;
@@ -10825,7 +10931,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     if (window.SakurayoLifecycle?.waveTint) $("#waveF").style.background = window.SakurayoLifecycle.waveTint(lifecycleWorld44());
     const tip44 = window.SakurayoLifecycle?.hint?.(lifecycleWorld44()) || "点开看稳定度 · 暂停看构筑";
     $("#mission").innerHTML = `${tip44}${P.jam > 0 ? " · 受干扰" : ""}${P.healSupp > 0 ? " · 治疗受限" : ""}<br>${phaseWin} · 稳定度 <b>${a.rank}</b> · ${pressure}${weak ? ` · 天敌 ${weak}` : ""}`;
-    $("#combo").textContent = P.combo >= 5 ? `${P.combo} COMBO` : "";
+    { const cb=$("#combo"),txt=P.combo >= 5 ? `${P.combo} COMBO` : ""; if(cb.textContent!==txt){cb.textContent=txt;if(txt&&P.combo%10===0){cb.classList.remove("pop46");void cb.offsetWidth;cb.classList.add("pop46");}} }
+    $("#hud").classList.toggle("lowHp46", state==="play" && P.hp > 0 && P.hp / P.maxHp < 0.3);
     $("#skill").classList.toggle("ready44", P.skill <= 0);
     $("#dash").classList.toggle("ready44", P.dash <= 0);
     $("#skill").dataset.cd = P.skill > 0 ? (P.skill >= 10 ? Math.ceil(P.skill) : P.skill.toFixed(1)) : "";
@@ -11352,6 +11459,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function playToast(){
     if(toastBusy||!toastQueue.length||transientBlocked())return;
     toastBusy=true;let e=$("#toast");e.textContent=toastQueue.shift();e.classList.add("show");
+    if(/不足|无法|未解锁|不能/.test(e.textContent))sound("error");else if(/\+\d|领取|获得/.test(e.textContent))sound("coin");
     placeToast46();
     clearTimeout(playToast.t);playToast.t=setTimeout(()=>{e.classList.remove("show");toastBusy=false;setTimeout(playToast,160)},1100);
   }
@@ -11366,6 +11474,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function sound(k) {
     const audioGain=clamp((save.settings?.master??.8)*(save.settings?.sfx??.8),0,1);
     if (!audio || audioGain===0 || platformSuspended48) return;
+    if (window.SakurayoSfxLib?.play(audio, k, audioGain)) return;
     let v = {
         shot: [650, 0.035, 0.012, "square"],
         rifle: [190, 0.055, 0.032, "sawtooth"],
@@ -13105,6 +13214,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     activeTrial46=T&&id&&T.available(save,id)?id:null;
     const b=$("#trialBadge46"),mini=$("#menu .stageMini");
     if(b&&mini&&b.parentElement!==mini)mini.appendChild(b);
+    const placeBadge=()=>{const n=$("#sname");if(!mini||!n)return;const r=document.createRange();r.selectNodeContents(n);mini.style.setProperty("--trialBadgeX",Math.round(r.getBoundingClientRect().right-mini.getBoundingClientRect().left+10)+"px");};placeBadge();setTimeout(placeBadge,60);
     if(b){const t=activeTrial46&&T.find(activeTrial46);b.classList.toggle("hidden",!t);b.innerHTML=t?`<b>试炼</b>${t.name}<button type="button" aria-label="取消试炼">×</button>`:"";const x=b.querySelector("button");if(x)x.onclick=()=>{setTrial46(null);toast("已取消试炼");};}
     return activeTrial46;
   }
@@ -13113,6 +13223,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     T.render($("#trialsBody46"),save,{art:artUrl,active:activeTrial46,choose(id){
       runMode36="story";pendingMode46="story";
       if(!setTrial46(id))return;
+      sound("trial");
       menuUpdate();closeDrawers();setTrial46(id);
       toast(`已选择试炼「${T.find(id).name}」· 选好角色后出击`);
     }});
