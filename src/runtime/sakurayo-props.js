@@ -44,6 +44,9 @@
     for (i = 0; i < L.chests; i++) place("chest", 22, {});
     for (i = 0; i < L.shrines; i++) place("shrine", 26, { charge: 0 });
     for (i = 0; i < (L.traps || 2); i++) place("trap", 20, { cool: 0 });
+    // 场景机关（RESEARCH_V7 ④，参考哈迪斯的陷阱机关）：灯笼阵 = 走近点燃，持续灼烧周围敌人；鸟居 = 穿过获得短暂加速
+    for (i = 0; i < (L.lanterns || 3); i++) place("lantern", 18, { cool: 0, lit: 0, tick: 0 });
+    for (i = 0; i < (L.torii || 2); i++) place("torii", 30, { cool: 0 });
     return list;
   }
   function update(list, P, dt, api, moving) {
@@ -62,6 +65,13 @@
         // 符咒机关: stepping on the seal detonates it on nearby enemies, then it re-arms.
         p.cool = Math.max(0, p.cool - dt);
         if (touch && p.cool <= 0) { p.cool = TRAP_REARM; api.fx("skill", p.x, p.y); api.sound("crit"); api.aoe(p.x, p.y, 170); api.toast("符咒机关：引爆"); }
+      } else if (p.kind === "lantern") {
+        p.cool = Math.max(0, p.cool - dt);
+        if (p.lit > 0) { p.lit -= dt; p.tick -= dt; if (p.tick <= 0) { p.tick = 0.5; api.burn ? api.burn(p.x, p.y, 150) : api.aoe(p.x, p.y, 150); } }
+        else if (touch && p.cool <= 0) { p.lit = 4; p.tick = 0; p.cool = 14; api.fx("skill", p.x, p.y); api.sound("crit"); api.toast("灯笼阵：点燃（4 秒灼烧）"); }
+      } else if (p.kind === "torii") {
+        p.cool = Math.max(0, p.cool - dt);
+        if (touch && p.cool <= 0) { p.cool = 10; if (api.haste) api.haste(3); api.fx("levelup", p.x, p.y); api.toast("鸟居：疾行 3 秒"); }
       } else if (p.kind === "shrine") {
         p.charge = touch ? Math.min(1.5, p.charge + dt) : Math.max(0, p.charge - dt * 0.5);
         if (p.charge >= 1.5) { p.done = true; api.fx("levelup", p.x, p.y); api.sound("level"); api.heal(0.25); api.shield(20); api.toast("灵龛：生命 +25%、护盾 +20"); }
@@ -84,6 +94,13 @@
       if (!armed) { ctx.fillStyle = "rgba(255,255,255,.7)"; ctx.font = "800 11px system-ui"; ctx.textAlign = "center"; ctx.fillText(Math.ceil(p.cool) + "s", p.x, p.y - p.r); }
       ctx.restore(); return;
     }
+    if (p.kind === "lantern") { var on = p.lit > 0, fl = 0.8 + Math.sin(t * 13 + p.x) * 0.2;
+      if (on) { var gr = ctx.createRadialGradient(p.x, p.y, 4, p.x, p.y, 150); gr.addColorStop(0, "rgba(255,150,60," + 0.35 * fl + ")"); gr.addColorStop(1, "rgba(255,90,30,0)"); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(p.x, p.y, 150, 0, Math.PI * 2); ctx.fill(); }
+      ctx.fillStyle = on ? "#ff9a3d" : p.cool > 0 ? "#6a4a3a" : "#d8553a"; ctx.beginPath(); ctx.ellipse(p.x, p.y - 22, 13, 17, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = "#2a1408"; ctx.fillRect(p.x - 8, p.y - 42, 16, 4); ctx.fillRect(p.x - 8, p.y - 6, 16, 4); ctx.fillRect(p.x - 1.5, p.y - 2, 3, 14);
+      ctx.restore(); return; }
+    if (p.kind === "torii") { var rd = p.cool > 0 ? "#7a3a3a" : "#e0303a"; ctx.fillStyle = rd; ctx.fillRect(p.x - 30, p.y - 56, 7, 56); ctx.fillRect(p.x + 23, p.y - 56, 7, 56); ctx.fillRect(p.x - 40, p.y - 62, 80, 8); ctx.fillRect(p.x - 32, p.y - 46, 64, 5);
+      if (p.cool <= 0) { ctx.strokeStyle = "rgba(255,220,120," + (0.4 + Math.sin(t * 4) * 0.3) + ")"; ctx.lineWidth = 2; ctx.strokeRect(p.x - 23, p.y - 46, 46, 46); }
+      ctx.restore(); return; }
     if (p.kind === "chest") { ctx.shadowColor = "#7ff3ff"; ctx.shadowBlur = 10 + Math.sin(t * 4) * 5; }
     if (img) ctx.drawImage(img, p.x - s / 2, p.y - s * 0.7, s, s);
     else { ctx.fillStyle = p.kind === "chest" ? "#c9a24a" : p.kind === "shrine" ? "#b9a8d8" : "#8a5a3a"; ctx.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 2); }

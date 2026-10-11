@@ -62,3 +62,8 @@
 | Danmokou (Unity) | 代码 MIT | 符卡阶段结构 |
 | Skullgirls / Guilty Gear Xrd 的 GDC 演讲 | 公开演讲 | 涂抹帧、有限帧动画、关键帧停顿 |
 | 吸血鬼幸存者 / 哈迪斯 / 杀戮尖塔 | 商业作品（只参考设计） | 波次表、精英节点、预告门、事件取舍 |
+| Danmakufu ph3（touhougc） | NYSL（相当于“随便用”） | Plural/Single 符卡分层、cut-in 惯例（只参考结构，没用脚本或素材） |
+| LuaSTG Sub / THlib (gitlab.com/luastg-community/luastg-sub) | 引擎 MIT；THlib 素材另行授权（未使用） | 自机切帧规则（待机循环 + 左右倾斜）、boss.card 结构 |
+| Fighter Factory Studio / Ultimate | 免费软件（闭源，没有分发、没有集成） | AIR/SFF 编辑和判定框校对流程（只参考工作流） |
+| MUGEN 文档（Elecbyte）/ mugen-net wiki | 文档 | .air 元素、Clsn1/Clsn2、HitDef（pausetime、hittime、guardflag、animtype） |
+| VampireUnpacker / VS Mod Loader / Bloodlines | 各自仓库许可证（未使用代码或素材） | VS 按分钟的关卡数据格式（minimum、frequency、定时 boss + 宝箱） |

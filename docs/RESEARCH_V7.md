@@ -41,3 +41,49 @@
 2. **波次节奏**（参考吸血鬼幸存者的分钟表）：每个战斗节点分 “集结 → 压力 → 喘息 → 高潮” 4 段，喘息段刷新减半并掉回复；第 60% 时间点出现一只带光环的精英，掉落宝箱。
 3. **场景机关**：灯笼阵（踩到被点燃后，短时间灼烧周围敌人）、鸟居（穿过时获得短暂加速）。这两种机关在各模式都会出现，按主题换皮。
 4. **各模式**：STG 每层安排 1 个中 Boss 加道中精英编队；格斗遵循“前两局普通、Boss 局带新招”；割草按上面的 4 段节奏。
+
+---
+## 补充：社区二创包和 mod 生态调研（落地对照表）
+
+### A. MUGEN 和 Ikemen GO 人物包（.air / .cns / .sff）
+**看了什么**：Elecbyte 官方的 AIR 和 CNS 文档、mugen-net wiki 的 State Controller Reference、Ikemen GO 的 ZSS 文档，以及社区人物包的一般结构（`chars/<名字>/` 下的 `.def`、`.air`、`.cns`、`.cmd`、`.sff`、`.snd`）。
+- **.air 动作表**：`[Begin Action N]` 后面是一串元素，格式为 `组,图,x,y,ticks`（60 tick/秒），可以带 `Loopstart`。每个元素前可以声明 `Clsn1`（红，攻击框）和 `Clsn2`（蓝，受击框）；`Clsn2Default` 对后续帧持续生效。社区约定：攻击框只出现在发生帧（第一帧就带 Clsn1 会变成“无法防御”）；Clsn2 应包住 Clsn1 的根部，这样才会有相杀。
+- **.cns 的 HitDef**：`pausetime = p1,p2`（攻击方冻结帧 / 受击方抖动帧分开）、`ground.hittime` 和 `ground.slidetime`（硬直、后滑）、`guardflag`（H/L/A/M 防御段）、`animtype = Light/Medium/Hard`（受击动作档位）、`sparkxy`（火花位置）、`ground.velocity`（击退）、`air.juggle`（浮空追击点数）。
+- **.cmd**：`command = ~D, DF, F, x` 这类搓招序列，带 `time` 窗口和 `buffer.time`。
+- **社区改造经验**（Fighter Factory、MUGEN Free For All 论坛和 MFG 的教程帖）：(1) 拿到手绘人物包后，常见的“润色”是给轻攻击补收招帧、给重攻击补 1~2 帧过冲帧，把 4 帧的拳改成 6~7 帧；(2) 普遍推荐的 tick 节奏是前摇 2~4 tick/帧，发生帧 2~3 tick，收招 3~5 tick/帧，越重的招收招越长；(3) 受击动作分轻、中、重三档加浮空，按 `animtype` 自动挑选；(4) 判定框要随帧变化，不要一个框用到底。
+- **工具**：Fighter Factory Studio 和 Ultimate（免费软件，闭源；用于编辑 AIR、SFF 和判定框，只作参考工具，不随游戏分发）；Ikemen GO（MIT）可以直接载入 MUGEN 人物包做对照测试。
+
+**落到我们游戏里**：
+- `sakurayo-duel.js` 的 `MV` 本来就是 HitDef 式的数据（`st`/`ac`/`rc` 对应前摇、发生、收招 tick；`hs`/`bs` 对应 hittime 和 guard hittime；`h` 对应 guardflag；`kb` 对应 ground.velocity）。本轮新增的 **`ANIM` 表等同于 .air**：每招分三段列出关键帧，按段内 tick 均分、硬切显示；每个角色补了 8 张关键帧（lp_s、lp_r、hp_r、dp_r、super_r、rush_r、throw_s、jatk_s）。
+- **Clsn 调试叠加层**：`o.clsn` 或 `window.__duelClsn = 1` 时绘制蓝色受击框（站立 220 / 蹲 130）和红色攻击框（只在发生帧，宽度等于 reach、高度以 y 为中心），沿用 MUGEN 的红蓝配色约定，方便逐帧校对。
+- **pausetime 分离**：受击方在 hitstop 期间左右抖动 ±4px（对应 p2 shaketime 的视觉部分），攻击方冻结。我试过让受击方多停 2 帧，但会让连段计时和平衡跑偏（Boss 胜率测试越界），所以只保留了视觉抖动。
+- 受击 squash、发生帧 stretch、残影、刀光，对应社区包里常见的 `Explod` 特效和 `AfterImage` 控制器，这里改成程序化实现。
+
+### B. 东方二创 STG：Danmakufu ph3、LuaSTG Sub、THP 和弹幕脚本库
+- **Danmakufu ph3**（NYSL 许可证，相当于“随便用”）：脚本按 `#TouhouDanmakufu[Single/Plural/Stage]` 分层，`Plural` 把多张 `Single` 串成 Boss 战，每张卡有 `SetTimer`、`SetLife`、符卡奖励和 `ObjCutin`。社区的“立绘 + cut-in 库”（如 Sparen 教程里的 cutin 函数）统一采用：宣言时大立绘从侧面斜入、0.5~1s 后淡出，并配符卡名横幅。
+- **LuaSTG Sub 和 THlib**（引擎 MIT）：自机定义包含 `imgs`（待机 8 帧循环 + 左右倾斜各 4 帧过渡，横移时按速度切帧）、`hspeed` 和 `lspeed`（高速、低速），以及判定点精灵；Boss 卡用 `boss.card.New(name, t1, t2, t3, hp, drop, is_extra)` 描述。LuaSTG Editor Sharp 是可视化关卡编辑器。
+- **THP / 东方吧社区二创**：自机精灵普遍是 32×48 到 64×64 的 Q 版，Boss 也用同规格的 Q 版精灵加符卡立绘。我们原来直接缩小大立绘当自机，正是“看着难受”的原因。
+
+**落到我们游戏里**：
+- 自机和 Boss 改成 **Q 版飞行精灵**（`art/shmup/chibi_{sayo,aya,rion,boss1-3}_{idle0,idle1,left,right}.webp`），按 LuaSTG 的规则切帧：横移速度平滑后超过阈值切左、右倾斜帧，否则 2 帧飘动（自机 6fps，Boss 4fps）。生成用 gpt-image-2，以原立绘为参考先出 Q 版主帧，再以主帧为底链式生成其他帧，保证一致；后处理脚本是 `tools/stg_post.py`。
+- **符卡、Bomb cut-in**（`cut_*.webp`）：按 Danmakufu cutin 惯例，宣言时斜切面板从侧边滑入、停 0.6s、淡出，Boss 从右侧进、自机从左侧进。
+- 符卡数据结构（name、time、hp、无伤无 Bomb 收取奖励）原本就与 `boss.card.New` 同构，这次没有改动。
+
+### C. 吸血鬼幸存者类：mod 和关卡数据
+- **VS 的数据驱动关卡**：社区解包工具（VampireUnpacker）和 mod 生成器显示，关卡是 JSON 里按分钟划分的条目：`minute` → `enemies[]`、`minimum`（场上保底数量）、`frequency`（刷新间隔）、`bosses[]`（定时精英，带宝箱），外加 `events`（蝙蝠群、花墙等环绕刷怪）。VS Mod Loader 是用 JS 钩子改写这些表；Bloodlines 是角色包导入器。
+- **社区评价**（Reddit r/VampireSurvivors、Steam 讨论区）：好关卡的标准是节奏有起伏（压力 → 喘息），每分钟有可预期的新威胁，精英必掉宝箱；场景机关（光源、可破坏物）要给出可见的收益。
+- **Hades**：房间门上的奖励图标（预告）、混沌门（付血换奖励）；**杀戮尖塔**：精英节点、问号事件、路线可预判。这几点社区好评最集中。
+
+**落到我们游戏里**：
+- **波次节奏表** `wavePace46`：每 30 秒一轮，集结 0.85 → 压力 1.25 → 喘息 0.5 → 高潮 1.6，归一化后平均刷怪密度不变（对应 VS 的 minimum 和 frequency 思路，测试的平衡数据不受影响）。
+- **定时精英**：关卡进行到 60% 时必定出现一只“妖气精英”（HP ×1.6），击破掉落宝箱（樱花币 +30 加一圈经验宝石），对应 VS 的定时 boss 带宝箱。
+- **奖励预告**（Hades 门图标）：夜行地图上每个战斗和委托节点都有角标 💠 魂晶 ×1.6 / ❤ 回复 20% / ⬆ 强化 +1 / 🔮 遗物二选一；点选后的详情里也会写出来。
+- **妖气节点**（风险和回报一开始就写明）：约 35% 的第 3 行及以后的战斗节点带 ☠，目标加量（坚守 +15s 或清剿 ×1.4），奖励为魂晶翻倍加遗物二选一。
+- **新事件**：千本鸟居的试炼（-20% 生命换遗物）、狐面赌徒（50/50）、熄灭的灯笼摊（魂晶换回复）。
+- **场景机关**（`sakurayo-props.js`）：灯笼阵（靠近后点燃 4 秒，每 0.5 秒灼烧 150px 范围，冷却 14s）、鸟居（穿过后疾行 3 秒，冷却 10s），与已有的符咒机关、灵龛、宝箱共用同一套 props 管线。
+- STG 道中、格斗局数的节奏沿用 V6（STG 有中 Boss 和符卡阶段；格斗第 2 局起 Boss 学习猜段）。
+
+### D. 没有采用的东西（版权原因）
+- MUGEN 社区人物包里的 SFF 精灵大多是从商业格斗游戏里提取的（KOF、GG、BB），**一张都不用**，只研究了 .air、.cns 的结构和帧数。
+- 东方原作立绘、Danmakufu 社区脚本附带的立绘：不用。弹幕图案全部是我们自己写的数学定义。
+- VS 解包得到的素材和数据：不用，只参考数据格式。

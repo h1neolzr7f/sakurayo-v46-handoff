@@ -55,7 +55,7 @@
   function pickW(r, w) { var t = 0, k; for (k in w) t += w[k]; var x = r() * t; for (k in w) { x -= w[k]; if (x <= 0) return k; } return k; }
 
   function generate(seed) {
-    var r = rng(seed), layers = [];
+    var r = rng(seed), r2 = rng((seed ^ 0x5eed1) >>> 0), layers = []; // r2：奖励预告 / 妖气节点，独立随机流，不改变原地图布局
     for (var L = 0; L < LAYERS; L++) {
       var rows = [];
       for (var row = 0; row < ROWS; row++) {
@@ -64,6 +64,8 @@
           var t = row === 0 ? "fight" : row === ROWS - 1 ? "boss" : row === ROWS - 2 ? (i === 0 ? "shrine" : pickW(r, { shop: 2, fight: 2, event: 1 }))
             : pickW(r, row === 1 ? { fight: 4, event: 2, goal: 2 } : { fight: 3, elite: row >= 2 ? 2 : 0, goal: 2, event: 2, shop: row === 2 ? 1 : 0.5 });
           nodes.push({ id: L + 1 + "-" + row + "-" + i, layer: L + 1, row: row, col: i, type: t, x: 8 + row * (84 / (ROWS - 1)), y: n === 1 ? 50 : 20 + i * (60 / (n - 1)) + (r() - 0.5) * 6, next: [] });
+          var nd0 = nodes[nodes.length - 1];
+          if (t === "fight" || t === "goal") { nd0.reward = pickW(r2, { shards: 3, heal: 2, level: 2, relic: 1 }); if (t === "fight" && row >= 2 && r2() < 0.35) nd0.haunt = 1; } // 哈迪斯式奖励预告门 + 可选的高风险“妖气”节点
         }
         rows.push(nodes);
       }
@@ -102,7 +104,9 @@
   function isMode(t) { return t === "sky" || t === "duel"; }
   function isCombat(t) { return t === "fight" || t === "elite" || t === "goal" || t === "boss"; }
   // Spec consumed by SakurayoLevels.create/tick/rate (ids are "R…" so they never touch main-line stars).
-  function levelSpec(st, nd) {
+  var REWARD = { shards: { i: "💠", n: "魂晶 ×1.6" }, heal: { i: "❤", n: "回复 20%" }, level: { i: "⬆", n: "强化 +1" }, relic: { i: "🔮", n: "遗物二选一" } };
+  function levelSpec(st, nd) { var sp = levelSpec0(st, nd); if (nd.haunt && sp.goal) { sp.haunt = 1; sp.n = "妖气 · " + sp.n; if (sp.goal.t) sp.goal.t += 15; if (sp.goal.n) sp.goal.n = Math.round(sp.goal.n * 1.4); sp.stars[1].v = 8; } return sp; }
+  function levelSpec0(st, nd) {
     var L = nd.layer, base = { id: "R" + nd.id, ch: L, run46: true, map: [nd.x, nd.y], stars: [{ k: "win", d: "通关" }, { k: "hits", v: 6, d: "受击 ≤ 6 次" }, { k: "time", v: 90, d: "90 秒内完成" }] };
     if (nd.type === "boss") return Object.assign(base, { n: LAYER_NAMES[L - 1] + " · 层主", type: "boss", boss: true, goal: { bossAt: 14 } });
     if (nd.type === "elite") return Object.assign(base, { n: "精英 · 镜卫", type: "timed", goal: { n: 2, limit: 70, hp: 420 + 160 * L, kind: "elite" } });
@@ -123,6 +127,10 @@
     st.nodesWon++; if (build) st.build = build;
     var gain = Math.round(({ fight: 22, goal: 30, elite: 40, boss: 60, sky: 36, duel: 34 }[nd.type] || 0) * shardMul(st)); st.shards += gain;
     var out = { shards: gain, relicOffer: nd.type === "elite" || nd.type === "boss" || isMode(nd.type) ? relicOffer(st, isMode(nd.type) ? 2 : 3) : null };
+    // 预告奖励兑现；妖气节点（更难）：魂晶翻倍且额外遗物二选一——风险与回报在地图上提前可见
+    if (nd.reward === "shards") { var ex = Math.round(gain * 0.6); st.shards += ex; out.shards += ex; } else if (nd.reward === "heal") st.pending.push({ heal: 0.2 }); else if (nd.reward === "level") st.pending.push({ levels: 1 }); else if (nd.reward === "relic" && !out.relicOffer) out.relicOffer = relicOffer(st, 2);
+    if (nd.haunt && nd.type === "fight") { st.shards += gain; out.shards += gain; if (!out.relicOffer) out.relicOffer = relicOffer(st, 2); }
+    out.reward = nd.reward || null;
     if (nd.type === "boss") { if (st.layer >= LAYERS) { st.done = true; st.win = true; out.runWin = true; } else { st.layer++; st.at = null; out.nextLayer = st.layer; } }
     return out;
   }
@@ -142,6 +150,9 @@
       var ev = [
         { t: "无人的手水舍", d: "水面映出的不是你。", o: [{ k: "heal", n: "掬水", d: "回复 25% 生命" }, { k: "shards", v: 35, n: "捞起水底的魂晶", d: "魂晶 +35，生命 -10%", hp: -0.1 }] },
         { t: "迷路的狐面孩子", d: "「姐姐，带我去鸟居好吗？」", o: [{ k: "relic", n: "陪他走一段", d: "获得随机遗物，生命 -15%", hp: -0.15 }, { k: "shards", v: 15, n: "指路", d: "魂晶 +15" }] },
+        { t: "千本鸟居的试炼", d: "朱红的鸟居一路向上。走到尽头的人能带走一样东西。", o: [{ k: "relic", n: "登上去", d: "获得随机遗物，生命 -20%", hp: -0.2 }, { k: "heal", n: "在山脚歇脚", d: "回复 25% 生命" }] },
+        { t: "狐面赌徒", d: "「猜猜哪只手里有魂晶？猜错可要付点代价。」", o: [{ k: "gamble", n: "赌一把", d: "50%：魂晶 +60；50%：生命 -15%" }, { k: "leave", n: "不赌", d: "什么也不发生" }] },
+        { t: "熄灭的灯笼摊", d: "摊主不见了，柜台上留着一盏还温热的灯笼。", o: [{ k: "shards", v: -25, n: "留下魂晶买走", d: "魂晶 -25，回复 30% 生命", heal: 0.3 }, { k: "leave", n: "离开", d: "" }] },
         { t: "镜面裂缝的低语", d: "它说它能让你更强——代价是一部分的你。", o: [{ k: "level", n: "接受", d: "获得 2 次强化，最大生命 -10", lv: 2, maxHp: -10 }, { k: "leave", n: "拒绝", d: "什么也不发生" }] }
       ];
       var e = ev[Math.floor(r() * ev.length)]; nd.eventTitle = e.t; nd.eventText = e.d; return e.o;
@@ -155,7 +166,8 @@
     if (opt.maxHp) st.pending.push({ maxHp: opt.maxHp });
     if (opt.k === "heal") st.pending.push({ heal: nd.type === "shrine" ? 0.35 : nd.type === "shop" ? 0.3 : 0.25 });
     else if (opt.k === "level") st.pending.push({ levels: opt.lv || 1 });
-    else if (opt.k === "shards") st.shards += opt.v;
+    else if (opt.k === "shards") { if (opt.v < 0 && st.shards < -opt.v) return { ok: false, why: "魂晶不足" }; st.shards += opt.v; if (opt.heal) st.pending.push({ heal: opt.heal }); }
+    else if (opt.k === "gamble") { var gr = rng(st.seed ^ (st.path.length * 40503)); if (gr() < 0.5) { st.shards += 60; return { ok: true, won: true }; } st.pending.push({ heal: -0.15 }); return { ok: true, won: false }; }
     else if (opt.k === "form") { var FM = global.SakurayoForms, r2 = FM && FM.switchTo(st, opt.id, "node", st.build && st.build.up ? Object.keys(st.build.up) : []); if (!r2) return { ok: false, why: "本层已经换过面具了" }; return { ok: true, form: opt.id }; }
     else if (opt.k === "relic") { var id = opt.id || (relicOffer(st, 1)[0] || {}).id; if (id) gainRelic(st, id); return { ok: true, relic: id }; }
     return { ok: true };
@@ -198,5 +210,5 @@
   }
   // meta reward when the run ends (sakura coins); per-node coin rewards are paid by the normal result flow
   function runReward(st) { var won = st.nodesWon || 0; return st.win ? 300 + 60 * LAYERS : Math.round((300 + 60 * (st.layer - 1)) * Math.min(0.9, Math.max(0.4, won / (LAYERS * ROWS)))); }
-  global.SakurayoRun = { ROUTES: ROUTES, BOSS_MODES: BOSS_MODES, route: route, bossModes: bossModes, isSky: isSky, isMode: isMode, LAYERS: LAYERS, ROWS: ROWS, NODE: NODE, RELICS: RELICS, LAYER_NAMES: LAYER_NAMES, MOVES: MOVES, generate: generate, create: create, node: node, available: available, canEnter: canEnter, enter: enter, isCombat: isCombat, levelSpec: levelSpec, complete: complete, options: options, choose: choose, relic: relic, relicOffer: relicOffer, gainRelic: gainRelic, applyPending: applyPending, snapshot: snapshot, restore: restore, sanitize: sanitize, runReward: runReward };
+  global.SakurayoRun = { ROUTES: ROUTES, BOSS_MODES: BOSS_MODES, route: route, bossModes: bossModes, isSky: isSky, isMode: isMode, LAYERS: LAYERS, ROWS: ROWS, NODE: NODE, REWARD: REWARD, RELICS: RELICS, LAYER_NAMES: LAYER_NAMES, MOVES: MOVES, generate: generate, create: create, node: node, available: available, canEnter: canEnter, enter: enter, isCombat: isCombat, levelSpec: levelSpec, complete: complete, options: options, choose: choose, relic: relic, relicOffer: relicOffer, gainRelic: gainRelic, applyPending: applyPending, snapshot: snapshot, restore: restore, sanitize: sanitize, runReward: runReward };
 })(typeof window !== "undefined" ? window : globalThis);
