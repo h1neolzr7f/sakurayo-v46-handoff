@@ -14,7 +14,7 @@ for (let L = 1; L <= 3; L++) {
   console.log(`duel L${L}: foe ${a.w.toFixed(2)} (med ${a.med.toFixed(0)}s), boss ${b.w.toFixed(2)} (med ${b.med.toFixed(0)}s), max combo ${Math.max(a.combo, b.combo)}`);
 }
 { const f = rate({ layer: 3, power: 2.2, full: true }, 12); assert.ok(f.med >= 25 && f.min >= 12, 'full build vs normal foe still has exchanges: median ' + f.med.toFixed(1)); console.log('duel full build vs normal foe: median', f.med.toFixed(1), 's, min', f.min.toFixed(1));
-  const b = rate({ layer: 3, power: 2.2, full: true, boss: true }, 24); assert.ok(b.w >= 0.75 && b.w <= 0.92, 'duel boss full-build win rate ' + b.w.toFixed(3)); console.log('duel boss full-build win rate', b.w.toFixed(3)); }
+  const b = rate({ layer: 3, power: 2.2, full: true, boss: true }, 24); assert.ok(b.w >= 0.75 && b.w <= 0.85, 'duel boss full-build win rate ' + b.w.toFixed(3)); console.log('duel boss full-build win rate', b.w.toFixed(3)); }
 for (const w of ks) { const r = D.simulate({ character: 'sayo', seed: 3, layer: 1, weapons: { [w]: { lv: 3 } } }); assert.equal(r.special, w, 'build picks the A-special variant'); }
 { // KOF 系统：搓招解析、取消、投/拆投、防御段位
   const g = new D.Game({ character: 'sayo', seed: 1, layer: 1 }); const P = g.P;
@@ -31,7 +31,7 @@ for (const w of ks) { const r = D.simulate({ character: 'sayo', seed: 3, layer: 
   assert.ok(ev / 300 < PK.COST, 'EV ' + (ev / 300).toFixed(1) + ' < cost'); assert.ok(jack > 0 && jack / 300 < 0.2, 'jackpot rate ' + jack / 300);
   for (const q of PK.PRIZES) assert.deepEqual(Object.keys(q).filter(k => !['id', 'n', 'coins', 'kyo', 'again', 'col'].includes(k)), [], 'prize is currency only');
 }
-console.log('PASS modes unit: pachinko lottery + KOF duel (commands/cancel/block heights, win rates per layer, boss 75–92%), ratio', rd.toFixed(2));
+console.log('PASS modes unit: pachinko lottery + KOF duel (commands/cancel/block heights, win rates per layer, boss 75–85%), ratio', rd.toFixed(2));
 { // 路线：弹珠节点已移出夜行地图；路线决定 Boss 推荐模式与遗物池
   vm.runInContext(fs.readFileSync('src/runtime/sakurayo-run.js', 'utf8'), ctx); const R = ctx.SakurayoRun;
   for (let s = 1; s <= 20; s++) { const st = R.create(s, 'sayo', s % 2 ? 'tech' : 'bio'); assert.ok(!JSON.stringify(st.map).includes('"pin"'), 'no pin nodes'); const rp = R.route(st).relics; assert.ok(R.relicOffer(st, 3).every(q => rp.includes(q.id)), 'route relic pool'); }

@@ -80,6 +80,7 @@
     var m = MV[name]; if (!m) return false; var E = this.opp(f);
     if (m.meter && f.meter < 1) return false; if (m.meter) f.meter -= 1;
     if (m.c === 2 && f.mv && f.mv.c === 2) f.chain++; else if (!f.mv || f.mv.c !== 2) f.chain = 1;
+    if (m.h && m.h !== "throw") { var Eh = this.opp(f).habit; if (Eh) { if (m.h === "low") Eh.low++; else Eh.high++; } }
     f.mv = m; f.mn = name; f.mf = 0; f.hit = false; f.st = m.air ? "air" : "move"; f.multi = 0;
     if (m.inv) f.inv = m.inv; if (name === "hp" && f.o.armorHP && !f.armorUsed) { f.armor = 1; }
     if (m.su) { this.freeze = 36; this.fx.push({ k: "super", f: f, t: 0, life: 0.9 }); this.banner = { s: f === this.P ? this.ch.S + (this.route === "tech" ? " · MAX" : "") : CH[f.cid].S, t: 0, life: 1.1, side: f.side }; }
@@ -131,17 +132,23 @@
     var eAtt = pe && pe.mv && pe.mf < pe.mvst + pe.mvac, eLow = pe && pe.h === "low", eOver = pe && pe.h === "over", eAir = pe && pe.y < -10, eRec = E.mv && E.mf >= E.mv.st + E.mv.ac && !E.hit && E.y === 0;
     var meterOK = f.meter >= 1;
     if (f.st === "thrown") { if (r() < B.tech) out.btns.push("T"); return out; }
-    if (f.st === "down") { if (r() < 0.3) out.btns.push("L"); return out; }
+    if (f.st === "down") { if (B.tele && dist < 140 && f.stT >= 10 && !f.wake) { f.wake = 1; out.btns.push(f.meter >= 1 && r() < 0.5 ? "SU" : "DP"); return this.aiFix(f, out); } if (r() < 0.3) out.btns.push("L"); return out; } // Boss 起身无敌技（升龙 / 超必）
+    f.wake = 0;
     if (f.st === "block" || f.st === "hitstun") { out.dir = f.blockH === "low" ? 1 : 4; if (f.st === "block" && meterOK && f.stT > 3 && r() < 0.012 * (B.tele ? 2 : 1)) { out.dir = 6; out.btns.push("T"); } return out; }
     // 连段确认：命中后在取消窗口里接必杀 / 超必
     if (f.st === "move" && f.hit && f.mv && !f.comboPlan) { f.comboPlan = r() < B.combo ? (meterOK && (f.mv.sp || r() < 0.5) ? "S" : f.mv.c === 2 && f.chain < 2 ? (r() < 0.5 ? "chain" : "hp") : "sp") : "none"; }
     if (f.st === "move" && f.hit && f.comboPlan && f.comboPlan !== "none" && f.mf >= f.mv.st + 1) { var pl = f.comboPlan; f.comboPlan = "none";
       if (pl === "S" && this.canCancel(f, "su")) out.btns.push("SU"); else if (pl === "chain") out.btns.push(f.mn === "clp" ? "L" : "L"), out.dir = f.mn === "clp" ? 2 : 5; else if (pl === "hp") out.btns.push("H"); else if (this.canCancel(f, "sp")) { out.btns.push("SP"); if (dist > 140 || !CH[f.cid].proj) { out.btns.pop(); out.dir = 4; out.btns.push("B_"); } } return this.aiFix(f, out); }
     if (f.st !== "move") f.comboPlan = null;
+    if (B.tele && f.st === "move" && f.mv && f.mv.c === 2 && E.st === "block" && f.mf >= f.mv.st + f.mv.ac && !f.trap) { f.trap = 1; out.btns.push(r() < 0.5 ? "H" : "L"); out.dir = r() < 0.4 ? 2 : 5; return this.aiFix(f, out); } // Boss 压制：被防后接打帧陷阱
+    if (f.st !== "move") f.trap = 0;
     if (!this.actionable(f) && f.st !== "air") return out;
     if (f.st === "air") { if (!f.mv && dist < 120 && f.vy > -100 && r() < 0.25) out.btns.push(r() < 0.6 ? "H" : "L"); return out; }
-    // 防御（读段）
-    if (eAtt && dist < 230 && r() < B.block) { out.dir = eLow ? 1 : eOver ? 4 : (r() < 0.5 ? 4 : 1); if (eOver) out.dir = 4; if (eLow) out.dir = 1; return out; }
+    // Boss 识破飞行道具：来弹时跳过去（顺势跳攻）或用无敌升龙穿过；有气时直接超必杀穿弹
+    if (B.tele) { var inc = this.shots.find(function (q) { return q.owner !== f && Math.abs(q.x - f.x) < 260 && (q.x - f.x) * q.vx < 0; }); if (inc && r() < 0.5) { if (f.meter >= 1 && dist < 330 && r() < 0.35) out.btns.push("SU"); else if (Math.abs(inc.x - f.x) < 150 && r() < 0.5) out.btns.push("DP"); else out.dir = 9; return this.aiFix(f, out); } }
+    // 防御（读段）；Boss 记录玩家出招的高低段习惯，猜段按习惯来（学习型防御），第 2 局起反应更快
+    var habit = f.habit || (f.habit = { low: 1, high: 1 }), blk = B.block + (B.tele ? 0.06 * (this.round - 1) : 0);
+    if (eAtt && dist < 230 && r() < blk) { out.dir = eLow ? 1 : eOver ? 4 : (B.tele ? (habit.low > habit.high ? 1 : 4) : (r() < 0.5 ? 4 : 1)); if (eOver) out.dir = 4; if (eLow) out.dir = 1; return out; }
     // 对空
     if (eAir && dist < 210 && dist > 30 && E.vy > -200 && (E.x - f.x) * f.face > 0 && r() < B.aa * 0.12) { out.btns.push("DP"); return this.aiFix(f, out); }
     // 确反
