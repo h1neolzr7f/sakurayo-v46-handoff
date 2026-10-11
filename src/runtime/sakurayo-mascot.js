@@ -67,6 +67,13 @@
   function resolve(setting, selected) { setting = normalize(setting); return setting === "follow" ? selected : setting; }
   function next(setting) { var i = IDS.indexOf(normalize(setting)); return IDS[(i + 1) % IDS.length]; }
   var lastLine = "", timer = 0;
+  /* 气泡避让 Logo / 指挥室标题：相交就下移到它们下方（只改这一个气泡的 top） */
+  function avoid(menu, b) {
+    b.style.left = ""; b.style.right = ""; var r = b.getBoundingClientRect(), mr = menu.getBoundingClientRect(), x = 0;
+    menu.querySelectorAll(".coverTitle36,#commandHeading47,#syTod").forEach(function (e) { var q = e.getBoundingClientRect(); if (q.height && q.right > r.left && q.left < r.right && q.bottom > r.top && q.top < r.bottom) x = Math.max(x, q.right); });
+    if (x) { b.style.left = (x - mr.left + 10) + "px"; b.style.right = "auto"; }
+  }
+
   function say(menu, id, name, kind) {
     if (!menu) return "";
     var b = menu.querySelector(".mascotBubble46");
@@ -76,6 +83,7 @@
     lastLine = line;
     b.innerHTML = "<b>" + String(name || "").replace(/[<>&]/g, "") + "</b>" + line;
     b.classList.add("on");
+    avoid(menu, b);
     clearTimeout(timer);
     timer = setTimeout(function () { b.classList.remove("on"); }, 2600);
     return line;

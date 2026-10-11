@@ -10,6 +10,7 @@ const drawer=k=>async p=>{await T(p,'openDrawer',k);await W(p,900);};
 const S={
   rotate:{vps:[VP_P],go:async p=>{await W(p,600);const r=await p.evaluate(()=>{const e=document.getElementById('syRotate');const c=e&&getComputedStyle(e);return {on:!!(e&&e.classList.contains('on')),display:c&&c.display,blocked:!!window.__syRotateBlocked,top:document.elementFromPoint(195,422)?.closest('#syRotate')?true:false};});if(!r.on||r.display==='none'||!r.blocked||!r.top)throw new Error('竖屏旋转提示未生效 '+JSON.stringify(r));}},
   lobby:async p=>{await W(p,600);},
+  lobbynew:async p=>{await p.evaluate(()=>{sessionStorage.setItem('syKeep','1');return localStorage.setItem('sakurayoV3',JSON.stringify({coins:0,unlock:1,done:[],tutorialDone:true,character:'sayo'}))});await p.reload();await p.locator('.bootArt35').waitFor({state:'detached',timeout:15000});await W(p,1200);await p.evaluate(()=>{const h=document.querySelector('.heroTap46,#heroTap46');h&&h.click();});await W(p,500);},
   stage:drawer('stage'),story:drawer('story'),talent:drawer('talent'),ach:drawer('ach'),shop:drawer('shop'),gacha:drawer('gacha'),roster:drawer('roster'),trials:drawer('trials'),archive:drawer('archive'),asc:drawer('asc'),
   wardrobe:async p=>{await T(p,'openWardrobe46');await W(p,900);},
   night:async p=>{await T(p,'openNight46');await W(p,900);},
@@ -34,7 +35,7 @@ const S={
 const report={};const b=await chromium.launch({args:['--allow-file-access-from-files']});
 for(const [name,sc] of Object.entries(S)){ if(only&&!only.split(',').includes(name))continue;
  for(const [v,w,h] of (sc.vps||VPS)){const key=`${name}_${v}`;const ctx=await b.newContext({viewport:{width:w,height:h},hasTouch:v!=='d',isMobile:v!=='d'});
-  await ctx.addInitScript({path:path.join(path.dirname(fileURLToPath(import.meta.url)),'ui_audit.js')});await ctx.addInitScript(s=>localStorage.setItem('sakurayoV3',JSON.stringify(s)),SAVE);const p=await ctx.newPage();const errs=[],miss=[];
+  await ctx.addInitScript({path:path.join(path.dirname(fileURLToPath(import.meta.url)),'ui_audit.js')});await ctx.addInitScript(s=>{if(!sessionStorage.getItem('syKeep'))localStorage.setItem('sakurayoV3',JSON.stringify(s));},SAVE);const p=await ctx.newPage();const errs=[],miss=[];
   p.on('pageerror',e=>errs.push(String(e).slice(0,200)));p.on('console',m=>{if(m.type()==='error')errs.push(m.text().slice(0,200));});p.on('requestfailed',r=>miss.push(r.url().split('/').slice(-3).join('/')));p.on('response',r=>{if(r.status()>=400)miss.push(r.status()+' '+r.url().split('/').slice(-3).join('/'));});
   try{await p.goto(URL);await p.locator('.bootArt35').waitFor({state:'detached',timeout:15000});const go=sc.go||sc;await go(p);
    const n=sc.frames||1;for(let i=0;i<n;i++){await p.screenshot({path:`${out}/${key}${n>1?'_'+i:''}.png`});if(i<n-1)await W(p,900);}

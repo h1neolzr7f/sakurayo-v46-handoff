@@ -63,7 +63,7 @@ button.sy-pop{animation:syPop .32s var(--sy-ease-back)}@keyframes syPop{0%{scale
 #menu[data-tod="day"]{--sy-tod:linear-gradient(180deg,rgb(var(--c-n6-rgb) / .35),rgb(var(--c-rare-ssr-rgb) / .1))}
 #menu[data-tod="dusk"]{--sy-tod:linear-gradient(180deg,rgb(var(--c-accent-rgb) / .5),rgb(var(--c-rare-sr-rgb) / .3))}
 #menu[data-tod="night"]{--sy-tod:linear-gradient(180deg,rgb(var(--c-primary-rgb) / .45),rgb(var(--c-n0-rgb) / .35))}
-#syTod{position:absolute;top:calc(env(safe-area-inset-top) + 96px);left:40px;z-index:6;font:italic 700 11px var(--sy-font-title);letter-spacing:.1em;color:var(--sy-c-cyan);background:rgb(var(--c-n0-rgb) / .6);border-left:2px solid var(--sy-c-cyan);padding:2px 10px;pointer-events:none}
+#syTod.inHead{position:relative!important;top:auto!important;left:auto!important;display:block;width:max-content;margin:0 0 4px}#syTod{position:absolute;top:calc(env(safe-area-inset-top) + 96px);left:40px;z-index:6;font:italic 700 11px var(--sy-font-title);letter-spacing:.1em;color:var(--sy-c-cyan);background:rgb(var(--c-n0-rgb) / .6);border-left:2px solid var(--sy-c-cyan);padding:2px 10px;pointer-events:none}
 .sy-roll{display:inline-block;font-variant-numeric:tabular-nums}.sy-roll.up{color:var(--c-rare-ssr);text-shadow:0 0 8px var(--c-rare-ssr)}.sy-roll.down{color:var(--c-accent)}
 @media (prefers-reduced-motion:reduce){#syWipe,.sy-chibi i,.sy-dot{animation:none!important}}
 `;
@@ -110,7 +110,7 @@ button.sy-pop{animation:syPop .32s var(--sy-ease-back)}@keyframes syPop{0%{scale
   // ---------- 11. 昼夜时段 ----------
   function tod(h) { return h >= 5 && h < 8 ? "dawn" : h >= 8 && h < 17 ? "day" : h >= 17 && h < 19 ? "dusk" : "night"; }
   var TODN = { dawn: "SYS 05:00 · 晨间巡逻", day: "SYS 12:00 · 日间值守", dusk: "SYS 18:00 · 黄昏警戒", night: "SYS 00:00 · 夜间作战" };
-  function applyTod(force) { var m = doc.getElementById("menu"); if (!m) return; var t = force || tod(new Date().getHours()); m.dataset.tod = t; var tag = doc.getElementById("syTod"); if (!tag) { tag = doc.createElement("div"); tag.id = "syTod"; m.appendChild(tag); } tag.textContent = TODN[t]; }
+  function applyTod(force) { var m = doc.getElementById("menu"); if (!m) return; var t = force || tod(new Date().getHours()); m.dataset.tod = t; var tag = doc.getElementById("syTod"); if (!tag) { tag = doc.createElement("div"); tag.id = "syTod"; m.appendChild(tag); } tag.textContent = TODN[t]; var hd = doc.getElementById("commandHeading47"); if (hd && tag.parentNode !== hd) { hd.insertBefore(tag, hd.firstChild); tag.classList.add("inHead"); } }
   // ---------- 7. 红点 → 灯笼 ----------
   function lanternDots(root) { (root || doc).querySelectorAll("[data-open]").forEach(function (b) { var dot = b.querySelector(".dot, .red, .badgeDot, .newDot, i.n"), want = !!dot || b.classList.contains("has-new") || b.dataset.new === "1"; var has = b.querySelector(".sy-dot"); if (dot) dot.style.opacity = "0"; if (want && !has) { var s = doc.createElement("span"); s.className = "sy-dot"; b.appendChild(s); } else if (!want && has) has.remove(); }); }
   // ---------- 初始化 ----------
@@ -122,7 +122,7 @@ button.sy-pop{animation:syPop .32s var(--sy-ease-back)}@keyframes syPop{0%{scale
     doc.addEventListener("click", function (e) { if (e.target.closest("[data-open], #levelMapBtn46, #pachiBtn46, [data-k=node]")) { transition(); blip("open"); } }, true);
     ["coins", "shopCoins", "tcoins"].forEach(function (id) { watchNumber(doc.getElementById(id)); });
     var boot = doc.getElementById("bootArt35"); if (boot) boot.appendChild(chibi("再等一下下……正在擦亮镜子。", "sayo"));
-    applyTod(); setInterval(applyTod, 60000);
+    applyTod(); setTimeout(applyTod, 1200); setTimeout(applyTod, 4000); setInterval(applyTod, 60000);
     var pend = 0; new MutationObserver(function () { if (pend) return; pend = setTimeout(function () { pend = 0; decorateEmpty(); lanternDots(); }, 250); }).observe(doc.body, { childList: true, subtree: true }); /* 节流：战斗中 DOM 变化频繁 */ decorateEmpty(); lanternDots();
   }
   if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", init); else init();
