@@ -160,7 +160,7 @@
   d.getElementById('commandActivity48').style.backgroundImage='linear-gradient(90deg,#14283dbb,#14283d30),url("'+activityArt+'")';
   d.getElementById('commandHeading47').querySelector('b').textContent='回收行动局';
   d.getElementById('commandProgress47').textContent='章节 '+model.completed+'/4 · 作战 '+(Number(model.save.runs)||0);
-  d.getElementById('commandSignal47').textContent='离线作战就绪 / OFFLINE MODE';
+  d.getElementById('commandSignal47').textContent='离线作战就绪 / OFFLINE MODE · v'+(global.SAKURAYO_DISPLAY_VERSION||'0.9.0-beta');
  }
  global.SakurayoTerminal={css:CSS,icon:icon,decorate:decorate};
 })(window);

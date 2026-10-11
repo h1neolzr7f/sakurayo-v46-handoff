@@ -62,6 +62,7 @@
     clean.runHistory = list(clean.runHistory).filter(object).slice(0,30);
     ['story','forms','fusions','endings','evo46','avgRead46','cg46'].forEach(function (key) {if (!Array.isArray(clean[key])) clean[key] = copy(DEFAULTS[key]);});
     clean.talRefund46 = integer(clean.talRefund46,-1,COUNT_MAX,-1);
+    clean.wishTickets46 = integer(incoming.wishTickets46,0,COUNT_MAX,0); // 内测寻访券（邮件发放，寻访优先消耗）
     clean.season46 = global.SakurayoSeason ? global.SakurayoSeason.sanitize(object(incoming.season46) ? copy(incoming.season46) : null) : (object(incoming.season46) ? copy(incoming.season46) : null);
     clean.pachi46 = object(incoming.pachi46) && incoming.pachi46.day > 0 ? { day: incoming.pachi46.day | 0, free: Math.max(0, Math.min(9, incoming.pachi46.free | 0)), balls: Math.max(0, incoming.pachi46.balls | 0) } : null; // 樱花弹珠台每日次数
     clean.cosmetics46 = global.SakurayoWardrobe ? global.SakurayoWardrobe.sanitize(object(incoming.cosmetics46) ? copy(incoming.cosmetics46) : null) : (object(incoming.cosmetics46) ? copy(incoming.cosmetics46) : null);

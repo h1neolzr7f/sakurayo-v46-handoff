@@ -33,16 +33,25 @@ const S={
   duelcmd:{go:async p=>{await p.evaluate(()=>window.SakurayoDuel.start({character:'aya',seed:3,layer:1,auto:true,skill:0.85,route:'tech',power:1.2}));await W(p,1800);await p.locator('#duel46 .cmdT46').click();await W(p,400);}},
   duel:{frames:3,go:async p=>{await p.evaluate(()=>window.SakurayoDuel.start({character:'sayo',seed:5,layer:2,auto:true,skill:0.85,route:'bio',power:1.2}));await W(p,2500);}},
 };
+/* 横屏纵向滚动白名单：只有真正的长列表允许纵向滚动（理由写在值里），其余弹窗/面板出现纵向滚动即报「竖屏式堆叠」 */
+const VSCROLL_WL={
+ '#mailList46,#mailList46 *':'邮件列表：条数随运营增长，长列表',
+ '.rosterGrid46,.rosterGrid46 *':'干员 / 仓库网格：条目随收集增长',
+ '#storyDrawer .dbody,#storyDrawer .dbody *':'剧情档案：章节回放长列表',
+ '.gachaHistory46,.gachaHistory46 *':'寻访记录：长列表',
+ '#achDrawer .dbody':'成就：长列表',
+};
 const report={};const b=await chromium.launch({args:['--allow-file-access-from-files']});
 for(const [name,sc] of Object.entries(S)){ if(only&&!only.split(',').includes(name))continue;
  for(const [v,w,h] of (sc.vps||VPS)){const key=`${name}_${v}`;const ctx=await b.newContext({viewport:{width:w,height:h},hasTouch:v!=='d',isMobile:v!=='d'});
-  await ctx.addInitScript({path:path.join(path.dirname(fileURLToPath(import.meta.url)),'ui_audit.js')});await ctx.addInitScript(s=>{if(!sessionStorage.getItem('syKeep'))localStorage.setItem('sakurayoV3',JSON.stringify(s));},SAVE);const p=await ctx.newPage();const errs=[],miss=[];
+  await ctx.addInitScript(w=>{window.__syVScrollWL=w;},VSCROLL_WL);await ctx.addInitScript({path:path.join(path.dirname(fileURLToPath(import.meta.url)),'ui_audit.js')});await ctx.addInitScript(s=>{if(!sessionStorage.getItem('syKeep'))localStorage.setItem('sakurayoV3',JSON.stringify(s));},SAVE);const p=await ctx.newPage();const errs=[],miss=[];
   p.on('pageerror',e=>errs.push(String(e).slice(0,200)));p.on('console',m=>{if(m.type()==='error')errs.push(m.text().slice(0,200));});p.on('requestfailed',r=>miss.push(r.url().split('/').slice(-3).join('/')));p.on('response',r=>{if(r.status()>=400)miss.push(r.status()+' '+r.url().split('/').slice(-3).join('/'));});
   try{await p.goto(URL);await p.locator('.bootArt35').waitFor({state:'detached',timeout:15000});const go=sc.go||sc;await go(p);
    const n=sc.frames||1;for(let i=0;i<n;i++){await p.screenshot({path:`${out}/${key}${n>1?'_'+i:''}.png`});if(i<n-1)await W(p,900);}
    const info=await p.evaluate(async()=>{const vw=innerWidth,vh=innerHeight,o=[];document.querySelectorAll('body *').forEach(e=>{if(!e.offsetParent&&getComputedStyle(e).position!=='fixed')return;const c=getComputedStyle(e);if(c.visibility==='hidden'||+c.opacity===0)return;const r=e.getBoundingClientRect();if(!r.width||!r.height)return;
      if(e.children.length===0&&e.textContent.trim()&&(e.scrollWidth>e.clientWidth+2&&c.overflow!=='visible'&&c.textOverflow!=='ellipsis'))o.push('clip:'+(e.id||e.className)+':'+e.textContent.trim().slice(0,16));
      if((e.tagName==='BUTTON')&&(r.right>vw+2||r.bottom>vh+2||r.left<-2||r.top<-2))o.push('offscreen:'+(e.id||e.className||e.textContent.trim().slice(0,10)));
+     if(r.width>40&&r.height>40&&/^(auto|scroll)$/.test(c.overflowY)&&e.scrollHeight>e.clientHeight+4&&e.closest('.drawer:not(.hidden),.modal:not(.hidden),[role=dialog]')){const id='#'+(e.id||e.closest('[id]')?.id||'?')+'.'+String(e.className||'').split(' ')[0];const wl=window.__syVScrollWL||{};if(!Object.keys(wl).some(k=>e.matches(k)))o.push('vscroll:'+id+':'+e.scrollHeight+'>'+e.clientHeight);}
      if(e.tagName==='IMG'&&e.complete&&!e.naturalWidth)o.push('brokenimg:'+(e.getAttribute('src')||'').slice(-40));
      if(e.children.length===0&&/TODO|undefined|NaN|\[object/.test(e.textContent))o.push('placeholder:'+e.textContent.trim().slice(0,30));});
      const t0=performance.now();let f=0;await new Promise(r=>{const step=()=>{f++;performance.now()-t0<1000?requestAnimationFrame(step):r();};requestAnimationFrame(step);});window.__syCanvasText=[];await new Promise(r=>setTimeout(r,700));const au=window.SyAudit?window.SyAudit.audit({touch:matchMedia('(pointer:coarse)').matches}):{fails:[],stats:{}};return {issues:[...new Set(o)].slice(0,30),fps:f,a11y:au.fails,a11yStats:au.stats};});
@@ -50,6 +59,8 @@ for(const [name,sc] of Object.entries(S)){ if(only&&!only.split(',').includes(na
   }catch(e){report[key]={fail:String(e).slice(0,300),errors:errs};try{await p.screenshot({path:`${out}/${key}_FAIL.png`});}catch{}}
   await ctx.close();console.log(key,JSON.stringify(report[key]).slice(0,240));}}
 fs.writeFileSync(`${out}/report.json`,JSON.stringify(report,null,1));await b.close();
+const vs=Object.entries(report).flatMap(([k,v])=>(v.issues||[]).filter(x=>x.startsWith('vscroll:')).map(x=>k+' '+x));
+console.log(`竖屏式堆叠检查（横屏弹窗/面板纵向滚动）：${vs.length} 项`);for(const x of vs)console.log('  '+x);
 const bad=Object.entries(report).filter(([k,v])=>(v.a11y||[]).length);const total=bad.reduce((n,[k,v])=>n+v.a11y.length,0);
 console.log(`a11y 图标/文字检查：${total} 项不达标（${bad.length} 个画面）`);for(const [k,v] of bad)console.log('  '+k+': '+v.a11y.slice(0,40).join(' | '));
 if(process.env.SWEEP_STRICT&&(total||Object.values(report).some(v=>v.fail)))process.exit(1);

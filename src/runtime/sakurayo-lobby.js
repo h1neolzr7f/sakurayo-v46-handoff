@@ -746,7 +746,8 @@
     if (!list.length) {
       return { ok: false, reason: "empty", results: [], coins: coins, pool: pool, pity: save.shop40.ops.pity, pitySR: save.shop40.ops.pitySR, owned: save.shop40.ops.owned };
     }
-    if (coins < cost) {
+    var tickets = Math.max(0, Number(save.wishTickets46) || 0), useTicket = tickets >= n; // 内测寻访券：够数时优先用券
+    if (!useTicket && coins < cost) {
       return { ok: false, reason: "coins", results: [], coins: coins, pool: pool, pity: save.shop40.ops.pity, pitySR: save.shop40.ops.pitySR, owned: save.shop40.ops.owned };
     }
     var rand = typeof rng === "function" ? rng : Math.random;
@@ -759,7 +760,7 @@
     }
     if (n === 10) state.tenPulls += 1;
     state.last = results.slice();
-    save.coins = coins - cost;
+    if (useTicket) save.wishTickets46 = tickets - n; else save.coins = coins - cost;
     return {
       ok: true,
       results: results,
