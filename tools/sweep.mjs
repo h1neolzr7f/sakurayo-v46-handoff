@@ -17,6 +17,12 @@ const S={
     for(let k=0;k<8;k++){const st=await T(p,'runState46');if((st.path||[]).length>=3&&!st.modal)break;if(st.modal){await T(p,'runChoose46',0).catch(()=>{});await T(p,'runSkipModal46').catch(()=>{});continue;}
       const a=st.available||[];const n=a.find(q=>!['sky','duel','boss'].includes(q.type))||a[0];if(!n)break;await T(p,'runEnter46',n.id);await W(p,300);await T(p,'runWinNode46').catch(()=>{});await T(p,'runContinue46').catch(()=>{});await clean();}
     await clean();await p.evaluate(()=>{document.querySelector('#run46')?.classList.remove('hidden');});await W(p,900);},
+  levelmap:async p=>{await p.evaluate(()=>document.getElementById('levelMapBtn46')?.click());await W(p,900);},
+  shateki:async p=>{await T(p,'openPachi46',{seed:3});await W(p,500);await T(p,'pachiFire46',0.5,0.4).catch(()=>{});await W(p,700);},
+  avg:async p=>{await T(p,'selectStage',1);await T(p,'start');await W(p,2200);await p.evaluate(()=>{const a=document.querySelector('#dialogue .dialogueArt');if(a){/* nudge repaint after avg preload */ a.style.opacity=.999;requestAnimationFrame(()=>a.style.opacity='');}});await W(p,400);},
+  mow:{frames:3,go:async p=>{await T(p,'selectStage',2);await T(p,'start');await T(p,'dismissDialogue');await T(p,'realtime46');await W(p,2500);}},
+  levelup:async p=>{await T(p,'selectStage',1);await T(p,'start');await T(p,'dismissDialogue');await T(p,'realtime46');await W(p,1500);await T(p,'triggerUpgrade');await W(p,800);},
+  result:async p=>{await T(p,'selectStage',1);await T(p,'start');await T(p,'dismissDialogue');await T(p,'realtime46');await W(p,800);await T(p,'finishNow46',true);await W(p,2200);},
   bosspick:async p=>{await T(p,'runStart46',7);for(let k=0;k<30;k++){const st=await T(p,'runState46');if(st.modal?.kind==='bossmode')break;
     if(st.modal){await T(p,'runChoose46',0).catch(()=>{});await T(p,'runSkipModal46').catch(()=>{});continue;}
     if(['play','sky','duel'].includes(st.mode)){await T(p,'runWinNode46').catch(()=>{});await T(p,'runContinue46').catch(()=>{});continue;}
