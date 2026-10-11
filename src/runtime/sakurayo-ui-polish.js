@@ -16,10 +16,10 @@
 --sy-ease-out:cubic-bezier(.22,1,.36,1);--sy-ease-back:cubic-bezier(.34,1.56,.64,1);--sy-t-fast:.12s;--sy-t-mid:.28s;
 --sy-font-title:"SyTitleEn","SyTitleSC","Noto Sans SC",sans-serif;--sy-cut:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px)}
 /* 2. 按钮微动效：悬停上浮 + 光泽扫过，按下回弹压缩 */
-button:not(.sy-nofx){transition:transform var(--sy-t-fast) var(--sy-ease-out),filter var(--sy-t-fast),box-shadow var(--sy-t-mid);will-change:transform}
-@media (hover:hover){button:not(.sy-nofx):not(:disabled):hover{transform:translateY(-2px);filter:brightness(1.08)}}
-button:not(.sy-nofx):not(:disabled):active,button.sy-press{transform:translateY(1px) scale(.95)!important;filter:brightness(.95)}
-button.sy-pop{animation:syPop .32s var(--sy-ease-back)}@keyframes syPop{0%{transform:scale(.92)}60%{transform:scale(1.05)}100%{transform:scale(1)}}
+button:not(.sy-nofx){transition:scale var(--sy-t-fast) var(--sy-ease-out),translate var(--sy-t-fast) var(--sy-ease-out),filter var(--sy-t-fast),box-shadow var(--sy-t-mid)}
+@media (hover:hover){button:not(.sy-nofx):not(:disabled):hover{translate:0 -2px;filter:brightness(1.08)}}
+button:not(.sy-nofx):not(:disabled):active,button.sy-press{translate:0 1px;scale:.95;filter:brightness(.95)}
+button.sy-pop{animation:syPop .32s var(--sy-ease-back)}@keyframes syPop{0%{scale:.92}60%{scale:1.05}100%{scale:1}} /* 用独立的 scale/translate 属性，不覆盖元素自身用 transform 做的定位（地图节点等） */
 .go,.levelMapBtn46{position:relative;overflow:hidden}
 .go::after,.levelMapBtn46::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.35) 48%,transparent 66%);transform:translateX(-120%);pointer-events:none}
 @media (hover:hover){.go:hover::after,.levelMapBtn46:hover::after{transform:translateX(120%);transition:transform .6s var(--sy-ease-out)}}
