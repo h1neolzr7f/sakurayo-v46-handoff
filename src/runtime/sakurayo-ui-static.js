@@ -194,6 +194,23 @@ html body #hud #minimap46{top:calc(env(safe-area-inset-top,0px) + 172px)!importa
 html body .banter{top:calc(env(safe-area-inset-top,0px) + 252px)!important;bottom:auto!important;left:10px!important;right:10px!important;width:auto!important;transform:none!important} /* 竖屏对白气泡原来贴在技能键上 */}
 /* 技能键文字：标签放在菱形键下方居中，不再溢出到键外 */
 html body #hud .act{font-size:10px!important;line-height:1.15!important;letter-spacing:0!important;white-space:normal;word-break:keep-all;padding:0 6px!important}
+/* 夜行地图弹窗（遗物、事件、商店、Boss 三选一）：外层全屏遮罩原来也套了面板样式，右上角多出一个方框；卡片还是旧版紫色圆角。统一成 v2 */
+html body:not(#sy0):not(#sy1) #run46 .rm46{background:radial-gradient(ellipse at 50% 55%,rgb(var(--c-primary-rgb) / .1),rgb(var(--c-n0-rgb) / .82) 70%)!important;border:0!important;box-shadow:none!important;clip-path:none!important}
+html body:not(#sy0):not(#sy1) #run46 .rm46::before,html body:not(#sy0):not(#sy1) #run46 .rm46::after{display:none!important}
+html body:not(#sy0):not(#sy1) #run46 .rm46>div{width:min(760px,92vw);max-height:calc(100dvh - 24px);overflow-y:auto;padding:22px 26px;border-radius:0!important;background:var(--sy-scan),var(--sy-glass)!important;border:1px solid var(--c-line)!important;border-top:3px solid var(--c-primary)!important;box-shadow:var(--sy-shadow)!important;clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,22px 100%,0 calc(100% - 22px))}
+html body:not(#sy0):not(#sy1) #run46 .rm46 small{color:var(--c-primary)!important;font-weight:700}
+html body:not(#sy0):not(#sy1) #run46 .rm46 h3{color:var(--c-n6)!important;font-size:26px!important}
+html body:not(#sy0):not(#sy1) #run46 .rm46 p{color:var(--c-n5)!important}
+html body:not(#sy0):not(#sy1) #run46 .rm46 .opts button{border-radius:0!important;background:linear-gradient(180deg,var(--c-surface-2),var(--c-surface-1))!important;border:1px solid var(--c-line)!important;border-top:3px solid var(--c-line)!important;color:var(--c-n6)!important;outline:0!important;box-shadow:none!important;clip-path:polygon(0 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%);transition:translate .15s,box-shadow .15s}
+html body:not(#sy0):not(#sy1) #run46 .rm46 .opts button:hover{translate:0 -3px;border-top-color:var(--c-primary)!important}
+html body:not(#sy0):not(#sy1) #run46 .rm46 .opts button.rec{border-top-color:var(--c-accent)!important;background:linear-gradient(180deg,rgb(var(--c-accent-rgb) / .16),var(--c-surface-1) 55%)!important;box-shadow:0 0 0 1px rgb(var(--c-accent-rgb) / .6),0 0 18px rgb(var(--c-accent-rgb) / .25)!important}
+html body:not(#sy0):not(#sy1) #run46 .rm46 .opts i{width:44px;height:44px;display:grid!important;place-items:center;font-size:22px!important;color:var(--c-primary);background:rgb(var(--c-primary-rgb) / .12);clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);margin-bottom:8px}
+html body:not(#sy0):not(#sy1) #run46 .rm46 .opts button.rec i{color:var(--c-accent);background:rgb(var(--c-accent-rgb) / .14)}
+html body:not(#sy0):not(#sy1) #run46 .rm46 .opts b{color:var(--c-n6)!important;font-size:17px!important}
+html body:not(#sy0):not(#sy1) #run46 .rm46 .opts span{color:var(--c-n5)!important}
+html body:not(#sy0):not(#sy1) #run46 .rm46 .opts em{color:var(--c-primary)!important}
+html body:not(#sy0):not(#sy1) #run46 .rm46 .skip{border-radius:0!important;background:transparent!important;border:1px solid var(--c-line)!important;color:var(--c-n5)!important}
+@media (max-width:520px){html body:not(#sy0):not(#sy1) #run46 .rm46 .opts{grid-template-columns:1fr!important}html body:not(#sy0):not(#sy1) #run46 .rm46 .opts button{min-height:0!important;display:grid!important;grid-template-columns:44px 1fr;column-gap:12px;align-items:center}html body:not(#sy0):not(#sy1) #run46 .rm46 .opts i{grid-row:span 2;margin:0}}
 `;
   var st = document.createElement("style"); st.id = "syStatic"; st.textContent = css; document.head.appendChild(st);
   // 底栏选中态：最近打开的入口保持高亮，直到它的面板关掉

@@ -19,7 +19,10 @@ const S={
   mow:{frames:3,go:async p=>{await T(p,'selectStage',2);await T(p,'start');await T(p,'dismissDialogue');await T(p,'realtime46');await W(p,2500);}},
   levelup:async p=>{await T(p,'selectStage',1);await T(p,'start');await T(p,'dismissDialogue');await T(p,'realtime46');await W(p,1500);await T(p,'triggerUpgrade');await W(p,800);},
   result:async p=>{await T(p,'selectStage',1);await T(p,'start');await T(p,'dismissDialogue');await T(p,'realtime46');await W(p,800);await T(p,'finishNow46',true);await W(p,2200);},
-  bosspick:async p=>{await T(p,'runStart46',7);for(let k=0;k<14;k++){let st=await T(p,'runState46');if(st.modal?.kind==='bossmode')break;if(st.modal){await T(p,'runChoose46',0).catch(()=>{});continue;}const n=(st.available||[]).find(q=>!['sky','duel'].includes(q.type))||st.available?.[0];if(!n)break;await T(p,'runEnter46',n.id);st=await T(p,'runState46');if(st.modal?.kind==='bossmode')break;if(st.mode==='play'||st.mode==='sky'){await T(p,'runWinNode46').catch(()=>{});await W(p,300);await T(p,'runContinue46').catch(()=>{});}else await T(p,'runChoose46',0).catch(()=>{});}await W(p,800);},
+  bosspick:async p=>{await T(p,'runStart46',7);for(let k=0;k<30;k++){const st=await T(p,'runState46');if(st.modal?.kind==='bossmode')break;
+    if(st.modal){await T(p,'runChoose46',0).catch(()=>{});await T(p,'runSkipModal46').catch(()=>{});continue;}
+    if(['play','sky','duel'].includes(st.mode)){await T(p,'runWinNode46').catch(()=>{});await T(p,'runContinue46').catch(()=>{});continue;}
+    await p.evaluate(()=>{try{window.SakurayoDuel?.stop?.()}catch(e){}try{window.SakurayoShmup?.stop?.()}catch(e){}document.querySelectorAll('#duel46,#shm46').forEach(e=>e.remove());});const a=st.available||[];const n=a.find(q=>q.type==='boss')||a.find(q=>!['sky','duel'].includes(q.type))||a[0];if(!n)break;await T(p,'runEnter46',n.id);}await W(p,900);},
   shmup:{frames:3,go:async p=>{await p.evaluate(()=>window.SakurayoShmup.start({character:'sayo',seed:9,layer:3,kind:'boss',auto:true,skill:0.6,route:'tech',power:1.2}));await W(p,2500);}},
   duel:{frames:3,go:async p=>{await p.evaluate(()=>window.SakurayoDuel.start({character:'sayo',seed:5,layer:2,auto:true,skill:0.85,route:'bio',power:1.2}));await W(p,2500);}},
 };
