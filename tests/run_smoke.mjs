@@ -42,7 +42,7 @@ await page.click('#runBtn46');
 // walk until the next combat node, resolving non-combat nodes; check carry-over
 let combat = null, sawModal = false;
 for (let k = 0; k < 6 && !combat; k++) {
-  st = await api('runState46'); const n = st.available[0];
+  st = await api('runState46'); const n = st.available.find(q => !['sky', 'duel'].includes(q.type)) || st.available[0];
   await api('runEnter46', n.id); st = await api('runState46');
   if (st.mode === 'play') combat = n; else { assert.ok(st.modal && st.modal.n >= 1, 'non-combat node shows choices'); sawModal = true; await api('runChoose46', 0); st = await api('runState46'); if (st.modal) await api('runSkipModal46'); }
 }
@@ -54,7 +54,7 @@ await api('runWinNode46'); await api('runContinue46'); st = await api('runState4
 await page.evaluate(() => { const R = window.SakurayoRun; }); 
 const dmg0 = st.build ? null : null;
 // lose the next combat node → run ends with a coin settlement
-for (let k = 0; k < 8; k++) { st = await api('runState46'); const n = st.available[0]; await api('runEnter46', n.id); st = await api('runState46'); if (st.mode === 'play') break; await api('runChoose46', 0); st = await api('runState46'); if (st.modal) await api('runSkipModal46'); }
+for (let k = 0; k < 8; k++) { st = await api('runState46'); const n = st.available.find(q => !['sky', 'duel'].includes(q.type)) || st.available[0]; await api('runEnter46', n.id); st = await api('runState46'); if (st.modal?.kind === 'bossmode') { await api('runBossMode46', 'mow'); st = await api('runState46'); } if (st.mode === 'play') break; await api('runChoose46', 0); st = await api('runState46'); if (st.modal) await api('runSkipModal46'); }
 const coins0 = st.coins; await api('runLoseNode46'); st = await api('runState46');
 assert.equal(st.active, false, 'run cleared after defeat'); assert.equal(st.saved, false); assert.ok(st.coins > coins0, 'run settlement paid');
 assert.match(await page.locator('#runRes46').innerText(), /夜行中断/);

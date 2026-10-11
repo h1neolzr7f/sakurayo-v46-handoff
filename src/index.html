@@ -189,7 +189,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 <script src="runtime/sakurayo-levels.js"></script>
 <script src="runtime/sakurayo-forms.js"></script>
 <script src="runtime/sakurayo-shmup.js"></script>
-<script src="runtime/sakurayo-pinball.js"></script>
+<script src="runtime/sakurayo-pachinko.js"></script>
 <script src="runtime/sakurayo-duel.js"></script>
 <script src="runtime/sakurayo-run.js"></script>
 <script src="runtime/sakurayo-avg.js"></script>
@@ -4192,6 +4192,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (has("transform") && ["dmg", "multi", "pierce"].includes(u.id))
       w *= 0.45;
     if (u.weapon46 && globalThis.SakurayoWeapons) { if (evolvesNext46(u)) w += 6; else if (globalThis.SakurayoWeapons.level(P, u.weapon46) > 0) w = Math.max(w, 2.2); }
+    if (u.weapon46 && inRun46() && window.SakurayoRun) w *= ({3:1.8,1:0.55})[window.SakurayoRun.route(run46).up[u.weapon46]] || 1; // 路线倾向：科技线多出激光/追踪/浮游炮，生物线多出散射/贯穿/爆裂
     return Math.max(0.08, w);
   }
   function pickWeighted(arr) {
@@ -6501,6 +6502,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       }
     }
     if(P.form46&&P.form46.tint){const t=P.form46.tint,aw=P.form46.slot==="awaken",pu=.5+.5*Math.sin((runTime||0)*3);ctx.save();const g=ctx.createRadialGradient(0,4,4,0,4,aw?64:50);g.addColorStop(0,t+"88");g.addColorStop(1,t+"00");ctx.fillStyle=g;ctx.globalAlpha=.55+pu*.15;ctx.beginPath();ctx.ellipse(0,4,aw?64:50,aw?22:17,0,0,TAU);ctx.fill();ctx.restore();ctx.filter=`drop-shadow(0 0 ${aw?7:4}px ${t})`;}
+    if(P.form46&&inRun46()&&window.SakurayoRun){const rt=window.SakurayoRun.route(run46),tt=runTime||0;ctx.save();ctx.globalAlpha=.7;ctx.strokeStyle=rt.tint;ctx.lineWidth=1.6; // 路线形态表现：科技线 = 旋转的符文电路六角环；生物线 = 脉动的血藤荆棘
+      if(rt.id==="tech"){for(let k=0;k<6;k++){const a0=tt*1.2+k*TAU/6,r=42;ctx.beginPath();ctx.moveTo(Math.cos(a0)*r,4+Math.sin(a0)*r*.36);ctx.lineTo(Math.cos(a0+TAU/6)*r,4+Math.sin(a0+TAU/6)*r*.36);ctx.stroke();ctx.fillStyle=rt.tint;ctx.fillRect(Math.cos(a0)*r-1.5,4+Math.sin(a0)*r*.36-1.5,3,3);}}
+      else{const pu=1+.12*Math.sin(tt*5);for(let k=0;k<5;k++){const a0=k*TAU/5+tt*.4;ctx.beginPath();ctx.moveTo(0,8);ctx.quadraticCurveTo(Math.cos(a0+.6)*26*pu,8+Math.sin(a0+.6)*10,Math.cos(a0)*46*pu,6+Math.sin(a0)*16*pu);ctx.stroke();ctx.fillStyle=rt.tint;ctx.beginPath();ctx.arc(Math.cos(a0)*46*pu,6+Math.sin(a0)*16*pu,2.4,0,TAU);ctx.fill();}}
+      ctx.restore();}
     ctx.drawImage(image,-ox,-oy,vis,vis);ctx.filter="none";
     { const L=[[ATK_FRAMES46,(P.atkClock46||0)*ATK_FPS46],[RUN_FRAMES46,(P.runClock46||0)*RUN_FPS46],[IDLE_FRAMES46,(runTime||0)*IDLE_FPS46]].find(q=>q[0].includes(pose46)); const F=L&&L[0], ai=F?F.indexOf(pose46):-1; if(ai>=0){ const ph=L[1]%1; if(ph>.6){ const nx=charAnimImage35(c,F[(ai+1)%F.length],sk); if(nx&&artReady(nx)&&nx!==image){ const a0=ctx.globalAlpha; ctx.globalAlpha=a0*((ph-.6)/.4); ctx.drawImage(nx,-ox,-oy,vis,vis); ctx.globalAlpha=a0; } } } }
     if((P.outfitFade||0)>0){
@@ -7413,6 +7418,15 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
   document.addEventListener("click",e=>{if(e.target.closest("#levelMapBtn46")){openLevelMap46();}});
   (function(){const b=document.createElement("button");b.className="levelMapBtn46";b.id="levelMapBtn46";b.type="button";b.innerHTML="<b>主线关卡</b><small>章节地图 · 三星评价</small>";modeRow46().appendChild(b);})();
+  /* 樱花弹珠台：活动抽奖小游戏（runtime/sakurayo-pachinko.js）。每日免费 1 球，之后每球 80 樱花币；奖品只有货币/镜屑/再来一球。 */
+  function pachiSt46(){const d=new Date(),day=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();let p=save.pachi46;if(!p||typeof p!=="object"||p.day!==day)p=save.pachi46={day,free:1,balls:0};return p;}
+  function openPachi46(o={}){const PK=window.SakurayoPachinko;if(!PK)return null;
+    return PK.start({seed:o.seed,auto:o.auto,ticket:()=>({free:pachiSt46().free,coins:save.coins}),
+      pay:()=>{const p=pachiSt46();if(p.free>0){p.free--;p.balls++;persist();return true;}if(save.coins<PK.COST)return false;save.coins-=PK.COST;p.balls++;persist();return true;},
+      onPrize:q=>{if(q.coins)save.coins+=q.coins;if(q.kyo){const w=wardrobe46?.();if(w)w.kyo=(w.kyo||0)+q.kyo;}if(q.again)pachiSt46().free++;persist();toast(`樱花弹珠台：${q.n}`);menuUpdate?.();},
+      onClose:()=>menuUpdate?.()});}
+  document.addEventListener("click",e=>{if(e.target.closest("#pachiBtn46"))openPachi46();});
+  setTimeout(()=>{if(!$("#pachiBtn46")){const b=document.createElement("button");b.className="levelMapBtn46";b.id="pachiBtn46";b.type="button";b.innerHTML="<b>樱花弹珠台</b><small>活动抽奖 · 每日免费 1 球</small>";modeRow46().appendChild(b);}},0);
   function modeRow46(){let r=$("#modeRow46");if(!r){r=document.createElement("div");r.id="modeRow46";}const deck=$(".tacticalDeck48")||$("#menu");if(r.parentElement!==deck)deck.appendChild(r);return r;}
 
   /* ===== 夜行 · 肉鸽一局（runtime/sakurayo-run.js，DESIGN_V5 §3.2 / 路线图 P0） ===== */
@@ -7421,7 +7435,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function runPersist46(){if(run46)run46.modal=runModal46||null;save.run46=run46&&!run46.done?run46:null;persist();}
   function runLoad46(){if(!run46&&save.run46&&window.SakurayoRun){run46=window.SakurayoRun.sanitize(JSON.parse(JSON.stringify(save.run46)));runModal46=run46?.modal||null;}return run46;}
   function runHp46(){const b=run46?.build;return b?{hp:Math.max(0,Math.round(b.hp)),max:Math.round(b.maxHp)}:{hp:100,max:100};}
-  function startRun46(seed,opt={}){const R=window.SakurayoRun;if(!R)return null;const D=opt.daily&&window.SakurayoSeason?window.SakurayoSeason.daily():null;if(D){save.character=D.character;seed=D.seed;}run46=R.create(seed,save.character||"sayo");run46.abyss=D?D.abyss:Math.max(0,opt.abyss|0);if(D)run46.daily={day:D.day,mod:D.mod.id};runNode46=null;runPick46=null;runModal46=null;runPersist46();openRun46();return run46;}
+  var nightRoute46="tech";
+  function startRun46(seed,opt={}){const R=window.SakurayoRun;if(!R)return null;const D=opt.daily&&window.SakurayoSeason?window.SakurayoSeason.daily():null;if(D){save.character=D.character;seed=D.seed;}run46=R.create(seed,save.character||"sayo",opt.route||nightRoute46);run46.abyss=D?D.abyss:Math.max(0,opt.abyss|0);if(D)run46.daily={day:D.day,mod:D.mod.id};runNode46=null;runPick46=null;runModal46=null;runPersist46();openRun46();return run46;}
   function abandonRun46(){if(!run46)return;run46.done=true;const coins=window.SakurayoRun.runReward(run46);save.coins+=coins;run46=null;save.run46=null;persist();closeRun46();toast(`夜行结束，结算 🌸 ${coins}`);menuUpdate?.();}
   function openRun46(){
     if(!runLoad46())return false;
@@ -7429,7 +7444,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if(!el){el=document.createElement("section");el.id="run46";el.className="screen hidden";document.body.appendChild(el);
       el.addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(!b||b.disabled)return;const k=b.dataset.k,v=b.dataset.v;
         if(k==="close")closeRun46();else if(k==="node"){runPick46=v;paintRun46();sound?.("click");}else if(k==="unpick"){runPick46=null;paintRun46();}
-        else if(k==="go")runEnter46(v);else if(k==="opt")runChoose46(+v);else if(k==="relic")runTakeRelic46(v);else if(k==="skip"){runModal46=null;runPersist46();paintRun46();}
+        else if(k==="go")runEnter46(v);else if(k==="opt")runChoose46(+v);else if(k==="relic")runTakeRelic46(v);else if(k==="bmode")runBossMode46(v);else if(k==="skip"){runModal46=null;runPersist46();paintRun46();}
         else if(k==="abandon"){if(b.dataset.sure)abandonRun46();else{b.dataset.sure=1;b.textContent="再点一次确认放弃";}}});}
     $("#menu").classList.add("hidden");el.classList.remove("hidden");paintRun46();return true;
   }
@@ -7457,6 +7472,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
   function runModalHtml46(){
     const m=runModal46;if(!m)return "";
+    if(m.kind==="bossmode"){const R=window.SakurayoRun,rt=R.route(run46);return `<div class="rm46 bm46"><div><small>${rt.i} ${htmlEscape(rt.n)} · 层主战</small><h3>选择迎战方式</h3><p>三种都能打赢本层层主；路线推荐的模式会获得构筑的完整映射。</p><div class="opts">${R.bossModes(run46).map(o=>`<button data-k="bmode" data-v="${o.k}" class="${o.rec?"rec":""}"><i>${o.i}</i><b>${htmlEscape(o.n)}${o.rec?" · 推荐":""}</b><span>${htmlEscape(o.d)}</span></button>`).join("")}</div></div></div>`;}
     if(m.kind==="relic")return `<div class="rm46"><div><small>遗物 · 三选一</small><h3>${htmlEscape(m.title||"选择一件遗物")}</h3><div class="opts">${m.offer.map(q=>`<button data-k="relic" data-v="${q.id}"><i>${q.i}</i><b>${htmlEscape(q.n)}</b><span>${htmlEscape(q.d)}</span></button>`).join("")}</div><button class="skip" data-k="skip">放弃</button></div></div>`;
     const R=window.SakurayoRun,nd=R.node(run46,m.node),T=R.NODE[nd.type];
     return `<div class="rm46"><div><small>${T.i} ${T.n}</small><h3>${htmlEscape(nd.eventTitle||T.n)}</h3><p>${htmlEscape(nd.eventText||T.d)}</p><div class="opts ${nd.type==="mask"?"forms":""}">${m.opts.map((o,i)=>`<button data-k="opt" data-v="${i}" ${o.cost&&run46.shards<o.cost||m.used?.includes(i)?"disabled":""} ${o.k==="form"?`style="--t:${window.SakurayoForms.get(o.id).tint}"`:""}>${o.k==="form"?`<img src="${artUrl(window.SakurayoForms.get(o.id).art)}" alt="">`:""}<b>${htmlEscape(o.n)}${o.cost?` <em>💠${o.cost}</em>`:""}</b><span>${htmlEscape(o.d)}</span></button>`).join("")}</div>${nd.type==="shop"?"":""}</div></div>`;
@@ -7464,10 +7480,14 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function runEnter46(id){
     const R=window.SakurayoRun;if(!run46||!R.canEnter(run46,id))return false;
     const nd=R.enter(run46,id);runPick46=null;
+    if(nd.type==="boss"&&!nd.mode){runModal46={kind:"bossmode",node:nd.id};runPersist46();paintRun46();return true;} // Boss 前三选一：割草 / 格斗 / 弹幕（路线只决定推荐项）
+    if(nd.type==="boss"&&nd.mode!=="mow"){runPersist46();launchSky46(nd,{as:nd.mode});return true;}
     if(R.isCombat(nd.type)){runPersist46();launchRunNode46(nd);return true;}
     if(R.isMode&&R.isMode(nd.type)){runPersist46();launchSky46(nd);return true;}
     runModal46={node:nd.id,opts:R.options(run46,nd),used:[]};runPersist46();paintRun46();return true;
   }
+  function runBossMode46(k){const R=window.SakurayoRun;if(!run46||runModal46?.kind!=="bossmode")return false;const nd=R.node(run46,runModal46.node);if(!nd||!R.BOSS_MODES.some(m=>m.k===k))return false;
+    nd.mode=k;runModal46=null;runPersist46();if(k==="mow")launchRunNode46(nd);else launchSky46(nd,{as:k});return true;}
   function runApplyBuildNow46(){/* event/shop effects that touch HP are shown on the map right away */
     if(!run46?.build)return;const b=run46.build;for(const q of run46.pending){if(q.heal)b.hp=Math.max(1,Math.min(b.maxHp,b.hp+b.maxHp*q.heal));if(q.maxHp){b.maxHp=Math.max(40,b.maxHp+q.maxHp);b.hp=Math.min(b.hp,b.maxHp);}}
     run46.pending=run46.pending.filter(q=>!q.heal&&!q.maxHp);
@@ -7485,12 +7505,12 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   /* 镜空节点：纵版射击（runtime/sakurayo-shmup.js）。构筑武器/形态/生命带入，结束后生命写回构筑并走同一套节点结算。 */
   let sky46=null;
   function launchSky46(nd,opts={}){
-    const R=window.SakurayoRun,SH={sky:window.SakurayoShmup,pin:window.SakurayoPinball,duel:window.SakurayoDuel}[nd.type];if(!SH)return false;
+    const R=window.SakurayoRun,as=opts.as||nd.type,SH={sky:window.SakurayoShmup,duel:window.SakurayoDuel}[as];if(!SH)return false;const isBoss=nd.type==="boss";
     const b=run46.build||{},FM=window.SakurayoForms,fm=run46.form&&FM?FM.get(run46.form.id):null;
     $("#run46")?.classList.add("hidden");runNode46=nd;
     sky46=SH.start({character:run46.character||save.character||"sayo",seed:(run46.seed^(nd.layer*7919+nd.row*131+nd.col))>>>0,layer:nd.layer,
       form:fm?{slot:fm.slot,name:fm.name,tint:fm.tint}:null,weapons:b.weapons46||{},hpFrac:b.maxHp?b.hp/b.maxHp:run46.hpFrac??1,power:1+0.06*(run46.nodesWon||0),
-      art:p=>artUrl(p),auto:!!opts.auto,okText:"返回夜行地图",boss:nd.type==="duel"&&nd.layer>=3,kind:nd.type==="sky"&&nd.layer>=3?"boss":undefined,
+      art:p=>artUrl(p),auto:!!opts.auto,okText:"返回夜行地图",boss:as==="duel"&&(isBoss||nd.layer>=3),kind:as==="sky"&&(isBoss||nd.layer>=3)?"boss":undefined,route:R.route(run46).id,
       onClose:r=>skyDone46(nd,r)});
     return true;
   }
@@ -7509,7 +7529,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     return {coins,notes};}
   function kyoGain46(type){const W=window.SakurayoWardrobe,w=wardrobe46();if(!W||!w)return 0;const g=W.gainKyo(w,type);if(g){toast(`镜屑 +${g}（本周 ${w.kyoGot}/${W.KYO_WEEK_CAP}）`);persist();}return g;}
   function noteRunForms46(){const W=window.SakurayoWardrobe,w=wardrobe46(),st=run46?.form;if(!W||!w||!st)return;const ids=new Set([st.id,...(st.history||[]).flatMap(h=>[h.from,h.to])].filter(Boolean));ids.forEach(id=>W.noteFormUse(w,id));}
-  function modeCur46(){return [window.SakurayoShmup,window.SakurayoPinball,window.SakurayoDuel].find(m=>m?.current())||null;}
+  function modeCur46(){return [window.SakurayoShmup,window.SakurayoDuel].find(m=>m?.current())||null;}
   function skyDone46(nd,r){
     const R=window.SakurayoRun;sky46=null;if(!run46)return;
     const b=run46.build?JSON.parse(JSON.stringify(run46.build)):null;if(b&&b.maxHp)b.hp=Math.max(1,Math.round(b.maxHp*r.hpFrac));else run46.hpFrac=r.hpFrac;
@@ -7642,14 +7662,17 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     let el=$("#night46");if(!el){el=document.createElement("div");el.id="night46";document.body.appendChild(el);}
     el.innerHTML=`<div class="box"><header><b>夜行</b><button class="x" data-nx>✕</button></header>
       <div class="cards"><div class="nc"><small>常夜 / 深渊夜</small><div class="ab"><button data-na="-1" ${nightAbyss46<=0?"disabled":""}>◀</button><b>${ab.label}</b><button data-na="1" ${nightAbyss46>=s.abyssMax?"disabled":""}>▶</button></div>
-        <p>${nightAbyss46?`敌人生命 ×${ab.hp.toFixed(2)} · 结算樱花币 ×${ab.coins.toFixed(2)}`:"标准难度。通关解锁深渊夜 1。"}<br>已解锁至 深渊夜 ${s.abyssMax}</p><button class="go" data-ngo>出发（${htmlEscape(CHN[save.character||"sayo"]||"")}）</button></div>
+        <p>${nightAbyss46?`敌人生命 ×${ab.hp.toFixed(2)} · 结算樱花币 ×${ab.coins.toFixed(2)}`:"标准难度。通关解锁深渊夜 1。"}<br>已解锁至 深渊夜 ${s.abyssMax}</p><div class="rt">${Object.values(window.SakurayoRun.ROUTES).map(q=>`<button data-nroute="${q.id}" class="${nightRoute46===q.id?"on":""}" style="--t:${q.tint}" title="${htmlEscape(q.d)}">${q.i} ${htmlEscape(q.n)}</button>`).join("")}</div><button class="go" data-ngo>出发（${htmlEscape(CHN[save.character||"sayo"]||"")}）</button></div>
       <div class="nc daily"><small>每日挑战 · ${new Date().toLocaleDateString()}</small><b>${CHN[D.character]} · ${htmlEscape(D.mod.n)}</b><p>${htmlEscape(D.mod.d)}<br>固定地图 · 深渊夜 ${D.abyss} · 到达第 2 层即得 🌸 ${D.reward}</p><button class="go" data-ndaily ${done?"disabled":""}>${done?"今日已完成":"挑战"}</button></div>
       <div class="nc season"><small>百夜行纪 · 第 ${s.season} 期</small><b>Lv ${lv} / ${S.LV_MAX}</b><div class="bar"><i style="width:${lv>=S.LV_MAX?100:(s.xp%S.XP_PER)}%"></i></div><p>节点、Boss、玩法节点与通关都会累积行纪经验。奖励只有樱花币与称号。${s.titles.length?`<br>称号：${s.titles.map(htmlEscape).join(" · ")}`:""}</p><button class="go" data-nclaim ${s.claimed>=lv?"disabled":""}>${s.claimed>=lv?"暂无可领取":`领取 ${lv-s.claimed} 级奖励`}</button></div></div></div>`;
     el.classList.remove("hidden");return true;}
-  document.addEventListener("click",e=>{const t=e.target.closest("#night46 [data-nx],#night46 [data-na],#night46 [data-ngo],#night46 [data-ndaily],#night46 [data-nclaim]");if(!t)return;const el=$("#night46");
+  document.addEventListener("click",e=>{const t=e.target.closest("#night46 [data-nroute],#night46 [data-nx],#night46 [data-na],#night46 [data-ngo],#night46 [data-ndaily],#night46 [data-nclaim]");if(!t)return;const el=$("#night46");
+    if(t.dataset.nroute){nightRoute46=t.dataset.nroute;openNight46();return;}
     if(t.dataset.nx!==undefined)el.classList.add("hidden");else if(t.dataset.na){nightAbyss46=Math.max(0,nightAbyss46+Number(t.dataset.na));openNight46();}
     else if(t.dataset.ngo!==undefined){el.classList.add("hidden");startRun46(undefined,{abyss:nightAbyss46});}else if(t.dataset.ndaily!==undefined){el.classList.add("hidden");startRun46(0,{daily:true});}else if(t.dataset.nclaim!==undefined){seasonClaim46();openNight46();}});
   style37.textContent+=`.heroVid46{position:absolute;inset:0;pointer-events:auto}.heroVid46 video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:50% 100%;opacity:0;transition:opacity .18s linear}.heroVid46 video.on{opacity:1}`;
+  style37.textContent+=`#night46 .rt{display:flex;gap:6px;margin:6px 0}#night46 .rt button{flex:1;padding:6px;border-radius:8px;border:1px solid var(--t);background:#0006;color:#fff;opacity:.6}#night46 .rt button.on{opacity:1;background:color-mix(in srgb,var(--t) 30%,#0008);box-shadow:0 0 10px var(--t)}.bm46 .opts button.rec{outline:2px solid #ffd76a;box-shadow:0 0 16px #ffd76a88}`;
+  style37.textContent+=`#pachi46{position:fixed;inset:0;z-index:140;background:#05030acc;display:grid;place-items:center}#pachi46 .pf{background:#160c26;border:1px solid #ff9ec766;border-radius:14px;padding:8px;display:flex;flex-direction:column;gap:6px;max-height:96vh}#pachi46 header{display:flex;align-items:center;gap:8px;color:#fff}#pachi46 header small{color:#ffc4e6;flex:1}#pachi46 .x{background:none;border:0;color:#fff;font-size:18px}#pachi46 canvas{height:min(80vh,600px);aspect-ratio:3/5;border-radius:10px}#pachi46 footer{display:flex;align-items:center;gap:8px;color:#ccc}#pachi46 .go{padding:8px 22px;border-radius:999px;border:0;background:linear-gradient(#ff8ac4,#d64d91);color:#fff;font-weight:700}`;
   style37.textContent+=`#night46{position:fixed;inset:0;z-index:130;background:#08050fcc;display:grid;place-items:center;padding:12px}#night46.hidden{display:none}#night46 .box{width:min(980px,100%);max-height:100%;overflow:auto;background:#1a1228;border:1px solid #ffffff22;border-radius:16px;padding:12px 16px}#night46 header{display:flex}#night46 header b{flex:1;font-size:20px}#night46 .x{background:none;border:0;color:#fff;font-size:20px}#night46 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:8px}#night46 .nc{background:#251a38;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;border:1px solid #ffffff18}#night46 .nc small{color:#c9b8e8}#night46 .nc b{font-size:17px}#night46 .nc p{font-size:12px;color:#d8cdea;flex:1;margin:0}#night46 .ab{display:flex;align-items:center;gap:10px}#night46 .ab button{width:34px;height:30px;border-radius:8px;border:0;background:#3a2c55;color:#fff}#night46 .go{padding:9px;border-radius:10px;border:0;background:linear-gradient(135deg,#6a3cff,#ff5fae);color:#fff;font-weight:bold}#night46 .go:disabled{background:#4a3c60;color:#bba}#night46 .daily{border-color:#ffd76a55}#night46 .bar{height:8px;background:#ffffff22;border-radius:4px;overflow:hidden}#night46 .bar i{display:block;height:100%;background:#ffd76a}`;
   function paintRunBtn46(){modeRow46();const b=$("#runBtn46");if(!b)return;const r=runLoad46();b.innerHTML=r?`<b>继续夜行</b><small>第 ${r.layer} 层 · 💠 ${r.shards}</small>`:`<b>夜行 · 肉鸽</b><small>三层地图 · 构筑跨节点</small>`;}
   (function(){const b=document.createElement("button");b.className="levelMapBtn46 runBtn46";b.id="runBtn46";b.type="button";modeRow46().prepend(b);paintRunBtn46();})();
@@ -7863,9 +7886,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       openEvoCodex46(){return openEvoCodex46();},
       rebootSave46(){return JSON.parse(JSON.stringify(bootLoadSave()));},
       skyEnter46(auto=true,type="sky"){if(!run46)return null;const R=window.SakurayoRun;let nd=R.available(run46).find(n=>n.type===type)||null;
-        if(!nd){/* 测试捷径：把当前位置放到通往本层该节点的上一行 */const rows=run46.map[run46.layer-1],sk=rows.flat().find(n=>n.type===type),pre=sk&&rows[sk.row-1].find(n=>n.next.includes(sk.id));if(!pre)return null;run46.at=pre.id;nd=sk;}R.enter(run46,nd.id);launchSky46(nd,{auto});return nd.id;},
+        if(!nd){/* 测试捷径：把当前位置放到通往本层该节点的上一行 */const rows=run46.map[run46.layer-1],sk=rows.flat().find(n=>n.type===type),pre=sk&&rows[sk.row-1].find(n=>n.next.includes(sk.id));if(!pre)return null;run46.at=pre.id;nd=sk;}if(type==="boss"){runEnter46(nd.id);return nd.id;}R.enter(run46,nd.id);launchSky46(nd,{auto});return nd.id;},
+      bossModeAuto46(k){const R=window.SakurayoRun;if(runModal46?.kind!=="bossmode")return false;const nd=R.node(run46,runModal46.node);nd.mode=k;runModal46=null;runPersist46();if(k==="mow"){launchRunNode46(nd);return true;}return launchSky46(nd,{as:k,auto:true});},
       skyState46(){const g=modeCur46()?.current();return g?g.snapshot():null;},
-      skyStep46(sec=1,dt=1/60){const SH=modeCur46(),g=SH?.current();if(!g)return null;for(let t=0;t<sec&&!g.done;t+=dt){if(SH===window.SakurayoPinball&&g.canShoot()&&!g.done)window.SakurayoPinball.autoTurn(g);SH.step(dt);}return g.snapshot();},
+      skyStep46(sec=1,dt=1/60){const SH=modeCur46(),g=SH?.current();if(!g)return null;for(let t=0;t<sec&&!g.done;t+=dt){SH.step(dt);}return g.snapshot();},
       skyClose46(){const ok=document.querySelector("#shm46 .res .ok,#pin46 .res .ok,#duel46 .res .ok");if(ok){ok.click();return true;}return false;},
       openWardrobe46(tab){return openWardrobe46(tab);},
       openNight46(){return openNight46();},
@@ -7892,7 +7916,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       launchLevel46(id){return launchLevel46(id);},
       runStart46(seed){return !!startRun46(seed);},
       runState46(){const r=run46||runLoad46();return {active:!!r,mode:state,screen:!$("#run46")?.classList.contains("hidden"),layer:r?.layer||0,at:r?.at||null,path:r?[...r.path]:[],shards:r?.shards||0,relics:r?[...r.relics]:[],pending:r?JSON.parse(JSON.stringify(r.pending)):[],available:r?window.SakurayoRun.available(r).map(n=>({id:n.id,type:n.type})):[],modal:runModal46?{kind:runModal46.kind||"node",n:(runModal46.offer||runModal46.opts||[]).length}:null,build:r?.build?{level:r.build.level,hp:r.build.hp,maxHp:r.build.maxHp,up:Object.keys(r.build.up||{}).length,weapons:Object.keys(r.build.weapons46||{})}:null,node:activeLevel46?.run46?activeLevel46.id:null,player:{level:P.level,hp:P.hp,maxHp:P.maxHp,dmg:P.dmg,up:Object.keys(P.up||{}).length},saved:!!save.run46,coins:save.coins,talRefund46:save.talRefund46};},
-      runEnter46(id){return runEnter46(id);},
+      openPachi46(o){const g=openPachi46(o||{});return !!g;},pachiFire46(x){const g=window.SakurayoPachinko?.current();if(!g)return false;if(x!=null)g.aim(x);return g.fire();},pachiStep46(sec=1){const g=window.SakurayoPachinko?.current();if(!g)return null;for(let t=0;t<sec;t+=1/60)g.step(1/60);return {got:g.got.map(q=>q.id),st:pachiSt46(),coins:save.coins};},pachiClose46(){window.SakurayoPachinko?.stop();return true;},
+      runEnter46(id){return runEnter46(id);},runBossMode46(k){return runBossMode46(k);},runRoute46(r){if(r)nightRoute46=r;return run46?.route||nightRoute46;},
       runChoose46(i){return runChoose46(i);},
       runTakeRelic46(id){return runTakeRelic46(id);},
       runSkipModal46(){runModal46=null;runPersist46();paintRun46();return true;},

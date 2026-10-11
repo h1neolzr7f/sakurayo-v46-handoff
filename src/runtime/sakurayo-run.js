@@ -13,12 +13,22 @@
     event: { n: "事件", i: "❔", d: "镜界里的偶遇，选项有得有失。" },
     shop: { n: "商店", i: "🏮", d: "用魂晶购买治疗、强化与遗物。" },
     shrine: { n: "神社", i: "⛩", d: "休整：回复生命或获得一次强化。" },
-    sky: { n: "镜空", i: "✈", d: "纵版射击：乘符纸机穿越镜空裂隙。构筑与形态映射为机体武装，胜利获得魂晶与遗物。" },
-    pin: { n: "镜弹", i: "🎯", d: "弹珠：拖拽弹射自己撞碎镜妖，回合制。构筑变成撞击特效，形态改变球体手感。" },
+    sky: { n: "镜空", i: "✦", d: "弹幕射击：本人飞上镜空，低速显示判定点、擦弹攒符、符卡 Boss。构筑映射为射击方式。" },
     duel: { n: "镜斗", i: "🥋", d: "格斗：与镜中倒影一对一。构筑决定必杀技，形态改变攻防节奏。" },
     mask: { n: "面具摊", i: "🎭", d: "狸老板的面具摊：戴上面具切换形态（每层 1 次）。" },
     boss: { n: "层主", i: "👹", d: "本层 Boss。击破后进入下一层。" }
   };
+  /* 路线（开局选择，整局不变）：科技线 / 生物线。决定 Boss 战默认推荐的模式、遗物池、强化倾向与形态的视觉表现。
+     Boss 前三种模式（割草 / 格斗 / 弹幕）都可以自由选，路线只决定推荐项。 */
+  var ROUTES = {
+    tech: { id: "tech", n: "科技线", i: "⚙", rec: "sky", tint: "#5fd8ff", d: "式神机关与符文电路：激光、追踪、浮游炮。Boss 战推荐弹幕射击。",
+      relics: ["sake", "mirror", "gear", "coil", "lantern", "coin"], up: { laser: 3, homing: 3, orbit: 3, spread: 1, pierce: 1, bomb: 1 } },
+    bio: { id: "bio", n: "生物线", i: "🌿", rec: "duel", tint: "#ff5f7a", d: "血藤、蛊虫与妖化：散射孢子、贯穿荆棘、爆裂瘤。Boss 战推荐格斗。",
+      relics: ["petal", "bell", "omamori", "geta", "vine", "fang"], up: { spread: 3, pierce: 3, bomb: 3, laser: 1, homing: 1, orbit: 1 } }
+  };
+  var BOSS_MODES = [{ k: "mow", n: "割草", i: "⚔", d: "原本的俯视角乱战：走位、拾取、构筑全开。" }, { k: "duel", n: "格斗", i: "🥋", d: "一对一格斗：搓招、连段、超必杀。构筑映射为招式。" }, { k: "sky", n: "弹幕射击", i: "✦", d: "本人飞行的弹幕 STG：低速判定点、擦弹、Bomb、符卡。" }];
+  function route(st) { return ROUTES[st && st.route] || ROUTES.tech; }
+  function bossModes(st) { var rec = route(st).rec; return BOSS_MODES.map(function (m) { return Object.assign({ rec: m.k === rec }, m); }); }
   var LAYER_NAMES = ["神社外街", "雨夜商圈", "黄泉参道"];
   var RELICS = [
     { id: "petal", n: "樱瓣护符", i: "🌸", d: "攻击力 +12%", fx: { dmgMul: 1.12 } },
@@ -28,7 +38,11 @@
     { id: "mirror", n: "裂镜片", i: "🪞", d: "暴击率 +6%", fx: { crit: 0.06 } },
     { id: "omamori", n: "平安守", i: "🧧", d: "每进入战斗节点回复 8% 生命", fx: { nodeHeal: 0.08 } },
     { id: "sake", n: "御神酒", i: "🍶", d: "射速 +8%", fx: { rateMul: 0.926 } },
-    { id: "coin", n: "五円硬币", i: "🪙", d: "魂晶收益 +25%", fx: { shardMul: 1.25 } }
+    { id: "coin", n: "五円硬币", i: "🪙", d: "魂晶收益 +25%", fx: { shardMul: 1.25 } },
+    { id: "gear", n: "式神齿轮", i: "⚙", d: "射速 +10%（科技线）", fx: { rateMul: 0.91 } },
+    { id: "coil", n: "雷符线圈", i: "⚡", d: "暴击率 +8%（科技线）", fx: { crit: 0.08 } },
+    { id: "vine", n: "血藤心", i: "🌿", d: "最大生命 +30（生物线）", fx: { maxHp: 30 } },
+    { id: "fang", n: "妖牙", i: "🦷", d: "攻击力 +10%、移速 +4%（生物线）", fx: { dmgMul: 1.1, spdMul: 1.04 } }
   ];
   var GOALS = [ // objective templates per layer (from SakurayoLevels types)
     [{ type: "escort", goal: { path: [[0.18, 0.5], [0.4, 0.38], [0.62, 0.6], [0.84, 0.48]] }, npc: "miko", n: "送灯" }, { type: "mech", goal: { n: 2 }, n: "符咒机关" }],
@@ -62,17 +76,16 @@
         for (j = 0; j < b.length; j++) if (!a.some(function (q) { return q.next.indexOf(b[j].id) >= 0; })) a[Math.min(a.length - 1, Math.round(j * (a.length - 1) / Math.max(1, b.length - 1)))].next.push(b[j].id);
       }
       rows[2][rows[2].length - 1].type = "mask"; // 每层保证一个面具摊（形态切换，DESIGN_V5 §1.3）
-      rows[3][0].type = "sky";
-      rows[1][rows[1].length - 1].type = "pin"; rows[2][0].type = "duel"; // 每层各一个弹珠/格斗节点（玩法切换，DESIGN_V5 §3） // 每层保证一个镜空节点（纵版射击，DESIGN_V5 路线图 P2）
+      rows[3][0].type = "sky"; rows[2][0].type = "duel"; // 每层各一个弹幕/格斗试炼节点（弹珠已退出夜行地图，改为大厅抽奖小游戏）
       // goal node variant per layer
       rows.forEach(function (rw) { rw.forEach(function (nd) { if (nd.type === "goal") nd.goal = Math.floor(r() * GOALS[L].length); if (nd.type === "fight") nd.fight = r() < 0.5 ? "survive" : "clear"; }); });
       layers.push(rows);
     }
     return layers;
   }
-  function create(seed, character) {
+  function create(seed, character, rt) {
     seed = (seed >>> 0) || ((Date.now() ^ (Math.random() * 1e9)) >>> 0);
-    return { v: 1, seed: seed, character: character || "sayo", map: generate(seed), layer: 1, at: null, path: [], shards: 0, relics: [], pending: [], build: null, hpFrac: 1, done: false, win: false, started: Date.now(), nodesWon: 0, rerolls: 0 };
+    return { v: 1, seed: seed, character: character || "sayo", map: generate(seed), layer: 1, at: null, path: [], shards: 0, relics: [], pending: [], build: null, hpFrac: 1, done: false, win: false, started: Date.now(), nodesWon: 0, rerolls: 0, route: ROUTES[rt] ? rt : "tech" };
   }
   function node(st, id) { for (var L = 0; L < st.map.length; L++) for (var r = 0; r < st.map[L].length; r++) for (var i = 0; i < st.map[L][r].length; i++) if (st.map[L][r][i].id === id) return st.map[L][r][i]; return null; }
   function available(st) {
@@ -86,7 +99,7 @@
   function canEnter(st, id) { return available(st).some(function (n) { return n.id === id; }); }
   function enter(st, id) { if (!canEnter(st, id)) return null; st.at = id; st.path.push(id); return node(st, id); }
   function isSky(t) { return t === "sky"; }
-  function isMode(t) { return t === "sky" || t === "pin" || t === "duel"; }
+  function isMode(t) { return t === "sky" || t === "duel"; }
   function isCombat(t) { return t === "fight" || t === "elite" || t === "goal" || t === "boss"; }
   // Spec consumed by SakurayoLevels.create/tick/rate (ids are "R…" so they never touch main-line stars).
   function levelSpec(st, nd) {
@@ -99,7 +112,7 @@
   function shardMul(st) { return st.relics.reduce(function (m, id) { var r = relic(id); return m * (r && r.fx.shardMul || 1); }, 1); }
   function relic(id) { for (var i = 0; i < RELICS.length; i++) if (RELICS[i].id === id) return RELICS[i]; return null; }
   function relicOffer(st, n) {
-    var r = rng(st.seed ^ (st.path.length * 2654435761)), pool = RELICS.filter(function (q) { return st.relics.indexOf(q.id) < 0; }), out = [];
+    var r = rng(st.seed ^ (st.path.length * 2654435761)), rp = route(st).relics, pool = RELICS.filter(function (q) { return st.relics.indexOf(q.id) < 0 && rp.indexOf(q.id) >= 0; }), out = [];
     while (pool.length && out.length < (n || 3)) out.push(pool.splice(Math.floor(r() * pool.length), 1)[0]);
     return out;
   }
@@ -108,7 +121,7 @@
   function complete(st, nd, win, build) {
     if (!win) { st.done = true; st.win = false; return { over: true }; }
     st.nodesWon++; if (build) st.build = build;
-    var gain = Math.round(({ fight: 22, goal: 30, elite: 40, boss: 60, sky: 36, pin: 32, duel: 34 }[nd.type] || 0) * shardMul(st)); st.shards += gain;
+    var gain = Math.round(({ fight: 22, goal: 30, elite: 40, boss: 60, sky: 36, duel: 34 }[nd.type] || 0) * shardMul(st)); st.shards += gain;
     var out = { shards: gain, relicOffer: nd.type === "elite" || nd.type === "boss" || isMode(nd.type) ? relicOffer(st, isMode(nd.type) ? 2 : 3) : null };
     if (nd.type === "boss") { if (st.layer >= LAYERS) { st.done = true; st.win = true; out.runWin = true; } else { st.layer++; st.at = null; out.nextLayer = st.layer; } }
     return out;
@@ -176,6 +189,8 @@
     ["path", "relics", "pending"].forEach(function (k) { if (!Array.isArray(st[k])) st[k] = []; });
     st.shards = Math.max(0, Math.floor(+st.shards || 0)); st.relics = st.relics.filter(function (id) { return !!relic(id); });
     if (st.at && !node(st, st.at)) st.at = null;
+    if (!ROUTES[st.route]) st.route = "tech"; // 旧存档：没有路线 → 科技线
+    st.map.forEach(function (rows) { rows.forEach(function (rw) { rw.forEach(function (nd) { if (nd.type === "pin") nd.type = "fight"; if (nd.mode && !BOSS_MODES.some(function (m) { return m.k === nd.mode; })) delete nd.mode; }); }); }); // 旧存档里的弹珠节点 → 普通战斗
     st.abyss = Math.max(0, Math.min(10, st.abyss | 0)); if (st.daily && (typeof st.daily !== "object" || !(st.daily.day > 0))) st.daily = null;
     if (st.build && typeof st.build !== "object") st.build = null;
     if (st.form) { st.form = global.SakurayoForms ? global.SakurayoForms.sanitize(st.form, st.character || "sayo") : st.form; if (!st.form) delete st.form; }
@@ -183,5 +198,5 @@
   }
   // meta reward when the run ends (sakura coins); per-node coin rewards are paid by the normal result flow
   function runReward(st) { var won = st.nodesWon || 0; return st.win ? 300 + 60 * LAYERS : Math.round((300 + 60 * (st.layer - 1)) * Math.min(0.9, Math.max(0.4, won / (LAYERS * ROWS)))); }
-  global.SakurayoRun = { isSky: isSky, isMode: isMode, LAYERS: LAYERS, ROWS: ROWS, NODE: NODE, RELICS: RELICS, LAYER_NAMES: LAYER_NAMES, MOVES: MOVES, generate: generate, create: create, node: node, available: available, canEnter: canEnter, enter: enter, isCombat: isCombat, levelSpec: levelSpec, complete: complete, options: options, choose: choose, relic: relic, relicOffer: relicOffer, gainRelic: gainRelic, applyPending: applyPending, snapshot: snapshot, restore: restore, sanitize: sanitize, runReward: runReward };
+  global.SakurayoRun = { ROUTES: ROUTES, BOSS_MODES: BOSS_MODES, route: route, bossModes: bossModes, isSky: isSky, isMode: isMode, LAYERS: LAYERS, ROWS: ROWS, NODE: NODE, RELICS: RELICS, LAYER_NAMES: LAYER_NAMES, MOVES: MOVES, generate: generate, create: create, node: node, available: available, canEnter: canEnter, enter: enter, isCombat: isCombat, levelSpec: levelSpec, complete: complete, options: options, choose: choose, relic: relic, relicOffer: relicOffer, gainRelic: gainRelic, applyPending: applyPending, snapshot: snapshot, restore: restore, sanitize: sanitize, runReward: runReward };
 })(typeof window !== "undefined" ? window : globalThis);
