@@ -25,6 +25,7 @@ const S={
     if(['play','sky','duel'].includes(st.mode)){await T(p,'runWinNode46').catch(()=>{});await T(p,'runContinue46').catch(()=>{});continue;}
     await p.evaluate(()=>{try{window.SakurayoDuel?.stop?.()}catch(e){}try{window.SakurayoShmup?.stop?.()}catch(e){}document.querySelectorAll('#duel46,#shm46').forEach(e=>e.remove());});const a=st.available||[];const n=a.find(q=>q.type==='boss')||a.find(q=>!['sky','duel'].includes(q.type))||a[0];if(!n)break;await T(p,'runEnter46',n.id);}await W(p,900);},
   shmup:{frames:3,go:async p=>{await p.evaluate(()=>window.SakurayoShmup.start({character:'sayo',seed:9,layer:3,kind:'boss',auto:true,skill:0.6,route:'tech',power:1.2}));await W(p,2500);}},
+  duelcmd:{go:async p=>{await p.evaluate(()=>window.SakurayoDuel.start({character:'aya',seed:3,layer:1,auto:true,skill:0.85,route:'tech',power:1.2}));await W(p,1800);await p.locator('#duel46 .cmdT46').click();await W(p,400);}},
   duel:{frames:3,go:async p=>{await p.evaluate(()=>window.SakurayoDuel.start({character:'sayo',seed:5,layer:2,auto:true,skill:0.85,route:'bio',power:1.2}));await W(p,2500);}},
 };
 const report={};const b=await chromium.launch({args:['--allow-file-access-from-files']});

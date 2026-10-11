@@ -27,7 +27,7 @@
     chp: { st: 9, ac: 4, rc: 23, dmg: 8, hs: 0, bs: 13, kb: 60, reach: 108, y: 20, h: "low", c: 1, kd: 1, pose: "chp", crouch: 1, shake: 3 },
     jlp: { st: 4, ac: 8, rc: 3, dmg: 4, hs: 14, bs: 10, kb: 30, reach: 66, y: 60, h: "over", air: 1, pose: "jatk" },
     jhp: { st: 7, ac: 6, rc: 4, dmg: 8, hs: 18, bs: 13, kb: 50, reach: 84, y: 40, h: "over", air: 1, pose: "jatk", shake: 2 },
-    thr: { st: 3, ac: 2, rc: 22, dmg: 12, reach: 62, y: 120, h: "throw", pose: "throw", kd: 1 },
+    thr: { st: 3, ac: 2, rc: 22, dmg: 12, reach: 70, y: 120, h: "throw", pose: "throw", kd: 1 },
     gc: { st: 4, ac: 4, rc: 22, dmg: 4, hs: 0, bs: 10, kb: 160, reach: 96, y: 120, h: "mid", kd: 1, inv: 10, pose: "hp", meter: 1 },
     A: { st: 12, ac: 2, rc: 24, dmg: 8, hs: 18, bs: 14, kb: 70, h: "mid", sp: 1, chip: 1, proj: 1, pose: "special" },
     D: { st: 3, ac: 10, rc: 28, dmg: 12, hs: 0, bs: 16, kb: 80, reach: 86, y: 160, h: "mid", sp: 1, inv: 8, kd: 1, rise: 1, chip: 1, pose: "dp", shake: 4 },
@@ -263,14 +263,20 @@
   Game.prototype.frameStep = function () {
     var P = this.P, E = this.E;
     this.hist.push({ P: snapF(P), E: snapF(E) }); if (this.hist.length > 30) this.hist.shift();
+    [P, E].forEach(function (f) { // 白色延迟扣血：受伤后白段停 0.6 s 再匀速追上；连击数在连段结束后再停留 1 s
+      if (f.dly == null || f.hp > f.dly) f.dly = f.hp; if (f.hp < (f.lastHp == null ? f.hp : f.lastHp)) f.dlyT = 0; else f.dlyT = (f.dlyT || 0) + 1;
+      if (f.dly > f.hp && f.dlyT > 36) f.dly = Math.max(f.hp, f.dly - 0.9); f.lastHp = f.hp;
+      var cs = f.comboShow = f.comboShow || { n: 0, t: 0, pop: 0 }; if (f.combo >= 2) { if (f.combo !== cs.n) cs.pop = 1; cs.n = f.combo; cs.t = 1; } else if (cs.t > 0) cs.t -= DT; cs.pop = Math.max(0, cs.pop - DT * 6);
+    });
     if (this.pauseT > 0) { this.pauseT -= DT; return; }
     if (this.freeze > 0) { this.freeze--; this.control(P, !this.auto); this.control(E, false); return; }
     if (this.slowmo > 0) { this.slowmo--; if (this.slowmo % 2) return; if (this.slowmo === 0) return this.endRound(); }
     this.frame++; this.roundT += DT; this.t += DT;
     this.control(P, !this.auto); this.control(E, false);
     this.stepFighter(P); this.stepFighter(E);
-    // 推挤
-    var dx = E.x - P.x; if (Math.abs(dx) < 54 && P.y > -80 && E.y > -80) { var push = (54 - Math.abs(dx)) / 2 * (dx >= 0 ? 1 : -1); P.x = clamp(P.x - push, STAGE_L, STAGE_R); E.x = clamp(E.x + push, STAGE_L, STAGE_R); }
+    // 推挤（MUGEN 式 size.ground.front/back + size.height）：两人的推挤框在横、纵向都重叠时才推；
+    // 一方贴版边时由另一方承担全部位移；最后再做一次硬分离，任何时候都不允许重叠
+    this.pushApart();
     // 飞行道具
     var self = this; this.shots.forEach(function (q) {
       if (q.dead) return; q.t += DT; q.life -= DT; if (q.life <= 0) { q.dead = 1; return; }
@@ -287,6 +293,21 @@
     this.shots = this.shots.filter(function (q) { return !q.dead; });
     if (this.roundT >= this.limit && !this.koT) { this.koT = 1; this.roundWinner = P.hp / P.max >= E.hp / E.max ? P : E; this.banner = { s: "TIME UP", t: 0, life: 1.4 }; this.slowmo = 40; }
   };
+  var PUSH = { front: 32, back: 28, air: 28, height: 190, crouchH: 120 };
+  Game.prototype.pushBox = function (f) { var crouch = f.st === "crouch" || (f.mv && f.mv.crouch), air = f.y < -2, fr = air ? PUSH.air : PUSH.front, bk = air ? PUSH.air : PUSH.back;
+    var l = f.face > 0 ? f.x - bk : f.x - fr, r = f.face > 0 ? f.x + fr : f.x + bk; return { l: l, r: r, top: f.y - (crouch ? PUSH.crouchH : PUSH.height), bot: f.y }; };
+  Game.prototype.pushApart = function () {
+    var P = this.P, E = this.E; if (P.st === "thrown" || E.st === "thrown") return; // 投技中由投技本身摆位
+    for (var it = 0; it < 2; it++) {
+      var a = this.pushBox(P), b = this.pushBox(E); if (a.bot <= b.top || b.bot <= a.top) return; // 纵向不重叠（跳过头顶）
+      var ov = Math.min(a.r, b.r) - Math.max(a.l, b.l); if (ov <= 0) return;
+      var dir = E.x > P.x ? 1 : E.x < P.x ? -1 : (P.face > 0 ? 1 : -1); // E 在 P 的哪一侧；完全重合时按朝向分开
+      var pw = P.x <= STAGE_L + 0.5 && dir > 0 || P.x >= STAGE_R - 0.5 && dir < 0, ew = E.x <= STAGE_L + 0.5 && dir < 0 || E.x >= STAGE_R - 0.5 && dir > 0;
+      var kp = pw ? 0 : ew ? 1 : 0.5, ke = 1 - kp; if (pw && ew) { kp = ke = 0.5; }
+      P.x = clamp(P.x - dir * ov * kp, STAGE_L, STAGE_R); E.x = clamp(E.x + dir * ov * ke, STAGE_L, STAGE_R);
+    }
+  };
+  Game.PUSH = PUSH;
   function snapF(f) { return { x: f.x, y: f.y, vy: f.vy, st: f.st, mv: !!f.mv, mf: f.mf, mvst: f.mv ? f.mv.st : 0, mvac: f.mv ? f.mv.ac : 0, h: f.mv ? f.mv.h : null }; }
   Game.prototype.endRound = function () {
     var w = this.roundWinner || this.P; w.wins++; this.koT = 0;
@@ -328,7 +349,10 @@
     g.fillStyle = "rgba(0,0,0,.22)"; g.fillRect(0, GROUND, FW, FH - GROUND);
     [[this.E, img.foe, true], [this.P, img.me, false]].forEach(function (pr) {
       var f = pr[0], set = pr[1] || {}, ps = self.pose(f), FB = { hp_s: "idle_b", special_s: "idle_b", jump_up: "jump", jump_fall: "jump", dash: "walk1", lp_s: "idle_b", lp_r: "idle", lp_s2: "lp_s", lp_a2: "lp", lp_r2: "lp_r", hp_s2: "hp_s", hp_o: "hp_r", hp_r2: "hp_r", hit_l: "hit", hit_h: "hit2", air_up: "hit2", air_fall: "hit", hp_r: "hp", dp_r: "crouch", super_r: "super", rush_r: "rush", throw_s: "throw", jatk_s: "jump" }, im = set[ps] && set[ps].width ? set[ps] : set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")] && set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")].width ? set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")] : set.idle, x = f.x, y = GROUND + f.y + 7, h = 265;
-      g.fillStyle = "rgba(0,0,0,.35)"; g.beginPath(); g.ellipse(x, GROUND + 4, 52, 10, 0, 0, 7); g.fill();
+      // 脚下影子：始终贴地，离地越高越小越淡（跳跃时也能看清落点）
+      var air = Math.min(1, Math.max(0, -f.y / 220)), shR = 58 * (1 - 0.45 * air), sg = g.createRadialGradient(x, GROUND + 3, 2, x, GROUND + 3, shR);
+      var tkS = global.SakurayoTok || function () { return "transparent"; }; sg.addColorStop(0, tkS("n0", 0.62 * (1 - 0.6 * air))); sg.addColorStop(0.7, tkS("n0", 0.3 * (1 - 0.6 * air))); sg.addColorStop(1, tkS("n0", 0));
+      g.save(); g.fillStyle = sg; g.translate(x, GROUND + 3); g.scale(1, 0.2); g.beginPath(); g.arc(0, 0, shR, 0, 7); g.restore(); g.save(); g.fillStyle = sg; g.beginPath(); g.ellipse(x, GROUND + 3, shR, shR * 0.2, 0, 0, 7); g.fill(); g.restore();
       var m = f.mv, ph = m ? (f.mf < m.st ? 0 : f.mf < m.st + m.ac ? 1 : 2) : -1, sx = 1, sy = 1, rot = 0, jit = 0;
       // 程序性补正：发生帧拉伸（stretch）、受击压扁（squash）+ 弹簧式回正、起跳拉伸 / 蹲跳压扁、受击方额外抖动（MUGEN HitDef 的 p2 shaketime）
       if (ph === 1 && f.mf - m.st < 3) { sx = 1.08; sy = 0.95; } else if (ph === 0 && STRONG[m.pose]) { sx = 0.96; sy = 1.03; }
@@ -369,29 +393,66 @@
       else if (f.k === "glint") { g.fillStyle = "#fff"; g.save(); g.translate(f.f.x + f.f.face * 30, GROUND + f.f.y - 170); g.rotate(f.t * 6); g.fillRect(-26 * a, -2, 52 * a, 4); g.fillRect(-2, -26 * a, 4, 52 * a); g.restore(); }
       else if (f.k === "super") { var pimg = f.f === self.P ? img.meCut : img.foeCut; g.globalAlpha = Math.min(1, a * 2); g.fillStyle = f.f === self.P ? "rgba(255,120,180,.5)" : "rgba(150,90,255,.5)"; g.fillRect(0, FH * 0.3, FW, FH * 0.32); if (pimg && pimg.width) { var ph = FH * 0.6, pw = ph * pimg.width / pimg.height, px = f.f.side < 0 ? 40 + (1 - a) * 120 : FW - pw - 40 - (1 - a) * 120; g.drawImage(pimg, px, FH * 0.08, pw, ph); } }
       g.globalAlpha = 1; });
-    // HUD
-    var bar = function (x, f, right) { var v = Math.max(0, f.hp / f.max), wv = Math.max(0, (f.hp + f.white) / f.max); g.fillStyle = "#000a"; g.fillRect(x, 18, 380, 20); g.fillStyle = "#ffffff55"; g.fillRect(right ? x + 380 - 380 * wv : x, 18, 380 * wv, 20); g.fillStyle = v < 0.3 ? "#ff5d5d" : "#ffd76a"; g.fillRect(right ? x + 380 - 380 * v : x, 18, 380 * v, 20); g.strokeStyle = "#fff8"; g.strokeRect(x, 18, 380, 20);
-      for (var i = 0; i < 3; i++) { g.fillStyle = f.meter >= i + 1 ? "#5fd8ff" : "#ffffff22"; var mw = 70, mx = right ? x + 380 - (i + 1) * (mw + 6) : x + i * (mw + 6); g.fillRect(mx, FH - 34, mw, 12); if (f.meter > i && f.meter < i + 1) { g.fillStyle = "#5fd8ff88"; g.fillRect(mx, FH - 34, mw * (f.meter - i), 12); } }
-      for (i = 0; i < f.wins; i++) { g.fillStyle = "#ff5f9e"; g.beginPath(); g.arc(right ? x + 380 - 10 - i * 22 : x + 10 + i * 22, 50, 7, 0, 7); g.fill(); }
-      if (f.guard > 1) { g.fillStyle = "#8fd8ff"; g.fillRect(right ? x + 380 - 120 * f.guard / 100 : x, 40, 120 * f.guard / 100, 4); } };
-    bar(30, this.P, false); bar(FW - 410, this.E, true);
-    g.fillStyle = "#fff"; g.font = "bold 32px SyTitle, sans-serif"; g.textAlign = "center"; g.fillText(Math.max(0, Math.ceil(this.limit - this.roundT)), FW / 2, 44);
-    g.font = "15px sans-serif"; g.textAlign = "left"; g.fillText(this.ch.name, 30, 74); g.textAlign = "right"; g.fillText(this.E.name, FW - 30, 74);
-    [this.P, this.E].forEach(function (f) { if (f.combo >= 2) { g.font = "bold 36px SyTitle, sans-serif"; g.textAlign = f.side < 0 ? "left" : "right"; g.fillStyle = "#ffd76a"; g.strokeStyle = "#000"; g.lineWidth = 5; var cx = f.side < 0 ? 30 : FW - 30; g.strokeText(f.combo + " HIT", cx, 150); g.fillText(f.combo + " HIT", cx, 150); } });
+    // HUD（崩三 × 拳皇：切角血条 + 白色延迟扣血、分段发光气槽、六边形计时与头像框、斜体连击数）
+    var K = global.SyKit, TK = K ? K.T : function () { return "gray"; };
+    if (K) {
+      [[this.P, false, img.meCut], [this.E, true, img.foeCut]].forEach(function (pr) {
+        var f = pr[0], R = pr[1], cimg = pr[2], px = R ? FW - 56 : 56, py = 58, bx = R ? FW - 98 - 352 : 98;
+        K.bar(g, { x: bx, y: 26, w: 352, h: 22, v: Math.max(0, f.hp / f.max), delay: Math.max(0, f.dly == null ? f.hp : f.dly) / f.max, regen: (f.white || 0) / f.max, right: R });
+        if (f.guard > 1) { g.fillStyle = TK("primary", 0.85); var gw = 140 * f.guard / 100; g.fillRect(R ? bx + 352 - gw - 10 : bx + 10, 52, gw, 3); }
+        g.save(); K.hex(g, px, py, 38); g.fillStyle = TK("n0", 0.9); g.fill(); g.lineWidth = 3; g.strokeStyle = R ? TK(self.E.o.boss ? "danger" : "rare-sr", 1) : TK("accent", 1); g.stroke(); K.hex(g, px, py, 34); g.clip();
+        if (cimg && cimg.width) { var cw = cimg.width * 0.42, sx0 = cimg.width * 0.29, sy0 = cimg.height * 0.06; g.save(); g.translate(px, py); if (R) g.scale(-1, 1); g.drawImage(cimg, sx0, sy0, cw, cw, -36, -36, 72, 72); g.restore(); if (R) { g.fillStyle = TK("rare-sr", 0.18); g.fillRect(px - 40, py - 40, 80, 80); } }
+        g.restore();
+        g.font = "800 16px SyTitle, sans-serif"; g.textBaseline = "top"; g.textAlign = R ? "right" : "left"; g.lineWidth = 4; g.strokeStyle = TK("n0", 0.9); var nm = R ? self.E.name : self.ch.name; g.strokeText(nm, R ? bx + 352 - 14 : bx + 14, 58); g.fillStyle = TK("n6", 1); g.fillText(nm, R ? bx + 352 - 14 : bx + 14, 58);
+        for (var i = 0; i < 2; i++) { var wx = R ? bx + 14 + i * 22 : bx + 352 - 14 - i * 22; K.diamond(g, wx, 66, 7); g.fillStyle = f.wins > i ? TK("accent", 1) : TK("n0", 0.7); g.fill(); g.lineWidth = 1.5; g.strokeStyle = TK("n5", 0.8); g.stroke(); }
+        K.meter(g, { x: R ? FW - 98 - 200 : 98, y: 86, w: 200, h: 9, n: 3, v: f.meter, right: R, t: self.t });
+        g.font = "700 11px SyTitleEn, sans-serif"; g.textBaseline = "bottom"; g.textAlign = R ? "right" : "left"; g.fillStyle = TK("primary-strong", 0.9); g.fillText("POWER", R ? FW - 98 : 98, 84);
+        var cs = f.comboShow; if (cs && cs.t > 0) { var al = Math.min(1, cs.t / 0.3), pop = 1 + 0.25 * Math.max(0, cs.pop || 0), cx = R ? FW - 40 : 40;
+          g.save(); g.globalAlpha = al; g.translate(cx, 190); g.transform(1, 0, -0.18, 1, 0, 0); g.scale(pop, pop); g.textAlign = R ? "right" : "left"; g.textBaseline = "alphabetic";
+          g.font = "900 54px SyTitleEn, SyTitle, sans-serif"; g.lineWidth = 7; g.strokeStyle = TK("n0", 0.95); g.strokeText(String(cs.n), 0, 0); g.fillStyle = TK(R ? "rare-sr" : "rare-ssr", 1); g.fillText(String(cs.n), 0, 0);
+          var nw = g.measureText(String(cs.n)).width; g.font = "800 20px SyTitleEn, sans-serif"; g.lineWidth = 4; var hx = R ? -nw - 8 : nw + 8; g.textAlign = R ? "right" : "left"; g.strokeText("HITS", hx, -4); g.fillStyle = TK("n6", 1); g.fillText("HITS", hx, -4); g.restore(); }
+      });
+      g.save(); K.hex(g, FW / 2, 46, 36, true); g.fillStyle = TK("n0", 0.88); g.fill(); g.lineWidth = 2; g.strokeStyle = TK("primary", 1); g.stroke(); K.hex(g, FW / 2, 46, 30, true); g.lineWidth = 1; g.strokeStyle = TK("primary", 0.35); g.stroke();
+      var tl = Math.max(0, Math.ceil(this.limit - this.roundT)); g.font = "900 34px SyTitleEn, SyTitle, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillStyle = tl <= 10 ? TK("danger", 1) : TK("n6", 1); g.fillText(String(tl), FW / 2, 48);
+      g.font = "700 10px SyTitleEn, sans-serif"; g.fillStyle = TK("primary-strong", 1); g.fillText("ROUND " + this.round, FW / 2, 92); g.restore();
+      g.textBaseline = "alphabetic";
+    } else {
+      g.fillStyle = TK("n6", 1); g.font = "bold 32px SyTitle, sans-serif"; g.textAlign = "center"; g.fillText(Math.max(0, Math.ceil(this.limit - this.roundT)), FW / 2, 44);
+    }
     if (this.banner) { var b = this.banner, al = Math.min(1, b.t * 5, (b.life - b.t) * 4); g.globalAlpha = Math.max(0, al); g.font = "bold 60px SyTitle, sans-serif"; g.textAlign = "center"; g.fillStyle = "#fff"; g.strokeStyle = "#ff3d8a"; g.lineWidth = 8; var by = b.side ? FH * 0.72 : FH / 2; g.font = b.side ? "bold 40px sans-serif" : "bold 60px sans-serif"; g.strokeText(b.s, FW / 2, by); g.fillText(b.s, FW / 2, by); g.globalAlpha = 1; }
     g.setTransform(1, 0, 0, 1, 0, 0);
   };
   Game.prototype.snapshot = function () { var P = this.P, E = this.E; return { t: +this.t.toFixed(2), round: this.round, wins: [P.wins, E.wins], hp: +(P.hp / P.max).toFixed(3), foeHp: +(E.hp / E.max).toFixed(3), meter: +P.meter.toFixed(2), foeMeter: +E.meter.toFixed(2), combo: P.combo, maxCombo: P.maxCombo, st: P.st, foeSt: E.st, move: P.mn && P.mv ? P.mn : null, foeMove: E.mn && E.mv ? E.mn : null, x: Math.round(P.x), foeX: Math.round(E.x), done: this.done, win: this.win, special: this.special, ch: this.cid, foe: E.cid, form: this.slot, route: this.route, pose: this.pose(P) }; };
   /* —— DOM 外壳 —— */
   var POSES = ["idle", "idle_m", "idle_b", "walk1", "walk2", "crouch", "jump", "lp", "hp", "clp", "chp", "jatk", "block", "cblock", "hit", "hit2", "down", "throw", "special", "dp", "rush", "super", "win", "walk_0", "walk_1", "walk_2", "walk_3", "walk_4", "walk_5", "walk_6", "walk_7", "hp_s", "special_s", "jump_up", "jump_fall", "dash", "lp_s", "lp_r", "hp_r", "dp_r", "super_r", "rush_r", "throw_s", "jatk_s", "lp_s2", "lp_a2", "lp_r2", "hp_s2", "hp_o", "hp_r2", "hit_l", "hit_h", "air_up", "air_fall"];
-  var CSS = "#duel46{position:fixed;inset:0;z-index:125;background:#07050d;touch-action:none;user-select:none;color:#fff}#duel46 canvas{position:absolute;inset:0;width:100%;height:100%}#duel46 .dstk46{position:absolute;left:max(18px,env(safe-area-inset-left));bottom:18px;width:150px;height:150px;border-radius:50%;background:#ffffff14;border:2px solid #ffffff33}#duel46 .dstk46 i{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px;border-radius:50%;background:#ffffff44;transform:translate(var(--x,0),var(--y,0))}#duel46 .dact46{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:14px;display:grid;grid-template-columns:repeat(3,64px);gap:8px}#duel46 .dact46 button{width:64px;height:64px;padding:0;line-height:1.1;border-radius:50%;border:2px solid #ffffff44;background:#1a1230cc;color:#fff;font-weight:700;font-size:14px}#duel46 .dact46 button.on{border-color:#5fd8ff;box-shadow:0 0 12px #5fd8ff}#duel46 .res{position:absolute;inset:0;display:grid;place-items:center;background:#06040ccc}#duel46 .res .box{text-align:center}#duel46 .res button{margin-top:14px;padding:12px 26px;border-radius:999px;border:0;background:#ff5f9e;color:#fff;font-size:15px}#duel46 .help{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:11px;color:#ffffffaa;text-align:center;pointer-events:none;white-space:nowrap}";
+  var CSS = "#duel46{position:fixed;inset:0;z-index:125;background:#07050d;touch-action:none;user-select:none;color:#fff}#duel46 canvas{position:absolute;inset:0;width:100%;height:100%}"
+    + "#duel46 .dstk46{position:absolute;left:max(22px,env(safe-area-inset-left));bottom:22px;width:150px;height:150px;isolation:isolate}"
+    + "#duel46 .dstk46::before,#duel46 .dstk46::after{content:'';position:absolute;inset:0;z-index:-1;clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%)}"
+    + "#duel46 .dstk46::before{background:rgb(var(--c-primary-rgb) / .55)}#duel46 .dstk46::after{inset:2px;background:radial-gradient(circle,rgb(var(--c-n2-rgb) / .7),rgb(var(--c-n0-rgb) / .62))}"
+    + "#duel46 .dstk46 i{position:absolute;left:50%;top:50%;width:58px;height:58px;margin:-29px;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);background:linear-gradient(160deg,var(--c-primary-strong),var(--c-primary));transform:translate(var(--x,0),var(--y,0))}"
+    + "#duel46 .dact46{position:absolute;right:max(16px,env(safe-area-inset-right));bottom:12px;width:250px;height:190px}"
+    + "#duel46 .dact46 .sykBtn{position:absolute;width:72px;height:72px;font-size:15px}#duel46 .dact46 .sykBtn.hex{width:86px;height:76px}"
+    + "#duel46 .b-L{left:0;bottom:56px}#duel46 .b-H{left:62px;bottom:0}#duel46 .b-T{left:62px;bottom:112px}#duel46 .b-BK{left:0;bottom:0;width:58px!important;height:58px!important;font-size:13px!important}"
+    + "#duel46 .b-SP{right:0;bottom:22px}#duel46 .b-SU{right:0;bottom:106px}"
+    + "#duel46 .cmdT46{position:absolute;top:max(108px,calc(env(safe-area-inset-top) + 100px));left:50%;transform:translateX(-50%);padding:5px 14px;border:1px solid rgb(var(--c-primary-rgb) / .6);background:rgb(var(--c-n0-rgb) / .7);color:var(--c-primary-strong);font:700 12px var(--sy-font-title,sans-serif);letter-spacing:.1em;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}#duel46 .cmdT46.on{background:var(--c-primary);color:var(--c-on-primary)}"
+    + "#duel46 .cmd46{position:absolute;top:max(142px,calc(env(safe-area-inset-top) + 134px));left:50%;transform:translateX(-50%);width:min(420px,70vw);max-height:calc(100% - 300px);min-height:120px;overflow:auto;padding:12px 16px}"
+    + "#duel46 .cmd46 dl{display:grid;grid-template-columns:auto 1fr;gap:5px 14px;margin:8px 0 0}#duel46 .cmd46 dt{font-weight:800;color:var(--c-accent);font-size:13px}#duel46 .cmd46 dd{margin:0;color:var(--c-n6);font-size:13px}"
+    + "@media (max-height:440px){#duel46 .dstk46{width:120px;height:120px;bottom:14px}#duel46 .dact46{transform:scale(.8);transform-origin:right bottom;bottom:6px}#duel46 .cmdT46{top:96px}#duel46 .cmd46{top:126px;max-height:calc(100% - 140px)}}"
+    + "#duel46 .res{position:absolute;inset:0;display:grid;place-items:center;background:#06040ccc}#duel46 .res .box{text-align:center}#duel46 .res button{margin-top:14px;padding:12px 26px;border-radius:999px;border:0;background:#ff5f9e;color:#fff;font-size:15px}";
   var cur = null, raf = 0;
   function start(o) {
     stop(); o = o || {};
     if (!document.getElementById("duel46css")) { var st = document.createElement("style"); st.id = "duel46css"; st.textContent = CSS; document.head.appendChild(st); }
     var root = document.createElement("div"); root.id = "duel46";
-    root.innerHTML = '<canvas></canvas><div class="dstk46"><i></i></div><div class="dact46"><button data-p="L">轻<br><small>J</small></button><button data-p="H">重<br><small>K</small></button><button data-p="T">投<br><small>J+K</small></button><button data-p="SP">必杀<br><small>↓↘→</small></button><button data-p="SU" class="su">超必<br><small>1 气</small></button><button data-p="BK">防<br><small>←</small></button></div><div class="help">↓↘→+拳 波动 · →↓↘+拳 升龙 · ↓↙←+拳 突进 · ↓↘→↓↘→+拳 超必杀 · →→ 冲刺 · 防御中 →+J+K 反击</div>';
+    root.innerHTML = '<canvas></canvas><div class="dstk46"><i></i></div><div class="dact46">'
+      + '<button class="sykBtn dia b-L" data-p="L">轻<small>J</small></button><button class="sykBtn dia b-H pri" data-p="H">重<small>K</small></button>'
+      + '<button class="sykBtn dia b-T" data-p="T">投<small>J+K</small></button><button class="sykBtn dia b-BK" data-p="BK">防<small>←</small></button>'
+      + '<button class="sykBtn hex b-SP acc" data-p="SP">必杀<small>↓↘→</small></button><button class="sykBtn hex b-SU su" data-p="SU">超必<small>1 气</small></button></div>'
+      + '<button class="cmdT46" type="button" aria-expanded="false">出招表</button><div class="cmd46 sykPanel" hidden><div class="t">COMMAND LIST · 出招表</div><dl>'
+      + [["波动", "↓↘→ + 拳"], ["升龙", "→↓↘ + 拳"], ["突进", "↓↙← + 拳"], ["超必杀", "↓↘→↓↘→ + 拳（1 气）"], ["冲刺", "→→"], ["后撤", "←←"], ["投技", "J + K（近身）"], ["防御反击", "防御中 → + J + K（1 气）"], ["下段", "↓ + K"]].map(function (r) { return "<dt>" + r[0] + "</dt><dd>" + r[1] + "</dd>"; }).join("")
+      + '</dl></div>';
     (o.parent || document.body).appendChild(root);
+    var cmdT = root.querySelector(".cmdT46"), cmdP = root.querySelector(".cmd46"); cmdT.addEventListener("click", function () { var open = cmdP.hidden; cmdP.hidden = !open; cmdT.setAttribute("aria-expanded", String(open)); cmdT.classList.toggle("on", open); });
     var cv = root.querySelector("canvas"), g = cv.getContext("2d"), img = {};
     var art = function (p) { var i = new Image(); i.src = o.art ? o.art(p) : ((typeof window !== "undefined" && window.SakurayoArtBase) || "art/") + p; /* 没传 art() 时用游戏统一的素材根目录，避免直接调用时整套 404 */ return i; };
     img.stage = art("duel/stage" + (((o.layer || 1) - 1) % 3 + 1) + ".webp");
