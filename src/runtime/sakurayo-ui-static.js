@@ -180,6 +180,11 @@ html body #menu #modeRow46>button small{font-size:10px!important;line-height:1.2
 @media (max-width:1100px){html body #menu #modeRow46>button small{display:none!important}html body #menu #modeRow46>button b{font-size:12px!important}}
 html body #menu .terminalActivity48 small,html body #menu .terminalActivity48 em{font-size:12px!important;color:var(--c-n5)!important}
 html body #menu .terminalActivity48 b{font-size:14px!important;color:var(--c-n6)!important}
+/* AVG 对话框：“继续”键原来被通用弹窗按钮规则刷成白底小方块，文字看不见；改成右下角主色斜切键，提示文字并排 */
+html body:not(#sy0):not(#sy1) #dialogue #dialogueContinue48{float:right;min-width:96px;min-height:36px;padding:6px 22px!important;background:var(--c-primary)!important;color:var(--c-on-primary)!important;border:0!important;font:italic 800 14px var(--sy-font-title,sans-serif)!important;letter-spacing:.2em;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);box-shadow:none!important}
+html body:not(#sy0):not(#sy1) #dialogue #dialogueHint{color:var(--c-n5)!important;font-size:12px!important;letter-spacing:.12em;line-height:36px}
+html body:not(#sy0):not(#sy1) #dialogue .speaker{background:var(--c-accent)!important;color:var(--c-on-accent)!important;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);border-radius:0!important}
+html body:not(#sy0):not(#sy1) #dialogue .dialogueText{color:var(--c-n6)!important;font-size:15px;line-height:1.75}
 `;
   var st = document.createElement("style"); st.id = "syStatic"; st.textContent = css; document.head.appendChild(st);
   // 底栏选中态：最近打开的入口保持高亮，直到它的面板关掉

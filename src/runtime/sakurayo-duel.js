@@ -391,7 +391,7 @@
     root.innerHTML = '<canvas></canvas><div class="dstk46"><i></i></div><div class="dact46"><button data-p="L">轻<br><small>J</small></button><button data-p="H">重<br><small>K</small></button><button data-p="T">投<br><small>J+K</small></button><button data-p="SP">必杀<br><small>↓↘→</small></button><button data-p="SU" class="su">超必<br><small>1 气</small></button><button data-p="BK">防<br><small>←</small></button></div><div class="help">↓↘→+拳 波动 · →↓↘+拳 升龙 · ↓↙←+拳 突进 · ↓↘→↓↘→+拳 超必杀 · →→ 冲刺 · 防御中 →+J+K 反击</div>';
     (o.parent || document.body).appendChild(root);
     var cv = root.querySelector("canvas"), g = cv.getContext("2d"), img = {};
-    var art = function (p) { var i = new Image(); i.src = o.art ? o.art(p) : "art/" + p; return i; };
+    var art = function (p) { var i = new Image(); i.src = o.art ? o.art(p) : ((typeof window !== "undefined" && window.SakurayoArtBase) || "art/") + p; /* 没传 art() 时用游戏统一的素材根目录，避免直接调用时整套 404 */ return i; };
     img.stage = art("duel/stage" + (((o.layer || 1) - 1) % 3 + 1) + ".webp");
     var game = new Game(Object.assign({}, o, { onEnd: function (r) { var el = document.createElement("div"); el.className = "res"; el.innerHTML = '<div class="box"><h2>' + (r.win ? "镜斗胜利" : "败北") + "</h2><p>" + r.rounds[0] + " : " + r.rounds[1] + " · 用时 " + r.time + " s · 最大连击 " + r.maxCombo + " · 承伤 " + r.taken + '</p><button class="ok">' + (o.okText || "继续") + "</button></div>"; root.appendChild(el); el.querySelector(".ok").onclick = function () { stop(); o.onClose && o.onClose(r); }; o.onEnd && o.onEnd(r); } }));
     var set = function (c) { var S = {}; POSES.forEach(function (k) { S[k] = art("duel/" + c + "/" + k + ".webp"); }); return S; };

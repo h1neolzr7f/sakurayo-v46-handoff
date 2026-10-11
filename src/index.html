@@ -6574,8 +6574,15 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   const _showDialogue35=showDialogue;
   showDialogue=function(lines,done,kind){let c=char35(),sk=skin35();
     const raw=Array.isArray(lines)?lines:[],first=raw.find(l=>l&&(Array.isArray(l)?l[0]:l.sp)),spk=first&&(Array.isArray(first)?first[0]:first.sp);
-    const art=npcFaceSrc47(spk,kind)||faceSrc46(c,sk,kind);
-    $(".dialogueArt").style.backgroundImage=`linear-gradient(transparent 30%,#0d0a20),url('${art}')`;return _showDialogue35(mapLines35(lines),done,kind);};
+    const paint=()=>{const art=npcFaceSrc47(spk,kind)||faceSrc46(c,sk,kind);$(".dialogueArt").style.backgroundImage=`linear-gradient(transparent 30%,#0d0a20),url('${art}')`;};
+    paint();
+    // 立绘第一次用到时还没加载完，会退回到占位剪影（还会画成玩家角色）。等图片加载完再补画一次。
+    const npc=NPC_ART47[spk],moodK=({boss:"serious",phase:"surprised",ending:"smile",win:"smile"})[kind]||"calm";
+    const want=npc?[artImage(`npc/${npc}/face_${moodK}.webp`),artImage(`npc/${npc}/face_calm.webp`),artImage(`npc/${npc}/portrait.webp`)]:[artImage(`characters/${c.id}/default/face_${moodK}.webp`),artImage(charArtPath35(c,"dialogue",sk))];
+    want.forEach(im=>{if(im&&!artReady(im))im.addEventListener("load",()=>{if(!$("#dialogue").classList.contains("hidden"))paint();},{once:true});});
+    return _showDialogue35(mapLines35(lines),done,kind);};
+  // 进游戏后空闲时预载剧情 NPC 立绘，避免第一次对话时闪占位图
+  setTimeout(()=>{try{Object.values(NPC_ART47).forEach(n=>["calm","serious","smile","surprised"].forEach(m=>artImage(`npc/${n}/face_${m}.webp`)));}catch(e){}},2500);
   const _showBanter35=showBanter;
   showBanter=function(lines,force=false){return _showBanter35(mapLines35(typeof lines==="string"?localize35(lines):lines),force);};
   const _ending35=endingData;
