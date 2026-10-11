@@ -349,7 +349,7 @@
         g.restore(); }
       if (self.o.clsn || global.__duelClsn) { g.save(); g.scale(1 / sx, 1 / sy); g.lineWidth = 2; g.strokeStyle = "#3b8bff"; g.strokeRect(-30, -(f.st === "crouch" || (m && m.crouch) ? 130 : 220), 60, f.st === "crouch" || (m && m.crouch) ? 130 : 220); // Clsn2（蓝，受击框）
         if (ph === 1 && m.reach) { g.strokeStyle = "#ff3344"; g.strokeRect(20, -(m.y || 120) - 20, m.reach - 20, 40); } g.restore(); } // Clsn1（红，攻击框）
-      if (f.tele && f.mv && f.mf < 0) { g.fillStyle = "#ff3355"; g.font = "bold 40px sans-serif"; g.textAlign = "center"; g.fillText("!", 0, -h - 10); }
+      if (f.tele && f.mv && f.mf < 0) { g.fillStyle = "#ff3355"; g.font = "bold 40px SyTitle, sans-serif"; g.textAlign = "center"; g.fillText("!", 0, -h - 10); }
       g.restore();
       if (f.inv > 0 && f.st === "stand") { g.strokeStyle = "rgba(255,255,255,.4)"; g.beginPath(); g.ellipse(x, y - 120, 60, 130, 0, 0, 7); g.stroke(); }
     });
@@ -363,7 +363,7 @@
       else if (f.k === "guard") { g.strokeStyle = "#8fd8ff"; g.lineWidth = 5; g.beginPath(); g.arc(f.x, f.y, 34 + f.t * 80, -1.2, 1.2); g.stroke(); }
       else if (f.k === "boom") { g.strokeStyle = "#ffb36b"; g.lineWidth = 10; g.beginPath(); g.arc(f.x, f.y, f.r * (0.4 + f.t / f.life), 0, 7); g.stroke(); }
       else if (f.k === "beam") { g.fillStyle = f.col; g.fillRect(f.dir > 0 ? f.x : 0, f.y - 14, f.dir > 0 ? FW - f.x : f.x, 28); g.fillStyle = "#fff"; g.fillRect(f.dir > 0 ? f.x : 0, f.y - 4, f.dir > 0 ? FW - f.x : f.x, 8); }
-      else if (f.k === "txt") { g.fillStyle = "#ffd76a"; g.strokeStyle = "#000"; g.lineWidth = 5; g.font = "bold 30px sans-serif"; g.textAlign = "center"; g.strokeText(f.s, f.x, f.y - f.t * 30); g.fillText(f.s, f.x, f.y - f.t * 30); }
+      else if (f.k === "txt") { g.fillStyle = "#ffd76a"; g.strokeStyle = "#000"; g.lineWidth = 5; g.font = "bold 30px SyTitle, sans-serif"; g.textAlign = "center"; g.strokeText(f.s, f.x, f.y - f.t * 30); g.fillText(f.s, f.x, f.y - f.t * 30); }
       else if (f.k === "glint") { g.fillStyle = "#fff"; g.save(); g.translate(f.f.x + f.f.face * 30, GROUND + f.f.y - 170); g.rotate(f.t * 6); g.fillRect(-26 * a, -2, 52 * a, 4); g.fillRect(-2, -26 * a, 4, 52 * a); g.restore(); }
       else if (f.k === "super") { var pimg = f.f === self.P ? img.meCut : img.foeCut; g.globalAlpha = Math.min(1, a * 2); g.fillStyle = f.f === self.P ? "rgba(255,120,180,.5)" : "rgba(150,90,255,.5)"; g.fillRect(0, FH * 0.3, FW, FH * 0.32); if (pimg && pimg.width) { var ph = FH * 0.6, pw = ph * pimg.width / pimg.height, px = f.f.side < 0 ? 40 + (1 - a) * 120 : FW - pw - 40 - (1 - a) * 120; g.drawImage(pimg, px, FH * 0.08, pw, ph); } }
       g.globalAlpha = 1; });
@@ -373,10 +373,10 @@
       for (i = 0; i < f.wins; i++) { g.fillStyle = "#ff5f9e"; g.beginPath(); g.arc(right ? x + 380 - 10 - i * 22 : x + 10 + i * 22, 50, 7, 0, 7); g.fill(); }
       if (f.guard > 1) { g.fillStyle = "#8fd8ff"; g.fillRect(right ? x + 380 - 120 * f.guard / 100 : x, 40, 120 * f.guard / 100, 4); } };
     bar(30, this.P, false); bar(FW - 410, this.E, true);
-    g.fillStyle = "#fff"; g.font = "bold 32px sans-serif"; g.textAlign = "center"; g.fillText(Math.max(0, Math.ceil(this.limit - this.roundT)), FW / 2, 44);
+    g.fillStyle = "#fff"; g.font = "bold 32px SyTitle, sans-serif"; g.textAlign = "center"; g.fillText(Math.max(0, Math.ceil(this.limit - this.roundT)), FW / 2, 44);
     g.font = "15px sans-serif"; g.textAlign = "left"; g.fillText(this.ch.name, 30, 74); g.textAlign = "right"; g.fillText(this.E.name, FW - 30, 74);
-    [this.P, this.E].forEach(function (f) { if (f.combo >= 2) { g.font = "bold 36px sans-serif"; g.textAlign = f.side < 0 ? "left" : "right"; g.fillStyle = "#ffd76a"; g.strokeStyle = "#000"; g.lineWidth = 5; var cx = f.side < 0 ? 30 : FW - 30; g.strokeText(f.combo + " HIT", cx, 150); g.fillText(f.combo + " HIT", cx, 150); } });
-    if (this.banner) { var b = this.banner, al = Math.min(1, b.t * 5, (b.life - b.t) * 4); g.globalAlpha = Math.max(0, al); g.font = "bold 60px sans-serif"; g.textAlign = "center"; g.fillStyle = "#fff"; g.strokeStyle = "#ff3d8a"; g.lineWidth = 8; var by = b.side ? FH * 0.72 : FH / 2; g.font = b.side ? "bold 40px sans-serif" : "bold 60px sans-serif"; g.strokeText(b.s, FW / 2, by); g.fillText(b.s, FW / 2, by); g.globalAlpha = 1; }
+    [this.P, this.E].forEach(function (f) { if (f.combo >= 2) { g.font = "bold 36px SyTitle, sans-serif"; g.textAlign = f.side < 0 ? "left" : "right"; g.fillStyle = "#ffd76a"; g.strokeStyle = "#000"; g.lineWidth = 5; var cx = f.side < 0 ? 30 : FW - 30; g.strokeText(f.combo + " HIT", cx, 150); g.fillText(f.combo + " HIT", cx, 150); } });
+    if (this.banner) { var b = this.banner, al = Math.min(1, b.t * 5, (b.life - b.t) * 4); g.globalAlpha = Math.max(0, al); g.font = "bold 60px SyTitle, sans-serif"; g.textAlign = "center"; g.fillStyle = "#fff"; g.strokeStyle = "#ff3d8a"; g.lineWidth = 8; var by = b.side ? FH * 0.72 : FH / 2; g.font = b.side ? "bold 40px sans-serif" : "bold 60px sans-serif"; g.strokeText(b.s, FW / 2, by); g.fillText(b.s, FW / 2, by); g.globalAlpha = 1; }
     g.setTransform(1, 0, 0, 1, 0, 0);
   };
   Game.prototype.snapshot = function () { var P = this.P, E = this.E; return { t: +this.t.toFixed(2), round: this.round, wins: [P.wins, E.wins], hp: +(P.hp / P.max).toFixed(3), foeHp: +(E.hp / E.max).toFixed(3), meter: +P.meter.toFixed(2), foeMeter: +E.meter.toFixed(2), combo: P.combo, maxCombo: P.maxCombo, st: P.st, foeSt: E.st, move: P.mn && P.mv ? P.mn : null, foeMove: E.mn && E.mv ? E.mn : null, x: Math.round(P.x), foeX: Math.round(E.x), done: this.done, win: this.win, special: this.special, ch: this.cid, foe: E.cid, form: this.slot, route: this.route, pose: this.pose(P) }; };
