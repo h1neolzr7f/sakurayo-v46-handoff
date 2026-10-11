@@ -27,3 +27,11 @@
 - 替换 28 张：`stages/stage_1、stage_3` 的 chapter_keyart_v2 / battle_bg_v2 / battle_bg / cg；`shmup/tile_1、bg1`；`duel/stage1`；`story/ch1–ch4` 全部 17 张背景和 CG。stage_2（赛博雨街）、stage_4（镜界）、shmup tile_2/3、duel stage2/3 本来就不是和风，保留。
 - 剧情同步（用户已授权，故事核心不变：百夜祭循环、名刀传说、代际传承）：神社→灵枢观、鸟居→全息牌楼、参道→御道、本殿→主殿、绘马→祈愿签、瓦版→快报、缘日→庙会、狐面→傩面、祭典→灯会、神乐→傩舞。改动见 `docs/STORY.md` 末尾对照表；四章剧本 `src/runtime/sakurayo-story-ch*.js`、大厅 / 关卡 / 夜行文案和测试同步。
 - 对比图：`01_scene_keyart_duel.png`、`01_scene_story_bg.png`、`01_scene_cg.png`。
+
+## ④ 弹幕（东方 / LuaSTG / Danmakufu）
+- **布局**：横屏时战场（540×960 逻辑尺寸）放左中，右侧 Canvas 绘制完整信息面板（`SyKit.panel`）：角色立绘切角框、HiScore / Score（9 位，HiScore 存 localStorage）、Player（残机星）、Spell（符卡菱形）、Power（数值 + 进度条）、Graze、当前符卡名与收取数。战场外双线框 + 四角强调色括号，左侧竖排六角纹样与流动的数据流竖线。Boss 名、剩余符卡星、细血条、符卡计时（<6 s 变红）、BONUS 收取中都画在战场顶部。旧 DOM HUD / Boss 条 / 底部提示隐藏；低速 / 符卡 / 觉醒改为六边形 `sykBtn`，放在面板底部。
+- **弹型**：新增 `scale` 鳞弹、`laser` 直线激光（光身 54，判定用点到线段距离）；所有弹型改为离屏预渲染贴图（彩色外发光 → 彩色弹体 → 白色弹芯，`lighter` 叠加），按 弹型+颜色 缓存。光玉为白芯径向渐变，大玉为双层 + 白环。用法：雨符「骤雨回旋伞」→ 鳞弹、冥符「黄泉比良坂」→ 激光、旋转杂兵 → 鳞弹；判定半径与原弹型一致，`tests/shmup_unit.mjs` 胜率 / 用时比（1.17）不变。
+- **自机**：按屏幕像素定高 60 px（限制 48–64 px），三名角色立绘宽高比不同也一致（修前 sayo 在 844×390 上只有 35 px）。
+- **素材**：`shmup/tile_1、tile_3、bg1、bg3` 重绘为中式科技（去鸟居 / 和纸灯笼），tile 用 `tools/shmup_tiles.py` 同样的交叉淡化做成竖向周期（接缝行差 5.6 ≈ 图内 6.4）。
+- 文本：镜卫符卡「合わせ鏡」（日文假名）改为「对镜回廊」。
+- 截图脚本：`tools/shoot_shmup_cards.mjs` 把 Boss 推进到指定符卡截图。
