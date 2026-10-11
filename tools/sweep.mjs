@@ -1,6 +1,6 @@
 // 截图巡检：全部界面 × 两种横屏尺寸（1280×720 / 844×390）。游戏锁定横屏，竖屏 390×844 只检查旋转提示（rotate 场景）。战斗类切实时时钟并取多帧。
 // 用法：node tools/sweep.mjs <输出目录> [场景名过滤]；输出 PNG + report.json（控制台报错、404、溢出元素、FPS）
-import {chromium} from 'playwright';import path from 'node:path';import fs from 'node:fs';import {pathToFileURL} from 'node:url';
+import {chromium} from 'playwright';import path from 'node:path';import fs from 'node:fs';import {pathToFileURL,fileURLToPath} from 'node:url';
 const out=process.argv[2]||'/tmp/sweep';const only=process.argv[3];fs.mkdirSync(out,{recursive:true});
 const URL=pathToFileURL(path.resolve('src/index.html')).href+'?test=1';
 const VPS=[['d',1280,720],['l',844,390]];const VP_P=['p',390,844];
@@ -34,7 +34,7 @@ const S={
 const report={};const b=await chromium.launch({args:['--allow-file-access-from-files']});
 for(const [name,sc] of Object.entries(S)){ if(only&&!only.split(',').includes(name))continue;
  for(const [v,w,h] of (sc.vps||VPS)){const key=`${name}_${v}`;const ctx=await b.newContext({viewport:{width:w,height:h},hasTouch:v!=='d',isMobile:v!=='d'});
-  await ctx.addInitScript(s=>localStorage.setItem('sakurayoV3',JSON.stringify(s)),SAVE);const p=await ctx.newPage();const errs=[],miss=[];
+  await ctx.addInitScript({path:path.join(path.dirname(fileURLToPath(import.meta.url)),'ui_audit.js')});await ctx.addInitScript(s=>localStorage.setItem('sakurayoV3',JSON.stringify(s)),SAVE);const p=await ctx.newPage();const errs=[],miss=[];
   p.on('pageerror',e=>errs.push(String(e).slice(0,200)));p.on('console',m=>{if(m.type()==='error')errs.push(m.text().slice(0,200));});p.on('requestfailed',r=>miss.push(r.url().split('/').slice(-3).join('/')));p.on('response',r=>{if(r.status()>=400)miss.push(r.status()+' '+r.url().split('/').slice(-3).join('/'));});
   try{await p.goto(URL);await p.locator('.bootArt35').waitFor({state:'detached',timeout:15000});const go=sc.go||sc;await go(p);
    const n=sc.frames||1;for(let i=0;i<n;i++){await p.screenshot({path:`${out}/${key}${n>1?'_'+i:''}.png`});if(i<n-1)await W(p,900);}
@@ -43,8 +43,11 @@ for(const [name,sc] of Object.entries(S)){ if(only&&!only.split(',').includes(na
      if((e.tagName==='BUTTON')&&(r.right>vw+2||r.bottom>vh+2||r.left<-2||r.top<-2))o.push('offscreen:'+(e.id||e.className||e.textContent.trim().slice(0,10)));
      if(e.tagName==='IMG'&&e.complete&&!e.naturalWidth)o.push('brokenimg:'+(e.getAttribute('src')||'').slice(-40));
      if(e.children.length===0&&/TODO|undefined|NaN|\[object/.test(e.textContent))o.push('placeholder:'+e.textContent.trim().slice(0,30));});
-     const t0=performance.now();let f=0;await new Promise(r=>{const step=()=>{f++;performance.now()-t0<1000?requestAnimationFrame(step):r();};requestAnimationFrame(step);});return {issues:[...new Set(o)].slice(0,30),fps:f};});
+     const t0=performance.now();let f=0;await new Promise(r=>{const step=()=>{f++;performance.now()-t0<1000?requestAnimationFrame(step):r();};requestAnimationFrame(step);});window.__syCanvasText=[];await new Promise(r=>setTimeout(r,700));const au=window.SyAudit?window.SyAudit.audit({touch:matchMedia('(pointer:coarse)').matches}):{fails:[],stats:{}};return {issues:[...new Set(o)].slice(0,30),fps:f,a11y:au.fails,a11yStats:au.stats};});
    report[key]={errors:errs,missing:[...new Set(miss)],...info};
   }catch(e){report[key]={fail:String(e).slice(0,300),errors:errs};try{await p.screenshot({path:`${out}/${key}_FAIL.png`});}catch{}}
   await ctx.close();console.log(key,JSON.stringify(report[key]).slice(0,240));}}
 fs.writeFileSync(`${out}/report.json`,JSON.stringify(report,null,1));await b.close();
+const bad=Object.entries(report).filter(([k,v])=>(v.a11y||[]).length);const total=bad.reduce((n,[k,v])=>n+v.a11y.length,0);
+console.log(`a11y 图标/文字检查：${total} 项不达标（${bad.length} 个画面）`);for(const [k,v] of bad)console.log('  '+k+': '+v.a11y.slice(0,40).join(' | '));
+if(process.env.SWEEP_STRICT&&(total||Object.values(report).some(v=>v.fail)))process.exit(1);
