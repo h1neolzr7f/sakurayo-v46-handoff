@@ -128,6 +128,14 @@ html body:not(#sy0) #result .actions{position:sticky;bottom:-1px;z-index:3;paddi
 html body:not(#sy0) #result .resultIcon{display:none!important}
 @media (max-height:440px){html body:not(#sy0) #result .actions{display:flex!important;gap:8px}html body:not(#sy0) #result .actions button{flex:1;min-height:40px!important;margin:0!important}html body:not(#sy0) #result .rankBig{font-size:48px!important;line-height:1!important}}
 html body:not(#sy0) #result .modal .sy-win{position:fixed;height:min(110dvh,900px);right:max(0px,calc(50vw - 520px))}
+/* 矮横屏（844×390）升级弹窗：三张卡加按钮超出屏幕，“重抽 / 全部拿 / 图鉴”看不到。压缩卡片，弹窗内可滚动，按钮行并排 */
+@media (max-height:440px){html body:not(#sy0):not(#sy1) #level .modal{max-height:calc(100dvh - 12px);overflow-y:auto!important;padding-top:10px!important;padding-bottom:10px!important}
+html body:not(#sy0) #level .modal>h2{font-size:20px!important;padding:3px 30px 3px 22px!important;margin-bottom:2px!important}
+html body:not(#sy0):not(#sy1) #level .choice{min-height:0!important;padding:8px 10px!important}
+html body:not(#sy0):not(#sy1) #level .choice img{width:44px!important;height:44px!important;margin:0 auto 2px!important}
+html body:not(#sy0):not(#sy1) #level .choice small:last-child,html body:not(#sy0):not(#sy1) #level .choice .dots46,html body:not(#sy0):not(#sy1) #level .choice [class*="dots"]{display:none!important}
+html body:not(#sy0):not(#sy1) #level .modal>#reroll,html body:not(#sy0):not(#sy1) #level .modal>#levelBar46{display:inline-flex!important;width:calc(50% - 4px)!important;vertical-align:middle;margin:6px 0 0!important;min-height:36px!important}
+html body:not(#sy0):not(#sy1) #level .modal>#reroll{margin-right:8px!important}}
 #syShow.out{animation:syOut .35s ease-in forwards}
 @keyframes syBand{from{transform:skewY(-6deg) translateX(-110%)}to{transform:skewY(-6deg) translateX(0)}}
 @keyframes syHero{from{translate:30% 0;opacity:0}to{translate:0 0;opacity:1}}
