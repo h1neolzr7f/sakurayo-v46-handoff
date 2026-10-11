@@ -3,7 +3,7 @@ import { chromium } from 'playwright'; import { pathToFileURL } from 'node:url';
 const out = process.argv[2] || '/tmp/sy/ui'; fs.rmSync(out, { recursive: true, force: true }); fs.mkdirSync(out, { recursive: true });
 const b = await chromium.launch({ args: ['--allow-file-access-from-files'] }); const ctx = await b.newContext({ viewport: { width: 1280, height: 720 } });
 await ctx.addInitScript(() => localStorage.setItem('sakurayoV3', JSON.stringify({ coins: 2400, unlock: 5, done: [1, 2, 3, 4], tutorialDone: true, character: 'sayo' })));
-const p = await ctx.newPage(); const url = pathToFileURL(path.resolve('src/index.html')).href + '?test=1';
+const p = await ctx.newPage(); const url = pathToFileURL(path.resolve('src/index.html')).href + '?test=1' + (process.env.PALETTE ? '&palette=' + process.env.PALETTE : '');
 await p.goto(url); await p.waitForTimeout(250); await p.screenshot({ path: `${out}/00_loading.png` });
 await p.locator('.bootArt35').waitFor({ state: 'detached' }); await p.waitForTimeout(800); await p.screenshot({ path: `${out}/01_lobby.png` });
 const api = (fn, ...a) => p.evaluate(([fn, a]) => window.__SAKURAYO_TEST__[fn]?.(...a), [fn, a]).catch(() => null);

@@ -4,6 +4,7 @@ root_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$root_dir"
 
 python tools/static_check.py src/index.html
+python tools/check_colors.py
 node --check tests/artifacts/static/index.extracted.js
 for runtime_file in src/runtime/*.js; do node --check "$runtime_file"; done
 for unit_file in tests/*_unit.mjs; do node "$unit_file"; done
