@@ -295,7 +295,8 @@
     var spr = function (name, x, y, s, flash, alt) { var im = img[name]; if ((!im || !im.width) && alt) im = img[alt]; if (!im || !im.width) { g.fillStyle = "#c66"; g.beginPath(); g.arc(x, y, s / 3, 0, TAU); g.fill(); return; } var w = s, h = s * im.height / im.width; g.drawImage(im, x - w / 2, y - h / 2, w, h); if (flash > 0) { g.globalAlpha = 0.4; g.globalCompositeOperation = "lighter"; g.drawImage(im, x - w / 2, y - h / 2, w, h); g.globalCompositeOperation = "source-over"; g.globalAlpha = 1; } };
     this.E.forEach(function (e) { spr(e.spr, e.x, e.y, e.size, e.flash); });
     if (Bo) { g.save(); var bob = Math.sin(t * 2) * 6, bk = Bo.spr.replace("boss_girl_", "boss"), bdx = Bo.x - (Bo.lx == null ? Bo.x : Bo.lx); Bo.lx = Bo.x; Bo.sv = (Bo.sv || 0) * 0.85 + bdx * 0.15;
-      var bf = Bo.sv < -0.6 ? "left" : Bo.sv > 0.6 ? "right" : (Math.floor(t * 4) % 2 ? "idle1" : "idle0"); spr("chibi_" + bk + "_" + bf, Bo.x, Bo.y + bob, Bo.size, Bo.flash, Bo.spr); g.restore(); }
+      var bbt = Bo.sv < -0.6 ? -4 : Bo.sv > 0.6 ? 4 : 0; Bo.bk = (Bo.bk || 0); Bo.bkA = (Bo.bkA || 0) + 1; if (Bo.bkA >= 2) { Bo.bkA = 0; Bo.bk += Math.sign(bbt - Bo.bk); }
+      var bf = Bo.bk === 0 ? "idle" + (Math.floor(t * 8) % 8) : (Bo.bk < 0 ? "left" : "right") + (Math.abs(Bo.bk) === 4 ? "" : Math.abs(Bo.bk)); spr("chibi_" + bk + "_" + bf, Bo.x, Bo.y + bob, Bo.size, Bo.flash, Bo.spr); g.restore(); }
     // 道具
     this.items.forEach(function (it) { if (it.k === "pt") { g.fillStyle = "#9fe6ff"; g.fillRect(it.x - 2, it.y - 2, 4, 4); return; } g.fillStyle = it.k === "p" ? "#ff4f6a" : "#4fd27a"; g.fillRect(it.x - 7, it.y - 7, 14, 14); g.fillStyle = "#fff"; g.font = "bold 11px sans-serif"; g.textAlign = "center"; g.fillText(it.k === "p" ? "P" : "B", it.x, it.y + 4); });
     // 我方弹
@@ -316,7 +317,8 @@
     if (this.form.tint || aw) { var rg = g.createRadialGradient(P.x, P.y, 6, P.x, P.y, 64); rg.addColorStop(0, (aw ? "#ffd76a" : tint) + "77"); rg.addColorStop(1, "transparent"); g.fillStyle = rg; g.fillRect(P.x - 64, P.y - 64, 128, 128); }
     g.globalAlpha = blink ? 0.45 : 1; var tilt = clamp((this.lastX != null ? P.x - this.lastX : 0) * 0.02, -0.18, 0.18); this.lastX = P.x;
     this.sv = (this.sv || 0) * 0.8 + tilt * 50 * 0.2; // 平滑横移速度 → 选左右倾斜帧（东方式自机：待机飘动 2 帧 + 左/右倾斜帧）
-    var fr = this.sv < -1.6 ? "left" : this.sv > 1.6 ? "right" : (Math.floor(t * 6) % 2 ? "idle1" : "idle0");
+    var bt = this.sv < -1.6 ? -4 : this.sv > 1.6 ? 4 : 0; this.bankAcc = (this.bankAcc || 0) + 1; if (this.bankAcc >= 2) { this.bankAcc = 0; this.bank = (this.bank || 0) + Math.sign(bt - (this.bank || 0)); } // LuaSTG 式：倾斜 4 帧逐帧过渡
+    var bk0 = this.bank || 0, fr = bk0 === 0 ? "idle" + (Math.floor(t * 8) % 8) : (bk0 < 0 ? "left" : "right") + (Math.abs(bk0) === 4 ? "" : Math.abs(bk0));
     g.save(); g.translate(P.x, P.y + Math.sin(t * 5) * 2); g.rotate(tilt * 0.35); spr("chibi_" + this.cid + "_" + fr, 0, -6, 92, 0, "fly_" + this.cid); g.restore(); g.globalAlpha = 1;
     // 敌弹（高对比：彩色外圈 + 白芯；贴图半径 > 判定半径）
     this.B.forEach(function (b) {
@@ -341,7 +343,7 @@
     boss: b ? { name: b.name, hp: Math.round(b.hp), max: Math.round(b.max), card: b.card && !b.card.non ? b.card.n : null, ci: b.ci, cards: b.cards.length, time: +b.ct.toFixed(1), cap: b.capOk } : null, caps: this.caps, gauge: Math.round(P.gauge), awaken: this.t < P.awakenUntil, pause: this.pause, done: this.done, win: this.win, form: this.slot, ch: this.cid, route: this.route, x: Math.round(P.x), y: Math.round(P.y), hit: P.hit }; };
 
   /* —— DOM 外壳 —— */
-  var CHB = []; ["sayo", "aya", "rion", "boss1", "boss2", "boss3"].forEach(function (c) { ["idle0", "idle1", "left", "right"].forEach(function (k) { CHB.push("chibi_" + c + "_" + k); }); CHB.push("cut_" + c); });
+  var CHB = []; ["sayo", "aya", "rion", "boss1", "boss2", "boss3"].forEach(function (c) { ["idle0", "idle1", "idle2", "idle3", "idle4", "idle5", "idle6", "idle7", "left1", "left2", "left3", "left", "right1", "right2", "right3", "right"].forEach(function (k) { CHB.push("chibi_" + c + "_" + k); }); CHB.push("cut_" + c); });
   var ART = ["tile_1", "tile_2", "tile_3", "bg1", "bg2", "bg3", "boss1", "boss2", "boss3", "boss_girl_1", "boss_girl_2", "boss_girl_3", "ship_sayo", "ship_aya", "ship_rion", "fly_sayo", "fly_aya", "fly_rion"];
   ART = ART.concat(CHB);
   ["a", "b"].forEach(function (s) { for (var i = 0; i < 6; i++) ART.push("enemy_" + s + i); });
