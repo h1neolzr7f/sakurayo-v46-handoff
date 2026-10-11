@@ -3,6 +3,7 @@
    api.gems(x, y, count, value), api.heal(fraction), api.shield(amount), api.coins(n),
    api.fx(kind, x, y), api.toast(text), api.sound(key). */
 (function (global) {
+  var SPR = {}; function spr(n) { if (typeof Image === "undefined") return null; if (!SPR[n]) { SPR[n] = new Image(); SPR[n].src = (global.SakurayoArtBase || "art/") + "props/" + n + ".webp"; } return SPR[n]; }
   "use strict";
   // per chapter layout flavour: how many of each prop and how they cluster
   var LAYOUT = {
@@ -95,11 +96,11 @@
       ctx.restore(); return;
     }
     if (p.kind === "lantern") { var on = p.lit > 0, fl = 0.8 + Math.sin(t * 13 + p.x) * 0.2;
-      if (on) { var gr = ctx.createRadialGradient(p.x, p.y, 4, p.x, p.y, 150); gr.addColorStop(0, "rgba(255,150,60," + 0.35 * fl + ")"); gr.addColorStop(1, "rgba(255,90,30,0)"); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(p.x, p.y, 150, 0, Math.PI * 2); ctx.fill(); }
-      ctx.fillStyle = on ? "#ff9a3d" : p.cool > 0 ? "#6a4a3a" : "#d8553a"; ctx.beginPath(); ctx.ellipse(p.x, p.y - 22, 13, 17, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = "#2a1408"; ctx.fillRect(p.x - 8, p.y - 42, 16, 4); ctx.fillRect(p.x - 8, p.y - 6, 16, 4); ctx.fillRect(p.x - 1.5, p.y - 2, 3, 14);
+      if (on) { var gr = ctx.createRadialGradient(p.x, p.y, 4, p.x, p.y, 150); gr.addColorStop(0, "rgba(140,170,255," + 0.3 * fl + ")"); gr.addColorStop(1, "rgba(120,150,255,0)"); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(p.x, p.y, 150, 0, Math.PI * 2); ctx.fill(); }
+      var ls = spr("lantern_tech"); if (ls && ls.naturalWidth) { var lh = 58, lw = lh * ls.naturalWidth / ls.naturalHeight; ctx.globalAlpha = on ? 1 : p.cool > 0 ? 0.45 : 0.8; ctx.drawImage(ls, p.x - lw / 2, p.y + 4 - lh, lw, lh); ctx.globalAlpha = 1; }
       ctx.restore(); return; }
-    if (p.kind === "torii") { var rd = p.cool > 0 ? "#7a3a3a" : "#e0303a"; ctx.fillStyle = rd; ctx.fillRect(p.x - 30, p.y - 56, 7, 56); ctx.fillRect(p.x + 23, p.y - 56, 7, 56); ctx.fillRect(p.x - 40, p.y - 62, 80, 8); ctx.fillRect(p.x - 32, p.y - 46, 64, 5);
-      if (p.cool <= 0) { ctx.strokeStyle = "rgba(255,220,120," + (0.4 + Math.sin(t * 4) * 0.3) + ")"; ctx.lineWidth = 2; ctx.strokeRect(p.x - 23, p.y - 46, 46, 46); }
+    if (p.kind === "torii") { var ps = spr("paifang"), pw2 = 96, ph2 = ps && ps.naturalWidth ? pw2 * ps.naturalHeight / ps.naturalWidth : 84; ctx.globalAlpha = p.cool > 0 ? 0.45 : 0.95; if (ps && ps.naturalWidth) ctx.drawImage(ps, p.x - pw2 / 2, p.y - ph2, pw2, ph2); ctx.globalAlpha = 1;
+      if (p.cool <= 0) { ctx.strokeStyle = "rgba(150,190,255," + (0.4 + Math.sin(t * 4) * 0.3) + ")"; ctx.lineWidth = 2; ctx.strokeRect(p.x - 23, p.y - 46, 46, 46); }
       ctx.restore(); return; }
     if (p.kind === "chest") { ctx.shadowColor = "#7ff3ff"; ctx.shadowBlur = 10 + Math.sin(t * 4) * 5; }
     if (img) ctx.drawImage(img, p.x - s / 2, p.y - s * 0.7, s, s);

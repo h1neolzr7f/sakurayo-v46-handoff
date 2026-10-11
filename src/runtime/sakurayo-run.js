@@ -33,7 +33,7 @@
   var RELICS = [
     { id: "petal", n: "樱瓣护符", i: "🌸", d: "攻击力 +12%", fx: { dmgMul: 1.12 } },
     { id: "bell", n: "铃之残响", i: "🔔", d: "最大生命 +20", fx: { maxHp: 20 } },
-    { id: "lantern", n: "引魂灯", i: "🏮", d: "拾取范围 +40", fx: { mag: 40 } },
+    { id: "lantern", n: "引魂灯", i: "🔆", d: "拾取范围 +40", fx: { mag: 40 } },
     { id: "geta", n: "疾风木屐", i: "👡", d: "移速 +8%", fx: { spdMul: 1.08 } },
     { id: "mirror", n: "裂镜片", i: "🪞", d: "暴击率 +6%", fx: { crit: 0.06 } },
     { id: "omamori", n: "平安守", i: "🧧", d: "每进入战斗节点回复 8% 生命", fx: { nodeHeal: 0.08 } },

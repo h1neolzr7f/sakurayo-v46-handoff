@@ -2298,15 +2298,19 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       }
     } catch (err) {}
   }
+  var VIEW_H46 = 900, ZOOM46 = 1;
   function resize() {
     D = Math.min(adaptiveQuality48 >= 1 ? 2.5 : 2, devicePixelRatio || 1);
     const view = viewportSize46();
     const prev = window.SakurayoCamera ? window.SakurayoCamera.size() : null;
-    W = view.w;
-    H = view.h;
-    cv.width = Math.floor(W * D);
-    cv.height = Math.floor(H * D);
-    ctx.setTransform(D, 0, 0, D, 0, 0);
+    /* 镜头按屏幕短边自适应：纵向固定 VIEW_H46 个世界单位（自机约占屏高 12%），横向按屏幕比例展开。
+       W/H 是世界视野尺寸；ZOOM46 = 屏幕 CSS px / 世界单位。各尺寸下视野纵向一致，宽屏多看一些两侧。 */
+    ZOOM46 = view.h / VIEW_H46;
+    W = view.w / ZOOM46;
+    H = VIEW_H46;
+    cv.width = Math.floor(view.w * D);
+    cv.height = Math.floor(view.h * D);
+    ctx.setTransform(D * ZOOM46, 0, 0, D * ZOOM46, 0, 0);
     if (window.SakurayoCamera) {
       const next = window.SakurayoCamera.configure(W, H);
       if (P && Number.isFinite(P.x) && prev && prev.worldW && prev.worldH) {
@@ -5418,9 +5422,13 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     updateArenaHazards(dt);
     if (state !== "play") return;
     shake = Math.max(0, shake - 28 * dt);
-    updateHud();
+    /* HUD 写 DOM 限到 15Hz（原来每个 60Hz 逻辑步都写 20 多处 DOM / innerHTML，触发重排和 MutationObserver） */
+    hudAcc46 += dt; if (hudAcc46 >= 1 / 15 || manualTestClock) { hudAcc46 = 0; updateHud(); }
   }
+  var hudAcc46 = 1;
 
+  const html46 = new Map();
+  function setHtml46(sel, v) { if (html46.get(sel) === v) return; html46.set(sel, v); const e = $(sel); if (e) e.innerHTML = v; }
   function rankValue(r){return ({D:0,C:1,B:2,A:3,S:4})[r]??2;}
   function updateHud() {
     let s = stage(),
@@ -5459,7 +5467,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         : `尸潮进度 ${Math.floor(prog * 100)}%`;
     if (window.SakurayoLifecycle?.waveTint) $("#waveF").style.background = window.SakurayoLifecycle.waveTint(lifecycleWorld44());
     const tip44 = window.SakurayoLifecycle?.hint?.(lifecycleWorld44()) || "点开看稳定度 · 暂停看构筑";
-    $("#mission").innerHTML = `${tip44}${P.jam > 0 ? " · 受干扰" : ""}${P.healSupp > 0 ? " · 治疗受限" : ""}<br>${phaseWin} · 稳定度 <b>${a.rank}</b> · ${pressure}${weak ? ` · 天敌 ${weak}` : ""}`;
+    setHtml46("#mission", `${tip44}${P.jam > 0 ? " · 受干扰" : ""}${P.healSupp > 0 ? " · 治疗受限" : ""}<br>${phaseWin} · 稳定度 <b>${a.rank}</b> · ${pressure}${weak ? ` · 天敌 ${weak}` : ""}`);
     { const cb=$("#combo"),txt=P.combo >= 5 ? `${P.combo} COMBO` : ""; if(cb.textContent!==txt){cb.textContent=txt;if(txt&&P.combo%10===0){cb.classList.remove("pop46");void cb.offsetWidth;cb.classList.add("pop46");}} }
     $("#hud").classList.toggle("lowHp46", state==="play" && P.hp > 0 && P.hp / P.maxHp < 0.3);
     $("#skill").classList.toggle("ready44", P.skill <= 0);
@@ -5474,8 +5482,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       "--ready",
       `${P.dash <= 0 ? 100 : (1 - P.dash / P.dashCd) * 100}%`,
     );
-    $("#perf").textContent =
-      `${quality < 0.8 ? "省电" : "自动"} ${Math.round(fps)}fps`;
+    setHtml46("#perf", `${save.settings?.fx === 0 ? "省电" : quality < 0.8 ? "降级" : "高画质"} ${Math.round(fps)}fps`);
   }
   function particles(x, y, n, c) {
     let cap = caps();
@@ -5991,6 +5998,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (a && !pad46.dash) dash(); if (b && !pad46.skill) $("#skill")?.click();
     pad46.dash = a; pad46.skill = b;
   }
+  var lowSec46 = 0, highSec46 = 0;
   function loop(now) {
     if (state !== "play") return;
     let frame = Math.min(0.08, (now - last) / 1000 || 0);
@@ -6001,17 +6009,22 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     fpsClock += frame;
     if (fpsClock >= 1) {
       fps = fpsFrames / fpsClock;
-      adaptiveQuality48 = fps < 42 ? 0.62 : fps > 54 ? 1 : adaptiveQuality48;
+      /* 自动降级规则（docs/PLAYBOOK.md「帧率与画质」）：连续 5 秒 < 40fps 才降到省电画质；连续 3 秒 ≥ 52fps 恢复。
+         开局前 4 秒（加载 / 解码）不计。不锁帧，跟随屏幕刷新率。手动省电 (settings.fx===0) 优先。 */
+      if (runTime > 4) { lowSec46 = fps < 40 ? lowSec46 + 1 : 0; highSec46 = fps >= 52 ? highSec46 + 1 : 0; }
+      if (lowSec46 >= 5) { adaptiveQuality48 = 0.62; lowSec46 = 0; } else if (highSec46 >= 3) { adaptiveQuality48 = 1; highSec46 = 0; }
       updateQuality48();
       fpsFrames = 0;
       fpsClock = 0;
     }
-    acc = Math.min(0.12, acc + frame);
-    let steps = 0;
-    while (acc >= 1 / 60 && steps < 4 && state === "play") {
-      update(1 / 60);
-      acc -= 1 / 60;
-      steps++;
+    /* 可变步长：每帧按真实 dt 推进（拆成 ≤1/60s 的子步），90/120Hz 屏不会出现“这帧没更新”的抖动，30fps 也不丢时间 */
+    if (manualTestClock) {
+      acc = Math.min(0.12, acc + frame);
+      let steps = 0;
+      while (acc >= 1 / 60 && steps < 4 && state === "play") { update(1 / 60); acc -= 1 / 60; steps++; }
+    } else {
+      const n = Math.max(1, Math.ceil(frame / (1 / 60) - 1e-6)), h = frame / n;
+      for (let i = 0; i < n && state === "play"; i++) update(h);
     }
     draw();
     if (state === "play") scheduleLoop();
@@ -6115,8 +6128,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     joy.sy = e.clientY;
     move(e);
     let j = $("#joy");
-    j.style.left = `${clamp(e.clientX - 59, 8, W - 126)}px`;
-    j.style.top = `${clamp(e.clientY - 59, 75, H - 126)}px`;
+    j.style.left = `${clamp(e.clientX - 59, 8, innerWidth - 126)}px`;
+    j.style.top = `${clamp(e.clientY - 59, 75, innerHeight - 126)}px`;
     j.style.bottom = "auto";
   }
   function move(e) {

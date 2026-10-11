@@ -6,7 +6,7 @@
   "use strict";
   var TAU = Math.PI * 2;
   var TYPE = {
-    survive: { n: "生存", i: "⏳" }, clear: { n: "清剿", i: "⚔" }, escort: { n: "护送", i: "🏮" },
+    survive: { n: "生存", i: "⏳" }, clear: { n: "清剿", i: "⚔" }, escort: { n: "护送", i: "🔆" },
     timed: { n: "限时摧毁", i: "⏱" }, mech: { n: "机关", i: "☯" }, channel: { n: "读取", i: "📡" }, boss: { n: "Boss", i: "👹" }
   };
   // star keys: win | hits<=v | chests>=v | time<=v | npcHp>=v | mechKills>=v | breaks>=v | noUlt

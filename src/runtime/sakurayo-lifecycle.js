@@ -513,30 +513,10 @@
       ctx.ellipse(o.x + (o.w || 0) * 0.5, o.y + (o.h || 0) + 9, o.kind === "sword" ? o.r * 0.4 : o.kind === "vehicle" ? o.w * 0.6 : 27, o.kind === "vehicle" ? 9 : 7, 0, 0, TAU);
       ctx.fill();
       if (o.kind === "torii") {
-        ctx.fillStyle = "rgba(255,142,171,0.10)";
-        ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, TAU); ctx.fill();
-        ctx.fillStyle = "#581c33";
-        ctx.fillRect(o.x - 20, o.y - 6, 8, 38);
-        ctx.fillRect(o.x + 12, o.y - 6, 8, 38);
-        ctx.fillStyle = "#bc455f";
-        ctx.fillRect(o.x - 20, o.y - 6, 3, 35);
-        ctx.fillRect(o.x + 12, o.y - 6, 3, 35);
-        ctx.fillStyle = "#251923";
-        ctx.fillRect(o.x - 23, o.y + 28, 14, 5);
-        ctx.fillRect(o.x + 9, o.y + 28, 14, 5);
-        ctx.fillStyle = "#dc7586";
-        ctx.fillRect(o.x - 26, o.y - 16, 52, 9);
-        ctx.fillRect(o.x - 18, o.y - 4, 36, 5);
-        ctx.fillStyle = "#f5aea8";
-        ctx.fillRect(o.x - 28, o.y - 18, 56, 3);
-        ctx.fillStyle = "#352333";
-        ctx.fillRect(o.x - 4, o.y - 10, 8, 12);
-        ctx.fillStyle = "#ffc7a4";
-        ctx.fillRect(o.x - 2, o.y - 7, 4, 6);
-        ctx.fillStyle = "rgba(255,193,130," + (0.17 + Math.sin(t * 1.8 + i) * 0.045) + ")";
-        ctx.beginPath(); ctx.arc(o.x, o.y - 24, 8, 0, TAU); ctx.fill();
-        ctx.fillStyle = "#ffd0a0";
-        ctx.beginPath(); ctx.arc(o.x, o.y - 24, 3, 0, TAU); ctx.fill();
+        /* 全息牌楼（替换和风鸟居，props/paifang.webp，黑底发光图用 lighter 叠加） */
+        var pf = propSprite("paifang"), pw = 92, ph = pf && pf.naturalWidth ? pw * pf.naturalHeight / pf.naturalWidth : 80;
+        ctx.fillStyle = "rgba(120,160,255,0.10)"; ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, TAU); ctx.fill();
+        if (pf && pf.naturalWidth) { ctx.save(); ctx.globalAlpha = 0.85 + Math.sin(t * 1.8 + i) * 0.1; ctx.drawImage(pf, o.x - pw / 2, o.y + 30 - ph, pw, ph); ctx.restore(); }
       } else if (o.kind === "vehicle") {
         ctx.fillStyle = "#060b14";
         ctx.fillRect(o.x + 8, o.y - 3, 9, 5);
@@ -735,6 +715,8 @@
     ctx.restore();
   }
 
+  var PROP_SPR = {};
+  function propSprite(n) { if (typeof Image === "undefined") return null; if (!PROP_SPR[n]) { PROP_SPR[n] = new Image(); PROP_SPR[n].src = (global.SakurayoArtBase || "art/") + "props/" + n + ".webp"; } return PROP_SPR[n]; }
   function heroVisualScale(width) {
     return (width || 0) >= 560 ? 1.3 : 1.16; // ART_PASS ②：自机放大，读得清动作
   }
