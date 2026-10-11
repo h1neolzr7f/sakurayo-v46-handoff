@@ -7882,7 +7882,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       start(){startGame();return snapshot35();},
       pauseNow(){pauseGame();return snapshot35();},
       dismissDialogue(){let guard=80;while(state==="dialogue"&&guard-->0)nextDialogue();if(guard<=0)throw new Error("Dialogue guard exhausted");return snapshot35();},
-      protectPlayer(){P.inv=9999;return snapshot35();},freezeProgression(){P.xp=0;P.next=1e9;return snapshot35();},
+      protectPlayer(){P.inv=9999;return snapshot35();},finishNow46(win=true){if(state!=="play")throw new Error("finishNow46 requires play mode");finish(!!win);return snapshot35();},freezeProgression(){P.xp=0;P.next=1e9;return snapshot35();},
       playerGeometry(){return {...PLAYER_GEOMETRY35,radius:PLAYER_GEOMETRY35.collisionRadius};},
       circleCollision(distance,firstRadius,secondRadius){return circlesOverlap35(0,0,Number(firstRadius),Number(distance),0,Number(secondRadius));},
       meleeCollision(distance,slashRadius,enemyRadius){return circlesOverlap35(0,0,Number(slashRadius),Number(distance),0,Number(enemyRadius));},

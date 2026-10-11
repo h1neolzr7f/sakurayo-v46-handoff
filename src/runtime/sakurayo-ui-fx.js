@@ -73,7 +73,7 @@ ${Array.from({ length: 10 }, function (_, i) { return "#result.sy-show #rstats>*
 /* 验收第 4 轮：结算胜利立绘层、角色出场主题色 + 台词、加载页层次 */
 #result .modal .sy-win{position:absolute;right:-6%;bottom:0;height:118%;max-width:none;z-index:0;pointer-events:none;opacity:0;-webkit-mask-image:linear-gradient(90deg,transparent,var(--c-n0) 35%);mask-image:linear-gradient(90deg,transparent,var(--c-n0) 35%);filter:drop-shadow(-10px 0 0 rgb(var(--c-primary-rgb) / .25))}
 #result.sy-show .modal .sy-win{animation:syWin .8s .25s var(--sy-ease-out,ease) forwards}
-@keyframes syWin{from{opacity:0;translate:60px 0}to{opacity:.5;translate:0 0}}
+@keyframes syWin{from{opacity:0;translate:60px 0}to{opacity:.3;translate:0 0}}
 #result .modal>*:not(.sy-win):not(.sy-sigil){position:relative;z-index:1}
 #syShow{--hc:var(--c-primary);--hc-rgb:var(--c-primary-rgb)}
 #syShow[data-c="aya"]{--hc:var(--c-accent);--hc-rgb:var(--c-accent-rgb)}#syShow[data-c="rion"]{--hc:var(--c-rare-sr);--hc-rgb:var(--c-rare-sr-rgb)}
@@ -122,6 +122,12 @@ html body:not(#sy0):not(#sy1) #level .choice[data-rec]{outline:1px solid var(--c
 #level .choice .meta span:last-child{color:var(--rc)!important;font-weight:800}
 #level button:not(.choice){clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
 @media (prefers-reduced-motion:reduce){#level .modal,#level .modal>h2,#level .choice{animation:none!important}}
+/* 结算面板：内容多时不再超出屏幕底部（“再次迎击 / 返回”原来看不到），中间滚动、按钮吸底；旧的 🌸 表情图标与 SKR 徽记重叠，隐藏 */
+html body:not(#sy0) #result .modal{max-height:calc(100dvh - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow-y:auto!important;overscroll-behavior:contain}
+html body:not(#sy0) #result .actions{position:sticky;bottom:-1px;z-index:3;padding:10px 0 4px;background:linear-gradient(transparent,var(--c-surface-1) 30%)}
+html body:not(#sy0) #result .resultIcon{display:none!important}
+@media (max-height:440px){html body:not(#sy0) #result .actions{display:flex!important;gap:8px}html body:not(#sy0) #result .actions button{flex:1;min-height:40px!important;margin:0!important}html body:not(#sy0) #result .rankBig{font-size:48px!important;line-height:1!important}}
+html body:not(#sy0) #result .modal .sy-win{position:fixed;height:min(110dvh,900px);right:max(0px,calc(50vw - 520px))}
 #syShow.out{animation:syOut .35s ease-in forwards}
 @keyframes syBand{from{transform:skewY(-6deg) translateX(-110%)}to{transform:skewY(-6deg) translateX(0)}}
 @keyframes syHero{from{translate:30% 0;opacity:0}to{translate:0 0;opacity:1}}
