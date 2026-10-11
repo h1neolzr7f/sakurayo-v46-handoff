@@ -288,7 +288,6 @@
   /* —— 渲染 —— */
   /* 弹型贴图缓存（LuaSTG 式分层：彩色外发光 + 彩色弹体 + 白色弹芯），按 弹型+颜色 预渲染一次 */
   var BSPR = {};
-  var FNT = function (g, w, px, fam) { return (global.SyKit ? global.SyKit.font : function (g, w, px, fam) { g.font = w + " " + px + "px " + fam; })(g, w, px, fam); };
   function bulletSprite(ty, col) {
     var key = ty + col; if (BSPR[key]) return BSPR[key]; if (typeof document === "undefined") return null;
     var R = ty === "big" ? 26 : ty === "orb" ? 15 : ty === "laser" ? 12 : 14, c = document.createElement("canvas"), L = ty === "laser" ? BT.laser.len + 16 : R * 2 + 16;
@@ -325,7 +324,7 @@
       var bbt = Bo.sv < -0.6 ? -4 : Bo.sv > 0.6 ? 4 : 0; Bo.bk = (Bo.bk || 0); Bo.bkA = (Bo.bkA || 0) + 1; if (Bo.bkA >= 2) { Bo.bkA = 0; Bo.bk += Math.sign(bbt - Bo.bk); }
       var bf = Bo.bk === 0 ? "idle" + (Math.floor(t * 8) % 8) : (Bo.bk < 0 ? "left" : "right") + (Math.abs(Bo.bk) === 4 ? "" : Math.abs(Bo.bk)); spr("chibi_" + bk + "_" + bf, Bo.x, Bo.y + bob, Bo.size, Bo.flash, Bo.spr); g.restore(); }
     // 道具
-    this.items.forEach(function (it) { if (it.k === "pt") { g.fillStyle = TKS("primary-strong", 1); g.fillRect(it.x - 2, it.y - 2, 4, 4); return; } g.fillStyle = it.k === "p" ? TKS("danger", 1) : TKS("ok", 1); var fz = FNT(g, "bold", 11, "sans-serif"), hs = Math.max(7, fz * 0.68); g.fillRect(it.x - hs, it.y - hs, hs * 2, hs * 2); g.fillStyle = TKS("n6", 1); g.textAlign = "center"; g.fillText(it.k === "p" ? "P" : "B", it.x, it.y + fz * 0.36); });
+    this.items.forEach(function (it) { if (it.k === "pt") { g.fillStyle = TKS("primary-strong", 1); g.fillRect(it.x - 2, it.y - 2, 4, 4); return; } g.fillStyle = it.k === "p" ? TKS("danger", 1) : TKS("ok", 1); g.fillRect(it.x - 7, it.y - 7, 14, 14); g.fillStyle = TKS("n6", 1); g.font = "bold 11px sans-serif"; g.textAlign = "center"; g.fillText(it.k === "p" ? "P" : "B", it.x, it.y + 4); });
     // 我方弹
     var tint = this.form.tint || (this.route === "tech" ? "#5fd8ff" : this.route === "bio" ? "#ff5f7a" : this.ch.col), core = this.form.core || "#fff4fa";
     g.globalCompositeOperation = "lighter";
@@ -371,10 +370,10 @@
   Game.prototype.drawBossBar = function (g, Bo, spell) {
     var K = global.SyKit; g.save();
     if (K) K.bar(g, { x: 70, y: 12, w: FW - 140, h: 8, v: Math.max(0, Bo.hp / Bo.max), delay: Math.max(0, Bo.hp / Bo.max), cut: 6 });
-    FNT(g, "800", 13, "SyTitle, sans-serif"); g.textAlign = "left"; g.textBaseline = "top"; g.lineWidth = 3; g.strokeStyle = TKS("n0", 0.9); g.strokeText(Bo.name, 12, 26); g.fillStyle = TKS("n6", 1); g.fillText(Bo.name, 12, 26);
+    g.font = "800 13px SyTitle, sans-serif"; g.textAlign = "left"; g.textBaseline = "top"; g.lineWidth = 3; g.strokeStyle = TKS("n0", 0.9); g.strokeText(Bo.name, 12, 26); g.fillStyle = TKS("n6", 1); g.fillText(Bo.name, 12, 26);
     var left = Math.max(0, Bo.cards.length - Bo.ci - 1); for (var i = 0; i < left; i++) { if (K) { K.diamond(g, 18 + i * 14, 50, 5); g.fillStyle = TKS("rare-ssr", 1); g.fill(); } }
     g.font = "900 22px SyTitleEn, sans-serif"; g.textAlign = "right"; var ct = Math.max(0, Bo.ct); g.strokeText(ct.toFixed(1), FW - 12, 24); g.fillStyle = ct < 6 ? TKS("danger", 1) : TKS("n6", 1); g.fillText(ct.toFixed(1), FW - 12, 24);
-    if (spell && Bo.capOk) { FNT(g, "700", 11, "SyTitle, sans-serif"); g.fillStyle = TKS("rare-ssr", 1); g.fillText("BONUS 收取中", FW - 12, 50); }
+    if (spell && Bo.capOk) { g.font = "700 11px SyTitle, sans-serif"; g.fillStyle = TKS("rare-ssr", 1); g.fillText("BONUS 收取中", FW - 12, 50); }
     g.restore();
   };
   // 两侧装饰边框：战场描边 + 角括号、左侧竖排纹样（六角 + 云纹 + 飞檐线），全部用令牌色

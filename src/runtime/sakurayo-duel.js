@@ -11,7 +11,6 @@
    形态：guard = 不吃削血、破防值减半；speed = 走/冲刺 +20%、轻攻击可 4 连；burst = 伤害 ×1.3、受伤 ×1.2。 */
 (function (global) {
   "use strict";
-  var FNT = function (g, w, px, fam) { return (global.SyKit ? global.SyKit.font : function (g, w, px, fam) { g.font = w + " " + px + "px " + fam; })(g, w, px, fam); };
   var FW = 960, FH = 540, GROUND = 468, DT = 1 / 60, STAGE_L = 40, STAGE_R = 920;
   function rng(s) { s = (s >>> 0) || 1; return function () { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
   function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
@@ -404,10 +403,10 @@
         g.save(); K.hex(g, px, py, 38); g.fillStyle = TK("n0", 0.9); g.fill(); g.lineWidth = 3; g.strokeStyle = R ? TK(self.E.o.boss ? "danger" : "rare-sr", 1) : TK("accent", 1); g.stroke(); K.hex(g, px, py, 34); g.clip();
         if (cimg && cimg.width) { var cw = cimg.width * 0.42, sx0 = cimg.width * 0.29, sy0 = cimg.height * 0.06; g.save(); g.translate(px, py); if (R) g.scale(-1, 1); g.drawImage(cimg, sx0, sy0, cw, cw, -36, -36, 72, 72); g.restore(); if (R) { g.fillStyle = TK("rare-sr", 0.18); g.fillRect(px - 40, py - 40, 80, 80); } }
         g.restore();
-        FNT(g, "800", 16, "SyTitle, sans-serif"); g.textBaseline = "top"; g.textAlign = R ? "right" : "left"; g.lineWidth = 4; g.strokeStyle = TK("n0", 0.9); var nm = R ? self.E.name : self.ch.name; g.strokeText(nm, R ? bx + 352 - 14 : bx + 14, 58); g.fillStyle = TK("n6", 1); g.fillText(nm, R ? bx + 352 - 14 : bx + 14, 58);
+        g.font = "800 16px SyTitle, sans-serif"; g.textBaseline = "top"; g.textAlign = R ? "right" : "left"; g.lineWidth = 4; g.strokeStyle = TK("n0", 0.9); var nm = R ? self.E.name : self.ch.name; g.strokeText(nm, R ? bx + 352 - 14 : bx + 14, 58); g.fillStyle = TK("n6", 1); g.fillText(nm, R ? bx + 352 - 14 : bx + 14, 58);
         for (var i = 0; i < 2; i++) { var wx = R ? bx + 14 + i * 22 : bx + 352 - 14 - i * 22; K.diamond(g, wx, 66, 7); g.fillStyle = f.wins > i ? TK("accent", 1) : TK("n0", 0.7); g.fill(); g.lineWidth = 1.5; g.strokeStyle = TK("n5", 0.8); g.stroke(); }
         K.meter(g, { x: R ? FW - 98 - 200 : 98, y: 86, w: 200, h: 9, n: 3, v: f.meter, right: R, t: self.t });
-        FNT(g, "700", 11, "SyTitleEn, sans-serif"); g.textBaseline = "bottom"; g.textAlign = R ? "right" : "left"; g.fillStyle = TK("primary-strong", 0.9); g.fillText("POWER", R ? FW - 98 : 98, 84);
+        g.font = "700 11px SyTitleEn, sans-serif"; g.textBaseline = "bottom"; g.textAlign = R ? "right" : "left"; g.fillStyle = TK("primary-strong", 0.9); g.fillText("POWER", R ? FW - 98 : 98, 84);
         var cs = f.comboShow; if (cs && cs.t > 0) { var al = Math.min(1, cs.t / 0.3), pop = 1 + 0.25 * Math.max(0, cs.pop || 0), cx = R ? FW - 40 : 40;
           g.save(); g.globalAlpha = al; g.translate(cx, 190); g.transform(1, 0, -0.18, 1, 0, 0); g.scale(pop, pop); g.textAlign = R ? "right" : "left"; g.textBaseline = "alphabetic";
           g.font = "900 54px SyTitleEn, SyTitle, sans-serif"; g.lineWidth = 7; g.strokeStyle = TK("n0", 0.95); g.strokeText(String(cs.n), 0, 0); g.fillStyle = TK(R ? "rare-sr" : "rare-ssr", 1); g.fillText(String(cs.n), 0, 0);
@@ -415,7 +414,7 @@
       });
       g.save(); K.hex(g, FW / 2, 46, 36, true); g.fillStyle = TK("n0", 0.88); g.fill(); g.lineWidth = 2; g.strokeStyle = TK("primary", 1); g.stroke(); K.hex(g, FW / 2, 46, 30, true); g.lineWidth = 1; g.strokeStyle = TK("primary", 0.35); g.stroke();
       var tl = Math.max(0, Math.ceil(this.limit - this.roundT)); g.font = "900 34px SyTitleEn, SyTitle, sans-serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillStyle = tl <= 10 ? TK("danger", 1) : TK("n6", 1); g.fillText(String(tl), FW / 2, 48);
-      FNT(g, "700", 10, "SyTitleEn, sans-serif"); g.fillStyle = TK("primary-strong", 1); g.fillText("ROUND " + this.round, FW / 2, 92); g.restore();
+      g.font = "700 10px SyTitleEn, sans-serif"; g.fillStyle = TK("primary-strong", 1); g.fillText("ROUND " + this.round, FW / 2, 92); g.restore();
       g.textBaseline = "alphabetic";
     } else {
       g.fillStyle = TK("n6", 1); g.font = "bold 32px SyTitle, sans-serif"; g.textAlign = "center"; g.fillText(Math.max(0, Math.ceil(this.limit - this.roundT)), FW / 2, 44);

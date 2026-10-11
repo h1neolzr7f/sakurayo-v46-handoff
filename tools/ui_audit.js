@@ -1,7 +1,7 @@
 /* 图标与文字可读性自动检查（被 tools/sweep.mjs 注入页面）。规则见 docs/PLAYBOOK.md「图标与文字」。
    返回 {fails:[...], stats:{...}}；fails 非空 = 不达标。 */
 (function (global) {
-  function rgb(s) { var o = String(s).match(/oklch\(([^)]+)\)/); if (o && !/rgba?\(/.test(String(s).slice(0, o.index))) { var q = o[1].split(/[ ,/]+/).filter(Boolean), L = parseFloat(q[0]) / (/%/.test(q[0]) ? 100 : 1), lin = L * L * L, sv = lin <= 0.0031308 ? 12.92 * lin : 1.055 * Math.pow(lin, 1 / 2.4) - 0.055; return { r: sv * 255, g: sv * 255, b: sv * 255, a: q.length > 3 ? parseFloat(q[3]) / (/%/.test(q[3]) ? 100 : 1) : 1 }; } var m = String(s).match(/rgba?\(([^)]+)\)/); if (!m) return null; var p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number); return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 }; }
+  function rgb(s) { var m = String(s).match(/rgba?\(([^)]+)\)/); if (!m) return null; var p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number); return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 }; }
   function lum(c) { function f(v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); } return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b); }
   function ratio(a, b) { var x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
   function mix(top, bot) { var a = top.a; return { r: top.r * a + bot.r * (1 - a), g: top.g * a + bot.g * (1 - a), b: top.b * a + bot.b * (1 - a), a: 1 }; }
@@ -11,7 +11,7 @@
     while (e && e.nodeType === 1) {
       var c = getComputedStyle(e), bi = c.backgroundImage;
       var col = rgb(c.backgroundColor);
-      if (bi && bi !== "none") { var gm = bi.match(/(?:rgba?|oklch)\([^)]+\)/); if (/url\(/.test(bi) && !(col && col.a > 0.85)) return { image: true, layers: layers }; if (gm) { var gc = rgb(gm[0]); if (gc && gc.a > 0) layers.push(gc); if (gc && gc.a > 0.85) break; } }
+      if (bi && bi !== "none") { var gm = bi.match(/rgba?\([^)]+\)/); if (/url\(/.test(bi) && !(col && col.a > 0.85)) return { image: true, layers: layers }; if (gm) { var gc = rgb(gm[0]); if (gc && gc.a > 0) layers.push(gc); if (gc && gc.a > 0.85) break; } }
       if (col && col.a > 0) { layers.push(col); if (col.a > 0.85) break; }
       e = e.parentElement;
     }
@@ -74,7 +74,7 @@
   global.SyAudit = { audit: audit };
   // fillText 钩子
   if (global.CanvasRenderingContext2D && !global.__syHook) {
-    global.__syHook = 1; global.__syCanvasText = []; var seen = {}; global.__syCanvasReset = function () { global.__syCanvasText = []; seen = {}; };
+    global.__syHook = 1; global.__syCanvasText = []; var seen = {};
     var P = CanvasRenderingContext2D.prototype, ft = P.fillText;
     P.fillText = function (s, x, y) {
       try {

@@ -43,7 +43,7 @@ for(const [name,sc] of Object.entries(S)){ if(only&&!only.split(',').includes(na
      if((e.tagName==='BUTTON')&&(r.right>vw+2||r.bottom>vh+2||r.left<-2||r.top<-2))o.push('offscreen:'+(e.id||e.className||e.textContent.trim().slice(0,10)));
      if(e.tagName==='IMG'&&e.complete&&!e.naturalWidth)o.push('brokenimg:'+(e.getAttribute('src')||'').slice(-40));
      if(e.children.length===0&&/TODO|undefined|NaN|\[object/.test(e.textContent))o.push('placeholder:'+e.textContent.trim().slice(0,30));});
-     const t0=performance.now();let f=0;await new Promise(r=>{const step=()=>{f++;performance.now()-t0<1000?requestAnimationFrame(step):r();};requestAnimationFrame(step);});window.__syCanvasReset&&window.__syCanvasReset();await new Promise(r=>setTimeout(r,700));const au=window.SyAudit?window.SyAudit.audit({touch:matchMedia('(pointer:coarse)').matches}):{fails:[],stats:{}};return {issues:[...new Set(o)].slice(0,30),fps:f,a11y:au.fails,a11yStats:au.stats};});
+     const t0=performance.now();let f=0;await new Promise(r=>{const step=()=>{f++;performance.now()-t0<1000?requestAnimationFrame(step):r();};requestAnimationFrame(step);});window.__syCanvasText=[];await new Promise(r=>setTimeout(r,700));const au=window.SyAudit?window.SyAudit.audit({touch:matchMedia('(pointer:coarse)').matches}):{fails:[],stats:{}};return {issues:[...new Set(o)].slice(0,30),fps:f,a11y:au.fails,a11yStats:au.stats};});
    report[key]={errors:errs,missing:[...new Set(miss)],...info};
   }catch(e){report[key]={fail:String(e).slice(0,300),errors:errs};try{await p.screenshot({path:`${out}/${key}_FAIL.png`});}catch{}}
   await ctx.close();console.log(key,JSON.stringify(report[key]).slice(0,240));}}
