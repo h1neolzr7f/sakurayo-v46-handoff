@@ -5425,9 +5425,10 @@ window.SAKURAYO_VERSION_CODE = 71;
     if (state !== "play") return;
     shake = Math.max(0, shake - 28 * dt);
     /* HUD 写 DOM 限到 15Hz（原来每个 60Hz 逻辑步都写 20 多处 DOM / innerHTML，触发重排和 MutationObserver） */
-    hudAcc46 += dt; if (hudAcc46 >= 1 / 15 || manualTestClock) { hudAcc46 = 0; updateHud(); }
+    if (typeof globalThis.__hudAcc46 !== "number") globalThis.__hudAcc46 = 1;
+    globalThis.__hudAcc46 += dt;
+    if (globalThis.__hudAcc46 >= 1 / 15 || (typeof manualTestClock !== "undefined" && manualTestClock)) { globalThis.__hudAcc46 = 0; if (typeof updateHud === "function") updateHud(); }
   }
-  var hudAcc46 = 1;
 
   const html46 = new Map();
   function setHtml46(sel, v) { if (html46.get(sel) === v) return; html46.set(sel, v); const e = $(sel); if (e) e.innerHTML = v; }
@@ -6000,7 +6001,6 @@ window.SAKURAYO_VERSION_CODE = 71;
     if (a && !pad46.dash) dash(); if (b && !pad46.skill) $("#skill")?.click();
     pad46.dash = a; pad46.skill = b;
   }
-  var lowSec46 = 0, highSec46 = 0;
   function loop(now) {
     if (state !== "play") return;
     let frame = Math.min(0.08, (now - last) / 1000 || 0);
@@ -6013,14 +6013,15 @@ window.SAKURAYO_VERSION_CODE = 71;
       fps = fpsFrames / fpsClock;
       /* 自动降级规则（docs/PLAYBOOK.md「帧率与画质」）：连续 5 秒 < 40fps 才降到省电画质；连续 3 秒 ≥ 52fps 恢复。
          开局前 4 秒（加载 / 解码）不计。不锁帧，跟随屏幕刷新率。手动省电 (settings.fx===0) 优先。 */
-      if (runTime > 4) { lowSec46 = fps < 40 ? lowSec46 + 1 : 0; highSec46 = fps >= 52 ? highSec46 + 1 : 0; }
-      if (lowSec46 >= 5) { adaptiveQuality48 = 0.62; lowSec46 = 0; } else if (highSec46 >= 3) { adaptiveQuality48 = 1; highSec46 = 0; }
+      if (typeof globalThis.__lowSec46 !== "number") { globalThis.__lowSec46 = 0; globalThis.__highSec46 = 0; }
+      if (typeof runTime === "number" && runTime > 4) { globalThis.__lowSec46 = fps < 40 ? globalThis.__lowSec46 + 1 : 0; globalThis.__highSec46 = fps >= 52 ? globalThis.__highSec46 + 1 : 0; }
+      if (globalThis.__lowSec46 >= 5) { adaptiveQuality48 = 0.62; globalThis.__lowSec46 = 0; } else if (globalThis.__highSec46 >= 3) { adaptiveQuality48 = 1; globalThis.__highSec46 = 0; }
       updateQuality48();
       fpsFrames = 0;
       fpsClock = 0;
     }
     /* 可变步长：每帧按真实 dt 推进（拆成 ≤1/60s 的子步），90/120Hz 屏不会出现“这帧没更新”的抖动，30fps 也不丢时间 */
-    if (manualTestClock) {
+    if (typeof manualTestClock !== "undefined" && manualTestClock) {
       acc = Math.min(0.12, acc + frame);
       let steps = 0;
       while (acc >= 1 / 60 && steps < 4 && state === "play") { update(1 / 60); acc -= 1 / 60; steps++; }
@@ -6130,8 +6131,8 @@ window.SAKURAYO_VERSION_CODE = 71;
     joy.sy = e.clientY;
     move(e);
     let j = $("#joy");
-    j.style.left = `${clamp(e.clientX - 59, 8, innerWidth - 126)}px`;
-    j.style.top = `${clamp(e.clientY - 59, 75, innerHeight - 126)}px`;
+    j.style.left = `${clamp(e.clientX - 59, 8, (typeof innerWidth === "number" ? innerWidth : W) - 126)}px`;
+    j.style.top = `${clamp(e.clientY - 59, 75, (typeof innerHeight === "number" ? innerHeight : H) - 126)}px`;
     j.style.bottom = "auto";
   }
   function move(e) {
@@ -8121,17 +8122,21 @@ window.SAKURAYO_VERSION_CODE = 71;
   }
   function setLiveLayer46(img, path, done) {
     if (!img) return;
-    img.classList.add("off");
-    img.onload = () => {
-      img.classList.remove("off");
-      done && done(true);
+    const url = artUrl(path);
+    /* 预解码 + 双缓冲：先在离屏 Image 上 decode，成功后再赋给可见层，避免切换时解码间隙闪黑/闪白 */
+    const next = new Image();
+    next.decoding = "async";
+    const apply = () => {
+      img.onload = () => { img.classList.remove("off"); done && done(true); };
+      img.onerror = () => { img.removeAttribute("src"); img.classList.add("off"); done && done(false); };
+      if (img.getAttribute("src") !== url) img.src = url; else { img.classList.remove("off"); done && done(true); }
     };
-    img.onerror = () => {
-      img.removeAttribute("src");
-      img.classList.add("off");
-      done && done(false);
+    next.onload = () => {
+      const d = next.decode ? next.decode() : Promise.resolve();
+      Promise.resolve(d).then(apply).catch(apply);
     };
-    img.src = artUrl(path);
+    next.onerror = () => { img.classList.add("off"); done && done(false); };
+    next.src = url;
   }
   function updateHeroLive46() {
     const root = $("#heroLive46");

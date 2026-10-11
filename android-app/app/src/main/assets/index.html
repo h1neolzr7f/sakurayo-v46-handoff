@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" name="viewport"/>
 <meta content="#090714" name="theme-color"/>
-<title>樱夜·尸潮：Mod Kit V4.6.0</title>
+<title>樱夜·尸潮 0.9.0-beta</title>
 <style>
 :root{--p:#ff58a7;--p2:#ffb4d5;--c:#56ddff;--g:#ffd36b;--bg:#080713;--panel:rgba(18,14,39,.96);--line:rgba(170,220,255,.24);--mut:#cfc4df;--red:#ff4e72}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:#fff;font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;touch-action:none}button{border:0;color:inherit;font:inherit}button:active{transform:scale(.985)}canvas{position:fixed;inset:0;width:100%;height:100%}.hidden{display:none!important}.screen{position:fixed;inset:0;z-index:10}
@@ -129,7 +129,9 @@
 <div class="overlay hidden" id="result"><div class="modal"><div class="resultIcon" id="ricon">🌸</div><div class="rankBig" id="rankBig"></div><h2 id="rtitle"></h2><p class="sub" id="rsub"></p><div class="stats" id="rstats"></div><div class="endingTag" id="endingTag">结局演算中</div><div class="report" id="damageReport"></div><div class="routeNote" id="routeNote"></div><div class="actions"><button class="primary" id="again">再次迎击</button><button class="secondary" id="back">返回主界面</button></div></div></div>
 <div class="warn hidden" id="warning"></div><div id="toast"></div>
 <script>
-window.SAKURAYO_GAME_VERSION = "4.6.0";
+window.SAKURAYO_GAME_VERSION = "4.6.0"; // 模组 API 兼容用的引擎版本，不对玩家显示
+window.SAKURAYO_DISPLAY_VERSION = "0.9.0-beta"; // 对玩家显示的版本号，与 android versionName 同步
+window.SAKURAYO_VERSION_CODE = 71;
 (() => {
   "use strict";
   const enabled = /(?:\?|&)(?:debug|test)=1(?:&|$)/.test(location.search || "");
@@ -1177,30 +1179,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       ctx.ellipse(o.x + (o.w || 0) * 0.5, o.y + (o.h || 0) + 9, o.kind === "sword" ? o.r * 0.4 : o.kind === "vehicle" ? o.w * 0.6 : 27, o.kind === "vehicle" ? 9 : 7, 0, 0, TAU);
       ctx.fill();
       if (o.kind === "torii") {
-        ctx.fillStyle = "rgba(255,142,171,0.10)";
-        ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, TAU); ctx.fill();
-        ctx.fillStyle = "#581c33";
-        ctx.fillRect(o.x - 20, o.y - 6, 8, 38);
-        ctx.fillRect(o.x + 12, o.y - 6, 8, 38);
-        ctx.fillStyle = "#bc455f";
-        ctx.fillRect(o.x - 20, o.y - 6, 3, 35);
-        ctx.fillRect(o.x + 12, o.y - 6, 3, 35);
-        ctx.fillStyle = "#251923";
-        ctx.fillRect(o.x - 23, o.y + 28, 14, 5);
-        ctx.fillRect(o.x + 9, o.y + 28, 14, 5);
-        ctx.fillStyle = "#dc7586";
-        ctx.fillRect(o.x - 26, o.y - 16, 52, 9);
-        ctx.fillRect(o.x - 18, o.y - 4, 36, 5);
-        ctx.fillStyle = "#f5aea8";
-        ctx.fillRect(o.x - 28, o.y - 18, 56, 3);
-        ctx.fillStyle = "#352333";
-        ctx.fillRect(o.x - 4, o.y - 10, 8, 12);
-        ctx.fillStyle = "#ffc7a4";
-        ctx.fillRect(o.x - 2, o.y - 7, 4, 6);
-        ctx.fillStyle = "rgba(255,193,130," + (0.17 + Math.sin(t * 1.8 + i) * 0.045) + ")";
-        ctx.beginPath(); ctx.arc(o.x, o.y - 24, 8, 0, TAU); ctx.fill();
-        ctx.fillStyle = "#ffd0a0";
-        ctx.beginPath(); ctx.arc(o.x, o.y - 24, 3, 0, TAU); ctx.fill();
+        /* 全息牌楼（替换和风鸟居，props/paifang.webp，黑底发光图用 lighter 叠加） */
+        var pf = propSprite("paifang"), pw = 92, ph = pf && pf.naturalWidth ? pw * pf.naturalHeight / pf.naturalWidth : 80;
+        ctx.fillStyle = "rgba(120,160,255,0.10)"; ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, TAU); ctx.fill();
+        if (pf && pf.naturalWidth) { ctx.save(); ctx.globalAlpha = 0.85 + Math.sin(t * 1.8 + i) * 0.1; ctx.drawImage(pf, o.x - pw / 2, o.y + 30 - ph, pw, ph); ctx.restore(); }
       } else if (o.kind === "vehicle") {
         ctx.fillStyle = "#060b14";
         ctx.fillRect(o.x + 8, o.y - 3, 9, 5);
@@ -1399,6 +1381,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     ctx.restore();
   }
 
+  var PROP_SPR = {};
+  function propSprite(n) { if (typeof Image === "undefined") return null; if (!PROP_SPR[n]) { PROP_SPR[n] = new Image(); PROP_SPR[n].src = (global.SakurayoArtBase || "art/") + "props/" + n + ".webp"; } return PROP_SPR[n]; }
   function heroVisualScale(width) {
     return (width || 0) >= 560 ? 1.3 : 1.16; // ART_PASS ②：自机放大，读得清动作
   }
@@ -2299,7 +2283,16 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 (function(global){
   'use strict';
   // Offline finite rewards. Presentation belongs to the command room.
-  var MAIL_IDS=['welcome','firstRun','chapter1','chapter2','chapter3','chapter4','kills500'];
+  // 内测福利邮件（0.9.0-beta）。mailbox() 每次按 ID 生成，旧存档打开即收到；领取记录按 ID 存，不会重复发放。
+  var BETA_MAILS=[
+    {id:'beta_welcome',title:'内测欢迎信',desc:'指挥官，欢迎参加《樱夜尸潮》内测。本版本的抽卡、衣橱、形态与夜行都已开放，这里先送上一份见面礼。',items:{coins:3000,tickets:10}},
+    {id:'beta_supply',title:'内测补给 · 足量物资',desc:'为了让你充分体验寻访、衣橱与形态解锁，行动局拨付了一批内测专用物资。数值仅供测试，正式版会重置。',items:{coins:60000,tickets:40,kyo:900}},
+    {id:'beta_login',title:'每日登录累积奖励（内测）',desc:'内测期间登录即可领取累积奖励，七日签到照常进行，与本邮件不冲突。',items:{coins:8000,tickets:10,kyo:200}},
+    {id:'beta_patch',title:'版本 0.9.0-beta 更新公告',desc:'横屏锁定、寻访立绘头部安全区、看板娘去闪烁、新手教学左右分栏、割草镜头按屏高自适应与 60fps 默认画质、中式科技风道具替换。详见公告。',items:{coins:5000,kyo:300}},
+    {id:'beta_feedback',title:'问题反馈感谢信',desc:'感谢你在实机上反馈的问题（立绘被裁、看板娘闪烁、弹窗需要滚动、割草角色过大等），它们已在本版本修复。这是一点心意。',items:{coins:10000,tickets:20,kyo:400}}
+  ];
+  var BETA_IDS=BETA_MAILS.map(function(m){return m.id;});
+  var MAIL_IDS=['welcome','firstRun','chapter1','chapter2','chapter3','chapter4','kills500'].concat(BETA_IDS);
   var LOGIN_REWARDS=[60,80,100,120,140,160,240];
   function validDay(s){
     if(typeof s!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(s))return false;
@@ -2310,7 +2303,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     var r=raw&&typeof raw==='object'&&!Array.isArray(raw)?raw:{};
     var read={};MAIL_IDS.forEach(function(id){read[id]=!!(r.mailRead&&r.mailRead[id]===true);});
     var dates=[];(Array.isArray(r.loginDates)?r.loginDates:[]).forEach(function(day){if(validDay(day)&&dates.indexOf(day)<0)dates.push(day);});
-    return {mailRead:read,welcomeClaimed:r.welcomeClaimed===true,loginDates:dates.sort().slice(0,7)};
+    var beta={};BETA_IDS.forEach(function(id){beta[id]=!!(r.betaClaimed&&r.betaClaimed[id]===true);});
+    return {mailRead:read,welcomeClaimed:r.welcomeClaimed===true,betaClaimed:beta,loginDates:dates.sort().slice(0,7)};
   }
   function state(save){return normalize(save&&save.shop40&&save.shop40.ops&&save.shop40.ops.services);}
   function write(save,value){
@@ -2319,8 +2313,15 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     save.shop40.ops.services=value;
   }
   function credit(save,reward){var coins=Number(save.coins);save.coins=(Number.isFinite(coins)?Math.max(0,coins):0)+reward;}
+  // 附件发放：樱花币 → save.coins；寻访券 → save.wishTickets46（寻访优先消耗券）；镜屑 → 衣橱 cosmetics46.kyo
+  function grant(save,items){
+    if(items.coins)credit(save,items.coins);
+    if(items.tickets)save.wishTickets46=Math.max(0,Number(save.wishTickets46)||0)+items.tickets;
+    if(items.kyo){if(!save.cosmetics46||typeof save.cosmetics46!=='object')save.cosmetics46=global.SakurayoWardrobe?global.SakurayoWardrobe.blank():{owned:[],equip:{form:{},weapon:{},fx:null},kyo:0,kyoWeek:0,kyoGot:0,formUses:{}};save.cosmetics46.kyo=Math.min(9999,(Number(save.cosmetics46.kyo)||0)+items.kyo);}
+  }
   function mailbox(save,command){
     var s=state(save),rows=[{id:'welcome',title:'行动终端接入补给',desc:'欢迎回到樱夜行动局。整备你的装备，从灵枢观外街开始回收行动。',reward:200,claimed:s.welcomeClaimed}];
+    BETA_MAILS.forEach(function(m){rows.push({id:m.id,title:m.title,desc:m.desc,reward:m.items.coins||0,items:m.items,claimed:s.betaClaimed[m.id]});});
     if(command)command.inbox(save).filter(function(r){return r.ready;}).forEach(function(r){rows.push({id:r.id,title:r.title,desc:r.desc+' 补给已送达，可在邮箱或任务中领取。',reward:r.reward,claimed:r.claimed});});
     return rows.map(function(r){r.read=s.mailRead[r.id]===true;r.sender='樱夜行动局';return r;});
   }
@@ -2333,7 +2334,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if(!mail)return {ok:false,reason:'unknown',reward:0};
     if(mail.claimed)return {ok:false,reason:'claimed',reward:0};
     var result;
-    if(id==='welcome'){var s=state(save);s.welcomeClaimed=true;write(save,s);credit(save,200);result={ok:true,reason:'',reward:200};}
+    var beta=BETA_MAILS.filter(function(m){return m.id===id;})[0];
+    if(beta){var b=state(save);b.betaClaimed[id]=true;write(save,b);grant(save,beta.items);result={ok:true,reason:'',reward:beta.items.coins||0,items:beta.items};}
+    else if(id==='welcome'){var s=state(save);s.welcomeClaimed=true;write(save,s);credit(save,200);result={ok:true,reason:'',reward:200};}
     else result=command.claimSupply(save,id);
     if(result.ok)markRead(save,id,command);
     return result;
@@ -2357,7 +2360,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     var s=state(save);s.loginDates.push(status.today);write(save,s);credit(save,status.reward);
     return {ok:true,reason:'',reward:status.reward};
   }
-  global.SakurayoServices={normalize:normalize,mailbox:mailbox,markRead:markRead,claimMail:claimMail,claimAll:claimAll,loginStatus:loginStatus,claimLogin:claimLogin};
+  global.SakurayoServices={BETA_MAILS:BETA_MAILS,grant:grant,normalize:normalize,mailbox:mailbox,markRead:markRead,claimMail:claimMail,claimAll:claimAll,loginStatus:loginStatus,claimLogin:claimLogin};
 })(window);
 
 </script>
@@ -2588,6 +2591,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
    api.gems(x, y, count, value), api.heal(fraction), api.shield(amount), api.coins(n),
    api.fx(kind, x, y), api.toast(text), api.sound(key). */
 (function (global) {
+  var SPR = {}; function spr(n) { if (typeof Image === "undefined") return null; if (!SPR[n]) { SPR[n] = new Image(); SPR[n].src = (global.SakurayoArtBase || "art/") + "props/" + n + ".webp"; } return SPR[n]; }
   "use strict";
   // per chapter layout flavour: how many of each prop and how they cluster
   var LAYOUT = {
@@ -2680,11 +2684,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       ctx.restore(); return;
     }
     if (p.kind === "lantern") { var on = p.lit > 0, fl = 0.8 + Math.sin(t * 13 + p.x) * 0.2;
-      if (on) { var gr = ctx.createRadialGradient(p.x, p.y, 4, p.x, p.y, 150); gr.addColorStop(0, "rgba(255,150,60," + 0.35 * fl + ")"); gr.addColorStop(1, "rgba(255,90,30,0)"); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(p.x, p.y, 150, 0, Math.PI * 2); ctx.fill(); }
-      ctx.fillStyle = on ? "#ff9a3d" : p.cool > 0 ? "#6a4a3a" : "#d8553a"; ctx.beginPath(); ctx.ellipse(p.x, p.y - 22, 13, 17, 0, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = "#2a1408"; ctx.fillRect(p.x - 8, p.y - 42, 16, 4); ctx.fillRect(p.x - 8, p.y - 6, 16, 4); ctx.fillRect(p.x - 1.5, p.y - 2, 3, 14);
+      if (on) { var gr = ctx.createRadialGradient(p.x, p.y, 4, p.x, p.y, 150); gr.addColorStop(0, "rgba(140,170,255," + 0.3 * fl + ")"); gr.addColorStop(1, "rgba(120,150,255,0)"); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(p.x, p.y, 150, 0, Math.PI * 2); ctx.fill(); }
+      var ls = spr("lantern_tech"); if (ls && ls.naturalWidth) { var lh = 58, lw = lh * ls.naturalWidth / ls.naturalHeight; ctx.globalAlpha = on ? 1 : p.cool > 0 ? 0.45 : 0.8; ctx.drawImage(ls, p.x - lw / 2, p.y + 4 - lh, lw, lh); ctx.globalAlpha = 1; }
       ctx.restore(); return; }
-    if (p.kind === "torii") { var rd = p.cool > 0 ? "#7a3a3a" : "#e0303a"; ctx.fillStyle = rd; ctx.fillRect(p.x - 30, p.y - 56, 7, 56); ctx.fillRect(p.x + 23, p.y - 56, 7, 56); ctx.fillRect(p.x - 40, p.y - 62, 80, 8); ctx.fillRect(p.x - 32, p.y - 46, 64, 5);
-      if (p.cool <= 0) { ctx.strokeStyle = "rgba(255,220,120," + (0.4 + Math.sin(t * 4) * 0.3) + ")"; ctx.lineWidth = 2; ctx.strokeRect(p.x - 23, p.y - 46, 46, 46); }
+    if (p.kind === "torii") { var ps = spr("paifang"), pw2 = 96, ph2 = ps && ps.naturalWidth ? pw2 * ps.naturalHeight / ps.naturalWidth : 84; ctx.globalAlpha = p.cool > 0 ? 0.45 : 0.95; if (ps && ps.naturalWidth) ctx.drawImage(ps, p.x - pw2 / 2, p.y - ph2, pw2, ph2); ctx.globalAlpha = 1;
+      if (p.cool <= 0) { ctx.strokeStyle = "rgba(150,190,255," + (0.4 + Math.sin(t * 4) * 0.3) + ")"; ctx.lineWidth = 2; ctx.strokeRect(p.x - 23, p.y - 46, 46, 46); }
       ctx.restore(); return; }
     if (p.kind === "chest") { ctx.shadowColor = "#7ff3ff"; ctx.shadowBlur = 10 + Math.sin(t * 4) * 5; }
     if (img) ctx.drawImage(img, p.x - s / 2, p.y - s * 0.7, s, s);
@@ -2896,7 +2900,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   "use strict";
   var TAU = Math.PI * 2;
   var TYPE = {
-    survive: { n: "生存", i: "⏳" }, clear: { n: "清剿", i: "⚔" }, escort: { n: "护送", i: "🏮" },
+    survive: { n: "生存", i: "⏳" }, clear: { n: "清剿", i: "⚔" }, escort: { n: "护送", i: "🔆" },
     timed: { n: "限时摧毁", i: "⏱" }, mech: { n: "机关", i: "☯" }, channel: { n: "读取", i: "📡" }, boss: { n: "Boss", i: "👹" }
   };
   // star keys: win | hits<=v | chests>=v | time<=v | npcHp>=v | mechKills>=v | breaks>=v | noUlt
@@ -4236,7 +4240,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   var RELICS = [
     { id: "petal", n: "樱瓣护符", i: "🌸", d: "攻击力 +12%", fx: { dmgMul: 1.12 } },
     { id: "bell", n: "铃之残响", i: "🔔", d: "最大生命 +20", fx: { maxHp: 20 } },
-    { id: "lantern", n: "引魂灯", i: "🏮", d: "拾取范围 +40", fx: { mag: 40 } },
+    { id: "lantern", n: "引魂灯", i: "🔆", d: "拾取范围 +40", fx: { mag: 40 } },
     { id: "geta", n: "疾风木屐", i: "👡", d: "移速 +8%", fx: { spdMul: 1.08 } },
     { id: "mirror", n: "裂镜片", i: "🪞", d: "暴击率 +6%", fx: { crit: 0.06 } },
     { id: "omamori", n: "平安守", i: "🧧", d: "每进入战斗节点回复 8% 生命", fx: { nodeHeal: 0.08 } },
@@ -5610,6 +5614,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     "#menu.homeDock46 .heroLiveBreath46{width:min(62vw,680px);height:100%}" +
     "#menu.homeDock46 .heroLiveBreath46:before{content:\"\";position:absolute;inset:18% 18% 0 18%;background:radial-gradient(ellipse at 50% 78%,#1a103066 0%,#12081c00 70%);pointer-events:none}" +
     "#menu.homeDock46 .heroLiveBreath46 img,.wishHero46{background:transparent!important;image-rendering:auto;filter:none}" +
+    "@keyframes heroBlink46{0%,86%,100%{opacity:0}88%,94%{opacity:1}}" +
+    "@keyframes heroBaseBlink46{0%,86%,100%{opacity:1}88%,94%{opacity:0}}" +
     ".heroLive46.hasBlink:not(.livePuppet46) .heroLiveBlink46{animation:heroBlink46 5.4s steps(1) infinite}" +
     ".heroLive46.hasBlink:not(.livePuppet46) .heroLiveBase46{animation:heroBaseBlink46 5.4s steps(1) infinite}" +
     ".pityRail46{height:7px}" +
@@ -5982,7 +5988,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (!list.length) {
       return { ok: false, reason: "empty", results: [], coins: coins, pool: pool, pity: save.shop40.ops.pity, pitySR: save.shop40.ops.pitySR, owned: save.shop40.ops.owned };
     }
-    if (coins < cost) {
+    var tickets = Math.max(0, Number(save.wishTickets46) || 0), useTicket = tickets >= n; // 内测寻访券：够数时优先用券
+    if (!useTicket && coins < cost) {
       return { ok: false, reason: "coins", results: [], coins: coins, pool: pool, pity: save.shop40.ops.pity, pitySR: save.shop40.ops.pitySR, owned: save.shop40.ops.owned };
     }
     var rand = typeof rng === "function" ? rng : Math.random;
@@ -5995,7 +6002,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }
     if (n === 10) state.tenPulls += 1;
     state.last = results.slice();
-    save.coins = coins - cost;
+    if (useTicket) save.wishTickets46 = tickets - n; else save.coins = coins - cost;
     return {
       ok: true,
       results: results,
@@ -6898,6 +6905,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     clean.runHistory = list(clean.runHistory).filter(object).slice(0,30);
     ['story','forms','fusions','endings','evo46','avgRead46','cg46'].forEach(function (key) {if (!Array.isArray(clean[key])) clean[key] = copy(DEFAULTS[key]);});
     clean.talRefund46 = integer(clean.talRefund46,-1,COUNT_MAX,-1);
+    clean.wishTickets46 = integer(incoming.wishTickets46,0,COUNT_MAX,0); // 内测寻访券（邮件发放，寻访优先消耗）
     clean.season46 = global.SakurayoSeason ? global.SakurayoSeason.sanitize(object(incoming.season46) ? copy(incoming.season46) : null) : (object(incoming.season46) ? copy(incoming.season46) : null);
     clean.pachi46 = object(incoming.pachi46) && incoming.pachi46.day > 0 ? { day: incoming.pachi46.day | 0, free: Math.max(0, Math.min(9, incoming.pachi46.free | 0)), balls: Math.max(0, incoming.pachi46.balls | 0) } : null; // 樱花弹珠台每日次数
     clean.cosmetics46 = global.SakurayoWardrobe ? global.SakurayoWardrobe.sanitize(object(incoming.cosmetics46) ? copy(incoming.cosmetics46) : null) : (object(incoming.cosmetics46) ? copy(incoming.cosmetics46) : null);
@@ -8203,7 +8211,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   d.getElementById('commandActivity48').style.backgroundImage='linear-gradient(90deg,#14283dbb,#14283d30),url("'+activityArt+'")';
   d.getElementById('commandHeading47').querySelector('b').textContent='回收行动局';
   d.getElementById('commandProgress47').textContent='章节 '+model.completed+'/4 · 作战 '+(Number(model.save.runs)||0);
-  d.getElementById('commandSignal47').textContent='离线作战就绪 / OFFLINE MODE';
+  d.getElementById('commandSignal47').textContent='离线作战就绪 / OFFLINE MODE · v'+(global.SAKURAYO_DISPLAY_VERSION||'0.9.0-beta');
  }
  global.SakurayoTerminal={css:CSS,icon:icon,decorate:decorate};
 })(window);
@@ -8254,7 +8262,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   var CSS = `
     button{cursor:pointer}button:focus-visible{outline:2px solid #83e4f2;outline-offset:3px}button:disabled{cursor:default}
     .cmdMailbox48{display:grid;grid-template-columns:minmax(210px,31%) 1fr;gap:20px}.cmdMailList48{display:grid;align-content:start;gap:7px}.cmdMailList48 button{position:relative;min-height:65px;padding:12px 14px;border:1px solid var(--cmd-line);background:#1c2b39;color:#e8f0f5;text-align:left;font-size:12px}.cmdMailList48 button small{display:block;color:var(--cmd-dim);font-size:9px;margin-top:6px}.cmdMailList48 button.on{border-color:#8ce1ef;background:#244556}.cmdMailList48 button.unread:before{content:'';position:absolute;right:8px;top:8px;width:6px;height:6px;background:#efb26c;transform:rotate(45deg)}
-    .cmdMailLetter48{min-height:320px;padding:30px;background:linear-gradient(135deg,#ffffff08,transparent),#172631;border:1px solid var(--cmd-line)}.cmdMailLetter48>small{font-size:10px;letter-spacing:.15em;color:var(--cmd-pink)}.cmdMailLetter48 h3{font-size:24px;font-weight:550;margin:18px 0}.cmdMailLetter48 p{font-size:13px;color:#cbdce6;line-height:1.9;max-width:650px}.cmdMailAttachment48{display:flex;align-items:center;gap:13px;margin:28px 0;padding:15px;border:1px solid var(--cmd-line);max-width:260px;background:#90d9eb0a}.cmdMailAttachment48 svg{width:35px;height:35px;color:var(--cmd-gold)}.cmdMailAttachment48 b{font-size:18px}.cmdMailAttachment48 small{display:block;font-size:10px;color:var(--cmd-dim);margin-top:4px}
+    .cmdMailLetter48{min-height:320px;padding:30px;background:linear-gradient(135deg,#ffffff08,transparent),#172631;border:1px solid var(--cmd-line)}.cmdMailLetter48>small{font-size:10px;letter-spacing:.15em;color:var(--cmd-pink)}.cmdMailLetter48 h3{font-size:24px;font-weight:550;margin:18px 0}.cmdMailLetter48 p{font-size:13px;color:#cbdce6;line-height:1.9;max-width:650px}.cmdMailAttachRow48{display:flex;flex-wrap:wrap;gap:10px;margin:14px 0}.cmdMailAttachRow48 .cmdMailAttachment48{margin:0!important;min-width:120px}.cmdMailAttachment48.got{opacity:.5}.cmdMailAttachment48{display:flex;align-items:center;gap:13px;margin:28px 0;padding:15px;border:1px solid var(--cmd-line);max-width:260px;background:#90d9eb0a}.cmdMailAttachment48 svg{width:35px;height:35px;color:var(--cmd-gold)}.cmdMailAttachment48 b{font-size:18px}.cmdMailAttachment48 small{display:block;font-size:10px;color:var(--cmd-dim);margin-top:4px}
     .cmdLogin48{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:10px;margin:26px 0}.cmdLoginDay48{min-height:140px;padding:15px 5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#1b2c3a;border:1px solid var(--cmd-line)}.cmdLoginDay48 small{font-size:10px;letter-spacing:.1em;color:var(--cmd-dim)}.cmdLoginDay48 svg{width:30px;height:30px;color:var(--cmd-gold)}.cmdLoginDay48 b{font-size:21px;font-weight:550}.cmdLoginDay48 span{font-size:10px;color:#b7cddd}.cmdLoginDay48.on{border-color:#90e8fd;background:#204454}.cmdLoginDay48.done{opacity:.55}.cmdLoginDay48.done span{color:#9dedce}
     .cmdNotice48{max-width:850px;padding:24px;margin-bottom:15px;border:1px solid var(--cmd-line);border-left:2px solid #8ce1ef;background:#182a37}.cmdNotice48 small{font-size:9px;letter-spacing:.15em;color:var(--cmd-pink)}.cmdNotice48 h3{margin:12px 0;font-size:22px;font-weight:500}.cmdNotice48 p{font-size:13px;color:#cbdce6;line-height:1.8}.cmdActions47 button:disabled{background:#263847!important;color:#8ea4b3!important;border-color:var(--cmd-line)!important}
     @media(max-width:640px){.cmdMailbox48{grid-template-columns:1fr}.cmdMailList48{max-height:190px;overflow:auto}.cmdMailLetter48{min-height:280px;padding:20px}.cmdLogin48{grid-template-columns:repeat(2,1fr)}.cmdLoginDay48{min-height:110px}.cmdLoginDay48:last-child{grid-column:1/-1}}
@@ -8388,12 +8396,12 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       var letter=letters.filter(function(m){return m.id===selectedMail;})[0]||letters[0];selectedMail=letter.id;
       if(!letter.read){S.markRead(model.save,letter.id,global.SakurayoCommand);options.persist();letters=S.mailbox(model.save,global.SakurayoCommand);letter=letters.filter(function(m){return m.id===selectedMail;})[0];}
       var canClaim=letters.some(function(m){return !m.claimed;});
-      body.innerHTML='<div class="cmdMailbox48"><div class="cmdMailList48">'+letters.map(function(m){return '<button type="button" id="mail48-'+m.id+'" data-mail="'+m.id+'" class="'+(m.id===selectedMail?'on ':'')+(m.read?'':'unread')+'"><b>'+esc(m.title)+'</b><small>'+esc(m.sender)+' / '+(m.claimed?'已领取':m.read?'已读 · 待领取':'未读')+'</small></button>';}).join('')+'</div><article class="cmdMailLetter48"><small>DISPATCH / '+esc(letter.id.toUpperCase())+'</small><h3>'+esc(letter.title)+'</h3><p>发件人：'+esc(letter.sender)+'</p><p>'+esc(letter.desc)+'</p><p>这份补给存放在你的本机档案中。任务与邮件共用领取记录。</p><div class="cmdMailAttachment48">'+global.SakurayoTerminal.icon('supplies')+'<div><b>'+letter.reward+'</b><small>樱花币</small></div></div><div class="cmdActions47"><button class="primary47" id="commandMailClaim48" '+(letter.claimed?'disabled':'')+'>'+(letter.claimed?'附件已领取':'领取附件')+'</button><button id="commandMailAll48" '+(canClaim?'':'disabled')+'>一键领取</button></div></article></div>';
+      body.innerHTML='<div class="cmdMailbox48"><div class="cmdMailList48">'+letters.map(function(m){return '<button type="button" id="mail48-'+m.id+'" data-mail="'+m.id+'" class="'+(m.id===selectedMail?'on ':'')+(m.read?'':'unread')+'"><b>'+esc(m.title)+'</b><small>'+esc(m.sender)+' / '+(m.claimed?'已领取':m.read?'已读 · 待领取':'未读')+'</small></button>';}).join('')+'</div><article class="cmdMailLetter48"><small>DISPATCH / '+esc(letter.id.toUpperCase())+'</small><h3>'+esc(letter.title)+'</h3><p>发件人：'+esc(letter.sender)+'</p><p>'+esc(letter.desc)+'</p><p>这份补给存放在你的本机档案中。任务与邮件共用领取记录。</p><div class="cmdMailAttachRow48">'+(letter.items?Object.keys(letter.items):['coins']).map(function(k){var n=letter.items?letter.items[k]:letter.reward;return '<div class="cmdMailAttachment48'+(letter.claimed?' got':'')+'">'+global.SakurayoTerminal.icon('supplies')+'<div><b>'+n+'</b><small>'+({coins:'樱花币',tickets:'寻访券',kyo:'镜屑'})[k]+'</small></div></div>';}).join('')+'</div><div class="cmdActions47"><button class="primary47" id="commandMailClaim48" '+(letter.claimed?'disabled':'')+'>'+(letter.claimed?'附件已领取':'领取附件')+'</button><button id="commandMailAll48" '+(canClaim?'':'disabled')+'>一键领取</button></div></article></div>';
     }else if(kind==='login'){
       var status=global.SakurayoServices.loginStatus(model.save),label=status.reason==='complete'?'七日补给已全部领取':status.reason==='clock'?'请检查本机日期':status.reason==='claimed'?'今日已签到':'签到领取 · 樱花币 +'+status.reward;
       body.innerHTML='<article class="cmdNotice48"><small>WELCOME BACK / '+esc(status.today)+'</small><h3>每一次归来，都有新的补给。</h3><p>累计七个登录日，无需连续签到。本机日期每日最多领取一次；七日完成后不重复循环。已完成 '+status.count+' / 7 天。</p></article><div class="cmdLogin48">'+status.rewards.map(function(reward,i){return '<article class="cmdLoginDay48 '+(i<status.count?'done':i===status.count?'on':'')+'"><small>DAY '+(i+1)+'</small>'+global.SakurayoTerminal.icon('supplies')+'<b>'+reward+'</b><span>'+(i<status.count?'已领取':i===status.count?'本次补给':'待签到')+'</span></article>';}).join('')+'</div><div class="cmdActions47"><button class="primary47" id="commandLoginClaim48" '+(status.ready?'':'disabled')+'>'+label+'</button></div>';
     }else if(kind==='notice'){
-      body.innerHTML='<article class="cmdNotice48"><small>UPDATE / DEVELOPMENT BUILD</small><h3>4.6.0 · 行动终端更新</h3><p>新大厅加入邮箱、七日登录签到、任务补给与活动入口。邮件与任务共享领取状态，进度保存在本机。四章插画和场景动画已更新。</p><p>当前为开发预发布版本；新 Android 安装包尚未发布。</p></article><article class="cmdNotice48"><small>FIELD MANUAL</small><h3>关于这场回收行动</h3><p>三名作战角色，四章战场。回收演习保留职业、转职、融合与三相飞升的肉鸽构筑；证词模式侧重剧情；主神空间提供高难轮回挑战。</p><p>寻访、装备、剧情档案与历史战绩均可从大厅进入。导出存档请前往设置。</p></article><div class="cmdActions47"><button id="commandNoticeActivity48">查看活动与行动</button></div>';
+      body.innerHTML='<article class="cmdNotice48"><small>UPDATE / CLOSED BETA</small><h3>'+esc(global.SAKURAYO_DISPLAY_VERSION||'0.9.0-beta')+' · 内测版本</h3><p>横屏锁定；寻访与各处立绘按头部安全区定位；看板娘改为往返播放并预解码，消除闪烁；新手教学与说明弹窗改为左右分栏；割草镜头按屏高固定视野，默认 60fps；场景道具统一为中式科技风。内测福利已通过邮件发放，可在邮箱一键领取。</p><p>本版本使用新的固定签名，首次安装前请卸载旧的调试版。</p></article><article class="cmdNotice48"><small>UPDATE / DEVELOPMENT BUILD</small><h3>4.6.0 · 行动终端更新</h3><p>新大厅加入邮箱、七日登录签到、任务补给与活动入口。邮件与任务共享领取状态，进度保存在本机。四章插画和场景动画已更新。</p><p>当前为开发预发布版本；新 Android 安装包尚未发布。</p></article><article class="cmdNotice48"><small>FIELD MANUAL</small><h3>关于这场回收行动</h3><p>三名作战角色，四章战场。回收演习保留职业、转职、融合与三相飞升的肉鸽构筑；证词模式侧重剧情；主神空间提供高难轮回挑战。</p><p>寻访、装备、剧情档案与历史战绩均可从大厅进入。导出存档请前往设置。</p></article><div class="cmdActions47"><button id="commandNoticeActivity48">查看活动与行动</button></div>';
     }else if(kind==='activities'){
       body.innerHTML='<div class="cmdActivities48">'+[['story','回收行动 · 四章演习','三名角色出击，收集随机升级并组合职业、转职与融合。'],['testimony','证词回收 · 剧情档案','沿着四章剧情完成证词回收。此模式不发放随机升级卡。'],['mainGod','主神空间 · 高难轮回','进入独立的主神试炼与兑换界面，解锁条件沿用现有游戏规则。']].map(function(a){return '<article class="cmdNotice48 cmdActivity48" style="background-image:linear-gradient(90deg,#102332e6,#10233299),url(&quot;'+esc(options.art('ui/tactical/activity-'+(a[0]==='mainGod'?'maingod':a[0])+'-v3.webp'))+'&quot;)"><small>LOCAL OPERATION / '+a[0].toUpperCase()+'</small><h3>'+a[1]+'</h3><p>'+a[2]+'</p><div class="cmdActions47"><button data-operation="'+a[0]+'">进入行动 →</button></div></article>';}).join('')+'</div>';
     }else{
@@ -8667,6 +8675,23 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function resolve(setting, selected) { setting = normalize(setting); return setting === "follow" ? selected : setting; }
   function next(setting) { var i = IDS.indexOf(normalize(setting)); return IDS[(i + 1) % IDS.length]; }
   var lastLine = "", timer = 0;
+  /* 气泡避让 Logo / 指挥室标题：相交就下移到它们下方（只改这一个气泡的 top） */
+  function avoid(menu, b) {
+    /* 依次试候选位置，取第一个不压 Logo / 标题 / 按钮 / 看板娘脸部的位置 */
+    var mr = menu.getBoundingClientRect(), vh = innerHeight / 100, mx = parseFloat(getComputedStyle(menu).getPropertyValue("--mascotX")) || 50;
+    var fx = mr.left + mr.width * (/%/.test(getComputedStyle(menu).getPropertyValue("--mascotX")) || mx > 1 ? mx / 100 : mx);
+    var face = { left: fx - 13 * vh, right: fx + 13 * vh, top: 4 * vh, bottom: 32 * vh };
+    var blocks = [face]; var gt = document.getElementById("syGuideTip"); if (gt && gt.classList.contains("on")) blocks.push(gt.getBoundingClientRect()); menu.querySelectorAll(".coverTitle36,#commandHeading47,#syTod,button,.terminalTop48,[id^=commandMail],[id^=command] .terminalLabel48").forEach(function (e) { var q = e.getBoundingClientRect(); if (q.width && q.height && q.bottom > 0 && q.top < innerHeight) blocks.push(q); });
+    function hit(r) { for (var i = 0; i < blocks.length; i++) { var q = blocks[i]; if (q.right > r.left && q.left < r.right && q.bottom > r.top && q.top < r.bottom) return true; } return r.left < 0 || r.right > innerWidth; }
+    var w = b.offsetWidth, h = b.offsetHeight, cands = [null, [fx + 13 * vh, 8 * vh], [fx - w / 2, 33 * vh], [fx - 13 * vh - w, 33 * vh], [fx - w / 2, 33 * vh + 0], [fx - w / 2, 52 * vh]];
+    for (var i = 0; i < cands.length; i++) {
+      var c = cands[i]; b.style.left = c ? (c[0] - mr.left) + "px" : ""; b.style.right = c ? "auto" : ""; b.style.top = c ? (c[1]) + "px" : "";
+      if (!hit(b.getBoundingClientRect())) return;
+    }
+    b.style.left = (fx - w / 2 - mr.left) + "px"; b.style.right = "auto"; b.style.top = 52 * vh + "px";
+  }
+
+
   function say(menu, id, name, kind) {
     if (!menu) return "";
     var b = menu.querySelector(".mascotBubble46");
@@ -8676,6 +8701,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     lastLine = line;
     b.innerHTML = "<b>" + String(name || "").replace(/[<>&]/g, "") + "</b>" + line;
     b.classList.add("on");
+    avoid(menu, b);
     clearTimeout(timer);
     timer = setTimeout(function () { b.classList.remove("on"); }, 2600);
     return line;
@@ -10966,15 +10992,19 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       }
     } catch (err) {}
   }
+  var VIEW_H46 = 900, ZOOM46 = 1;
   function resize() {
     D = Math.min(adaptiveQuality48 >= 1 ? 2.5 : 2, devicePixelRatio || 1);
     const view = viewportSize46();
     const prev = window.SakurayoCamera ? window.SakurayoCamera.size() : null;
-    W = view.w;
-    H = view.h;
-    cv.width = Math.floor(W * D);
-    cv.height = Math.floor(H * D);
-    ctx.setTransform(D, 0, 0, D, 0, 0);
+    /* 镜头按屏幕短边自适应：纵向固定 VIEW_H46 个世界单位（自机约占屏高 12%），横向按屏幕比例展开。
+       W/H 是世界视野尺寸；ZOOM46 = 屏幕 CSS px / 世界单位。各尺寸下视野纵向一致，宽屏多看一些两侧。 */
+    ZOOM46 = view.h / VIEW_H46;
+    W = view.w / ZOOM46;
+    H = VIEW_H46;
+    cv.width = Math.floor(view.w * D);
+    cv.height = Math.floor(view.h * D);
+    ctx.setTransform(D * ZOOM46, 0, 0, D * ZOOM46, 0, 0);
     if (window.SakurayoCamera) {
       const next = window.SakurayoCamera.configure(W, H);
       if (P && Number.isFinite(P.x) && prev && prev.worldW && prev.worldH) {
@@ -14086,9 +14116,14 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     updateArenaHazards(dt);
     if (state !== "play") return;
     shake = Math.max(0, shake - 28 * dt);
-    updateHud();
+    /* HUD 写 DOM 限到 15Hz（原来每个 60Hz 逻辑步都写 20 多处 DOM / innerHTML，触发重排和 MutationObserver） */
+    if (typeof globalThis.__hudAcc46 !== "number") globalThis.__hudAcc46 = 1;
+    globalThis.__hudAcc46 += dt;
+    if (globalThis.__hudAcc46 >= 1 / 15 || (typeof manualTestClock !== "undefined" && manualTestClock)) { globalThis.__hudAcc46 = 0; if (typeof updateHud === "function") updateHud(); }
   }
 
+  const html46 = new Map();
+  function setHtml46(sel, v) { if (html46.get(sel) === v) return; html46.set(sel, v); const e = $(sel); if (e) e.innerHTML = v; }
   function rankValue(r){return ({D:0,C:1,B:2,A:3,S:4})[r]??2;}
   function updateHud() {
     let s = stage(),
@@ -14127,7 +14162,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
         : `尸潮进度 ${Math.floor(prog * 100)}%`;
     if (window.SakurayoLifecycle?.waveTint) $("#waveF").style.background = window.SakurayoLifecycle.waveTint(lifecycleWorld44());
     const tip44 = window.SakurayoLifecycle?.hint?.(lifecycleWorld44()) || "点开看稳定度 · 暂停看构筑";
-    $("#mission").innerHTML = `${tip44}${P.jam > 0 ? " · 受干扰" : ""}${P.healSupp > 0 ? " · 治疗受限" : ""}<br>${phaseWin} · 稳定度 <b>${a.rank}</b> · ${pressure}${weak ? ` · 天敌 ${weak}` : ""}`;
+    setHtml46("#mission", `${tip44}${P.jam > 0 ? " · 受干扰" : ""}${P.healSupp > 0 ? " · 治疗受限" : ""}<br>${phaseWin} · 稳定度 <b>${a.rank}</b> · ${pressure}${weak ? ` · 天敌 ${weak}` : ""}`);
     { const cb=$("#combo"),txt=P.combo >= 5 ? `${P.combo} COMBO` : ""; if(cb.textContent!==txt){cb.textContent=txt;if(txt&&P.combo%10===0){cb.classList.remove("pop46");void cb.offsetWidth;cb.classList.add("pop46");}} }
     $("#hud").classList.toggle("lowHp46", state==="play" && P.hp > 0 && P.hp / P.maxHp < 0.3);
     $("#skill").classList.toggle("ready44", P.skill <= 0);
@@ -14142,8 +14177,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       "--ready",
       `${P.dash <= 0 ? 100 : (1 - P.dash / P.dashCd) * 100}%`,
     );
-    $("#perf").textContent =
-      `${quality < 0.8 ? "省电" : "自动"} ${Math.round(fps)}fps`;
+    setHtml46("#perf", `${save.settings?.fx === 0 ? "省电" : quality < 0.8 ? "降级" : "高画质"} ${Math.round(fps)}fps`);
   }
   function particles(x, y, n, c) {
     let cap = caps();
@@ -14669,17 +14703,23 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     fpsClock += frame;
     if (fpsClock >= 1) {
       fps = fpsFrames / fpsClock;
-      adaptiveQuality48 = fps < 42 ? 0.62 : fps > 54 ? 1 : adaptiveQuality48;
+      /* 自动降级规则（docs/PLAYBOOK.md「帧率与画质」）：连续 5 秒 < 40fps 才降到省电画质；连续 3 秒 ≥ 52fps 恢复。
+         开局前 4 秒（加载 / 解码）不计。不锁帧，跟随屏幕刷新率。手动省电 (settings.fx===0) 优先。 */
+      if (typeof globalThis.__lowSec46 !== "number") { globalThis.__lowSec46 = 0; globalThis.__highSec46 = 0; }
+      if (typeof runTime === "number" && runTime > 4) { globalThis.__lowSec46 = fps < 40 ? globalThis.__lowSec46 + 1 : 0; globalThis.__highSec46 = fps >= 52 ? globalThis.__highSec46 + 1 : 0; }
+      if (globalThis.__lowSec46 >= 5) { adaptiveQuality48 = 0.62; globalThis.__lowSec46 = 0; } else if (globalThis.__highSec46 >= 3) { adaptiveQuality48 = 1; globalThis.__highSec46 = 0; }
       updateQuality48();
       fpsFrames = 0;
       fpsClock = 0;
     }
-    acc = Math.min(0.12, acc + frame);
-    let steps = 0;
-    while (acc >= 1 / 60 && steps < 4 && state === "play") {
-      update(1 / 60);
-      acc -= 1 / 60;
-      steps++;
+    /* 可变步长：每帧按真实 dt 推进（拆成 ≤1/60s 的子步），90/120Hz 屏不会出现“这帧没更新”的抖动，30fps 也不丢时间 */
+    if (typeof manualTestClock !== "undefined" && manualTestClock) {
+      acc = Math.min(0.12, acc + frame);
+      let steps = 0;
+      while (acc >= 1 / 60 && steps < 4 && state === "play") { update(1 / 60); acc -= 1 / 60; steps++; }
+    } else {
+      const n = Math.max(1, Math.ceil(frame / (1 / 60) - 1e-6)), h = frame / n;
+      for (let i = 0; i < n && state === "play"; i++) update(h);
     }
     draw();
     if (state === "play") scheduleLoop();
@@ -14783,8 +14823,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     joy.sy = e.clientY;
     move(e);
     let j = $("#joy");
-    j.style.left = `${clamp(e.clientX - 59, 8, W - 126)}px`;
-    j.style.top = `${clamp(e.clientY - 59, 75, H - 126)}px`;
+    j.style.left = `${clamp(e.clientX - 59, 8, (typeof innerWidth === "number" ? innerWidth : W) - 126)}px`;
+    j.style.top = `${clamp(e.clientY - 59, 75, (typeof innerHeight === "number" ? innerHeight : H) - 126)}px`;
     j.style.bottom = "auto";
   }
   function move(e) {
@@ -15388,14 +15428,14 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   const style37=document.createElement("style");style37.textContent=`.tierPick37{display:flex;align-items:center;gap:8px;margin:7px 0}.tierPick37 span{min-width:72px;text-align:center;color:#ffe9a9;font-weight:800}.tierPick37 button{min-width:40px;padding:7px}.mgMeta37{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:8px}.mgMeta37 span{padding:5px 8px;border-radius:10px;background:#ffffff12}.mgMeta37 button{margin-left:auto;background:#33264d;color:#ffe5a4;border:1px solid #a887df;border-radius:10px;padding:7px 10px}`;document.head.appendChild(style37);
 
   const TUTORIAL37=[
-    {i:"🕹️",t:"只管移动，武器自动瞄准",x:"左侧摇杆走位。枪自动锁最近的敌人；太刀只砍面前那一扇。第一章前二十秒尸潮会包抄，把全息牌楼当掩体，不要站桩。"},
-    {i:"✦",t:"先成型一所学校",x:"击破拾取晶核升级。围绕一个职业拿齐三项核心，再补生存或克制。战斗屏只留生命和进度；构筑细节在暂停页。点满三家只会让尸潮学会克制你。"},
-    {i:"🧩",t:"转职、融合、飞升都看得见",x:"9级选分支，12级和15级继续进阶。暂停页会显示每个学校 1/2 分支点，以及最近一次可做的融合。先成型，再谈融合。"},
-    {i:"⚠️",t:"认剪影，读地面",x:"盾尸有六角、自爆有红芯、迅捷有箭翼。四章地面不同：全息牌楼挡弹、车辆挡直线、剑区减速近战加伤、碎镜折射一次。技能和冲刺亮起来再按。"},
+    {img:"move",i:"🕹️",t:"只管移动，武器自动瞄准",x:"左侧摇杆走位。枪自动锁最近的敌人；太刀只砍面前那一扇。第一章前二十秒尸潮会包抄，把全息牌楼当掩体，不要站桩。"},
+    {img:"build",i:"✦",t:"先成型一所学校",x:"击破拾取晶核升级。围绕一个职业拿齐三项核心，再补生存或克制。战斗屏只留生命和进度；构筑细节在暂停页。点满三家只会让尸潮学会克制你。"},
+    {img:"evolve",i:"🧩",t:"转职、融合、飞升都看得见",x:"9级选分支，12级和15级继续进阶。暂停页会显示每个学校 1/2 分支点，以及最近一次可做的融合。先成型，再谈融合。"},
+    {img:"read",i:"⚠️",t:"认剪影，读地面",x:"盾尸有六角、自爆有红芯、迅捷有箭翼。四章地面不同：全息牌楼挡弹、车辆挡直线、剑区减速近战加伤、碎镜折射一次。技能和冲刺亮起来再按。"},
   ];
   let tutorialStep37=0,tutorialLaunch37=false;
-  function ensureTutorial37(){let d=$("#tutorialDrawer37");if(d)return d;d=document.createElement("section");d.id="tutorialDrawer37";d.className="drawer hidden tutorial37";d.innerHTML='<div class="dhead"><h2>作战入门</h2><button class="close">×</button></div><div class="dbody"><div class="tutorialArt37" id="tutorialArt37"></div><div class="tutorialDots37" id="tutorialDots37"></div><button id="tutorialNext37">下一步</button><button id="tutorialSkip37">跳过并开始</button></div>';d.querySelector(".close").onclick=()=>window.SakurayoUI.close(d);d.querySelector("#tutorialNext37").onclick=()=>{if(tutorialStep37<TUTORIAL37.length-1){tutorialStep37++;renderTutorial37();}else finishTutorial37();};d.querySelector("#tutorialSkip37").onclick=finishTutorial37;document.body.appendChild(d);return d;}
-  function renderTutorial37(){const v=TUTORIAL37[tutorialStep37],d=ensureTutorial37();$("#tutorialArt37").innerHTML=`<div class="tutorialIcon37">${v.i}</div><h3>${v.t}</h3><p>${v.x}</p>`;$("#tutorialDots37").innerHTML=TUTORIAL37.map((_,i)=>`<i class="${i===tutorialStep37?"on":""}"></i>`).join("");$("#tutorialNext37").textContent=tutorialStep37===TUTORIAL37.length-1?(tutorialLaunch37?"进入战斗":"完成"):"下一步";$("#tutorialSkip37").textContent=tutorialLaunch37?"跳过并开始":"关闭";window.SakurayoUI.open(d,{onClose:()=>{tutorialLaunch37=false;}});}
+  function ensureTutorial37(){let d=$("#tutorialDrawer37");if(d)return d;d=document.createElement("section");d.id="tutorialDrawer37";d.className="drawer hidden tutorial37";d.innerHTML='<div class="dhead"><h2>作战入门</h2><button class="close">×</button></div><div class="dbody tut2"><figure class="tutPic37"><img id="tutorialPic37" alt=""></figure><div class="tutSide37"><div class="tutStep37" id="tutorialStep37"></div><div class="tutorialArt37" id="tutorialArt37"></div><div class="tutFoot37"><div class="tutorialDots37" id="tutorialDots37"></div><button id="tutorialSkip37" class="tutGhost37">跳过并开始</button><button id="tutorialNext37" class="tutGo37">下一步</button></div></div></div>';d.querySelector(".close").onclick=()=>window.SakurayoUI.close(d);d.querySelector("#tutorialNext37").onclick=()=>{if(tutorialStep37<TUTORIAL37.length-1){tutorialStep37++;renderTutorial37();}else finishTutorial37();};d.querySelector("#tutorialSkip37").onclick=finishTutorial37;document.body.appendChild(d);return d;}
+  function renderTutorial37(){const v=TUTORIAL37[tutorialStep37],d=ensureTutorial37();$("#tutorialArt37").innerHTML=`<h3>${v.t}</h3><p>${v.x}</p>`;$("#tutorialPic37").src=artUrl(`ui/tutorial/tut_${v.img}.webp`);$("#tutorialStep37").innerHTML=`<b>${String(tutorialStep37+1).padStart(2,"0")}</b><span>/ ${String(TUTORIAL37.length).padStart(2,"0")}</span><em>作战入门 · TUTORIAL</em>`;$("#tutorialDots37").innerHTML=TUTORIAL37.map((_,i)=>`<i class="${i===tutorialStep37?"on":""}"></i>`).join("");$("#tutorialNext37").textContent=tutorialStep37===TUTORIAL37.length-1?(tutorialLaunch37?"进入战斗":"完成"):"下一步";$("#tutorialSkip37").textContent=tutorialLaunch37?"跳过并开始":"关闭";window.SakurayoUI.open(d,{onClose:()=>{tutorialLaunch37=false;}});}
   function openTutorial37(startAfter=false){tutorialStep37=0;tutorialLaunch37=startAfter;renderTutorial37();}
   function finishTutorial37(){const launch=tutorialLaunch37;save.tutorialDone=true;persist();window.SakurayoUI.close(ensureTutorial37(),{restore:!launch});tutorialLaunch37=false;if(launch)startGame();}
 
@@ -15758,7 +15798,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   renderChoices=function(){const result=_renderChoices40();document.querySelectorAll("#choices .choice").forEach(card=>{const u=U.find(x=>x.id===card.dataset.upgradeId);if(!u?.conflict40)return;card.classList.add("conflictChoice40");const p=card.querySelector("p");if(p)p.insertAdjacentHTML("beforeend",'<strong class="conflictWarn40">高风险冲突：收益与削弱同时生效，可能让构筑失控。</strong>');});return result;};
 
   style37.textContent+=`.shopTabs40{margin:0 0 10px}.shopGroup40{display:grid;gap:9px}.shopItem40{display:grid;grid-template-columns:52px 1fr auto;gap:10px;align-items:center;padding:11px;border-radius:14px;background:#100c20e8;border:1px solid #ffffff18;margin-bottom:9px}.shopItem40 h3{margin:0 0 4px;font-size:14px}.shopItem40 p{margin:0;color:#c7bfd2;font-size:11px;line-height:1.45}.shopItem40 button,.shopUpgrade40,.challengeToggle40,.betaActions40 button,.betaDrawer40>[class] button[data-beta="refresh"],.betaDrawer40 .dbody>button[data-beta="refresh"]{padding:9px;border-radius:10px;border:1px solid #8463aa;background:#261b3d;color:#fff}.shopIcon40{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:#27183d;font-size:24px}.shopUpgrade40{grid-column:3;margin-top:-6px}.challengeToggle40{width:100%;margin-bottom:10px;border-color:#ffd36b;color:#ffe69b;background:#35251d}.conflictChoice40{border-color:#ff6f7e!important;background:linear-gradient(145deg,#2a101be8,#160d22e8)!important}.conflictWarn40{display:block;margin-top:6px;color:#ff8793}.betaGrid40{display:grid;grid-template-columns:1fr 1fr;gap:8px}.betaGrid40 label{display:grid;gap:5px;font-size:11px}.betaGrid40 select{padding:9px;border-radius:9px;background:#141025;color:#fff;border:1px solid #70558c}.betaActions40{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0}.betaDrawer40 textarea{width:100%;height:230px;background:#080713;color:#bdf4de;border:1px solid #6b548b;border-radius:10px;padding:9px;font:10px/1.4 ui-monospace,monospace}.betaDrawer40 .dbody>button[data-beta="refresh"]{width:100%;margin-top:8px}.hiddenStory40{border-color:#ffe6a455!important}`;
-  document.title="樱夜·尸潮：Mod Kit V4.6.0";
+  document.title="樱夜·尸潮 "+window.SAKURAYO_DISPLAY_VERSION;
 
   /* ================= V4.0 融合扩展：24种跨职业机制 ================= */
   const FUSION_ICON_ALIAS41={elementalbeast:"chimera",plagueidol:"plagueforge",soulgun:"gunshrine",nanoninja:"shadowmage",fleshshrine:"corpseimmortal",bloodmage:"bloodstar"};
@@ -16380,7 +16420,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   style37.textContent+=`#run46 .rn46 .rw46,#run46 .rn46 .hn46{position:absolute;top:-8px;right:-8px;font-size:12px;background:#1b1030;border:1px solid #ffd76a88;border-radius:999px;padding:1px 4px;line-height:1.2}#run46 .rn46 .hn46{right:auto;left:-8px;border-color:#ff4d6d;color:#ff7a8a}#run46 .rn46.t-fight:has(.hn46){box-shadow:0 0 14px #ff335566}
 #pachi46{position:fixed;inset:0;z-index:140;background:#05030acc;display:grid;place-items:center}#pachi46 .pf{background:#160c26;border:1px solid #ff9ec766;border-radius:14px;padding:8px;display:flex;flex-direction:column;gap:6px;max-height:96vh}#pachi46 header{display:flex;align-items:center;gap:8px;color:#fff}#pachi46 header small{color:#ffc4e6;flex:1}#pachi46 .x{background:none;border:0;color:#fff;font-size:18px}#pachi46 canvas{position:static;inset:auto;display:block;height:min(72vh,600px);width:auto;max-width:none;aspect-ratio:3/5;border-radius:10px;margin:0 auto}#pachi46 footer{display:flex;align-items:center;gap:8px;color:#ccc}#pachi46 .go{padding:8px 22px;border-radius:999px;border:0;background:linear-gradient(#ff8ac4,#d64d91);color:#fff;font-weight:700}`;
   style37.textContent+=`#night46{position:fixed;inset:0;z-index:130;background:#08050fcc;display:grid;place-items:center;padding:12px}#night46.hidden{display:none}#night46 .box{width:min(980px,100%);max-height:100%;overflow:auto;background:#1a1228;border:1px solid #ffffff22;border-radius:16px;padding:12px 16px}#night46 header{display:flex}#night46 header b{flex:1;font-size:20px}#night46 .x{background:none;border:0;color:#fff;font-size:20px}#night46 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:8px}#night46 .nc{background:#251a38;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;border:1px solid #ffffff18}#night46 .nc small{color:#c9b8e8}#night46 .nc b{font-size:17px}#night46 .nc p{font-size:12px;color:#d8cdea;flex:1;margin:0}#night46 .ab{display:flex;align-items:center;gap:10px}#night46 .ab button{width:34px;height:30px;border-radius:8px;border:0;background:#3a2c55;color:#fff}#night46 .go{padding:9px;border-radius:10px;border:0;background:linear-gradient(135deg,#6a3cff,#ff5fae);color:#fff;font-weight:bold}#night46 .go:disabled{background:#4a3c60;color:#bba}#night46 .daily{border-color:#ffd76a55}#night46 .bar{height:8px;background:#ffffff22;border-radius:4px;overflow:hidden}#night46 .bar i{display:block;height:100%;background:#ffd76a}`;
-  function paintRunBtn46(){modeRow46();const b=$("#runBtn46");if(!b)return;const r=runLoad46();b.innerHTML=r?`<b>继续夜行</b><small>第 ${r.layer} 层 · 💠 ${r.shards}</small>`:`<b>夜行 · 肉鸽</b><small>三层地图 · 构筑跨节点</small>`;}
+  function paintRunBtn46(){modeRow46();const b=$("#runBtn46");if(!b)return;const r=runLoad46();b.innerHTML=r?`<b>继续夜行</b><small>第 ${r.layer} 层 · 💠 ${r.shards}</small>`:`<b>夜行<span class="mx46"> · 肉鸽</span></b><small>三层地图 · 构筑跨节点</small>`;}
   (function(){const b=document.createElement("button");b.className="levelMapBtn46 runBtn46";b.id="runBtn46";b.type="button";modeRow46().prepend(b);paintRunBtn46();})();
   (function(){const b=document.createElement("button");b.className="levelMapBtn46 wdBtn46";b.id="wdBtn46";b.type="button";b.innerHTML="<b>衣橱</b><small>华彩 · 传说 · 武器 · 特效</small>";modeRow46().append(b);})();
   const _menuUpdateRun46=menuUpdate;menuUpdate=function(){const r=_menuUpdateRun46.apply(this,arguments);paintRunBtn46();return r;};
@@ -16774,17 +16814,21 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   }
   function setLiveLayer46(img, path, done) {
     if (!img) return;
-    img.classList.add("off");
-    img.onload = () => {
-      img.classList.remove("off");
-      done && done(true);
+    const url = artUrl(path);
+    /* 预解码 + 双缓冲：先在离屏 Image 上 decode，成功后再赋给可见层，避免切换时解码间隙闪黑/闪白 */
+    const next = new Image();
+    next.decoding = "async";
+    const apply = () => {
+      img.onload = () => { img.classList.remove("off"); done && done(true); };
+      img.onerror = () => { img.removeAttribute("src"); img.classList.add("off"); done && done(false); };
+      if (img.getAttribute("src") !== url) img.src = url; else { img.classList.remove("off"); done && done(true); }
     };
-    img.onerror = () => {
-      img.removeAttribute("src");
-      img.classList.add("off");
-      done && done(false);
+    next.onload = () => {
+      const d = next.decode ? next.decode() : Promise.resolve();
+      Promise.resolve(d).then(apply).catch(apply);
     };
-    img.src = artUrl(path);
+    next.onerror = () => { img.classList.add("off"); done && done(false); };
+    next.src = url;
   }
   function updateHeroLive46() {
     const root = $("#heroLive46");
@@ -17319,7 +17363,7 @@ button.sy-pop{animation:syPop .32s var(--sy-ease-back)}@keyframes syPop{0%{scale
 #menu[data-tod="day"]{--sy-tod:linear-gradient(180deg,rgb(var(--c-n6-rgb) / .35),rgb(var(--c-rare-ssr-rgb) / .1))}
 #menu[data-tod="dusk"]{--sy-tod:linear-gradient(180deg,rgb(var(--c-accent-rgb) / .5),rgb(var(--c-rare-sr-rgb) / .3))}
 #menu[data-tod="night"]{--sy-tod:linear-gradient(180deg,rgb(var(--c-primary-rgb) / .45),rgb(var(--c-n0-rgb) / .35))}
-#syTod{position:absolute;top:calc(env(safe-area-inset-top) + 96px);left:40px;z-index:6;font:italic 700 11px var(--sy-font-title);letter-spacing:.1em;color:var(--sy-c-cyan);background:rgb(var(--c-n0-rgb) / .6);border-left:2px solid var(--sy-c-cyan);padding:2px 10px;pointer-events:none}
+#syTod.inHead{position:relative!important;top:auto!important;left:auto!important;display:block;width:max-content;margin:0 0 4px}#syTod{position:absolute;top:calc(env(safe-area-inset-top) + 96px);left:40px;z-index:6;font:italic 700 11px var(--sy-font-title);letter-spacing:.1em;color:var(--sy-c-cyan);background:rgb(var(--c-n0-rgb) / .6);border-left:2px solid var(--sy-c-cyan);padding:2px 10px;pointer-events:none}
 .sy-roll{display:inline-block;font-variant-numeric:tabular-nums}.sy-roll.up{color:var(--c-rare-ssr);text-shadow:0 0 8px var(--c-rare-ssr)}.sy-roll.down{color:var(--c-accent)}
 @media (prefers-reduced-motion:reduce){#syWipe,.sy-chibi i,.sy-dot{animation:none!important}}
 `;
@@ -17366,7 +17410,7 @@ button.sy-pop{animation:syPop .32s var(--sy-ease-back)}@keyframes syPop{0%{scale
   // ---------- 11. 昼夜时段 ----------
   function tod(h) { return h >= 5 && h < 8 ? "dawn" : h >= 8 && h < 17 ? "day" : h >= 17 && h < 19 ? "dusk" : "night"; }
   var TODN = { dawn: "SYS 05:00 · 晨间巡逻", day: "SYS 12:00 · 日间值守", dusk: "SYS 18:00 · 黄昏警戒", night: "SYS 00:00 · 夜间作战" };
-  function applyTod(force) { var m = doc.getElementById("menu"); if (!m) return; var t = force || tod(new Date().getHours()); m.dataset.tod = t; var tag = doc.getElementById("syTod"); if (!tag) { tag = doc.createElement("div"); tag.id = "syTod"; m.appendChild(tag); } tag.textContent = TODN[t]; }
+  function applyTod(force) { var m = doc.getElementById("menu"); if (!m) return; var t = force || tod(new Date().getHours()); m.dataset.tod = t; var tag = doc.getElementById("syTod"); if (!tag) { tag = doc.createElement("div"); tag.id = "syTod"; m.appendChild(tag); } tag.textContent = TODN[t]; var hd = doc.getElementById("commandHeading47"); if (hd && tag.parentNode !== hd) { hd.insertBefore(tag, hd.firstChild); tag.classList.add("inHead"); } }
   // ---------- 7. 红点 → 灯笼 ----------
   function lanternDots(root) { (root || doc).querySelectorAll("[data-open]").forEach(function (b) { var dot = b.querySelector(".dot, .red, .badgeDot, .newDot, i.n"), want = !!dot || b.classList.contains("has-new") || b.dataset.new === "1"; var has = b.querySelector(".sy-dot"); if (dot) dot.style.opacity = "0"; if (want && !has) { var s = doc.createElement("span"); s.className = "sy-dot"; b.appendChild(s); } else if (!want && has) has.remove(); }); }
   // ---------- 初始化 ----------
@@ -17378,7 +17422,7 @@ button.sy-pop{animation:syPop .32s var(--sy-ease-back)}@keyframes syPop{0%{scale
     doc.addEventListener("click", function (e) { if (e.target.closest("[data-open], #levelMapBtn46, #pachiBtn46, [data-k=node]")) { transition(); blip("open"); } }, true);
     ["coins", "shopCoins", "tcoins"].forEach(function (id) { watchNumber(doc.getElementById(id)); });
     var boot = doc.getElementById("bootArt35"); if (boot) boot.appendChild(chibi("再等一下下……正在擦亮镜子。", "sayo"));
-    applyTod(); setInterval(applyTod, 60000);
+    applyTod(); setTimeout(applyTod, 1200); setTimeout(applyTod, 4000); setInterval(applyTod, 60000);
     var pend = 0; new MutationObserver(function () { if (pend) return; pend = setTimeout(function () { pend = 0; decorateEmpty(); lanternDots(); }, 250); }).observe(doc.body, { childList: true, subtree: true }); /* 节流：战斗中 DOM 变化频繁 */ decorateEmpty(); lanternDots();
   }
   if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", init); else init();
@@ -17464,7 +17508,7 @@ html body #menu .homeNav46{margin-bottom:env(safe-area-inset-bottom)}html body #
 /* ---- 新手引导 ---- */
 #start.sy-guide{animation:syGuide 1.6s ease-in-out infinite}
 @keyframes syGuide{0%,100%{box-shadow:inset 0 0 0 1px rgb(var(--c-accent-rgb) / .6),0 0 10px rgb(var(--c-accent-rgb) / .4)}50%{box-shadow:inset 0 0 0 2px var(--c-n6),0 0 30px rgb(var(--c-accent-rgb) / .9)}}
-#start .sy-tip{position:absolute;right:14px;top:8px;z-index:3;font:italic 700 12px var(--sy-font-title);background:var(--sy-c-cyan);color:var(--c-on-primary);padding:2px 12px 2px 8px;clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+.sy-tip46{position:fixed;z-index:40;display:none;pointer-events:none;align-items:center;gap:8px;white-space:nowrap;padding:6px 14px 6px 10px;background:var(--c-accent);color:var(--c-on-accent);font:700 13px var(--sy-font-title);clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%);filter:drop-shadow(0 4px 10px rgb(var(--c-n0-rgb) / .6))}.sy-tip46.on{display:flex}.sy-tip46 b{font-style:italic;letter-spacing:.08em}.sy-tip46 i{position:fixed;display:none}.sy-tip46[data-side=l]{clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%);padding-right:22px}.sy-tip46[data-side=t]{clip-path:polygon(0 0,100% 0,100% calc(100% - 8px),calc(50% + 8px) calc(100% - 8px),50% 100%,calc(50% - 8px) calc(100% - 8px),0 calc(100% - 8px));padding-bottom:14px}.sy-tip46[data-side=b]{clip-path:polygon(0 8px,calc(50% - 8px) 8px,50% 0,calc(50% + 8px) 8px,100% 8px,100% 100%,0 100%);padding-top:14px}#start .sy-tip{position:absolute;right:14px;top:8px;z-index:3;font:italic 700 12px var(--sy-font-title);background:var(--sy-c-cyan);color:var(--c-on-primary);padding:2px 12px 2px 8px;clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%)}
 html body #menu .terminalActivity48{border-radius:0!important;clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);box-shadow:var(--sy-stroke-in)!important}
 /* ===== 第 2 轮补充：战斗 HUD、通用弹窗、列表卡片多层悬停、射的 / 地图面板 ===== */
 .overlay .modal{background:var(--sy-scan),var(--sy-glass)!important;border:1px solid rgb(var(--c-primary-rgb) / .45)!important;border-radius:0!important;clip-path:polygon(20px 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%,0 20px);box-shadow:var(--sy-stroke-in),0 0 36px rgb(var(--c-primary-rgb) / .18)!important}
@@ -17617,7 +17661,10 @@ html body:not(#sy0) #dialogue .dialogueText{font-size:13px!important;line-height
   var st = document.createElement("style"); st.id = "syStatic"; st.textContent = css; document.head.appendChild(st);
   // 底栏选中态：最近打开的入口保持高亮，直到它的面板关掉
   function sync() { var open = document.querySelector(".drawer:not(.hidden)"), want = open ? open.id.replace(/Drawer$/, "") : "stage"; document.querySelectorAll(".homeNav46>[data-open]").forEach(function (b) { var on = b.dataset.open === want; if (b.hasAttribute("data-sy-on") !== on) { if (on) b.setAttribute("data-sy-on", ""); else b.removeAttribute("data-sy-on"); } }); } /* 用 data 属性而不是 class 标记选中态，避免与 class 观察器互相触发 */
-  function guide() { try { var sv = JSON.parse(localStorage.getItem("sakurayoV3") || "{}"), b = document.getElementById("start"); if (!b || (sv.done && sv.done.length) || b.querySelector(".sy-tip")) return; b.classList.add("sy-guide"); var t = document.createElement("span"); t.className = "sy-tip"; t.textContent = "START ▶ 从这里开始第一战"; b.appendChild(t); } catch (e) { } }
+  /* 新手引导：提示框放在按钮外侧（优先左侧，其次上 / 下），箭头指向按钮；按钮本身呼吸描边。不再盖住按钮文字。 */
+  function guide() { try { var sv = JSON.parse(localStorage.getItem("sakurayoV3") || "{}"), b = document.getElementById("start"); if (!b || (sv.done && sv.done.length) || document.getElementById("syGuideTip")) return; b.classList.add("sy-guide"); var t = document.createElement("div"); t.id = "syGuideTip"; t.className = "sy-tip46"; t.innerHTML = "<b>START</b><span>从这里开始第一战</span><i></i>"; document.body.appendChild(t);
+    function place() { if (!t.isConnected) return; var sv2 = {}; try { sv2 = JSON.parse(localStorage.getItem("sakurayoV3") || "{}"); } catch (e) { } var r = b.getBoundingClientRect(), menu = document.getElementById("menu"); var cx = r.left + r.width / 2, cy = r.top + r.height / 2, top = document.elementFromPoint(Math.min(innerWidth - 1, Math.max(0, cx)), Math.min(innerHeight - 1, Math.max(0, cy))); var vis = r.width > 0 && menu && !menu.classList.contains("hidden") && top && (top === b || b.contains(top)) && !(sv2.done && sv2.done.length); t.classList.toggle("on", !!vis); if (!vis) return; var tw = t.offsetWidth, th = t.offsetHeight, g = 14, side; if (r.left - tw - g >= 8) { side = "l"; t.style.left = (r.left - tw - g) + "px"; t.style.top = Math.max(8, cy - th / 2) + "px"; } else if (r.top - th - g >= 8) { side = "t"; t.style.left = Math.min(innerWidth - tw - 8, Math.max(8, cx - tw / 2)) + "px"; t.style.top = (r.top - th - g) + "px"; } else { side = "b"; t.style.left = Math.min(innerWidth - tw - 8, Math.max(8, cx - tw / 2)) + "px"; t.style.top = (r.bottom + g) + "px"; } t.setAttribute("data-side", side); if (sv2.done && sv2.done.length) { t.remove(); b.classList.remove("sy-guide"); } }
+    place(); addEventListener("resize", place); var iv = setInterval(function () { if (!t.isConnected) return clearInterval(iv); place(); }, 400); } catch (e) { } }
   var CODES = { stageDrawer: "OPS-01 // 关卡", gachaDrawer: "SUP-02 // 寻访", shopDrawer: "DEP-03 // 补给", rosterDrawer: "INV-04 // 仓库", archiveDrawer: "ARC-05 // 档案", trialsDrawer: "TRL-06 // 试炼", storyDrawer: "LOG-07", achDrawer: "ACH-08", talentDrawer: "TAL-09", ascDrawer: "ASC-10" };
   function codes() { Object.keys(CODES).forEach(function (id) { var h = document.querySelector("#" + id + " .dhead"); if (h && !h.dataset.syCode) { h.dataset.syCode = CODES[id]; anchor(h); } }); [["#wd46 .box>header", "WRD-11 // 衣橱"], ["#night46 .box>header", "NGT-12 // 夜行"]].forEach(function (q) { var h = document.querySelector(q[0]); if (h && !h.dataset.syCode) { h.dataset.syCode = q[1]; anchor(h); } }); }
   /* 编号标签用页头做定位基准；页头本身是 static 时补 relative（原来标签会跑到下面的卡片上） */
@@ -18059,6 +18106,27 @@ html body #menu .coins{color:var(--c-n6)!important;font-weight:800}
     + "html body #hud .bars .bar>.sykGhost{position:absolute;left:0;top:0;bottom:0;z-index:0;background:var(--c-n6);transition:width .6s .35s}html body #hud .bars .bar>span{position:relative;z-index:2;color:var(--c-n6)}"
     /* 局部可读性：关卡卡片简介压在场景图上，加暗色描边阴影 */
     + "html body:not(#sy0):not(#sy1) .stageMini .sdesc{text-shadow:0 1px 2px rgb(var(--c-n0-rgb) / .95),0 0 8px rgb(var(--c-n0-rgb) / .9)!important}"
+    /* 实机 1024×461：模式条四个入口标题被裁、干员 / 装备卡内容高于卡片（图标顶出、英文被切） */
+    + "@media (max-height:500px) and (orientation:landscape){html body:not(#sy0):not(#sy1):not(#sy2) :is(#runBtn46,#levelMapBtn46,#wdBtn46,#pachiBtn46)>b{font-size:11px!important;letter-spacing:0!important;white-space:nowrap}html body:not(#sy0):not(#sy1):not(#sy2) #runBtn46 .mx46{display:none!important}html body:not(#sy0):not(#sy1):not(#sy2) :is(#runBtn46,#levelMapBtn46,#wdBtn46,#pachiBtn46){padding-left:3px!important;padding-right:3px!important;text-align:center!important;align-items:center!important}"
+    + "html body:not(#sy0):not(#sy1):not(#sy2) #menu :is(#commandCharacter47,#commandPrepare47){flex-direction:row!important;align-items:center!important;justify-content:center!important;gap:8px!important}html body:not(#sy0):not(#sy1):not(#sy2) #menu :is(#commandCharacter47,#commandPrepare47) .terminalIcon48{position:static!important;width:26px!important;height:26px!important;margin:0!important;transform:none!important}html body:not(#sy0):not(#sy1):not(#sy2) #menu :is(#commandCharacter47,#commandPrepare47) .terminalIcon48 svg{width:26px!important;height:26px!important}html body:not(#sy0):not(#sy1):not(#sy2) #menu :is(#commandCharacter47,#commandPrepare47) .terminalLabel48{position:static!important;margin:0!important;transform:none!important}}"
+    /* 实机：COMBO 与小地图重叠 → 放到小地图正下方；任务条横屏下两行显示，不再被省略号截断 */
+    + "html body:not(#sy0):not(#sy1):not(#sy2) #hud #combo{top:calc(max(8px,env(safe-area-inset-top)) + 190px)!important;right:max(10px,env(safe-area-inset-right))!important}"
+    + "@media (max-height:500px){html body:not(#sy0):not(#sy1):not(#sy2) #hud #combo{top:calc(max(6px,env(safe-area-inset-top)) + 168px)!important}}"
+    + "@media (orientation:landscape){html body:not(#sy0):not(#sy1):not(#sy2) #hud .mission{white-space:normal!important;max-height:none!important;display:-webkit-box!important;-webkit-box-orient:vertical;-webkit-line-clamp:2;max-width:min(52vw,520px)!important}}"
+    + "html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .dhead{max-width:min(1060px,96vw)!important;width:100%!important;margin-left:auto!important;margin-right:auto!important;box-sizing:border-box}"
+    /* 新手教学：横屏左右分栏（左插图 / 右标题 + 说明 + 步骤 + 右下并排按钮），一屏放下不滚动 */
+    + "html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .dbody.tut2{display:grid!important;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:clamp(12px,2.4vw,28px);align-items:stretch;height:min(560px,calc(100dvh - 92px));max-height:min(560px,calc(100dvh - 92px));overflow:hidden!important;max-width:min(1060px,96vw)!important;width:100%!important;margin:0 auto!important;padding:4px clamp(14px,3vw,40px) clamp(10px,2.4vh,22px)!important;text-align:left!important;box-sizing:border-box}"
+    + "html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .tutPic37{margin:0;position:relative;min-height:0;overflow:hidden;background:var(--c-n1);clip-path:polygon(18px 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%,0 18px);border:1px solid var(--c-line)}"
+    + "html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .tutPic37 img{width:100%;height:100%;object-fit:cover;display:block}"
+    + "html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .tutPic37::before,html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .tutPic37::after{content:'';position:absolute;width:18px;height:18px;border:2px solid var(--c-primary);z-index:1}html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .tutPic37::before{left:8px;top:8px;border-right:0;border-bottom:0}html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .tutPic37::after{right:8px;bottom:8px;border-left:0;border-top:0}"
+    + "html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .tutSide37{display:flex;flex-direction:column;min-height:0;gap:8px;padding:clamp(12px,2vw,22px);background:rgb(var(--c-n1-rgb) / .94);border:1px solid var(--c-line);clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px))}"
+    + "html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .tutStep37{display:flex;align-items:baseline;gap:6px;color:var(--c-n5);font:700 12px var(--sy-font-title,sans-serif)}html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .tutStep37 b{font-size:28px;font-style:italic;color:var(--c-primary-strong)}html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .tutStep37 em{margin-left:auto;font-size:11px;letter-spacing:.12em;color:var(--c-n4)}"
+    + "html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .tutorialArt37{flex:1;min-height:0;overflow:hidden;padding:0!important;background:none!important;border:0!important;box-shadow:none!important}"
+    + "html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .tutorialArt37 h3{margin:2px 0 10px;font:italic 900 clamp(18px,2.4vw,26px)/1.25 var(--sy-font-title,sans-serif);color:var(--c-n6);padding-left:12px;border-left:3px solid var(--c-accent)}"
+    + "html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .tutorialArt37 p{margin:0;font-size:clamp(13px,1.35vw,15px);line-height:1.7;color:var(--c-n5)}"
+    + "html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .tutFoot37{display:flex;align-items:center;gap:10px}html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .tutorialDots37{margin:0 auto 0 0!important;display:flex;gap:6px}html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .tutorialDots37 i{width:16px;height:4px;border-radius:0!important;background:var(--c-n3)}html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .tutorialDots37 i.on{width:28px;background:var(--c-primary)}"
+    + "html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .tutFoot37 button{width:auto!important;margin:0!important;min-width:104px;height:42px;padding:0 20px!important;border-radius:0!important;font:800 14px var(--sy-font-title,sans-serif);clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%)}"
+    + "html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .tutFoot37 .tutGhost37{background:var(--c-n2)!important;color:var(--c-n5)!important;border:0!important}html body:not(#sy0):not(#sy1):not(#sy2) #tutorialDrawer37 .tutFoot37 .tutGo37{background:var(--c-primary)!important;color:var(--c-on-primary)!important;border:0!important;box-shadow:none!important}"
     + "@keyframes sykGlow{from{filter:drop-shadow(0 0 2px rgb(var(--c-primary-rgb) / .6))}to{filter:drop-shadow(0 0 10px rgb(var(--c-primary-rgb) / 1))}}";
   if (typeof document !== "undefined" && !document.getElementById("sykCss")) { var st = document.createElement("style"); st.id = "sykCss"; st.textContent = CSS; (document.head || document.documentElement).appendChild(st); }
 
@@ -18075,6 +18143,43 @@ html body #menu .coins{color:var(--c-n6)!important;font-weight:800}
   if (typeof document !== "undefined") { if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", ghostBars); else ghostBars(); }
   global.SyKit = { T: T, cut: cut, hex: hex, diamond: diamond, bar: bar, meter: meter, panel: panel };
 })(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+/* 立绘头部锚点定位：让立绘的头顶落在“头部安全线”之下（页头横幅 / 顶栏的底边 + 间距），
+   不随屏幕比例被裁掉或被 UI 盖住。立绘图都是 2:3 全身像，HEAD 记录头顶在图中的相对高度。 */
+(function (global) {
+  "use strict";
+  if (typeof document === "undefined") return;
+  var HEAD = { sayo: 0.035, aya: 0.06, rion: 0.03, crown: 0.0 };
+  function headOf(img) { var m = /up_(\w+)\.webp/.exec(img.currentSrc || img.src || ""); return m && HEAD[m[1]] != null ? HEAD[m[1]] : 0.03; }
+  // 头部安全线：所有“盖在立绘上方”的 UI 的底边最大值
+  function safeLine(img, sel, x0, x1) {
+    var y = 0; (img.closest(".drawer") || document).querySelectorAll(sel).forEach(function (e) { var r = e.getBoundingClientRect(); if (r.height && r.bottom < innerHeight * 0.5 && r.right > x0 && r.left < x1) y = Math.max(y, r.bottom); });
+    return y;
+  }
+  function fit(img, o) {
+    var box = img.offsetParent; if (!box || !img.naturalWidth) return;
+    var br = box.getBoundingClientRect(); if (!br.height) return;
+    var gap = Math.max(8, br.height * 0.03), safe = Math.max(br.top, safeLine(img, o.cover, img.getBoundingClientRect().left, img.getBoundingClientRect().right)) + gap - br.top;
+    var ar = img.naturalWidth / img.naturalHeight, head = headOf(img);
+    // 可用高度 → 显示 keep 比例的全身（脚下可裁），头顶贴安全线
+    var H = (br.height - safe) / (o.keep - head);
+    var maxW = br.width * o.maxW; if (H * ar > maxW) H = maxW / ar;
+    var top = safe - head * H;
+    var s = img.style;
+    s.setProperty("top", top + "px", "important"); s.setProperty("bottom", "auto", "important");
+    s.setProperty("height", H + "px", "important"); s.setProperty("width", H * ar + "px", "important");
+    s.setProperty("object-fit", "contain", "important"); s.setProperty("object-position", "50% 0", "important");
+    img.setAttribute("data-head-fit", Math.round(safe));
+  }
+  var RULES = [{ sel: "#gachaDrawer .wishHero46", cover: ".dhead,.wishTitle46", keep: 0.9, maxW: 0.5 }];
+  function run() { RULES.forEach(function (r) { document.querySelectorAll(r.sel).forEach(function (img) { if (img.complete) fit(img, r); else img.addEventListener("load", function () { fit(img, r); }, { once: true }); }); }); }
+  var t = 0; function later() { if (!t) t = requestAnimationFrame(function () { t = 0; run(); }); }
+  function boot() { new MutationObserver(function (ms) { for (var i = 0; i < ms.length; i++) for (var j = 0; j < ms[i].addedNodes.length; j++) { var n = ms[i].addedNodes[j]; if (n.nodeType === 1 && (n.matches(".wishHero46,.wishStage46") || n.querySelector && n.querySelector(".wishHero46"))) { later(); return; } } }).observe(document.body, { childList: true, subtree: true }); addEventListener("resize", later); document.addEventListener("transitionend", function (e) { if (e.target && e.target.classList && e.target.classList.contains("drawer")) later(); }); later(); }
+  if (document.body) boot(); else document.addEventListener("DOMContentLoaded", boot);
+  global.SyPortrait = { fit: fit, run: run, HEAD: HEAD };
+})(window);
 
 </script>
 <script>

@@ -146,3 +146,18 @@
 - 用法：`tools/emu.sh start` → `install <apk>` → `launch` → `shot <name>`（存 /workspace/sakurayo-shots/emulator/）→ `tap x y` / `swipe x1 y1 x2 y2 [ms]` → `fps`（dumpsys gfxinfo）→ `stop`。
 - 环境变量：EMU_GPU（host/swiftshader_indirect）、EMU_ACCEL（on/off）、EMU_PKG、EMU_SHOTS。
 - ⚠️ 2026-10-12 实测：box 的 /dev/kvm 能打开，但创建 vCPU 时宿主内核报 BUG（vmx_vcpu_create → kvm_spurious_fault，嵌套虚拟化坏了），qemu 卡死 0% CPU。不要再在 box 上用 KVM 启模拟器；纯软件模式（EMU_ACCEL=off）对 WebView 游戏慢到无法测帧率。实测请用真机或带可用 KVM 的机器。
+
+
+## 帧率与画质
+- **默认目标**：跟随屏幕刷新率跑满（常见 60fps；高刷屏可到 90/120）。不主动锁 30。
+- **降级条件**（`adaptiveQuality48`）：开局前 4 秒不计；连续 **5 秒** 实测 <40fps → 降到 0.62（粒子/特效减半）；连续 **3 秒** ≥52fps → 恢复 1.0。
+- **手动省电**：设置里「画质：省电」(`settings.fx===0`) 固定 0.62，右上角显示「省电」。自适应降级显示「降级」，满血显示「高画质」。
+- **时间推进**：非测试模式下每帧按真实 `dt` 拆成 ≤1/60s 的子步（可变步长），避免 30fps 丢时间、高刷「有的帧没更新」。HUD DOM 写操作限到 15Hz。
+- **ERROR_LEDGER**：布局类错误记在 `docs/ERROR_LEDGER.md`，写 UI 前先过清单。
+
+
+## 签名与版本
+- **版本**：`versionName` 与游戏内显示均为 `0.9.0-beta`，`versionCode` 71（比旧 debug 至少 +10）。引擎 API 兼容字段 `SAKURAYO_GAME_VERSION` 仍为 `4.6.0`。
+- **Keystore**：项目固定 release 签名在 `/workspace/.secrets/sakurayo-release.jks`，密码在 `/workspace/.secrets/sakurayo-release.properties`（**不进仓库**）。构建时复制为 `android-app/keystore.properties`（已 gitignore）。
+- **覆盖安装**：旧 debug 签名包与本 release 签名不同，用户手机上需**先卸载**再装 `sakurayo-0.9.0-beta.apk`。
+- **产物**：`/workspace/sakurayo-release/sakurayo-0.9.0-beta.apk`（也不要擅自发 GitHub Release）。

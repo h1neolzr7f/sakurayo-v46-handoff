@@ -374,6 +374,8 @@
     "#menu.homeDock46 .heroLiveBreath46{width:min(62vw,680px);height:100%}" +
     "#menu.homeDock46 .heroLiveBreath46:before{content:\"\";position:absolute;inset:18% 18% 0 18%;background:radial-gradient(ellipse at 50% 78%,#1a103066 0%,#12081c00 70%);pointer-events:none}" +
     "#menu.homeDock46 .heroLiveBreath46 img,.wishHero46{background:transparent!important;image-rendering:auto;filter:none}" +
+    "@keyframes heroBlink46{0%,86%,100%{opacity:0}88%,94%{opacity:1}}" +
+    "@keyframes heroBaseBlink46{0%,86%,100%{opacity:1}88%,94%{opacity:0}}" +
     ".heroLive46.hasBlink:not(.livePuppet46) .heroLiveBlink46{animation:heroBlink46 5.4s steps(1) infinite}" +
     ".heroLive46.hasBlink:not(.livePuppet46) .heroLiveBase46{animation:heroBaseBlink46 5.4s steps(1) infinite}" +
     ".pityRail46{height:7px}" +
