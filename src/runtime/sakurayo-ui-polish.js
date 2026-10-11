@@ -37,7 +37,7 @@ button.sy-pop{animation:syPop .32s var(--sy-ease-back)}@keyframes syPop{0%{scale
 @keyframes syBlink{0%,100%{opacity:1}50%{opacity:.45}}
 .sy-tag{position:absolute;top:6px;left:-4px;padding:1px 12px 1px 8px;font:italic 700 11px var(--sy-font-title);letter-spacing:.08em;color:var(--c-on-primary);background:var(--sy-c-cyan);clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%);box-shadow:0 0 12px rgb(var(--c-primary-rgb) / .6);pointer-events:none;z-index:3}.sy-tag.hot{background:var(--sy-c-pink);color:var(--c-n6)}.sy-tag.gold{background:var(--sy-c-gold)}
 /* 9. 面板折角 + 纹样 + 美术字标题 */
-.drawer .dhead,.drawer header,#run46 .rs46,#pachi46 .pf,.rm46,.modal46{position:relative}
+#run46 .rs46,#pachi46 .pf,.rm46,.modal46{position:relative}
 .drawer::before,#pachi46 .pf::before,#run46 .rs46::before{content:"";position:absolute;inset:6px;pointer-events:none;z-index:4;background:linear-gradient(var(--sy-c-cyan),var(--sy-c-cyan)) 0 0/18px 2px,linear-gradient(var(--sy-c-cyan),var(--sy-c-cyan)) 0 0/2px 18px,linear-gradient(var(--sy-c-cyan),var(--sy-c-cyan)) 100% 100%/18px 2px,linear-gradient(var(--sy-c-cyan),var(--sy-c-cyan)) 100% 100%/2px 18px;background-repeat:no-repeat;filter:drop-shadow(0 0 4px var(--sy-c-cyan))}
 .drawer h2,.drawer h3,#run46 h3,#pachi46 header b,.rm46 h3{font-family:var(--sy-font-title);font-style:italic;font-weight:800;letter-spacing:.04em;color:var(--c-n6);text-shadow:0 0 12px rgb(var(--c-primary-rgb) / .55)}
 /* 10. 加载 / 空状态小人 */
