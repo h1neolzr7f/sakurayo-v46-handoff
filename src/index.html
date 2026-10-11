@@ -4757,7 +4757,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }
     ctx.restore();
   }
-  var propArt46 = kind => { if (kind === "trap") return null; const img = artImage(`props/${kind}.webp`); return artReady(img) ? img : null; };
+  var propArt46 = kind => { if (kind === "trap" || kind === "lantern" || kind === "torii") return null; const img = artImage(`props/${kind}.webp`); return artReady(img) ? img : null; };
   function propsEnabled46() { return !!globalThis.SakurayoProps && !(typeof isMainGodRun36 === "function" && isMainGodRun36()) && runMode36 !== "testimony"; }
   function wavePace46(t) { const c = t % 30, ph = c < 8 ? ["集结", 0.85] : c < 20 ? ["压力", 1.25] : c < 25 ? ["喘息", 0.5] : ["高潮", 1.6]; return { phase: ph[0], mult: ph[1] / 1.077 }; }
   function updateProps46(dt, moving) {
