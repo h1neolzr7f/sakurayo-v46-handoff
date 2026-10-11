@@ -7688,12 +7688,12 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   "use strict";
   var cur = null;
   function has(id) { var c = global.SakurayoMascotVideoClips; return !!(c && c[id] && c[id].idle); }
-  function load(id, artUrl) { // 动态加载 clips.js（file:// 下不能 fetch JSON，用 <script>）
-    return new Promise(function (res) {
-      if (has(id)) return res(true);
-      var s = document.createElement("script"); s.src = artUrl("live_video/" + id + "/clips.js");
-      s.onload = function () { res(has(id)); }; s.onerror = function () { res(false); }; document.head.appendChild(s);
-    });
+  var idxP = null;
+  function script(src) { return new Promise(function (res) { var s = document.createElement("script"); s.src = src; s.onload = function () { res(true); }; s.onerror = function () { res(false); }; document.head.appendChild(s); }); }
+  function load(id, artUrl) { // 先读 live_video/index.js（登记了哪些角色有视频），只加载登记过的 clips.js —— 不存在的文件不去探测，避免控制台 404
+    if (has(id)) return Promise.resolve(true);
+    if (!idxP) idxP = script(artUrl("live_video/index.js"));
+    return idxP.then(function () { var L = global.SakurayoMascotVideoIndex || []; if (L.indexOf(id) < 0) return false; return script(artUrl("live_video/" + id + "/clips.js")).then(function () { return has(id); }); });
   }
   function mount(box, id, artUrl, opt) {
     unmount(); opt = opt || {};
