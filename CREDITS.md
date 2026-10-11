@@ -51,3 +51,14 @@
 | gpt-image-2（中转站） | 去手臂补全躯干层、动作关键帧、语义 mask | 生成内容归本项目 |
 | 评估未采用：[Doubiiu/ToonCrafter](https://github.com/Doubiiu/ToonCrafter) | 官方 HF Space（ZeroGPU）匿名调用返回错误；本机无 GPU，权重约 10 GB、CPU 推理需 >20 GB 内存，盒子仅 15 GB 且与其它进程共享，不可行 | Apache-2.0（代码）|
 | 评估未采用：GMFSS / AnimeInterp | 需 CUDA 自定义算子（GMFSS 的 softsplat / AnimeInterp 的 cupy），CPU 不可运行 | MIT / — |
+
+## V7 设计参考（仅参考思路，没有拷贝任何代码或素材）
+| 项目 | 许可证 | 借鉴内容 |
+|---|---|---|
+| Ikemen GO (github.com/ikemen-engine/Ikemen-GO) | 引擎 MIT；附带素材为 CC BY 3.0，其中 Elecbyte 素材限非商用（未使用） | hitpause/shaketime 分离、按 tick 计时的帧动画、碰撞框思路 |
+| MUGEN 社区帧数设计文档 | 社区文档 | 前摇、发生、收招的帧数划分 |
+| Taisei Project (github.com/taisei-project/taisei) | 自定（代码 MIT 风格，素材另行授权；未使用） | 自机 Q 版精灵、倾斜帧、符卡切入 |
+| BulletUpHell (Godot) | MIT | 弹幕模式分类 |
+| Danmokou (Unity) | 代码 MIT | 符卡阶段结构 |
+| Skullgirls / Guilty Gear Xrd 的 GDC 演讲 | 公开演讲 | 涂抹帧、有限帧动画、关键帧停顿 |
+| 吸血鬼幸存者 / 哈迪斯 / 杀戮尖塔 | 商业作品（只参考设计） | 波次表、精英节点、预告门、事件取舍 |
