@@ -223,9 +223,12 @@ html body #menu #commandActivityName48{font-size:14px!important;line-height:1.35
 /* 底部“离线作战就绪”信号文字直接压在立绘上看不清，加深色底条 */
 html body #menu #commandSignal47{padding:2px 10px!important;background:rgb(var(--c-n0-rgb) / .72)!important;color:var(--c-n5)!important;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
 /* 一次性功能提示：改成 v2 样式，右侧显示“点击关闭” */
-html body .syHint46{border-radius:0!important;background:rgb(var(--c-n1-rgb) / .96)!important;border:1px solid var(--c-line)!important;border-left:3px solid var(--c-primary)!important;color:var(--c-n6)!important;cursor:pointer;display:flex;align-items:center;gap:8px}
+html body .syHint46{border-radius:0!important;background:rgb(var(--c-n1-rgb) / .96)!important;border:1px solid var(--c-line)!important;border-left:3px solid var(--c-primary)!important;color:var(--c-n6)!important;cursor:pointer;display:block}
 html body .syHint46 b{color:var(--c-primary)!important}
-html body .syHint46 i{font-style:normal;font-size:11px;color:var(--c-n4);white-space:nowrap;margin-left:auto;padding-left:10px}
+html body .syHint46 i{font-style:normal;font-size:11px;color:var(--c-n4);white-space:nowrap;margin-left:10px}
+/* 竖屏寻访：UP 角色立绘被缩成 170px 宽、贴底放在屏幕外，看不到人；标题被页头压住一半 */
+@media (max-width:520px) and (orientation:portrait){html body #gachaDrawer .wishHero46{left:0!important;right:0!important;width:100%!important;top:150px!important;bottom:auto!important;height:calc(100% - 330px)!important;object-fit:contain!important;object-position:50% 100%!important;transform:none!important}
+html body #gachaDrawer .dbody h3{margin-top:18px!important}}
 `;
   var st = document.createElement("style"); st.id = "syStatic"; st.textContent = css; document.head.appendChild(st);
   // 底栏选中态：最近打开的入口保持高亮，直到它的面板关掉
