@@ -26,4 +26,7 @@ if [[ "${1:-}" != "--static" ]]; then
     SAKURAYO_ENTRY="$root_dir/android-app/app/src/main/assets/index.html" node "$smoke_file" android-app/app/src/main/assets/index.html
   done
 fi
+# 全界面巡检 + 图标/文字可读性（字号、对比度、底板、截断、点击区、Canvas 字号），不达标即失败
+SWEEP_STRICT=1 node tools/sweep.mjs "${TMPDIR:-/tmp}/sakurayo-sweep-verify" >/dev/null
+echo 'PASS sweep a11y (icons/text/targets)'
 echo 'VERIFY PASS'
