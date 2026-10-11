@@ -209,6 +209,52 @@
     ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh);
   }
 
+
+  /* ART_PASS ②：大块面、不重复的地面。把 1024² 的地面素材切成 4 块 512²，在 4×4 的大画布上随机挑块、随机 90° 旋转 / 翻转，
+     统一压低饱和度和对比度（VS 类经验：地面是“背景噪声”，必须比角色、敌人、宝石暗且平），再散布少量低透明度的中式科技装饰
+     （六角地砖缝、全息云纹圈、导流线）。结果作为 2048² 的图案平铺，肉眼几乎看不出重复。按图片缓存，只算一次。 */
+  var mosaicCache = typeof WeakMap === "function" ? new WeakMap() : null;
+  var GROUND_FILTER = "saturate(.55) contrast(.78) brightness(.82)";
+  function tokc(n, a) { return global.SakurayoTok ? global.SakurayoTok(n, a) : "transparent"; }
+  function groundMosaic(img, seed) {
+    if (!img || !img.naturalWidth || typeof document === "undefined") return img;
+    var hit = mosaicCache && mosaicCache.get(img); if (hit) return hit;
+    var B = 512, N = 4, c = document.createElement("canvas"); c.width = c.height = B * N; var g = c.getContext("2d");
+    var s = (seed || 7) >>> 0, r = function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+    var half = img.naturalWidth / 2;
+    g.filter = GROUND_FILTER;
+    for (var y = 0; y < N; y++) for (var x = 0; x < N; x++) {
+      var q = Math.floor(r() * 4), rot = Math.floor(r() * 4), flip = r() < 0.5;
+      g.save(); g.translate(x * B + B / 2, y * B + B / 2); g.rotate(rot * Math.PI / 2); if (flip) g.scale(-1, 1);
+      g.drawImage(img, (q % 2) * half, Math.floor(q / 2) * half, half, half, -B / 2 - 1, -B / 2 - 1, B + 2, B + 2); g.restore();
+    }
+    g.filter = "none";
+    // 接缝柔化：沿块边画一条极淡的暗线，当作地砖缝，比硬接缝自然
+    g.strokeStyle = tokc("n0", 0.35); g.lineWidth = 3; for (var k = 1; k < N; k++) { g.beginPath(); g.moveTo(k * B, 0); g.lineTo(k * B, N * B); g.moveTo(0, k * B); g.lineTo(N * B, k * B); g.stroke(); }
+    // 散布装饰
+    for (var d = 0; d < 26; d++) {
+      var dx = r() * N * B, dy = r() * N * B, kind = Math.floor(r() * 3), sz = 40 + r() * 70;
+      g.save(); g.translate(dx, dy); g.rotate(r() * Math.PI);
+      if (kind === 0) { g.strokeStyle = tokc("primary", 0.07); g.lineWidth = 2; g.beginPath(); for (var i = 0; i < 6; i++) { var a = Math.PI / 3 * i; g[i ? "lineTo" : "moveTo"](Math.cos(a) * sz, Math.sin(a) * sz); } g.closePath(); g.stroke(); }
+      else if (kind === 1) { g.strokeStyle = tokc("primary", 0.06); g.lineWidth = 2; for (var j = 0; j < 3; j++) { g.beginPath(); g.arc(j * sz * 0.5, 0, sz * 0.35, Math.PI, Math.PI * 2); g.stroke(); } }
+      else { g.strokeStyle = tokc("n5", 0.05); g.lineWidth = 3; g.setLineDash([14, 10]); g.beginPath(); g.moveTo(-sz * 1.5, 0); g.lineTo(sz * 1.5, 0); g.stroke(); }
+      g.restore();
+    }
+    if (mosaicCache) mosaicCache.set(img, c);
+    return c;
+  }
+  /* 轮廓光精灵：给精灵加一圈 2px 令牌色描边（rim light），按 图片+颜色 缓存成离屏画布，战斗中零额外开销 */
+  var rimCache = {};
+  function rimSprite(img, tokName, alpha) {
+    if (!img || !img.naturalWidth || typeof document === "undefined") return img;
+    var key = (img.currentSrc || img.src) + "|" + tokName + "|" + alpha, hit = rimCache[key]; if (hit) return hit;
+    var w = img.naturalWidth, h = img.naturalHeight, pad = Math.max(3, Math.round(w / 90)), c = document.createElement("canvas"); c.width = w + pad * 2; c.height = h + pad * 2;
+    var g = c.getContext("2d"), m = document.createElement("canvas"); m.width = c.width; m.height = c.height; var mg = m.getContext("2d");
+    mg.drawImage(img, pad, pad); mg.globalCompositeOperation = "source-in"; mg.fillStyle = tokc(tokName, 1); mg.fillRect(0, 0, m.width, m.height);
+    g.globalAlpha = alpha == null ? 0.7 : alpha; for (var i = 0; i < 12; i++) { var a = i / 12 * TAU; g.drawImage(m, Math.cos(a) * pad, Math.sin(a) * pad); }
+    g.globalAlpha = 1; g.globalCompositeOperation = "destination-out"; g.drawImage(img, pad, pad); g.globalCompositeOperation = "source-over"; g.drawImage(img, pad, pad);
+    c.naturalWidth = c.width; c.naturalHeight = c.height; c.complete = true; c.rimPad = pad; rimCache[key] = c; return c;
+  }
   function photoReady(world) {
     var photo = world && world.battleBg;
     return !!(photo && photo.complete && photo.naturalWidth > 0);
@@ -222,7 +268,7 @@
       if (groundPatternImage !== world.battleBg || groundPatternContext !== ctx) {
         groundPatternImage = world.battleBg;
         groundPatternContext = ctx;
-        groundPattern = ctx.createPattern(world.battleBg, "repeat");
+        groundPattern = ctx.createPattern(world.groundMosaic ? groundMosaic(world.battleBg, world.stageId || 7) : world.battleBg, "repeat");
       }
       if (groundPattern) {
         ctx.fillStyle = groundPattern;
@@ -690,7 +736,7 @@
   }
 
   function heroVisualScale(width) {
-    return (width || 0) >= 560 ? 1.12 : 1;
+    return (width || 0) >= 560 ? 1.3 : 1.16; // ART_PASS ②：自机放大，读得清动作
   }
 
   function careerProgress(careers, fusionId, formId, fusionCatalog, schools, careerDefs) {
@@ -822,6 +868,9 @@
     deflectBullet: deflectBullet,
     drawRoleSilhouette: drawRoleSilhouette,
     heroVisualScale: heroVisualScale,
+    groundMosaic: groundMosaic,
+    rimSprite: rimSprite,
+    GROUND_FILTER: GROUND_FILTER,
     careerProgress: careerProgress,
     missionLine: missionLine,
     hint: hint,
