@@ -173,6 +173,11 @@ html body:not(#sy0):not(#sy1) .drawer button[data-shop].on,html body:not(#sy0):n
 @media (max-height:520px){.drawer .dhead,#wd46 .box>header,#night46 .box>header{min-height:0!important;padding:6px var(--sy-sp-4) 6px!important;align-items:center!important}.drawer .dhead::before,#wd46 .box>header::before,#night46 .box>header::before{top:50%;translate:0 -50%}}
 /* 全屏抽屉不切角：切角会把四角的点击区域也裁掉（弹层左上角点不到），切角感由 HUD 拐角线框表达 */
 html body .drawer{clip-path:none!important}
+/* 验收：大厅模式卡文字不再截断，信息条字号提高 */
+html body #menu #modeRow46>button b{font-size:13px!important;white-space:nowrap}
+html body #menu #modeRow46>button small{font-size:10px!important;line-height:1.25!important;white-space:normal!important;overflow:hidden;display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;text-overflow:clip;color:var(--c-n5)!important}
+html body #menu .terminalActivity48 small,html body #menu .terminalActivity48 em{font-size:12px!important;color:var(--c-n5)!important}
+html body #menu .terminalActivity48 b{font-size:14px!important;color:var(--c-n6)!important}
 `;
   var st = document.createElement("style"); st.id = "syStatic"; st.textContent = css; document.head.appendChild(st);
   // 底栏选中态：最近打开的入口保持高亮，直到它的面板关掉
