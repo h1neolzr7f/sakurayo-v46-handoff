@@ -1,13 +1,14 @@
-// 截图巡检：全部界面 × 三种尺寸（1280×720 / 844×390 / 390×844）。战斗类切实时时钟并取多帧。
+// 截图巡检：全部界面 × 两种横屏尺寸（1280×720 / 844×390）。游戏锁定横屏，竖屏 390×844 只检查旋转提示（rotate 场景）。战斗类切实时时钟并取多帧。
 // 用法：node tools/sweep.mjs <输出目录> [场景名过滤]；输出 PNG + report.json（控制台报错、404、溢出元素、FPS）
 import {chromium} from 'playwright';import path from 'node:path';import fs from 'node:fs';import {pathToFileURL} from 'node:url';
 const out=process.argv[2]||'/tmp/sweep';const only=process.argv[3];fs.mkdirSync(out,{recursive:true});
 const URL=pathToFileURL(path.resolve('src/index.html')).href+'?test=1';
-const VPS=[['d',1280,720],['l',844,390],['p',390,844]];
+const VPS=[['d',1280,720],['l',844,390]];const VP_P=['p',390,844];
 const SAVE={coins:2400,unlock:5,done:[1,2,3,4],tutorialDone:true,character:'sayo'};
 const W=(p,ms)=>p.waitForTimeout(ms);const T=(p,code,...a)=>p.evaluate(([c,a])=>window.__SAKURAYO_TEST__[c](...a),[code,a]);
 const drawer=k=>async p=>{await T(p,'openDrawer',k);await W(p,900);};
 const S={
+  rotate:{vps:[VP_P],go:async p=>{await W(p,600);const r=await p.evaluate(()=>{const e=document.getElementById('syRotate');const c=e&&getComputedStyle(e);return {on:!!(e&&e.classList.contains('on')),display:c&&c.display,blocked:!!window.__syRotateBlocked,top:document.elementFromPoint(195,422)?.closest('#syRotate')?true:false};});if(!r.on||r.display==='none'||!r.blocked||!r.top)throw new Error('竖屏旋转提示未生效 '+JSON.stringify(r));}},
   lobby:async p=>{await W(p,600);},
   stage:drawer('stage'),story:drawer('story'),talent:drawer('talent'),ach:drawer('ach'),shop:drawer('shop'),gacha:drawer('gacha'),roster:drawer('roster'),trials:drawer('trials'),archive:drawer('archive'),asc:drawer('asc'),
   wardrobe:async p=>{await T(p,'openWardrobe46');await W(p,900);},
@@ -28,7 +29,7 @@ const S={
 };
 const report={};const b=await chromium.launch({args:['--allow-file-access-from-files']});
 for(const [name,sc] of Object.entries(S)){ if(only&&!only.split(',').includes(name))continue;
- for(const [v,w,h] of VPS){const key=`${name}_${v}`;const ctx=await b.newContext({viewport:{width:w,height:h},hasTouch:v!=='d',isMobile:v!=='d'});
+ for(const [v,w,h] of (sc.vps||VPS)){const key=`${name}_${v}`;const ctx=await b.newContext({viewport:{width:w,height:h},hasTouch:v!=='d',isMobile:v!=='d'});
   await ctx.addInitScript(s=>localStorage.setItem('sakurayoV3',JSON.stringify(s)),SAVE);const p=await ctx.newPage();const errs=[],miss=[];
   p.on('pageerror',e=>errs.push(String(e).slice(0,200)));p.on('console',m=>{if(m.type()==='error')errs.push(m.text().slice(0,200));});p.on('requestfailed',r=>miss.push(r.url().split('/').slice(-3).join('/')));p.on('response',r=>{if(r.status()>=400)miss.push(r.status()+' '+r.url().split('/').slice(-3).join('/'));});
   try{await p.goto(URL);await p.locator('.bootArt35').waitFor({state:'detached',timeout:15000});const go=sc.go||sc;await go(p);

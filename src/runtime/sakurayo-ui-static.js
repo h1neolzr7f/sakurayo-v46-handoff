@@ -185,15 +185,6 @@ html body:not(#sy0):not(#sy1) #dialogue #dialogueContinue48{float:right;min-widt
 html body:not(#sy0):not(#sy1) #dialogue #dialogueHint{color:var(--c-n5)!important;font-size:12px!important;letter-spacing:.12em;line-height:36px}
 html body:not(#sy0):not(#sy1) #dialogue .speaker{background:var(--c-accent)!important;color:var(--c-on-accent)!important;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);border-radius:0!important}
 html body:not(#sy0):not(#sy1) #dialogue .dialogueText{color:var(--c-n6)!important;font-size:15px;line-height:1.75}
-/* 竖屏窄屏 HUD：波次条、任务提示、暂停键、帧率标签原来和顶部信息栏互相压住，改成在顶栏下面依次排开 */
-@media (max-width:520px){html body #hud .wave{left:10px!important;right:10px!important;width:auto!important;top:calc(env(safe-area-inset-top,0px) + 96px)!important;transform:none!important}
-html body #hud #mission{position:fixed!important;left:10px!important;right:64px!important;width:auto!important;top:calc(env(safe-area-inset-top,0px) + 122px)!important;transform:none!important}
-html body #hud #pause{position:fixed!important;right:10px!important;top:calc(env(safe-area-inset-top,0px) + 122px)!important}
-html body #hud #perf{position:fixed!important;right:62px!important;left:auto!important;top:calc(env(safe-area-inset-top,0px) + 146px)!important}
-html body #hud #minimap46{top:calc(env(safe-area-inset-top,0px) + 172px)!important}
-html body .banter{top:calc(env(safe-area-inset-top,0px) + 252px)!important;bottom:auto!important;left:10px!important;right:10px!important;width:auto!important;transform:none!important} /* 竖屏对白气泡原来贴在技能键上 */
-html body:not(#sy0):not(#sy1) #toast,html body:not(#sy0):not(#sy1) #toast.show{top:calc(env(safe-area-inset-top,0px) + 200px)!important;bottom:auto!important;transform:translateX(-50%)!important} /* 证词 toast 避开重排后的 mission */
-html body:not(#sy0):not(#sy1) #bossRule39{top:calc(env(safe-area-inset-top,0px) + 200px)!important;bottom:auto!important} /* Boss 规则条同样避开 mission */}
 /* 技能键文字：标签放在菱形键下方居中，不再溢出到键外 */
 html body #hud .act{font-size:10px!important;line-height:1.15!important;letter-spacing:0!important;white-space:normal;word-break:keep-all;padding:0 6px!important}
 /* 夜行地图弹窗（遗物、事件、商店、Boss 三选一）：外层全屏遮罩原来也套了面板样式，右上角多出一个方框；卡片还是旧版紫色圆角。统一成 v2 */
@@ -216,21 +207,12 @@ html body:not(#sy0):not(#sy1) #run46 .rm46 .skip{border-radius:0!important;backg
 /* 性能：抽屉是近乎不透明的全屏面板，背后的大厅仍在跑动画、抽屉还对它做实时模糊，桌面端掉到 15fps。抽屉打开时暂停大厅动画、去掉抽屉的背景模糊 */
 html body:not(#sy0):not(#sy1) .drawer{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 html body:has(.drawer:not(.hidden)) #menu,html body:has(.drawer:not(.hidden)) #menu *,html body:has(.drawer:not(.hidden)) #menu *::before,html body:has(.drawer:not(.hidden)) #menu *::after{animation-play-state:paused!important}
-/* 竖屏大厅：四个玩法入口挤在 156px 宽的一行里，每个只有 33px，“主线关卡”“缘日射的”被截断。改成 2×2 网格，标签完整显示 */
-@media (max-width:520px) and (orientation:portrait){html body #menu #modeRow46{display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px!important;height:auto!important;min-height:0!important}
-html body #menu #modeRow46>button{width:auto!important;min-width:0!important;height:34px!important;min-height:0!important;padding:0 6px!important;overflow:hidden}
-html body #menu #modeRow46>button b{font-size:11px!important;white-space:nowrap!important;letter-spacing:0!important}
-html body #menu #modeRow46>button small{display:none!important}
-html body #menu #commandActivityName48{font-size:14px!important;line-height:1.35!important}}
 /* 底部“离线作战就绪”信号文字直接压在立绘上看不清，加深色底条 */
 html body #menu #commandSignal47{padding:2px 10px!important;background:rgb(var(--c-n0-rgb) / .72)!important;color:var(--c-n5)!important;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
 /* 一次性功能提示：改成 v2 样式，右侧显示“点击关闭” */
 html body .syHint46{border-radius:0!important;background:rgb(var(--c-n1-rgb) / .96)!important;border:1px solid var(--c-line)!important;border-left:3px solid var(--c-primary)!important;color:var(--c-n6)!important;cursor:pointer;display:block}
 html body .syHint46 b{color:var(--c-primary)!important}
 html body .syHint46 i{font-style:normal;font-size:11px;color:var(--c-n4);white-space:nowrap;margin-left:10px}
-/* 竖屏寻访：UP 角色立绘被缩成 170px 宽、贴底放在屏幕外，看不到人；标题被页头压住一半 */
-@media (max-width:520px) and (orientation:portrait){html body #gachaDrawer .wishHero46{left:0!important;right:0!important;width:100%!important;top:150px!important;bottom:auto!important;height:calc(100% - 330px)!important;object-fit:contain!important;object-position:50% 100%!important;transform:none!important}
-html body #gachaDrawer .dbody h3{margin-top:18px!important}}
 /* 矮横屏射的：画布占满高度，底部「开一局」键被挤出屏幕 */
 @media (max-height:440px){html body #pachi46{align-items:stretch!important;padding:4px!important}
 html body #pachi46 .pf{max-height:none!important;height:calc(100dvh - 8px)!important;overflow:hidden!important;padding:4px 8px!important;gap:4px!important;display:flex!important;flex-direction:column!important}
@@ -242,8 +224,6 @@ html body:not(#sy0) #dialogue .dialogueArt{background-size:auto 115%!important;b
 @media (max-height:440px){html body:not(#sy0) #dialogue .dialogueArt{height:34vh!important;min-height:120px!important}
 html body:not(#sy0) #dialogue .modal{max-height:calc(100dvh - 12px);overflow-y:auto}
 html body:not(#sy0) #dialogue .dialogueText{font-size:13px!important;line-height:1.5!important}}
-@media (orientation:portrait) and (max-width:520px){html body:not(#sy0) #dialogue .dialogueArt{height:36vh!important;min-height:200px!important}
-html body:not(#sy0) #dialogue .dialogueText{font-size:14px!important}}
 `;
   var st = document.createElement("style"); st.id = "syStatic"; st.textContent = css; document.head.appendChild(st);
   // 底栏选中态：最近打开的入口保持高亮，直到它的面板关掉

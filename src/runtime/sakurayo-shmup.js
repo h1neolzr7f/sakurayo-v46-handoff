@@ -381,7 +381,7 @@
       var aw = root.querySelector(".aw"); aw.hidden = !game.canAwaken() && !s.awaken; aw.classList.toggle("ready", game.canAwaken());
     };
     game.paint = paint; var t0 = performance.now();
-    var loop = function (now) { raf = requestAnimationFrame(loop); var dt = Math.min(0.05, (now - t0) / 1000); t0 = now; if (global.__shmManual) return; game.update(dt); paint(); };
+    var loop = function (now) { raf = requestAnimationFrame(loop); var dt = Math.min(0.05, (now - t0) / 1000); t0 = now; if (global.__shmManual || global.__syRotateBlocked) return; game.update(dt); paint(); }; /* 竖屏旋转提示期间时钟暂停 */
     raf = requestAnimationFrame(loop); return game;
   }
   function stop() { if (raf) cancelAnimationFrame(raf); raf = 0; if (cur) { removeEventListener("keydown", cur.kd); removeEventListener("keyup", cur.ku); cur.root && cur.root.remove(); } cur = null; }
