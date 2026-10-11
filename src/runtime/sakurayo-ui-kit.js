@@ -130,5 +130,10 @@
     });
   }
   if (typeof document !== "undefined") { if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", ghostBars); else ghostBars(); }
-  global.SyKit = { T: T, cut: cut, hex: hex, diamond: diamond, bar: bar, meter: meter, panel: panel };
+  /* Canvas 字号底线：按实际屏幕缩放把字号抬到 ≥ minPx（默认 --fs-aux 11px）。返回实际使用的逻辑字号 */
+  function font(g, w, px, fam, minPx) {
+    var m = g.getTransform ? g.getTransform() : { a: 1, b: 0 }, cv = g.canvas, sc = Math.hypot(m.a, m.b) * (cv && cv.clientWidth && cv.width ? cv.clientWidth / cv.width : 1) || 1;
+    var v = Math.max(px, (minPx || 11) / sc); g.font = w + " " + Math.round(v * 10) / 10 + "px " + fam; return v;
+  }
+  global.SyKit = { font: font, T: T, cut: cut, hex: hex, diamond: diamond, bar: bar, meter: meter, panel: panel };
 })(typeof window !== "undefined" ? window : globalThis);
