@@ -303,9 +303,11 @@
       if (p === "lp" || p === "clp") return ph === 1 ? p : (m.crouch ? "crouch" : "idle");
       if (p === "jatk") return ph === 0 ? "jump" : "jatk";
       if (p === "super") return ph === 0 ? "special" : "super";
-      return ph === 0 ? (m.crouch ? "crouch" : p === "dp" ? "crouch" : "idle_b") : p; }
-    if (f.st === "air" || f.st === "backdash") return "jump"; if (f.st === "jsquat" || f.st === "crouch") return "crouch";
-    if (f.st === "walk" || f.st === "dash") return Math.floor(this.frame / 7) % 2 ? "walk1" : "walk2";
+      if (ph === 0) return m.crouch ? "crouch" : p === "dp" ? "crouch" : p === "hp" || p === "rush" ? "hp_s" : p === "special" ? "special_s" : "idle_b";
+      return p; }
+    if (f.st === "air" || f.st === "backdash") return f.vy < -300 ? "jump_up" : f.vy > 250 ? "jump_fall" : "jump"; if (f.st === "jsquat" || f.st === "crouch") return "crouch";
+    if (f.st === "dash") return "dash";
+    if (f.st === "walk") { var wi = Math.floor(this.frame / 5) % 8; if (f.vx * f.face < 0) wi = 7 - wi; return "walk_" + wi; } // 8 帧走路循环（后退倒放）
     return ["idle", "idle_m", "idle_b", "idle_m"][Math.floor(this.frame / 12) % 4]; // 待机呼吸：两张关键帧 + RIFE 中间帧（位移小，无重影）
   };
   Game.prototype.draw = function (g, img, W, H) {
@@ -316,7 +318,7 @@
     var sup = this.fx.find(function (q) { return q.k === "super"; }); if (sup || this.freeze > 0) { g.fillStyle = "rgba(8,0,20,.72)"; g.fillRect(0, 0, FW, FH); }
     g.fillStyle = "rgba(0,0,0,.22)"; g.fillRect(0, GROUND, FW, FH - GROUND);
     [[this.E, img.foe, true], [this.P, img.me, false]].forEach(function (pr) {
-      var f = pr[0], set = pr[1] || {}, ps = self.pose(f), im = set[ps] && set[ps].width ? set[ps] : set.idle, x = f.x, y = GROUND + f.y + 7, h = 265;
+      var f = pr[0], set = pr[1] || {}, ps = self.pose(f), FB = { hp_s: "idle_b", special_s: "idle_b", jump_up: "jump", jump_fall: "jump", dash: "walk1" }, im = set[ps] && set[ps].width ? set[ps] : set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")] && set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")].width ? set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")] : set.idle, x = f.x, y = GROUND + f.y + 7, h = 265;
       g.fillStyle = "rgba(0,0,0,.35)"; g.beginPath(); g.ellipse(x, GROUND + 4, 52, 10, 0, 0, 7); g.fill();
       g.save(); g.translate(x, y); g.scale(f.face, 1);
       if (f.st === "down" || f.st === "dead") { g.translate(0, 0); }
@@ -354,7 +356,7 @@
   };
   Game.prototype.snapshot = function () { var P = this.P, E = this.E; return { t: +this.t.toFixed(2), round: this.round, wins: [P.wins, E.wins], hp: +(P.hp / P.max).toFixed(3), foeHp: +(E.hp / E.max).toFixed(3), meter: +P.meter.toFixed(2), foeMeter: +E.meter.toFixed(2), combo: P.combo, maxCombo: P.maxCombo, st: P.st, foeSt: E.st, move: P.mn && P.mv ? P.mn : null, foeMove: E.mn && E.mv ? E.mn : null, x: Math.round(P.x), foeX: Math.round(E.x), done: this.done, win: this.win, special: this.special, ch: this.cid, foe: E.cid, form: this.slot, route: this.route, pose: this.pose(P) }; };
   /* —— DOM 外壳 —— */
-  var POSES = ["idle", "idle_m", "idle_b", "walk1", "walk2", "crouch", "jump", "lp", "hp", "clp", "chp", "jatk", "block", "cblock", "hit", "hit2", "down", "throw", "special", "dp", "rush", "super", "win"];
+  var POSES = ["idle", "idle_m", "idle_b", "walk1", "walk2", "crouch", "jump", "lp", "hp", "clp", "chp", "jatk", "block", "cblock", "hit", "hit2", "down", "throw", "special", "dp", "rush", "super", "win", "walk_0", "walk_1", "walk_2", "walk_3", "walk_4", "walk_5", "walk_6", "walk_7", "hp_s", "special_s", "jump_up", "jump_fall", "dash"];
   var CSS = "#duel46{position:fixed;inset:0;z-index:125;background:#07050d;touch-action:none;user-select:none;color:#fff}#duel46 canvas{position:absolute;inset:0;width:100%;height:100%}#duel46 .dstk46{position:absolute;left:max(18px,env(safe-area-inset-left));bottom:18px;width:150px;height:150px;border-radius:50%;background:#ffffff14;border:2px solid #ffffff33}#duel46 .dstk46 i{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px;border-radius:50%;background:#ffffff44;transform:translate(var(--x,0),var(--y,0))}#duel46 .dact46{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:14px;display:grid;grid-template-columns:repeat(3,64px);gap:8px}#duel46 .dact46 button{width:64px;height:64px;padding:0;line-height:1.1;border-radius:50%;border:2px solid #ffffff44;background:#1a1230cc;color:#fff;font-weight:700;font-size:14px}#duel46 .dact46 button.on{border-color:#5fd8ff;box-shadow:0 0 12px #5fd8ff}#duel46 .res{position:absolute;inset:0;display:grid;place-items:center;background:#06040ccc}#duel46 .res .box{text-align:center}#duel46 .res button{margin-top:14px;padding:12px 26px;border-radius:999px;border:0;background:#ff5f9e;color:#fff;font-size:15px}#duel46 .help{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:11px;color:#ffffffaa;text-align:center;pointer-events:none;white-space:nowrap}";
   var cur = null, raf = 0;
   function start(o) {
