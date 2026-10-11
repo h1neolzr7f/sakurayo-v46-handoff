@@ -214,6 +214,14 @@ html body:not(#sy0):not(#sy1) #run46 .rm46 .skip{border-radius:0!important;backg
 /* 性能：抽屉是近乎不透明的全屏面板，背后的大厅仍在跑动画、抽屉还对它做实时模糊，桌面端掉到 15fps。抽屉打开时暂停大厅动画、去掉抽屉的背景模糊 */
 html body:not(#sy0):not(#sy1) .drawer{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 html body:has(.drawer:not(.hidden)) #menu,html body:has(.drawer:not(.hidden)) #menu *,html body:has(.drawer:not(.hidden)) #menu *::before,html body:has(.drawer:not(.hidden)) #menu *::after{animation-play-state:paused!important}
+/* 竖屏大厅：四个玩法入口挤在 156px 宽的一行里，每个只有 33px，“主线关卡”“缘日射的”被截断。改成 2×2 网格，标签完整显示 */
+@media (max-width:520px) and (orientation:portrait){html body #menu #modeRow46{display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px!important;height:auto!important;min-height:0!important}
+html body #menu #modeRow46>button{width:auto!important;min-width:0!important;height:34px!important;min-height:0!important;padding:0 6px!important;overflow:hidden}
+html body #menu #modeRow46>button b{font-size:11px!important;white-space:nowrap!important;letter-spacing:0!important}
+html body #menu #modeRow46>button small{display:none!important}
+html body #menu #commandActivityName48{font-size:14px!important;line-height:1.35!important}}
+/* 底部“离线作战就绪”信号文字直接压在立绘上看不清，加深色底条 */
+html body #menu #commandSignal47{padding:2px 10px!important;background:rgb(var(--c-n0-rgb) / .72)!important;color:var(--c-n5)!important;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
 `;
   var st = document.createElement("style"); st.id = "syStatic"; st.textContent = css; document.head.appendChild(st);
   // 底栏选中态：最近打开的入口保持高亮，直到它的面板关掉
