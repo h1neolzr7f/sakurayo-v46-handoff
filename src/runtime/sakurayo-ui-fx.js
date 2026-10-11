@@ -22,7 +22,7 @@
 #menu{perspective:1400px}
 #menu .bg{translate:calc(var(--px,0) * -14px) calc(var(--py,0) * -8px);scale:1.04;transition:translate .25s ease-out}
 #menu #heroLive46{translate:calc(var(--px,0) * -6px) calc(var(--py,0) * -4px);transition:translate .25s ease-out}
-html body #menu #tacticalDeck48{transform-style:preserve-3d;rotate:y calc(var(--px,0) * -4deg);translate:calc(var(--px,0) * 6px) 0;transition:rotate .3s ease-out,translate .3s ease-out}
+/* 可点击的入口面板不参与视差：preserve-3d/rotateY 会让切角按钮的命中落到父容器，位移会把按钮推出安全区 */
 #menu #coverTitle36{translate:calc(var(--px,0) * 8px) calc(var(--py,0) * 4px);transition:translate .3s ease-out}
 /* 镜头推拉：打开子页面时大厅后退、模糊、压暗 */
 #menu{transition:scale .45s var(--sy-ease-out,ease),filter .45s}
