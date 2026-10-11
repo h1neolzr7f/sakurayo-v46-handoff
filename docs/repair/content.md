@@ -27,7 +27,7 @@
 | `node --check tests/browser_smoke.mjs` | 通过 |
 | `git diff --cached --check` | 通过 |
 
-真实收据回归使用自建旧档，初始币 500。鸟居补给 +12、封印碎片 +8、事件保留残响 +10，到 530；实际购买限购一次的 observer_manual -25 到 505。再次调用同一旧按钮 callback、测试购买 API、刷新再领取和购买都保持 505。持久化 JSON 具有 `purchases.observer_manual = 1`、两个 `collected` 收据、`choices["shrine-outskirts:echo-altar"] = "preserve"`、两条 fragments；第二次打开场景 `visits = 2`。pageerror 为零。
+真实收据回归使用自建旧档，初始币 500。全息牌楼补给 +12、封印碎片 +8、事件保留残响 +10，到 530；实际购买限购一次的 observer_manual -25 到 505。再次调用同一旧按钮 callback、测试购买 API、刷新再领取和购买都保持 505。持久化 JSON 具有 `purchases.observer_manual = 1`、两个 `collected` 收据、`choices["shrine-outskirts:echo-altar"] = "preserve"`、两条 fragments；第二次打开场景 `visits = 2`。pageerror 为零。
 
 本地证据（生成且未提交）：`tests/artifacts/content/receipts.json`、`tests/artifacts/smoke/content-receipts.json`、`tests/artifacts/smoke/report.json`、`tests/artifacts/framework/report.json`。
 

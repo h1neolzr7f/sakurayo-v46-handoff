@@ -17,11 +17,11 @@
   }
   var H = function (v) { return { k: "hits", v: v, d: "受击 ≤ " + v + " 次" }; };
   var LEVELS = [
-    L("1-1", 1, "灯笼参道", "survive", { t: 90 }, { k: "chests", v: 2, d: "打开 2 个宝箱" }, H(6), [11, 57]),
-    L("1-2", 1, "绘马长廊", "clear", { n: 60 }, { k: "time", v: 60, d: "60 秒内完成" }, H(6), [32, 44]),
+    L("1-1", 1, "灯笼御道", "survive", { t: 90 }, { k: "chests", v: 2, d: "打开 2 个宝箱" }, H(6), [11, 57]),
+    L("1-2", 1, "祈愿签长廊", "clear", { n: 60 }, { k: "time", v: 60, d: "60 秒内完成" }, H(6), [32, 44]),
     L("1-3", 1, "送灯", "escort", { path: [[0.18, 0.5], [0.36, 0.36], [0.55, 0.62], [0.72, 0.4], [0.86, 0.52]] }, { k: "npcHp", v: 70, d: "巫女血量 ≥ 70%" }, H(5), [55, 51], { npc: "miko" }),
     L("1-4", 1, "百目尸将", "boss", { bossAt: 22 }, { k: "breaks", v: 2, d: "触发 2 次破防" }, H(8), [84, 31]),
-    L("2-1", 2, "瓦版追风", "timed", { n: 4, limit: 90 }, { k: "time", v: 65, d: "65 秒内完成" }, H(6), [12, 60]),
+    L("2-1", 2, "快报追风", "timed", { n: 4, limit: 90 }, { k: "time", v: 65, d: "65 秒内完成" }, H(6), [12, 60]),
     L("2-2", 2, "射的屋", "mech", { n: 3 }, { k: "mechKills", v: 30, d: "机关击破 ≥ 30" }, H(6), [35, 40]),
     L("2-3", 2, "雨伞送箱", "escort", { path: [[0.15, 0.7], [0.4, 0.55], [0.6, 0.3], [0.85, 0.42]] }, H(0), { k: "npcHp", v: 70, d: "保安血量 ≥ 70%" }, [60, 58], { npc: "guard" }),
     L("2-4", 2, "射的屋大将", "boss", { bossAt: 22 }, { k: "breaks", v: 2, d: "触发 2 次破防" }, H(8), [85, 35]),
@@ -29,14 +29,14 @@
     L("3-2", 3, "宗一的飞剑", "timed", { n: 6, limit: 110, flee: 1 }, { k: "time", v: 70, d: "70 秒内完成" }, H(6), [34, 38]),
     L("3-3", 3, "花火筒", "channel", { t: 30 }, H(2), { k: "time", v: 70, d: "70 秒内完成" }, [58, 60]),
     L("3-4", 3, "鬼宗一", "boss", { bossAt: 22 }, { k: "breaks", v: 2, d: "触发 2 次破防" }, H(8), [84, 36]),
-    L("4-1", 4, "本殿回廊", "timed", { n: 8, limit: 115, hp: 180, kind: "mirror" }, { k: "time", v: 75, d: "75 秒内完成" }, H(6), [12, 44]),
+    L("4-1", 4, "主殿回廊", "timed", { n: 8, limit: 115, hp: 180, kind: "mirror" }, { k: "time", v: 75, d: "75 秒内完成" }, H(6), [12, 44]),
     L("4-2", 4, "第 412 夜", "survive", { t: 110 }, { k: "noUlt", d: "不使用大招" }, H(6), [36, 60]),
     L("4-3", 4, "散场广播", "escort", { path: [[0.15, 0.4], [0.38, 0.62], [0.62, 0.36], [0.86, 0.5]] }, { k: "npcHp", v: 100, d: "雨宫凛 0 次受伤" }, H(6), [60, 42], { npc: "rin" }),
     L("4-4", 4, "鬼·朔夜", "boss", { bossAt: 22 }, { k: "breaks", v: 3, d: "触发 3 次破防" }, H(8), [86, 30])
   ];
   var CHAPTERS = [
-    { ch: 1, n: "第一章 · 神社外街", theme: "门认出了你。" }, { ch: 2, n: "第二章 · 夜店街", theme: "瓦版不说谎。" },
-    { ch: 3, n: "第三章 · 河边花火会场", theme: "觊觎鬼力的人。" }, { ch: 4, n: "终章 · 本殿", theme: "千夜一闪。" }
+    { ch: 1, n: "第一章 · 灵枢观外街", theme: "门认出了你。" }, { ch: 2, n: "第二章 · 夜店街", theme: "快报不说谎。" },
+    { ch: 3, n: "第三章 · 河边花火会场", theme: "觊觎鬼力的人。" }, { ch: 4, n: "终章 · 主殿", theme: "千夜一闪。" }
   ];
   function find(id) { for (var i = 0; i < LEVELS.length; i++) if (LEVELS[i].id === id) return LEVELS[i]; return null; }
   function chapter(ch) { return LEVELS.filter(function (l) { return l.ch === ch; }); }
@@ -113,7 +113,7 @@
     switch (level.type) {
       case "survive": return "存活 " + Math.max(0, Math.ceil(g.t - o.t)) + " 秒";
       case "clear": return "击破尸潮 " + Math.min(g.n, o.killsNow || 0) + "/" + g.n;
-      case "timed": return (g.flee ? "摧毁无主飞剑 " : g.kind === "mirror" ? "击碎复制镜 " : g.kind === "elite" ? "击破精英镜卫 " : "拦下瓦版摊车 ") + o.targets.filter(function (e) { return e.dead || e.hp <= 0; }).length + "/" + g.n + " · 剩余 " + Math.max(0, Math.ceil(g.limit - o.t)) + "s";
+      case "timed": return (g.flee ? "摧毁无主飞剑 " : g.kind === "mirror" ? "击碎复制镜 " : g.kind === "elite" ? "击破精英镜卫 " : "拦下快报摊车 ") + o.targets.filter(function (e) { return e.dead || e.hp <= 0; }).length + "/" + g.n + " · 剩余 " + Math.max(0, Math.ceil(g.limit - o.t)) + "s";
       case "mech": return "引爆符咒机关 " + o.pads.filter(function (q) { return q.used; }).length + "/" + g.n + "（站在机关上）";
       case "escort": return "护送 " + Math.round(o.npc.k / o.npc.path.length * 100) + "% · 血量 " + Math.ceil(o.npc.hp) + "%" + (o.npc.waiting ? " · 靠近她才会前进" : "");
       case "channel": return "读取日志 " + Math.floor(o.chan * 100) + "%" + (o.inside ? "" : " · 回到圈内");

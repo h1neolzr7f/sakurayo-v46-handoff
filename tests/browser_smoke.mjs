@@ -774,8 +774,8 @@ try {
   await api(page, "freezeProgression");
   const ground1 = await api(page, "lifecycle44");
   assert.equal(ground1.ground, "torii");
-  assert.equal(ground1.label, "石板参道");
-  assert.match(ground1.hint, /鸟居/);
+  assert.equal(ground1.label, "石板御道");
+  assert.match(ground1.hint, /全息牌楼/);
   assert.ok(ground1.obstacleCount >= 3, `第一章障碍不足：${ground1.obstacleCount}`);
   await page.evaluate(() => window.advanceTime(8000));
   const early = await state(page);
@@ -783,7 +783,7 @@ try {
   assert.equal(early.stage44.earlyWindow, true);
   assert.ok(early.counts.enemies <= (await api(page, "crowdBudget")).e);
   await shot(page, "02f-ch1-ground.png");
-  pass("第一章石板参道、鸟居柱与前二十秒尸潮密度");
+  pass("第一章石板御道、牌楼柱与前二十秒尸潮密度");
 
   await api(page, "backMenu");
   await api(page, "selectStage", 2);

@@ -1,4 +1,4 @@
-// RESEARCH_V7 ④：奖励预告、妖气节点（风险/回报）、新事件、场景机关（灯笼阵 / 鸟居）
+// RESEARCH_V7 ④：奖励预告、妖气节点（风险/回报）、新事件、场景机关（灯笼阵 / 全息牌楼）
 import fs from 'node:fs'; import vm from 'node:vm'; import assert from 'node:assert/strict';
 const ctx = vm.createContext({ console, Math, JSON }); ctx.globalThis = ctx; ctx.window = ctx;
 for (const f of ['run', 'props']) vm.runInContext(fs.readFileSync(`src/runtime/sakurayo-${f}.js`, 'utf8'), ctx);
@@ -11,7 +11,7 @@ for (let seed = 1; seed <= 40; seed++) { const st = R.create(seed, 'sayo', 'tech
       const s1 = JSON.parse(JSON.stringify(st)), s2 = JSON.parse(JSON.stringify(st)); s1.pending = []; s2.pending = [];
       const o1 = R.complete(s1, n, true), o2 = R.complete(s2, Object.assign({}, n, { haunt: 0 }), true); assert.ok(o1.shards > o2.shards && o1.relicOffer, 'haunt pays more + relic'); } } }
 assert.ok(haunts > 10 && rewards > 200, `haunts ${haunts}, rewards ${rewards}`);
-// 场景机关：灯笼点燃后持续灼烧，鸟居给加速，有冷却
+// 场景机关：灯笼点燃后持续灼烧，全息牌楼给加速，有冷却
 const list = PR.create(1, 3000, 3000, 1500, 1500, 7, null), lan = list.find(p => p.kind === 'lantern'), tor = list.find(p => p.kind === 'torii'); assert.ok(lan && tor, 'lantern + torii placed');
 let burns = 0, haste = 0; const api = { gems() {}, heal() {}, shield() {}, coins() {}, fx() {}, toast() {}, sound() {}, aoe() {}, burn() { burns++; }, haste() { haste++; } };
 for (let i = 0; i < 300; i++) PR.update(list, { x: lan.x, y: lan.y, r: 14 }, 1 / 30, api, true);

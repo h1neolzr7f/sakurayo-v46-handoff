@@ -1,4 +1,4 @@
-// 录制缘日射的（庙会抽奖）与 Boss 三选一面板。
+// 录制庙会射的（庙会抽奖）与 Boss 三选一面板。
 import path from 'node:path'; import fs from 'node:fs'; import { pathToFileURL } from 'node:url'; import { chromium } from 'playwright';
 const out = process.argv[2] || '/tmp/sy/pachi'; fs.rmSync(out, { recursive: true, force: true }); fs.mkdirSync(out, { recursive: true });
 const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: 844, height: 390 }, recordVideo: { dir: out, size: { width: 844, height: 390 } } }); const p = await ctx.newPage();

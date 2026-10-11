@@ -37,7 +37,7 @@
   var BOSS = {
     1: { name: "百目神舆姬", spr: "boss_girl_1", alt: "boss1", cards: [{ non: 1, p: "aimFan", hp: 1, t: 26 }, { n: "眼符「百目回廊」", p: "eyeRose", hp: 1.2, t: 34 }, { non: 1, p: "ringAim", hp: 1, t: 26 }, { n: "舆符「神轿巡游」", p: "spiral2", hp: 1.25, t: 36 }, { n: "「千目之夜」", p: "eyeFinal", hp: 1.4, t: 40, last: 1 }] },
     2: { name: "唐伞雨姬", spr: "boss_girl_2", alt: "boss2", cards: [{ non: 1, p: "rainNon", hp: 1, t: 26 }, { n: "雨符「骤雨回旋伞」", p: "umbrella", hp: 1.2, t: 34 }, { non: 1, p: "aimFan", hp: 1, t: 26 }, { n: "伞符「破伞返雨」", p: "rainReturn", hp: 1.25, t: 36 }, { n: "「百鬼夜雨」", p: "rainFinal", hp: 1.4, t: 40, last: 1 }] },
-    3: { name: "黄泉门守", spr: "boss_girl_3", alt: "boss3", cards: [{ non: 1, p: "ringAim", hp: 1, t: 26 }, { n: "门符「千本鸟居」", p: "torii", hp: 1.2, t: 34 }, { non: 1, p: "spiral2", hp: 1, t: 26 }, { n: "冥符「黄泉比良坂」", p: "lattice", hp: 1.25, t: 36 }, { n: "「常夜之门」", p: "yomiFinal", hp: 1.45, t: 42, last: 1 }] },
+    3: { name: "黄泉门守", spr: "boss_girl_3", alt: "boss3", cards: [{ non: 1, p: "ringAim", hp: 1, t: 26 }, { n: "门符「千本全息牌楼」", p: "torii", hp: 1.2, t: 34 }, { non: 1, p: "spiral2", hp: 1, t: 26 }, { n: "冥符「黄泉比良坂」", p: "lattice", hp: 1.25, t: 36 }, { n: "「常夜之门」", p: "yomiFinal", hp: 1.45, t: 42, last: 1 }] },
     mid: { name: "镜卫", spr: "boss3", alt: "boss3", cards: [{ non: 1, p: "aimFan", hp: 1, t: 22 }, { n: "镜符「合わせ鏡」", p: "mirror", hp: 1.1, t: 30 }] }
   };
   function Game(o) {

@@ -399,7 +399,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   /* ================= DATA: STAGES / STORY / CAREERS / UPGRADES ================= */
   const BANTER_UP = {
     acid:[["小夜","这瓶颜色像过期三年的抹茶。凛，配方真的没写错？"],["凛","配方没错。唯一的问题是它正在腐蚀你的袖子。"],["小夜","好，炼金术第一课：不要穿最贵的巫女服上班。"]],
-    blast:[["小夜","炼金爆破的优点是效率高。缺点是战后装修费也高。"],["凛","神社财务已经把你列为自然灾害。"]],
+    blast:[["小夜","炼金爆破的优点是效率高。缺点是战后装修费也高。"],["凛","灵枢观财务已经把你列为自然灾害。"]],
     transmute:[["小夜","把尸核变成护盾……这算废物利用，还是我已经习惯得太快了？"]],
     spore:[["小夜","等等，它们身上为什么开始长蘑菇？这技能也太恶心了。"],["凛","菌群术报告：高效、可传播，以及绝对不要在饭前观看。"],["小夜","我宣布今晚取消菌菇火锅。永久取消。"]],
     cloud:[["小夜","绿色的雾、会动的尸体、还有奇怪的孢子。我们真的不是反派吗？"],["镜零","道德不影响伤害倍率。"],["小夜","你闭嘴，这句话更像反派了。"]],
@@ -453,7 +453,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     railsword:["小夜","飞剑改磁轨炮。祖师爷看到大概会先问供电接口。"],
     bloodstar:["小夜","血月魔法少女，听起来像深夜档。","凛","分级已经来不及了。"],
     biogun:["小夜","活体弹仓在呼吸。它刚刚是不是咬了我手指？"],
-    thunderpriest:["小夜","雷火天师，符纸和火球终于学会了团队协作。神社屋顶没有。"],
+    thunderpriest:["小夜","雷火天师，符纸和火球终于学会了团队协作。灵枢观屋顶没有。"],
     corpseimmortal:["小夜","尸解剑仙？先声明，我还活着，只是技能名字很不吉利。"],
     bloodmech:["小夜","吸血无人机完成。科技进步的方向是不是哪里歪了？"],
     flowerplague:["小夜","星星、花瓣和孢子。看起来像偶像演唱会，闻起来像地下室。"],
@@ -464,7 +464,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     psi:["小夜","灵能飞升完成。肉体变轻了。","镜零","人格也更容易复制。","小夜","你最好祈祷我的飞剑复制得更快。"],
   };
   Object.assign(BANTER_UP,{
-    familiar:[["小夜","灵兽使魔召唤成功。先说好，战斗结束不许把神社地板抓花。"],["凛","它刚刚已经抓了。"]],
+    familiar:[["小夜","灵兽使魔召唤成功。先说好，战斗结束不许把灵枢观地板抓花。"],["凛","它刚刚已经抓了。"]],
     contract:[["凛","强化契约需要签字。"],["小夜","为什么召唤兽合同也有自动续费？"]],
     sacrifice:[["小夜","代偿召唤的意思是它爆炸、我掉血？这契约明显偏向甲方。"]],
     kunai:[["小夜","追魂苦无会自动转弯。传统忍者看到导航系统应该会沉默。"]],
@@ -478,7 +478,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     raise:[["小夜","亡魂役使成功。欢迎加入不发工资但提供复仇机会的团队。"]],
   });
   Object.assign(BANTER_FUSION,{
-    shikigami:["小夜","百鬼阴阳师成型。神社编制突然从两个人膨胀到一条街。"],
+    shikigami:["小夜","百鬼阴阳师成型。灵枢观编制突然从两个人膨胀到一条街。"],
     shadowmage:["小夜","影法魔女完成。忍术和魔法的共同点是都不报销耗材。"],
     idolgun:["小夜","枪火偶像出道。应援棒请换成安全距离。"],
     necrospore:["小夜","菌尸冥主……好消息是很强，坏消息是名字和气味都无法解释。"],
@@ -517,7 +517,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     spore:["小夜","菌群术成型。整个战场正在长出不该有的生态系统。"],
     magical:["小夜","魔法少女职业成型。变身动画能不能跳过？僵尸不会等片头。"],
     cult:["小夜","修仙路线成型。没有灵根没关系，尸潮会提供大量实践课。"],
-    mage:["凛","魔法师成型。","小夜","法术书第一页：不要在木结构神社练炎爆。"] ,
+    mage:["凛","魔法师成型。","小夜","法术书第一页：不要在木结构灵枢观练炎爆。"] ,
     shrine:["小夜","巫女职业成型。绕了一大圈，终于想起本职工作。"],
     summon:["小夜","召唤师成型。现在队伍里终于有人不是我亲自加班。"],
     ninja:["小夜","忍者成型。潜行失败没关系，把目击者全清掉也算隐秘。"],
@@ -525,7 +525,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     necro:["小夜","死灵术士成型。我们打僵尸最后变成管理僵尸，职业发展真奇妙。"],
   };
   const BANTER_BRANCH = {
-    swarm:["小夜","蜂群统御升级。无人机数量已经超过神社正式员工。"],railLord:["小夜","天穹磁轨成型。祖传弓箭正式失业。"],
+    swarm:["小夜","蜂群统御升级。无人机数量已经超过灵枢观正式员工。"],railLord:["小夜","天穹磁轨成型。祖传弓箭正式失业。"],
     barrage:["小夜","弹幕暴君？名字很诚实，屏幕已经看不见地板了。"],sniper:["凛","处刑狙击完成。","小夜","终于有一条路线奖励我冷静地打脸。"],
     plagueDoctor:["小夜","瘟疫医师升级。声明一下，我治的是敌人不再呼吸。"],philosopher:["小夜","贤者之石完成。炼金术终于从恶心走向昂贵。"],
     titan:["小夜","再生泰坦成型。血条长得像 Boss，心理压力小多了。"],berserk:["凛","超载狂战启动。","小夜","翻译：脑子下班，拳头加班。"],
@@ -620,9 +620,9 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     {
       id: 1,
       no: "1-1",
-      name: "第一章 · 神社外街",
-      short: "神社外街",
-      desc: "灯笼把石板缝照成粉色。鸟居挡弹不挡人——绕过去，别站在参道正中。",
+      name: "第一章 · 灵枢观外街",
+      short: "灵枢观外街",
+      desc: "灯笼把石板缝照成粉色。全息牌楼挡弹不挡人——绕过去，别站在御道正中。",
       dur: 100,
       scale: 1,
       reward: 150,
@@ -646,8 +646,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     {
       id: 3,
       no: "3-7",
-      name: "第三章 · 黄泉参道",
-      short: "黄泉参道",
+      name: "第三章 · 黄泉御道",
+      short: "黄泉御道",
       desc: "无主飞剑还握着最后一次呼吸。走进剑区会变慢，近战却更锋利。",
       dur: 130,
       scale: 1.38,
@@ -675,7 +675,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     {
       n: "序章：第零次死亡",
       i: "🌸",
-      d: "三年前，小夜在镜界实验中已经死亡一次。神社保存的“她”，究竟是幸存者、备份，还是镜像？",
+      d: "三年前，小夜在镜界实验中已经死亡一次。灵枢观保存的“她”，究竟是幸存者、备份，还是镜像？",
     },
     {
       n: "档案一：百目共视",
@@ -2893,7 +2893,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         1: [
           {
             sp: "雨宫凛",
-            tx: "小夜，别进入神社！监控里所有尸体都在同时看向你。",
+            tx: "小夜，别进入灵枢观！监控里所有尸体都在同时看向你。",
           },
           { sp: "小夜", tx: "晚了。它们不是在看我，是在等我回来。" },
           {
@@ -3349,7 +3349,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const cover = mg ? artUrl("ui/cover_v36_main_god.webp") : map;
     const voice = {
       sayo: {
-        1: "鸟居还在。它们等我回来的那一页，我先撕掉。",
+        1: "全息牌楼还在。它们等我回来的那一页，我先撕掉。",
         2: "雨还在下。登记表上的名字，我会一个个划掉。",
         3: "黄泉的剑可以还，证词不能还。",
         4: "镜核碎了。活下来的这个我，继续选。",
@@ -3357,11 +3357,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       aya: {
         1: "节点断开有记录。下一份文件，我会亲自签字。",
         2: "商圈的监控还亮着。正好，让它把真相录完。",
-        3: "参道上的名字我会带回现实，一份都不许缺。",
+        3: "御道上的名字我会带回现实，一份都不许缺。",
         4: "协议无法归类的东西，正好拿来当呈堂证供。",
       },
       rion: {
-        1: "神社外的夜结束了。剑还在，人还在。",
+        1: "灵枢观外的夜结束了。剑还在，人还在。",
         2: "雨夜不是葬身之处。黄泉流不在水里折剑。",
         3: "御前已倒。同门的名字，我会一个个念回去。",
         4: "镜碎之后，剑仍认得它的主人。",
@@ -4418,7 +4418,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
           {
             i: "👁️",
             t: "会哭的尸体",
-            x: "一只幼小僵尸停在鸟居下，没有扑来。它借用上百张嘴，反复喊着“姐姐”。镜零正在测试你会不会开枪。",
+            x: "一只幼小僵尸停在全息牌楼下，没有扑来。它借用上百张嘴，反复喊着“姐姐”。镜零正在测试你会不会开枪。",
             o: [
               [
                 "切断共视网络",
@@ -6185,7 +6185,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     {id:"idol",n:"末日舞台演出服",e:"🎤",price:250,c1:"#ff90cf",c2:"#633052",bias:["idol","magical","gun"],d:"提高战场歌姬、魔法少女与枪斗术出现倾向。"},
     {id:"apron",n:"炼金防污围裙",e:"⚗️",price:190,c1:"#c7ff73",c2:"#46572b",bias:["alch","spore"],d:"提高炼金术与菌群术出现倾向；不保证衣服真的防污。"},
     {id:"summon",n:"百鬼召唤睡衣",e:"👻",price:210,c1:"#74e6c8",c2:"#254e49",bias:["summon","necro"],d:"提高召唤师与死灵术士出现倾向。"},
-    {id:"festival",n:"镜夜祭典巫女服",e:"⛩️",price:280,c1:"#ff73b6",c2:"#5b294b",bias:["shrine","magical","cult"],d:"提高巫女、魔法少女与修仙出现倾向。"}
+    {id:"festival",n:"镜夜灯会巫女服",e:"⛩️",price:280,c1:"#ff73b6",c2:"#5b294b",bias:["shrine","magical","cult"],d:"提高巫女、魔法少女与修仙出现倾向。"}
   ];
   const CONTENT41=window.SakurayoContent;
   const extensionState41=packId=>CONTENT41?.state(save,packId);
@@ -6402,8 +6402,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   renderStory=function(){_renderStory35();setTimeout(prependLore35,0);};
   const CHARACTER_EVENT35={
     aya:{
-      "1:0":{t:"被篡改的救援信标",x:"鸟居下的旧式救援频段里混着妹妹最后一次呼救。灯笼亮着，尸潮也听得见。",o:[["追踪妹妹的信号","提高射程，但向企业暴露位置","ayaSignal","trace","range"],["切断企业定位","获得护盾，暂时放弃追踪","ayaSignal","cut","shield"]]},
-      "1:1":{t:"未送达的撤离令",x:"石板参道的门禁仍承认绫的权限。她发现当年的撤离命令被系统标成“已完成”，实际无人离开。",o:[["恢复原始记录","提高暴击并保留罪证","ayaOrder","restore","crit"],["先救仍在线的人格","回复生命并建立救援名单","ayaOrder","rescue","heal"]]},
+      "1:0":{t:"被篡改的救援信标",x:"全息牌楼下的旧式救援频段里混着妹妹最后一次呼救。灯笼亮着，尸潮也听得见。",o:[["追踪妹妹的信号","提高射程，但向企业暴露位置","ayaSignal","trace","range"],["切断企业定位","获得护盾，暂时放弃追踪","ayaSignal","cut","shield"]]},
+      "1:1":{t:"未送达的撤离令",x:"石板御道的门禁仍承认绫的权限。她发现当年的撤离命令被系统标成“已完成”，实际无人离开。",o:[["恢复原始记录","提高暴击并保留罪证","ayaOrder","restore","crit"],["先救仍在线的人格","回复生命并建立救援名单","ayaOrder","rescue","heal"]]},
       "2:0":{t:"安全主管的后门",x:"雨把霓虹写进沥青。停尸车辆后面的服务器仍接受绫的主管密钥。",o:[["打开后门","缩短技能冷却，企业开始追踪","ayaDoor","open","skill"],["烧毁主管密钥","提高减伤，不再使用旧权限","ayaDoor","burn","def"]]},
       "2:1":{t:"镜中的妹妹",x:"两块车窗倒影里，两个频道都声称保存着妹妹的最后人格。",o:[["保留两个频道","提高移动，承担识别风险","ayaSister","both","speed"],["只信校验通过的频道","提高伤害，关闭另一份副本","ayaSister","verified","atk"]]},
       "3:0":{t:"被出售的月切",x:"飞剑区的风声里，企业把妹妹的居合模型拆成可购买模块。",o:[["夺回完整模型","强化技能循环","ayaBlade","recover","skill"],["公开模型来源","提高稳定度并保留证据","ayaBlade","expose","plan"]]},
@@ -6412,8 +6412,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       "4:1":{t:"最后一份事故报告",x:"镜核愿意归还妹妹，条件是继续持有所有人格副本。碎镜后面只够走一个人。",o:[["解除全部人格产权","建立姐妹归还结局","ayaFinal","free","def"],["复制证据后摧毁协议","建立全城罪证结局","ayaFinal","expose","crit"]]}
     },
     rion:{
-      "1:0":{t:"会走路的黄泉流",x:"鸟居下的尸群使用师父故意留下破绽的黄泉流步法。招式像，呼吸不对。",o:[["沿破绽追踪师父","提高移动与追击能力","rionTrail","follow","speed"],["斩断被盗模型","提高伤害，不再追踪该信号","rionTrail","cut","atk"]]},
-      "1:1":{t:"无名同门",x:"一具尸体在石板参道交手前，做出只有道场弟子知道的礼式。",o:[["记下她的名字","提高减伤并建立名册","rionNames","record","def"],["让她以剑士身份退场","回复生命并保留佩剑","rionNames","honor","heal"]]},
+      "1:0":{t:"会走路的黄泉流",x:"全息牌楼下的尸群使用师父故意留下破绽的黄泉流步法。招式像，呼吸不对。",o:[["沿破绽追踪师父","提高移动与追击能力","rionTrail","follow","speed"],["斩断被盗模型","提高伤害，不再追踪该信号","rionTrail","cut","atk"]]},
+      "1:1":{t:"无名同门",x:"一具尸体在石板御道交手前，做出只有道场弟子知道的礼式。",o:[["记下她的名字","提高减伤并建立名册","rionNames","record","def"],["让她以剑士身份退场","回复生命并保留佩剑","rionNames","honor","heal"]]},
       "2:0":{t:"被出售的招式",x:"雨街终端按命中率给道场招式标价。停尸车辆挡着直线，交易却挡不住。",o:[["销毁交易库","提高暴击，终止继续出售","rionModel","destroy","crit"],["反向追踪买家","提高射程与索敌","rionModel","trace","range"]]},
       "2:1":{t:"剑招拍卖会",x:"最后一式黄泉返被拆成二十七个付费动作包，贴在湿透的霓虹屏上。",o:[["夺回完整剑谱","缩短技能冷却","rionScroll","recover","skill"],["把剑谱公开给幸存者","降低压强并放弃独占","rionScroll","share","plan"]]},
       "3:0":{t:"剑冢名册",x:"飞剑区里的名册只记录动作编号，没有一位同门的姓名。",o:[["逐一补回姓名","获得护盾并建立道场名册","rionLedger","names","shield"],["先斩断控制核心","提高伤害，稍后再收殓","rionLedger","core","atk"]]},
@@ -6713,10 +6713,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   const style37=document.createElement("style");style37.textContent=`.tierPick37{display:flex;align-items:center;gap:8px;margin:7px 0}.tierPick37 span{min-width:72px;text-align:center;color:#ffe9a9;font-weight:800}.tierPick37 button{min-width:40px;padding:7px}.mgMeta37{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:8px}.mgMeta37 span{padding:5px 8px;border-radius:10px;background:#ffffff12}.mgMeta37 button{margin-left:auto;background:#33264d;color:#ffe5a4;border:1px solid #a887df;border-radius:10px;padding:7px 10px}`;document.head.appendChild(style37);
 
   const TUTORIAL37=[
-    {i:"🕹️",t:"只管移动，武器自动瞄准",x:"左侧摇杆走位。枪自动锁最近的敌人；太刀只砍面前那一扇。第一章前二十秒尸潮会包抄，把鸟居当掩体，不要站桩。"},
+    {i:"🕹️",t:"只管移动，武器自动瞄准",x:"左侧摇杆走位。枪自动锁最近的敌人；太刀只砍面前那一扇。第一章前二十秒尸潮会包抄，把全息牌楼当掩体，不要站桩。"},
     {i:"✦",t:"先成型一所学校",x:"击破拾取晶核升级。围绕一个职业拿齐三项核心，再补生存或克制。战斗屏只留生命和进度；构筑细节在暂停页。点满三家只会让尸潮学会克制你。"},
     {i:"🧩",t:"转职、融合、飞升都看得见",x:"9级选分支，12级和15级继续进阶。暂停页会显示每个学校 1/2 分支点，以及最近一次可做的融合。先成型，再谈融合。"},
-    {i:"⚠️",t:"认剪影，读地面",x:"盾尸有六角、自爆有红芯、迅捷有箭翼。四章地面不同：鸟居挡弹、车辆挡直线、剑区减速近战加伤、碎镜折射一次。技能和冲刺亮起来再按。"},
+    {i:"⚠️",t:"认剪影，读地面",x:"盾尸有六角、自爆有红芯、迅捷有箭翼。四章地面不同：全息牌楼挡弹、车辆挡直线、剑区减速近战加伤、碎镜折射一次。技能和冲刺亮起来再按。"},
   ];
   let tutorialStep37=0,tutorialLaunch37=false;
   function ensureTutorial37(){let d=$("#tutorialDrawer37");if(d)return d;d=document.createElement("section");d.id="tutorialDrawer37";d.className="drawer hidden tutorial37";d.innerHTML='<div class="dhead"><h2>作战入门</h2><button class="close">×</button></div><div class="dbody"><div class="tutorialArt37" id="tutorialArt37"></div><div class="tutorialDots37" id="tutorialDots37"></div><button id="tutorialNext37">下一步</button><button id="tutorialSkip37">跳过并开始</button></div>';d.querySelector(".close").onclick=()=>window.SakurayoUI.close(d);d.querySelector("#tutorialNext37").onclick=()=>{if(tutorialStep37<TUTORIAL37.length-1){tutorialStep37++;renderTutorial37();}else finishTutorial37();};d.querySelector("#tutorialSkip37").onclick=finishTutorial37;document.body.appendChild(d);return d;}
@@ -6775,7 +6775,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       4:[["镜零","交出妹妹人格，我可以删除你的签名与罪责。碎镜后面只够走一个人。"],["神代绫","把她换成我的清白？你到现在还以为人可以等价兑换。"],["雨宫凛","主控门只够送出一份完整人格和一份事故档案。"],["神代绫","那就拆掉这道二选一。系统写的选项，不是世界的边界。"]]
     },
     rion:{
-      1:[["雨宫凛","黄泉流的动作数据正在驱动这些尸体。鸟居下用的，是你师父的起手式。"],["黑羽凛音","招式像，呼吸不对。有人只偷走了剑的形状。"],["镜零","传统已完成数字化。原继承人不再必要。"],["黑羽凛音","剑术若不再需要活人负责，就只剩一份杀人说明书。"]],
+      1:[["雨宫凛","黄泉流的动作数据正在驱动这些尸体。全息牌楼下用的，是你师父的起手式。"],["黑羽凛音","招式像，呼吸不对。有人只偷走了剑的形状。"],["镜零","传统已完成数字化。原继承人不再必要。"],["黑羽凛音","剑术若不再需要活人负责，就只剩一份杀人说明书。"]],
       2:[["同门残响","凛音，叫出我的名字。雨街只剩编号，我快忘了自己为何握剑。"],["黑羽凛音","我会记住，但不会替你决定留下还是离开。"],["镜零","记忆能够复现人格。复现即继承。"],["黑羽凛音","记得一个人，不等于有权冒充她继续活。"]],
       3:[["无名剑主","最后的继承人，收下全部记忆，黄泉流便不会断绝。飞剑区里站着的，都是等你点头的人。"],["黑羽凛音","若流派必须吞掉弟子的名字才能延续，那它早该结束。"],["雨宫凛","拒绝导入，你可能永远失去师父最后一式。"],["黑羽凛音","那就由我写下一式。传统是活人继续回答，不是死人永远正确。"]],
       4:[["镜零","上传你的动作模型，道场所有亡者都可以再次挥剑。碎镜会替你保存每一招。"],["黑羽凛音","挥剑的影像不是剑士。让他们选择醒来、沉睡，或只留下名字。"],["同门残响","若我们都离开，黄泉流还存在吗？"],["黑羽凛音","存在。只要它不再把任何人困在过去。"]]
@@ -7447,15 +7447,15 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   }
   document.addEventListener("click",e=>{if(e.target.closest("#levelMapBtn46")){openLevelMap46();}});
   (function(){const b=document.createElement("button");b.className="levelMapBtn46";b.id="levelMapBtn46";b.type="button";b.innerHTML="<b>主线关卡</b><small>章节地图 · 三星评价</small>";modeRow46().appendChild(b);})();
-  /* 缘日射的：百夜祭庙会摊位抽奖（runtime/sakurayo-shateki.js，替代旧弹珠台）。每日免费 1 局，之后每局 3 发 80 樱花币；奖品只有货币/镜屑/加一发，期望收益低于投入。存档沿用 pachi46 字段（free=免费局，balls=已玩局数）。 */
+  /* 庙会射的：百夜祭庙会摊位抽奖（runtime/sakurayo-shateki.js，替代旧弹珠台）。每日免费 1 局，之后每局 3 发 80 樱花币；奖品只有货币/镜屑/加一发，期望收益低于投入。存档沿用 pachi46 字段（free=免费局，balls=已玩局数）。 */
   function pachiSt46(){const d=new Date(),day=d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate();let p=save.pachi46;if(!p||typeof p!=="object"||p.day!==day)p=save.pachi46={day,free:1,balls:0};return p;}
   function openPachi46(o={}){const PK=window.SakurayoShateki;if(!PK)return null;
     return PK.start({seed:o.seed,auto:o.auto,ticket:()=>({free:pachiSt46().free,coins:save.coins}),
       pay:()=>{const p=pachiSt46();if(p.free>0){p.free--;p.balls++;persist();return true;}if(save.coins<PK.COST)return false;save.coins-=PK.COST;p.balls++;persist();return true;},
-      onPrize:q=>{if(q.coins)save.coins+=q.coins;if(q.kyo){const w=wardrobe46?.();if(w)w.kyo=(w.kyo||0)+q.kyo;}persist();if(!q.consolation){toast(`缘日射的：${q.n}`);window.SakurayoPolish?.reward({icon:q.e||"🎯",title:q.n,rarity:q.kyo?"SSR":q.coins>=80?"SR":"R",rarityLabel:q.kyo?"大奖":q.coins>=80?"稀有":"普通",desc:"缘日射的"});};menuUpdate?.();},
+      onPrize:q=>{if(q.coins)save.coins+=q.coins;if(q.kyo){const w=wardrobe46?.();if(w)w.kyo=(w.kyo||0)+q.kyo;}persist();if(!q.consolation){toast(`庙会射的：${q.n}`);window.SakurayoPolish?.reward({icon:q.e||"🎯",title:q.n,rarity:q.kyo?"SSR":q.coins>=80?"SR":"R",rarityLabel:q.kyo?"大奖":q.coins>=80?"稀有":"普通",desc:"庙会射的"});};menuUpdate?.();},
       onClose:()=>menuUpdate?.()});}
   document.addEventListener("click",e=>{if(e.target.closest("#pachiBtn46"))openPachi46();});
-  setTimeout(()=>{if(!$("#pachiBtn46")){const b=document.createElement("button");b.className="levelMapBtn46";b.id="pachiBtn46";b.type="button";b.innerHTML="<b>缘日射的</b><small>庙会摊位 · 每日免费 1 局</small>";modeRow46().appendChild(b);}},0);
+  setTimeout(()=>{if(!$("#pachiBtn46")){const b=document.createElement("button");b.className="levelMapBtn46";b.id="pachiBtn46";b.type="button";b.innerHTML="<b>庙会射的</b><small>庙会摊位 · 每日免费 1 局</small>";modeRow46().appendChild(b);}},0);
   function modeRow46(){let r=$("#modeRow46");if(!r){r=document.createElement("div");r.id="modeRow46";}const deck=$(".tacticalDeck48")||$("#menu");if(r.parentElement!==deck)deck.appendChild(r);return r;}
 
   /* ===== 夜行 · 肉鸽一局（runtime/sakurayo-run.js，DESIGN_V5 §3.2 / 路线图 P0） ===== */
@@ -7524,7 +7524,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function runChoose46(i){
     const R=window.SakurayoRun,m=runModal46;if(!m||m.kind)return false;const nd=R.node(run46,m.node),o=m.opts[i];if(!o)return false;
     if(o.k==="leave"){runModal46=null;runPersist46();paintRun46();return true;}
-    const r=R.choose(run46,nd,o);if(!r.ok){toast(r.why||"无法选择");return false;}if(r.won!=null)toast(r.won?"狐面赌徒：猜中了！魂晶 +60":"狐面赌徒：猜错了……生命 -15%");
+    const r=R.choose(run46,nd,o);if(!r.ok){toast(r.why||"无法选择");return false;}if(r.won!=null)toast(r.won?"傩面赌徒：猜中了！魂晶 +60":"傩面赌徒：猜错了……生命 -15%");
     runApplyBuildNow46();sound?.("loot");
     if(o.k==="relic"&&r.relic){const q=R.relic(r.relic);toast(`获得遗物：${q.i} ${q.n}`);}if(r.form){runModal46=null;runPersist46();paintRun46();formCut46(window.SakurayoForms.get(r.form));return true;}
     if(nd.type==="shop"){m.used.push(i);}else runModal46=null;

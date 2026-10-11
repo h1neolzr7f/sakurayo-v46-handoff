@@ -44,7 +44,7 @@
     for (i = 0; i < L.chests; i++) place("chest", 22, {});
     for (i = 0; i < L.shrines; i++) place("shrine", 26, { charge: 0 });
     for (i = 0; i < (L.traps || 2); i++) place("trap", 20, { cool: 0 });
-    // 场景机关（RESEARCH_V7 ④，参考哈迪斯的陷阱机关）：灯笼阵 = 走近点燃，持续灼烧周围敌人；鸟居 = 穿过获得短暂加速
+    // 场景机关（RESEARCH_V7 ④，参考哈迪斯的陷阱机关）：灯笼阵 = 走近点燃，持续灼烧周围敌人；全息牌楼 = 穿过获得短暂加速
     for (i = 0; i < (L.lanterns || 3); i++) place("lantern", 18, { cool: 0, lit: 0, tick: 0 });
     for (i = 0; i < (L.torii || 2); i++) place("torii", 30, { cool: 0 });
     return list;
@@ -71,7 +71,7 @@
         else if (touch && p.cool <= 0) { p.lit = 4; p.tick = 0; p.cool = 14; api.fx("skill", p.x, p.y); api.sound("crit"); api.toast("灯笼阵：点燃（4 秒灼烧）"); }
       } else if (p.kind === "torii") {
         p.cool = Math.max(0, p.cool - dt);
-        if (touch && p.cool <= 0) { p.cool = 10; if (api.haste) api.haste(3); api.fx("levelup", p.x, p.y); api.toast("鸟居：疾行 3 秒"); }
+        if (touch && p.cool <= 0) { p.cool = 10; if (api.haste) api.haste(3); api.fx("levelup", p.x, p.y); api.toast("全息牌楼：疾行 3 秒"); }
       } else if (p.kind === "shrine") {
         p.charge = touch ? Math.min(1.5, p.charge + dt) : Math.max(0, p.charge - dt * 0.5);
         if (p.charge >= 1.5) { p.done = true; api.fx("levelup", p.x, p.y); api.sound("level"); api.heal(0.25); api.shield(20); api.toast("灵龛：生命 +25%、护盾 +20"); }

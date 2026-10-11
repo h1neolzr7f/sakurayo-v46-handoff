@@ -46,7 +46,7 @@ skins = [
     ("idol", "末日舞台演出服", "pink black post-apocalypse idol stage costume with practical boots"),
     ("apron", "炼金防污围裙", "lime cream alchemist work apron with potion belt and protective gloves"),
     ("summon", "百鬼召唤睡衣", "teal spirit-summoner pajama outfit with cute ghost talismans"),
-    ("festival", "镜夜祭典巫女服", "magenta white mirror-night festival shrine maiden outfit"),
+    ("festival", "镜夜灯会巫女服", "magenta white mirror-night festival shrine maiden outfit"),
 ]
 enemies = [
     ("normal", "普通僵尸"), ("fast", "迅捷僵尸"), ("tank", "重甲僵尸"), ("ranged", "远程僵尸"),
@@ -91,9 +91,9 @@ fusions = [
 ]
 ascensions = [("tech", "科技飞升·机神巫女"), ("bio", "生物飞升·绯血神躯"), ("psi", "灵能飞升·万象灵体")]
 stages = [
-    ("stage_1", "神社外街", "night cyber shrine outer street, cherry blossoms, broken seals, readable top-down combat lanes"),
+    ("stage_1", "灵枢观外街", "night cyber shrine outer street, cherry blossoms, broken seals, readable top-down combat lanes"),
     ("stage_2", "雨夜商圈", "rainy neon shopping district, wet asphalt, abandoned signs without text, readable top-down lanes"),
-    ("stage_3", "黄泉参道", "underworld shrine approach with spectral swords and stone lanterns, readable top-down lanes"),
+    ("stage_3", "黄泉御道", "underworld shrine approach with spectral swords and stone lanterns, readable top-down lanes"),
     ("stage_4", "镜界核心", "surreal mirror-core arena with cracked reflections and magenta cyan circuitry, readable top-down lanes"),
 ]
 skills = [

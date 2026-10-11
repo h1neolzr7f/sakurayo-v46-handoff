@@ -1,4 +1,4 @@
-// RESEARCH_V7 ④ 录像：夜行地图（奖励预告 / 妖气节点）+ 割草关卡场景机关（灯笼阵、鸟居）。Usage: node tools/record_level7.mjs <frames-dir>
+// RESEARCH_V7 ④ 录像：夜行地图（奖励预告 / 妖气节点）+ 割草关卡场景机关（灯笼阵、全息牌楼）。Usage: node tools/record_level7.mjs <frames-dir>
 import { chromium } from 'playwright'; import { pathToFileURL } from 'node:url'; import path from 'node:path'; import fs from 'node:fs';
 const out = process.argv[2] || '/tmp/sy/lv7'; fs.rmSync(out, { recursive: true, force: true }); fs.mkdirSync(out, { recursive: true });
 const browser = await chromium.launch({ args: ['--allow-file-access-from-files'] });

@@ -9,17 +9,17 @@
   function F(ch, slot, name, mask, rule, mods, compat, ban) { return { id: ch + "_" + slot, ch: ch, slot: slot, name: name, mask: mask, rule: rule, mods: mods, compat: compat || [], ban: ban || [] }; }
   var FORMS = [
     F("sayo", "base", "夜樱射手", "无", "连射累积热度", {}, ["spread", "ricochet", "laser"]),
-    F("sayo", "guard", "镜盾哨兵", "狐面", "站定时展开护盾，热度转为护盾值", { standShield: 0.35, moveSpeed: 0.9 }, ["spread", "laser", "orbit"], ["dashTrail"]),
+    F("sayo", "guard", "镜盾哨兵", "傩面", "站定时展开护盾，热度转为护盾值", { standShield: 0.35, moveSpeed: 0.9 }, ["spread", "laser", "orbit"], ["dashTrail"]),
     F("sayo", "speed", "疾风樱刃", "天狗面", "移动射击无惩罚，热度满自动冲刺", { moveSpeed: 1.18, autoDash: 1, dmg: 0.9 }, ["ricochet", "homing", "spread"], ["orbit"]),
     F("sayo", "burst", "过载炮手", "般若面", "主动过热：弹幕翻倍，受伤翻倍", { overheat: 1, fireRate: 1.25, dmgTaken: 1.35 }, ["explosive", "laser", "burst"], ["orbit"]),
     F("sayo", "awaken", "千樱·零式", "纸面具", "10 秒：热度锁满，全屏樱花弹", { fireRate: 2, dmg: 1.4, invuln: 1 }, []),
     F("aya", "base", "枪刀双持", "无", "远程叠印，近身消印", {}, ["burst", "pierce", "homing"]),
-    F("aya", "guard", "证人", "狐面", "印记转为护送目标与自身的护盾", { markShield: 0.4, moveSpeed: 0.92 }, ["pierce", "orbit", "spread"], ["explosive"]),
+    F("aya", "guard", "证人", "傩面", "印记转为护送目标与自身的护盾", { markShield: 0.4, moveSpeed: 0.92 }, ["pierce", "orbit", "spread"], ["explosive"]),
     F("aya", "speed", "乱舞", "天狗面", "枪刀自动交替，切换无硬直", { swapFree: 1, fireRate: 1.15 }, ["burst", "ricochet", "pierce"], ["laser"]),
     F("aya", "burst", "连麦", "般若面", "召唤协同分身，自身生命上限减半", { clone: 1, maxHp: 0.5 }, ["homing", "explosive", "burst"], ["orbit"]),
     F("aya", "awaken", "双生·证词", "纸面具", "10 秒：所有印记同时引爆", { markDetonate: 1, dmg: 1.4, invuln: 1 }, []),
     F("rion", "base", "居合", "无", "静止蓄力，移动释放", {}, ["pierce", "orbit", "explosive"]),
-    F("rion", "guard", "守冢", "狐面", "插剑形成剑区：区内减速敌人、近战增伤", { swordZone: 1, moveSpeed: 0.9 }, ["orbit", "explosive", "spread"], ["homing"]),
+    F("rion", "guard", "守冢", "傩面", "插剑形成剑区：区内减速敌人、近战增伤", { swordZone: 1, moveSpeed: 0.9 }, ["orbit", "explosive", "spread"], ["homing"]),
     F("rion", "speed", "百鬼连斩", "天狗面", "取消蓄力，改为越连越快的连段", { comboChain: 1, chargeTime: 0 }, ["pierce", "ricochet", "burst"], ["laser"]),
     F("rion", "burst", "黄泉一闪", "般若面", "蓄力上限翻倍，蓄满前不能移动", { chargeCap: 2, rootWhileCharge: 1, dmg: 1.15 }, ["explosive", "pierce", "laser"], ["orbit"]),
     F("rion", "awaken", "万剑归坟", "纸面具", "10 秒：每次斩击召唤剑雨", { swordRain: 1, dmg: 1.4, invuln: 1 }, [])

@@ -51,7 +51,7 @@ export async function verifyContentReceipts(browser,inputUrl){
     assert.equal((await api('triggerExplorationEvent41','echo-altar')).opened,true);
     await page.locator('#exploreEventChoices412 button').filter({hasText:'保留残响'}).click();
     save=await readStored();assert.equal(save.coins,530);assert.equal(save.extensions['official.story-exploration'].data.choices['shrine-outskirts:echo-altar'],'preserve');
-    assert.deepEqual(save.extensions['official.story-exploration'].data.fragments,['神社封印残页','被保留的神社残响']);
+    assert.deepEqual(save.extensions['official.story-exploration'].data.fragments,['灵枢观封印残页','被保留的灵枢观残响']);
     await api('closeExploration41');await api('openDrawer','shop');
     await page.locator('.shopTabs40 [data-shop="extensions"]').click();
     const button=page.locator('[data-shop-group="extensions"] .shopItem40').filter({hasText:'扩展观测手册'}).locator('button');

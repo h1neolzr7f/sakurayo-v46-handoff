@@ -1,5 +1,5 @@
 // 夜行（肉鸽一局，P0）：地图生成与路线推进、战斗节点复用关卡目标、构筑与生命跨节点保留、
-// 事件/商店/神社/遗物、局内存档（刷新后继续）、失败结算；永久天赋冻结 + 一次性返还且旧字段保留。
+// 事件/商店/灵枢观/遗物、局内存档（刷新后继续）、失败结算；永久天赋冻结 + 一次性返还且旧字段保留。
 import assert from 'node:assert/strict';
 import { chromium } from 'playwright';
 import { pathToFileURL } from 'node:url';

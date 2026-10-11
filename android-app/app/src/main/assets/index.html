@@ -3468,7 +3468,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       var aw = root.querySelector(".aw"); aw.hidden = !game.canAwaken() && !s.awaken; aw.classList.toggle("ready", game.canAwaken());
     };
     game.paint = paint; var t0 = performance.now();
-    var loop = function (now) { raf = requestAnimationFrame(loop); var dt = Math.min(0.05, (now - t0) / 1000); t0 = now; if (global.__shmManual) return; game.update(dt); paint(); };
+    var loop = function (now) { raf = requestAnimationFrame(loop); var dt = Math.min(0.05, (now - t0) / 1000); t0 = now; if (global.__shmManual || global.__syRotateBlocked) return; game.update(dt); paint(); }; /* 竖屏旋转提示期间时钟暂停 */
     raf = requestAnimationFrame(loop); return game;
   }
   function stop() { if (raf) cancelAnimationFrame(raf); raf = 0; if (cur) { removeEventListener("keydown", cur.kd); removeEventListener("keyup", cur.ku); cur.root && cur.root.remove(); } cur = null; }
@@ -3972,7 +3972,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   Game.prototype.snapshot = function () { var P = this.P, E = this.E; return { t: +this.t.toFixed(2), round: this.round, wins: [P.wins, E.wins], hp: +(P.hp / P.max).toFixed(3), foeHp: +(E.hp / E.max).toFixed(3), meter: +P.meter.toFixed(2), foeMeter: +E.meter.toFixed(2), combo: P.combo, maxCombo: P.maxCombo, st: P.st, foeSt: E.st, move: P.mn && P.mv ? P.mn : null, foeMove: E.mn && E.mv ? E.mn : null, x: Math.round(P.x), foeX: Math.round(E.x), done: this.done, win: this.win, special: this.special, ch: this.cid, foe: E.cid, form: this.slot, route: this.route, pose: this.pose(P) }; };
   /* —— DOM 外壳 —— */
   var POSES = ["idle", "idle_m", "idle_b", "walk1", "walk2", "crouch", "jump", "lp", "hp", "clp", "chp", "jatk", "block", "cblock", "hit", "hit2", "down", "throw", "special", "dp", "rush", "super", "win", "walk_0", "walk_1", "walk_2", "walk_3", "walk_4", "walk_5", "walk_6", "walk_7", "hp_s", "special_s", "jump_up", "jump_fall", "dash", "lp_s", "lp_r", "hp_r", "dp_r", "super_r", "rush_r", "throw_s", "jatk_s", "lp_s2", "lp_a2", "lp_r2", "hp_s2", "hp_o", "hp_r2", "hit_l", "hit_h", "air_up", "air_fall"];
-  var CSS = "#duel46{position:fixed;inset:0;z-index:125;background:#07050d;touch-action:none;user-select:none;color:#fff}#duel46 canvas{position:absolute;inset:0;width:100%;height:100%}@media (orientation:portrait){#duel46::after{content:'⟳  横屏游玩体验更佳 · ROTATE FOR FULL STAGE';position:absolute;left:50%;top:calc(env(safe-area-inset-top,0px) + 22%);translate:-50% 0;white-space:nowrap;padding:6px 14px;font:700 12px sans-serif;letter-spacing:.12em;color:var(--c-n6);background:rgb(var(--c-n1-rgb) / .85);border:1px solid rgb(var(--c-primary-rgb) / .5);pointer-events:none}#duel46 .help{bottom:auto!important;top:calc(env(safe-area-inset-top,0px) + 22% + 36px);white-space:normal!important;width:92vw;line-height:1.5}}#duel46 .dstk46{position:absolute;left:max(18px,env(safe-area-inset-left));bottom:18px;width:150px;height:150px;border-radius:50%;background:#ffffff14;border:2px solid #ffffff33}#duel46 .dstk46 i{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px;border-radius:50%;background:#ffffff44;transform:translate(var(--x,0),var(--y,0))}#duel46 .dact46{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:14px;display:grid;grid-template-columns:repeat(3,64px);gap:8px}#duel46 .dact46 button{width:64px;height:64px;padding:0;line-height:1.1;border-radius:50%;border:2px solid #ffffff44;background:#1a1230cc;color:#fff;font-weight:700;font-size:14px}#duel46 .dact46 button.on{border-color:#5fd8ff;box-shadow:0 0 12px #5fd8ff}#duel46 .res{position:absolute;inset:0;display:grid;place-items:center;background:#06040ccc}#duel46 .res .box{text-align:center}#duel46 .res button{margin-top:14px;padding:12px 26px;border-radius:999px;border:0;background:#ff5f9e;color:#fff;font-size:15px}#duel46 .help{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:11px;color:#ffffffaa;text-align:center;pointer-events:none;white-space:nowrap}";
+  var CSS = "#duel46{position:fixed;inset:0;z-index:125;background:#07050d;touch-action:none;user-select:none;color:#fff}#duel46 canvas{position:absolute;inset:0;width:100%;height:100%}#duel46 .dstk46{position:absolute;left:max(18px,env(safe-area-inset-left));bottom:18px;width:150px;height:150px;border-radius:50%;background:#ffffff14;border:2px solid #ffffff33}#duel46 .dstk46 i{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px;border-radius:50%;background:#ffffff44;transform:translate(var(--x,0),var(--y,0))}#duel46 .dact46{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:14px;display:grid;grid-template-columns:repeat(3,64px);gap:8px}#duel46 .dact46 button{width:64px;height:64px;padding:0;line-height:1.1;border-radius:50%;border:2px solid #ffffff44;background:#1a1230cc;color:#fff;font-weight:700;font-size:14px}#duel46 .dact46 button.on{border-color:#5fd8ff;box-shadow:0 0 12px #5fd8ff}#duel46 .res{position:absolute;inset:0;display:grid;place-items:center;background:#06040ccc}#duel46 .res .box{text-align:center}#duel46 .res button{margin-top:14px;padding:12px 26px;border-radius:999px;border:0;background:#ff5f9e;color:#fff;font-size:15px}#duel46 .help{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:11px;color:#ffffffaa;text-align:center;pointer-events:none;white-space:nowrap}";
   var cur = null, raf = 0;
   function start(o) {
     stop(); o = o || {};
@@ -3999,7 +3999,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     addEventListener("keydown", game.kd); addEventListener("keyup", game.ku);
     var paint = function () { var dpr = Math.min(global.devicePixelRatio || 1, 2), W = Math.round(cv.clientWidth * dpr), H = Math.round(cv.clientHeight * dpr); if (cv.width !== W || cv.height !== H) { cv.width = W; cv.height = H; } game.draw(g, img, W, H); root.querySelector(".su").classList.toggle("on", game.P.meter >= 1); };
     game.paint = paint; var t0 = performance.now();
-    var loop = function (now) { raf = requestAnimationFrame(loop); var dt = Math.min(0.05, (now - t0) / 1000); t0 = now; if (global.__duelManual) return; game.update(dt); paint(); };
+    var loop = function (now) { raf = requestAnimationFrame(loop); var dt = Math.min(0.05, (now - t0) / 1000); t0 = now; if (global.__duelManual || global.__syRotateBlocked) return; game.update(dt); paint(); }; /* 竖屏旋转提示期间时钟暂停 */
     raf = requestAnimationFrame(loop); return game;
   }
   function stop() { if (raf) cancelAnimationFrame(raf); raf = 0; if (cur) { removeEventListener("keydown", cur.kd); removeEventListener("keyup", cur.ku); cur.root && cur.root.remove(); } cur = null; }
@@ -17374,15 +17374,6 @@ html body:not(#sy0):not(#sy1) #dialogue #dialogueContinue48{float:right;min-widt
 html body:not(#sy0):not(#sy1) #dialogue #dialogueHint{color:var(--c-n5)!important;font-size:12px!important;letter-spacing:.12em;line-height:36px}
 html body:not(#sy0):not(#sy1) #dialogue .speaker{background:var(--c-accent)!important;color:var(--c-on-accent)!important;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);border-radius:0!important}
 html body:not(#sy0):not(#sy1) #dialogue .dialogueText{color:var(--c-n6)!important;font-size:15px;line-height:1.75}
-/* 竖屏窄屏 HUD：波次条、任务提示、暂停键、帧率标签原来和顶部信息栏互相压住，改成在顶栏下面依次排开 */
-@media (max-width:520px){html body #hud .wave{left:10px!important;right:10px!important;width:auto!important;top:calc(env(safe-area-inset-top,0px) + 96px)!important;transform:none!important}
-html body #hud #mission{position:fixed!important;left:10px!important;right:64px!important;width:auto!important;top:calc(env(safe-area-inset-top,0px) + 122px)!important;transform:none!important}
-html body #hud #pause{position:fixed!important;right:10px!important;top:calc(env(safe-area-inset-top,0px) + 122px)!important}
-html body #hud #perf{position:fixed!important;right:62px!important;left:auto!important;top:calc(env(safe-area-inset-top,0px) + 146px)!important}
-html body #hud #minimap46{top:calc(env(safe-area-inset-top,0px) + 172px)!important}
-html body .banter{top:calc(env(safe-area-inset-top,0px) + 252px)!important;bottom:auto!important;left:10px!important;right:10px!important;width:auto!important;transform:none!important} /* 竖屏对白气泡原来贴在技能键上 */
-html body:not(#sy0):not(#sy1) #toast,html body:not(#sy0):not(#sy1) #toast.show{top:calc(env(safe-area-inset-top,0px) + 200px)!important;bottom:auto!important;transform:translateX(-50%)!important} /* 证词 toast 避开重排后的 mission */
-html body:not(#sy0):not(#sy1) #bossRule39{top:calc(env(safe-area-inset-top,0px) + 200px)!important;bottom:auto!important} /* Boss 规则条同样避开 mission */}
 /* 技能键文字：标签放在菱形键下方居中，不再溢出到键外 */
 html body #hud .act{font-size:10px!important;line-height:1.15!important;letter-spacing:0!important;white-space:normal;word-break:keep-all;padding:0 6px!important}
 /* 夜行地图弹窗（遗物、事件、商店、Boss 三选一）：外层全屏遮罩原来也套了面板样式，右上角多出一个方框；卡片还是旧版紫色圆角。统一成 v2 */
@@ -17405,21 +17396,12 @@ html body:not(#sy0):not(#sy1) #run46 .rm46 .skip{border-radius:0!important;backg
 /* 性能：抽屉是近乎不透明的全屏面板，背后的大厅仍在跑动画、抽屉还对它做实时模糊，桌面端掉到 15fps。抽屉打开时暂停大厅动画、去掉抽屉的背景模糊 */
 html body:not(#sy0):not(#sy1) .drawer{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
 html body:has(.drawer:not(.hidden)) #menu,html body:has(.drawer:not(.hidden)) #menu *,html body:has(.drawer:not(.hidden)) #menu *::before,html body:has(.drawer:not(.hidden)) #menu *::after{animation-play-state:paused!important}
-/* 竖屏大厅：四个玩法入口挤在 156px 宽的一行里，每个只有 33px，“主线关卡”“缘日射的”被截断。改成 2×2 网格，标签完整显示 */
-@media (max-width:520px) and (orientation:portrait){html body #menu #modeRow46{display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px!important;height:auto!important;min-height:0!important}
-html body #menu #modeRow46>button{width:auto!important;min-width:0!important;height:34px!important;min-height:0!important;padding:0 6px!important;overflow:hidden}
-html body #menu #modeRow46>button b{font-size:11px!important;white-space:nowrap!important;letter-spacing:0!important}
-html body #menu #modeRow46>button small{display:none!important}
-html body #menu #commandActivityName48{font-size:14px!important;line-height:1.35!important}}
 /* 底部“离线作战就绪”信号文字直接压在立绘上看不清，加深色底条 */
 html body #menu #commandSignal47{padding:2px 10px!important;background:rgb(var(--c-n0-rgb) / .72)!important;color:var(--c-n5)!important;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
 /* 一次性功能提示：改成 v2 样式，右侧显示“点击关闭” */
 html body .syHint46{border-radius:0!important;background:rgb(var(--c-n1-rgb) / .96)!important;border:1px solid var(--c-line)!important;border-left:3px solid var(--c-primary)!important;color:var(--c-n6)!important;cursor:pointer;display:block}
 html body .syHint46 b{color:var(--c-primary)!important}
 html body .syHint46 i{font-style:normal;font-size:11px;color:var(--c-n4);white-space:nowrap;margin-left:10px}
-/* 竖屏寻访：UP 角色立绘被缩成 170px 宽、贴底放在屏幕外，看不到人；标题被页头压住一半 */
-@media (max-width:520px) and (orientation:portrait){html body #gachaDrawer .wishHero46{left:0!important;right:0!important;width:100%!important;top:150px!important;bottom:auto!important;height:calc(100% - 330px)!important;object-fit:contain!important;object-position:50% 100%!important;transform:none!important}
-html body #gachaDrawer .dbody h3{margin-top:18px!important}}
 /* 矮横屏射的：画布占满高度，底部「开一局」键被挤出屏幕 */
 @media (max-height:440px){html body #pachi46{align-items:stretch!important;padding:4px!important}
 html body #pachi46 .pf{max-height:none!important;height:calc(100dvh - 8px)!important;overflow:hidden!important;padding:4px 8px!important;gap:4px!important;display:flex!important;flex-direction:column!important}
@@ -17431,8 +17413,6 @@ html body:not(#sy0) #dialogue .dialogueArt{background-size:auto 115%!important;b
 @media (max-height:440px){html body:not(#sy0) #dialogue .dialogueArt{height:34vh!important;min-height:120px!important}
 html body:not(#sy0) #dialogue .modal{max-height:calc(100dvh - 12px);overflow-y:auto}
 html body:not(#sy0) #dialogue .dialogueText{font-size:13px!important;line-height:1.5!important}}
-@media (orientation:portrait) and (max-width:520px){html body:not(#sy0) #dialogue .dialogueArt{height:36vh!important;min-height:200px!important}
-html body:not(#sy0) #dialogue .dialogueText{font-size:14px!important}}
 `;
   var st = document.createElement("style"); st.id = "syStatic"; st.textContent = css; document.head.appendChild(st);
   // 底栏选中态：最近打开的入口保持高亮，直到它的面板关掉
@@ -17586,14 +17566,6 @@ html body:not(#sy0):not(#sy1) #level .choice img{width:44px!important;height:44p
 html body:not(#sy0):not(#sy1) #level .choice small:last-child,html body:not(#sy0):not(#sy1) #level .choice .dots46,html body:not(#sy0):not(#sy1) #level .choice [class*="dots"]{display:none!important}
 html body:not(#sy0):not(#sy1) #level .modal>#reroll,html body:not(#sy0):not(#sy1) #level .modal>#levelBar46{display:inline-flex!important;width:calc(50% - 4px)!important;vertical-align:middle;margin:6px 0 0!important;min-height:36px!important}
 html body:not(#sy0):not(#sy1) #level .modal>#reroll{margin-right:8px!important}}
-/* 竖屏升级弹窗：三张卡纵向堆叠后操作按钮被挤出屏幕外 */
-@media (max-width:520px) and (orientation:portrait){html body:not(#sy0):not(#sy1) #level .modal{max-height:calc(100dvh - 16px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow-y:auto!important;padding:10px 12px!important}
-html body:not(#sy0) #level .modal>h2{font-size:18px!important;padding:4px 28px 4px 18px!important;margin:0 0 4px!important}
-html body:not(#sy0):not(#sy1) #level .choice{min-height:0!important;padding:8px 10px!important;display:grid!important;grid-template-columns:52px 1fr;column-gap:10px;align-items:center;text-align:left!important}
-html body:not(#sy0):not(#sy1) #level .choice img{width:48px!important;height:48px!important;margin:0!important;grid-row:span 3}
-html body:not(#sy0):not(#sy1) #level .choice small:last-child,html body:not(#sy0):not(#sy1) #level .choice .dots46{display:none!important}
-html body:not(#sy0):not(#sy1) #level .modal>#reroll,html body:not(#sy0):not(#sy1) #level .modal>#levelBar46{position:sticky;bottom:0;z-index:2;display:block!important;width:100%!important;margin:6px 0 0!important;min-height:40px!important;background:var(--c-surface-1)}
-html body:not(#sy0):not(#sy1) #level .choices{display:flex!important;flex-direction:column!important;gap:8px!important;max-height:none!important}}
 #syShow.out{animation:syOut .35s ease-in forwards}
 @keyframes syBand{from{transform:skewY(-6deg) translateX(-110%)}to{transform:skewY(-6deg) translateX(0)}}
 @keyframes syHero{from{translate:30% 0;opacity:0}to{translate:0 0;opacity:1}}
@@ -17750,6 +17722,57 @@ html body #menu .coins{color:var(--c-n6)!important;font-weight:800}
   apply(); var n = 0, t = setInterval(function () { apply(); if (++n > 20) clearInterval(t); }, 250);
   global.SakurayoIcons = { svg: svg, apply: apply, list: Object.keys(I) };
 })(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+/* 横屏锁定：游戏只支持横屏。竖屏时盖一层全屏旋转提示（崩三风格：手机旋转动画 + “请横屏游玩”），
+   提示期间通过 SakurayoPlatform 暂停时钟、释放输入，并挡住所有触摸；支持的环境里尝试 screen.orientation.lock。 */
+(function (global) {
+  "use strict";
+  var doc = global.document;
+  var css = `
+#syRotate{position:fixed;inset:0;z-index:2147483000;display:none;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:radial-gradient(ellipse at 50% 42%,rgb(var(--c-primary-rgb) / .2),transparent 68%),var(--c-n0);color:var(--c-n6);touch-action:none;user-select:none;-webkit-user-select:none}
+#syRotate.on{display:flex}
+#syRotate::before{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgb(var(--c-n6-rgb) / .03) 0 1px,transparent 1px 3px)}
+#syRotate .ph{position:relative;width:64px;height:112px;border:4px solid var(--c-n6);border-radius:12px;animation:syRot 2.4s cubic-bezier(.6,0,.3,1) infinite;box-shadow:0 0 18px rgb(var(--c-primary-rgb) / .55)}
+#syRotate .ph::before{content:"";position:absolute;left:50%;top:6px;width:18px;height:3px;margin-left:-9px;border-radius:2px;background:var(--c-n6)}
+#syRotate .ph::after{content:"";position:absolute;inset:14px 6px;background:linear-gradient(135deg,rgb(var(--c-primary-rgb) / .55),rgb(var(--c-accent-rgb) / .35))}
+#syRotate .arc{position:absolute;width:150px;height:150px;border:3px solid transparent;border-top-color:var(--c-primary);border-right-color:var(--c-primary);border-radius:50%;animation:syArc 2.4s cubic-bezier(.6,0,.3,1) infinite;opacity:.8}
+#syRotate .stage{position:relative;display:grid;place-items:center;width:160px;height:160px}
+#syRotate b{font:italic 800 22px var(--sy-font-title,sans-serif);letter-spacing:.2em;padding:6px 34px 6px 26px;background:var(--c-primary);color:var(--c-on-primary);clip-path:polygon(0 0,100% 0,calc(100% - 16px) 100%,0 100%)}
+#syRotate small{font:700 11px sans-serif;letter-spacing:.32em;color:var(--c-n5)}
+@keyframes syRot{0%,18%{rotate:0deg}48%,82%{rotate:-90deg}100%{rotate:0deg}}
+@keyframes syArc{0%,18%{rotate:0deg;opacity:0}30%{opacity:.8}48%,82%{rotate:-90deg;opacity:.8}100%{rotate:0deg;opacity:0}}
+@media (prefers-reduced-motion:reduce){#syRotate .ph{animation:none;rotate:-90deg}#syRotate .arc{animation:none}}
+`;
+  var st = doc.createElement("style"); st.id = "syRotateCss"; st.textContent = css; doc.head.appendChild(st);
+  var el = doc.createElement("div"); el.id = "syRotate"; el.setAttribute("role", "alert"); el.setAttribute("aria-live", "assertive");
+  el.innerHTML = '<div class="stage"><i class="arc"></i><i class="ph"></i></div><b>请横屏游玩</b><small>ROTATE YOUR DEVICE</small>';
+  var mq = global.matchMedia("(orientation:portrait)");
+  var on = false;
+  function stop(e) { e.stopPropagation(); e.preventDefault(); }
+  ["pointerdown", "pointerup", "touchstart", "touchend", "click", "keydown"].forEach(function (t) { el.addEventListener(t, stop, { passive: false }); });
+  function tryLock() { try { var o = global.screen && global.screen.orientation; if (o && o.lock) o.lock("landscape").catch(function () {}); } catch (e) {} }
+  function apply() {
+    var want = mq.matches;
+    if (want === on) return;
+    on = want;
+    if (!el.isConnected) doc.body.appendChild(el);
+    el.classList.toggle("on", on);
+    doc.documentElement.classList.toggle("syPortraitBlocked", on);
+    global.__syRotateBlocked = on;
+    var P = global.SakurayoPlatform;
+    if (on) { if (P) P.suspend(); tryLock(); }
+    else if (P && !doc.hidden) P.resume();
+  }
+  function keyGuard(e) { if (on) { e.stopImmediatePropagation(); e.preventDefault(); } }
+  global.addEventListener("keydown", keyGuard, true); global.addEventListener("keyup", keyGuard, true);
+  if (mq.addEventListener) mq.addEventListener("change", apply); else mq.addListener(apply);
+  global.addEventListener("resize", apply);
+  doc.addEventListener("pointerdown", tryLock, { once: true, capture: true });
+  if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", apply); else apply();
+  global.SakurayoRotate = { state: function () { return on; }, apply: apply };
+})(window);
 
 </script>
 </body></html>

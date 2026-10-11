@@ -25,7 +25,7 @@ for (const w of ks) { const r = D.simulate({ character: 'sayo', seed: 3, layer: 
   E.holdDir = 4; E.st = 'stand'; assert.ok(g.blocks(E, D.MV.jhp) && !g.blocks(E, D.MV.clp), 'stand block: overhead yes, low no');
   P.st = 'move'; P.mv = D.MV.clp; P.mf = 6; P.hit = true; assert.ok(g.canCancel(P, 'sp') && g.canCancel(P, 'n'), 'light normal cancels into special / chains');
 }
-{ // 缘日射的（庙会抽奖）：确定性；即使“最优瞄准”期望收益也低于每局价格（镜屑按 60 币折算）；奖品只含货币
+{ // 庙会射的（庙会抽奖）：确定性；即使“最优瞄准”期望收益也低于每局价格（镜屑按 60 币折算）；奖品只含货币
   assert.deepEqual(J(PK.simulate(9, 'best')), J(PK.simulate(9, 'best')), 'shateki deterministic');
   for (const pol of ['best', 'random']) { let ev = 0, kyo = 0; for (let s = 1; s <= 1500; s++) { const r = PK.simulate(s, pol); assert.ok(r.shots >= PK.SHOTS, 'all shots fired'); ev += r.coins; kyo += r.kyo; }
     assert.ok((ev + 60 * kyo) / 1500 < PK.COST * 0.75, pol + ' EV ' + ((ev + 60 * kyo) / 1500).toFixed(1) + ' < cost'); assert.ok(ev > 0, 'prizes do drop'); }

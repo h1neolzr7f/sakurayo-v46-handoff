@@ -4,7 +4,7 @@
   // The command room owns presentation and finite supply receipts, never combat.
   var SUPPLIES = [
     {id:'firstRun',title:'初次出击补给',desc:'完成第一场战斗，无论胜败。',reward:120,test:function(s){return Number(s.runs)>=1;}},
-    {id:'chapter1',title:'第一章 · 神社回收',desc:'完成第一章后领取。',reward:180,chapter:1},
+    {id:'chapter1',title:'第一章 · 灵枢观回收',desc:'完成第一章后领取。',reward:180,chapter:1},
     {id:'chapter2',title:'第二章 · 霓虹追缉',desc:'完成第二章后领取。',reward:260,chapter:2},
     {id:'chapter3',title:'第三章 · 剑冢证词',desc:'完成第三章后领取。',reward:360,chapter:3},
     {id:'chapter4',title:'第四章 · 终夜归航',desc:'完成第四章后领取。',reward:480,chapter:4},

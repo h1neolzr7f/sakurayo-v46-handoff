@@ -8,5 +8,5 @@ await p.mouse.move(300, 300); for (let i = 0; i < 20; i++) { await p.mouse.move(
 for (const k of ['shop', 'gacha']) { const el = p.locator(`[data-open="${k}"]`).first(); const bb = await el.boundingBox(); if (bb) { await p.mouse.click(bb.x + bb.width / 2, bb.y + bb.height / 2); } await p.waitForTimeout(1500); await p.keyboard.press('Escape'); await p.evaluate(() => document.querySelectorAll('.drawer:not(.hidden) .close, .drawer:not(.hidden) [data-close]').forEach(x => x.click())); await p.waitForTimeout(600); }
 await p.evaluate(() => window.__SAKURAYO_TEST__.openPachi46({ seed: 11 })); await p.waitForTimeout(700);
 for (let i = 0; i < 4; i++) { await p.evaluate(() => window.__SAKURAYO_TEST__.pachiFire46()); await p.waitForTimeout(1300); }
-await p.evaluate(() => window.SakurayoPolish?.reward({ icon: '🐱', title: '招财猫（🌸 200 · 镜屑 1）', rarity: 'SSR', rarityLabel: '大奖', desc: '缘日射的' })); await p.waitForTimeout(2200);
+await p.evaluate(() => window.SakurayoPolish?.reward({ icon: '🐱', title: '招财猫（🌸 200 · 镜屑 1）', rarity: 'SSR', rarityLabel: '大奖', desc: '庙会射的' })); await p.waitForTimeout(2200);
 await ctx.close(); await b.close(); const f = fs.readdirSync(out).find(x => x.endsWith('.webm')); console.log(path.join(out, f));

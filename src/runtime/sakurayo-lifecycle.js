@@ -18,9 +18,9 @@
   var groundPatternImage = null;
   var groundPatternContext = null;
   var palettes = [
-    ["#1a1028", "#0c1424", "#ff6fb0", "torii", "石板参道"],
+    ["#1a1028", "#0c1424", "#ff6fb0", "torii", "石板御道"],
     ["#0c1730", "#061018", "#5ad2ff", "neon", "雨夜沥青"],
-    ["#16141c", "#0b0a10", "#c9bdd8", "swords", "剑冢参道"],
+    ["#16141c", "#0b0a10", "#c9bdd8", "swords", "剑冢御道"],
     ["#14102a", "#070614", "#c79bff", "mirror", "碎镜地砖"],
   ];
 
@@ -60,7 +60,7 @@
       bottom: row[1],
       accent: row[2],
       hue: hue,
-      waveNoun: id === 2 ? "雨街尸潮" : id === 3 ? "剑冢尸潮" : id === 4 || mainGod ? "镜核压境" : "参道尸潮",
+      waveNoun: id === 2 ? "雨街尸潮" : id === 3 ? "剑冢尸潮" : id === 4 || mainGod ? "镜核压境" : "御道尸潮",
     };
   }
 
@@ -760,7 +760,7 @@
     if (id === "swords") return "飞剑区减速 · 近战更锋利";
     if (id === "mirror") return "碎镜折射一次 · 别对镜面开枪";
     if (id === "maingod") return "回廊每三层换色温 · 别站桩";
-    return "鸟居挡弹不挡人 · 前二十秒会包抄";
+    return "全息牌楼挡弹不挡人 · 前二十秒会包抄";
   }
 
   function radio(world, character) {
@@ -782,8 +782,8 @@
       return "电台接通。碎镜把你折成第三百一十八次。先活着，再决定哪一个你留下。";
     }
     if (id === "maingod") return "白色大厅没有外线。经验很快，死亡立刻结算。";
-    if (who === "aya") return "电台接通。旧门禁还认得你。鸟居只挡弹，不替你洗白。";
-    if (who === "rion") return "电台接通。尸潮在用师父的起手式。鸟居挡弹，不挡失礼。";
+    if (who === "aya") return "电台接通。旧门禁还认得你。全息牌楼只挡弹，不替你洗白。";
+    if (who === "rion") return "电台接通。尸潮在用师父的起手式。全息牌楼挡弹，不挡失礼。";
     return "电台接通。门还认得你的灵纹。先活过这二十秒，再谈你是谁。";
   }
 

@@ -424,7 +424,7 @@
       "title": "百目尸将 倒下",
       "kind": "boss",
       "ground": "torii",
-      "chapter": "1-1 · 神社外街"
+      "chapter": "1-1 · 灵枢观外街"
     },
     "victoryAfter": {
       "version": "4.6.0",
@@ -435,7 +435,7 @@
       "title": "",
       "kind": "ending",
       "ground": "torii",
-      "chapter": "1-1 · 神社外街"
+      "chapter": "1-1 · 灵枢观外街"
     },
     "errors": []
   },
@@ -759,7 +759,7 @@
       "title": "",
       "kind": "opening",
       "ground": "torii",
-      "chapter": "1-1 · 神社外街"
+      "chapter": "1-1 · 灵枢观外街"
     },
     "victoryCancel": {
       "done": 0,
@@ -771,7 +771,7 @@
       "title": "",
       "kind": "opening",
       "ground": "torii",
-      "chapter": "1-1 · 神社外街"
+      "chapter": "1-1 · 灵枢观外街"
     },
     "errors": []
   },

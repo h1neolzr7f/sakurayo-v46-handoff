@@ -1,4 +1,4 @@
-/* 缘日射的（百夜祭庙会摊位抽奖小游戏，替代旧樱花弹珠台）。
+/* 庙会射的（百夜祭庙会摊位抽奖小游戏，替代旧樱花弹珠台）。
    每局 3 发软木弹：三层货架上的奖品横向移动，越值钱越小、越快、越重。准星有不可消除的手抖（σ≈9px），
    命中位置越靠上越容易打倒（倒地概率 = 奖品基础概率 × 命中高度），打中没倒给 5 币安慰奖。
    期望收益 < 每局花费（测试对“最优瞄准”策略断言），不能刷币。奖品只有樱花币、镜屑、加一发——不含战斗属性。
@@ -58,7 +58,7 @@
   function start(o) {
     stop(); o = o || {};
     var root = document.createElement("div"); root.id = "pachi46"; root.className = "shateki46";
-    root.innerHTML = '<div class="pf"><header><b>缘日射的</b><small class="tk"></small><button class="x" aria-label="关闭">✕</button></header><canvas width="' + W + '" height="' + H + '"></canvas><footer><button class="go">开一局（3 发）</button><small class="msg">点货架上的奖品射击；打奖品上沿更容易打倒</small></footer></div>';
+    root.innerHTML = '<div class="pf"><header><b>庙会射的</b><small class="tk"></small><button class="x" aria-label="关闭">✕</button></header><canvas width="' + W + '" height="' + H + '"></canvas><footer><button class="go">开一局（3 发）</button><small class="msg">点货架上的奖品射击；打奖品上沿更容易打倒</small></footer></div>';
     document.body.appendChild(root);
     var cv = root.querySelector("canvas"), g = cv.getContext("2d"), S = null, aim = { x: W / 2, y: 300 }, last = performance.now(), raf = 0, st = { root: root, o: o, got: [] };
     function ticket() { return o.ticket ? o.ticket() : { free: 0, coins: 0 }; }

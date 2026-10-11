@@ -47,4 +47,4 @@ await page.screenshot({ path: '/tmp/sy/pachi-end.png' }).catch(() => {});
 assert.ok(await api('pachiClose46')); assert.equal(await page.locator('#pachi46').count(), 0);
 assert.deepEqual(errors, []);
 await browser.close();
-console.log('PASS modes (sky/duel + festival shateki (缘日射的)): node per layer, shmup overlay, autopilot clear, shards/relic writeback, overlay teardown');
+console.log('PASS modes (sky/duel + festival shateki (庙会射的)): node per layer, shmup overlay, autopilot clear, shards/relic writeback, overlay teardown');

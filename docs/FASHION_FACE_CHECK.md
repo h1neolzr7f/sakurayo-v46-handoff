@@ -10,7 +10,7 @@
 |---|---|---|---|---|---|
 | fashion_sayo_plain | 小夜 常服白羽织 | 紫黑 | 袖口起线、旧步枪 | 否 | 是 |
 | fashion_sayo_neon | 小夜 霓虹夜 | 紫黑 | 灯照伤口、电台在脚边 | 否（≠ radio_bat） | 是 |
-| fashion_sayo_night | 小夜 夜巡鸟居 | 紫黑 | 空班、低月、步枪背着 | 否 | 是 |
+| fashion_sayo_night | 小夜 夜巡全息牌楼 | 紫黑 | 空班、低月、步枪背着 | 否 | 是 |
 | fashion_aya_suit | 绫 企业制服 | 银白 | 工牌作废、枪在腰侧朝下 | 否 | 是 |
 | fashion_aya_coat | 绫 风衣 | 银白 | 作废券露在内袋、枪口朝下 | 否 | 是 |
 | fashion_aya_veil | 绫 葬仪面纱 | 银白 | 花瓣粘纱、枪垂在身侧 | 否 | 是 |

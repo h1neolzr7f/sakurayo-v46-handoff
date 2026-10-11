@@ -22,7 +22,7 @@
   }
   function credit(save,reward){var coins=Number(save.coins);save.coins=(Number.isFinite(coins)?Math.max(0,coins):0)+reward;}
   function mailbox(save,command){
-    var s=state(save),rows=[{id:'welcome',title:'行动终端接入补给',desc:'欢迎回到樱夜行动局。整备你的装备，从神社外街开始回收行动。',reward:200,claimed:s.welcomeClaimed}];
+    var s=state(save),rows=[{id:'welcome',title:'行动终端接入补给',desc:'欢迎回到樱夜行动局。整备你的装备，从灵枢观外街开始回收行动。',reward:200,claimed:s.welcomeClaimed}];
     if(command)command.inbox(save).filter(function(r){return r.ready;}).forEach(function(r){rows.push({id:r.id,title:r.title,desc:r.desc+' 补给已送达，可在邮箱或任务中领取。',reward:r.reward,claimed:r.claimed});});
     return rows.map(function(r){r.read=s.mailRead[r.id]===true;r.sender='樱夜行动局';return r;});
   }

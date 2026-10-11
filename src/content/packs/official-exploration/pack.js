@@ -22,7 +22,7 @@
       {
         id: "shrine-outskirts",
         stageId: 1,
-        title: "神社外街 · 封印余响",
+        title: "灵枢观外街 · 封印余响",
         background: "content-packs/official-exploration/maps/chapter1.webp",
         spawn: [0.5, 0.78],
         walkable: [
@@ -33,13 +33,13 @@
           { type: "polygon", points: [[0.90,0.84],[0.69,0.89],[0.50,0.62],[0.60,0.44],[0.85,0.61]] }
         ],
         nodes: [
-          { id: "torii-cache", x: 0.18, y: 0.72, icon: "🌸", label: "鸟居后的补给", reward: { type: "coins", amount: 12 } },
-          { id: "seal-fragment", x: 0.77, y: 0.63, icon: "📜", label: "破损封印记录", reward: { type: "fragment", value: "神社封印残页", coins: 8 } },
+          { id: "torii-cache", x: 0.18, y: 0.72, icon: "🌸", label: "全息牌楼后的补给", reward: { type: "coins", amount: 12 } },
+          { id: "seal-fragment", x: 0.77, y: 0.63, icon: "📜", label: "破损封印记录", reward: { type: "fragment", value: "灵枢观封印残页", coins: 8 } },
           { id: "moon-crystal", x: 0.52, y: 0.32, icon: "✦", label: "月下晶核", reward: { type: "coins", amount: 18 } },
           { id: "hidden-offering", x: 0.36, y: 0.48, icon: "🌸", label: "显形的旧祭盒", requiresEvent: "echo-altar", reward: { type: "coins", amount: 28 } }
         ],
         events: [{ id:"echo-altar", x:0.50, y:0.55, icon:"印", requiresNode:"seal-fragment", title:"残响祭坛", text:"封印里夹着一段未登记的人格残响。留下它，还是拆解成补给？", choices:[
-          { id:"preserve", label:"保留残响", description:"获得证词碎片并显形隐藏祭盒。", coins:10, fragment:"被保留的神社残响" },
+          { id:"preserve", label:"保留残响", description:"获得证词碎片并显形隐藏祭盒。", coins:10, fragment:"被保留的灵枢观残响" },
           { id:"extract", label:"拆解封印", description:"立即获得更多樱花币，但记录会留下选择。", coins:24, fragment:"被拆解的封印编号" }
         ] }]
       },
