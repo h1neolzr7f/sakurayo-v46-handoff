@@ -30,6 +30,10 @@
     supplies: '<rect x="4.5" y="4" width="15" height="17.5" rx="1.5" ' + F + '/><rect x="8.5" y="2.5" width="7" height="3.5" rx="1" fill="var(--c-n1)" stroke="currentColor" stroke-width="1.6"/><path d="M8 11.5l1.6 1.6L12.5 10M8 16.5h8" fill="none" stroke="var(--c-n1)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
     // 签到：日历打勾
     login: '<rect x="3.5" y="5" width="17" height="15.5" rx="1.5" ' + F + '/><path d="M7.5 3v4M16.5 3v4" fill="none" ' + S + '/><path d="M8 13.5l2.6 2.6L16 11" fill="none" stroke="var(--c-n1)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>',
+    // 天赋：六芒星
+    talent: '<path d="M12 2.5l2.6 5.2 5.7.8-4.1 4 1 5.7L12 15.5l-5.2 2.7 1-5.7-4.1-4 5.7-.8Z" ' + F + '/><path d="M12 19.5v2.5" fill="none" ' + S + '/>',
+    // 职业与飞升：上升双箭头 + 底座
+    ascend: '<path d="M6 12.5 12 6.5l6 6" fill="none" ' + S + '/><path d="M6 18 12 12l6 6" fill="none" ' + S + '/><path d="M8 3h8" fill="none" ' + S + '/>',
     // 樱花币：圆币 + 五瓣樱花
     coin: '<circle cx="12" cy="12" r="10" fill="var(--c-rare-ssr)"/><g fill="var(--c-on-accent)" transform="translate(12 12)"><path id="syPetal" d="M0-1.2C-2-3-2.4-6.2 0-7.2 2.4-6.2 2-3 0-1.2Z"/><use href="#syPetal" transform="rotate(72)"/><use href="#syPetal" transform="rotate(144)"/><use href="#syPetal" transform="rotate(216)"/><use href="#syPetal" transform="rotate(288)"/></g>'
   };
@@ -40,6 +44,8 @@
     document.querySelectorAll(".homeNav46>button").forEach(function (b) { var k = NAV[b.getAttribute("data-open")] || (b.id === "commandHistory47" ? "records" : null); if (k) put(b.querySelector(".terminalIcon48"), k); });
     put(document.getElementById("commandMail48"), "mail"); put(document.getElementById("commandNotice48"), "notice"); put(document.getElementById("commandSettings47"), "settings");
     put(document.getElementById("commandSupplies47"), "supplies"); put(document.getElementById("commandLogin48"), "login");
+    var ARC = { trials: "trials", talent: "talent", story: "archive", asc: "ascend", ach: "records" };
+    document.querySelectorAll("#archiveDrawer .archiveDock46>button").forEach(function (b) { var k = ARC[b.getAttribute("data-open")]; if (!k) return; var w = b.querySelector(":scope>.syArcIco"); if (!w) { w = document.createElement("i"); w.className = "syArcIco"; b.insertBefore(w, b.firstChild); } put(w, k); });
     document.querySelectorAll("#menu .coins").forEach(function (c) { put(c, "coin"); });
   }
   var css = `
@@ -57,6 +63,14 @@ html body #menu #commandMail48 span,html body #menu #commandNotice48 span,html b
 html body #menu #commandSupplies47>.syIco,html body #menu #commandLogin48>.syIco{width:28px;height:28px;color:var(--c-n6);flex:none}
 html body #menu #commandSupplies47,html body #menu #commandLogin48{color:var(--c-n6)!important;font-weight:700}
 html body #menu .coins>.syIco{width:22px;height:22px;flex:none}
+/* 樱夜档案入口：原来是一整块主色色块（毛坯），改成深色卡片 + 主色图标 + 左侧主色竖条 */
+html body:not(#sy0):not(#sy1) #archiveDrawer .archiveDock46 button{display:flex!important;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:6px;text-align:left;background:linear-gradient(160deg,var(--c-surface-2),var(--c-surface-1))!important;color:var(--c-n6)!important;border:1px solid var(--c-line)!important;border-left:3px solid var(--c-primary)!important;box-shadow:inset 0 1px 0 rgb(var(--c-n6-rgb) / .06)!important;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%);transition:translate .15s,box-shadow .15s}
+html body:not(#sy0):not(#sy1) #archiveDrawer .archiveDock46 button{font:700 18px var(--sy-font-title,sans-serif)!important;letter-spacing:.06em}
+html body:not(#sy0):not(#sy1) #archiveDrawer .archiveDock46 button b{color:var(--c-n6)!important}
+html body:not(#sy0):not(#sy1) #archiveDrawer .archiveDock46 button small{color:var(--c-n5)!important;opacity:1!important}
+html body:not(#sy0):not(#sy1) #archiveDrawer .archiveDock46 button:hover{translate:0 -2px;box-shadow:0 0 0 1px var(--c-primary),0 6px 18px rgb(var(--c-primary-rgb) / .25)!important}
+html body #archiveDrawer .syArcIco{display:block;width:40px;height:40px;color:var(--c-primary);margin-bottom:auto;filter:drop-shadow(0 0 6px rgb(var(--c-primary-rgb) / .45))}
+@media (max-height:440px){html body #archiveDrawer .syArcIco{width:28px;height:28px}html body:not(#sy0):not(#sy1) #archiveDrawer .archiveDock46 button{min-height:96px!important;padding:12px!important}}
 html body #menu .coins{color:var(--c-n6)!important;font-weight:800}
 @media (max-width:520px){html body #menu .homeNav46>button .terminalIcon48{width:28px!important;height:28px!important;min-width:28px}html body #menu .homeNav46>button small{display:none!important}}
 @media (max-height:440px) and (orientation:landscape){html body #menu .homeNav46>button{flex-direction:row!important;gap:5px!important;padding-top:2px!important;padding-bottom:2px!important}html body #menu .homeNav46>button .terminalIcon48{width:28px!important;height:28px!important;min-width:28px}html body #menu .homeNav46>button small{display:none!important}}
