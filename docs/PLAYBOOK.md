@@ -140,3 +140,9 @@
   - 在支持的环境里尝试调用 `screen.orientation.lock("landscape")`，失败时静默忽略。
 - 不再为竖屏写排版分支。新界面只需要适配横屏，最低保证矮横屏 844×390 和 640×360；`@media (max-height:440px)` 这类矮横屏规则要保留。
 - 巡检 `tools/sweep.mjs` 只截 1280×720 和 844×390；390×844 只跑 `rotate` 场景，检查旋转提示。测试里原来的竖屏视口都改成了对应的横屏尺寸，竖屏行为由 `tests/rotate_smoke.mjs` 单独覆盖。
+
+## 安卓模拟器实测（tools/emu.sh）
+- SDK：/workspace/android-sdk；镜像 `system-images;android-34;google_apis;x86_64`；AVD `sakurayo_2400x1080`（1080×2400 横屏用，400dpi，3GB，swiftshader_indirect，首次 start 自动创建）。
+- 用法：`tools/emu.sh start` → `install <apk>` → `launch` → `shot <name>`（存 /workspace/sakurayo-shots/emulator/）→ `tap x y` / `swipe x1 y1 x2 y2 [ms]` → `fps`（dumpsys gfxinfo）→ `stop`。
+- 环境变量：EMU_GPU（host/swiftshader_indirect）、EMU_ACCEL（on/off）、EMU_PKG、EMU_SHOTS。
+- ⚠️ 2026-10-12 实测：box 的 /dev/kvm 能打开，但创建 vCPU 时宿主内核报 BUG（vmx_vcpu_create → kvm_spurious_fault，嵌套虚拟化坏了），qemu 卡死 0% CPU。不要再在 box 上用 KVM 启模拟器；纯软件模式（EMU_ACCEL=off）对 WebView 游戏慢到无法测帧率。实测请用真机或带可用 KVM 的机器。

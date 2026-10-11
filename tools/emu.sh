@@ -36,7 +36,7 @@ case "${1:-}" in
     ensure_avd
     GPU="${EMU_GPU:-swiftshader_indirect}"
     # kvm group membership may not be active in this shell yet -> use sg
-    setsid nohup sg kvm -c "$EMU -avd $AVD -no-window -no-audio -no-boot-anim -no-snapshot -gpu $GPU -accel on" >"$LOG" 2>&1 < /dev/null &
+    setsid nohup sg kvm -c "$EMU -avd $AVD -no-window -no-audio -no-boot-anim -no-snapshot -gpu $GPU -accel ${EMU_ACCEL:-on}" >"$LOG" 2>&1 < /dev/null &
     "$ADB" wait-for-device
     for i in $(seq 1 180); do
       [ "$("$ADB" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = 1 ] && break; sleep 2; done

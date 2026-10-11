@@ -10,6 +10,7 @@ const drawer=k=>async p=>{await T(p,'openDrawer',k);await W(p,900);};
 const S={
   rotate:{vps:[VP_P],go:async p=>{await W(p,600);const r=await p.evaluate(()=>{const e=document.getElementById('syRotate');const c=e&&getComputedStyle(e);return {on:!!(e&&e.classList.contains('on')),display:c&&c.display,blocked:!!window.__syRotateBlocked,top:document.elementFromPoint(195,422)?.closest('#syRotate')?true:false};});if(!r.on||r.display==='none'||!r.blocked||!r.top)throw new Error('竖屏旋转提示未生效 '+JSON.stringify(r));}},
   lobby:async p=>{await W(p,600);},
+  tutorial:async p=>{await p.evaluate(()=>{const b=document.getElementById('guideButton37')||document.getElementById('commandGuide48');b&&b.click();});await W(p,900);},
   lobbynew:async p=>{await p.evaluate(()=>{sessionStorage.setItem('syKeep','1');return localStorage.setItem('sakurayoV3',JSON.stringify({coins:0,unlock:1,done:[],tutorialDone:true,character:'sayo'}))});await p.reload();await p.locator('.bootArt35').waitFor({state:'detached',timeout:15000});await W(p,1200);await p.evaluate(()=>{const h=document.querySelector('.heroTap46,#heroTap46');h&&h.click();});await W(p,500);},
   stage:drawer('stage'),story:drawer('story'),talent:drawer('talent'),ach:drawer('ach'),shop:drawer('shop'),gacha:drawer('gacha'),roster:drawer('roster'),trials:drawer('trials'),archive:drawer('archive'),asc:drawer('asc'),
   wardrobe:async p=>{await T(p,'openWardrobe46');await W(p,900);},
