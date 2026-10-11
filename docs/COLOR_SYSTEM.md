@@ -95,3 +95,13 @@
 `tools/check_colors.py` 已接入 `tools/verify.sh`：
 - `src/runtime/sakurayo-ui-*.js` 里出现任何 `#hex`、`rgb(数字…)`、`hsl(`、`oklch(` 字面量就报错（令牌文件的 `tokens:start/end` 区除外）。
 - `src/index.html` 和其它旧 runtime 文件里还有 2454 处历史硬编码颜色。这些先登记在 `tools/color_baseline.json`，只许减少不许增加；新增颜色必须走令牌。可见的部分已经由覆盖层统一。
+
+## 8. 大厅图标规范（2026-10-11 16:00）
+
+- 全部改为矢量 SVG（`src/runtime/sakurayo-ui-icons.js`），粗线 2.2px + 实心块，颜色用 currentColor 跟随令牌，不再用缩小的位图插画。
+- 底栏：寻访（菱形框 + 四芒星）、仓库（立方箱）、采购（购物袋）、关卡（旗帜）、试炼（交叉双剑）、档案（书）、战绩（奖杯）。右上：邮箱（信封）、公告（喇叭）、设置（齿轮）。左下：任务补给（清单板）、签到（日历打勾）。货币：金色圆币 + 五瓣樱花。
+- 尺寸：底栏 30px（窄竖屏 28px），右上 26px，左下 28px。
+- 颜色：未选中 n6 #e8effb，对底栏 n1 约 15:1；选中主色 #87b1fd（对 n1 约 8.5:1），加主色光、下划线，放大 1.12 倍。
+- 文字：中文 13px 粗体 n6，英文副标 9.5px n5；宽度 ≤520px 时隐藏英文副标。
+- 图标 pointer-events:none，点击区仍是整个按钮。
+- 对比图：shots/color/15_nav_icons.webp（1280×720、932×430、430×932 和右上角）。

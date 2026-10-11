@@ -17070,7 +17070,7 @@ button.sy-pop{animation:syPop .32s var(--sy-ease-back)}@keyframes syPop{0%{scale
 @keyframes syBlink{0%,100%{opacity:1}50%{opacity:.45}}
 .sy-tag{position:absolute;top:6px;left:-4px;padding:1px 12px 1px 8px;font:italic 700 11px var(--sy-font-title);letter-spacing:.08em;color:var(--c-on-primary);background:var(--sy-c-cyan);clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%);box-shadow:0 0 12px rgb(var(--c-primary-rgb) / .6);pointer-events:none;z-index:3}.sy-tag.hot{background:var(--sy-c-pink);color:var(--c-n6)}.sy-tag.gold{background:var(--sy-c-gold)}
 /* 9. 面板折角 + 纹样 + 美术字标题 */
-.drawer .dhead,.drawer header,#run46 .rs46,#pachi46 .pf,.rm46,.modal46{position:relative}
+#run46 .rs46,#pachi46 .pf,.rm46,.modal46{position:relative}
 .drawer::before,#pachi46 .pf::before,#run46 .rs46::before{content:"";position:absolute;inset:6px;pointer-events:none;z-index:4;background:linear-gradient(var(--sy-c-cyan),var(--sy-c-cyan)) 0 0/18px 2px,linear-gradient(var(--sy-c-cyan),var(--sy-c-cyan)) 0 0/2px 18px,linear-gradient(var(--sy-c-cyan),var(--sy-c-cyan)) 100% 100%/18px 2px,linear-gradient(var(--sy-c-cyan),var(--sy-c-cyan)) 100% 100%/2px 18px;background-repeat:no-repeat;filter:drop-shadow(0 0 4px var(--sy-c-cyan))}
 .drawer h2,.drawer h3,#run46 h3,#pachi46 header b,.rm46 h3{font-family:var(--sy-font-title);font-style:italic;font-weight:800;letter-spacing:.04em;color:var(--c-n6);text-shadow:0 0 12px rgb(var(--c-primary-rgb) / .55)}
 /* 10. 加载 / 空状态小人 */
@@ -17188,7 +17188,7 @@ button.sy-pop{animation:syPop .32s var(--sy-ease-back)}@keyframes syPop{0%{scale
 #wd46 .box::before,#night46 .box::before{content:"";position:absolute;inset:6px;pointer-events:none;z-index:6;background:linear-gradient(var(--c-primary),var(--c-primary)) 0 0/18px 2px,linear-gradient(var(--c-primary),var(--c-primary)) 0 0/2px 18px,linear-gradient(var(--c-primary),var(--c-primary)) 100% 100%/18px 2px,linear-gradient(var(--c-primary),var(--c-primary)) 100% 100%/2px 18px;background-repeat:no-repeat;filter:drop-shadow(0 0 4px var(--c-primary))}
 .wdc,.nc,.shopList>*,.storyCard,#stageList>*{box-shadow:var(--sy-stroke-in);border-radius:0!important;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
 /* ---- 页头：横幅插画 + 斜切标题条 + 编号 ---- */
-.drawer .dhead,#wd46 .box>header,#night46 .box>header{position:relative;min-height:96px;align-items:flex-end!important;padding:var(--sy-sp-4) var(--sy-sp-5) var(--sy-sp-3)!important;background-size:cover!important;background-position:center 45%!important;border-bottom:2px solid var(--sy-c-cyan)!important;box-shadow:0 2px 14px rgb(var(--c-primary-rgb) / .35)}
+.drawer .dhead,#wd46 .box>header,#night46 .box>header{min-height:96px;align-items:flex-end!important;padding:var(--sy-sp-4) var(--sy-sp-5) var(--sy-sp-3)!important;background-size:cover!important;background-position:center 45%!important;border-bottom:2px solid var(--sy-c-cyan)!important;box-shadow:0 2px 14px rgb(var(--c-primary-rgb) / .35)}
 .drawer .dhead::after,#wd46 .box>header::after,#night46 .box>header::after{content:"";position:absolute;inset:0;background:var(--sy-scan),linear-gradient(90deg,rgb(var(--c-n0-rgb) / .95) 0%,rgb(var(--c-n0-rgb) / .6) 42%,rgb(var(--c-n0-rgb) / .05) 100%);pointer-events:none}
 .drawer .dhead::before,#wd46 .box>header::before,#night46 .box>header::before{content:attr(data-sy-code);position:absolute;right:64px;top:10px;z-index:2;font:italic 700 12px var(--sy-font-title);letter-spacing:.2em;color:var(--c-on-primary);background:var(--sy-c-cyan);padding:1px 14px 1px 10px;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
 .drawer .dhead>*,#wd46 .box>header>*,#night46 .box>header>*{position:relative;z-index:1}
@@ -17233,7 +17233,7 @@ html body #menu .homeNav46>button[data-sy-on] .terminalIcon48{transform:translat
 html body #menu .homeNav46>button[data-sy-on] b{color:var(--sy-c-cyan)!important}
 /* ---- 留白 ---- */
 html body #menu #tacticalDeck48{gap:var(--sy-sp-3)!important}html body #menu #modeRow46{gap:var(--sy-sp-2)!important}
-.drawer .dbody{padding:var(--sy-sp-4) var(--sy-sp-5)!important}
+.drawer .dbody:not(#gachaBody46):not(#rosterBody46){padding:var(--sy-sp-4) var(--sy-sp-5)!important} /* 抽卡和仓库是满版舞台，保留原来的零内边距 */
 /* ---- 移动端：触控热区 ≥ 44px、安全区 ---- */
 .drawer .close,#wd46 .x,#night46 .x,#pachi46 .x,[data-wdx],[data-nx]{min-width:44px;min-height:44px;display:inline-grid;place-items:center}
 @media (pointer:coarse){html body #menu .homeNav46>button{min-height:52px}.levelMapBtn46{min-height:48px}}
@@ -17335,6 +17335,10 @@ html body:not(#sy0):not(#sy1) .drawer .close,html body:not(#sy0):not(#sy1) #wd46
 html body:not(#sy0):not(#sy1) .drawer .shopNotice,html body:not(#sy0):not(#sy1) .drawer [class*="Notice"],html body:not(#sy0):not(#sy1) .drawer [class*="notice"]{background:var(--c-surface-2)!important;border:1px solid var(--c-line)!important;border-left:3px solid var(--c-accent)!important;color:var(--c-text-2)!important}
 html body:not(#sy0):not(#sy1) .drawer button[data-shop],html body:not(#sy0):not(#sy1) .drawer button[data-tab],html body:not(#sy0):not(#sy1) .drawer button[data-gtab],html body:not(#sy0):not(#sy1) .drawer button[data-rtab],html body:not(#sy0):not(#sy1) .drawer [class*="Tabs"]>button,html body:not(#sy0):not(#sy1) .drawer [class*="tabs"]>button{background:var(--c-surface-2)!important;background-image:none!important;color:var(--c-text-2)!important;border:1px solid var(--c-line)!important}
 html body:not(#sy0):not(#sy1) .drawer button[data-shop].on,html body:not(#sy0):not(#sy1) .drawer button[data-tab].on,html body:not(#sy0):not(#sy1) .drawer button[data-gtab].on,html body:not(#sy0):not(#sy1) .drawer button[data-rtab].on,html body:not(#sy0):not(#sy1) .drawer [class*="Tabs"]>button.on,html body:not(#sy0):not(#sy1) .drawer [class*="tabs"]>button.on{color:var(--c-primary)!important;border-color:var(--c-primary)!important;box-shadow:inset 3px 0 0 var(--c-primary)!important}
+/* 矮屏（横屏手机 ≤520px 高）：页头横幅收成细条，把高度还给内容，避免抽卡按钮和卡片详情被挤出屏幕 */
+@media (max-height:520px){.drawer .dhead,#wd46 .box>header,#night46 .box>header{min-height:0!important;padding:6px var(--sy-sp-4) 6px!important;align-items:center!important}.drawer .dhead::before,#wd46 .box>header::before,#night46 .box>header::before{top:50%;translate:0 -50%}}
+/* 全屏抽屉不切角：切角会把四角的点击区域也裁掉（弹层左上角点不到），切角感由 HUD 拐角线框表达 */
+html body .drawer{clip-path:none!important}
 `;
   var st = document.createElement("style"); st.id = "syStatic"; st.textContent = css; document.head.appendChild(st);
   // 底栏选中态：最近打开的入口保持高亮，直到它的面板关掉
