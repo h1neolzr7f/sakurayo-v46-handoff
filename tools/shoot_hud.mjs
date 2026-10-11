@@ -5,5 +5,5 @@ const b = await chromium.launch({ args: ['--allow-file-access-from-files'] }); c
 await ctx.addInitScript(() => localStorage.setItem('sakurayoV3', JSON.stringify({ coins: 0, unlock: 4, tutorialDone: true })));
 const p = await ctx.newPage(); await p.goto(pathToFileURL(path.resolve('src/index.html')).href + '?test=1'); await p.locator('.bootArt35').waitFor({ state: 'detached' });
 const run = (fn, ...a) => p.evaluate(([fn, a]) => window.__SAKURAYO_TEST__[fn]?.(...a), [fn, a]);
-await run('selectCharacter', 'sayo'); await run('selectStage', 1); await run('start'); await run('dismissDialogue'); await run('protectPlayer'); await p.waitForTimeout(4000);
-await p.screenshot({ path: `${out}/13_hud.png` }); await run('forceLevelUp'); await p.waitForTimeout(600); await p.screenshot({ path: `${out}/14_levelup.png` }); await b.close();
+await run('selectCharacter', 'sayo'); await run('selectStage', 1); await run('start'); await run('dismissDialogue'); await run('protectPlayer'); await run('realtime46'); await p.waitForTimeout(4000);
+await p.screenshot({ path: `${out}/13_hud.png` }); await run('triggerUpgrade'); await p.waitForTimeout(600); await p.screenshot({ path: `${out}/14_levelup.png` }); await b.close();

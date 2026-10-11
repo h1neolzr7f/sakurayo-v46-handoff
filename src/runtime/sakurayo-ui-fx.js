@@ -102,6 +102,26 @@ html body:not(#sy0) .drawer .wdc,html body:not(#sy0) .drawer .nc,html body:not(#
 #pachi46 header::after,#levelMap46 .lm46Sheet::after,#run46 .rm46::after{content:"";position:absolute;right:14px;top:10px;width:18px;height:18px;border:2px solid var(--c-primary);rotate:45deg;animation:sySpin 6s linear infinite;pointer-events:none;opacity:.8}
 @keyframes sySpin{to{rotate:405deg}}
 @media (prefers-reduced-motion:reduce){#pachi46 header::after,#levelMap46 .lm46Sheet::after,#run46 .rm46::after{animation:none}}
+/* 升级弹窗（崩三式）：斜切大标题条 + LEVEL UP 英文、按稀有度的顶边色与光、卡片依次斜切入场、六边形图标框 */
+#level:not(.hidden){background:radial-gradient(ellipse at 50% 60%,rgb(var(--c-primary-rgb) / .12),rgb(var(--c-n0-rgb) / .78) 70%)!important;backdrop-filter:blur(3px) saturate(.8);-webkit-backdrop-filter:blur(3px) saturate(.8)}
+#level .modal{position:relative;overflow:visible!important;animation:syLvIn .42s var(--sy-ease-out,ease) both}
+@keyframes syLvIn{from{opacity:0;translate:0 24px;scale:.96}to{opacity:1;translate:0 0;scale:1}}
+html body:not(#sy0) #level .modal>h2{display:inline-block;margin-left:-28px!important;padding:6px 40px 6px 28px!important;background:linear-gradient(90deg,var(--c-accent),rgb(var(--c-accent-rgb) / .55))!important;color:var(--c-on-accent)!important;border:0!important;clip-path:polygon(0 0,100% 0,calc(100% - 22px) 100%,0 100%);text-shadow:none!important;font:italic 800 26px var(--sy-font-title,sans-serif)!important;letter-spacing:.06em;animation:syLvBar .5s var(--sy-ease-back,ease) both}
+#level .modal>h2::after{content:"LEVEL UP";margin-left:14px;font:italic 700 14px var(--sy-font-title,sans-serif);letter-spacing:.3em;opacity:.75}
+@keyframes syLvBar{from{clip-path:polygon(0 0,0 0,0 100%,0 100%)}to{clip-path:polygon(0 0,100% 0,calc(100% - 22px) 100%,0 100%)}}
+#level .modal::before{content:"SKR // RESONANCE";position:absolute;right:18px;top:12px;font:italic 700 11px var(--sy-font-title,sans-serif);letter-spacing:.3em;color:var(--c-n4)}
+html body:not(#sy0):not(#sy1) #level .choice{--rc:var(--c-rare-n);--rc-rgb:var(--c-rare-n-rgb);border:1px solid var(--c-line)!important;border-left-width:1px!important;border-top:3px solid var(--rc)!important;background:linear-gradient(180deg,rgb(var(--rc-rgb) / .16),var(--c-surface-2) 38%)!important;clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);animation:syCard .45s var(--sy-ease-out,ease) both;transition:translate .15s,box-shadow .15s}
+#level .choice:nth-child(2){animation-delay:.07s!important}#level .choice:nth-child(3){animation-delay:.14s!important}#level .choice:nth-child(4){animation-delay:.21s!important}
+@keyframes syCard{from{opacity:0;translate:40px 0;clip-path:polygon(14px 0,14px 0,0 100%,0 100%)}}
+html body:not(#sy0):not(#sy1) #level .choice.rar46-rare{--rc:var(--c-rare-r);--rc-rgb:var(--c-rare-r-rgb)}
+html body:not(#sy0):not(#sy1) #level .choice.rar46-epic{--rc:var(--c-rare-sr);--rc-rgb:var(--c-rare-sr-rgb)}
+html body:not(#sy0):not(#sy1) #level .choice.rar46-legend,html body:not(#sy0):not(#sy1) #level .choice.rar46-evo{--rc:var(--c-rare-ssr);--rc-rgb:var(--c-rare-ssr-rgb);box-shadow:0 0 18px rgb(var(--c-rare-ssr-rgb) / .35)!important}
+html body:not(#sy0):not(#sy1) #level .choice[data-rec]{outline:1px solid var(--c-primary);outline-offset:-1px}
+@media (hover:hover){html body:not(#sy0):not(#sy1) #level .choice:hover{translate:0 -6px;box-shadow:0 0 0 1px var(--rc),0 8px 26px rgb(var(--rc-rgb) / .45)!important}}
+#level .choice img{clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%);background:var(--c-n1);filter:drop-shadow(0 0 6px rgb(var(--rc-rgb) / .6))}
+#level .choice .meta span:last-child{color:var(--rc)!important;font-weight:800}
+#level button:not(.choice){clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+@media (prefers-reduced-motion:reduce){#level .modal,#level .modal>h2,#level .choice{animation:none!important}}
 #syShow.out{animation:syOut .35s ease-in forwards}
 @keyframes syBand{from{transform:skewY(-6deg) translateX(-110%)}to{transform:skewY(-6deg) translateX(0)}}
 @keyframes syHero{from{translate:30% 0;opacity:0}to{translate:0 0;opacity:1}}

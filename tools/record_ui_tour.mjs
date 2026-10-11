@@ -19,8 +19,12 @@ await p.goto(url);await p.locator('.bootArt35').waitFor({state:'detached'});
 try{await api('openPachi46',{seed:3});await W(3000);await api('backMenu');}catch(e){}
 try{await api('openNight46');await W(3000);await api('backMenu');}catch(e){}
 await p.goto(url);await p.locator('.bootArt35').waitFor({state:'detached'});await W(300);
-await p.evaluate(()=>{const t=window.__SAKURAYO_TEST__;t.selectCharacter?.('sayo');t.selectStage?.(1);t.start?.();t.dismissDialogue?.();t.protectPlayer?.();});await W(800);
+// 战斗片段：?test=1 下游戏用手动时钟（manualTestClock），不调用 realtime46() 时计时和敌人都不会动，之前录到的就是这种暂停画面。
+// 这里切到实时时钟；不开无敌，让敌人真的打到人，才能录到受击闪红和击杀数跳动。
+await p.evaluate(()=>{const t=window.__SAKURAYO_TEST__;t.selectCharacter('sayo');t.selectStage(1);t.start();t.dismissDialogue();t.realtime46();window.__tour={hurt:0,bump:0};new MutationObserver(r=>r.forEach(m=>{const e=m.target;if(e.id==='syHurt'&&e.classList.contains('on'))__tour.hurt++;if(e.id==='kill'&&e.classList.contains('sy-bump'))__tour.bump++;})).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});setInterval(()=>{const s=t.snapshot();if(s.mode==='level'){clearTimeout(window.__lv);window.__lv=setTimeout(()=>{try{t.chooseUpgrade(0)}catch(e){}},1500);}},400);});
 const hold=async(k,ms)=>{await p.keyboard.down(k);await W(ms);await p.keyboard.up(k);};
-for(let i=0;i<3;i++){await hold('KeyD',900);await hold('KeyW',800);await hold('KeyA',900);await hold('KeyS',800);}
+await W(2500);for(let i=0;i<2;i++){await hold('KeyD',900);await hold('KeyW',700);await hold('KeyA',900);await hold('KeyS',700);}
+await W(6000);
+const snap=await p.evaluate(()=>{const s=window.__SAKURAYO_TEST__.snapshot();return {mode:s.mode,enemies:s.counts.enemies,time:document.getElementById('time').textContent,kill:document.getElementById('kill').textContent,hurt:window.__tour.hurt,bump:window.__tour.bump};});console.log('battle',JSON.stringify(snap));
 await p.evaluate(()=>{const s=(id,t)=>{const e=document.getElementById(id);if(e)e.textContent=t};s('rankBig','S');s('rtitle','防线守住了');const r=document.getElementById('rstats');if(r)r.innerHTML='<div>击破 <b>1,284</b></div><div>存活 <b>302</b> 秒</div><div>樱花币 <b>+460</b></div>';document.getElementById('result')?.classList.remove('hidden');});await W(4000);
 const v=p.video();await ctx.close();await b.close();fs.renameSync(await v.path(),path.join(out,'tour.webm'));console.log('ok');
