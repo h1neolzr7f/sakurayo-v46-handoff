@@ -116,6 +116,8 @@
     + "html body #hud .bars .bar>.fill{position:relative;z-index:1;border-radius:0!important;background:linear-gradient(180deg,var(--c-rare-ssr),var(--c-warn))!important;box-shadow:none!important}"
     + "html body #hud .bars #shBar>.fill{background:linear-gradient(180deg,var(--c-primary-strong),var(--c-primary))!important}html body #hud .bars .bar>#xpF{background:linear-gradient(180deg,var(--c-accent),var(--c-rare-sr))!important}"
     + "html body #hud .bars .bar>.sykGhost{position:absolute;left:0;top:0;bottom:0;z-index:0;background:var(--c-n6);transition:width .6s .35s}html body #hud .bars .bar>span{position:relative;z-index:2;color:var(--c-n6)}"
+    /* 局部可读性：关卡卡片简介压在场景图上，加暗色描边阴影 */
+    + "html body:not(#sy0):not(#sy1) .stageMini .sdesc{text-shadow:0 1px 2px rgb(var(--c-n0-rgb) / .95),0 0 8px rgb(var(--c-n0-rgb) / .9)!important}"
     + "@keyframes sykGlow{from{filter:drop-shadow(0 0 2px rgb(var(--c-primary-rgb) / .6))}to{filter:drop-shadow(0 0 10px rgb(var(--c-primary-rgb) / 1))}}";
   if (typeof document !== "undefined" && !document.getElementById("sykCss")) { var st = document.createElement("style"); st.id = "sykCss"; st.textContent = CSS; (document.head || document.documentElement).appendChild(st); }
 
