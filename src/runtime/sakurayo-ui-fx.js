@@ -25,8 +25,8 @@
 /* 可点击的入口面板不参与视差：preserve-3d/rotateY 会让切角按钮的命中落到父容器，位移会把按钮推出安全区 */
 #menu #coverTitle36{translate:calc(var(--px,0) * 8px) calc(var(--py,0) * 4px);transition:translate .3s ease-out}
 /* 镜头推拉：打开子页面时大厅后退、模糊、压暗 */
-#menu{transition:scale .45s var(--sy-ease-out,ease),filter .45s}
-#menu[data-sy-push]{scale:.94;filter:blur(3px) brightness(.55) saturate(.8)}
+#menu{transition:filter .2s} /* 关闭抽屉时立即恢复缩放，避免回到大厅的瞬间点到错位的按钮 */
+#menu[data-sy-push]{transition:scale .45s var(--sy-ease-out,ease),filter .45s;scale:.94;filter:blur(3px) brightness(.55) saturate(.8)}
 .drawer:not(.hidden){animation:syDolly .5s var(--sy-ease-out,ease)}
 @keyframes syDolly{from{opacity:0;transform:perspective(1200px) translateZ(140px) rotateX(4deg)}to{opacity:1;transform:none}}
 /* 出击键：多层反馈（按下压缩 → 冲击菱环 → 故障闪烁 → 全屏斜切闪光） */
