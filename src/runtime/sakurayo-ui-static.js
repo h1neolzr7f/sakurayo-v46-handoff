@@ -176,6 +176,8 @@ html body .drawer{clip-path:none!important}
 /* 验收：大厅模式卡文字不再截断，信息条字号提高 */
 html body #menu #modeRow46>button b{font-size:13px!important;white-space:nowrap}
 html body #menu #modeRow46>button small{font-size:10px!important;line-height:1.25!important;white-space:normal!important;overflow:hidden;display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;text-overflow:clip;color:var(--c-n5)!important}
+@media (max-height:440px) and (orientation:landscape){html body #menu #tacticalDeck48{gap:6px!important}html body #menu #tacticalDeck48 #start{min-height:0!important;height:56px!important}html body #menu #tacticalDeck48>button:not(#start){min-height:0!important}} /* 矮横屏：压缩出击卡，保证模式行不压到底栏 */
+@media (max-width:1100px){html body #menu #modeRow46>button small{display:none!important}html body #menu #modeRow46>button b{font-size:12px!important}}
 html body #menu .terminalActivity48 small,html body #menu .terminalActivity48 em{font-size:12px!important;color:var(--c-n5)!important}
 html body #menu .terminalActivity48 b{font-size:14px!important;color:var(--c-n6)!important}
 `;

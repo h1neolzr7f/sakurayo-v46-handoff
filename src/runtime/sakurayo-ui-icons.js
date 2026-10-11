@@ -59,6 +59,7 @@ html body #menu #commandSupplies47,html body #menu #commandLogin48{color:var(--c
 html body #menu .coins>.syIco{width:22px;height:22px;flex:none}
 html body #menu .coins{color:var(--c-n6)!important;font-weight:800}
 @media (max-width:520px){html body #menu .homeNav46>button .terminalIcon48{width:28px!important;height:28px!important;min-width:28px}html body #menu .homeNav46>button small{display:none!important}}
+@media (max-height:440px) and (orientation:landscape){html body #menu .homeNav46>button{flex-direction:row!important;gap:5px!important;padding-top:2px!important;padding-bottom:2px!important}html body #menu .homeNav46>button .terminalIcon48{width:28px!important;height:28px!important;min-width:28px}html body #menu .homeNav46>button small{display:none!important}}
 `;
   var st = document.createElement("style"); st.id = "syIcons"; st.textContent = css; document.head.appendChild(st);
   apply(); var n = 0, t = setInterval(function () { apply(); if (++n > 20) clearInterval(t); }, 250);
