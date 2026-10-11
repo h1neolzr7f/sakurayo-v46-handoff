@@ -69,10 +69,20 @@
   var lastLine = "", timer = 0;
   /* 气泡避让 Logo / 指挥室标题：相交就下移到它们下方（只改这一个气泡的 top） */
   function avoid(menu, b) {
-    b.style.left = ""; b.style.right = ""; var r = b.getBoundingClientRect(), mr = menu.getBoundingClientRect(), x = 0;
-    menu.querySelectorAll(".coverTitle36,#commandHeading47,#syTod").forEach(function (e) { var q = e.getBoundingClientRect(); if (q.height && q.right > r.left && q.left < r.right && q.bottom > r.top && q.top < r.bottom) x = Math.max(x, q.right); });
-    if (x) { b.style.left = (x - mr.left + 10) + "px"; b.style.right = "auto"; }
+    /* 依次试候选位置，取第一个不压 Logo / 标题 / 按钮 / 看板娘脸部的位置 */
+    var mr = menu.getBoundingClientRect(), vh = innerHeight / 100, mx = parseFloat(getComputedStyle(menu).getPropertyValue("--mascotX")) || 50;
+    var fx = mr.left + mr.width * (/%/.test(getComputedStyle(menu).getPropertyValue("--mascotX")) || mx > 1 ? mx / 100 : mx);
+    var face = { left: fx - 13 * vh, right: fx + 13 * vh, top: 4 * vh, bottom: 32 * vh };
+    var blocks = [face]; var gt = document.getElementById("syGuideTip"); if (gt && gt.classList.contains("on")) blocks.push(gt.getBoundingClientRect()); menu.querySelectorAll(".coverTitle36,#commandHeading47,#syTod,button,.terminalTop48,[id^=commandMail],[id^=command] .terminalLabel48").forEach(function (e) { var q = e.getBoundingClientRect(); if (q.width && q.height && q.bottom > 0 && q.top < innerHeight) blocks.push(q); });
+    function hit(r) { for (var i = 0; i < blocks.length; i++) { var q = blocks[i]; if (q.right > r.left && q.left < r.right && q.bottom > r.top && q.top < r.bottom) return true; } return r.left < 0 || r.right > innerWidth; }
+    var w = b.offsetWidth, h = b.offsetHeight, cands = [null, [fx + 13 * vh, 8 * vh], [fx - w / 2, 33 * vh], [fx - 13 * vh - w, 33 * vh], [fx - w / 2, 33 * vh + 0], [fx - w / 2, 52 * vh]];
+    for (var i = 0; i < cands.length; i++) {
+      var c = cands[i]; b.style.left = c ? (c[0] - mr.left) + "px" : ""; b.style.right = c ? "auto" : ""; b.style.top = c ? (c[1]) + "px" : "";
+      if (!hit(b.getBoundingClientRect())) return;
+    }
+    b.style.left = (fx - w / 2 - mr.left) + "px"; b.style.right = "auto"; b.style.top = 52 * vh + "px";
   }
+
 
   function say(menu, id, name, kind) {
     if (!menu) return "";
