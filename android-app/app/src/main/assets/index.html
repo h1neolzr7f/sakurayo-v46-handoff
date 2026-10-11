@@ -112,7 +112,7 @@
 </section><div class="stageMini"><img id="simg"/><div><h3 id="sname"></h3><p id="sdesc"></p></div><strong id="sno"></strong></div><button class="start" id="start">出击</button><div class="nav homeNav46"><button data-open="gacha"><span>寻</span>寻访</button><button data-open="roster"><span>仓</span>仓库</button><button data-open="shop"><span>店</span>商店</button><button data-open="stage"><span>关</span>关卡</button><button data-open="trials"><span>试</span>试炼</button><button data-open="archive"><span>档</span>档案</button></div><div class="trialBadge46 hidden" id="trialBadge46"></div></div></section>
 <section class="drawer hidden" id="stageDrawer"><div class="dhead"><h2>关卡选择</h2><button class="close">×</button></div><div class="dbody" id="stageList"></div></section>
 <section class="drawer hidden" id="talentDrawer"><div class="dhead"><h2>永久天赋 <small style="font-size:11px;color:var(--g)">🌸 <span id="tcoins">0</span></small></h2><button class="close">×</button></div><div class="dbody" id="talentList"></div></section>
-<section class="drawer hidden" id="storyDrawer"><div class="dhead"><h2>樱夜档案</h2><button class="close">×</button></div><div class="dbody" id="storyList"></div></section>
+<section class="drawer hidden" id="storyDrawer"><div class="dhead"><h2>剧情档案</h2><button class="close">×</button></div><div class="dbody" id="storyList"></div></section>
 <section class="drawer hidden" id="ascDrawer"><div class="dhead"><h2>职业成型、进阶、融合与飞升</h2><button class="close">×</button></div><div class="dbody"><div class="storyCard open"><div class="storyIcon">ℹ️</div><div><h3>解锁方式</h3><p>单局先学习职业小技能：凑齐三项核心后职业成型，9级选择专精分支，12级与15级继续升阶并改变战斗机制。两个已成型职业可完成一次跨职业融合，随后仍可选择科技、生物或灵能飞升。融合能补足短板，也会带来新的天敌与代价。Boss 拥有四个阶段，每次转阶段都会改变场地、机制与剧情。</p></div></div><div class="dbody" id="ascList"></div></div></section>
 <section class="drawer hidden" id="achDrawer"><div class="dhead"><h2>成就图鉴</h2><button class="close">×</button></div><div class="dbody" id="achList"></div></section><section class="drawer hidden" id="shopDrawer">
 <div class="dhead"><div><h2>镜界补给商店</h2><p>服饰、初始核心、武器道具与职业排除符均为永久购买</p></div><div class="shopMoney">🌸 <span id="shopCoins">0</span></div><button class="close">×</button></div>
@@ -3434,7 +3434,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   var ART = ["tile_1", "tile_2", "tile_3", "bg1", "bg2", "bg3", "boss1", "boss2", "boss3", "boss_girl_1", "boss_girl_2", "boss_girl_3", "ship_sayo", "ship_aya", "ship_rion", "fly_sayo", "fly_aya", "fly_rion"];
   ART = ART.concat(CHB);
   ["a", "b"].forEach(function (s) { for (var i = 0; i < 6; i++) ART.push("enemy_" + s + i); });
-  var CSS = "#shm46{position:fixed;inset:0;z-index:125;background:#07050d;touch-action:none;user-select:none;font-family:inherit;color:#fff}#shm46 canvas{position:absolute;inset:0;width:100%;height:100%}#shm46 .hud{position:absolute;left:50%;transform:translateX(-50%);top:max(6px,env(safe-area-inset-top));width:min(94vw,56.25vh);display:flex;gap:10px;align-items:center;pointer-events:none;font-size:12px;text-shadow:0 1px 2px #000}#shm46 .hud .lv{color:#ff8fc0;letter-spacing:1px}#shm46 .hud .bb{color:#7fe0a0}#shm46 .hud .pw{color:#ffd76a}#shm46 .hud .gz{color:#cfd8ff;margin-left:auto}#shm46 .bossbar{position:absolute;left:50%;transform:translateX(-50%);top:calc(max(6px,env(safe-area-inset-top)) + 20px);width:min(90vw,54vh);font-size:12px;pointer-events:none}#shm46 .bossbar div{height:6px;border-radius:4px;background:#2a1830;overflow:hidden;margin-top:2px}#shm46 .bossbar i{display:block;height:100%;width:calc(var(--v)*100%);background:linear-gradient(90deg,#fff,#ff8fc0)}#shm46 .bossbar em{font-style:normal;color:#ffd76a;margin-left:6px}#shm46 .btns{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}#shm46 .btns button{width:66px;height:66px;border-radius:50%;border:2px solid #ffffff44;background:#1a1230cc;color:#fff;font-size:13px;font-weight:700}#shm46 .btns button.on,#shm46 .btns button.ready{border-color:#ffd76a;box-shadow:0 0 16px #ffd76a}#shm46 .btns button.off{opacity:.35}#shm46 .pick,#shm46 .res{position:absolute;inset:0;display:grid;place-items:center;background:#06040ccc}#shm46 .pick .box,#shm46 .res .box{width:min(92vw,560px);text-align:center}#shm46 .pick .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}#shm46 .pick button{padding:14px 8px;border-radius:14px;border:2px solid #ffb2d466;background:#1a1230;color:#fff}#shm46 .pick button b{display:block;font-size:15px}#shm46 .pick button span{font-size:11px;color:#cfc4dc}#shm46 .res button{margin-top:14px;padding:12px 26px;border-radius:999px;border:0;background:#ff5f9e;color:#fff;font-size:15px}#shm46 .tip{position:absolute;bottom:max(14px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);font-size:11px;color:#ffffffaa;pointer-events:none;text-align:center}";
+  var CSS = "#shm46{position:fixed;inset:0;z-index:125;background:#07050d;touch-action:none;user-select:none;font-family:inherit;color:#fff}#shm46 canvas{position:absolute;inset:0;width:100%;height:100%}#shm46 .hud{position:absolute;left:50%;transform:translateX(-50%);top:max(6px,env(safe-area-inset-top));width:min(94vw,56.25vh);display:flex;gap:10px;align-items:center;pointer-events:none;font-size:12px;text-shadow:0 1px 2px #000}#shm46 .hud .lv{color:#ff8fc0;letter-spacing:1px}#shm46 .hud .bb{color:#7fe0a0}#shm46 .hud .pw{color:#ffd76a}#shm46 .hud .gz{color:#cfd8ff;margin-left:auto}@media (orientation:landscape){#shm46 .hud{left:calc(50% - 28.125vh - 14px);transform:translateX(-100%);top:max(16px,env(safe-area-inset-top));width:auto;min-width:132px;flex-direction:column;align-items:stretch;gap:6px;padding:12px 14px;font-size:13px;background:linear-gradient(180deg,rgb(var(--c-n1-rgb) / .88),rgb(var(--c-n0-rgb) / .88));border:1px solid var(--c-line);border-right:3px solid var(--c-primary);clip-path:polygon(0 0,100% 0,100% 100%,12px 100%,0 calc(100% - 12px))}#shm46 .hud .nm{font-size:15px;white-space:nowrap;padding-bottom:4px;border-bottom:1px solid var(--c-line)}#shm46 .hud .gz{margin-left:0}#shm46 .hud span{white-space:nowrap}}#shm46 .bossbar{position:absolute;left:50%;transform:translateX(-50%);top:calc(max(6px,env(safe-area-inset-top)) + 20px);width:min(90vw,54vh);font-size:12px;pointer-events:none}#shm46 .bossbar div{height:6px;border-radius:4px;background:#2a1830;overflow:hidden;margin-top:2px}#shm46 .bossbar i{display:block;height:100%;width:calc(var(--v)*100%);background:linear-gradient(90deg,#fff,#ff8fc0)}#shm46 .bossbar em{font-style:normal;color:#ffd76a;margin-left:6px}#shm46 .btns{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:max(18px,env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}#shm46 .btns button{width:66px;height:66px;border-radius:50%;border:2px solid #ffffff44;background:#1a1230cc;color:#fff;font-size:13px;font-weight:700}#shm46 .btns button.on,#shm46 .btns button.ready{border-color:#ffd76a;box-shadow:0 0 16px #ffd76a}#shm46 .btns button.off{opacity:.35}#shm46 .pick,#shm46 .res{position:absolute;inset:0;display:grid;place-items:center;background:#06040ccc}#shm46 .pick .box,#shm46 .res .box{width:min(92vw,560px);text-align:center}#shm46 .pick .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}#shm46 .pick button{padding:14px 8px;border-radius:14px;border:2px solid #ffb2d466;background:#1a1230;color:#fff}#shm46 .pick button b{display:block;font-size:15px}#shm46 .pick button span{font-size:11px;color:#cfc4dc}#shm46 .res button{margin-top:14px;padding:12px 26px;border-radius:999px;border:0;background:#ff5f9e;color:#fff;font-size:15px}#shm46 .tip{position:absolute;bottom:max(14px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);font-size:11px;color:#ffffffaa;pointer-events:none;text-align:center}";
   var cur = null, raf = 0;
   function start(o) {
     stop(); o = o || {};
@@ -3443,7 +3443,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     root.innerHTML = '<canvas></canvas><div class="hud"><b class="nm"></b><span class="lv"></span><span class="bb"></span><span class="pw"></span><span class="gz"></span></div><div class="bossbar" hidden><b></b><em></em><div><i></i></div></div><div class="btns"><button class="aw" hidden>觉醒<br><small>F</small></button><button class="fc">低速<br><small>Shift</small></button><button class="bm">符卡<br><small class="n"></small></button></div><div class="tip">拖动移动 · 自动射击 · 按住「低速」/ Shift 显示判定点 · X 符卡（Bomb）</div>';
     (o.parent || document.body).appendChild(root);
     var cv = root.querySelector("canvas"), g = cv.getContext("2d"), img = {};
-    ART.forEach(function (k) { var i = new Image(); i.src = o.art ? o.art("shmup/" + k + ".webp") : "art/shmup/" + k + ".webp"; img[k] = i; });
+    ART.forEach(function (k) { var i = new Image(); i.src = o.art ? o.art("shmup/" + k + ".webp") : ((typeof window !== "undefined" && window.SakurayoArtBase) || "art/") + "shmup/" + k + ".webp"; img[k] = i; });
     var game = new Game(Object.assign({}, o, {
       onPick: function (opts) { if (o.auto) { Promise.resolve().then(function () { game.choose(opts[0].k); }); return; } var el = document.createElement("div"); el.className = "pick"; el.innerHTML = '<div class="box"><small>镜空 · 道中补给</small><h3>三选一</h3><div class="cards">' + opts.map(function (q) { return '<button data-k="' + q.k + '"><b>' + q.n + "</b><span>" + q.d + "</span></button>"; }).join("") + "</div></div>"; root.appendChild(el); el.onclick = function (e) { var b = e.target.closest("[data-k]"); if (!b) return; el.remove(); game.choose(b.dataset.k); }; },
       onEnd: function (r) { var el = document.createElement("div"); el.className = "res"; el.innerHTML = '<div class="box"><h2>' + (r.win ? "镜空突破" : "满身疮痍") + "</h2><p>用时 " + r.time + " s · 被弹 " + r.hits + " · Bomb " + r.bombs + " · 擦弹 " + r.grazes + (r.cards ? " · 符卡收取 " + r.caps + "/" + r.cards : "") + '</p><button class="ok">' + (o.okText || "继续") + "</button></div>"; root.appendChild(el); el.querySelector(".ok").onclick = function () { stop(); o.onClose && o.onClose(r); }; o.onEnd && o.onEnd(r); }
@@ -3908,6 +3908,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   Game.prototype.draw = function (g, img, W, H) {
     var sc = Math.min(W / FW, H / FH), ox = (W - FW * sc) / 2, oy = (H - FH * sc) / 2, self = this, sh = this.shake ? (this.r() - 0.5) * this.shake * 2 : 0;
     g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = "#07050d"; g.fillRect(0, 0, W, H);
+    // 屏幕比例和 16:9 舞台不一致时（手机竖屏 / 超宽横屏），用同一张舞台图铺满并压暗来填黑边，而不是留纯黑块
+    var st0 = img.stage; if (st0 && st0.width && (ox > 2 || oy > 2)) { var key = W + "x" + H; if (!this._fill || this._fill.key !== key) { var oc = document.createElement("canvas"); oc.width = W; oc.height = H; var og = oc.getContext("2d"), cs = Math.max(W / FW, H / FH) * 1.08; og.globalAlpha = 0.45; og.filter = "blur(10px)"; og.drawImage(st0, (W - FW * cs) / 2, (H - FH * cs) / 2, FW * cs, FH * cs); this._fill = { key: key, c: oc }; } g.drawImage(this._fill.c, 0, 0); /* 模糊填边只在尺寸变化时算一次，避免每帧做全屏模糊 */ var tk = global.SakurayoTok || function () { return "transparent"; }; g.fillStyle = tk("n0", 0.45); g.fillRect(0, 0, W, H); g.fillStyle = tk("primary", 0.5); if (oy > 2) { g.fillRect(0, oy - 1, W, 1); g.fillRect(0, oy + FH * sc, W, 1); } if (ox > 2) { g.fillRect(ox - 1, 0, 1, H); g.fillRect(ox + FW * sc, 0, 1, H); } }
     g.setTransform(sc, 0, 0, sc, ox + sh * sc, oy + (this.shake ? (this.r() - 0.5) * this.shake : 0) * sc);
     var st = img.stage; if (st && st.width) g.drawImage(st, 0, 0, FW, FH); else { g.fillStyle = "#1a1030"; g.fillRect(0, 0, FW, FH); }
     var sup = this.fx.find(function (q) { return q.k === "super"; }); if (sup || this.freeze > 0) { g.fillStyle = "rgba(8,0,20,.72)"; g.fillRect(0, 0, FW, FH); }
@@ -3970,7 +3972,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   Game.prototype.snapshot = function () { var P = this.P, E = this.E; return { t: +this.t.toFixed(2), round: this.round, wins: [P.wins, E.wins], hp: +(P.hp / P.max).toFixed(3), foeHp: +(E.hp / E.max).toFixed(3), meter: +P.meter.toFixed(2), foeMeter: +E.meter.toFixed(2), combo: P.combo, maxCombo: P.maxCombo, st: P.st, foeSt: E.st, move: P.mn && P.mv ? P.mn : null, foeMove: E.mn && E.mv ? E.mn : null, x: Math.round(P.x), foeX: Math.round(E.x), done: this.done, win: this.win, special: this.special, ch: this.cid, foe: E.cid, form: this.slot, route: this.route, pose: this.pose(P) }; };
   /* —— DOM 外壳 —— */
   var POSES = ["idle", "idle_m", "idle_b", "walk1", "walk2", "crouch", "jump", "lp", "hp", "clp", "chp", "jatk", "block", "cblock", "hit", "hit2", "down", "throw", "special", "dp", "rush", "super", "win", "walk_0", "walk_1", "walk_2", "walk_3", "walk_4", "walk_5", "walk_6", "walk_7", "hp_s", "special_s", "jump_up", "jump_fall", "dash", "lp_s", "lp_r", "hp_r", "dp_r", "super_r", "rush_r", "throw_s", "jatk_s", "lp_s2", "lp_a2", "lp_r2", "hp_s2", "hp_o", "hp_r2", "hit_l", "hit_h", "air_up", "air_fall"];
-  var CSS = "#duel46{position:fixed;inset:0;z-index:125;background:#07050d;touch-action:none;user-select:none;color:#fff}#duel46 canvas{position:absolute;inset:0;width:100%;height:100%}#duel46 .dstk46{position:absolute;left:max(18px,env(safe-area-inset-left));bottom:18px;width:150px;height:150px;border-radius:50%;background:#ffffff14;border:2px solid #ffffff33}#duel46 .dstk46 i{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px;border-radius:50%;background:#ffffff44;transform:translate(var(--x,0),var(--y,0))}#duel46 .dact46{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:14px;display:grid;grid-template-columns:repeat(3,64px);gap:8px}#duel46 .dact46 button{width:64px;height:64px;padding:0;line-height:1.1;border-radius:50%;border:2px solid #ffffff44;background:#1a1230cc;color:#fff;font-weight:700;font-size:14px}#duel46 .dact46 button.on{border-color:#5fd8ff;box-shadow:0 0 12px #5fd8ff}#duel46 .res{position:absolute;inset:0;display:grid;place-items:center;background:#06040ccc}#duel46 .res .box{text-align:center}#duel46 .res button{margin-top:14px;padding:12px 26px;border-radius:999px;border:0;background:#ff5f9e;color:#fff;font-size:15px}#duel46 .help{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:11px;color:#ffffffaa;text-align:center;pointer-events:none;white-space:nowrap}";
+  var CSS = "#duel46{position:fixed;inset:0;z-index:125;background:#07050d;touch-action:none;user-select:none;color:#fff}#duel46 canvas{position:absolute;inset:0;width:100%;height:100%}@media (orientation:portrait){#duel46::after{content:'⟳  横屏游玩体验更佳 · ROTATE FOR FULL STAGE';position:absolute;left:50%;top:calc(env(safe-area-inset-top,0px) + 22%);translate:-50% 0;white-space:nowrap;padding:6px 14px;font:700 12px sans-serif;letter-spacing:.12em;color:var(--c-n6);background:rgb(var(--c-n1-rgb) / .85);border:1px solid rgb(var(--c-primary-rgb) / .5);pointer-events:none}#duel46 .help{bottom:auto!important;top:calc(env(safe-area-inset-top,0px) + 22% + 36px);white-space:normal!important;width:92vw;line-height:1.5}}#duel46 .dstk46{position:absolute;left:max(18px,env(safe-area-inset-left));bottom:18px;width:150px;height:150px;border-radius:50%;background:#ffffff14;border:2px solid #ffffff33}#duel46 .dstk46 i{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px;border-radius:50%;background:#ffffff44;transform:translate(var(--x,0),var(--y,0))}#duel46 .dact46{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:14px;display:grid;grid-template-columns:repeat(3,64px);gap:8px}#duel46 .dact46 button{width:64px;height:64px;padding:0;line-height:1.1;border-radius:50%;border:2px solid #ffffff44;background:#1a1230cc;color:#fff;font-weight:700;font-size:14px}#duel46 .dact46 button.on{border-color:#5fd8ff;box-shadow:0 0 12px #5fd8ff}#duel46 .res{position:absolute;inset:0;display:grid;place-items:center;background:#06040ccc}#duel46 .res .box{text-align:center}#duel46 .res button{margin-top:14px;padding:12px 26px;border-radius:999px;border:0;background:#ff5f9e;color:#fff;font-size:15px}#duel46 .help{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:11px;color:#ffffffaa;text-align:center;pointer-events:none;white-space:nowrap}";
   var cur = null, raf = 0;
   function start(o) {
     stop(); o = o || {};
@@ -3979,7 +3981,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     root.innerHTML = '<canvas></canvas><div class="dstk46"><i></i></div><div class="dact46"><button data-p="L">轻<br><small>J</small></button><button data-p="H">重<br><small>K</small></button><button data-p="T">投<br><small>J+K</small></button><button data-p="SP">必杀<br><small>↓↘→</small></button><button data-p="SU" class="su">超必<br><small>1 气</small></button><button data-p="BK">防<br><small>←</small></button></div><div class="help">↓↘→+拳 波动 · →↓↘+拳 升龙 · ↓↙←+拳 突进 · ↓↘→↓↘→+拳 超必杀 · →→ 冲刺 · 防御中 →+J+K 反击</div>';
     (o.parent || document.body).appendChild(root);
     var cv = root.querySelector("canvas"), g = cv.getContext("2d"), img = {};
-    var art = function (p) { var i = new Image(); i.src = o.art ? o.art(p) : "art/" + p; return i; };
+    var art = function (p) { var i = new Image(); i.src = o.art ? o.art(p) : ((typeof window !== "undefined" && window.SakurayoArtBase) || "art/") + p; /* 没传 art() 时用游戏统一的素材根目录，避免直接调用时整套 404 */ return i; };
     img.stage = art("duel/stage" + (((o.layer || 1) - 1) % 3 + 1) + ".webp");
     var game = new Game(Object.assign({}, o, { onEnd: function (r) { var el = document.createElement("div"); el.className = "res"; el.innerHTML = '<div class="box"><h2>' + (r.win ? "镜斗胜利" : "败北") + "</h2><p>" + r.rounds[0] + " : " + r.rounds[1] + " · 用时 " + r.time + " s · 最大连击 " + r.maxCombo + " · 承伤 " + r.taken + '</p><button class="ok">' + (o.okText || "继续") + "</button></div>"; root.appendChild(el); el.querySelector(".ok").onclick = function () { stop(); o.onClose && o.onClose(r); }; o.onEnd && o.onEnd(r); } }));
     var set = function (c) { var S = {}; POSES.forEach(function (k) { S[k] = art("duel/" + c + "/" + k + ".webp"); }); return S; };
@@ -8594,7 +8596,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     var el = doc.createElement("div");
     el.className = "syHint46";
     el.setAttribute("role", "status");
-    el.innerHTML = "<b>提示</b>" + HINTS[id];
+    el.innerHTML = "<b>提示</b>" + HINTS[id] + "<i>点击关闭</i>";
+    el.addEventListener("click", function () { el.remove(); }); /* 一次性提示会压住面板底部的内容，允许点掉 */
     doc.body.appendChild(el);
     clearTimeout(hintTimer);
     hintTimer = setTimeout(function () { el.remove(); }, 4200);
@@ -15040,15 +15043,24 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function npcFaceSrc47(sp,kind){
     const npc=NPC_ART47[sp];if(!npc)return null;
     const mood=({boss:"serious",phase:"surprised",ending:"smile",win:"smile"})[kind]||"calm";
+    // 对话框立绘区用 avg_* 半身（竖图），不要用 face_/portrait 近景方图（会被裁成只剩眼睛）
+    for(const m of [mood,"calm","serious"]){const im=artImage(`npc/${npc}/avg_${m}.webp`);if(artReady(im))return im.src;}
+    const por=artImage(`npc/${npc}/portrait.webp`);if(artReady(por))return por.src;
     for(const m of [mood,"calm"]){const im=artImage(`npc/${npc}/face_${m}.webp`);if(artReady(im))return im.src;}
-    const p=artImage(`npc/${npc}/portrait.webp`);
-    return artReady(p)?p.src:null;
+    return null;
   }
   const _showDialogue35=showDialogue;
   showDialogue=function(lines,done,kind){let c=char35(),sk=skin35();
     const raw=Array.isArray(lines)?lines:[],first=raw.find(l=>l&&(Array.isArray(l)?l[0]:l.sp)),spk=first&&(Array.isArray(first)?first[0]:first.sp);
-    const art=npcFaceSrc47(spk,kind)||faceSrc46(c,sk,kind);
-    $(".dialogueArt").style.backgroundImage=`linear-gradient(transparent 30%,#0d0a20),url('${art}')`;return _showDialogue35(mapLines35(lines),done,kind);};
+    const paint=()=>{const art=npcFaceSrc47(spk,kind)||faceSrc46(c,sk,kind);$(".dialogueArt").style.backgroundImage=`linear-gradient(transparent 30%,#0d0a20),url('${art}')`;};
+    paint();
+    // 立绘第一次用到时还没加载完，会退回到占位剪影（还会画成玩家角色）。等图片加载完再补画一次。
+    const npc=NPC_ART47[spk],moodK=({boss:"serious",phase:"surprised",ending:"smile",win:"smile"})[kind]||"calm";
+    const want=npc?[artImage(`npc/${npc}/avg_${moodK}.webp`),artImage(`npc/${npc}/avg_calm.webp`),artImage(`npc/${npc}/portrait.webp`),artImage(`npc/${npc}/face_${moodK}.webp`)]:[artImage(charArtPath35(c,"dialogue",sk)),artImage(`characters/${c.id}/default/face_${moodK}.webp`)];
+    want.forEach(im=>{if(im&&!artReady(im))im.addEventListener("load",()=>{if(!$("#dialogue").classList.contains("hidden"))paint();},{once:true});});
+    return _showDialogue35(mapLines35(lines),done,kind);};
+  // 进游戏后空闲时预载剧情 NPC 立绘，避免第一次对话时闪占位图
+  setTimeout(()=>{try{Object.values(NPC_ART47).forEach(n=>{["calm","serious"].forEach(m=>artImage(`npc/${n}/avg_${m}.webp`));artImage(`npc/${n}/portrait.webp`);["calm","serious","smile","surprised"].forEach(m=>artImage(`npc/${n}/face_${m}.webp`));});}catch(e){}},2500);
   const _showBanter35=showBanter;
   showBanter=function(lines,force=false){return _showBanter35(mapLines35(typeof lines==="string"?localize35(lines):lines),force);};
   const _ending35=endingData;
@@ -15102,7 +15114,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   /* V4.1.1 角色识别层：只增强视觉锚点，不扩大 16px 碰撞半径。 */
   function drawPlayerLocator411(x,y){
     const c=char35(),color=c.main||"#ff67ad";
-    ctx.save();ctx.translate(x,y+21);ctx.globalAlpha=.72;
+    ctx.save();ctx.translate(x,y+11);ctx.globalAlpha=.72; /* 落脚圈对准脚底（原来 +21，角色看起来悬空在圈上方） */
     ctx.fillStyle="#07051199";ctx.beginPath();ctx.ellipse(0,0,29,10,0,0,TAU);ctx.fill();
     ctx.strokeStyle="#d9d5e1";ctx.lineWidth=1.25;ctx.beginPath();ctx.ellipse(0,0,27,9,0,0,TAU);ctx.stroke();
     ctx.globalAlpha=.9;ctx.fillStyle=color;
@@ -16348,7 +16360,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       start(){startGame();return snapshot35();},
       pauseNow(){pauseGame();return snapshot35();},
       dismissDialogue(){let guard=80;while(state==="dialogue"&&guard-->0)nextDialogue();if(guard<=0)throw new Error("Dialogue guard exhausted");return snapshot35();},
-      protectPlayer(){P.inv=9999;return snapshot35();},freezeProgression(){P.xp=0;P.next=1e9;return snapshot35();},
+      protectPlayer(){P.inv=9999;return snapshot35();},finishNow46(win=true){if(state!=="play")throw new Error("finishNow46 requires play mode");finish(!!win);return snapshot35();},freezeProgression(){P.xp=0;P.next=1e9;return snapshot35();},
       playerGeometry(){return {...PLAYER_GEOMETRY35,radius:PLAYER_GEOMETRY35.collisionRadius};},
       circleCollision(distance,firstRadius,secondRadius){return circlesOverlap35(0,0,Number(firstRadius),Number(distance),0,Number(secondRadius));},
       meleeCollision(distance,slashRadius,enemyRadius){return circlesOverlap35(0,0,Number(slashRadius),Number(distance),0,Number(enemyRadius));},
@@ -17190,7 +17202,7 @@ button.sy-pop{animation:syPop .32s var(--sy-ease-back)}@keyframes syPop{0%{scale
 /* ---- 页头：横幅插画 + 斜切标题条 + 编号 ---- */
 .drawer .dhead,#wd46 .box>header,#night46 .box>header{min-height:96px;align-items:flex-end!important;padding:var(--sy-sp-4) var(--sy-sp-5) var(--sy-sp-3)!important;background-size:cover!important;background-position:center 45%!important;border-bottom:2px solid var(--sy-c-cyan)!important;box-shadow:0 2px 14px rgb(var(--c-primary-rgb) / .35)}
 .drawer .dhead::after,#wd46 .box>header::after,#night46 .box>header::after{content:"";position:absolute;inset:0;background:var(--sy-scan),linear-gradient(90deg,rgb(var(--c-n0-rgb) / .95) 0%,rgb(var(--c-n0-rgb) / .6) 42%,rgb(var(--c-n0-rgb) / .05) 100%);pointer-events:none}
-.drawer .dhead::before,#wd46 .box>header::before,#night46 .box>header::before{content:attr(data-sy-code);position:absolute;right:64px;top:10px;z-index:2;font:italic 700 12px var(--sy-font-title);letter-spacing:.2em;color:var(--c-on-primary);background:var(--sy-c-cyan);padding:1px 14px 1px 10px;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+.drawer .dhead::before,#wd46 .box>header::before,#night46 .box>header::before{content:attr(data-sy-code);position:absolute;right:76px;top:10px;z-index:2;font:italic 700 12px var(--sy-font-title);letter-spacing:.2em;color:var(--c-on-primary);background:var(--sy-c-cyan);padding:1px 14px 1px 10px;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
 .drawer .dhead>*,#wd46 .box>header>*,#night46 .box>header>*{position:relative;z-index:1}
 .drawer .dhead h2,#wd46 .box>header>b,#night46 .box>header>b{padding:2px 26px 2px 12px;background:linear-gradient(90deg,rgb(var(--c-accent-rgb) / .0),rgb(var(--c-accent-rgb) / 0));border-left:4px solid var(--sy-c-pink)}
 #stageDrawer .dhead{background-image:${U("ui/polish2/ban_stage.webp")}!important}
@@ -17346,13 +17358,77 @@ html body #menu #modeRow46>button small{font-size:10px!important;line-height:1.2
 @media (max-width:1100px){html body #menu #modeRow46>button small{display:none!important}html body #menu #modeRow46>button b{font-size:12px!important}}
 html body #menu .terminalActivity48 small,html body #menu .terminalActivity48 em{font-size:12px!important;color:var(--c-n5)!important}
 html body #menu .terminalActivity48 b{font-size:14px!important;color:var(--c-n6)!important}
+/* AVG 对话框：“继续”键原来被通用弹窗按钮规则刷成白底小方块，文字看不见；改成右下角主色斜切键，提示文字并排 */
+html body:not(#sy0):not(#sy1) #dialogue #dialogueContinue48{float:right;min-width:96px;min-height:36px;padding:6px 22px!important;background:var(--c-primary)!important;color:var(--c-on-primary)!important;border:0!important;font:italic 800 14px var(--sy-font-title,sans-serif)!important;letter-spacing:.2em;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);box-shadow:none!important}
+html body:not(#sy0):not(#sy1) #dialogue #dialogueHint{color:var(--c-n5)!important;font-size:12px!important;letter-spacing:.12em;line-height:36px}
+html body:not(#sy0):not(#sy1) #dialogue .speaker{background:var(--c-accent)!important;color:var(--c-on-accent)!important;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);border-radius:0!important}
+html body:not(#sy0):not(#sy1) #dialogue .dialogueText{color:var(--c-n6)!important;font-size:15px;line-height:1.75}
+/* 竖屏窄屏 HUD：波次条、任务提示、暂停键、帧率标签原来和顶部信息栏互相压住，改成在顶栏下面依次排开 */
+@media (max-width:520px){html body #hud .wave{left:10px!important;right:10px!important;width:auto!important;top:calc(env(safe-area-inset-top,0px) + 96px)!important;transform:none!important}
+html body #hud #mission{position:fixed!important;left:10px!important;right:64px!important;width:auto!important;top:calc(env(safe-area-inset-top,0px) + 122px)!important;transform:none!important}
+html body #hud #pause{position:fixed!important;right:10px!important;top:calc(env(safe-area-inset-top,0px) + 122px)!important}
+html body #hud #perf{position:fixed!important;right:62px!important;left:auto!important;top:calc(env(safe-area-inset-top,0px) + 146px)!important}
+html body #hud #minimap46{top:calc(env(safe-area-inset-top,0px) + 172px)!important}
+html body .banter{top:calc(env(safe-area-inset-top,0px) + 252px)!important;bottom:auto!important;left:10px!important;right:10px!important;width:auto!important;transform:none!important} /* 竖屏对白气泡原来贴在技能键上 */}
+/* 技能键文字：标签放在菱形键下方居中，不再溢出到键外 */
+html body #hud .act{font-size:10px!important;line-height:1.15!important;letter-spacing:0!important;white-space:normal;word-break:keep-all;padding:0 6px!important}
+/* 夜行地图弹窗（遗物、事件、商店、Boss 三选一）：外层全屏遮罩原来也套了面板样式，右上角多出一个方框；卡片还是旧版紫色圆角。统一成 v2 */
+html body:not(#sy0):not(#sy1) #run46 .rm46{background:radial-gradient(ellipse at 50% 55%,rgb(var(--c-primary-rgb) / .1),rgb(var(--c-n0-rgb) / .82) 70%)!important;border:0!important;box-shadow:none!important;clip-path:none!important}
+html body:not(#sy0):not(#sy1) #run46 .rm46::before,html body:not(#sy0):not(#sy1) #run46 .rm46::after{display:none!important}
+html body:not(#sy0):not(#sy1) #run46 .rm46>div{width:min(760px,92vw);max-height:calc(100dvh - 24px);overflow-y:auto;padding:22px 26px;border-radius:0!important;background:var(--sy-scan),var(--sy-glass)!important;border:1px solid var(--c-line)!important;border-top:3px solid var(--c-primary)!important;box-shadow:var(--sy-shadow)!important;clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,22px 100%,0 calc(100% - 22px))}
+html body:not(#sy0):not(#sy1) #run46 .rm46 small{color:var(--c-primary)!important;font-weight:700}
+html body:not(#sy0):not(#sy1) #run46 .rm46 h3{color:var(--c-n6)!important;font-size:26px!important}
+html body:not(#sy0):not(#sy1) #run46 .rm46 p{color:var(--c-n5)!important}
+html body:not(#sy0):not(#sy1) #run46 .rm46 .opts button{border-radius:0!important;background:linear-gradient(180deg,var(--c-surface-2),var(--c-surface-1))!important;border:1px solid var(--c-line)!important;border-top:3px solid var(--c-line)!important;color:var(--c-n6)!important;outline:0!important;box-shadow:none!important;clip-path:polygon(0 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%);transition:translate .15s,box-shadow .15s}
+html body:not(#sy0):not(#sy1) #run46 .rm46 .opts button:hover{translate:0 -3px;border-top-color:var(--c-primary)!important}
+html body:not(#sy0):not(#sy1) #run46 .rm46 .opts button.rec{border-top-color:var(--c-accent)!important;background:linear-gradient(180deg,rgb(var(--c-accent-rgb) / .16),var(--c-surface-1) 55%)!important;box-shadow:0 0 0 1px rgb(var(--c-accent-rgb) / .6),0 0 18px rgb(var(--c-accent-rgb) / .25)!important}
+html body:not(#sy0):not(#sy1) #run46 .rm46 .opts i{width:44px;height:44px;display:grid!important;place-items:center;font-size:22px!important;color:var(--c-primary);background:rgb(var(--c-primary-rgb) / .12);clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);margin-bottom:8px}
+html body:not(#sy0):not(#sy1) #run46 .rm46 .opts button.rec i{color:var(--c-accent);background:rgb(var(--c-accent-rgb) / .14)}
+html body:not(#sy0):not(#sy1) #run46 .rm46 .opts b{color:var(--c-n6)!important;font-size:17px!important}
+html body:not(#sy0):not(#sy1) #run46 .rm46 .opts span{color:var(--c-n5)!important}
+html body:not(#sy0):not(#sy1) #run46 .rm46 .opts em{color:var(--c-primary)!important}
+html body:not(#sy0):not(#sy1) #run46 .rm46 .skip{border-radius:0!important;background:transparent!important;border:1px solid var(--c-line)!important;color:var(--c-n5)!important}
+@media (max-width:520px){html body:not(#sy0):not(#sy1) #run46 .rm46 .opts{grid-template-columns:1fr!important}html body:not(#sy0):not(#sy1) #run46 .rm46 .opts button{min-height:0!important;display:grid!important;grid-template-columns:44px 1fr;column-gap:12px;align-items:center}html body:not(#sy0):not(#sy1) #run46 .rm46 .opts i{grid-row:span 2;margin:0}}
+/* 性能：抽屉是近乎不透明的全屏面板，背后的大厅仍在跑动画、抽屉还对它做实时模糊，桌面端掉到 15fps。抽屉打开时暂停大厅动画、去掉抽屉的背景模糊 */
+html body:not(#sy0):not(#sy1) .drawer{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+html body:has(.drawer:not(.hidden)) #menu,html body:has(.drawer:not(.hidden)) #menu *,html body:has(.drawer:not(.hidden)) #menu *::before,html body:has(.drawer:not(.hidden)) #menu *::after{animation-play-state:paused!important}
+/* 竖屏大厅：四个玩法入口挤在 156px 宽的一行里，每个只有 33px，“主线关卡”“缘日射的”被截断。改成 2×2 网格，标签完整显示 */
+@media (max-width:520px) and (orientation:portrait){html body #menu #modeRow46{display:grid!important;grid-template-columns:1fr 1fr!important;gap:6px!important;height:auto!important;min-height:0!important}
+html body #menu #modeRow46>button{width:auto!important;min-width:0!important;height:34px!important;min-height:0!important;padding:0 6px!important;overflow:hidden}
+html body #menu #modeRow46>button b{font-size:11px!important;white-space:nowrap!important;letter-spacing:0!important}
+html body #menu #modeRow46>button small{display:none!important}
+html body #menu #commandActivityName48{font-size:14px!important;line-height:1.35!important}}
+/* 底部“离线作战就绪”信号文字直接压在立绘上看不清，加深色底条 */
+html body #menu #commandSignal47{padding:2px 10px!important;background:rgb(var(--c-n0-rgb) / .72)!important;color:var(--c-n5)!important;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%)}
+/* 一次性功能提示：改成 v2 样式，右侧显示“点击关闭” */
+html body .syHint46{border-radius:0!important;background:rgb(var(--c-n1-rgb) / .96)!important;border:1px solid var(--c-line)!important;border-left:3px solid var(--c-primary)!important;color:var(--c-n6)!important;cursor:pointer;display:block}
+html body .syHint46 b{color:var(--c-primary)!important}
+html body .syHint46 i{font-style:normal;font-size:11px;color:var(--c-n4);white-space:nowrap;margin-left:10px}
+/* 竖屏寻访：UP 角色立绘被缩成 170px 宽、贴底放在屏幕外，看不到人；标题被页头压住一半 */
+@media (max-width:520px) and (orientation:portrait){html body #gachaDrawer .wishHero46{left:0!important;right:0!important;width:100%!important;top:150px!important;bottom:auto!important;height:calc(100% - 330px)!important;object-fit:contain!important;object-position:50% 100%!important;transform:none!important}
+html body #gachaDrawer .dbody h3{margin-top:18px!important}}
+/* 矮横屏射的：画布占满高度，底部「开一局」键被挤出屏幕 */
+@media (max-height:440px){html body #pachi46{align-items:stretch!important;padding:4px!important}
+html body #pachi46 .pf{max-height:none!important;height:calc(100dvh - 8px)!important;overflow:hidden!important;padding:4px 8px!important;gap:4px!important;display:flex!important;flex-direction:column!important}
+html body #pachi46 canvas{height:auto!important;flex:1 1 auto!important;min-height:0!important;max-height:none!important;width:auto!important;margin:0 auto!important}
+html body #pachi46 header,html body #pachi46 footer{flex:0 0 auto!important}
+html body #pachi46 .go{padding:6px 18px!important;min-height:34px!important;font-size:13px!important}}
+/* AVG 立绘区：cover 在宽矮容器里会放大到只剩眼睛；改成按宽度铺满、从顶部对齐，露出完整面孔 */
+html body:not(#sy0) #dialogue .dialogueArt{background-size:auto 115%!important;background-position:50% 8%!important;background-repeat:no-repeat!important;min-height:240px!important;height:min(52vh,420px)!important;background-color:var(--c-n0)!important}
+@media (max-height:440px){html body:not(#sy0) #dialogue .dialogueArt{height:34vh!important;min-height:120px!important}
+html body:not(#sy0) #dialogue .modal{max-height:calc(100dvh - 12px);overflow-y:auto}
+html body:not(#sy0) #dialogue .dialogueText{font-size:13px!important;line-height:1.5!important}}
+@media (orientation:portrait) and (max-width:520px){html body:not(#sy0) #dialogue .dialogueArt{height:36vh!important;min-height:200px!important}
+html body:not(#sy0) #dialogue .dialogueText{font-size:14px!important}}
 `;
   var st = document.createElement("style"); st.id = "syStatic"; st.textContent = css; document.head.appendChild(st);
   // 底栏选中态：最近打开的入口保持高亮，直到它的面板关掉
   function sync() { var open = document.querySelector(".drawer:not(.hidden)"), want = open ? open.id.replace(/Drawer$/, "") : "stage"; document.querySelectorAll(".homeNav46>[data-open]").forEach(function (b) { var on = b.dataset.open === want; if (b.hasAttribute("data-sy-on") !== on) { if (on) b.setAttribute("data-sy-on", ""); else b.removeAttribute("data-sy-on"); } }); } /* 用 data 属性而不是 class 标记选中态，避免与 class 观察器互相触发 */
   function guide() { try { var sv = JSON.parse(localStorage.getItem("sakurayoV3") || "{}"), b = document.getElementById("start"); if (!b || (sv.done && sv.done.length) || b.querySelector(".sy-tip")) return; b.classList.add("sy-guide"); var t = document.createElement("span"); t.className = "sy-tip"; t.textContent = "START ▶ 从这里开始第一战"; b.appendChild(t); } catch (e) { } }
   var CODES = { stageDrawer: "OPS-01 // 关卡", gachaDrawer: "SUP-02 // 寻访", shopDrawer: "DEP-03 // 补给", rosterDrawer: "INV-04 // 仓库", archiveDrawer: "ARC-05 // 档案", trialsDrawer: "TRL-06 // 试炼", storyDrawer: "LOG-07", achDrawer: "ACH-08", talentDrawer: "TAL-09", ascDrawer: "ASC-10" };
-  function codes() { Object.keys(CODES).forEach(function (id) { var h = document.querySelector("#" + id + " .dhead"); if (h && !h.dataset.syCode) h.dataset.syCode = CODES[id]; }); [["#wd46 .box>header", "WRD-11 // 衣橱"], ["#night46 .box>header", "NGT-12 // 夜行"]].forEach(function (q) { var h = document.querySelector(q[0]); if (h && !h.dataset.syCode) h.dataset.syCode = q[1]; }); }
+  function codes() { Object.keys(CODES).forEach(function (id) { var h = document.querySelector("#" + id + " .dhead"); if (h && !h.dataset.syCode) { h.dataset.syCode = CODES[id]; anchor(h); } }); [["#wd46 .box>header", "WRD-11 // 衣橱"], ["#night46 .box>header", "NGT-12 // 夜行"]].forEach(function (q) { var h = document.querySelector(q[0]); if (h && !h.dataset.syCode) { h.dataset.syCode = q[1]; anchor(h); } }); }
+  /* 编号标签用页头做定位基准；页头本身是 static 时补 relative（原来标签会跑到下面的卡片上） */
+  function anchor(h) { if (getComputedStyle(h).position === "static") h.style.position = "relative"; }
   function init() { sync(); guide(); codes(); new MutationObserver(codes).observe(document.body, { childList: true }); var mo = new MutationObserver(sync); document.querySelectorAll(".drawer").forEach(function (d) { mo.observe(d, { attributes: true, attributeFilter: ["class"] }); }); /* 只观察抽屉本身，不观察整棵 body（战斗中 class 变化极频繁） */ }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })(typeof window !== "undefined" ? window : globalThis);
@@ -17434,7 +17510,7 @@ ${Array.from({ length: 10 }, function (_, i) { return "#result.sy-show #rstats>*
 /* 验收第 4 轮：结算胜利立绘层、角色出场主题色 + 台词、加载页层次 */
 #result .modal .sy-win{position:absolute;right:-6%;bottom:0;height:118%;max-width:none;z-index:0;pointer-events:none;opacity:0;-webkit-mask-image:linear-gradient(90deg,transparent,var(--c-n0) 35%);mask-image:linear-gradient(90deg,transparent,var(--c-n0) 35%);filter:drop-shadow(-10px 0 0 rgb(var(--c-primary-rgb) / .25))}
 #result.sy-show .modal .sy-win{animation:syWin .8s .25s var(--sy-ease-out,ease) forwards}
-@keyframes syWin{from{opacity:0;translate:60px 0}to{opacity:.5;translate:0 0}}
+@keyframes syWin{from{opacity:0;translate:60px 0}to{opacity:.3;translate:0 0}}
 #result .modal>*:not(.sy-win):not(.sy-sigil){position:relative;z-index:1}
 #syShow{--hc:var(--c-primary);--hc-rgb:var(--c-primary-rgb)}
 #syShow[data-c="aya"]{--hc:var(--c-accent);--hc-rgb:var(--c-accent-rgb)}#syShow[data-c="rion"]{--hc:var(--c-rare-sr);--hc-rgb:var(--c-rare-sr-rgb)}
@@ -17463,6 +17539,48 @@ html body:not(#sy0) .drawer .wdc,html body:not(#sy0) .drawer .nc,html body:not(#
 #pachi46 header::after,#levelMap46 .lm46Sheet::after,#run46 .rm46::after{content:"";position:absolute;right:14px;top:10px;width:18px;height:18px;border:2px solid var(--c-primary);rotate:45deg;animation:sySpin 6s linear infinite;pointer-events:none;opacity:.8}
 @keyframes sySpin{to{rotate:405deg}}
 @media (prefers-reduced-motion:reduce){#pachi46 header::after,#levelMap46 .lm46Sheet::after,#run46 .rm46::after{animation:none}}
+/* 升级弹窗（崩三式）：斜切大标题条 + LEVEL UP 英文、按稀有度的顶边色与光、卡片依次斜切入场、六边形图标框 */
+#level:not(.hidden){background:radial-gradient(ellipse at 50% 60%,rgb(var(--c-primary-rgb) / .12),rgb(var(--c-n0-rgb) / .78) 70%)!important;backdrop-filter:blur(3px) saturate(.8);-webkit-backdrop-filter:blur(3px) saturate(.8)}
+#level .modal{position:relative;overflow:visible!important;animation:syLvIn .42s var(--sy-ease-out,ease) both}
+@keyframes syLvIn{from{opacity:0;translate:0 24px;scale:.96}to{opacity:1;translate:0 0;scale:1}}
+html body:not(#sy0) #level .modal>h2{display:inline-block;margin-left:-28px!important;padding:6px 40px 6px 28px!important;background:linear-gradient(90deg,var(--c-accent),rgb(var(--c-accent-rgb) / .55))!important;color:var(--c-on-accent)!important;border:0!important;clip-path:polygon(0 0,100% 0,calc(100% - 22px) 100%,0 100%);text-shadow:none!important;font:italic 800 26px var(--sy-font-title,sans-serif)!important;letter-spacing:.06em;animation:syLvBar .5s var(--sy-ease-back,ease) both}
+#level .modal>h2::after{content:"LEVEL UP";margin-left:14px;font:italic 700 14px var(--sy-font-title,sans-serif);letter-spacing:.3em;opacity:.75}
+@keyframes syLvBar{from{clip-path:polygon(0 0,0 0,0 100%,0 100%)}to{clip-path:polygon(0 0,100% 0,calc(100% - 22px) 100%,0 100%)}}
+#level .modal::before{content:"SKR // RESONANCE";position:absolute;right:18px;top:12px;font:italic 700 11px var(--sy-font-title,sans-serif);letter-spacing:.3em;color:var(--c-n4)}
+html body:not(#sy0):not(#sy1) #level .choice{--rc:var(--c-rare-n);--rc-rgb:var(--c-rare-n-rgb);border:1px solid var(--c-line)!important;border-left-width:1px!important;border-top:3px solid var(--rc)!important;background:linear-gradient(180deg,rgb(var(--rc-rgb) / .16),var(--c-surface-2) 38%)!important;clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);animation:syCard .45s var(--sy-ease-out,ease) both;transition:translate .15s,box-shadow .15s}
+#level .choice:nth-child(2){animation-delay:.07s!important}#level .choice:nth-child(3){animation-delay:.14s!important}#level .choice:nth-child(4){animation-delay:.21s!important}
+@keyframes syCard{from{opacity:0;translate:40px 0;clip-path:polygon(14px 0,14px 0,0 100%,0 100%)}}
+html body:not(#sy0):not(#sy1) #level .choice.rar46-rare{--rc:var(--c-rare-r);--rc-rgb:var(--c-rare-r-rgb)}
+html body:not(#sy0):not(#sy1) #level .choice.rar46-epic{--rc:var(--c-rare-sr);--rc-rgb:var(--c-rare-sr-rgb)}
+html body:not(#sy0):not(#sy1) #level .choice.rar46-legend,html body:not(#sy0):not(#sy1) #level .choice.rar46-evo{--rc:var(--c-rare-ssr);--rc-rgb:var(--c-rare-ssr-rgb);box-shadow:0 0 18px rgb(var(--c-rare-ssr-rgb) / .35)!important}
+html body:not(#sy0):not(#sy1) #level .choice[data-rec]{outline:1px solid var(--c-primary);outline-offset:-1px}
+@media (hover:hover){html body:not(#sy0):not(#sy1) #level .choice:hover{translate:0 -6px;box-shadow:0 0 0 1px var(--rc),0 8px 26px rgb(var(--rc-rgb) / .45)!important}}
+#level .choice img{clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%);background:var(--c-n1);filter:drop-shadow(0 0 6px rgb(var(--rc-rgb) / .6))}
+#level .choice .meta span:last-child{color:var(--rc)!important;font-weight:800}
+#level button:not(.choice){clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+@media (prefers-reduced-motion:reduce){#level .modal,#level .modal>h2,#level .choice{animation:none!important}}
+/* 结算面板：内容多时不再超出屏幕底部（“再次迎击 / 返回”原来看不到），中间滚动、按钮吸底；旧的 🌸 表情图标与 SKR 徽记重叠，隐藏 */
+html body:not(#sy0) #result .modal{max-height:calc(100dvh - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow-y:auto!important;overscroll-behavior:contain}
+html body:not(#sy0) #result .actions{position:sticky;bottom:-1px;z-index:3;padding:10px 0 4px;background:linear-gradient(transparent,var(--c-surface-1) 30%)}
+html body:not(#sy0) #result .resultIcon{display:none!important}
+@media (max-height:440px){html body:not(#sy0) #result .actions{display:flex!important;gap:8px}html body:not(#sy0) #result .actions button{flex:1;min-height:40px!important;margin:0!important}html body:not(#sy0) #result .rankBig{font-size:48px!important;line-height:1!important}}
+html body:not(#sy0) #result .modal .sy-win{position:fixed;height:min(110dvh,900px);right:max(0px,calc(50vw - 520px))}
+/* 矮横屏（844×390）升级弹窗：三张卡加按钮超出屏幕，“重抽 / 全部拿 / 图鉴”看不到。压缩卡片，弹窗内可滚动，按钮行并排 */
+@media (max-height:440px){html body:not(#sy0):not(#sy1) #level .modal{max-height:calc(100dvh - 12px);overflow-y:auto!important;padding-top:10px!important;padding-bottom:10px!important}
+html body:not(#sy0) #level .modal>h2{font-size:20px!important;padding:3px 30px 3px 22px!important;margin-bottom:2px!important}
+html body:not(#sy0):not(#sy1) #level .choice{min-height:0!important;padding:8px 10px!important}
+html body:not(#sy0):not(#sy1) #level .choice img{width:44px!important;height:44px!important;margin:0 auto 2px!important}
+html body:not(#sy0):not(#sy1) #level .choice small:last-child,html body:not(#sy0):not(#sy1) #level .choice .dots46,html body:not(#sy0):not(#sy1) #level .choice [class*="dots"]{display:none!important}
+html body:not(#sy0):not(#sy1) #level .modal>#reroll,html body:not(#sy0):not(#sy1) #level .modal>#levelBar46{display:inline-flex!important;width:calc(50% - 4px)!important;vertical-align:middle;margin:6px 0 0!important;min-height:36px!important}
+html body:not(#sy0):not(#sy1) #level .modal>#reroll{margin-right:8px!important}}
+/* 竖屏升级弹窗：三张卡纵向堆叠后操作按钮被挤出屏幕外 */
+@media (max-width:520px) and (orientation:portrait){html body:not(#sy0):not(#sy1) #level .modal{max-height:calc(100dvh - 16px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow-y:auto!important;padding:10px 12px!important}
+html body:not(#sy0) #level .modal>h2{font-size:18px!important;padding:4px 28px 4px 18px!important;margin:0 0 4px!important}
+html body:not(#sy0):not(#sy1) #level .choice{min-height:0!important;padding:8px 10px!important;display:grid!important;grid-template-columns:52px 1fr;column-gap:10px;align-items:center;text-align:left!important}
+html body:not(#sy0):not(#sy1) #level .choice img{width:48px!important;height:48px!important;margin:0!important;grid-row:span 3}
+html body:not(#sy0):not(#sy1) #level .choice small:last-child,html body:not(#sy0):not(#sy1) #level .choice .dots46{display:none!important}
+html body:not(#sy0):not(#sy1) #level .modal>#reroll,html body:not(#sy0):not(#sy1) #level .modal>#levelBar46{position:sticky;bottom:0;z-index:2;display:block!important;width:100%!important;margin:6px 0 0!important;min-height:40px!important;background:var(--c-surface-1)}
+html body:not(#sy0):not(#sy1) #level .choices{display:flex!important;flex-direction:column!important;gap:8px!important;max-height:none!important}}
 #syShow.out{animation:syOut .35s ease-in forwards}
 @keyframes syBand{from{transform:skewY(-6deg) translateX(-110%)}to{transform:skewY(-6deg) translateX(0)}}
 @keyframes syHero{from{translate:30% 0;opacity:0}to{translate:0 0;opacity:1}}
@@ -17570,6 +17688,10 @@ html body:not(#sy0) .drawer .wdc,html body:not(#sy0) .drawer .nc,html body:not(#
     supplies: '<rect x="4.5" y="4" width="15" height="17.5" rx="1.5" ' + F + '/><rect x="8.5" y="2.5" width="7" height="3.5" rx="1" fill="var(--c-n1)" stroke="currentColor" stroke-width="1.6"/><path d="M8 11.5l1.6 1.6L12.5 10M8 16.5h8" fill="none" stroke="var(--c-n1)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>',
     // 签到：日历打勾
     login: '<rect x="3.5" y="5" width="17" height="15.5" rx="1.5" ' + F + '/><path d="M7.5 3v4M16.5 3v4" fill="none" ' + S + '/><path d="M8 13.5l2.6 2.6L16 11" fill="none" stroke="var(--c-n1)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>',
+    // 天赋：六芒星
+    talent: '<path d="M12 2.5l2.6 5.2 5.7.8-4.1 4 1 5.7L12 15.5l-5.2 2.7 1-5.7-4.1-4 5.7-.8Z" ' + F + '/><path d="M12 19.5v2.5" fill="none" ' + S + '/>',
+    // 职业与飞升：上升双箭头 + 底座
+    ascend: '<path d="M6 12.5 12 6.5l6 6" fill="none" ' + S + '/><path d="M6 18 12 12l6 6" fill="none" ' + S + '/><path d="M8 3h8" fill="none" ' + S + '/>',
     // 樱花币：圆币 + 五瓣樱花
     coin: '<circle cx="12" cy="12" r="10" fill="var(--c-rare-ssr)"/><g fill="var(--c-on-accent)" transform="translate(12 12)"><path id="syPetal" d="M0-1.2C-2-3-2.4-6.2 0-7.2 2.4-6.2 2-3 0-1.2Z"/><use href="#syPetal" transform="rotate(72)"/><use href="#syPetal" transform="rotate(144)"/><use href="#syPetal" transform="rotate(216)"/><use href="#syPetal" transform="rotate(288)"/></g>'
   };
@@ -17580,6 +17702,8 @@ html body:not(#sy0) .drawer .wdc,html body:not(#sy0) .drawer .nc,html body:not(#
     document.querySelectorAll(".homeNav46>button").forEach(function (b) { var k = NAV[b.getAttribute("data-open")] || (b.id === "commandHistory47" ? "records" : null); if (k) put(b.querySelector(".terminalIcon48"), k); });
     put(document.getElementById("commandMail48"), "mail"); put(document.getElementById("commandNotice48"), "notice"); put(document.getElementById("commandSettings47"), "settings");
     put(document.getElementById("commandSupplies47"), "supplies"); put(document.getElementById("commandLogin48"), "login");
+    var ARC = { trials: "trials", talent: "talent", story: "archive", asc: "ascend", ach: "records" };
+    document.querySelectorAll("#archiveDrawer .archiveDock46>button").forEach(function (b) { var k = ARC[b.getAttribute("data-open")]; if (!k) return; var w = b.querySelector(":scope>.syArcIco"); if (!w) { w = document.createElement("i"); w.className = "syArcIco"; b.insertBefore(w, b.firstChild); } put(w, k); });
     document.querySelectorAll("#menu .coins").forEach(function (c) { put(c, "coin"); });
   }
   var css = `
@@ -17597,6 +17721,14 @@ html body #menu #commandMail48 span,html body #menu #commandNotice48 span,html b
 html body #menu #commandSupplies47>.syIco,html body #menu #commandLogin48>.syIco{width:28px;height:28px;color:var(--c-n6);flex:none}
 html body #menu #commandSupplies47,html body #menu #commandLogin48{color:var(--c-n6)!important;font-weight:700}
 html body #menu .coins>.syIco{width:22px;height:22px;flex:none}
+/* 樱夜档案入口：原来是一整块主色色块（毛坯），改成深色卡片 + 主色图标 + 左侧主色竖条 */
+html body:not(#sy0):not(#sy1) #archiveDrawer .archiveDock46 button{display:flex!important;flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:6px;text-align:left;background:linear-gradient(160deg,var(--c-surface-2),var(--c-surface-1))!important;color:var(--c-n6)!important;border:1px solid var(--c-line)!important;border-left:3px solid var(--c-primary)!important;box-shadow:inset 0 1px 0 rgb(var(--c-n6-rgb) / .06)!important;clip-path:polygon(0 0,calc(100% - 16px) 0,100% 16px,100% 100%,0 100%);transition:translate .15s,box-shadow .15s}
+html body:not(#sy0):not(#sy1) #archiveDrawer .archiveDock46 button{font:700 18px var(--sy-font-title,sans-serif)!important;letter-spacing:.06em}
+html body:not(#sy0):not(#sy1) #archiveDrawer .archiveDock46 button b{color:var(--c-n6)!important}
+html body:not(#sy0):not(#sy1) #archiveDrawer .archiveDock46 button small{color:var(--c-n5)!important;opacity:1!important}
+html body:not(#sy0):not(#sy1) #archiveDrawer .archiveDock46 button:hover{translate:0 -2px;box-shadow:0 0 0 1px var(--c-primary),0 6px 18px rgb(var(--c-primary-rgb) / .25)!important}
+html body #archiveDrawer .syArcIco{display:block;width:40px;height:40px;color:var(--c-primary);margin-bottom:auto;filter:drop-shadow(0 0 6px rgb(var(--c-primary-rgb) / .45))}
+@media (max-height:440px){html body #archiveDrawer .syArcIco{width:28px;height:28px}html body:not(#sy0):not(#sy1) #archiveDrawer .archiveDock46 button{min-height:96px!important;padding:12px!important}}
 html body #menu .coins{color:var(--c-n6)!important;font-weight:800}
 @media (max-width:520px){html body #menu .homeNav46>button .terminalIcon48{width:28px!important;height:28px!important;min-width:28px}html body #menu .homeNav46>button small{display:none!important}}
 @media (max-height:440px) and (orientation:landscape){html body #menu .homeNav46>button{flex-direction:row!important;gap:5px!important;padding-top:2px!important;padding-bottom:2px!important}html body #menu .homeNav46>button .terminalIcon48{width:28px!important;height:28px!important;min-width:28px}html body #menu .homeNav46>button small{display:none!important}}
