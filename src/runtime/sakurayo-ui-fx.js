@@ -26,7 +26,7 @@ html body #menu #tacticalDeck48{transform-style:preserve-3d;rotate:y calc(var(--
 #menu #coverTitle36{translate:calc(var(--px,0) * 8px) calc(var(--py,0) * 4px);transition:translate .3s ease-out}
 /* 镜头推拉：打开子页面时大厅后退、模糊、压暗 */
 #menu{transition:scale .45s var(--sy-ease-out,ease),filter .45s}
-#menu.sy-push{scale:.94;filter:blur(3px) brightness(.55) saturate(.8)}
+#menu[data-sy-push]{scale:.94;filter:blur(3px) brightness(.55) saturate(.8)}
 .drawer:not(.hidden){animation:syDolly .5s var(--sy-ease-out,ease)}
 @keyframes syDolly{from{opacity:0;transform:perspective(1200px) translateZ(140px) rotateX(4deg)}to{opacity:1;transform:none}}
 /* 出击键：多层反馈（按下压缩 → 冲击菱环 → 故障闪烁 → 全屏斜切闪光） */
@@ -116,7 +116,7 @@ ${Array.from({ length: 10 }, function (_, i) { return "#result.sy-show #rstats>*
     var iv = setInterval(function () { if (!boot.isConnected) return clearInterval(iv); var im = [].slice.call(doc.images), done = im.filter(function (x) { return x.complete; }).length, real = im.length ? done / im.length : 1; p = Math.min(99, Math.max(p + 2, real * 100 * 0.9)); bar.style.width = p + "%"; pc.textContent = Math.round(p) + "%"; if (++k % 8 === 0) tip.textContent = TIPS[(k / 8 | 0) % TIPS.length]; }, 120); }
   // ---------- 6. 结算演出 ----------
   function resultFx() { var r = doc.getElementById("result"); if (!r) return; var md = r.querySelector(".modal"); if (md && !md.querySelector(".sy-sigil")) md.insertAdjacentHTML("afterbegin", sigil(220));
-    new MutationObserver(function () { var on = !r.classList.contains("hidden"); if (on && !r.classList.contains("sy-show")) { r.classList.add("sy-show"); r.querySelectorAll("#rstats b, #rstats strong").forEach(function (el, i) { if (global.SakurayoPolish) global.SakurayoPolish.watchNumber(el); var txt = el.textContent, n = parseInt(txt.replace(/[^\d]/g, ""), 10); if (!n || reduce()) return; var t1 = performance.now() + 550 + i * 70; (function step(now) { var k = Math.max(0, Math.min(1, (now - t1) / 700)); el.textContent = txt.replace(/[\d,]+/, Math.round(n * (1 - Math.pow(1 - k, 3))).toLocaleString("en-US")); if (k < 1) requestAnimationFrame(step); else el.textContent = txt; })(performance.now()); }); } else if (!on) r.classList.remove("sy-show"); }).observe(r, { attributes: true, attributeFilter: ["class"] }); }
+    new MutationObserver(function () { var on = !r.classList.contains("hidden"); if (on && !r.classList.contains("sy-show")) { r.classList.add("sy-show"); r.querySelectorAll("#rstats b, #rstats strong").forEach(function (el, i) { if (global.SakurayoPolish) global.SakurayoPolish.watchNumber(el); var txt = el.textContent, n = parseInt(txt.replace(/[^\d]/g, ""), 10); if (!n || reduce()) return; var t1 = performance.now() + 550 + i * 70; (function step(now) { var k = Math.max(0, Math.min(1, (now - t1) / 700)); el.textContent = txt.replace(/[\d,]+/, Math.round(n * (1 - Math.pow(1 - k, 3))).toLocaleString("en-US")); if (k < 1) requestAnimationFrame(step); else el.textContent = txt; })(performance.now()); }); } else if (!on && r.classList.contains("sy-show")) r.classList.remove("sy-show"); }) /* 注意：classList.remove 即使类不存在也会写 class 属性，会让自己的观察器无限触发 */.observe(r, { attributes: true, attributeFilter: ["class"] }); }
   // ---------- 7. 角色出场 ----------
   var show, lastName = null, showT = 0;
   function showcase(name) { if (reduce() || !show) return; var img = doc.querySelector("#heroLive46 img"); show.innerHTML = '<div class="band"></div>' + (img ? '<img src="' + img.src + '" alt="">' : "") + '<div class="cd">OPERATOR // SKR-0' + (1 + (name.length % 7)) + '</div><div class="nm"></div>'; show.querySelector(".nm").textContent = name; show.className = "on"; clearTimeout(showT); showT = setTimeout(function () { show.classList.add("out"); setTimeout(function () { show.className = ""; }, 360); }, 1400); }
@@ -129,7 +129,7 @@ ${Array.from({ length: 10 }, function (_, i) { return "#result.sy-show #rstats>*
     doc.addEventListener("pointermove", function (e) { if (e.pointerType === "mouse") setPar(e.clientX / innerWidth * 2 - 1, e.clientY / innerHeight * 2 - 1); }, { passive: true });
     addEventListener("deviceorientation", function (e) { if (e.gamma == null) return; setPar(e.gamma / 25, (e.beta - 45) / 25); }, { passive: true });
     doc.addEventListener("pointerdown", function (e) { if (e.target.closest && e.target.closest("#start")) startFx(e); }, true);
-    new MutationObserver(function () { var open = !!doc.querySelector(".drawer:not(.hidden)"); if (menu && menu.classList.contains("sy-push") !== open) menu.classList.toggle("sy-push", open); }).observe(doc.body, { attributes: true, attributeFilter: ["class"], subtree: true });
+    var pmo = new MutationObserver(function () { var open = !!doc.querySelector(".drawer:not(.hidden)"); if (menu && menu.hasAttribute("data-sy-push") !== open) { if (open) menu.setAttribute("data-sy-push", ""); else menu.removeAttribute("data-sy-push"); } }); doc.querySelectorAll(".drawer").forEach(function (d) { pmo.observe(d, { attributes: true, attributeFilter: ["class"] }); });
     bootFx(); resultFx(); watchChar();
   }
   if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", init); else init();

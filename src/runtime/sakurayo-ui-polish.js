@@ -120,7 +120,7 @@ button.sy-pop{animation:syPop .32s var(--sy-ease-back)}@keyframes syPop{0%{scale
     ["coins", "shopCoins", "tcoins"].forEach(function (id) { watchNumber(doc.getElementById(id)); });
     var boot = doc.getElementById("bootArt35"); if (boot) boot.appendChild(chibi("再等一下下……正在擦亮镜子。", "sayo"));
     applyTod(); setInterval(applyTod, 60000);
-    new MutationObserver(function () { decorateEmpty(); lanternDots(); }).observe(doc.body, { childList: true, subtree: true }); decorateEmpty(); lanternDots();
+    var pend = 0; new MutationObserver(function () { if (pend) return; pend = setTimeout(function () { pend = 0; decorateEmpty(); lanternDots(); }, 250); }).observe(doc.body, { childList: true, subtree: true }); /* 节流：战斗中 DOM 变化频繁 */ decorateEmpty(); lanternDots();
   }
   if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", init); else init();
   global.SakurayoPolish = { reward: reward, burst: burst, transition: transition, watchNumber: watchNumber, chibi: chibi, applyTod: applyTod, blip: blip };

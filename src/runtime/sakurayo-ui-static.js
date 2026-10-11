@@ -60,11 +60,11 @@ html body #menu .homeNav46>[data-open="shop"] .terminalIcon48{background-image:$
 html body #menu .homeNav46>[data-open="trials"] .terminalIcon48{background-image:${U("ui/nav/ascension.webp")}!important}html body #menu .homeNav46>[data-open="archive"] .terminalIcon48{background-image:${U("ui/nav/archive.webp")}!important}
 html body #menu #commandHistory47 .terminalIcon48{background-image:${U("ui/nav/achievement.webp")}!important}
 html body #menu .homeNav46>button{position:relative;transition:color .2s,background .2s}
-html body #menu .homeNav46>button.sy-on{background:linear-gradient(0deg,rgba(56,225,255,.28),transparent 80%)!important;color:#fff!important}
-html body #menu .homeNav46>button.sy-on::before{content:"";position:absolute;left:14%;right:14%;bottom:0;height:3px;background:var(--sy-c-cyan);box-shadow:0 0 10px var(--sy-c-cyan);clip-path:polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)}
-html body #menu .homeNav46>button.sy-on::after{content:"";position:absolute;left:50%;top:2px;width:6px;height:6px;margin-left:-3px;background:var(--sy-c-pink);transform:rotate(45deg);box-shadow:0 0 6px var(--sy-c-pink)}
-html body #menu .homeNav46>button.sy-on .terminalIcon48{transform:translateY(-3px) scale(1.12);filter:drop-shadow(0 0 6px rgba(56,225,255,.9))}
-html body #menu .homeNav46>button.sy-on b{color:var(--sy-c-cyan)!important}
+html body #menu .homeNav46>button[data-sy-on]{background:linear-gradient(0deg,rgba(56,225,255,.28),transparent 80%)!important;color:#fff!important}
+html body #menu .homeNav46>button[data-sy-on]::before{content:"";position:absolute;left:14%;right:14%;bottom:0;height:3px;background:var(--sy-c-cyan);box-shadow:0 0 10px var(--sy-c-cyan);clip-path:polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)}
+html body #menu .homeNav46>button[data-sy-on]::after{content:"";position:absolute;left:50%;top:2px;width:6px;height:6px;margin-left:-3px;background:var(--sy-c-pink);transform:rotate(45deg);box-shadow:0 0 6px var(--sy-c-pink)}
+html body #menu .homeNav46>button[data-sy-on] .terminalIcon48{transform:translateY(-3px) scale(1.12);filter:drop-shadow(0 0 6px rgba(56,225,255,.9))}
+html body #menu .homeNav46>button[data-sy-on] b{color:var(--sy-c-cyan)!important}
 /* ---- 留白 ---- */
 html body #menu #tacticalDeck48{gap:var(--sy-sp-3)!important}html body #menu #modeRow46{gap:var(--sy-sp-2)!important}
 .drawer .dbody{padding:var(--sy-sp-4) var(--sy-sp-5)!important}
@@ -80,10 +80,10 @@ html body #menu .terminalActivity48{border-radius:0!important;clip-path:polygon(
 `;
   var st = document.createElement("style"); st.id = "syStatic"; st.textContent = css; document.head.appendChild(st);
   // 底栏选中态：最近打开的入口保持高亮，直到它的面板关掉
-  function sync() { var open = document.querySelector(".drawer:not(.hidden)"), want = open ? open.id.replace(/Drawer$/, "") : "stage"; document.querySelectorAll(".homeNav46>[data-open]").forEach(function (b) { var on = b.dataset.open === want; if (b.classList.contains("sy-on") !== on) b.classList.toggle("sy-on", on); }); } // 先算目标再只改变化的，避免 class 观察自激
+  function sync() { var open = document.querySelector(".drawer:not(.hidden)"), want = open ? open.id.replace(/Drawer$/, "") : "stage"; document.querySelectorAll(".homeNav46>[data-open]").forEach(function (b) { var on = b.dataset.open === want; if (b.hasAttribute("data-sy-on") !== on) { if (on) b.setAttribute("data-sy-on", ""); else b.removeAttribute("data-sy-on"); } }); } /* 用 data 属性而不是 class 标记选中态，避免与 class 观察器互相触发 */
   function guide() { try { var sv = JSON.parse(localStorage.getItem("sakurayoV3") || "{}"), b = document.getElementById("start"); if (!b || (sv.done && sv.done.length) || b.querySelector(".sy-tip")) return; b.classList.add("sy-guide"); var t = document.createElement("span"); t.className = "sy-tip"; t.textContent = "START ▶ 从这里开始第一战"; b.appendChild(t); } catch (e) { } }
   var CODES = { stageDrawer: "OPS-01 // 关卡", gachaDrawer: "SUP-02 // 寻访", shopDrawer: "DEP-03 // 补给", rosterDrawer: "INV-04 // 仓库", archiveDrawer: "ARC-05 // 档案", trialsDrawer: "TRL-06 // 试炼", storyDrawer: "LOG-07", achDrawer: "ACH-08", talentDrawer: "TAL-09", ascDrawer: "ASC-10" };
   function codes() { Object.keys(CODES).forEach(function (id) { var h = document.querySelector("#" + id + " .dhead"); if (h && !h.dataset.syCode) h.dataset.syCode = CODES[id]; }); [["#wd46 .box>header", "WRD-11 // 衣橱"], ["#night46 .box>header", "NGT-12 // 夜行"]].forEach(function (q) { var h = document.querySelector(q[0]); if (h && !h.dataset.syCode) h.dataset.syCode = q[1]; }); }
-  function init() { sync(); guide(); codes(); new MutationObserver(codes).observe(document.body, { childList: true }); new MutationObserver(sync).observe(document.body, { attributes: true, attributeFilter: ["class"], subtree: true }); }
+  function init() { sync(); guide(); codes(); new MutationObserver(codes).observe(document.body, { childList: true }); var mo = new MutationObserver(sync); document.querySelectorAll(".drawer").forEach(function (d) { mo.observe(d, { attributes: true, attributeFilter: ["class"] }); }); /* 只观察抽屉本身，不观察整棵 body（战斗中 class 变化极频繁） */ }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })(typeof window !== "undefined" ? window : globalThis);
