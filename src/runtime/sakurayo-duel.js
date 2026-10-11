@@ -299,7 +299,7 @@
       return ph === 0 ? (m.crouch ? "crouch" : p === "dp" ? "crouch" : "idle_b") : p; }
     if (f.st === "air" || f.st === "backdash") return "jump"; if (f.st === "jsquat" || f.st === "crouch") return "crouch";
     if (f.st === "walk" || f.st === "dash") return Math.floor(this.frame / 7) % 2 ? "walk1" : "walk2";
-    return Math.floor(this.frame / 20) % 2 ? "idle" : "idle_b";
+    return ["idle", "idle_m", "idle_b", "idle_m"][Math.floor(this.frame / 12) % 4]; // 待机呼吸：两张关键帧 + RIFE 中间帧（位移小，无重影）
   };
   Game.prototype.draw = function (g, img, W, H) {
     var sc = Math.min(W / FW, H / FH), ox = (W - FW * sc) / 2, oy = (H - FH * sc) / 2, self = this, sh = this.shake ? (this.r() - 0.5) * this.shake * 2 : 0;
@@ -309,11 +309,11 @@
     var sup = this.fx.find(function (q) { return q.k === "super"; }); if (sup || this.freeze > 0) { g.fillStyle = "rgba(8,0,20,.72)"; g.fillRect(0, 0, FW, FH); }
     g.fillStyle = "rgba(0,0,0,.22)"; g.fillRect(0, GROUND, FW, FH - GROUND);
     [[this.E, img.foe, true], [this.P, img.me, false]].forEach(function (pr) {
-      var f = pr[0], set = pr[1] || {}, ps = self.pose(f), im = set[ps] || set.idle, x = f.x, y = GROUND + f.y, h = 250;
+      var f = pr[0], set = pr[1] || {}, ps = self.pose(f), im = set[ps] && set[ps].width ? set[ps] : set.idle, x = f.x, y = GROUND + f.y + 7, h = 265;
       g.fillStyle = "rgba(0,0,0,.35)"; g.beginPath(); g.ellipse(x, GROUND + 4, 52, 10, 0, 0, 7); g.fill();
       g.save(); g.translate(x, y); g.scale(f.face, 1);
       if (f.st === "down" || f.st === "dead") { g.translate(0, 0); }
-      if (im && im.width) { var w = h * im.width / im.height; if (pr[2]) g.filter = "brightness(.7) saturate(1.4) hue-rotate(" + (self.E.o.boss ? 300 : 230) + "deg) contrast(1.1)"; if (f.hitstop > 0 && f.st === "hitstun") g.filter = "brightness(1.8)"; g.drawImage(im, -w / 2, -h, w, h); g.filter = "none"; }
+      if (im && im.width) { var w = h * im.width / im.height; if (pr[2]) g.filter = "brightness(.8) saturate(.7) contrast(1.1) drop-shadow(0 0 6px " + (self.E.o.boss ? "#ff3355" : "#b06cff") + ")"; if (f.hitstop > 0 && f.st === "hitstun") g.filter = "brightness(1.8)"; g.drawImage(im, -w / 2, -h, w, h); g.filter = "none"; }
       else { g.fillStyle = pr[2] ? "#6a4a9a" : CH[f.cid].col; var crouch = ps === "crouch" || ps === "clp" || ps === "chp" || ps === "cblock"; g.fillRect(-26, crouch ? -120 : -210, 52, crouch ? 120 : 210); if (ps === "lp" || ps === "hp" || ps === "clp" || ps === "chp" || ps === "jatk" || ps === "dp" || ps === "rush" || ps === "super") { g.fillStyle = "#fff"; g.fillRect(20, crouch ? -60 : -140, (f.mv && f.mv.reach) || 60, 14); } }
       if (f.tele && f.mv && f.mf < 0) { g.fillStyle = "#ff3355"; g.font = "bold 40px sans-serif"; g.textAlign = "center"; g.fillText("!", 0, -h - 10); }
       g.restore();
@@ -347,14 +347,14 @@
   };
   Game.prototype.snapshot = function () { var P = this.P, E = this.E; return { t: +this.t.toFixed(2), round: this.round, wins: [P.wins, E.wins], hp: +(P.hp / P.max).toFixed(3), foeHp: +(E.hp / E.max).toFixed(3), meter: +P.meter.toFixed(2), foeMeter: +E.meter.toFixed(2), combo: P.combo, maxCombo: P.maxCombo, st: P.st, foeSt: E.st, move: P.mn && P.mv ? P.mn : null, foeMove: E.mn && E.mv ? E.mn : null, x: Math.round(P.x), foeX: Math.round(E.x), done: this.done, win: this.win, special: this.special, ch: this.cid, foe: E.cid, form: this.slot, route: this.route, pose: this.pose(P) }; };
   /* —— DOM 外壳 —— */
-  var POSES = ["idle", "idle_b", "walk1", "walk2", "crouch", "jump", "lp", "hp", "clp", "chp", "jatk", "block", "cblock", "hit", "hit2", "down", "throw", "special", "dp", "rush", "super", "win"];
-  var CSS = "#duel46{position:fixed;inset:0;z-index:125;background:#07050d;touch-action:none;user-select:none;color:#fff}#duel46 canvas{position:absolute;inset:0;width:100%;height:100%}#duel46 .stick{position:absolute;left:max(18px,env(safe-area-inset-left));bottom:18px;width:150px;height:150px;border-radius:50%;background:#ffffff14;border:2px solid #ffffff33}#duel46 .stick i{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px;border-radius:50%;background:#ffffff44;transform:translate(var(--x,0),var(--y,0))}#duel46 .act{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:14px;display:grid;grid-template-columns:repeat(3,64px);gap:8px}#duel46 .act button{height:64px;border-radius:50%;border:2px solid #ffffff44;background:#1a1230cc;color:#fff;font-weight:700;font-size:14px}#duel46 .act button.on{border-color:#5fd8ff;box-shadow:0 0 12px #5fd8ff}#duel46 .res{position:absolute;inset:0;display:grid;place-items:center;background:#06040ccc}#duel46 .res .box{text-align:center}#duel46 .res button{margin-top:14px;padding:12px 26px;border-radius:999px;border:0;background:#ff5f9e;color:#fff;font-size:15px}#duel46 .help{position:absolute;top:84px;left:50%;transform:translateX(-50%);font-size:11px;color:#ffffffaa;text-align:center;pointer-events:none;white-space:nowrap}";
+  var POSES = ["idle", "idle_m", "idle_b", "walk1", "walk2", "crouch", "jump", "lp", "hp", "clp", "chp", "jatk", "block", "cblock", "hit", "hit2", "down", "throw", "special", "dp", "rush", "super", "win"];
+  var CSS = "#duel46{position:fixed;inset:0;z-index:125;background:#07050d;touch-action:none;user-select:none;color:#fff}#duel46 canvas{position:absolute;inset:0;width:100%;height:100%}#duel46 .dstk46{position:absolute;left:max(18px,env(safe-area-inset-left));bottom:18px;width:150px;height:150px;border-radius:50%;background:#ffffff14;border:2px solid #ffffff33}#duel46 .dstk46 i{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px;border-radius:50%;background:#ffffff44;transform:translate(var(--x,0),var(--y,0))}#duel46 .dact46{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:14px;display:grid;grid-template-columns:repeat(3,64px);gap:8px}#duel46 .dact46 button{width:64px;height:64px;padding:0;line-height:1.1;border-radius:50%;border:2px solid #ffffff44;background:#1a1230cc;color:#fff;font-weight:700;font-size:14px}#duel46 .dact46 button.on{border-color:#5fd8ff;box-shadow:0 0 12px #5fd8ff}#duel46 .res{position:absolute;inset:0;display:grid;place-items:center;background:#06040ccc}#duel46 .res .box{text-align:center}#duel46 .res button{margin-top:14px;padding:12px 26px;border-radius:999px;border:0;background:#ff5f9e;color:#fff;font-size:15px}#duel46 .help{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:11px;color:#ffffffaa;text-align:center;pointer-events:none;white-space:nowrap}";
   var cur = null, raf = 0;
   function start(o) {
     stop(); o = o || {};
     if (!document.getElementById("duel46css")) { var st = document.createElement("style"); st.id = "duel46css"; st.textContent = CSS; document.head.appendChild(st); }
     var root = document.createElement("div"); root.id = "duel46";
-    root.innerHTML = '<canvas></canvas><div class="stick"><i></i></div><div class="act"><button data-p="L">轻<br><small>J</small></button><button data-p="H">重<br><small>K</small></button><button data-p="T">投<br><small>J+K</small></button><button data-p="SP">必杀<br><small>↓↘→</small></button><button data-p="SU" class="su">超必<br><small>1 气</small></button><button data-p="BK">防<br><small>←</small></button></div><div class="help">↓↘→+拳 波动 · →↓↘+拳 升龙 · ↓↙←+拳 突进 · ↓↘→↓↘→+拳 超必杀 · →→ 冲刺 · 防御中 →+J+K 反击</div>';
+    root.innerHTML = '<canvas></canvas><div class="dstk46"><i></i></div><div class="dact46"><button data-p="L">轻<br><small>J</small></button><button data-p="H">重<br><small>K</small></button><button data-p="T">投<br><small>J+K</small></button><button data-p="SP">必杀<br><small>↓↘→</small></button><button data-p="SU" class="su">超必<br><small>1 气</small></button><button data-p="BK">防<br><small>←</small></button></div><div class="help">↓↘→+拳 波动 · →↓↘+拳 升龙 · ↓↙←+拳 突进 · ↓↘→↓↘→+拳 超必杀 · →→ 冲刺 · 防御中 →+J+K 反击</div>';
     (o.parent || document.body).appendChild(root);
     var cv = root.querySelector("canvas"), g = cv.getContext("2d"), img = {};
     var art = function (p) { var i = new Image(); i.src = o.art ? o.art(p) : "art/" + p; return i; };
@@ -365,7 +365,7 @@
     img.meCut = art("characters/" + game.cid + "/default/avg_resolve.webp"); img.foeCut = art("characters/" + game.E.cid + "/default/avg_angry.webp");
     game.auto = !!o.auto; game.root = root; cur = game;
     // 摇杆
-    var stick = root.querySelector(".stick"), knob = stick.querySelector("i"), sid = null;
+    var stick = root.querySelector(".dstk46"), knob = stick.querySelector("i"), sid = null;
     var mv = function (e) { var r = stick.getBoundingClientRect(), dx = e.clientX - (r.left + r.width / 2), dy = e.clientY - (r.top + r.height / 2), l = Math.hypot(dx, dy), k = Math.min(1, 50 / (l || 1)); knob.style.setProperty("--x", dx * k + "px"); knob.style.setProperty("--y", dy * k + "px"); var a = Math.atan2(dy, dx); game.touch.ax = l < 18 ? 0 : Math.abs(Math.cos(a)) > 0.38 ? Math.sign(dx) : 0; game.touch.ay = l < 18 ? 0 : Math.abs(Math.sin(a)) > 0.38 ? Math.sign(dy) : 0; };
     stick.addEventListener("pointerdown", function (e) { sid = e.pointerId; stick.setPointerCapture(e.pointerId); mv(e); }); stick.addEventListener("pointermove", function (e) { if (e.pointerId === sid) mv(e); });
     var rel = function (e) { if (e.pointerId !== sid) return; sid = null; game.touch.ax = game.touch.ay = 0; knob.style.setProperty("--x", "0px"); knob.style.setProperty("--y", "0px"); }; stick.addEventListener("pointerup", rel); stick.addEventListener("pointercancel", rel);

@@ -14,7 +14,7 @@ await page.keyboard.press('j'); assert.ok(await moveSeen(3, 'lp'), 'J = light');
 await page.keyboard.down('ArrowDown'); await step(2); await page.keyboard.press('k'); assert.ok(await moveSeen(3, 'chp'), 'down + K = sweep'); await page.keyboard.up('ArrowDown'); await step(60);
 await page.evaluate(() => { const g = window.SakurayoDuel.current(); g.E.x = g.P.x + 60; }); await step(1); await page.keyboard.press('l'); assert.ok(await moveSeen(3, 'thr'), 'L / J+K = throw');
 await step(40); s = await step(1); assert.ok(s.foeHp < 1, 'damage dealt: ' + s.foeHp);
-assert.equal(await page.locator('#duel46 .stick').count(), 1); assert.equal(await page.locator('#duel46 .act button').count(), 6);
+assert.equal(await page.locator('#duel46 .dstk46').count(), 1); assert.equal(await page.locator('#duel46 .dact46 button').count(), 6);
 await page.screenshot({ path: process.env.SHOT || '/tmp/sy/duel-input.png' });
 assert.deepEqual(errors, []); await b.close();
 console.log('PASS duel input: 236+J special, 623+K DP, J light, 2+K sweep, throw; touch stick + 6 buttons');
