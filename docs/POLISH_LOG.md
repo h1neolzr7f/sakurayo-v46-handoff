@@ -113,3 +113,13 @@
 - **性能与降级**：不用 WebGL，全部用 Canvas2D 和 CSS，安卓 WebView 都能跑；DPR 上限 1.5，30fps 上限；大厅隐藏或页面后台时暂停；≤4 核或 ≤3GB 内存的设备粒子减半；`prefers-reduced-motion` 或“减弱特效”开启时关闭视差和旋转。实测 headless（无 GPU）平均帧耗时 23ms。
 - **参考**：Juice it or Lose it 的反馈叠加思路；ba-click-fx（MIT）的光环加碎片分层；崩三的斜切转场、结算砸字和角色切换演出只参考了节奏与构图，没有使用任何素材。
 - **修复**：按钮微动效改用独立的 `scale` / `translate` 属性。之前用 `transform` 会覆盖地图节点自身的定位，导致节点点击落空，`levels_smoke` 因此失败。
+
+## 进度台账（被中断后从这里接着做；每完成一个单元就提交、推送，并勾上）
+- [x] U1 动效层 `sakurayo-ui-polish.js` 改为崩三科技风：菱形提示点、斜切标签、HUD 拐角、斜切闪屏转场、发光碎片（5d0249d → ed8aff2）
+- [x] U2 静态视觉层 `sakurayo-ui-static.js`：切角面板、Logo、入口插画、页头横幅、六边形图标、底栏选中态，字体子集化（ed8aff2）
+- [x] U3 特色演出层 `sakurayo-ui-fx.js`：SKR 樱印、动态背景、视差与推拉、出击多层反馈、加载、结算、角色出场（444c0d6）
+- [x] U4 修复：观察器自激导致开局卡死；按钮 transform 覆盖地图节点定位（216b361、1d70f8a）
+- [x] U5 战斗 HUD、通用弹窗、列表卡片多层悬停、射的和地图面板（07ee737）
+- [ ] U6 HUD 和升级弹窗的前后对比图（后台跑 `tools/shoot_hud.mjs`，产物放 `shots/polish2/compare/13_hud.png`、`14_levelup.png`）
+- [ ] U7 全量回归和 APK（后台跑，日志 `/tmp/sy/verify_p4.log`）；已知偶发：`browser_smoke` 竖屏底栏命中检测，单独跑能通过
+- [ ] U8 按验收表重新打分；最低分项（加载立绘层、角色出场主题色、射的 HUD）进入第 4 轮
