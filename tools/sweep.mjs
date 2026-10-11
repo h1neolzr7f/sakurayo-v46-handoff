@@ -15,7 +15,7 @@ const S={
   runmap:async p=>{await T(p,'runStart46',7);await W(p,900);},
   levelmap:async p=>{await p.evaluate(()=>document.getElementById('levelMapBtn46')?.click());await W(p,900);},
   shateki:async p=>{await T(p,'openPachi46',{seed:3});await W(p,500);await T(p,'pachiFire46',0.5,0.4).catch(()=>{});await W(p,700);},
-  avg:async p=>{await T(p,'selectStage',1);await T(p,'start');await W(p,1200);},
+  avg:async p=>{await T(p,'selectStage',1);await T(p,'start');await W(p,2200);await p.evaluate(()=>{const a=document.querySelector('#dialogue .dialogueArt');if(a){/* nudge repaint after avg preload */ a.style.opacity=.999;requestAnimationFrame(()=>a.style.opacity='');}});await W(p,400);},
   mow:{frames:3,go:async p=>{await T(p,'selectStage',2);await T(p,'start');await T(p,'dismissDialogue');await T(p,'realtime46');await W(p,2500);}},
   levelup:async p=>{await T(p,'selectStage',1);await T(p,'start');await T(p,'dismissDialogue');await T(p,'realtime46');await W(p,1500);await T(p,'triggerUpgrade');await W(p,800);},
   result:async p=>{await T(p,'selectStage',1);await T(p,'start');await T(p,'dismissDialogue');await T(p,'realtime46');await W(p,800);await T(p,'finishNow46',true);await W(p,2200);},

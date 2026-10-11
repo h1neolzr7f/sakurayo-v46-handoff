@@ -229,6 +229,19 @@ html body .syHint46 i{font-style:normal;font-size:11px;color:var(--c-n4);white-s
 /* 竖屏寻访：UP 角色立绘被缩成 170px 宽、贴底放在屏幕外，看不到人；标题被页头压住一半 */
 @media (max-width:520px) and (orientation:portrait){html body #gachaDrawer .wishHero46{left:0!important;right:0!important;width:100%!important;top:150px!important;bottom:auto!important;height:calc(100% - 330px)!important;object-fit:contain!important;object-position:50% 100%!important;transform:none!important}
 html body #gachaDrawer .dbody h3{margin-top:18px!important}}
+/* 矮横屏射的：画布占满高度，底部「开一局」键被挤出屏幕 */
+@media (max-height:440px){html body #pachi46{align-items:stretch!important;padding:4px!important}
+html body #pachi46 .pf{max-height:none!important;height:calc(100dvh - 8px)!important;overflow:hidden!important;padding:4px 8px!important;gap:4px!important;display:flex!important;flex-direction:column!important}
+html body #pachi46 canvas{height:auto!important;flex:1 1 auto!important;min-height:0!important;max-height:none!important;width:auto!important;margin:0 auto!important}
+html body #pachi46 header,html body #pachi46 footer{flex:0 0 auto!important}
+html body #pachi46 .go{padding:6px 18px!important;min-height:34px!important;font-size:13px!important}}
+/* AVG 立绘区：cover 在宽矮容器里会放大到只剩眼睛；改成按宽度铺满、从顶部对齐，露出完整面孔 */
+html body:not(#sy0) #dialogue .dialogueArt{background-size:auto 115%!important;background-position:50% 8%!important;background-repeat:no-repeat!important;min-height:240px!important;height:min(52vh,420px)!important;background-color:var(--c-n0)!important}
+@media (max-height:440px){html body:not(#sy0) #dialogue .dialogueArt{height:34vh!important;min-height:120px!important}
+html body:not(#sy0) #dialogue .modal{max-height:calc(100dvh - 12px);overflow-y:auto}
+html body:not(#sy0) #dialogue .dialogueText{font-size:13px!important;line-height:1.5!important}}
+@media (orientation:portrait) and (max-width:520px){html body:not(#sy0) #dialogue .dialogueArt{height:36vh!important;min-height:200px!important}
+html body:not(#sy0) #dialogue .dialogueText{font-size:14px!important}}
 `;
   var st = document.createElement("style"); st.id = "syStatic"; st.textContent = css; document.head.appendChild(st);
   // 底栏选中态：最近打开的入口保持高亮，直到它的面板关掉

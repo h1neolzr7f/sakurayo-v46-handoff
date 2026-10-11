@@ -136,6 +136,14 @@ html body:not(#sy0):not(#sy1) #level .choice img{width:44px!important;height:44p
 html body:not(#sy0):not(#sy1) #level .choice small:last-child,html body:not(#sy0):not(#sy1) #level .choice .dots46,html body:not(#sy0):not(#sy1) #level .choice [class*="dots"]{display:none!important}
 html body:not(#sy0):not(#sy1) #level .modal>#reroll,html body:not(#sy0):not(#sy1) #level .modal>#levelBar46{display:inline-flex!important;width:calc(50% - 4px)!important;vertical-align:middle;margin:6px 0 0!important;min-height:36px!important}
 html body:not(#sy0):not(#sy1) #level .modal>#reroll{margin-right:8px!important}}
+/* 竖屏升级弹窗：三张卡纵向堆叠后操作按钮被挤出屏幕外 */
+@media (max-width:520px) and (orientation:portrait){html body:not(#sy0):not(#sy1) #level .modal{max-height:calc(100dvh - 16px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow-y:auto!important;padding:10px 12px!important}
+html body:not(#sy0) #level .modal>h2{font-size:18px!important;padding:4px 28px 4px 18px!important;margin:0 0 4px!important}
+html body:not(#sy0):not(#sy1) #level .choice{min-height:0!important;padding:8px 10px!important;display:grid!important;grid-template-columns:52px 1fr;column-gap:10px;align-items:center;text-align:left!important}
+html body:not(#sy0):not(#sy1) #level .choice img{width:48px!important;height:48px!important;margin:0!important;grid-row:span 3}
+html body:not(#sy0):not(#sy1) #level .choice small:last-child,html body:not(#sy0):not(#sy1) #level .choice .dots46{display:none!important}
+html body:not(#sy0):not(#sy1) #level .modal>#reroll,html body:not(#sy0):not(#sy1) #level .modal>#levelBar46{position:sticky;bottom:0;z-index:2;display:block!important;width:100%!important;margin:6px 0 0!important;min-height:40px!important;background:var(--c-surface-1)}
+html body:not(#sy0):not(#sy1) #level .choices{display:flex!important;flex-direction:column!important;gap:8px!important;max-height:none!important}}
 #syShow.out{animation:syOut .35s ease-in forwards}
 @keyframes syBand{from{transform:skewY(-6deg) translateX(-110%)}to{transform:skewY(-6deg) translateX(0)}}
 @keyframes syHero{from{translate:30% 0;opacity:0}to{translate:0 0;opacity:1}}
