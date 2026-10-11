@@ -20,9 +20,9 @@ button:not(.sy-nofx){transition:transform var(--sy-t-fast) var(--sy-ease-out),fi
 @media (hover:hover){button:not(.sy-nofx):not(:disabled):hover{transform:translateY(-2px);filter:brightness(1.08)}}
 button:not(.sy-nofx):not(:disabled):active,button.sy-press{transform:translateY(1px) scale(.95)!important;filter:brightness(.95)}
 button.sy-pop{animation:syPop .32s var(--sy-ease-back)}@keyframes syPop{0%{transform:scale(.92)}60%{transform:scale(1.05)}100%{transform:scale(1)}}
-.go,.levelMapBtn46,[data-open]{position:relative;overflow:hidden}
-.go::after,.levelMapBtn46::after,[data-open]::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.35) 48%,transparent 66%);transform:translateX(-120%);pointer-events:none}
-@media (hover:hover){.go:hover::after,.levelMapBtn46:hover::after,[data-open]:hover::after{transform:translateX(120%);transition:transform .6s var(--sy-ease-out)}}
+.go,.levelMapBtn46{position:relative;overflow:hidden}
+.go::after,.levelMapBtn46::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.35) 48%,transparent 66%);transform:translateX(-120%);pointer-events:none}
+@media (hover:hover){.go:hover::after,.levelMapBtn46:hover::after{transform:translateX(120%);transition:transform .6s var(--sy-ease-out)}}
 /* 3. 樱花点击粒子层 */
 #syFx{position:fixed;inset:0;pointer-events:none;z-index:9998}
 /* 4. 页面转场：樱色斜切幕 */
