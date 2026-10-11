@@ -153,7 +153,7 @@ html body:not(#sy0):not(#sy1) #hud #hpF{background:var(--c-accent)!important;box
 html body:not(#sy0):not(#sy1) #hud .bar{box-shadow:inset 0 0 0 1px var(--c-line-strong)!important;background:rgb(var(--c-n0-rgb) / .75)!important}
 html body:not(#sy0):not(#sy1) #hud .rinfo #time{color:var(--c-text-1)!important;text-shadow:0 2px 4px rgb(var(--c-n0-rgb) / .8)!important}
 html body:not(#sy0):not(#sy1) #hud .rinfo #kill,html body:not(#sy0):not(#sy1) #hud #stageHud{color:var(--c-text-2)!important}
-html body:not(#sy0):not(#sy1) #hud .act,html body:not(#sy0):not(#sy1) #hud #pause{background:radial-gradient(circle,rgb(var(--c-n2-rgb) / .95),rgb(var(--c-n0-rgb) / .9) 70%)!important;filter:drop-shadow(0 0 0 transparent)!important;box-shadow:inset 0 0 0 1px var(--c-line-strong)!important}
+html body:not(#sy0):not(#sy1) #hud .act,html body:not(#sy0):not(#sy1) #hud #pause{background:linear-gradient(160deg,var(--c-n3),var(--c-n2))!important;color:var(--c-primary-strong)!important;filter:drop-shadow(0 0 1px var(--c-primary)) drop-shadow(0 0 5px rgb(var(--c-primary-rgb) / .45))!important;box-shadow:none!important}
 html body:not(#sy0):not(#sy1) #hud [id*="atk"],html body:not(#sy0):not(#sy1) #hud [id*="attack"],html body:not(#sy0):not(#sy1) #hud [class*="atk"],html body:not(#sy0):not(#sy1) #hud [class*="main"]{background:radial-gradient(circle,var(--c-primary),rgb(var(--c-primary-rgb) / .6) 70%)!important;color:var(--c-on-primary)!important;filter:drop-shadow(0 0 8px rgb(var(--c-primary-rgb) / .6))!important}
 html body:not(#sy0):not(#sy1) #hud #combo{color:var(--c-rare-ssr)!important;text-shadow:0 2px 4px rgb(var(--c-n0-rgb) / .8)!important}
 /* 弹窗按钮：主操作 = 主色，次操作 = 中性描边 */
