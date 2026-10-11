@@ -241,6 +241,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       "ui/nav/gacha.webp","ui/nav/roster.webp","ui/nav/archive.webp","gacha/banner_bg.webp","ui/lobby_wide.webp"
     ];
   function artUrl(path) { return `${ART_ROOT}/${path}`; }
+  window.SakurayoArtBase = ART_ROOT + "/";
   { const boot=document.getElementById("bootArt35"); if(boot) boot.style.setProperty("--bootArt46",`url("${artUrl("ui/loading_v5.webp")}")`); }
   function artImage(path) {
     if (!ART_CACHE.has(path)) {
@@ -7431,7 +7432,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   function openPachi46(o={}){const PK=window.SakurayoShateki;if(!PK)return null;
     return PK.start({seed:o.seed,auto:o.auto,ticket:()=>({free:pachiSt46().free,coins:save.coins}),
       pay:()=>{const p=pachiSt46();if(p.free>0){p.free--;p.balls++;persist();return true;}if(save.coins<PK.COST)return false;save.coins-=PK.COST;p.balls++;persist();return true;},
-      onPrize:q=>{if(q.coins)save.coins+=q.coins;if(q.kyo){const w=wardrobe46?.();if(w)w.kyo=(w.kyo||0)+q.kyo;}persist();if(!q.consolation)toast(`缘日射的：${q.n}`);menuUpdate?.();},
+      onPrize:q=>{if(q.coins)save.coins+=q.coins;if(q.kyo){const w=wardrobe46?.();if(w)w.kyo=(w.kyo||0)+q.kyo;}persist();if(!q.consolation){toast(`缘日射的：${q.n}`);window.SakurayoPolish?.reward({icon:q.e||"🎯",title:q.n,rarity:q.kyo?"SSR":q.coins>=80?"SR":"R",rarityLabel:q.kyo?"大奖":q.coins>=80?"稀有":"普通",desc:"缘日射的"});};menuUpdate?.();},
       onClose:()=>menuUpdate?.()});}
   document.addEventListener("click",e=>{if(e.target.closest("#pachiBtn46"))openPachi46();});
   setTimeout(()=>{if(!$("#pachiBtn46")){const b=document.createElement("button");b.className="levelMapBtn46";b.id="pachiBtn46";b.type="button";b.innerHTML="<b>缘日射的</b><small>庙会摊位 · 每日免费 1 局</small>";modeRow46().appendChild(b);}},0);
@@ -8531,4 +8532,5 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 })();
 
 </script>
+<script src="runtime/sakurayo-ui-polish.js"></script>
 </body></html>

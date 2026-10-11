@@ -3382,7 +3382,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     var spr = function (name, x, y, s, flash, alt) { var im = img[name]; if ((!im || !im.width) && alt) im = img[alt]; if (!im || !im.width) { g.fillStyle = "#c66"; g.beginPath(); g.arc(x, y, s / 3, 0, TAU); g.fill(); return; } var w = s, h = s * im.height / im.width; g.drawImage(im, x - w / 2, y - h / 2, w, h); if (flash > 0) { g.globalAlpha = 0.4; g.globalCompositeOperation = "lighter"; g.drawImage(im, x - w / 2, y - h / 2, w, h); g.globalCompositeOperation = "source-over"; g.globalAlpha = 1; } };
     this.E.forEach(function (e) { spr(e.spr, e.x, e.y, e.size, e.flash); });
     if (Bo) { g.save(); var bob = Math.sin(t * 2) * 6, bk = Bo.spr.replace("boss_girl_", "boss"), bdx = Bo.x - (Bo.lx == null ? Bo.x : Bo.lx); Bo.lx = Bo.x; Bo.sv = (Bo.sv || 0) * 0.85 + bdx * 0.15;
-      var bf = Bo.sv < -0.6 ? "left" : Bo.sv > 0.6 ? "right" : (Math.floor(t * 4) % 2 ? "idle1" : "idle0"); spr("chibi_" + bk + "_" + bf, Bo.x, Bo.y + bob, Bo.size, Bo.flash, Bo.spr); g.restore(); }
+      var bbt = Bo.sv < -0.6 ? -4 : Bo.sv > 0.6 ? 4 : 0; Bo.bk = (Bo.bk || 0); Bo.bkA = (Bo.bkA || 0) + 1; if (Bo.bkA >= 2) { Bo.bkA = 0; Bo.bk += Math.sign(bbt - Bo.bk); }
+      var bf = Bo.bk === 0 ? "idle" + (Math.floor(t * 8) % 8) : (Bo.bk < 0 ? "left" : "right") + (Math.abs(Bo.bk) === 4 ? "" : Math.abs(Bo.bk)); spr("chibi_" + bk + "_" + bf, Bo.x, Bo.y + bob, Bo.size, Bo.flash, Bo.spr); g.restore(); }
     // 道具
     this.items.forEach(function (it) { if (it.k === "pt") { g.fillStyle = "#9fe6ff"; g.fillRect(it.x - 2, it.y - 2, 4, 4); return; } g.fillStyle = it.k === "p" ? "#ff4f6a" : "#4fd27a"; g.fillRect(it.x - 7, it.y - 7, 14, 14); g.fillStyle = "#fff"; g.font = "bold 11px sans-serif"; g.textAlign = "center"; g.fillText(it.k === "p" ? "P" : "B", it.x, it.y + 4); });
     // 我方弹
@@ -3403,7 +3404,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     if (this.form.tint || aw) { var rg = g.createRadialGradient(P.x, P.y, 6, P.x, P.y, 64); rg.addColorStop(0, (aw ? "#ffd76a" : tint) + "77"); rg.addColorStop(1, "transparent"); g.fillStyle = rg; g.fillRect(P.x - 64, P.y - 64, 128, 128); }
     g.globalAlpha = blink ? 0.45 : 1; var tilt = clamp((this.lastX != null ? P.x - this.lastX : 0) * 0.02, -0.18, 0.18); this.lastX = P.x;
     this.sv = (this.sv || 0) * 0.8 + tilt * 50 * 0.2; // 平滑横移速度 → 选左右倾斜帧（东方式自机：待机飘动 2 帧 + 左/右倾斜帧）
-    var fr = this.sv < -1.6 ? "left" : this.sv > 1.6 ? "right" : (Math.floor(t * 6) % 2 ? "idle1" : "idle0");
+    var bt = this.sv < -1.6 ? -4 : this.sv > 1.6 ? 4 : 0; this.bankAcc = (this.bankAcc || 0) + 1; if (this.bankAcc >= 2) { this.bankAcc = 0; this.bank = (this.bank || 0) + Math.sign(bt - (this.bank || 0)); } // LuaSTG 式：倾斜 4 帧逐帧过渡
+    var bk0 = this.bank || 0, fr = bk0 === 0 ? "idle" + (Math.floor(t * 8) % 8) : (bk0 < 0 ? "left" : "right") + (Math.abs(bk0) === 4 ? "" : Math.abs(bk0));
     g.save(); g.translate(P.x, P.y + Math.sin(t * 5) * 2); g.rotate(tilt * 0.35); spr("chibi_" + this.cid + "_" + fr, 0, -6, 92, 0, "fly_" + this.cid); g.restore(); g.globalAlpha = 1;
     // 敌弹（高对比：彩色外圈 + 白芯；贴图半径 > 判定半径）
     this.B.forEach(function (b) {
@@ -3428,7 +3430,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     boss: b ? { name: b.name, hp: Math.round(b.hp), max: Math.round(b.max), card: b.card && !b.card.non ? b.card.n : null, ci: b.ci, cards: b.cards.length, time: +b.ct.toFixed(1), cap: b.capOk } : null, caps: this.caps, gauge: Math.round(P.gauge), awaken: this.t < P.awakenUntil, pause: this.pause, done: this.done, win: this.win, form: this.slot, ch: this.cid, route: this.route, x: Math.round(P.x), y: Math.round(P.y), hit: P.hit }; };
 
   /* —— DOM 外壳 —— */
-  var CHB = []; ["sayo", "aya", "rion", "boss1", "boss2", "boss3"].forEach(function (c) { ["idle0", "idle1", "left", "right"].forEach(function (k) { CHB.push("chibi_" + c + "_" + k); }); CHB.push("cut_" + c); });
+  var CHB = []; ["sayo", "aya", "rion", "boss1", "boss2", "boss3"].forEach(function (c) { ["idle0", "idle1", "idle2", "idle3", "idle4", "idle5", "idle6", "idle7", "left1", "left2", "left3", "left", "right1", "right2", "right3", "right"].forEach(function (k) { CHB.push("chibi_" + c + "_" + k); }); CHB.push("cut_" + c); });
   var ART = ["tile_1", "tile_2", "tile_3", "bg1", "bg2", "bg3", "boss1", "boss2", "boss3", "boss_girl_1", "boss_girl_2", "boss_girl_3", "ship_sayo", "ship_aya", "ship_rion", "fly_sayo", "fly_aya", "fly_rion"];
   ART = ART.concat(CHB);
   ["a", "b"].forEach(function (s) { for (var i = 0; i < 6; i++) ART.push("enemy_" + s + i); });
@@ -3622,11 +3624,12 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   };
   // 每招的关键帧时间表（前摇 s / 发生 a / 收招 r）。思路取自 MUGEN/Ikemen 的 .air：每段有专门的预备、伸展、过冲、回架势帧，帧间硬切（有限帧动画），不插值
   var ANIM = {
-    lp: { s: ["lp_s"], a: ["lp"], r: ["lp_r", "idle"] }, clp: { s: ["crouch"], a: ["clp"], r: ["clp", "crouch"] },
-    hp: { s: ["hp_s"], a: ["hp"], r: ["hp_r", "hp_r", "idle_b"] }, chp: { s: ["crouch"], a: ["chp"], r: ["chp", "crouch", "crouch"] },
+    lp: { s: ["lp_s", "lp_s2"], a: ["lp", "lp_a2"], r: ["lp_r2", "lp_r", "idle"] }, clp: { s: ["crouch"], a: ["clp"], r: ["clp", "crouch"] },
+    hp: { s: ["hp_s", "hp_s2"], a: ["hp"], r: ["hp_o", "hp_r", "hp_r2", "idle_b"] }, chp: { s: ["crouch"], a: ["chp"], r: ["chp", "crouch", "crouch"] },
     jatk: { s: ["jatk_s"], a: ["jatk"], r: ["jatk", "jump_fall"] }, throw: { s: ["throw_s"], a: ["throw"], r: ["throw", "idle_b"] },
     special: { s: ["special_s", "special_s"], a: ["special"], r: ["special", "idle_b"] }, dp: { s: ["crouch"], a: ["dp"], r: ["dp", "jump_fall", "dp_r"] },
     rush: { s: ["hp_s"], a: ["rush"], r: ["rush_r", "rush_r", "idle_b"] }, super: { s: ["special_s", "special"], a: ["super", "super_r", "super", "super_r"], r: ["super_r", "idle_b"] } };
+  var HITSEQ = { 0: ["hit_l", "hit_l", "idle_b"], 1: ["hit", "hit2", "hit2", "idle_b"], 2: ["hit_h", "hit_h", "hit2", "hit2", "idle_b"] };
   var STRONG = { hp: 1, chp: 1, jatk: 1, dp: 1, rush: 1, super: 1, special: 1 };
   var CMD = [ // 按优先级匹配
     { m: "S", seq: [2, 3, 6, 2, 3, 6], win: 34 }, { m: "D", seq: [6, 2, 3], win: 16 }, { m: "A", seq: [2, 3, 6], win: 14 }, { m: "B", seq: [2, 1, 4], win: 14 }];
@@ -3777,7 +3780,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       var chip = m.chip && !d.o.noChip ? m.chip * a.o.dmg : 0; d.hp -= chip; d.st = "block"; d.stT = 0; d.bs = m.bs; d.blockH = m.h === "low" ? "low" : "high"; d.vx = -d.face * m.kb * 1.6;
       d.guard += (m.su ? 30 : m.sp ? 18 : m.dmg * 2.2) * d.o.guardK; a.blocked++; this.gain(a, 0.06); this.gain(d, 0.04);
       this.fx.push({ k: "guard", x: d.x + d.face * 30, y: GROUND - m.y - (d.y < 0 ? -d.y : 0), t: 0, life: 0.25 }); this.hitstopAll(m.su ? 4 : 7);
-      if (d.guard >= 100) { d.guard = 0; d.st = "hitstun"; d.stT = 0; d.hs = 60; this.fx.push({ k: "txt", s: "破防！", x: d.x, y: 240, t: 0, life: 1 }); this.shake = 8; }
+      if (d.guard >= 100) { d.guard = 0; d.st = "hitstun"; d.stT = 0; d.hitTier = m.dmg < 5 ? 0 : m.dmg < 9 ? 1 : 2; d.hs = 60; this.fx.push({ k: "txt", s: "破防！", x: d.x, y: 240, t: 0, life: 1 }); this.shake = 8; }
       if (!proj) a.hit = true; a.combo = 0; if (d.hp <= 0) this.ko(a, d); return;
     }
     if (d.armor && !proj && !m.su) { d.armor = 0; d.armorUsed = 1; d.hp -= m.dmg * a.o.dmg * 0.5 * d.o.taken; this.fx.push({ k: "txt", s: "霸体", x: d.x, y: 250, t: 0, life: 0.6 }); this.hitstopAll(8); a.hit = true; return; }
@@ -3787,7 +3790,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     this.gain(a, (m.su ? 0 : 0.1 + dmg * 0.012)); this.gain(d, 0.05);
     var air = d.y < 0 || m.kd || m.rise; d.mv = null; d.parry = 0; d.armor = 0;
     if (air) { d.st = "juggle"; d.stT = 0; d.vy = m.rise ? -520 : -360; d.vx = -d.face * (m.kb * 1.4); d.y = Math.min(d.y, -1); }
-    else { d.st = "hitstun"; d.stT = 0; d.hs = m.hs + (ctr ? 8 : 0); d.vx = -d.face * m.kb * 2.2; }
+    else { d.st = "hitstun"; d.stT = 0; d.hitTier = m.dmg < 5 ? 0 : m.dmg < 9 ? 1 : 2; d.hs = m.hs + (ctr ? 8 : 0); d.vx = -d.face * m.kb * 2.2; }
     var hsN = m.su ? 5 : m.dmg >= 8 ? 12 : 8; this.hitstopAll(hsN); this.shake = Math.max(this.shake, m.shake || 0);
     var hx = d.x + d.face * 28, hy = GROUND - m.y - (d.y < 0 ? -d.y : 0); this.fx.push({ k: "spark", x: hx, y: hy, t: 0, life: m.dmg >= 8 ? 0.3 : 0.22, big: m.dmg >= 8 || m.su, col: a === this.P ? CH[a.cid].col : "#c58cff" });
     if (ctr) this.fx.push({ k: "txt", s: "COUNTER", x: d.x, y: 210, t: 0, life: 0.7 });
@@ -3891,7 +3894,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   /* —— 姿势选择（每个动作 = 关键帧 pose-hold，切换不做混合 → 无重影） —— */
   Game.prototype.pose = function (f) {
     var m = f.mv;
-    if (f.st === "dead" || f.st === "down") return "down"; if (f.st === "thrown") return "hit2"; if (f.st === "juggle") return f.vy < 0 ? "hit2" : "hit"; // 浮空：上升后仰、下落翻身 if (f.st === "hitstun") return f.stT < 4 ? "hit" : (f.hs && f.stT >= f.hs - 4) ? "idle_b" : "hit2"; // 受击：冲击帧 → 后仰 → 最后 4 帧回架势（不再整段停在同一张）
+    if (f.st === "dead" || f.st === "down") return "down"; if (f.st === "thrown") return "hit2"; if (f.st === "juggle") return f.vy < 0 ? "air_up" : "air_fall"; // 浮空：上升后仰、下落翻身 if (f.st === "hitstun") { var HS = HITSEQ[f.hitTier || 1], hk = Math.min(HS.length - 1, Math.floor(f.stT / Math.max(1, f.hs || 14) * HS.length)); return HS[hk]; } // 受击分轻 / 中 / 重三档（MUGEN animtype Light/Medium/Hard） // 受击：冲击帧 → 后仰 → 最后 4 帧回架势（不再整段停在同一张）
     if (f.st === "block") return f.blockH === "low" ? "cblock" : "block";
     if (m) { // AIR 式动作表：按前摇 / 发生 / 收招三段各自的帧数，把关键帧均分到该段（与 MUGEN .air 的 element ticks 同理）
       var ph = f.mf < m.st ? 0 : f.mf < m.st + m.ac ? 1 : 2, A = ANIM[m.pose] || { s: ["idle_b"], a: [m.pose], r: ["idle"] }, seq = ph === 0 ? A.s : ph === 1 ? A.a : A.r,
@@ -3910,7 +3913,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     var sup = this.fx.find(function (q) { return q.k === "super"; }); if (sup || this.freeze > 0) { g.fillStyle = "rgba(8,0,20,.72)"; g.fillRect(0, 0, FW, FH); }
     g.fillStyle = "rgba(0,0,0,.22)"; g.fillRect(0, GROUND, FW, FH - GROUND);
     [[this.E, img.foe, true], [this.P, img.me, false]].forEach(function (pr) {
-      var f = pr[0], set = pr[1] || {}, ps = self.pose(f), FB = { hp_s: "idle_b", special_s: "idle_b", jump_up: "jump", jump_fall: "jump", dash: "walk1", lp_s: "idle_b", lp_r: "idle", hp_r: "hp", dp_r: "crouch", super_r: "super", rush_r: "rush", throw_s: "throw", jatk_s: "jump" }, im = set[ps] && set[ps].width ? set[ps] : set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")] && set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")].width ? set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")] : set.idle, x = f.x, y = GROUND + f.y + 7, h = 265;
+      var f = pr[0], set = pr[1] || {}, ps = self.pose(f), FB = { hp_s: "idle_b", special_s: "idle_b", jump_up: "jump", jump_fall: "jump", dash: "walk1", lp_s: "idle_b", lp_r: "idle", lp_s2: "lp_s", lp_a2: "lp", lp_r2: "lp_r", hp_s2: "hp_s", hp_o: "hp_r", hp_r2: "hp_r", hit_l: "hit", hit_h: "hit2", air_up: "hit2", air_fall: "hit", hp_r: "hp", dp_r: "crouch", super_r: "super", rush_r: "rush", throw_s: "throw", jatk_s: "jump" }, im = set[ps] && set[ps].width ? set[ps] : set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")] && set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")].width ? set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")] : set.idle, x = f.x, y = GROUND + f.y + 7, h = 265;
       g.fillStyle = "rgba(0,0,0,.35)"; g.beginPath(); g.ellipse(x, GROUND + 4, 52, 10, 0, 0, 7); g.fill();
       var m = f.mv, ph = m ? (f.mf < m.st ? 0 : f.mf < m.st + m.ac ? 1 : 2) : -1, sx = 1, sy = 1, rot = 0, jit = 0;
       // 程序性补正：发生帧拉伸（stretch）、受击压扁（squash）+ 弹簧式回正、起跳拉伸 / 蹲跳压扁、受击方额外抖动（MUGEN HitDef 的 p2 shaketime）
@@ -3966,7 +3969,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   };
   Game.prototype.snapshot = function () { var P = this.P, E = this.E; return { t: +this.t.toFixed(2), round: this.round, wins: [P.wins, E.wins], hp: +(P.hp / P.max).toFixed(3), foeHp: +(E.hp / E.max).toFixed(3), meter: +P.meter.toFixed(2), foeMeter: +E.meter.toFixed(2), combo: P.combo, maxCombo: P.maxCombo, st: P.st, foeSt: E.st, move: P.mn && P.mv ? P.mn : null, foeMove: E.mn && E.mv ? E.mn : null, x: Math.round(P.x), foeX: Math.round(E.x), done: this.done, win: this.win, special: this.special, ch: this.cid, foe: E.cid, form: this.slot, route: this.route, pose: this.pose(P) }; };
   /* —— DOM 外壳 —— */
-  var POSES = ["idle", "idle_m", "idle_b", "walk1", "walk2", "crouch", "jump", "lp", "hp", "clp", "chp", "jatk", "block", "cblock", "hit", "hit2", "down", "throw", "special", "dp", "rush", "super", "win", "walk_0", "walk_1", "walk_2", "walk_3", "walk_4", "walk_5", "walk_6", "walk_7", "hp_s", "special_s", "jump_up", "jump_fall", "dash", "lp_s", "lp_r", "hp_r", "dp_r", "super_r", "rush_r", "throw_s", "jatk_s"];
+  var POSES = ["idle", "idle_m", "idle_b", "walk1", "walk2", "crouch", "jump", "lp", "hp", "clp", "chp", "jatk", "block", "cblock", "hit", "hit2", "down", "throw", "special", "dp", "rush", "super", "win", "walk_0", "walk_1", "walk_2", "walk_3", "walk_4", "walk_5", "walk_6", "walk_7", "hp_s", "special_s", "jump_up", "jump_fall", "dash", "lp_s", "lp_r", "hp_r", "dp_r", "super_r", "rush_r", "throw_s", "jatk_s", "lp_s2", "lp_a2", "lp_r2", "hp_s2", "hp_o", "hp_r2", "hit_l", "hit_h", "air_up", "air_fall"];
   var CSS = "#duel46{position:fixed;inset:0;z-index:125;background:#07050d;touch-action:none;user-select:none;color:#fff}#duel46 canvas{position:absolute;inset:0;width:100%;height:100%}#duel46 .dstk46{position:absolute;left:max(18px,env(safe-area-inset-left));bottom:18px;width:150px;height:150px;border-radius:50%;background:#ffffff14;border:2px solid #ffffff33}#duel46 .dstk46 i{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px;border-radius:50%;background:#ffffff44;transform:translate(var(--x,0),var(--y,0))}#duel46 .dact46{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:14px;display:grid;grid-template-columns:repeat(3,64px);gap:8px}#duel46 .dact46 button{width:64px;height:64px;padding:0;line-height:1.1;border-radius:50%;border:2px solid #ffffff44;background:#1a1230cc;color:#fff;font-weight:700;font-size:14px}#duel46 .dact46 button.on{border-color:#5fd8ff;box-shadow:0 0 12px #5fd8ff}#duel46 .res{position:absolute;inset:0;display:grid;place-items:center;background:#06040ccc}#duel46 .res .box{text-align:center}#duel46 .res button{margin-top:14px;padding:12px 26px;border-radius:999px;border:0;background:#ff5f9e;color:#fff;font-size:15px}#duel46 .help{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:11px;color:#ffffffaa;text-align:center;pointer-events:none;white-space:nowrap}";
   var cur = null, raf = 0;
   function start(o) {

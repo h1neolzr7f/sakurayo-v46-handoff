@@ -67,3 +67,12 @@
 | Fighter Factory Studio / Ultimate | 免费软件（闭源，没有分发、没有集成） | AIR/SFF 编辑和判定框校对流程（只参考工作流） |
 | MUGEN 文档（Elecbyte）/ mugen-net wiki | 文档 | .air 元素、Clsn1/Clsn2、HitDef（pausetime、hittime、guardflag、animtype） |
 | VampireUnpacker / VS Mod Loader / Bloodlines | 各自仓库许可证（未使用代码或素材） | VS 按分钟的关卡数据格式（minimum、frequency、定时 boss + 宝箱） |
+
+## POLISH 第 1 轮（UI）参考
+| 项目 | 许可证 | 用法 |
+|---|---|---|
+| sf-yuzifu/BA-style-homepage | MIT | 点击特效、转场的模块结构参考（我们自己实现，没有拷贝代码和素材） |
+| CialloKing/ba-click-fx | MIT | 点击特效分层（光环、碎片、拖尾）思路 |
+| mashirozx/arknights-ui | 代码 MIT（贴图仅供学习，未使用） | 斜切面板、光泽扫过 |
+| easings.net、GSAP 缓动命名 | 文档 | cubic-bezier 取值 |
+| Juice it or Lose it（Jonasson & Purho, GDC 2012） | 演讲 | 反馈层叠原则 |
