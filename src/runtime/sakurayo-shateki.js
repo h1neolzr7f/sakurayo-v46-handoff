@@ -86,7 +86,7 @@
         if (!it.up) { g.rotate(Math.min(1.5, it.fall * 6)); g.globalAlpha = Math.max(0, 1 - it.fall / 2.5); }
         g.fillStyle = K.col; g.beginPath(); g.roundRect ? g.roundRect(-K.w / 2, -K.h, K.w, K.h, 6) : g.rect(-K.w / 2, -K.h, K.w, K.h); g.fill();
         g.globalAlpha *= 0.9; g.font = Math.round(K.h * 0.8) + "px sans-serif"; g.textAlign = "center"; g.fillText(K.e, 0, -K.h * 0.18); g.globalAlpha = 1;
-        g.fillStyle = "#fff"; (global.SyKit ? global.SyKit.font(g, "bold", 9, "sans-serif") : (g.font = "bold 9px sans-serif")); g.textAlign = "center"; g.fillText(K.coins ? K.coins : "+1", 0, -3); g.restore();
+        g.fillStyle = "#fff"; g.font = "bold 9px sans-serif"; g.textAlign = "center"; g.fillText(K.coins ? K.coins : "+1", 0, -3); g.restore();
       });
       else { g.fillStyle = "#ffd7e6"; g.font = "bold 18px sans-serif"; g.textAlign = "center"; g.fillText("点「开一局」或点击画面", W / 2, 300); }
       if (S) S.fx.forEach(function (f) { g.strokeStyle = f.hit ? "#ffe066" : "#ffffff88"; g.lineWidth = 2; g.beginPath(); g.arc(f.x, f.y, 4 + (0.4 - f.t) * 30, 0, 6.283); g.stroke(); });

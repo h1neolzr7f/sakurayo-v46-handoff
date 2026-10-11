@@ -46,7 +46,7 @@
           if (bd.image) { var plate = c.textShadow !== "none" || parseFloat(c.webkitTextStrokeWidth) > 0; if (!plate) fails.push("noplate:" + name(e) + ":" + own.slice(0, 12)); }
           else if (bd.color) { var rr = ratio(fg, bd.color); if (rr < min - 0.05) fails.push("contrast:" + name(e) + ":" + rr.toFixed(2) + "<" + min + ":" + own.slice(0, 12)); }
         }
-        if (c.overflow !== "visible" && c.webkitLineClamp === "none" && !(c.textOverflow === "ellipsis" && c.whiteSpace === "nowrap") && (e.scrollWidth > e.clientWidth + 2 || e.scrollHeight > e.clientHeight + 4 && c.overflowY === "hidden")) fails.push("trunc:" + name(e) + ":" + own.slice(0, 12));
+        if (c.overflow !== "visible" && c.textOverflow !== "ellipsis" && (e.scrollWidth > e.clientWidth + 2 || e.scrollHeight > e.clientHeight + 4 && c.overflowY === "hidden")) fails.push("trunc:" + name(e) + ":" + own.slice(0, 12));
       }
       // 图标
       var isIcon = e.matches("svg.syIco") ? false : (e.tagName === "IMG" && r.width <= 64 && r.height <= 64);

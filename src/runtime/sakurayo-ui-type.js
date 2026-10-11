@@ -9,11 +9,9 @@
   var css = ""
     + ":root{--fs-aux:11px;--fs-body:14px;--fs-sub:16px;--fs-title:20px;--fs-hero:28px;--sy-plate:0 1px 2px rgb(var(--c-n0-rgb) / .95),0 0 6px rgb(var(--c-n0-rgb) / .85)}"
     + "@media (max-width:1000px){:root{--fs-body:12px;--fs-sub:14px;--fs-title:18px;--fs-hero:24px}}"
-    + "@media (pointer:coarse){html body:not(#sy0):not(#sy1):not(#sy2):not(#sy3) button:not(.syTypeSmallOk){min-height:44px!important;min-width:44px!important}}"
+    + "@media (pointer:coarse){html body button:not(.syTypeSmallOk){min-height:44px!important;min-width:44px!important}}"
     + "html body .r46Shard .syIco,html body .wishCoin46{min-width:20px;min-height:20px}"
     + "html body #run46 .rn46 .st46{width:24px!important;height:24px!important;right:-8px!important;bottom:-6px!important}html body #run46 .rn46 .st46 .syIco{width:20px!important;height:20px!important}"
-    + "html body:not(#sy0):not(#sy1):not(#sy2):not(#sy3):not(#sy4):not(#sy5) #start small,html body:not(#sy0):not(#sy1):not(#sy2):not(#sy3):not(#sy4):not(#sy5) #start b{text-shadow:0 0 4px rgb(var(--c-n6-rgb) / .7),0 0 1px rgb(var(--c-n6-rgb) / .9)!important}"
-    + "html body:not(#sy0):not(#sy1):not(#sy2):not(#sy3) .gachaActions46 button small{background:rgb(var(--c-n0-rgb) / .62)!important}"
     + "html body .syPlate{text-shadow:var(--sy-plate)!important}";
   var st = document.createElement("style"); st.id = "syType"; st.textContent = css; (document.head || document.documentElement).appendChild(st);
 
@@ -46,7 +44,7 @@
       var fs = parseFloat(c.fontSize), isAux = own.length <= 8 || e.tagName === "SMALL" || fs < body && own.length <= 14;
       var need = isAux ? 11 : body;
       if (fs < need - 0.25) { e.style.setProperty("font-size", isAux ? "var(--fs-aux)" : "var(--fs-body)", "important"); e.setAttribute("data-sy-fs", "1"); }
-      if (c.overflow !== "visible" && c.webkitLineClamp === "none" && (c.textOverflow !== "ellipsis" || c.whiteSpace !== "nowrap") && (e.scrollWidth > e.clientWidth + 2 || e.scrollHeight > e.clientHeight + 4)) { e.style.setProperty("text-overflow", "ellipsis", "important"); e.style.setProperty("white-space", "nowrap", "important"); if (!e.title) e.title = own; }
+      if (c.overflow !== "visible" && c.textOverflow !== "ellipsis" && e.scrollWidth > e.clientWidth + 2) { e.style.setProperty("text-overflow", "ellipsis", "important"); e.style.setProperty("white-space", "nowrap", "important"); if (!e.title) e.title = own; }
       var bd = backdrop(e), fg = rgb(c.color); if (!fg) continue;
       if (!bd) { if (c.textShadow === "none" && !(parseFloat(c.webkitTextStrokeWidth) > 0)) e.classList.add("syPlate"); continue; }
       var big = fs >= 24 || fs >= 18.66 && (+c.fontWeight || 400) >= 700, min = big ? 3 : 4.5;
