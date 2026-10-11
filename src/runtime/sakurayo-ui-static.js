@@ -211,6 +211,9 @@ html body:not(#sy0):not(#sy1) #run46 .rm46 .opts span{color:var(--c-n5)!importan
 html body:not(#sy0):not(#sy1) #run46 .rm46 .opts em{color:var(--c-primary)!important}
 html body:not(#sy0):not(#sy1) #run46 .rm46 .skip{border-radius:0!important;background:transparent!important;border:1px solid var(--c-line)!important;color:var(--c-n5)!important}
 @media (max-width:520px){html body:not(#sy0):not(#sy1) #run46 .rm46 .opts{grid-template-columns:1fr!important}html body:not(#sy0):not(#sy1) #run46 .rm46 .opts button{min-height:0!important;display:grid!important;grid-template-columns:44px 1fr;column-gap:12px;align-items:center}html body:not(#sy0):not(#sy1) #run46 .rm46 .opts i{grid-row:span 2;margin:0}}
+/* 性能：抽屉是近乎不透明的全屏面板，背后的大厅仍在跑动画、抽屉还对它做实时模糊，桌面端掉到 15fps。抽屉打开时暂停大厅动画、去掉抽屉的背景模糊 */
+html body:not(#sy0):not(#sy1) .drawer{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+html body:has(.drawer:not(.hidden)) #menu,html body:has(.drawer:not(.hidden)) #menu *,html body:has(.drawer:not(.hidden)) #menu *::before,html body:has(.drawer:not(.hidden)) #menu *::after{animation-play-state:paused!important}
 `;
   var st = document.createElement("style"); st.id = "syStatic"; st.textContent = css; document.head.appendChild(st);
   // 底栏选中态：最近打开的入口保持高亮，直到它的面板关掉
