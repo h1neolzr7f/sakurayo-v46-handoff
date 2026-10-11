@@ -207,6 +207,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 <script src="runtime/sakurayo-chronicle.js"></script>
 <script src="runtime/sakurayo-live.js"></script>
 <script src="runtime/sakurayo-rig.js"></script>
+<script src="runtime/sakurayo-mascot-video.js"></script>
 <script src="runtime/sakurayo-terminal.js"></script>
 <script src="runtime/sakurayo-command.js"></script>
 <script src="runtime/sakurayo-theme.js"></script>
@@ -7648,6 +7649,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   document.addEventListener("click",e=>{const t=e.target.closest("#night46 [data-nx],#night46 [data-na],#night46 [data-ngo],#night46 [data-ndaily],#night46 [data-nclaim]");if(!t)return;const el=$("#night46");
     if(t.dataset.nx!==undefined)el.classList.add("hidden");else if(t.dataset.na){nightAbyss46=Math.max(0,nightAbyss46+Number(t.dataset.na));openNight46();}
     else if(t.dataset.ngo!==undefined){el.classList.add("hidden");startRun46(undefined,{abyss:nightAbyss46});}else if(t.dataset.ndaily!==undefined){el.classList.add("hidden");startRun46(0,{daily:true});}else if(t.dataset.nclaim!==undefined){seasonClaim46();openNight46();}});
+  style37.textContent+=`.heroVid46{position:absolute;inset:0;pointer-events:auto}.heroVid46 video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:50% 100%;opacity:0;transition:opacity .18s linear}.heroVid46 video.on{opacity:1}`;
   style37.textContent+=`#night46{position:fixed;inset:0;z-index:130;background:#08050fcc;display:grid;place-items:center;padding:12px}#night46.hidden{display:none}#night46 .box{width:min(980px,100%);max-height:100%;overflow:auto;background:#1a1228;border:1px solid #ffffff22;border-radius:16px;padding:12px 16px}#night46 header{display:flex}#night46 header b{flex:1;font-size:20px}#night46 .x{background:none;border:0;color:#fff;font-size:20px}#night46 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:8px}#night46 .nc{background:#251a38;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;border:1px solid #ffffff18}#night46 .nc small{color:#c9b8e8}#night46 .nc b{font-size:17px}#night46 .nc p{font-size:12px;color:#d8cdea;flex:1;margin:0}#night46 .ab{display:flex;align-items:center;gap:10px}#night46 .ab button{width:34px;height:30px;border-radius:8px;border:0;background:#3a2c55;color:#fff}#night46 .go{padding:9px;border-radius:10px;border:0;background:linear-gradient(135deg,#6a3cff,#ff5fae);color:#fff;font-weight:bold}#night46 .go:disabled{background:#4a3c60;color:#bba}#night46 .daily{border-color:#ffd76a55}#night46 .bar{height:8px;background:#ffffff22;border-radius:4px;overflow:hidden}#night46 .bar i{display:block;height:100%;background:#ffd76a}`;
   function paintRunBtn46(){modeRow46();const b=$("#runBtn46");if(!b)return;const r=runLoad46();b.innerHTML=r?`<b>继续夜行</b><small>第 ${r.layer} 层 · 💠 ${r.shards}</small>`:`<b>夜行 · 肉鸽</b><small>三层地图 · 构筑跨节点</small>`;}
   (function(){const b=document.createElement("button");b.className="levelMapBtn46 runBtn46";b.id="runBtn46";b.type="button";modeRow46().prepend(b);paintRunBtn46();})();
@@ -7939,6 +7941,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       grantCheat46(){return grantCheat46();},
       liveSnapshot46(){return window.SakurayoLive?window.SakurayoLive.snapshot():null;},
       liveTrigger46(kind="tapBody"){return window.SakurayoLive?window.SakurayoLive.trigger(kind):null;},
+      mascotVideo46(){return window.SakurayoMascotVideo?window.SakurayoMascotVideo.state():null;},mascotVideoTap46(p){return window.SakurayoMascotVideo?window.SakurayoMascotVideo.tap(p):null;},
       rigSnapshot46(){return window.SakurayoRig?window.SakurayoRig.snapshot():null;},
       rigPlay46(n){return window.SakurayoRig?window.SakurayoRig.play(n):false;},
       rigTouch46(x,y){return window.SakurayoRig?window.SakurayoRig.touch(x,y):null;},
@@ -8105,6 +8108,14 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   /* 看板娘网格变形（runtime/sakurayo-rig.js；数据由 tools/anim-pipeline 一条命令生成）。失败时保留旧的图片层。 */
   let rigTap46 = [0, 0];
   function mountRig46(root, id, ok) {
+    const V = window.SakurayoMascotVideo, vbox = root.querySelector(".heroLiveBreath46");
+    // 视频看板娘优先：art/live_video/<角色>/clips.js 存在就播视频（循环 idle + 点击片段），否则走原 rig
+    if (V && ok && vbox && save.settings.fx !== 0) {
+      root.dataset.vid = id;
+      V.load(id, artUrl).then(has => { if (root.dataset.vid !== id) return; if (!has) { root.classList.remove("vid46"); return; }
+        window.SakurayoRig?.unmount(); root.querySelector("canvas.heroRig46")?.remove(); V.mount(vbox, id, artUrl); root.classList.add("rig46", "vid46"); });
+      if (V.has(id)) return;
+    } else { V?.unmount(); root.classList.remove("vid46"); }
     const R = window.SakurayoRig, box = root.querySelector(".heroLiveBreath46");
     let cv = root.querySelector("canvas.heroRig46");
     if (!R || !ok || !box) { root.classList.remove("rig46"); R?.unmount(); return; }
