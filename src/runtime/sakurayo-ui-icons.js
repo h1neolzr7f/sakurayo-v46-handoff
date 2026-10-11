@@ -6,6 +6,20 @@
   var S = 'stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"';
   var F = 'fill="currentColor"';
   var I = {
+    // —— 夜行地图节点（ART_PASS ⑤）——
+    n_fight: '<path d="M4 4l11 11M20 4 9 15" fill="none" ' + S + ' stroke-width="2.6"/><path d="M13.5 16.5l4-4 2 2-4 4ZM10.5 16.5l-4-4-2 2 4 4Z" ' + F + '/>',
+    n_elite: '<path d="M4 6l3 3 2-5 3 4 3-4 2 5 3-3-1.5 10h-13Z" ' + F + '/><path d="M6 19.5h12" fill="none" ' + S + '/>',
+    n_goal: '<path d="M6 3.5h11a2 2 0 0 1 2 2V19a2 2 0 0 1-2 2H6Z" ' + F + '/><path d="M9 8h6M9 11.5h6M9 15h4" fill="none" stroke="var(--c-n1)" stroke-width="1.8" stroke-linecap="round"/>',
+    n_event: '<circle cx="12" cy="12" r="9.5" ' + F + '/><path d="M9.3 9.2a2.8 2.8 0 1 1 3.9 2.6c-.8.4-1.2 1-1.2 1.9v.6" fill="none" stroke="var(--c-n1)" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="17.3" r="1.3" fill="var(--c-n1)"/>',
+    n_shop: '<path d="M4.5 8h15l-1.2 12.5H5.7Z" ' + F + '/><path d="M8.5 10V6.5a3.5 3.5 0 0 1 7 0V10" fill="none" ' + S + '/>',
+    n_shrine: '<path d="M2 9.5c3 0 6-2 10-6 4 4 7 6 10 6" fill="none" ' + S + '/><path d="M5.5 9.5h13v2h-13Z" ' + F + '/><path d="M7 11.5v9M17 11.5v9M10 14.5h4v6h-4Z" fill="none" ' + S + '/>',
+    n_sky: '<path d="M12 2l2.4 7.6L22 12l-7.6 2.4L12 22l-2.4-7.6L2 12l7.6-2.4Z" ' + F + '/>',
+    n_duel: '<path d="M3 5l7 7-7 7M21 5l-7 7 7 7" fill="none" ' + S + ' stroke-width="2.8"/>',
+    n_mask: '<path d="M4 5c5-2 11-2 16 0v6c0 5-4 9-8 9s-8-4-8-9Z" ' + F + '/><path d="M7.5 10l2.5 1.5M16.5 10 14 11.5M9.5 16c1.5 1 3.5 1 5 0" fill="none" stroke="var(--c-n1)" stroke-width="1.9" stroke-linecap="round"/>',
+    n_boss: '<path d="M3 4l4 5 5-6 5 6 4-5-1.5 13h-15Z" ' + F + '/><path d="M9 12.5h.01M15 12.5h.01" stroke="var(--c-n1)" stroke-width="2.6" stroke-linecap="round"/><path d="M5 20.5h14" fill="none" ' + S + '/>',
+    n_shard: '<path d="M12 2 18.5 9 12 22 5.5 9Z" ' + F + '/><path d="M5.5 9h13M12 2 9.5 9 12 22l2.5-13Z" fill="none" stroke="var(--c-n1)" stroke-width="1.2" stroke-linejoin="round"/>',
+    n_lock: '<rect x="5" y="10.5" width="14" height="10" rx="1.5" ' + F + '/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" ' + S + '/>',
+    n_check: '<path d="M4.5 12.5l4.5 4.5 10.5-10.5" fill="none" ' + S + ' stroke-width="3"/>',
     // 寻访：菱形框里的实心四芒星（召唤 / 抽卡）
     gacha: '<path d="M12 2.5 21.5 12 12 21.5 2.5 12Z" fill="none" ' + S + '/><path d="M12 6.5 13.6 10.4 17.5 12 13.6 13.6 12 17.5 10.4 13.6 6.5 12 10.4 10.4Z" ' + F + '/>',
     // 仓库：实心立方体（箱子）

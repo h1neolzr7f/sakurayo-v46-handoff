@@ -74,6 +74,43 @@
     + ".sykBtn.pri::before{background:var(--c-primary)}.sykBtn.acc::before{background:var(--c-accent)}"
     + ".sykBtn.on::before{background:var(--c-primary-strong);filter:drop-shadow(0 0 8px var(--c-primary))}.sykBtn.on{animation:sykGlow 1s ease-in-out infinite alternate}"
     + ".sykBtn:active::after,.sykBtn.down::after{background:linear-gradient(160deg,rgb(var(--c-primary-rgb) / .55),rgb(var(--c-n0-rgb) / .9))}"
+    /* ART_PASS ⑤ 夜行地图：节点按类型分形状和颜色（杀戮尖塔 / 哈迪斯式），可走 / 已走 / 锁定三态；连线加粗发光，已走路径高亮；顶栏 v2 */
+    + "html body #run46 .rn46{--nc:var(--c-n5);--ncr:var(--c-n5-rgb,184 190 201);width:62px;height:62px;border:0!important;background:none!important;box-shadow:none!important;border-radius:0!important;isolation:isolate;overflow:visible;color:var(--c-n6);opacity:1;filter:none;animation:none}"
+    + "html body #run46 .rn46::before,html body #run46 .rn46::after{content:'';position:absolute;inset:0;z-index:-1;clip-path:var(--shape);transition:background .2s}"
+    + "html body #run46 .rn46::before{background:var(--nc)}html body #run46 .rn46::after{inset:3px;background:linear-gradient(160deg,color-mix(in oklab,var(--nc) 26%,var(--c-n1)),var(--c-n0))}"
+    + "html body #run46 .rn46 i{width:28px;height:28px;display:grid;place-items:center;color:var(--c-n6);font-size:22px;filter:drop-shadow(0 0 3px var(--nc))}html body #run46 .rn46 i .syIco{width:28px;height:28px;display:block;stroke-width:2.6}html body #run46 .rn46 i .syIco *{stroke-width:2.6}"
+    + "html body #run46 .rn46 span{position:absolute;top:calc(100% + 3px);left:50%;transform:translateX(-50%);white-space:nowrap;padding:1px 8px;font-size:11px;font-weight:800;color:var(--c-n6);background:rgb(var(--c-n0-rgb) / .78);clip-path:polygon(5px 0,100% 0,calc(100% - 5px) 100%,0 100%)}"
+    + "html body #run46 .rn46 .st46{position:absolute;right:-4px;bottom:-2px;width:18px;height:18px;display:grid;place-items:center;border-radius:50%;background:var(--c-n0);border:1.5px solid currentColor;font-style:normal}html body #run46 .rn46 .st46 .syIco{width:12px;height:12px}"
+    + "html body #run46 .rn46.t-fight{--shape:polygon(50% 0,100% 50%,50% 100%,0 50%)}"
+    + "html body #run46 .rn46.t-elite{--nc:var(--c-danger);--shape:polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%)}"
+    + "html body #run46 .rn46.t-goal{--nc:var(--c-warn);--shape:polygon(20% 0,100% 0,100% 80%,80% 100%,0 100%,0 20%)}"
+    + "html body #run46 .rn46.t-event{--nc:var(--c-rare-sr);--shape:circle(50% at 50% 50%)}"
+    + "html body #run46 .rn46.t-shop{--nc:var(--c-rare-ssr);--shape:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%)}"
+    + "html body #run46 .rn46.t-shrine{--nc:var(--c-ok);--shape:polygon(50% 0,100% 36%,100% 100%,0 100%,0 36%)}"
+    + "html body #run46 .rn46.t-sky{--nc:var(--c-primary-strong);--shape:polygon(50% 0,100% 28%,84% 100%,16% 100%,0 28%)}"
+    + "html body #run46 .rn46.t-duel{--nc:var(--c-accent);--shape:polygon(25% 4%,75% 4%,100% 50%,75% 96%,25% 96%,0 50%)}"
+    + "html body #run46 .rn46.t-mask{--nc:var(--c-rare-sr);--shape:polygon(0 0,100% 0,100% 55%,50% 100%,0 55%)}"
+    + "html body #run46 .rn46.t-boss{--nc:var(--c-danger);width:88px;height:88px;--shape:polygon(50% 0,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%)}html body #run46 .rn46.t-boss i,html body #run46 .rn46.t-boss i .syIco{width:40px;height:40px}"
+    + "html body #run46 .rn46.t-boss::after{inset:5px}html body #run46 .rn46.t-boss span{font-size:13px;color:var(--c-danger)}"
+    /* 三态 */
+    + "html body #run46 .rn46.can{filter:drop-shadow(0 0 10px var(--nc));animation:rn46can 1.4s ease-in-out infinite}html body #run46 .rn46.can::after{background:radial-gradient(circle at 50% 40%,color-mix(in oklab,var(--nc) 38%,var(--c-n1)),var(--c-n0))}"
+    + "@keyframes rn46can{0%,100%{filter:drop-shadow(0 0 4px var(--nc))}50%{filter:drop-shadow(0 0 14px var(--nc))}}"
+    + "html body #run46 .rn46.been{opacity:.9}html body #run46 .rn46.been::before{background:var(--c-primary)}html body #run46 .rn46.been::after{background:color-mix(in oklab,var(--c-primary) 30%,var(--c-n1))}html body #run46 .rn46.been i{color:var(--c-primary-strong)}html body #run46 .rn46.been .st46{color:var(--c-primary-strong)}"
+    + "html body #run46 .rn46.lock{opacity:.78}html body #run46 .rn46.lock::before{background:var(--c-n3)}html body #run46 .rn46.lock::after{background:var(--c-n1)}html body #run46 .rn46.lock i{filter:none}html body #run46 .rn46.lock i{color:var(--c-n4)}html body #run46 .rn46.lock span{color:var(--c-n4)}html body #run46 .rn46.lock .st46{color:var(--c-n4);border-color:var(--c-n3)}"
+    + "html body #run46 .rn46.here::before{background:var(--c-n6)}html body #run46 .rn46.here{filter:drop-shadow(0 0 12px rgb(var(--c-primary-rgb) / .9))}"
+    + "html body #run46 .rn46.pick{transform:translate(-50%,-50%) scale(1.16);filter:drop-shadow(0 0 16px var(--nc))}html body #run46 .rn46.pick::before{background:var(--c-n6)}"
+    + "html body #run46 .rn46 .me{bottom:calc(100% + 6px);border-color:var(--c-n6);box-shadow:0 0 12px rgb(var(--c-primary-rgb) / .9)}"
+    /* 连线：底层宽发光 + 上层实线 */
+    + "html body #run46 .r46Field path{fill:none;vector-effect:non-scaling-stroke;stroke-linecap:round}"
+    + "html body #run46 .r46Field path.lock{stroke:rgb(var(--c-n4-rgb) / .55);stroke-width:2.5;stroke-dasharray:2 7}html body #run46 .r46Field path.glow.lock{stroke:transparent}"
+    + "html body #run46 .r46Field path.open{stroke:var(--c-accent);stroke-width:4;stroke-dasharray:10 8;animation:r46dash 1s linear infinite}html body #run46 .r46Field path.glow.open{stroke:rgb(var(--c-accent-rgb) / .28);stroke-width:12;stroke-dasharray:none;animation:none}"
+    + "html body #run46 .r46Field path.walk{stroke:var(--c-primary-strong);stroke-width:5;stroke-dasharray:none}html body #run46 .r46Field path.glow.walk{stroke:rgb(var(--c-primary-rgb) / .35);stroke-width:16}"
+    + "@keyframes r46dash{to{stroke-dashoffset:-18}}"
+    /* 顶栏 v2 */
+    + "html body #run46 .r46Hp,html body #run46 .r46Shard,html body #run46 .r46Relics{border-radius:0!important;border:1px solid var(--c-n3)!important;background:rgb(var(--c-n1-rgb) / .9)!important;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);padding:6px 18px!important}"
+    + "html body #run46 .r46Hp em{color:var(--c-primary-strong)!important;font:900 12px var(--sy-font-title,sans-serif)}html body #run46 .r46Hp .sykBar{width:150px;height:10px}html body #run46 .r46Hp>b{font:800 13px var(--sy-font-title,sans-serif);color:var(--c-n6)}"
+    + "html body #run46 .r46Shard{display:flex;align-items:center;gap:6px;color:var(--c-n6)}html body #run46 .r46Shard .syIco{width:18px;height:18px;color:var(--c-primary-strong)}html body #run46 .r46Shard b{font:900 16px var(--sy-font-title,sans-serif)}html body #run46 .r46Shard small{color:var(--c-n5)!important}"
+    + "html body #run46 .r46Layers i{border-radius:0!important;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);background:var(--c-n2)!important;color:var(--c-n5)!important;border:0!important}html body #run46 .r46Layers i.on{background:var(--c-primary)!important;color:var(--c-on-primary)!important;box-shadow:none!important}html body #run46 .r46Layers i.done{background:var(--c-n4)!important;color:var(--c-n0)!important}"
     + "@keyframes sykGlow{from{filter:drop-shadow(0 0 2px rgb(var(--c-primary-rgb) / .6))}to{filter:drop-shadow(0 0 10px rgb(var(--c-primary-rgb) / 1))}}";
   if (typeof document !== "undefined" && !document.getElementById("sykCss")) { var st = document.createElement("style"); st.id = "sykCss"; st.textContent = CSS; (document.head || document.documentElement).appendChild(st); }
   global.SyKit = { T: T, cut: cut, hex: hex, diamond: diamond, bar: bar, meter: meter, panel: panel };

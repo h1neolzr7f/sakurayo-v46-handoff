@@ -285,6 +285,9 @@
   /* —— 渲染 —— */
   /* 弹型贴图缓存（LuaSTG 式分层：彩色外发光 + 彩色弹体 + 白色弹芯），按 弹型+颜色 预渲染一次 */
   var BSPR = {};
+  /* —— 渲染 —— */
+  /* 弹型贴图缓存（LuaSTG 式分层：彩色外发光 + 彩色弹体 + 白色弹芯），按 弹型+颜色 预渲染一次 */
+  var BSPR = {};
   function bulletSprite(ty, col) {
     var key = ty + col; if (BSPR[key]) return BSPR[key]; if (typeof document === "undefined") return null;
     var R = ty === "big" ? 26 : ty === "orb" ? 15 : ty === "laser" ? 12 : 14, c = document.createElement("canvas"), L = ty === "laser" ? BT.laser.len + 16 : R * 2 + 16;
@@ -313,15 +316,15 @@
     g.setTransform(sc, 0, 0, sc, ox, oy); g.save(); g.beginPath(); g.rect(0, 0, FW, FH); g.clip();
     if (bg && bg.width) { var th = FW / bg.width * bg.height, y0 = this.bgY % th; for (var k = -1; k * th + y0 < FH; k++) g.drawImage(bg, 0, Math.floor(y0 + k * th), FW, Math.ceil(th) + 1); } else { g.fillStyle = "#120c22"; g.fillRect(0, 0, FW, FH); }
     var Bo = this.boss, spell = Bo && Bo.card && !Bo.card.non;
-    g.fillStyle = spell ? "rgba(10,4,24,.62)" : "rgba(6,4,14,.3)"; g.fillRect(0, 0, FW, FH);
-    if (spell) { g.save(); g.translate(Bo.x, Bo.y); g.rotate(t * 0.4); g.strokeStyle = "rgba(255,120,180,.28)"; g.lineWidth = 2; for (k = 0; k < 3; k++) { g.beginPath(); g.arc(0, 0, 90 + k * 40, 0, TAU); g.stroke(); } for (k = 0; k < 6; k++) { g.rotate(TAU / 6); g.beginPath(); g.moveTo(0, -170); g.lineTo(147, 85); g.stroke(); } g.restore(); }
+    g.fillStyle = spell ? TKS("n0", 0.62) : TKS("n0", 0.3); g.fillRect(0, 0, FW, FH);
+    if (spell) { g.save(); g.translate(Bo.x, Bo.y); g.rotate(t * 0.4); g.strokeStyle = TKS("accent", 0.28); g.lineWidth = 2; for (k = 0; k < 3; k++) { g.beginPath(); g.arc(0, 0, 90 + k * 40, 0, TAU); g.stroke(); } for (k = 0; k < 6; k++) { g.rotate(TAU / 6); g.beginPath(); g.moveTo(0, -170); g.lineTo(147, 85); g.stroke(); } g.restore(); }
     var spr = function (name, x, y, s, flash, alt) { var im = img[name]; if ((!im || !im.width) && alt) im = img[alt]; if (!im || !im.width) { g.fillStyle = "#c66"; g.beginPath(); g.arc(x, y, s / 3, 0, TAU); g.fill(); return; } var w = s, h = s * im.height / im.width; g.drawImage(im, x - w / 2, y - h / 2, w, h); if (flash > 0) { g.globalAlpha = 0.4; g.globalCompositeOperation = "lighter"; g.drawImage(im, x - w / 2, y - h / 2, w, h); g.globalCompositeOperation = "source-over"; g.globalAlpha = 1; } };
     this.E.forEach(function (e) { spr(e.spr, e.x, e.y, e.size, e.flash); });
     if (Bo) { g.save(); var bob = Math.sin(t * 2) * 6, bk = Bo.spr.replace("boss_girl_", "boss"), bdx = Bo.x - (Bo.lx == null ? Bo.x : Bo.lx); Bo.lx = Bo.x; Bo.sv = (Bo.sv || 0) * 0.85 + bdx * 0.15;
       var bbt = Bo.sv < -0.6 ? -4 : Bo.sv > 0.6 ? 4 : 0; Bo.bk = (Bo.bk || 0); Bo.bkA = (Bo.bkA || 0) + 1; if (Bo.bkA >= 2) { Bo.bkA = 0; Bo.bk += Math.sign(bbt - Bo.bk); }
       var bf = Bo.bk === 0 ? "idle" + (Math.floor(t * 8) % 8) : (Bo.bk < 0 ? "left" : "right") + (Math.abs(Bo.bk) === 4 ? "" : Math.abs(Bo.bk)); spr("chibi_" + bk + "_" + bf, Bo.x, Bo.y + bob, Bo.size, Bo.flash, Bo.spr); g.restore(); }
     // 道具
-    this.items.forEach(function (it) { if (it.k === "pt") { g.fillStyle = "#9fe6ff"; g.fillRect(it.x - 2, it.y - 2, 4, 4); return; } g.fillStyle = it.k === "p" ? "#ff4f6a" : "#4fd27a"; g.fillRect(it.x - 7, it.y - 7, 14, 14); g.fillStyle = "#fff"; g.font = "bold 11px sans-serif"; g.textAlign = "center"; g.fillText(it.k === "p" ? "P" : "B", it.x, it.y + 4); });
+    this.items.forEach(function (it) { if (it.k === "pt") { g.fillStyle = TKS("primary-strong", 1); g.fillRect(it.x - 2, it.y - 2, 4, 4); return; } g.fillStyle = it.k === "p" ? TKS("danger", 1) : TKS("ok", 1); g.fillRect(it.x - 7, it.y - 7, 14, 14); g.fillStyle = TKS("n6", 1); g.font = "bold 11px sans-serif"; g.textAlign = "center"; g.fillText(it.k === "p" ? "P" : "B", it.x, it.y + 4); });
     // 我方弹
     var tint = this.form.tint || (this.route === "tech" ? "#5fd8ff" : this.route === "bio" ? "#ff5f7a" : this.ch.col), core = this.form.core || "#fff4fa";
     g.globalCompositeOperation = "lighter";
@@ -350,7 +353,7 @@
       if (rot) { g.save(); g.translate(b.x, b.y); g.rotate(rot); g.drawImage(sp, -sp.width / 2, -sp.height / 2); g.restore(); } else g.drawImage(sp, b.x - sp.width / 2, b.y - sp.height / 2); });
     g.globalCompositeOperation = "source-over";
     // 低速：判定点 + 旋转法阵
-    if (P.focus) { g.save(); g.translate(P.x, P.y); g.rotate(t * 2); g.strokeStyle = tint; g.globalAlpha = 0.75; g.lineWidth = 1.5; g.beginPath(); g.arc(0, 0, 26, 0, TAU); g.stroke(); g.strokeRect(-17, -17, 34, 34); g.restore(); g.globalAlpha = 1; g.fillStyle = "#ff2244"; g.beginPath(); g.arc(P.x, P.y, P.hit + 2.5, 0, TAU); g.fill(); g.fillStyle = "#fff"; g.beginPath(); g.arc(P.x, P.y, P.hit, 0, TAU); g.fill(); }
+    if (P.focus) { g.save(); g.translate(P.x, P.y); g.rotate(t * 2); g.strokeStyle = tint; g.globalAlpha = 0.75; g.lineWidth = 1.5; g.beginPath(); g.arc(0, 0, 26, 0, TAU); g.stroke(); g.strokeRect(-17, -17, 34, 34); g.restore(); g.globalAlpha = 1; g.fillStyle = TKS("danger", 1); g.beginPath(); g.arc(P.x, P.y, P.hit + 2.5, 0, TAU); g.fill(); g.fillStyle = TKS("n6", 1); g.beginPath(); g.arc(P.x, P.y, P.hit, 0, TAU); g.fill(); }
     this.FX.forEach(function (f) { var k3 = f.t / f.life; if (f.spark) { g.fillStyle = "#fff"; g.globalAlpha = 1 - k3; g.fillRect(f.x - 2, f.y - 2, 4, 4); g.globalAlpha = 1; return; } g.strokeStyle = f.col; g.globalAlpha = (f.big ? 0.35 : 0.6) * (1 - k3); g.lineWidth = f.big ? 16 : 4; g.beginPath(); g.arc(f.x, f.y, f.r + (f.big ? 700 : 60) * k3, 0, TAU); g.stroke(); g.globalAlpha = 1; });
     // 符卡 / Bomb 宣言特写（东方式 cut-in）：斜切面板从侧边滑入、停留、淡出，约 1.1s
     if (this.cut && this.t - this.cut.at < 1.1 && img[this.cut.k] && img[this.cut.k].width) { var ce = this.t - this.cut.at, ci = img[this.cut.k], cw = FW * 0.62, chh = cw * ci.height / ci.width, slide = ce < 0.2 ? (1 - ce / 0.2) : 0, ca = ce > 0.8 ? (1.1 - ce) / 0.3 : 1, cx0 = this.cut.me ? -cw * slide : FW - cw + cw * slide, cy0 = this.cut.me ? FH * 0.3 : FH * 0.08;
