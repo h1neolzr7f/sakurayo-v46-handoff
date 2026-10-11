@@ -185,6 +185,15 @@ html body:not(#sy0):not(#sy1) #dialogue #dialogueContinue48{float:right;min-widt
 html body:not(#sy0):not(#sy1) #dialogue #dialogueHint{color:var(--c-n5)!important;font-size:12px!important;letter-spacing:.12em;line-height:36px}
 html body:not(#sy0):not(#sy1) #dialogue .speaker{background:var(--c-accent)!important;color:var(--c-on-accent)!important;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);border-radius:0!important}
 html body:not(#sy0):not(#sy1) #dialogue .dialogueText{color:var(--c-n6)!important;font-size:15px;line-height:1.75}
+/* 竖屏窄屏 HUD：波次条、任务提示、暂停键、帧率标签原来和顶部信息栏互相压住，改成在顶栏下面依次排开 */
+@media (max-width:520px){html body #hud .wave{left:10px!important;right:10px!important;width:auto!important;top:calc(env(safe-area-inset-top,0px) + 96px)!important;transform:none!important}
+html body #hud #mission{position:fixed!important;left:10px!important;right:64px!important;width:auto!important;top:calc(env(safe-area-inset-top,0px) + 122px)!important;transform:none!important}
+html body #hud #pause{position:fixed!important;right:10px!important;top:calc(env(safe-area-inset-top,0px) + 122px)!important}
+html body #hud #perf{position:fixed!important;right:62px!important;left:auto!important;top:calc(env(safe-area-inset-top,0px) + 146px)!important}
+html body #hud #minimap46{top:calc(env(safe-area-inset-top,0px) + 172px)!important}
+html body .banter{top:calc(env(safe-area-inset-top,0px) + 252px)!important;bottom:auto!important;left:10px!important;right:10px!important;width:auto!important;transform:none!important} /* 竖屏对白气泡原来贴在技能键上 */}
+/* 技能键文字：标签放在菱形键下方居中，不再溢出到键外 */
+html body #hud .act{font-size:10px!important;line-height:1.15!important;letter-spacing:0!important;white-space:normal;word-break:keep-all;padding:0 6px!important}
 `;
   var st = document.createElement("style"); st.id = "syStatic"; st.textContent = css; document.head.appendChild(st);
   // 底栏选中态：最近打开的入口保持高亮，直到它的面板关掉
