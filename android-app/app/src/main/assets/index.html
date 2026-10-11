@@ -15043,8 +15043,11 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function npcFaceSrc47(sp,kind){
     const npc=NPC_ART47[sp];if(!npc)return null;
     const mood=({boss:"serious",phase:"surprised",ending:"smile",win:"smile"})[kind]||"calm";
-    // 对话框立绘区用 avg_* 半身（竖图），不要用 face_/portrait 近景方图（会被裁成只剩眼睛）
-    for(const m of [mood,"calm","serious"]){const im=artImage(`npc/${npc}/avg_${m}.webp`);if(artReady(im))return im.src;}
+    // 对话框立绘区用 avg_* 半身（竖图）；仅对确有素材的 NPC 请求，避免 404 污染控制台
+    if(["rin","miko","guard","sakuya","soichi","tanuki","yoi"].includes(npc)){
+      const avgMood=mood==="serious"?"serious":"calm";
+      for(const m of [avgMood,"calm"]){const im=artImage(`npc/${npc}/avg_${m}.webp`);if(artReady(im))return im.src;}
+    }
     const por=artImage(`npc/${npc}/portrait.webp`);if(artReady(por))return por.src;
     for(const m of [mood,"calm"]){const im=artImage(`npc/${npc}/face_${m}.webp`);if(artReady(im))return im.src;}
     return null;
@@ -15056,11 +15059,19 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     paint();
     // 立绘第一次用到时还没加载完，会退回到占位剪影（还会画成玩家角色）。等图片加载完再补画一次。
     const npc=NPC_ART47[spk],moodK=({boss:"serious",phase:"surprised",ending:"smile",win:"smile"})[kind]||"calm";
-    const want=npc?[artImage(`npc/${npc}/avg_${moodK}.webp`),artImage(`npc/${npc}/avg_calm.webp`),artImage(`npc/${npc}/portrait.webp`),artImage(`npc/${npc}/face_${moodK}.webp`)]:[artImage(charArtPath35(c,"dialogue",sk)),artImage(`characters/${c.id}/default/face_${moodK}.webp`)];
+    const hasAvg=npc&&["rin","miko","guard","sakuya","soichi","tanuki","yoi"].includes(npc);
+    const want=npc?(hasAvg?[artImage(`npc/${npc}/avg_${moodK==="serious"?"serious":"calm"}.webp`),artImage(`npc/${npc}/avg_calm.webp`),artImage(`npc/${npc}/portrait.webp`),artImage(`npc/${npc}/face_${moodK}.webp`)]:[artImage(`npc/${npc}/portrait.webp`),artImage(`npc/${npc}/face_${moodK}.webp`),artImage(`npc/${npc}/face_calm.webp`)]):[artImage(charArtPath35(c,"dialogue",sk)),artImage(`characters/${c.id}/default/face_${moodK}.webp`)];
     want.forEach(im=>{if(im&&!artReady(im))im.addEventListener("load",()=>{if(!$("#dialogue").classList.contains("hidden"))paint();},{once:true});});
     return _showDialogue35(mapLines35(lines),done,kind);};
   // 进游戏后空闲时预载剧情 NPC 立绘，避免第一次对话时闪占位图
-  setTimeout(()=>{try{Object.values(NPC_ART47).forEach(n=>{["calm","serious"].forEach(m=>artImage(`npc/${n}/avg_${m}.webp`));artImage(`npc/${n}/portrait.webp`);["calm","serious","smile","surprised"].forEach(m=>artImage(`npc/${n}/face_${m}.webp`));});}catch(e){}},2500);
+  setTimeout(()=>{try{
+    const hasAvg=new Set(["rin","miko","guard","sakuya","soichi","tanuki","yoi"]);
+    Object.values(NPC_ART47).forEach(n=>{
+      if(hasAvg.has(n))["calm","serious"].forEach(m=>artImage(`npc/${n}/avg_${m}.webp`));
+      artImage(`npc/${n}/portrait.webp`);
+      ["calm","serious","smile","surprised"].forEach(m=>artImage(`npc/${n}/face_${m}.webp`));
+    });
+  }catch(e){}},2500);
   const _showBanter35=showBanter;
   showBanter=function(lines,force=false){return _showBanter35(mapLines35(typeof lines==="string"?localize35(lines):lines),force);};
   const _ending35=endingData;

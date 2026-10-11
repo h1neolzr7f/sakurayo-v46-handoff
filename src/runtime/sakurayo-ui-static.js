@@ -191,7 +191,9 @@ html body #hud #mission{position:fixed!important;left:10px!important;right:64px!
 html body #hud #pause{position:fixed!important;right:10px!important;top:calc(env(safe-area-inset-top,0px) + 122px)!important}
 html body #hud #perf{position:fixed!important;right:62px!important;left:auto!important;top:calc(env(safe-area-inset-top,0px) + 146px)!important}
 html body #hud #minimap46{top:calc(env(safe-area-inset-top,0px) + 172px)!important}
-html body .banter{top:calc(env(safe-area-inset-top,0px) + 252px)!important;bottom:auto!important;left:10px!important;right:10px!important;width:auto!important;transform:none!important} /* 竖屏对白气泡原来贴在技能键上 */}
+html body .banter{top:calc(env(safe-area-inset-top,0px) + 252px)!important;bottom:auto!important;left:10px!important;right:10px!important;width:auto!important;transform:none!important} /* 竖屏对白气泡原来贴在技能键上 */
+html body:not(#sy0):not(#sy1) #toast,html body:not(#sy0):not(#sy1) #toast.show{top:calc(env(safe-area-inset-top,0px) + 200px)!important;bottom:auto!important;transform:translateX(-50%)!important} /* 证词 toast 避开重排后的 mission */
+html body:not(#sy0):not(#sy1) #bossRule39{top:calc(env(safe-area-inset-top,0px) + 200px)!important;bottom:auto!important} /* Boss 规则条同样避开 mission */}
 /* 技能键文字：标签放在菱形键下方居中，不再溢出到键外 */
 html body #hud .act{font-size:10px!important;line-height:1.15!important;letter-spacing:0!important;white-space:normal;word-break:keep-all;padding:0 6px!important}
 /* 夜行地图弹窗（遗物、事件、商店、Boss 三选一）：外层全屏遮罩原来也套了面板样式，右上角多出一个方框；卡片还是旧版紫色圆角。统一成 v2 */

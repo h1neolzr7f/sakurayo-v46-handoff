@@ -39,3 +39,4 @@
 | 26 | S1 | 缘日射的（矮横屏） | 「开一局」键被挤出屏幕底部，点不到 | 画布按 72vh 固定高度，矮屏下占满后没给页脚留位置 | 已修：矮屏下弹窗用 flex，画布 flex:1，页脚固定在底部 |
 | 27 | S1 | AVG 剧情 | 立绘只露出眼睛和耳机，看不到半身 | 对话框用了 face_/portrait 近景方图，再加 cover 裁切 | 已修：优先用 avg_* 半身竖图；立绘区按高度铺满，从顶部对齐 |
 | 28 | S1 | 回归 / 控制台 | 预载不存在的 avg_*.webp（镜零、剑主、smile 情绪）产生 5 条 404，browser_smoke 失败 | 预载列表没有对照实际素材 | 已修：只对确有 avg 的 NPC 请求 calm/serious，其余走 portrait/face |
+| 29 | S1 | 竖屏战斗 / 回归 | 证词 toast、Boss 规则条压住 mission（竖屏 HUD 重排后的副作用） | toast/规则条仍按旧的 136px 顶距定位 | 已修：窄屏下 toast 和 bossRule39 下移到 200px，避开 mission |
