@@ -3606,6 +3606,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     var m = MV[name]; if (!m) return false; var E = this.opp(f);
     if (m.meter && f.meter < 1) return false; if (m.meter) f.meter -= 1;
     if (m.c === 2 && f.mv && f.mv.c === 2) f.chain++; else if (!f.mv || f.mv.c !== 2) f.chain = 1;
+    if (m.h && m.h !== "throw") { var Eh = this.opp(f).habit; if (Eh) { if (m.h === "low") Eh.low++; else Eh.high++; } }
     f.mv = m; f.mn = name; f.mf = 0; f.hit = false; f.st = m.air ? "air" : "move"; f.multi = 0;
     if (m.inv) f.inv = m.inv; if (name === "hp" && f.o.armorHP && !f.armorUsed) { f.armor = 1; }
     if (m.su) { this.freeze = 36; this.fx.push({ k: "super", f: f, t: 0, life: 0.9 }); this.banner = { s: f === this.P ? this.ch.S + (this.route === "tech" ? " · MAX" : "") : CH[f.cid].S, t: 0, life: 1.1, side: f.side }; }
@@ -3657,17 +3658,23 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     var eAtt = pe && pe.mv && pe.mf < pe.mvst + pe.mvac, eLow = pe && pe.h === "low", eOver = pe && pe.h === "over", eAir = pe && pe.y < -10, eRec = E.mv && E.mf >= E.mv.st + E.mv.ac && !E.hit && E.y === 0;
     var meterOK = f.meter >= 1;
     if (f.st === "thrown") { if (r() < B.tech) out.btns.push("T"); return out; }
-    if (f.st === "down") { if (r() < 0.3) out.btns.push("L"); return out; }
+    if (f.st === "down") { if (B.tele && dist < 140 && f.stT >= 10 && !f.wake) { f.wake = 1; out.btns.push(f.meter >= 1 && r() < 0.5 ? "SU" : "DP"); return this.aiFix(f, out); } if (r() < 0.3) out.btns.push("L"); return out; } // Boss 起身无敌技（升龙 / 超必）
+    f.wake = 0;
     if (f.st === "block" || f.st === "hitstun") { out.dir = f.blockH === "low" ? 1 : 4; if (f.st === "block" && meterOK && f.stT > 3 && r() < 0.012 * (B.tele ? 2 : 1)) { out.dir = 6; out.btns.push("T"); } return out; }
     // 连段确认：命中后在取消窗口里接必杀 / 超必
     if (f.st === "move" && f.hit && f.mv && !f.comboPlan) { f.comboPlan = r() < B.combo ? (meterOK && (f.mv.sp || r() < 0.5) ? "S" : f.mv.c === 2 && f.chain < 2 ? (r() < 0.5 ? "chain" : "hp") : "sp") : "none"; }
     if (f.st === "move" && f.hit && f.comboPlan && f.comboPlan !== "none" && f.mf >= f.mv.st + 1) { var pl = f.comboPlan; f.comboPlan = "none";
       if (pl === "S" && this.canCancel(f, "su")) out.btns.push("SU"); else if (pl === "chain") out.btns.push(f.mn === "clp" ? "L" : "L"), out.dir = f.mn === "clp" ? 2 : 5; else if (pl === "hp") out.btns.push("H"); else if (this.canCancel(f, "sp")) { out.btns.push("SP"); if (dist > 140 || !CH[f.cid].proj) { out.btns.pop(); out.dir = 4; out.btns.push("B_"); } } return this.aiFix(f, out); }
     if (f.st !== "move") f.comboPlan = null;
+    if (B.tele && f.st === "move" && f.mv && f.mv.c === 2 && E.st === "block" && f.mf >= f.mv.st + f.mv.ac && !f.trap) { f.trap = 1; out.btns.push(r() < 0.5 ? "H" : "L"); out.dir = r() < 0.4 ? 2 : 5; return this.aiFix(f, out); } // Boss 压制：被防后接打帧陷阱
+    if (f.st !== "move") f.trap = 0;
     if (!this.actionable(f) && f.st !== "air") return out;
     if (f.st === "air") { if (!f.mv && dist < 120 && f.vy > -100 && r() < 0.25) out.btns.push(r() < 0.6 ? "H" : "L"); return out; }
-    // 防御（读段）
-    if (eAtt && dist < 230 && r() < B.block) { out.dir = eLow ? 1 : eOver ? 4 : (r() < 0.5 ? 4 : 1); if (eOver) out.dir = 4; if (eLow) out.dir = 1; return out; }
+    // Boss 识破飞行道具：来弹时跳过去（顺势跳攻）或用无敌升龙穿过；有气时直接超必杀穿弹
+    if (B.tele) { var inc = this.shots.find(function (q) { return q.owner !== f && Math.abs(q.x - f.x) < 260 && (q.x - f.x) * q.vx < 0; }); if (inc && r() < 0.5) { if (f.meter >= 1 && dist < 330 && r() < 0.35) out.btns.push("SU"); else if (Math.abs(inc.x - f.x) < 150 && r() < 0.5) out.btns.push("DP"); else out.dir = 9; return this.aiFix(f, out); } }
+    // 防御（读段）；Boss 记录玩家出招的高低段习惯，猜段按习惯来（学习型防御），第 2 局起反应更快
+    var habit = f.habit || (f.habit = { low: 1, high: 1 }), blk = B.block + (B.tele ? 0.06 * (this.round - 1) : 0);
+    if (eAtt && dist < 230 && r() < blk) { out.dir = eLow ? 1 : eOver ? 4 : (B.tele ? (habit.low > habit.high ? 1 : 4) : (r() < 0.5 ? 4 : 1)); if (eOver) out.dir = 4; if (eLow) out.dir = 1; return out; }
     // 对空
     if (eAir && dist < 210 && dist > 30 && E.vy > -200 && (E.x - f.x) * f.face > 0 && r() < B.aa * 0.12) { out.btns.push("DP"); return this.aiFix(f, out); }
     // 确反
@@ -3822,9 +3829,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       if (p === "lp" || p === "clp") return ph === 1 ? p : (m.crouch ? "crouch" : "idle");
       if (p === "jatk") return ph === 0 ? "jump" : "jatk";
       if (p === "super") return ph === 0 ? "special" : "super";
-      return ph === 0 ? (m.crouch ? "crouch" : p === "dp" ? "crouch" : "idle_b") : p; }
-    if (f.st === "air" || f.st === "backdash") return "jump"; if (f.st === "jsquat" || f.st === "crouch") return "crouch";
-    if (f.st === "walk" || f.st === "dash") return Math.floor(this.frame / 7) % 2 ? "walk1" : "walk2";
+      if (ph === 0) return m.crouch ? "crouch" : p === "dp" ? "crouch" : p === "hp" || p === "rush" ? "hp_s" : p === "special" ? "special_s" : "idle_b";
+      return p; }
+    if (f.st === "air" || f.st === "backdash") return f.vy < -300 ? "jump_up" : f.vy > 250 ? "jump_fall" : "jump"; if (f.st === "jsquat" || f.st === "crouch") return "crouch";
+    if (f.st === "dash") return "dash";
+    if (f.st === "walk") { var wi = Math.floor(this.frame / 5) % 8; if (f.vx * f.face < 0) wi = 7 - wi; return "walk_" + wi; } // 8 帧走路循环（后退倒放）
     return ["idle", "idle_m", "idle_b", "idle_m"][Math.floor(this.frame / 12) % 4]; // 待机呼吸：两张关键帧 + RIFE 中间帧（位移小，无重影）
   };
   Game.prototype.draw = function (g, img, W, H) {
@@ -3835,7 +3844,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     var sup = this.fx.find(function (q) { return q.k === "super"; }); if (sup || this.freeze > 0) { g.fillStyle = "rgba(8,0,20,.72)"; g.fillRect(0, 0, FW, FH); }
     g.fillStyle = "rgba(0,0,0,.22)"; g.fillRect(0, GROUND, FW, FH - GROUND);
     [[this.E, img.foe, true], [this.P, img.me, false]].forEach(function (pr) {
-      var f = pr[0], set = pr[1] || {}, ps = self.pose(f), im = set[ps] && set[ps].width ? set[ps] : set.idle, x = f.x, y = GROUND + f.y + 7, h = 265;
+      var f = pr[0], set = pr[1] || {}, ps = self.pose(f), FB = { hp_s: "idle_b", special_s: "idle_b", jump_up: "jump", jump_fall: "jump", dash: "walk1" }, im = set[ps] && set[ps].width ? set[ps] : set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")] && set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")].width ? set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")] : set.idle, x = f.x, y = GROUND + f.y + 7, h = 265;
       g.fillStyle = "rgba(0,0,0,.35)"; g.beginPath(); g.ellipse(x, GROUND + 4, 52, 10, 0, 0, 7); g.fill();
       g.save(); g.translate(x, y); g.scale(f.face, 1);
       if (f.st === "down" || f.st === "dead") { g.translate(0, 0); }
@@ -3873,7 +3882,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   };
   Game.prototype.snapshot = function () { var P = this.P, E = this.E; return { t: +this.t.toFixed(2), round: this.round, wins: [P.wins, E.wins], hp: +(P.hp / P.max).toFixed(3), foeHp: +(E.hp / E.max).toFixed(3), meter: +P.meter.toFixed(2), foeMeter: +E.meter.toFixed(2), combo: P.combo, maxCombo: P.maxCombo, st: P.st, foeSt: E.st, move: P.mn && P.mv ? P.mn : null, foeMove: E.mn && E.mv ? E.mn : null, x: Math.round(P.x), foeX: Math.round(E.x), done: this.done, win: this.win, special: this.special, ch: this.cid, foe: E.cid, form: this.slot, route: this.route, pose: this.pose(P) }; };
   /* —— DOM 外壳 —— */
-  var POSES = ["idle", "idle_m", "idle_b", "walk1", "walk2", "crouch", "jump", "lp", "hp", "clp", "chp", "jatk", "block", "cblock", "hit", "hit2", "down", "throw", "special", "dp", "rush", "super", "win"];
+  var POSES = ["idle", "idle_m", "idle_b", "walk1", "walk2", "crouch", "jump", "lp", "hp", "clp", "chp", "jatk", "block", "cblock", "hit", "hit2", "down", "throw", "special", "dp", "rush", "super", "win", "walk_0", "walk_1", "walk_2", "walk_3", "walk_4", "walk_5", "walk_6", "walk_7", "hp_s", "special_s", "jump_up", "jump_fall", "dash"];
   var CSS = "#duel46{position:fixed;inset:0;z-index:125;background:#07050d;touch-action:none;user-select:none;color:#fff}#duel46 canvas{position:absolute;inset:0;width:100%;height:100%}#duel46 .dstk46{position:absolute;left:max(18px,env(safe-area-inset-left));bottom:18px;width:150px;height:150px;border-radius:50%;background:#ffffff14;border:2px solid #ffffff33}#duel46 .dstk46 i{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px;border-radius:50%;background:#ffffff44;transform:translate(var(--x,0),var(--y,0))}#duel46 .dact46{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:14px;display:grid;grid-template-columns:repeat(3,64px);gap:8px}#duel46 .dact46 button{width:64px;height:64px;padding:0;line-height:1.1;border-radius:50%;border:2px solid #ffffff44;background:#1a1230cc;color:#fff;font-weight:700;font-size:14px}#duel46 .dact46 button.on{border-color:#5fd8ff;box-shadow:0 0 12px #5fd8ff}#duel46 .res{position:absolute;inset:0;display:grid;place-items:center;background:#06040ccc}#duel46 .res .box{text-align:center}#duel46 .res button{margin-top:14px;padding:12px 26px;border-radius:999px;border:0;background:#ff5f9e;color:#fff;font-size:15px}#duel46 .help{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:11px;color:#ffffffaa;text-align:center;pointer-events:none;white-space:nowrap}";
   var cur = null, raf = 0;
   function start(o) {
@@ -16037,7 +16046,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     else if(t.dataset.ngo!==undefined){el.classList.add("hidden");startRun46(undefined,{abyss:nightAbyss46});}else if(t.dataset.ndaily!==undefined){el.classList.add("hidden");startRun46(0,{daily:true});}else if(t.dataset.nclaim!==undefined){seasonClaim46();openNight46();}});
   style37.textContent+=`.heroVid46{position:absolute;inset:0;pointer-events:auto}.heroVid46 video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:50% 100%;opacity:0;transition:opacity .18s linear}.heroVid46 video.on{opacity:1}`;
   style37.textContent+=`#night46 .rt{display:flex;gap:6px;margin:6px 0}#night46 .rt button{flex:1;padding:6px;border-radius:8px;border:1px solid var(--t);background:#0006;color:#fff;opacity:.6}#night46 .rt button.on{opacity:1;background:color-mix(in srgb,var(--t) 30%,#0008);box-shadow:0 0 10px var(--t)}.bm46 .opts button.rec{outline:2px solid #ffd76a;box-shadow:0 0 16px #ffd76a88}`;
-  style37.textContent+=`#pachi46{position:fixed;inset:0;z-index:140;background:#05030acc;display:grid;place-items:center}#pachi46 .pf{background:#160c26;border:1px solid #ff9ec766;border-radius:14px;padding:8px;display:flex;flex-direction:column;gap:6px;max-height:96vh}#pachi46 header{display:flex;align-items:center;gap:8px;color:#fff}#pachi46 header small{color:#ffc4e6;flex:1}#pachi46 .x{background:none;border:0;color:#fff;font-size:18px}#pachi46 canvas{height:min(80vh,600px);aspect-ratio:3/5;border-radius:10px}#pachi46 footer{display:flex;align-items:center;gap:8px;color:#ccc}#pachi46 .go{padding:8px 22px;border-radius:999px;border:0;background:linear-gradient(#ff8ac4,#d64d91);color:#fff;font-weight:700}`;
+  style37.textContent+=`#pachi46{position:fixed;inset:0;z-index:140;background:#05030acc;display:grid;place-items:center}#pachi46 .pf{background:#160c26;border:1px solid #ff9ec766;border-radius:14px;padding:8px;display:flex;flex-direction:column;gap:6px;max-height:96vh}#pachi46 header{display:flex;align-items:center;gap:8px;color:#fff}#pachi46 header small{color:#ffc4e6;flex:1}#pachi46 .x{background:none;border:0;color:#fff;font-size:18px}#pachi46 canvas{height:min(80vh,600px);width:auto;aspect-ratio:3/5;border-radius:10px}#pachi46 footer{display:flex;align-items:center;gap:8px;color:#ccc}#pachi46 .go{padding:8px 22px;border-radius:999px;border:0;background:linear-gradient(#ff8ac4,#d64d91);color:#fff;font-weight:700}`;
   style37.textContent+=`#night46{position:fixed;inset:0;z-index:130;background:#08050fcc;display:grid;place-items:center;padding:12px}#night46.hidden{display:none}#night46 .box{width:min(980px,100%);max-height:100%;overflow:auto;background:#1a1228;border:1px solid #ffffff22;border-radius:16px;padding:12px 16px}#night46 header{display:flex}#night46 header b{flex:1;font-size:20px}#night46 .x{background:none;border:0;color:#fff;font-size:20px}#night46 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:8px}#night46 .nc{background:#251a38;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;border:1px solid #ffffff18}#night46 .nc small{color:#c9b8e8}#night46 .nc b{font-size:17px}#night46 .nc p{font-size:12px;color:#d8cdea;flex:1;margin:0}#night46 .ab{display:flex;align-items:center;gap:10px}#night46 .ab button{width:34px;height:30px;border-radius:8px;border:0;background:#3a2c55;color:#fff}#night46 .go{padding:9px;border-radius:10px;border:0;background:linear-gradient(135deg,#6a3cff,#ff5fae);color:#fff;font-weight:bold}#night46 .go:disabled{background:#4a3c60;color:#bba}#night46 .daily{border-color:#ffd76a55}#night46 .bar{height:8px;background:#ffffff22;border-radius:4px;overflow:hidden}#night46 .bar i{display:block;height:100%;background:#ffd76a}`;
   function paintRunBtn46(){modeRow46();const b=$("#runBtn46");if(!b)return;const r=runLoad46();b.innerHTML=r?`<b>继续夜行</b><small>第 ${r.layer} 层 · 💠 ${r.shards}</small>`:`<b>夜行 · 肉鸽</b><small>三层地图 · 构筑跨节点</small>`;}
   (function(){const b=document.createElement("button");b.className="levelMapBtn46 runBtn46";b.id="runBtn46";b.type="button";modeRow46().prepend(b);paintRunBtn46();})();
