@@ -76,3 +76,9 @@
 | mashirozx/arknights-ui | 代码 MIT（贴图仅供学习，未使用） | 斜切面板、光泽扫过 |
 | easings.net、GSAP 缓动命名 | 文档 | cubic-bezier 取值 |
 | Juice it or Lose it（Jonasson & Purho, GDC 2012） | 演讲 | 反馈层叠原则 |
+
+## 字体（OFL 1.1，可商用，已子集化）
+| 字体 | 文件 | 用途 |
+|---|---|---|
+| Noto Sans SC（Google / Adobe，思源黑体同源） | `art/fonts/sy-title-sc.woff2`（800 字重，1829 字子集），许可证 `art/fonts/OFL-NotoSansSC.txt` | 中文标题 |
+| Rajdhani Bold（Indian Type Foundry） | `art/fonts/sy-title-en.woff2`（ASCII 子集），许可证 `art/fonts/OFL-Rajdhani.txt` | 英文斜体标题和编号 |

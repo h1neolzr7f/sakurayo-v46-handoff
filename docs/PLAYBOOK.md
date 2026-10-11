@@ -119,3 +119,13 @@
   - 统一缩放到 420px 高。
 - 动画：招式一律 pose-hold 硬切（起手/判定/收招各对应一张关键帧），不做混合，所以不会有重影。RIFE 只用在剪影差异 ≤15% 的过渡上（待机呼吸 idle↔idle_b），并用“半透明像素比例”检测重影：中间帧不能明显高于关键帧。RIFE 需要输入尺寸是 64 的倍数，用 `rife_pad.py` 先补边再裁回。
 - 运行时 `#duel46` 的控件 class 不能用 `.stick` / `.act` 这类通用名：大厅的全局 CSS 会把它们覆盖（摇杆曾因此跑到左上角）。已改成 `.dstk46` / `.dact46`。
+
+
+## UI 美术方向（2026-10-11 确定；覆盖之前的“和风”和“国风”方向）
+- **中式科技二次元，以《崩坏3》为主要参考。** 主体是科幻机能风：切角面板、发光描边、HUD 线框和刻度、扫描线、编号文字、少量 glitch 点缀。
+- **中式元素只做点缀**：印章式编号、线框化云纹、少量汉字。不要和风元素（鸟居、和服、和式灯笼），也不要国风的水墨、卷轴作为主体。
+- **配色令牌**：底色 `--sy-c-bg #070c18`，主发光 `--sy-c-cyan #38e1ff`，强调 `--sy-c-pink #ff6fae` 和 `--sy-c-red #ff3b4e`，稀有度 `--sy-c-gold #ffc94a`。
+- **部件规范**：发光菱形提示点、斜切标签、HUD 拐角、斜切闪屏转场、发光碎片粒子。
+- **字体**：Rajdhani Bold 斜体（英文）+ Noto Sans SC 800（中文），都是 OFL，必须子集化（`pyftsubset --flavor=woff2`，字表从 src 全量抽取）。
+- **实现位置**：`src/runtime/sakurayo-ui-polish.js`（动效层）、`src/runtime/sakurayo-ui-static.js`（静态视觉层）。改样式只改令牌，新组件不写死颜色。
+- **素材**：一律用中转站 gpt-image-2 生成，提示词前缀见 `/workspace/sakurayo-gen/jobs_ui3.json`。截图用 `node tools/shoot_ui.mjs <dir>`，动效录像用 `node tools/record_ui_polish.mjs <dir> [repoRoot]`。
