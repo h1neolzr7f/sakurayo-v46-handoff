@@ -3,6 +3,7 @@
 rig 不再继续开发。大厅看板娘优先播放视频；某个角色没有视频清单时，自动回退到现有的 rig / 静态立绘。
 
 ## 放置位置
+先在 `art/live_video/index.js` 的 `SakurayoMascotVideoIndex` 数组里登记角色 id（例如 `["sayo"]`）；没有登记的角色不会去加载视频，直接使用 rig 或静态立绘，这样也不会产生 404。
 ```
 android-app/app/src/main/assets/game/art/live_video/<角色>/   # 角色：sayo / aya / rion
   clips.js        # 清单（必需）
