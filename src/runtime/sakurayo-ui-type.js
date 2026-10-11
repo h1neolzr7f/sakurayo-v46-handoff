@@ -14,9 +14,6 @@
     + "html body #run46 .rn46 .st46{width:24px!important;height:24px!important;right:-8px!important;bottom:-6px!important}html body #run46 .rn46 .st46 .syIco{width:20px!important;height:20px!important}"
     + "html body:not(#sy0):not(#sy1):not(#sy2):not(#sy3):not(#sy4):not(#sy5) #start small,html body:not(#sy0):not(#sy1):not(#sy2):not(#sy3):not(#sy4):not(#sy5) #start b{text-shadow:0 0 4px rgb(var(--c-n6-rgb) / .7),0 0 1px rgb(var(--c-n6-rgb) / .9)!important}"
     + "html body:not(#sy0):not(#sy1):not(#sy2):not(#sy3) .gachaActions46 button small{background:rgb(var(--c-n0-rgb) / .62)!important}"
-    /* 窄横屏放不下的装饰性英文 / 重复信息：隐藏而不是缩到 11px 以下 */
-    + "html body:not(#sy0):not(#sy1):not(#sy2) :is(#runBtn46,#levelMapBtn46,#wdBtn46,#pachiBtn46)>small{display:none!important}"
-    + "@media (max-width:1000px){html body .coverTitle36>span{display:none!important}html body #syTod{display:none!important}html body .commandHeading47>small{visibility:hidden!important;white-space:nowrap!important;overflow:hidden}}"
     + "html body .syPlate{text-shadow:var(--sy-plate)!important}";
   var st = document.createElement("style"); st.id = "syType"; st.textContent = css; (document.head || document.documentElement).appendChild(st);
 
