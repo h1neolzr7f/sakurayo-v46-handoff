@@ -314,7 +314,7 @@
     var aw = t < P.awakenUntil, blink = P.inv > 0 && !aw && P.bombT <= 0 && Math.floor(t * 6) % 2;
     if (this.form.tint || aw) { var rg = g.createRadialGradient(P.x, P.y, 6, P.x, P.y, 64); rg.addColorStop(0, (aw ? "#ffd76a" : tint) + "77"); rg.addColorStop(1, "transparent"); g.fillStyle = rg; g.fillRect(P.x - 64, P.y - 64, 128, 128); }
     g.globalAlpha = blink ? 0.45 : 1; var tilt = clamp((this.lastX != null ? P.x - this.lastX : 0) * 0.02, -0.18, 0.18); this.lastX = P.x;
-    g.save(); g.translate(P.x, P.y + Math.sin(t * 5) * 2); g.rotate(tilt); spr("fly_" + this.cid, 0, -6, 84, 0, "ship_" + this.cid); g.restore(); g.globalAlpha = 1;
+    g.save(); g.translate(P.x, P.y + Math.sin(t * 5) * 2); g.rotate(tilt); spr("fly_" + this.cid, 0, -10, 112, 0, "ship_" + this.cid); g.restore(); g.globalAlpha = 1;
     // 敌弹（高对比：彩色外圈 + 白芯；贴图半径 > 判定半径）
     this.B.forEach(function (b) {
       g.fillStyle = b.col;
