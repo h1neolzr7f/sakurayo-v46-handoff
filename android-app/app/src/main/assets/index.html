@@ -17128,7 +17128,7 @@ button.sy-pop{animation:syPop .32s var(--sy-ease-back)}@keyframes syPop{0%{scale
     ["coins", "shopCoins", "tcoins"].forEach(function (id) { watchNumber(doc.getElementById(id)); });
     var boot = doc.getElementById("bootArt35"); if (boot) boot.appendChild(chibi("再等一下下……正在擦亮镜子。", "sayo"));
     applyTod(); setInterval(applyTod, 60000);
-    new MutationObserver(function () { decorateEmpty(); lanternDots(); }).observe(doc.body, { childList: true, subtree: true }); decorateEmpty(); lanternDots();
+    var pend = 0; new MutationObserver(function () { if (pend) return; pend = setTimeout(function () { pend = 0; decorateEmpty(); lanternDots(); }, 250); }).observe(doc.body, { childList: true, subtree: true }); /* 节流：战斗中 DOM 变化频繁 */ decorateEmpty(); lanternDots();
   }
   if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", init); else init();
   global.SakurayoPolish = { reward: reward, burst: burst, transition: transition, watchNumber: watchNumber, chibi: chibi, applyTod: applyTod, blip: blip };
@@ -17198,11 +17198,11 @@ html body #menu .homeNav46>[data-open="shop"] .terminalIcon48{background-image:$
 html body #menu .homeNav46>[data-open="trials"] .terminalIcon48{background-image:${U("ui/nav/ascension.webp")}!important}html body #menu .homeNav46>[data-open="archive"] .terminalIcon48{background-image:${U("ui/nav/archive.webp")}!important}
 html body #menu #commandHistory47 .terminalIcon48{background-image:${U("ui/nav/achievement.webp")}!important}
 html body #menu .homeNav46>button{position:relative;transition:color .2s,background .2s}
-html body #menu .homeNav46>button.sy-on{background:linear-gradient(0deg,rgba(56,225,255,.28),transparent 80%)!important;color:#fff!important}
-html body #menu .homeNav46>button.sy-on::before{content:"";position:absolute;left:14%;right:14%;bottom:0;height:3px;background:var(--sy-c-cyan);box-shadow:0 0 10px var(--sy-c-cyan);clip-path:polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)}
-html body #menu .homeNav46>button.sy-on::after{content:"";position:absolute;left:50%;top:2px;width:6px;height:6px;margin-left:-3px;background:var(--sy-c-pink);transform:rotate(45deg);box-shadow:0 0 6px var(--sy-c-pink)}
-html body #menu .homeNav46>button.sy-on .terminalIcon48{transform:translateY(-3px) scale(1.12);filter:drop-shadow(0 0 6px rgba(56,225,255,.9))}
-html body #menu .homeNav46>button.sy-on b{color:var(--sy-c-cyan)!important}
+html body #menu .homeNav46>button[data-sy-on]{background:linear-gradient(0deg,rgba(56,225,255,.28),transparent 80%)!important;color:#fff!important}
+html body #menu .homeNav46>button[data-sy-on]::before{content:"";position:absolute;left:14%;right:14%;bottom:0;height:3px;background:var(--sy-c-cyan);box-shadow:0 0 10px var(--sy-c-cyan);clip-path:polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)}
+html body #menu .homeNav46>button[data-sy-on]::after{content:"";position:absolute;left:50%;top:2px;width:6px;height:6px;margin-left:-3px;background:var(--sy-c-pink);transform:rotate(45deg);box-shadow:0 0 6px var(--sy-c-pink)}
+html body #menu .homeNav46>button[data-sy-on] .terminalIcon48{transform:translateY(-3px) scale(1.12);filter:drop-shadow(0 0 6px rgba(56,225,255,.9))}
+html body #menu .homeNav46>button[data-sy-on] b{color:var(--sy-c-cyan)!important}
 /* ---- 留白 ---- */
 html body #menu #tacticalDeck48{gap:var(--sy-sp-3)!important}html body #menu #modeRow46{gap:var(--sy-sp-2)!important}
 .drawer .dbody{padding:var(--sy-sp-4) var(--sy-sp-5)!important}
@@ -17218,11 +17218,11 @@ html body #menu .terminalActivity48{border-radius:0!important;clip-path:polygon(
 `;
   var st = document.createElement("style"); st.id = "syStatic"; st.textContent = css; document.head.appendChild(st);
   // 底栏选中态：最近打开的入口保持高亮，直到它的面板关掉
-  function sync() { var open = document.querySelector(".drawer:not(.hidden)"), want = open ? open.id.replace(/Drawer$/, "") : "stage"; document.querySelectorAll(".homeNav46>[data-open]").forEach(function (b) { var on = b.dataset.open === want; if (b.classList.contains("sy-on") !== on) b.classList.toggle("sy-on", on); }); } // 先算目标再只改变化的，避免 class 观察自激
+  function sync() { var open = document.querySelector(".drawer:not(.hidden)"), want = open ? open.id.replace(/Drawer$/, "") : "stage"; document.querySelectorAll(".homeNav46>[data-open]").forEach(function (b) { var on = b.dataset.open === want; if (b.hasAttribute("data-sy-on") !== on) { if (on) b.setAttribute("data-sy-on", ""); else b.removeAttribute("data-sy-on"); } }); } /* 用 data 属性而不是 class 标记选中态，避免与 class 观察器互相触发 */
   function guide() { try { var sv = JSON.parse(localStorage.getItem("sakurayoV3") || "{}"), b = document.getElementById("start"); if (!b || (sv.done && sv.done.length) || b.querySelector(".sy-tip")) return; b.classList.add("sy-guide"); var t = document.createElement("span"); t.className = "sy-tip"; t.textContent = "START ▶ 从这里开始第一战"; b.appendChild(t); } catch (e) { } }
   var CODES = { stageDrawer: "OPS-01 // 关卡", gachaDrawer: "SUP-02 // 寻访", shopDrawer: "DEP-03 // 补给", rosterDrawer: "INV-04 // 仓库", archiveDrawer: "ARC-05 // 档案", trialsDrawer: "TRL-06 // 试炼", storyDrawer: "LOG-07", achDrawer: "ACH-08", talentDrawer: "TAL-09", ascDrawer: "ASC-10" };
   function codes() { Object.keys(CODES).forEach(function (id) { var h = document.querySelector("#" + id + " .dhead"); if (h && !h.dataset.syCode) h.dataset.syCode = CODES[id]; }); [["#wd46 .box>header", "WRD-11 // 衣橱"], ["#night46 .box>header", "NGT-12 // 夜行"]].forEach(function (q) { var h = document.querySelector(q[0]); if (h && !h.dataset.syCode) h.dataset.syCode = q[1]; }); }
-  function init() { sync(); guide(); codes(); new MutationObserver(codes).observe(document.body, { childList: true }); new MutationObserver(sync).observe(document.body, { attributes: true, attributeFilter: ["class"], subtree: true }); }
+  function init() { sync(); guide(); codes(); new MutationObserver(codes).observe(document.body, { childList: true }); var mo = new MutationObserver(sync); document.querySelectorAll(".drawer").forEach(function (d) { mo.observe(d, { attributes: true, attributeFilter: ["class"] }); }); /* 只观察抽屉本身，不观察整棵 body（战斗中 class 变化极频繁） */ }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })(typeof window !== "undefined" ? window : globalThis);
 
@@ -17256,7 +17256,7 @@ html body #menu #tacticalDeck48{transform-style:preserve-3d;rotate:y calc(var(--
 #menu #coverTitle36{translate:calc(var(--px,0) * 8px) calc(var(--py,0) * 4px);transition:translate .3s ease-out}
 /* 镜头推拉：打开子页面时大厅后退、模糊、压暗 */
 #menu{transition:scale .45s var(--sy-ease-out,ease),filter .45s}
-#menu.sy-push{scale:.94;filter:blur(3px) brightness(.55) saturate(.8)}
+#menu[data-sy-push]{scale:.94;filter:blur(3px) brightness(.55) saturate(.8)}
 .drawer:not(.hidden){animation:syDolly .5s var(--sy-ease-out,ease)}
 @keyframes syDolly{from{opacity:0;transform:perspective(1200px) translateZ(140px) rotateX(4deg)}to{opacity:1;transform:none}}
 /* 出击键：多层反馈（按下压缩 → 冲击菱环 → 故障闪烁 → 全屏斜切闪光） */
@@ -17346,7 +17346,7 @@ ${Array.from({ length: 10 }, function (_, i) { return "#result.sy-show #rstats>*
     var iv = setInterval(function () { if (!boot.isConnected) return clearInterval(iv); var im = [].slice.call(doc.images), done = im.filter(function (x) { return x.complete; }).length, real = im.length ? done / im.length : 1; p = Math.min(99, Math.max(p + 2, real * 100 * 0.9)); bar.style.width = p + "%"; pc.textContent = Math.round(p) + "%"; if (++k % 8 === 0) tip.textContent = TIPS[(k / 8 | 0) % TIPS.length]; }, 120); }
   // ---------- 6. 结算演出 ----------
   function resultFx() { var r = doc.getElementById("result"); if (!r) return; var md = r.querySelector(".modal"); if (md && !md.querySelector(".sy-sigil")) md.insertAdjacentHTML("afterbegin", sigil(220));
-    new MutationObserver(function () { var on = !r.classList.contains("hidden"); if (on && !r.classList.contains("sy-show")) { r.classList.add("sy-show"); r.querySelectorAll("#rstats b, #rstats strong").forEach(function (el, i) { if (global.SakurayoPolish) global.SakurayoPolish.watchNumber(el); var txt = el.textContent, n = parseInt(txt.replace(/[^\d]/g, ""), 10); if (!n || reduce()) return; var t1 = performance.now() + 550 + i * 70; (function step(now) { var k = Math.max(0, Math.min(1, (now - t1) / 700)); el.textContent = txt.replace(/[\d,]+/, Math.round(n * (1 - Math.pow(1 - k, 3))).toLocaleString("en-US")); if (k < 1) requestAnimationFrame(step); else el.textContent = txt; })(performance.now()); }); } else if (!on) r.classList.remove("sy-show"); }).observe(r, { attributes: true, attributeFilter: ["class"] }); }
+    new MutationObserver(function () { var on = !r.classList.contains("hidden"); if (on && !r.classList.contains("sy-show")) { r.classList.add("sy-show"); r.querySelectorAll("#rstats b, #rstats strong").forEach(function (el, i) { if (global.SakurayoPolish) global.SakurayoPolish.watchNumber(el); var txt = el.textContent, n = parseInt(txt.replace(/[^\d]/g, ""), 10); if (!n || reduce()) return; var t1 = performance.now() + 550 + i * 70; (function step(now) { var k = Math.max(0, Math.min(1, (now - t1) / 700)); el.textContent = txt.replace(/[\d,]+/, Math.round(n * (1 - Math.pow(1 - k, 3))).toLocaleString("en-US")); if (k < 1) requestAnimationFrame(step); else el.textContent = txt; })(performance.now()); }); } else if (!on && r.classList.contains("sy-show")) r.classList.remove("sy-show"); }) /* 注意：classList.remove 即使类不存在也会写 class 属性，会让自己的观察器无限触发 */.observe(r, { attributes: true, attributeFilter: ["class"] }); }
   // ---------- 7. 角色出场 ----------
   var show, lastName = null, showT = 0;
   function showcase(name) { if (reduce() || !show) return; var img = doc.querySelector("#heroLive46 img"); show.innerHTML = '<div class="band"></div>' + (img ? '<img src="' + img.src + '" alt="">' : "") + '<div class="cd">OPERATOR // SKR-0' + (1 + (name.length % 7)) + '</div><div class="nm"></div>'; show.querySelector(".nm").textContent = name; show.className = "on"; clearTimeout(showT); showT = setTimeout(function () { show.classList.add("out"); setTimeout(function () { show.className = ""; }, 360); }, 1400); }
@@ -17359,7 +17359,7 @@ ${Array.from({ length: 10 }, function (_, i) { return "#result.sy-show #rstats>*
     doc.addEventListener("pointermove", function (e) { if (e.pointerType === "mouse") setPar(e.clientX / innerWidth * 2 - 1, e.clientY / innerHeight * 2 - 1); }, { passive: true });
     addEventListener("deviceorientation", function (e) { if (e.gamma == null) return; setPar(e.gamma / 25, (e.beta - 45) / 25); }, { passive: true });
     doc.addEventListener("pointerdown", function (e) { if (e.target.closest && e.target.closest("#start")) startFx(e); }, true);
-    new MutationObserver(function () { var open = !!doc.querySelector(".drawer:not(.hidden)"); if (menu && menu.classList.contains("sy-push") !== open) menu.classList.toggle("sy-push", open); }).observe(doc.body, { attributes: true, attributeFilter: ["class"], subtree: true });
+    var pmo = new MutationObserver(function () { var open = !!doc.querySelector(".drawer:not(.hidden)"); if (menu && menu.hasAttribute("data-sy-push") !== open) { if (open) menu.setAttribute("data-sy-push", ""); else menu.removeAttribute("data-sy-push"); } }); doc.querySelectorAll(".drawer").forEach(function (d) { pmo.observe(d, { attributes: true, attributeFilter: ["class"] }); });
     bootFx(); resultFx(); watchChar();
   }
   if (doc.readyState === "loading") doc.addEventListener("DOMContentLoaded", init); else init();

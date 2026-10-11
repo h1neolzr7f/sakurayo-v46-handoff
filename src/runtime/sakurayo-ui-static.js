@@ -77,6 +77,36 @@ html body #menu .homeNav46{margin-bottom:env(safe-area-inset-bottom)}html body #
 @keyframes syGuide{0%,100%{box-shadow:inset 0 0 0 1px rgba(255,111,174,.6),0 0 10px rgba(255,111,174,.4)}50%{box-shadow:inset 0 0 0 2px #fff,0 0 30px rgba(255,111,174,.9)}}
 #start .sy-tip{position:absolute;right:14px;top:8px;z-index:3;font:italic 700 12px var(--sy-font-title);background:var(--sy-c-cyan);color:#04111f;padding:2px 12px 2px 8px;clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%)}
 html body #menu .terminalActivity48{border-radius:0!important;clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px);box-shadow:var(--sy-stroke-in)!important}
+/* ===== 第 2 轮补充：战斗 HUD、通用弹窗、列表卡片多层悬停、射的 / 地图面板 ===== */
+.overlay .modal{background:var(--sy-scan),var(--sy-glass)!important;border:1px solid rgba(56,225,255,.45)!important;border-radius:0!important;clip-path:polygon(20px 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%,0 20px);box-shadow:var(--sy-stroke-in),0 0 36px rgba(56,225,255,.18)!important}
+.overlay .modal h2{font-family:var(--sy-font-title);font-style:italic;font-weight:800;color:#fff;text-shadow:0 0 12px rgba(56,225,255,.6);border-left:4px solid var(--sy-c-pink);padding-left:12px;text-align:left}
+.overlay .modal .sub{color:var(--sy-c-sub)}
+.overlay .modal button.primary,.overlay .modal button.secondary,#choices>*,#eventChoices>*{border-radius:0!important;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px)}
+.overlay .modal button.primary{background:linear-gradient(90deg,var(--sy-c-red),var(--sy-c-pink))!important;color:#fff!important}
+.overlay .modal button.secondary{background:rgba(56,225,255,.12)!important;color:#bfefff!important;border:1px solid rgba(56,225,255,.5)!important}
+#choices>*,#eventChoices>*{background:linear-gradient(160deg,rgba(18,36,64,.95),rgba(6,12,26,.95))!important;border:1px solid rgba(56,225,255,.35)!important;box-shadow:var(--sy-stroke-in)!important}
+/* HUD */
+#hud .bar{border-radius:0!important;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);background:rgba(4,10,22,.75)!important;box-shadow:inset 0 0 0 1px rgba(56,225,255,.35)!important}
+#hud #hpF{background:linear-gradient(90deg,var(--sy-c-red),var(--sy-c-pink))!important;box-shadow:0 0 8px var(--sy-c-pink)}
+#hud #shF{background:linear-gradient(90deg,#1aa9d6,var(--sy-c-cyan))!important}#hud #xpF{background:linear-gradient(90deg,#c08a1a,var(--sy-c-gold))!important}
+#hud .bar span{font:italic 700 11px var(--sy-font-title)!important;letter-spacing:.06em}
+#hud .rinfo #time{font:italic 800 28px var(--sy-font-title)!important;color:#fff;text-shadow:2px 0 0 rgba(255,59,78,.6),-1px 0 0 rgba(56,225,255,.8)}
+#hud .rinfo #kill,#hud #stageHud{font:italic 700 12px var(--sy-font-title);color:var(--sy-c-cyan);letter-spacing:.08em}
+#hud .wave{border-radius:0!important;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);box-shadow:inset 0 0 0 1px rgba(56,225,255,.4)!important;background:rgba(4,10,22,.7)!important}
+#hud #waveF{background:repeating-linear-gradient(110deg,var(--sy-c-cyan) 0 8px,#1aa9d6 8px 12px)!important}
+#hud .hero img{border-radius:0!important;clip-path:polygon(25% 0,100% 0,75% 100%,0 100%)!important;border:0!important;box-shadow:none!important;filter:drop-shadow(0 0 4px var(--sy-c-cyan))}
+#hud .act,#hud #pause{border-radius:0!important;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);background:radial-gradient(circle,rgba(56,225,255,.35),rgba(4,10,22,.85) 70%)!important;border:0!important;box-shadow:none!important}
+#hud .act span{font:italic 800 12px var(--sy-font-title)}
+#hud #combo{font-family:var(--sy-font-title)!important;font-style:italic;color:var(--sy-c-gold)!important;text-shadow:3px 0 0 rgba(255,59,78,.6),0 0 12px rgba(255,201,74,.7)!important}
+/* 列表卡片：多层悬停（上浮 + 青色描边发光 + 扫描光带） */
+.wdc,.shopList>*,#stageList>*,.nc,#gachaBody46 [class*="card"],#rosterBody46 [class*="card"]{position:relative;transition:translate .2s var(--sy-ease-out),box-shadow .2s,filter .2s}
+@media (hover:hover){.wdc:hover,.shopList>*:hover,#stageList>*:hover,.nc:hover{translate:0 -4px;filter:brightness(1.08);box-shadow:inset 0 0 0 1px var(--sy-c-cyan),0 0 18px rgba(56,225,255,.45)!important}
+.wdc:hover::after,.shopList>*:hover::after,#stageList>*:hover::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,transparent 0%,rgba(56,225,255,.22) 50%,transparent 52%);background-size:100% 200%;animation:syScan 1.1s linear infinite}}
+@keyframes syScan{from{background-position:0 100%}to{background-position:0 -100%}}
+/* 射的、地图面板 */
+#pachi46 header{border-bottom:2px solid var(--sy-c-cyan)!important;background:linear-gradient(90deg,rgba(5,10,22,.95),rgba(14,28,52,.6))!important}
+#levelMap46 .lm46Sheet,#run46 .rm46,#run46 .rs46{background:var(--sy-scan),var(--sy-glass)!important;border:1px solid rgba(56,225,255,.4)!important;border-radius:0!important;clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)}
+#levelMap46 .lm46Node b,#run46 .rn46 span{font-family:var(--sy-font-title);font-style:italic}
 `;
   var st = document.createElement("style"); st.id = "syStatic"; st.textContent = css; document.head.appendChild(st);
   // 底栏选中态：最近打开的入口保持高亮，直到它的面板关掉
