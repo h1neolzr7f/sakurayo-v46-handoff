@@ -18052,8 +18052,27 @@ html body #menu .coins{color:var(--c-n6)!important;font-weight:800}
     + "html body #run46 .r46Hp em{color:var(--c-primary-strong)!important;font:900 12px var(--sy-font-title,sans-serif)}html body #run46 .r46Hp .sykBar{width:150px;height:10px}html body #run46 .r46Hp>b{font:800 13px var(--sy-font-title,sans-serif);color:var(--c-n6)}"
     + "html body #run46 .r46Shard{display:flex;align-items:center;gap:6px;color:var(--c-n6)}html body #run46 .r46Shard .syIco{width:18px;height:18px;color:var(--c-primary-strong)}html body #run46 .r46Shard b{font:900 16px var(--sy-font-title,sans-serif)}html body #run46 .r46Shard small{color:var(--c-n5)!important}"
     + "html body #run46 .r46Layers i{border-radius:0!important;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);background:var(--c-n2)!important;color:var(--c-n5)!important;border:0!important}html body #run46 .r46Layers i.on{background:var(--c-primary)!important;color:var(--c-on-primary)!important;box-shadow:none!important}html body #run46 .r46Layers i.done{background:var(--c-n4)!important;color:var(--c-n0)!important}"
+    /* ⑥ 割草 HUD 血条 / 护盾 / 经验同样走 .sykBar 规范：切角 + 白色延迟扣血 */
+    + "html body #hud .bars .bar{position:relative;border-radius:0!important;border:0!important;background:rgb(var(--c-n2-rgb) / .95)!important;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);overflow:hidden}"
+    + "html body #hud .bars .bar>.fill{position:relative;z-index:1;border-radius:0!important;background:linear-gradient(180deg,var(--c-rare-ssr),var(--c-warn))!important;box-shadow:none!important}"
+    + "html body #hud .bars #shBar>.fill{background:linear-gradient(180deg,var(--c-primary-strong),var(--c-primary))!important}html body #hud .bars .bar>#xpF{background:linear-gradient(180deg,var(--c-accent),var(--c-rare-sr))!important}"
+    + "html body #hud .bars .bar>.sykGhost{position:absolute;left:0;top:0;bottom:0;z-index:0;background:var(--c-n6);transition:width .6s .35s}html body #hud .bars .bar>span{position:relative;z-index:2;color:var(--c-n6)}"
+    /* 局部可读性：关卡卡片简介压在场景图上，加暗色描边阴影 */
+    + "html body:not(#sy0):not(#sy1) .stageMini .sdesc{text-shadow:0 1px 2px rgb(var(--c-n0-rgb) / .95),0 0 8px rgb(var(--c-n0-rgb) / .9)!important}"
     + "@keyframes sykGlow{from{filter:drop-shadow(0 0 2px rgb(var(--c-primary-rgb) / .6))}to{filter:drop-shadow(0 0 10px rgb(var(--c-primary-rgb) / 1))}}";
   if (typeof document !== "undefined" && !document.getElementById("sykCss")) { var st = document.createElement("style"); st.id = "sykCss"; st.textContent = CSS; (document.head || document.documentElement).appendChild(st); }
+
+  /* ⑥ DOM 血条白色延迟扣血：给 #hpF 等 .fill 配一条跟随的白条 */
+  function ghostBars() {
+    if (typeof document === "undefined") return;
+    ["hpF", "shF"].forEach(function (id) {
+      var f = document.getElementById(id); if (!f || f.__syk) return; f.__syk = 1;
+      var gh = document.createElement("i"); gh.className = "sykGhost"; gh.style.width = f.style.width || "100%";
+      f.parentNode.insertBefore(gh, f);
+      new MutationObserver(function () { gh.style.width = f.style.width; }).observe(f, { attributes: true, attributeFilter: ["style"] });
+    });
+  }
+  if (typeof document !== "undefined") { if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", ghostBars); else ghostBars(); }
   global.SyKit = { T: T, cut: cut, hex: hex, diamond: diamond, bar: bar, meter: meter, panel: panel };
 })(typeof window !== "undefined" ? window : globalThis);
 
