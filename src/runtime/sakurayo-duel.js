@@ -37,7 +37,7 @@
   // 每招的关键帧时间表（前摇 s / 发生 a / 收招 r）。思路取自 MUGEN/Ikemen 的 .air：每段有专门的预备、伸展、过冲、回架势帧，帧间硬切（有限帧动画），不插值
   var ANIM = {
     lp: { s: ["lp_s"], a: ["lp"], r: ["lp_r", "idle"] }, clp: { s: ["crouch"], a: ["clp"], r: ["clp", "crouch"] },
-    hp: { s: ["hp_s"], a: ["hp"], r: ["hp_r", "hp_r", "idle_b"] }, chp: { s: ["crouch"], a: ["chp"], r: ["chp", "crouch"] },
+    hp: { s: ["hp_s"], a: ["hp"], r: ["hp_r", "hp_r", "idle_b"] }, chp: { s: ["crouch"], a: ["chp"], r: ["chp", "crouch", "crouch"] },
     jatk: { s: ["jatk_s"], a: ["jatk"], r: ["jatk", "jump_fall"] }, throw: { s: ["throw_s"], a: ["throw"], r: ["throw", "idle_b"] },
     special: { s: ["special_s", "special_s"], a: ["special"], r: ["special", "idle_b"] }, dp: { s: ["crouch"], a: ["dp"], r: ["dp", "jump_fall", "dp_r"] },
     rush: { s: ["hp_s"], a: ["rush"], r: ["rush_r", "rush_r", "idle_b"] }, super: { s: ["special_s", "special"], a: ["super", "super_r", "super", "super_r"], r: ["super_r", "idle_b"] } };
@@ -305,7 +305,7 @@
   /* —— 姿势选择（每个动作 = 关键帧 pose-hold，切换不做混合 → 无重影） —— */
   Game.prototype.pose = function (f) {
     var m = f.mv;
-    if (f.st === "dead" || f.st === "down") return "down"; if (f.st === "juggle" || f.st === "thrown") return "hit2"; if (f.st === "hitstun") return f.stT < 6 ? "hit" : "hit2";
+    if (f.st === "dead" || f.st === "down") return "down"; if (f.st === "thrown") return "hit2"; if (f.st === "juggle") return f.vy < 0 ? "hit2" : "hit"; // 浮空：上升后仰、下落翻身 if (f.st === "hitstun") return f.stT < 4 ? "hit" : (f.hs && f.stT >= f.hs - 4) ? "idle_b" : "hit2"; // 受击：冲击帧 → 后仰 → 最后 4 帧回架势（不再整段停在同一张）
     if (f.st === "block") return f.blockH === "low" ? "cblock" : "block";
     if (m) { // AIR 式动作表：按前摇 / 发生 / 收招三段各自的帧数，把关键帧均分到该段（与 MUGEN .air 的 element ticks 同理）
       var ph = f.mf < m.st ? 0 : f.mf < m.st + m.ac ? 1 : 2, A = ANIM[m.pose] || { s: ["idle_b"], a: [m.pose], r: ["idle"] }, seq = ph === 0 ? A.s : ph === 1 ? A.a : A.r,
@@ -329,7 +329,9 @@
       var m = f.mv, ph = m ? (f.mf < m.st ? 0 : f.mf < m.st + m.ac ? 1 : 2) : -1, sx = 1, sy = 1, rot = 0, jit = 0;
       // 程序性补正：发生帧拉伸（stretch）、受击压扁（squash）+ 弹簧式回正、起跳拉伸 / 蹲跳压扁、受击方额外抖动（MUGEN HitDef 的 p2 shaketime）
       if (ph === 1 && f.mf - m.st < 3) { sx = 1.08; sy = 0.95; } else if (ph === 0 && STRONG[m.pose]) { sx = 0.96; sy = 1.03; }
-      if (f.st === "hitstun" || f.st === "juggle") { var e = Math.exp(-f.stT / 6); sx = 1 - 0.12 * e; sy = 1 + 0.06 * e; rot = -0.08 * e * Math.cos(f.stT * 0.8); }
+      if (f.st === "hitstun" || f.st === "juggle") { var e = Math.exp(-f.stT / 10); sx = 1 - 0.12 * Math.exp(-f.stT / 5); sy = 1 + 0.06 * Math.exp(-f.stT / 5); rot = -0.09 * e * Math.cos(f.stT * 0.55); } // 弹簧回正衰减放慢，硬直全程都有动态
+      if (f.st === "block") { sx = 1 - 0.05 * Math.exp(-f.stT / 4); rot = -0.04 * Math.exp(-f.stT / 6) * Math.cos(f.stT * 0.7); }
+      if (!m && (f.st === "stand" || f.st === "crouch")) sy *= 1 + 0.008 * Math.sin(self.frame / 9); // 站立 / 蹲时微呼吸，避免长时间静帧
       if (f.st === "jsquat") { sx = 1.1; sy = 0.88; } else if (f.st === "air" && f.vy < -300) { sx = 0.94; sy = 1.07; }
       if (f.hitstop > 0 && (f.st === "hitstun" || f.st === "block" || f.st === "juggle")) jit = (f.hitstop % 2 ? 4 : -4);
       // 残影：发生帧、突进、冲刺、超必杀时，画出前几帧位置的半透明拖影
