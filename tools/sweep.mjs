@@ -3,7 +3,7 @@
 import {chromium} from 'playwright';import path from 'node:path';import fs from 'node:fs';import {pathToFileURL,fileURLToPath} from 'node:url';
 const out=process.argv[2]||'/tmp/sweep';const only=process.argv[3];fs.mkdirSync(out,{recursive:true});
 const URL=pathToFileURL(path.resolve('src/index.html')).href+'?test=1';
-const VPS=[['d',1280,720],['l',844,390]];const VP_P=['p',390,844];
+const VPS=[['d',1280,720],['l',844,390],['r',1024,461],['w',2400,1080]];const VP_P=['p',390,844];
 const SAVE={coins:2400,unlock:5,done:[1,2,3,4],tutorialDone:true,character:'sayo'};
 const W=(p,ms)=>p.waitForTimeout(ms);const T=(p,code,...a)=>p.evaluate(([c,a])=>window.__SAKURAYO_TEST__[c](...a),[code,a]);
 const drawer=k=>async p=>{await T(p,'openDrawer',k);await W(p,900);};
