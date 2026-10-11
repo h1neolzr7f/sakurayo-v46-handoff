@@ -140,9 +140,3 @@
   - 在支持的环境里尝试调用 `screen.orientation.lock("landscape")`，失败时静默忽略。
 - 不再为竖屏写排版分支。新界面只需要适配横屏，最低保证矮横屏 844×390 和 640×360；`@media (max-height:440px)` 这类矮横屏规则要保留。
 - 巡检 `tools/sweep.mjs` 只截 1280×720 和 844×390；390×844 只跑 `rotate` 场景，检查旋转提示。测试里原来的竖屏视口都改成了对应的横屏尺寸，竖屏行为由 `tests/rotate_smoke.mjs` 单独覆盖。
-
-## 图标与文字可读性（自动检查，回归门禁）
-- **规则**：主入口图标 ≥28px、次要图标 ≥20px；触屏点击区 ≥44px；位图图标需 2 倍图，否则用矢量 SVG。正文 1280×720 下 ≥14px、844×390 下 ≥12px；辅助文字 ≥11px；对比度 ≥4.5:1（大字 ≥3:1）；压在立绘 / 场景上的文字必须有底板或描边；不许截断（单行用省略号 + title，多行用 line-clamp）。
-- **字号阶梯令牌**（`src/runtime/sakurayo-ui-type.js`）：`--fs-aux 11 / --fs-body 14(窄屏 12) / --fs-sub 16 / --fs-title 20 / --fs-hero 28`。运行时 `SyType` 只处理新增 / 换 class 的节点，把低于阶梯的文字抬到令牌字号、对比不足的改用 `--c-n5/--c-n6`、压图文字加 `--sy-plate`。Canvas 文字统一走 `SyKit.font(g, 字重, 字号, 字体)`，按实际屏幕缩放抬到 ≥11px（格斗 HUD、弹幕面板、射的标签）。
-- **检查**：`tools/ui_audit.js` 由 `tools/sweep.mjs` 注入每个画面，DOM 文字 / 图标 / 点击区 + 钩 `fillText` 量 Canvas 实际像素字号；`SWEEP_STRICT=1` 时任何不达标即失败，已接入 `tools/verify.sh`。
-- 放不下的纯装饰英文或重复信息（大厅指挥室英文角标、logo 下章节副标题、模式条副标题）宁可隐藏，不缩到 11px 以下。
