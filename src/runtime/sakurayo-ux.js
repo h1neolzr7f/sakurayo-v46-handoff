@@ -76,7 +76,8 @@
     var el = doc.createElement("div");
     el.className = "syHint46";
     el.setAttribute("role", "status");
-    el.innerHTML = "<b>提示</b>" + HINTS[id];
+    el.innerHTML = "<b>提示</b>" + HINTS[id] + "<i>点击关闭</i>";
+    el.addEventListener("click", function () { el.remove(); }); /* 一次性提示会压住面板底部的内容，允许点掉 */
     doc.body.appendChild(el);
     clearTimeout(hintTimer);
     hintTimer = setTimeout(function () { el.remove(); }, 4200);
