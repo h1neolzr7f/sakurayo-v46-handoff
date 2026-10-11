@@ -1,8 +1,8 @@
 // 镜弹（弹珠）/ 镜斗（格斗）纯逻辑：确定性、三角色首层必胜、构筑与形态都能生效且能通关、三角色用时比 ≤1.30。
 import assert from 'node:assert/strict'; import fs from 'node:fs'; import vm from 'node:vm';
 const ctx = { console, Math }; ctx.globalThis = ctx; vm.createContext(ctx);
-for (const f of ['pachinko', 'duel']) vm.runInContext(fs.readFileSync(`src/runtime/sakurayo-${f}.js`, 'utf8'), ctx);
-const PK = ctx.SakurayoPachinko, D = ctx.SakurayoDuel, J = x => JSON.parse(JSON.stringify(x));
+for (const f of ['shateki', 'duel']) vm.runInContext(fs.readFileSync(`src/runtime/sakurayo-${f}.js`, 'utf8'), ctx);
+const PK = ctx.SakurayoShateki, D = ctx.SakurayoDuel, J = x => JSON.parse(JSON.stringify(x));
 assert.deepEqual(J(D.simulate({ character: 'rion', seed: 5 })), J(D.simulate({ character: 'rion', seed: 5 })), 'duel deterministic');
 const FULL = { spread: { lv: 5, evo: 1 }, pierce: { lv: 5, evo: 1 }, laser: { lv: 5 }, bomb: { lv: 5, evo: 1 }, homing: { lv: 5 }, orbit: { lv: 5 } }, ks = Object.keys(FULL);
 const rate = (o, n) => { let w = 0, T = [], c = 0; const C = {}; for (const ch of ['sayo', 'aya', 'rion']) for (let s = 1; s <= n; s++) { const k = ks[s % 6]; const r = D.simulate(Object.assign({ character: ch, seed: s * 31 + (o.layer || 1), skill: 0.75, route: s % 2 ? 'tech' : 'bio', form: { slot: ['base', 'speed', 'burst', 'guard'][s % 4] }, weapons: o.full ? { [k]: FULL[k] } : { [k]: { lv: 2 } } }, o)); w += r.win; T.push(r.time); c = Math.max(c, r.maxCombo); C[ch] = (C[ch] || 0) + r.time; } T.sort((a, b) => a - b); const v = Object.values(C); return { w: w / (3 * n), med: T[T.length >> 1], min: T[0], combo: c, ratio: Math.max(...v) / Math.min(...v) }; };
@@ -25,13 +25,13 @@ for (const w of ks) { const r = D.simulate({ character: 'sayo', seed: 3, layer: 
   E.holdDir = 4; E.st = 'stand'; assert.ok(g.blocks(E, D.MV.jhp) && !g.blocks(E, D.MV.clp), 'stand block: overhead yes, low no');
   P.st = 'move'; P.mv = D.MV.clp; P.mf = 6; P.hit = true; assert.ok(g.canCancel(P, 'sp') && g.canCancel(P, 'n'), 'light normal cancels into special / chains');
 }
-{ // 樱花弹珠台（抽奖小游戏）：确定性、不卡球、期望收益低于每球价格（不能刷币）、奖品不含战斗属性
-  assert.deepEqual(J(PK.simulate(9, 120)), J(PK.simulate(9, 120)), 'pachinko deterministic');
-  let ev = 0, jack = 0; for (let s = 1; s <= 300; s++) { const r = PK.simulate(s, 30 + (s * 37) % 300); assert.ok(r.slot != null, 'ball always lands'); ev += (r.prize.coins || 0) + (r.prize.again ? 50 : 0); jack += r.prize.id === 'jack' ? 1 : 0; }
-  assert.ok(ev / 300 < PK.COST, 'EV ' + (ev / 300).toFixed(1) + ' < cost'); assert.ok(jack > 0 && jack / 300 < 0.2, 'jackpot rate ' + jack / 300);
-  for (const q of PK.PRIZES) assert.deepEqual(Object.keys(q).filter(k => !['id', 'n', 'coins', 'kyo', 'again', 'col'].includes(k)), [], 'prize is currency only');
+{ // 缘日射的（庙会抽奖）：确定性；即使“最优瞄准”期望收益也低于每局价格（镜屑按 60 币折算）；奖品只含货币
+  assert.deepEqual(J(PK.simulate(9, 'best')), J(PK.simulate(9, 'best')), 'shateki deterministic');
+  for (const pol of ['best', 'random']) { let ev = 0, kyo = 0; for (let s = 1; s <= 1500; s++) { const r = PK.simulate(s, pol); assert.ok(r.shots >= PK.SHOTS, 'all shots fired'); ev += r.coins; kyo += r.kyo; }
+    assert.ok((ev + 60 * kyo) / 1500 < PK.COST * 0.75, pol + ' EV ' + ((ev + 60 * kyo) / 1500).toFixed(1) + ' < cost'); assert.ok(ev > 0, 'prizes do drop'); }
+  for (const K of Object.values(PK.KINDS)) assert.deepEqual(Object.keys(K).filter(k => !['e', 'n', 'coins', 'kyo', 'extra', 'w', 'h', 'p', 'col', 'shelf', 'sp'].includes(k)), [], 'prize is currency only');
 }
-console.log('PASS modes unit: pachinko lottery + KOF duel (commands/cancel/block heights, win rates per layer, boss 75–85%), ratio', rd.toFixed(2));
+console.log('PASS modes unit: festival shateki + KOF duel (commands/cancel/block heights, win rates per layer, boss 75–85%), ratio', rd.toFixed(2));
 { // 路线：弹珠节点已移出夜行地图；路线决定 Boss 推荐模式与遗物池
   vm.runInContext(fs.readFileSync('src/runtime/sakurayo-run.js', 'utf8'), ctx); const R = ctx.SakurayoRun;
   for (let s = 1; s <= 20; s++) { const st = R.create(s, 'sayo', s % 2 ? 'tech' : 'bio'); assert.ok(!JSON.stringify(st.map).includes('"pin"'), 'no pin nodes'); const rp = R.route(st).relics; assert.ok(R.relicOffer(st, 3).every(q => rp.includes(q.id)), 'route relic pool'); }

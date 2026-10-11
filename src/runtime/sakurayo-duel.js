@@ -34,6 +34,14 @@
     B: { st: 10, ac: 8, rc: 22, dmg: 10, hs: 20, bs: 12, kb: 110, reach: 92, y: 110, h: "mid", sp: 1, dash: 520, chip: 1, pose: "rush", shake: 3 },
     S: { st: 8, ac: 30, rc: 30, dmg: 30, hs: 0, bs: 22, kb: 120, reach: 140, y: 120, h: "mid", su: 1, inv: 14, kd: 1, chip: 4, meter: 1, dash: 640, hits: 6, pose: "super", shake: 8 }
   };
+  // 每招的关键帧时间表（前摇 s / 发生 a / 收招 r）。思路取自 MUGEN/Ikemen 的 .air：每段有专门的预备、伸展、过冲、回架势帧，帧间硬切（有限帧动画），不插值
+  var ANIM = {
+    lp: { s: ["lp_s"], a: ["lp"], r: ["lp_r", "idle"] }, clp: { s: ["crouch"], a: ["clp"], r: ["clp", "crouch"] },
+    hp: { s: ["hp_s"], a: ["hp"], r: ["hp_r", "hp_r", "idle_b"] }, chp: { s: ["crouch"], a: ["chp"], r: ["chp", "crouch"] },
+    jatk: { s: ["jatk_s"], a: ["jatk"], r: ["jatk", "jump_fall"] }, throw: { s: ["throw_s"], a: ["throw"], r: ["throw", "idle_b"] },
+    special: { s: ["special_s", "special_s"], a: ["special"], r: ["special", "idle_b"] }, dp: { s: ["crouch"], a: ["dp"], r: ["dp", "jump_fall", "dp_r"] },
+    rush: { s: ["hp_s"], a: ["rush"], r: ["rush_r", "rush_r", "idle_b"] }, super: { s: ["special_s", "special"], a: ["super", "super_r", "super", "super_r"], r: ["super_r", "idle_b"] } };
+  var STRONG = { hp: 1, chp: 1, jatk: 1, dp: 1, rush: 1, super: 1, special: 1 };
   var CMD = [ // 按优先级匹配
     { m: "S", seq: [2, 3, 6, 2, 3, 6], win: 34 }, { m: "D", seq: [6, 2, 3], win: 16 }, { m: "A", seq: [2, 3, 6], win: 14 }, { m: "B", seq: [2, 1, 4], win: 14 }];
   function Fighter(side, cid, o) { return { side: side, cid: cid, ch: CH[cid], x: side < 0 ? 300 : 660, y: 0, vx: 0, vy: 0, face: side < 0 ? 1 : -1, hp: 100, max: 100, white: 0, meter: 0, stun: 0, guard: 0, st: "stand", stT: 0, mv: null, mf: 0, hit: false, hitstop: 0, combo: 0, juggle: 0, inv: 0, armor: 0, o: o, buf: [], btn: [], crouch: false, blockH: null, hits: 0, taken: 0, dealt: 0, landed: 0, blocked: 0, thrTech: 0, chain: 0, kdT: 0, wins: 0, cancelOK: 0, aiT: 0, maxCombo: 0 }; }
@@ -194,7 +202,7 @@
     var air = d.y < 0 || m.kd || m.rise; d.mv = null; d.parry = 0; d.armor = 0;
     if (air) { d.st = "juggle"; d.stT = 0; d.vy = m.rise ? -520 : -360; d.vx = -d.face * (m.kb * 1.4); d.y = Math.min(d.y, -1); }
     else { d.st = "hitstun"; d.stT = 0; d.hs = m.hs + (ctr ? 8 : 0); d.vx = -d.face * m.kb * 2.2; }
-    this.hitstopAll(m.su ? 5 : m.dmg >= 8 ? 12 : 8); this.shake = Math.max(this.shake, m.shake || 0);
+    var hsN = m.su ? 5 : m.dmg >= 8 ? 12 : 8; this.hitstopAll(hsN); this.shake = Math.max(this.shake, m.shake || 0);
     var hx = d.x + d.face * 28, hy = GROUND - m.y - (d.y < 0 ? -d.y : 0); this.fx.push({ k: "spark", x: hx, y: hy, t: 0, life: m.dmg >= 8 ? 0.3 : 0.22, big: m.dmg >= 8 || m.su, col: a === this.P ? CH[a.cid].col : "#c58cff" });
     if (ctr) this.fx.push({ k: "txt", s: "COUNTER", x: d.x, y: 210, t: 0, life: 0.7 });
     if (d.hp <= 0) this.ko(a, d);
@@ -299,12 +307,10 @@
     var m = f.mv;
     if (f.st === "dead" || f.st === "down") return "down"; if (f.st === "juggle" || f.st === "thrown") return "hit2"; if (f.st === "hitstun") return f.stT < 6 ? "hit" : "hit2";
     if (f.st === "block") return f.blockH === "low" ? "cblock" : "block";
-    if (m) { var ph = f.mf < m.st ? 0 : f.mf < m.st + m.ac ? 1 : 2; var p = m.pose;
-      if (p === "lp" || p === "clp") return ph === 1 ? p : (m.crouch ? "crouch" : "idle");
-      if (p === "jatk") return ph === 0 ? "jump" : "jatk";
-      if (p === "super") return ph === 0 ? "special" : "super";
-      if (ph === 0) return m.crouch ? "crouch" : p === "dp" ? "crouch" : p === "hp" || p === "rush" ? "hp_s" : p === "special" ? "special_s" : "idle_b";
-      return p; }
+    if (m) { // AIR 式动作表：按前摇 / 发生 / 收招三段各自的帧数，把关键帧均分到该段（与 MUGEN .air 的 element ticks 同理）
+      var ph = f.mf < m.st ? 0 : f.mf < m.st + m.ac ? 1 : 2, A = ANIM[m.pose] || { s: ["idle_b"], a: [m.pose], r: ["idle"] }, seq = ph === 0 ? A.s : ph === 1 ? A.a : A.r,
+        len = ph === 0 ? m.st : ph === 1 ? m.ac : m.rc, t0 = ph === 0 ? 0 : ph === 1 ? m.st : m.st + m.ac, k = Math.min(seq.length - 1, Math.floor((f.mf - t0) / Math.max(1, len) * seq.length));
+      return seq[Math.max(0, k)]; }
     if (f.st === "air" || f.st === "backdash") return f.vy < -300 ? "jump_up" : f.vy > 250 ? "jump_fall" : "jump"; if (f.st === "jsquat" || f.st === "crouch") return "crouch";
     if (f.st === "dash") return "dash";
     if (f.st === "walk") { var wi = Math.floor(this.frame / 5) % 8; if (f.vx * f.face < 0) wi = 7 - wi; return "walk_" + wi; } // 8 帧走路循环（后退倒放）
@@ -318,12 +324,28 @@
     var sup = this.fx.find(function (q) { return q.k === "super"; }); if (sup || this.freeze > 0) { g.fillStyle = "rgba(8,0,20,.72)"; g.fillRect(0, 0, FW, FH); }
     g.fillStyle = "rgba(0,0,0,.22)"; g.fillRect(0, GROUND, FW, FH - GROUND);
     [[this.E, img.foe, true], [this.P, img.me, false]].forEach(function (pr) {
-      var f = pr[0], set = pr[1] || {}, ps = self.pose(f), FB = { hp_s: "idle_b", special_s: "idle_b", jump_up: "jump", jump_fall: "jump", dash: "walk1" }, im = set[ps] && set[ps].width ? set[ps] : set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")] && set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")].width ? set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")] : set.idle, x = f.x, y = GROUND + f.y + 7, h = 265;
+      var f = pr[0], set = pr[1] || {}, ps = self.pose(f), FB = { hp_s: "idle_b", special_s: "idle_b", jump_up: "jump", jump_fall: "jump", dash: "walk1", lp_s: "idle_b", lp_r: "idle", hp_r: "hp", dp_r: "crouch", super_r: "super", rush_r: "rush", throw_s: "throw", jatk_s: "jump" }, im = set[ps] && set[ps].width ? set[ps] : set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")] && set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")].width ? set[FB[ps] || (ps.indexOf("walk_") === 0 ? (+ps.slice(5) < 4 ? "walk1" : "walk2") : "idle")] : set.idle, x = f.x, y = GROUND + f.y + 7, h = 265;
       g.fillStyle = "rgba(0,0,0,.35)"; g.beginPath(); g.ellipse(x, GROUND + 4, 52, 10, 0, 0, 7); g.fill();
-      g.save(); g.translate(x, y); g.scale(f.face, 1);
+      var m = f.mv, ph = m ? (f.mf < m.st ? 0 : f.mf < m.st + m.ac ? 1 : 2) : -1, sx = 1, sy = 1, rot = 0, jit = 0;
+      // 程序性补正：发生帧拉伸（stretch）、受击压扁（squash）+ 弹簧式回正、起跳拉伸 / 蹲跳压扁、受击方额外抖动（MUGEN HitDef 的 p2 shaketime）
+      if (ph === 1 && f.mf - m.st < 3) { sx = 1.08; sy = 0.95; } else if (ph === 0 && STRONG[m.pose]) { sx = 0.96; sy = 1.03; }
+      if (f.st === "hitstun" || f.st === "juggle") { var e = Math.exp(-f.stT / 6); sx = 1 - 0.12 * e; sy = 1 + 0.06 * e; rot = -0.08 * e * Math.cos(f.stT * 0.8); }
+      if (f.st === "jsquat") { sx = 1.1; sy = 0.88; } else if (f.st === "air" && f.vy < -300) { sx = 0.94; sy = 1.07; }
+      if (f.hitstop > 0 && (f.st === "hitstun" || f.st === "block" || f.st === "juggle")) jit = (f.hitstop % 2 ? 4 : -4);
+      // 残影：发生帧、突进、冲刺、超必杀时，画出前几帧位置的半透明拖影
+      f.trail = f.trail || []; var ghost = (ph === 1 && STRONG[m.pose]) || f.st === "dash" || (m && m.dash && ph < 2);
+      if (ghost && f.hitstop <= 0) f.trail.push({ x: x, y: y, im: im }); else if (!ghost) f.trail.length = 0; if (f.trail.length > 4) f.trail.shift();
+      f.trail.forEach(function (q, i) { if (!q.im || !q.im.width) return; var ww = h * q.im.width / q.im.height; g.save(); g.translate(q.x, q.y); g.scale(f.face, 1); g.globalAlpha = 0.12 + 0.07 * i; g.filter = "brightness(1.6) sepia(1) hue-rotate(" + (pr[2] ? 220 : 280) + "deg) saturate(3)"; g.drawImage(q.im, -ww / 2, -h, ww, h); g.restore(); });
+      g.save(); g.translate(x + jit, y); g.scale(f.face * sx, sy); g.rotate(rot);
       if (f.st === "down" || f.st === "dead") { g.translate(0, 0); }
       if (im && im.width) { var w = h * im.width / im.height; if (pr[2]) g.filter = "brightness(.8) saturate(.7) contrast(1.1) drop-shadow(0 0 6px " + (self.E.o.boss ? "#ff3355" : "#b06cff") + ")"; if (f.hitstop > 0 && f.st === "hitstun") g.filter = "brightness(1.8)"; g.drawImage(im, -w / 2, -h, w, h); g.filter = "none"; }
       else { g.fillStyle = pr[2] ? "#6a4a9a" : CH[f.cid].col; var crouch = ps === "crouch" || ps === "clp" || ps === "chp" || ps === "cblock"; g.fillRect(-26, crouch ? -120 : -210, 52, crouch ? 120 : 210); if (ps === "lp" || ps === "hp" || ps === "clp" || ps === "chp" || ps === "jatk" || ps === "dp" || ps === "rush" || ps === "super") { g.fillStyle = "#fff"; g.fillRect(20, crouch ? -60 : -140, (f.mv && f.mv.reach) || 60, 14); } }
+      if (ph === 1 && STRONG[m.pose]) { // 刀光（程序化的涂抹帧）：沿攻击方向画一道渐隐弧光
+        var k = (f.mf - m.st) / Math.max(1, m.ac), cy = -(m.y || 120) - 20, R0 = (m.reach || 90) + 20; g.save(); g.globalCompositeOperation = "lighter";
+        for (var j = 0; j < 3; j++) { g.globalAlpha = (0.55 - j * 0.15) * (1 - k * 0.6); g.strokeStyle = j ? (pr[2] ? "#b98cff" : CH[f.cid].col) : "#fff"; g.lineWidth = 14 - j * 4; g.beginPath(); g.arc(0, cy, R0 - j * 10, m.pose === "dp" ? -2.4 : -1.1, m.pose === "dp" ? -0.5 + k : 0.4 + k * 0.6); g.stroke(); }
+        g.restore(); }
+      if (self.o.clsn || global.__duelClsn) { g.save(); g.scale(1 / sx, 1 / sy); g.lineWidth = 2; g.strokeStyle = "#3b8bff"; g.strokeRect(-30, -(f.st === "crouch" || (m && m.crouch) ? 130 : 220), 60, f.st === "crouch" || (m && m.crouch) ? 130 : 220); // Clsn2（蓝，受击框）
+        if (ph === 1 && m.reach) { g.strokeStyle = "#ff3344"; g.strokeRect(20, -(m.y || 120) - 20, m.reach - 20, 40); } g.restore(); } // Clsn1（红，攻击框）
       if (f.tele && f.mv && f.mf < 0) { g.fillStyle = "#ff3355"; g.font = "bold 40px sans-serif"; g.textAlign = "center"; g.fillText("!", 0, -h - 10); }
       g.restore();
       if (f.inv > 0 && f.st === "stand") { g.strokeStyle = "rgba(255,255,255,.4)"; g.beginPath(); g.ellipse(x, y - 120, 60, 130, 0, 0, 7); g.stroke(); }
@@ -356,7 +378,7 @@
   };
   Game.prototype.snapshot = function () { var P = this.P, E = this.E; return { t: +this.t.toFixed(2), round: this.round, wins: [P.wins, E.wins], hp: +(P.hp / P.max).toFixed(3), foeHp: +(E.hp / E.max).toFixed(3), meter: +P.meter.toFixed(2), foeMeter: +E.meter.toFixed(2), combo: P.combo, maxCombo: P.maxCombo, st: P.st, foeSt: E.st, move: P.mn && P.mv ? P.mn : null, foeMove: E.mn && E.mv ? E.mn : null, x: Math.round(P.x), foeX: Math.round(E.x), done: this.done, win: this.win, special: this.special, ch: this.cid, foe: E.cid, form: this.slot, route: this.route, pose: this.pose(P) }; };
   /* —— DOM 外壳 —— */
-  var POSES = ["idle", "idle_m", "idle_b", "walk1", "walk2", "crouch", "jump", "lp", "hp", "clp", "chp", "jatk", "block", "cblock", "hit", "hit2", "down", "throw", "special", "dp", "rush", "super", "win", "walk_0", "walk_1", "walk_2", "walk_3", "walk_4", "walk_5", "walk_6", "walk_7", "hp_s", "special_s", "jump_up", "jump_fall", "dash"];
+  var POSES = ["idle", "idle_m", "idle_b", "walk1", "walk2", "crouch", "jump", "lp", "hp", "clp", "chp", "jatk", "block", "cblock", "hit", "hit2", "down", "throw", "special", "dp", "rush", "super", "win", "walk_0", "walk_1", "walk_2", "walk_3", "walk_4", "walk_5", "walk_6", "walk_7", "hp_s", "special_s", "jump_up", "jump_fall", "dash", "lp_s", "lp_r", "hp_r", "dp_r", "super_r", "rush_r", "throw_s", "jatk_s"];
   var CSS = "#duel46{position:fixed;inset:0;z-index:125;background:#07050d;touch-action:none;user-select:none;color:#fff}#duel46 canvas{position:absolute;inset:0;width:100%;height:100%}#duel46 .dstk46{position:absolute;left:max(18px,env(safe-area-inset-left));bottom:18px;width:150px;height:150px;border-radius:50%;background:#ffffff14;border:2px solid #ffffff33}#duel46 .dstk46 i{position:absolute;left:50%;top:50%;width:60px;height:60px;margin:-30px;border-radius:50%;background:#ffffff44;transform:translate(var(--x,0),var(--y,0))}#duel46 .dact46{position:absolute;right:max(14px,env(safe-area-inset-right));bottom:14px;display:grid;grid-template-columns:repeat(3,64px);gap:8px}#duel46 .dact46 button{width:64px;height:64px;padding:0;line-height:1.1;border-radius:50%;border:2px solid #ffffff44;background:#1a1230cc;color:#fff;font-weight:700;font-size:14px}#duel46 .dact46 button.on{border-color:#5fd8ff;box-shadow:0 0 12px #5fd8ff}#duel46 .res{position:absolute;inset:0;display:grid;place-items:center;background:#06040ccc}#duel46 .res .box{text-align:center}#duel46 .res button{margin-top:14px;padding:12px 26px;border-radius:999px;border:0;background:#ff5f9e;color:#fff;font-size:15px}#duel46 .help{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-size:11px;color:#ffffffaa;text-align:center;pointer-events:none;white-space:nowrap}";
   var cur = null, raf = 0;
   function start(o) {

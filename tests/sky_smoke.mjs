@@ -40,11 +40,11 @@ for (const [route, pickMode, sel] of [['bio', 'sky', '#shm46'], ['tech', 'duel',
 // 樱花弹珠台：大厅抽奖小游戏，每日免费 1 球
 await api('backMenu').catch(() => {});
 assert.ok(await api('openPachi46', { seed: 3 })); assert.ok(await page.locator('#pachi46 canvas').isVisible());
-const c0 = (await api('pachiStep46', 0)).coins; assert.ok(await api('pachiFire46', 180), 'free ball');
-let pr; for (let i = 0; i < 40 && !(pr = await api('pachiStep46', 1)).got.length; i++);
-assert.equal(pr.got.length, 1, 'ball landed'); assert.equal(pr.st.free + pr.st.balls >= 1, true);
+const c0 = (await api('pachiStep46', 0)).coins; let pr;
+for (let i = 0; i < 6; i++) { await api('pachiStep46', 0.5); if (!(await api('pachiFire46'))) break; } // 免费局 3 发（+加一发）
+pr = await api('pachiStep46', 0.2); assert.equal(pr.shots, 0, 'round used up'); assert.equal(pr.st.balls, 1, 'one round recorded'); assert.ok(pr.coins >= c0, 'free round never costs coins');
 await page.screenshot({ path: '/tmp/sy/pachi-end.png' }).catch(() => {});
 assert.ok(await api('pachiClose46')); assert.equal(await page.locator('#pachi46').count(), 0);
 assert.deepEqual(errors, []);
 await browser.close();
-console.log('PASS modes (sky/duel + sakura pachinko lottery): node per layer, shmup overlay, autopilot clear, shards/relic writeback, overlay teardown');
+console.log('PASS modes (sky/duel + festival shateki (缘日射的)): node per layer, shmup overlay, autopilot clear, shards/relic writeback, overlay teardown');
