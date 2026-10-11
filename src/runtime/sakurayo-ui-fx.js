@@ -21,7 +21,7 @@
 /* 视差：背景 / 角色 / 面板三层反向位移 + 轻微 3D 旋转 */
 #menu{perspective:1400px}
 #menu .bg{translate:calc(var(--px,0) * -14px) calc(var(--py,0) * -8px);scale:1.04;transition:translate .25s ease-out}
-#menu #heroLive46{translate:calc(var(--px,0) * -6px) calc(var(--py,0) * -4px);transition:translate .25s ease-out}
+#menu #heroLive46 img{translate:calc(var(--px,0) * -6px) calc(var(--py,0) * -4px);transition:translate .25s ease-out} /* 只移动立绘图片，不移动可点击的 heroTap 热区（会盖住竖屏底栏） */
 /* 可点击的入口面板不参与视差：preserve-3d/rotateY 会让切角按钮的命中落到父容器，位移会把按钮推出安全区 */
 #menu #coverTitle36{translate:calc(var(--px,0) * 8px) calc(var(--py,0) * 4px);transition:translate .3s ease-out}
 /* 镜头推拉：打开子页面时大厅后退、模糊、压暗 */
