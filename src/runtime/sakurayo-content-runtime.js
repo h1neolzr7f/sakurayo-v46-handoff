@@ -30,10 +30,16 @@
     Object.keys(value).forEach(function (key) {
       if (key === "__proto__" || key === "constructor" || key === "prototype") return;
       var incoming = value[key];
-      if (isRecord(output[key]) && isRecord(incoming)) output[key] = mergeDefaults(output[key], incoming);
+      if (isRecord(output[key])) output[key] = mergeDefaults(output[key], incoming);
+      else if (Array.isArray(output[key])) { if (Array.isArray(incoming)) output[key] = clone(incoming); }
       else output[key] = clone(incoming);
     });
     return output;
+  }
+
+  // Shared adapter receipts are typed even when a pack omits saveDefaults.
+  function normalizePackData(pack, value) {
+    return mergeDefaults(mergeDefaults({ purchases: {}, collected: {}, visits: {}, choices: {}, fragments: [] }, pack.saveDefaults), value);
   }
 
   function recordError(packId, phase, error) {
@@ -312,7 +318,11 @@
     var accepted = [];
     sorted.forEach(function (pack) {
       var conflict = accepted.find(function (other) { return pack.conflicts.indexOf(other.id) >= 0 || other.conflicts.indexOf(pack.id) >= 0; });
-      if (conflict) disable(pack, "Conflicts with " + conflict.id); else accepted.push(pack);
+      if (conflict) disable(pack, "Conflicts with " + conflict.id);
+      else {
+        var missing = pack.dependencies.find(function (dependency) { return !packById[dependency.id].enabled; });
+        if (missing) disable(pack, "Disabled dependency " + missing.id); else accepted.push(pack);
+      }
     });
     orderedPacks = accepted;
     emit("runtime:finalized", { enabled: accepted.map(function (pack) { return pack.id; }) });
@@ -349,7 +359,7 @@
   function migratePackData(pack, original, exists) {
     var currentVersion = Math.max(0, Math.floor(Number(original.__version) || 0));
     if (currentVersion > pack.version) throw new Error("Save version " + currentVersion + " is newer than pack " + pack.version);
-    var data = mergeDefaults(pack.saveDefaults, isRecord(original.data) ? original.data : original);
+    var data = normalizePackData(pack, isRecord(original.data) ? original.data : original);
     if (!exists || currentVersion === 0) return { __version: pack.version, data: data };
     var migrations = pack.migrations.map(function (entry) { return clone(entry); });
     while (currentVersion < pack.version) {
@@ -359,7 +369,7 @@
       if (to !== currentVersion + 1 || to > pack.version) throw new Error("Migration must advance exactly one version from " + currentVersion);
       data = applyMigration(data, matches[0]); currentVersion = to;
     }
-    return { __version: currentVersion, data: data };
+    return { __version: currentVersion, data: normalizePackData(pack, data) };
   }
 
   function migrateSave(save) {
@@ -399,8 +409,16 @@
     return function () { listeners[name] = (listeners[name] || []).filter(function (entry) { return entry.handler !== handler; }); };
   }
 
+  function ownerEnabled(owner) {
+    var pack = packById[owner];
+    return !pack || pack.enabled;
+  }
+
   function emit(eventName, payload) {
-    (listeners[String(eventName || "")] || []).slice().forEach(function (entry) { try { entry.handler(payload); } catch (error) { recordError(entry.owner, "event:" + eventName, error); } });
+    (listeners[String(eventName || "")] || []).slice().forEach(function (entry) {
+      if (!ownerEnabled(entry.owner)) return;
+      try { entry.handler(payload); } catch (error) { recordError(entry.owner, "event:" + eventName, error); }
+    });
   }
 
   function hook(name, handler, owner, priority) {
@@ -414,8 +432,7 @@
 
   function runHooks(name, payload) {
     (hooks[String(name || "")] || []).slice().forEach(function (entry) {
-      var ownerPack = packById[entry.owner];
-      if (ownerPack && !ownerPack.enabled) return;
+      if (!ownerEnabled(entry.owner)) return;
       try { entry.handler(payload); } catch (error) { recordError(entry.owner, "hook:" + name, error); }
     });
     return payload;

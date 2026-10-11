@@ -1,0 +1,157 @@
+OK: 16 required symbols present; 18 scripts (16 local external) -> tests/artifacts/static/index.extracted.js
+Next: node --check tests/artifacts/static/index.extracted.js
+camera_unit ok
+chapter_design_unit ok
+✔ fresh defaults have only normal Sayo starting stats (51.133627ms)
+✔ sayo/story full collection cannot change real reset stats or erase collection (44.826795ms)
+✔ aya/story full collection cannot change real reset stats or erase collection (22.262991ms)
+✔ rion/story full collection cannot change real reset stats or erase collection (24.191821ms)
+✔ sayo/testimony full collection cannot change real reset stats or erase collection (32.15033ms)
+✔ aya/testimony full collection cannot change real reset stats or erase collection (31.529147ms)
+✔ rion/testimony full collection cannot change real reset stats or erase collection (26.839793ms)
+✔ sayo/mainGod full collection cannot change real reset stats or erase collection (32.342602ms)
+✔ aya/mainGod full collection cannot change real reset stats or erase collection (29.605326ms)
+✔ rion/mainGod full collection cannot change real reset stats or erase collection (27.59604ms)
+✔ talents, initial core and regular shop mirror still change a real start (20.122917ms)
+✔ real lobby install retains declared school weights without duplicate stacking (27.546779ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 403.92631
+PASS command unit: legacy save, finite milestones, locked/duplicate claims, persistence
+✔ F22 default record/array shapes and all receipt fields survive serialized reload (9.142455ms)
+✔ F22 packs without defaults normalize before and after migration (1.574118ms)
+✔ F24 conflict disables downstream content, events and hooks consistently (6.593827ms)
+✔ owner callback failures are logged while following callbacks run (1.619005ms)
+✔ real extension shop callback and test API use current receipts and wallet (5.71177ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 38.291301
+cutscene_unit PASS: typing/victory remaining timers, cancellation
+✔ readable legacy storage remains readable even when writes throw (50.339392ms)
+✔ every pool preserves high balances, including cheat and snapshot (19.345392ms)
+✔ owned relationships and every actual merchandise cap normalize on startup/import (8.847057ms)
+✔ buying talisman with full slots persists once; repeated old button never pays twice (16.116189ms)
+✔ bait Lv.1 offers actual upgrade to 2 and 3 and disables unaffordable/max upgrade (13.48646ms)
+✔ refund sums exact arithmetic series and is bounded for corrupted input (6.839593ms)
+✔ wallet does not recommend paid-for goods (3.19534ms)
+✔ writeSave returns real write outcome and failure stays visible until successful retry (2.969983ms)
+✔ import saves candidate before replacing runtime object; failure has no success effects (3.003637ms)
+✔ all catalog limits apply uniformly; legitimate balances remain lifetime counters (5.330897ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 190.819942
+✔ bullets deflected cannot hit a overlapping target (48.477696ms)
+✔ bullets expired cannot hit a overlapping target (28.846301ms)
+✔ ebullets deflected cannot hit a overlapping target (26.485615ms)
+✔ ebullets expired cannot hit a overlapping target (24.868543ms)
+✔ acid and spore preserve fractional damage independent of fixed step (100.507177ms)
+✔ enemy bomb damages player and leaves adjacent enemy untouched (54.492798ms)
+✔ bioSplit is forwarded through real bullet kill to split projectiles (28.959227ms)
+✔ single-core challenge counts real formed careers (29.256591ms)
+✔ directional blade multiplier is applied once (29.028368ms)
+✔ drone pet multiplier is applied once at damage settlement (29.841073ms)
+✔ bat pet multiplier is applied once at damage settlement (25.519851ms)
+✔ familiar pet multiplier is applied once at damage settlement (31.060088ms)
+✔ wisp pet multiplier is applied once at damage settlement (37.777665ms)
+✔ boss radius broad phase includes cross-cell overlapping bullet (30.034257ms)
+✔ enemy burst and radial shots obey cap for every enqueue (27.409249ms)
+✔ Grid within rejects cell corner neighbors and nearest ignores dead enemies (39.303686ms)
+✔ homing bullets use bounded grid nearest after rebuild (26.005278ms)
+✔ aoe radius includes a large boss across a cell boundary (26.396383ms)
+✔ boss guards spawn around boss in world bounds (26.651092ms)
+✔ chapter 2 teleport remains in world near current encounter (25.914216ms)
+✔ real fixedUpdate DOT yields equal totals at 30/60/120Hz (95.203581ms)
+✔ aoe summon identity reaches damage settlement (27.211599ms)
+✔ spore spread and plague do not affect cell corner enemies (77.448805ms)
+✔ frost skill only freezes targets inside its circle (27.605472ms)
+✔ rion skill only freezes targets inside its circle (30.975079ms)
+✔ plagueforge burst rejects circular range cell corners (33.264338ms)
+✔ flowerplague burst rejects circular range cell corners (26.007558ms)
+✔ necrospore burst rejects circular range cell corners (28.215397ms)
+✔ purifier cleanse only clears ailments inside its circle (26.255457ms)
+✔ purifier healing only affects enemies inside its circle (36.454434ms)
+✔ elementalBeast41 secondary ailments stay inside circle (42.278831ms)
+✔ plagueIdol41 secondary ailments stay inside circle (29.042037ms)
+✔ elemental beast pulse 0 applies pet multiplier once for every source (29.072766ms)
+✔ elemental beast pulse 1 applies pet multiplier once for every source (67.875199ms)
+✔ elemental beast pulse 2 applies pet multiplier once for every source (25.723773ms)
+✔ orbit hits enemy that enters its radius across a grid cell during this fixed step (25.619408ms)
+✔ spore aura includes enemy that moved across a grid cell into its circle (33.076203ms)
+✔ purifier uses post-movement enemy positions independent of array order (true) (35.687064ms)
+✔ purifier uses post-movement enemy positions independent of array order (false) (37.013543ms)
+ℹ tests 39
+ℹ suites 0
+ℹ pass 39
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1445.171901
+lifecycle_unit ok
+PASS live unit: blink interval, look damp, tapHead trigger
+PASS lobby unit: rates, default two cards, pity, ten-pull, cheat taps, stage modes
+PASS ops unit: DP, 2 pins, testimony off, no update wrap
+platform_unit PASS: modal priority, lifecycle, Unicode bridge, strict zero sources/gain, observable errors
+✔ legacy numeric chapter IDs unlock progress and retain distinct completions (8.579189ms)
+✔ discard invalid run entries before the 30-record cap; preserve actual run evidence (4.367196ms)
+✔ old volume settings gain current defaults without overriding player volume (0.629363ms)
+✔ normalize is pure, idempotent and preserves valid progress and receipts (3.028964ms)
+✔ invalid root and core arrays cannot be imported (0.487415ms)
+✔ malformed containers and settings are repaired at the boundary (3.584644ms)
+✔ nested prototype keys and unknown top-level fields are excluded (0.739422ms)
+✔ defaults are fresh, missing startup fields migrate, and glow migration respects current choices (5.480962ms)
+✔ collection migration retains receipts and balances and shares no references with input (24.287449ms)
+✔ earned lifetime balances survive startup and export/import above legacy import caps (2.81354ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 119.012577
+PASS services unit: shared mail receipts, read/reload, claim-all, seven login days, clock rollback, malformed migration
+✔ reset deletes all old run properties and preserves player identity (30.238559ms)
+✔ first main God rebirth doll initializes a finite revive count (14.239655ms)
+✔ starting a new run discards previous enemies from spatial queries (20.168692ms)
+✔ XP earned while choosing stays unspent until each next choice (7.993736ms)
+✔ testimony and no-upgrade consume all thresholds exactly once (12.890682ms)
+✔ fixedUpdate returns before any work after play has ended (9.861251ms)
+✔ Aya second skill slash follows game time, pauses, and is cleared on a new run (28.060187ms)
+✔ fixedUpdate picks one XP gem, stops for its choice, and keeps other gems (25.081665ms)
+✔ finish rejects duplicate challenge credit and balance sample at the entry (18.84926ms)
+✔ a level-triggering twelfth gem still applies its transmutation reward (14.98297ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 218.726736
+PASS ui input: pointer ownership, effective quality, input release, missing blink art
+CONTENT PACK CHECK PASS: 6 scripts, 5 enabled, 1 conditional
+REGISTERED IDS: fixture.broken-content, official.feedback, official.framework-example, official.maingod-void, official.modkit-addon, official.story-exploration
+COMMAND ART PASS: 15 local WebP files, 8 animation frames, 3,239,014 bytes
+TACTICAL ART PASS: 10 approved local WebP files, 2,067,734 bytes; dimensions and SHA256 match
+BUILT /workspace/scratch/4f55dcd30fad/sakurayo-handoff/android-app/app/src/main/assets/index.html
+PACKS 6 ART_FILES 45
+SHA256 e38a9af002f95c8fb6d4e5f1b4cb3fe3a3d8ec07b45274f55798fca25d05bc22
+OK: 16 required symbols present; 24 scripts (0 local external) -> tests/artifacts/static/android.bundle.extracted.js
+Next: node --check tests/artifacts/static/android.bundle.extracted.js
+VERIFY PASS

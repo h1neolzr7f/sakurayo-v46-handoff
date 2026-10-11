@@ -1,0 +1,121 @@
+# PLAYBOOK — 这条线上验证过的做法与坑
+
+> 面向接手的人/agent。每条都是踩过坑后留下的“怎么做才对”。
+
+## 0. 速查目录
+| 场景 | 入口 |
+|---|---|
+| 出图（中转站） | `/workspace/sakurayo-gen/gen.py jobs_xxx.json`，§1 |
+| 看板娘：小幅动作（网格+骨骼） | `tools/anim-pipeline/body.py`，§6 |
+| 看板娘：大幅动作（关键帧+RIFE） | `tools/anim-pipeline/action.py`，§4–§6 |
+| 纵版射击背景平铺 | `tools/shmup_tiles.py`，§12 |
+| 弹珠/格斗/射击节点 | `src/runtime/sakurayo-{pinball,duel,shmup}.js`，§13 |
+| 衣橱（外观） | `src/runtime/sakurayo-wardrobe.js`，§14 |
+| 全量回归 | `bash tools/verify.sh`（约 25–40 分钟，后台跑），§8 |
+| 录像 | `tools/record_mascot.mjs` / `record_sky.mjs` / `record_sky_boss.mjs`，§7 |
+
+## 1. 中转站出图（gpt-image-2）
+- 脚本：`/workspace/sakurayo-gen/gen.py`，凭据在 `/workspace/.secrets/sakurayo-relay.env`（不要入库）。
+- **必须带浏览器 UA**（`User-Agent: Mozilla/5.0 …`），否则中转站的 WAF 会直接 403/断连。
+- `503 no_available_account` = 账号池暂时打满：退避 90–120 s 重试，最多 80 次；不要高频重试（会拖垮其它任务）。并发 4–6。
+- 每个资产出 2–3 个变体再自动/人工挑；edit 任务一律把原立绘作为 `ref`，提示词开头写“Keep … pixel-identical”。
+- 语义 mask 的套路：让模型把某部位“涂成纯色 #00FF00/#FFFF00/#0000FF”，再按颜色阈值取 mask，比分割模型稳。
+
+## 2. 抠图 rembg
+- 立绘/动漫用 `isnet-anime` 会话；会话对象复用（`new_session` 一次），否则每张都重载模型。
+- 白底生成图：先 rembg，再对 alpha 做 0.8 px 高斯，避免锯齿亮边。不要用“非白即前景”的阈值判断（米白阴影会变成白块）。
+
+## 3. 对齐 ECC
+- `cv2.findTransformECC(..., MOTION_AFFINE, mask=静止区)`：只用**不动的区域**求变换，否则动作本身会把变换带偏。
+- 输入灰度 float32/255；失败时 `cv2.error` 退回单位阵。
+- OpenCV 5 移走了 `CascadeClassifier`：钉 `opencv-python-headless<5`。
+
+## 4. RIFE 补帧（CPU）
+- `/workspace/sakurayo-tools/rife_interp.py`（Practical-RIFE v4.25 权重 + vs-rife 网络定义，MIT）。
+- 输入宽高必须是 **64 的倍数**（32 不够，多尺度金字塔会 1248≠1280 报错）。
+- RGBA：先合成到中性灰底再插值，再反合成；alpha 通道单独插。
+- 只在**运动区包围盒**里插，整图 1024×1536 在共享 15 GB 的盒子上会被 OOM killer 杀（dmesg 可见）。
+- 大动作别指望一次插：用 gpt-image-2 多出 2–3 个中间关键帧，每段再递归二分 3 次（7 帧）。
+
+## 5. 去闪烁 / 闪烁检测
+- 根因通常是：AI 重绘造成整体亮度/色偏不同、抠图边缘每帧不同、锚点漂移、重采样模糊。
+- 做法：静止区逐通道均值/方差匹配 → **静止区直接回填原图像素**（运动 mask 羽化）→ 首尾帧 == 原图。
+- 检测：静止区平均亮度跨帧极差（应 <0.5）、相邻帧运动区平均差、录像逐帧差的尖峰（接缝跳帧会出现 >4 的孤立尖峰）。
+- WCAG：`tests/flicker_smoke.mjs` 要求“减少闪光”开/关两种模式都 ≤3 次/秒。不要用删效果来过测试——用缓动曲线、峰值上限、交叉淡化。
+
+## 6. 动作与 rig 的分工
+- 小幅（呼吸、眨眼、头发、重心、转头联动）= rig v2 网格+骨骼（`tools/anim-pipeline/body.py`）。
+- 大幅（抬手、伸懒腰、招手）= 关键帧+补帧序列（`tools/anim-pipeline/action.py`），序列网格仍采样身体权重，所以播放中呼吸/重心不断。
+- 无缝切换：先把手臂待机摆动收为 0（0.25 s），序列淡入（首帧 == 待机），倒放回首帧后淡出。网格硬拉大动作会把袖子扯断——别再这么做。
+
+## 7. 录像 / 截图 / 相机裁剪
+- swiftshader 下 WebGL 很慢：录像不要用 Playwright `clock.install()`，改用 `window.__rigManual=1` + `SakurayoRig.step(1/30)` 逐帧推进再截图（`tools/record_mascot.mjs`）。
+- 截图超时调到 180 s；用 jpeg 帧再 ffmpeg 合成 `-framerate 30 -c:v libx264 -pix_fmt yuv420p -crf 18`。
+- 战斗录像的相机裁剪：先确认玩家/敌人在视口内（曾出现玩家在左上角以外时敌人不绘制的剔除 bug），竖屏/平板三种尺寸都截一遍（`tests/mascot_sizes_smoke.mjs`）。
+- Read 工具会缓存同路径图片：复核新截图时先复制成新文件名再看。
+
+## 8. 回归测试防抖
+- `localStorage` 写入与 `page.reload()` 竞争：reload 后等新文档的测试 API（如 `saveSnapshot`）出现，而不是等旧元素消失。
+- 固定 `waitForTimeout` 在高负载下会抖：改 `page.waitForFunction(条件)`。
+- 剧情行号会随文本改动：按说话人/内容找行，不要写死下标。
+- 护送 NPC 在 CPU 抢占时会被打死：测试 API `healNpc46` 兜底；时间限制留余量（4-1 = 115 s）。
+- `tools/verify.sh` 跑全量；浏览器崩溃多半是内存竞争，先单独重跑该测试确认，再查其它进程占用。
+
+## 9. 被中断后的保护
+- 开工前 `git status`；有未提交改动先 `git stash push -u -m wip-<时间>` 或提交到本地 WIP 提交，再继续。
+- 长任务拆小步：每步 → 单测 → 提交；全量回归通过后再 push 到 PR #32。
+- 后台任务输出写到 `/tmp/sy/*.log`，末尾追加 `EXIT $?`，中断后能判断跑到哪。
+
+## 10. 存档兼容
+- 新字段只增不改；旧字段读入后忽略（例如 DP 部署字段、永久数值天赋 → 一次性退还樱币 `talRefund46`）。
+- `sakurayo-save.js` 的 `sanitize` 对每个新模块调用其 `sanitize`，单测覆盖旧存档导入。
+
+## 11. build_smoke「图鉴解锁没保存」的真实根因
+- 不是游戏没写存档：5 个并发复现时，页面内 localStorage 已含 evo46，但 reload 后（甚至新开同源页面）读回的是种子存档——高负载下 Chromium 丢了渲染进程未提交的 localStorage 写入。
+- 修法：测试改为调用 `rebootSave46()`，走与启动时完全相同的 `bootLoadSave()` 读档管线；种子用 localStorage 标记只写一次。
+
+
+## 12. 纵版射击背景：周期化平铺，而不是镜像
+- 根因：旧实现把一张带月亮的背景上下镜像拼接 → 接缝一目了然，月亮出现两次。
+- 做法：让 gpt-image-2 生成“俯视、无天空/无地标、上下密度均匀”的地面图，再用 `tools/shmup_tiles.py` 把末尾 B 行与开头 B 行线性交叉淡化，输出高度 H−B 的严格周期图（第 0 行与最后一行像素连续）。
+- 自检：脚本打印“接缝行差 vs 图内相邻行差”，两者应接近（实测 12.5 vs 13.1、8.6 vs 8.1、4.4 vs 4.5）。
+- 天空元素（月亮）拆成单独精灵，作为远景层以 1/20 速度漂移，全程只出现一次。
+
+## 13. 玩法节点模块（射击/弹珠/格斗）的统一写法
+- 每个玩法是独立模块：`Game`（纯逻辑，可在 Node 里跑）+ `start(opts)`（自带画布、输入、HUD、结算框）+ `simulate()`（无 DOM 自动驾驶，用于平衡与单测）。
+- 与夜行地图只有两个接口：`opts`（角色、形态、`weapons`、`hpFrac`、`power`、`layer`、`seed`）和 `onClose(result)`（`win`、`hpFrac`…）；`index.html` 的 `launchSky46/skyDone46` 统一处理三种节点，生命写回构筑，魂晶+遗物与普通节点同一套 `SakurayoRun.complete`。
+- 平衡：三角色用时/回合比 ≤1.30（`tests/shmup_unit.mjs`、`tests/modes_unit.mjs`），所有形态×武器组合都要能通关。
+- 坑：自动驾驶遇到“段间三选一”会永远暂停——`auto` 模式下必须自动选择（射击模块已修）。录 Boss 战时先按 0.5 s 步进跳到 Boss 出现，再按 1/30 s 逐帧截图。
+- 新节点会改变地图结构，旧测试里“走某一行最后一个节点”的路径可能进入玩法节点 → 测试要能处理三种玩法节点（`forms_smoke` 已示范）。
+
+## 14. 外观（衣橱）只改视觉
+- 物品数据里不允许出现任何战斗字段（单测逐项断言）；运行时只通过 `look46`（光环色、子弹色、火花色、数字色、传说立绘）影响绘制。
+- 冒烟测试：装备前后进入同一关卡，`dmg/maxHp/speed/crit/fireRate` 必须完全相等。
+- 镜屑周上限 120（ISO 周一为界），传说外观需“该形态夜行中使用 3 局 + 120 镜屑 + 4500 樱花币”，不存在真实付费。
+- 新存档字段 `cosmetics46` 走 `SakurayoWardrobe.sanitize`：未知 id、未拥有却装备、跨角色装备都会被丢弃；旧存档得到空衣橱。
+
+## 15. 大幅动作补帧的经验数字
+- ToonCrafter：官方 HF Space（ZeroGPU）匿名调用直接报错；本机无 GPU、权重约 10 GB，不可行。GMFSS/AnimeInterp 依赖 CUDA 算子。→ 用 Practical-RIFE + 更密的 AI 关键帧。
+- 关键帧间距越大，RIFE 拖影越重：小夜 3 个关键帧够用；绫的长袖需要 6–8 个（`--keys k0q,k0h,k0r,k1h,k1q,k1r,k1m,k2 --inbetween 2`）。
+- gpt-image-2 不擅长“刚开始抬手”的极早期姿态（会直接画成抬到胸前）；早期姿态宁可用更多中段关键帧补。
+- 候选挑选 = 静止区残差 + 与上一关键帧的连续性；图集上限 4096（部分 Android WebView 的最大纹理），脚本会自动缩放。
+- 运行时：序列网格仍采样身体权重（呼吸不停），首尾帧 = 待机姿态；切入/切出各 0.25 s 淡化，录像逐帧差无尖峰。
+
+## 16. 中转站不可用时
+- 症状：`HTTP 530 … error code: 1033`（Cloudflare 隧道断开）或 `503 no_available_account`。gen.py 会以 90–120 s 间隔重试 80 次，不要并发加码。
+- 期间先写逻辑与测试；素材缺失由 `tests/story_unit.mjs` 这类“引用的文件必须存在”的测试兜住，不要用占位图蒙混过关。
+
+## 大动作“拖影”根治（v19，绫整理发夹）
+- 逐帧复查结论：RIFE 只能处理“同一画法的小位移”。关键帧之间若手肘外翻、袖子翻面（拓扑变化），无论插多少帧都会出现半透明双手——这是光流插值的原理性限制，加密 gpt-image-2 的独立关键帧也没用（每张画法不同，反而更糊）。
+- 做法：① **链式生成**（`/workspace/sakurayo-gen/chain_gen.py`）：每张关键帧以上一张选中的关键帧为编辑底图，只挪一小步，画法一致；对跨度仍大的段再补 halfway 帧（t2/v3/w3/u3）。② `action.py --largest`：贴片只保留手臂连通块；眼睛/嘴巴圆区强制用原图，交给 rig 眨眼（否则出现“补丁睁眼 + rig 闭眼”的半透明眼）。③ `--pose-hold 3`：不做 RIFE，每张关键帧定格 3 帧（24fps 下 8 张/秒，日式有限动画“三拍一”），运行时 `A.step` 关闭帧间交叉淡化——每一帧都是一张完整的手绘姿势，零叠影。idle↔动作的进出仍有 0.25s 淡入淡出。
+- 何时仍用 RIFE：关键帧间为同画法小位移（小夜/凛音的发夹、战斗精灵的走跑循环）。
+
+## 格斗精灵（KOF 式）制作经验（2026-10-11）
+- 先做“母版”：gpt-image-2 + 角色参考图生成一张侧视 idle（The King of Fighters XIII 手绘精灵风，朝右、脚贴近底边、纯灰底）。其余 21 个姿势全部用 **母版作参考图** 做编辑生成，提示词写明“same exact character / same scale / same camera / ground line at the same height”。这样三个角色的 22 张姿势，脸、服装和比例都是一致的。
+- 后处理（`/workspace/sakurayo-gen/ftg_post.py`）：
+  - 用 rembg（isnet-anime）抠图。
+  - 同一角色所有姿势用 idle 的包围盒推算一个统一裁切框。
+  - 着地姿势把脚底贴到 idle 的地平线；空中姿势（jump/jatk/dp/hit2）保持原位，由物理决定高度。
+  - 统一缩放到 420px 高。
+- 动画：招式一律 pose-hold 硬切（起手/判定/收招各对应一张关键帧），不做混合，所以不会有重影。RIFE 只用在剪影差异 ≤15% 的过渡上（待机呼吸 idle↔idle_b），并用“半透明像素比例”检测重影：中间帧不能明显高于关键帧。RIFE 需要输入尺寸是 64 的倍数，用 `rife_pad.py` 先补边再裁回。
+- 运行时 `#duel46` 的控件 class 不能用 `.stick` / `.act` 这类通用名：大厅的全局 CSS 会把它们覆盖（摇杆曾因此跑到左上角）。已改成 `.dstk46` / `.dact46`。

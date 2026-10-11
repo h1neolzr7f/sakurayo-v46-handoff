@@ -37,53 +37,16 @@
     return "还差 🌸 " + (price - wallet);
   }
 
-  function cheapestBuy(coins, shop40, starters, items, skins) {
-    var wallet = Math.max(0, Math.floor(Number(coins) || 0));
-    var hits = [];
-    Object.keys(starters || {}).forEach(function (id) {
-      var lv = (shop40 && shop40.starter && shop40.starter[id]) || 0;
-      if (lv >= 5) return;
-      var cost = 65 + lv * 55;
-      if (cost <= wallet) hits.push({ kind: "starter", id: id, name: starters[id].n, cost: cost });
-    });
-    Object.keys(items || {}).forEach(function (id) {
-      var u = items[id];
-      var lv = (shop40 && shop40.items && shop40.items[id]) || 0;
-      if (lv >= u.max) return;
-      var cost = u.base + u.step * lv;
-      if (cost <= wallet) hits.push({ kind: "item", id: id, name: u.n, cost: cost });
-    });
-    (skins || []).forEach(function (skin) {
-      if (!skin || !skin.price) return;
-      if (skin.price <= wallet) hits.push({ kind: "skin", id: skin.id, name: skin.n, cost: skin.price });
-    });
-    hits.sort(function (a, b) { return a.cost - b.cost; });
-    return hits[0] || null;
-  }
-
   function advice(character, coins, shop40, starters, items, skins) {
     injectStyle();
     var rec = recommend(character);
-    var starter = starters && starters[rec.starterId];
-    var item = items && items[rec.itemId];
-    var hasStarter = !!(shop40 && shop40.equippedStarter);
     var wallet = Math.max(0, Math.floor(Number(coins) || 0));
-    var next = cheapestBuy(wallet, shop40, starters, items, skins);
-    var line = rec.reason;
-    if (!hasStarter && starter) {
-      line = wallet >= 65
-        ? ("先买「" + starter.n + "」🌸 65。衣装稍后再说。")
-        : ("先打完第一章。通关后足够买「" + starter.n + "」。");
-    } else if (item && !(shop40 && shop40.items && shop40.items[rec.itemId])) {
-      line = rec.reason;
-    }
     return {
       version: VERSION,
       coins: wallet,
       recommend: rec,
-      next: next,
       firstClearBonus: FIRST_CLEAR,
-      line: line,
+      line: rec.reason,
     };
   }
 
@@ -93,8 +56,7 @@
     var node = global.document.createElement("div");
     node.className = "shopWallet44";
     node.id = "shopWallet44";
-    var next = info.next ? ("本局可买：" + info.next.name + " 🌸 " + info.next.cost) : "当前买不起新补给。先打一章再回来。";
-    node.innerHTML = "<b>🌸 " + info.coins + "</b><p>" + info.line + "</p><em>" + next + "</em>";
+    node.innerHTML = "<b>🌸 " + info.coins + "</b><p>" + info.line + "</p>";
     return node;
   }
 

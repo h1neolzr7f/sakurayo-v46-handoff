@@ -1,0 +1,2238 @@
+{
+  "baseline": "1e8e2e41bd03c99b2b567c05f55f511afda89e92",
+  "date": "2026-10-05",
+  "scope": "Read-only source and desktop Chromium audit; no APK or physical Android validation",
+  "baseline_bundle_sha256": "739eef62ff1e398c9e632c7aeb716a8ae2bf1b5e56d25024cbe07eac3e23a163",
+  "baseline_regression": "bash tools/verify.sh; node tests/testimony_smoke.mjs; both exit 0",
+  "source_and_bundle_battle_checks_each": 52,
+  "touch_checks": 37,
+  "asset_decode": {
+    "webp_files": 1330,
+    "failed_files": 0
+  },
+  "combat_vm": {
+    "dot_30": {
+      "damage": 60,
+      "acid": 30,
+      "spore": 30,
+      "expectedAcid": 2.9,
+      "expectedSpore": 2.75
+    },
+    "dot_60": {
+      "damage": 120,
+      "acid": 60,
+      "spore": 60,
+      "expectedAcid": 2.9,
+      "expectedSpore": 2.75
+    },
+    "dot_120": {
+      "damage": 240,
+      "acid": 120,
+      "spore": 120,
+      "expectedAcid": 2.9,
+      "expectedSpore": 2.75
+    },
+    "bomb": {
+      "playerHp": 100,
+      "playerDamageTaken": 0,
+      "bombDead": true,
+      "neighborDamage": 20,
+      "kills": 0
+    },
+    "bioSplit": {
+      "victimDead": true,
+      "lastHit": {
+        "source": "shot",
+        "school": "gun",
+        "rail": false
+      },
+      "generatedBioBullets": 0
+    },
+    "restart": {
+      "fusion": null,
+      "revive": 1,
+      "lordRisk": 1.3,
+      "berserk": 0.42,
+      "boneKing": 3,
+      "healingIdol": 3,
+      "flags": {
+        "soulGun41": 1,
+        "nanoNinja41": 1,
+        "fleshShrine41": 1,
+        "bloodMage41": 1,
+        "elementalBeast41": 1,
+        "plagueIdol41": 1
+      },
+      "staleSpellHeal": 2.1779999999999973,
+      "storyDamageAfterSwarm": 13
+    },
+    "mainGodFirstDoll": {
+      "revive": "NaN",
+      "isFinite": false
+    },
+    "specialist": {
+      "actualFormed": 3,
+      "accepted": true
+    },
+    "repeatFinish": {
+      "once": {
+        "points": 20,
+        "runs": 1,
+        "count": 1
+      },
+      "twice": {
+        "points": 20,
+        "runs": 1,
+        "count": 2
+      }
+    },
+    "repeatStoryFinish": {
+      "once": {
+        "samples": 1,
+        "runs": 2,
+        "coins": 59
+      },
+      "twice": {
+        "samples": 2,
+        "runs": 2,
+        "coins": 59
+      }
+    },
+    "bladeScaling": {
+      "actualDamage": 139.23999999999978,
+      "expectedOneApplication": 118
+    },
+    "petScaling": {
+      "bulletDamage": 10.98,
+      "actualDamage": 13.395599999999831,
+      "expectedOneApplication": 10.98
+    },
+    "gridCorner": {
+      "distance": 179.60512242138307,
+      "queryRadius": 120,
+      "returned": true
+    },
+    "bossGridMiss": {
+      "bullet": {
+        "x": 90,
+        "y": 100,
+        "r": 7
+      },
+      "boss": {
+        "x": 153,
+        "y": 100,
+        "r": 58
+      },
+      "overlap": true,
+      "returned": false,
+      "damageAfterOriginalFixedUpdate": 0
+    },
+    "enemyBulletCap": {
+      "declaredCap": 84,
+      "actualAfterBurst": 96
+    },
+    "multiLevelPickup": {
+      "level": 4,
+      "gemsConsumed": 3,
+      "choicesRendered": 1,
+      "state": "level"
+    },
+    "bossVictoryRace": {
+      "bossDead": true,
+      "playerHp": 0,
+      "state": "result",
+      "runWin": false
+    },
+    "worldBossAdds": {
+      "boss": {
+        "x": 1800,
+        "y": 500
+      },
+      "viewport": {
+        "W": 932,
+        "H": 430
+      },
+      "adds": [
+        {
+          "x": 912,
+          "y": 410
+        },
+        {
+          "x": 912,
+          "y": 410
+        },
+        {
+          "x": 912,
+          "y": 410
+        },
+        {
+          "x": 912,
+          "y": 410
+        }
+      ],
+      "guard": 4
+    },
+    "worldBossTeleport": {
+      "before": {
+        "x": 1800,
+        "y": 500
+      },
+      "after": {
+        "x": 466,
+        "y": 137.8
+      }
+    }
+  },
+  "content": [
+    {
+      "probe": "conflict_dependency_closure",
+      "packs": [
+        {
+          "id": "audit.first",
+          "version": 1,
+          "title": "audit.first",
+          "apiVersion": 1,
+          "enabled": true,
+          "disabledReason": "",
+          "dependencies": []
+        },
+        {
+          "id": "audit.dependency",
+          "version": 1,
+          "title": "audit.dependency",
+          "apiVersion": 1,
+          "enabled": false,
+          "disabledReason": "Conflicts with audit.first",
+          "dependencies": []
+        },
+        {
+          "id": "audit.dependent",
+          "version": 1,
+          "title": "audit.dependent",
+          "apiVersion": 1,
+          "enabled": true,
+          "disabledReason": "",
+          "dependencies": [
+            {
+              "id": "audit.dependency",
+              "minVersion": 1
+            }
+          ]
+        }
+      ],
+      "stories": [
+        {
+          "__packId": "audit.dependent",
+          "id": "still-active",
+          "n": "still-active",
+          "i": "📖",
+          "d": "",
+          "unlock": {
+            "type": "always"
+          }
+        }
+      ],
+      "eventCalls": 1,
+      "hookCalls": 0
+    },
+    {
+      "probe": "array_extension_receipts",
+      "first": {
+        "before": 500,
+        "after": 512,
+        "collectedPersisted": [],
+        "liveCollected": []
+      },
+      "second": {
+        "before": 512,
+        "after": 524,
+        "collectedPersisted": [],
+        "liveCollected": []
+      },
+      "purchaseFirst": {
+        "before": 524,
+        "after": 499,
+        "ok": true,
+        "stored": []
+      },
+      "purchaseSecond": {
+        "before": 499,
+        "after": 474,
+        "ok": true,
+        "stored": []
+      },
+      "pageErrors": []
+    }
+  ],
+  "grade": {
+    "strictAcceptedPower": 9007199254740991,
+    "definedMax": 5,
+    "strictAcceptedTalentAtk": 100,
+    "investmentOutcome": "Error: Script execution timed out after 150ms"
+  },
+  "ui": {
+    "rooms": [
+      {
+        "name": "gacha",
+        "focusInside": true,
+        "afterEscape": false
+      },
+      {
+        "name": "roster",
+        "focusInside": true,
+        "afterEscape": false
+      },
+      {
+        "name": "shop",
+        "focusInside": true,
+        "afterEscape": false
+      },
+      {
+        "name": "stage",
+        "focusInside": true,
+        "afterEscape": false
+      },
+      {
+        "name": "archive",
+        "focusInside": true,
+        "afterEscape": false
+      },
+      {
+        "name": "talent",
+        "focusInside": true,
+        "afterEscape": false
+      },
+      {
+        "name": "story",
+        "focusInside": true,
+        "afterEscape": false
+      },
+      {
+        "name": "asc",
+        "focusInside": true,
+        "afterEscape": false
+      },
+      {
+        "name": "ach",
+        "focusInside": true,
+        "afterEscape": false
+      }
+    ],
+    "reveal": {
+      "before": {
+        "coins": 4840,
+        "pulls": 1,
+        "active": "gachaDrawer",
+        "focus": ""
+      },
+      "focusCycle": [
+        {
+          "id": "",
+          "classes": "close",
+          "inReveal": false
+        },
+        {
+          "id": "",
+          "classes": "on",
+          "inReveal": false
+        },
+        {
+          "id": "",
+          "classes": "",
+          "inReveal": false
+        },
+        {
+          "id": "",
+          "classes": "",
+          "inReveal": false
+        },
+        {
+          "id": "gachaPull1",
+          "classes": "",
+          "inReveal": false
+        }
+      ],
+      "after": {
+        "coins": 4680,
+        "pulls": 2,
+        "reveals": 1
+      }
+    },
+    "skinBefore": {
+      "src": "file://<clean-head-snapshot>/android-app/app/src/main/assets/game/art/characters/sayo/techcoat/dialogue.webp",
+      "baseOpacity": "1",
+      "blinkSrc": null,
+      "blinkClass": "heroLiveBlink46 off"
+    },
+    "skinBlink": {
+      "eye": 0.3737499999999955,
+      "baseOpacity": "0",
+      "blinkOpacity": "0.62625",
+      "blinkSrc": null
+    },
+    "dialogue": {
+      "before": {
+        "speaker": "雨宫凛",
+        "text": "石板缝里的灯笼全亮了。门不是被撞开的，它从里面认出你的灵纹。",
+        "focus": "",
+        "controls": []
+      },
+      "focusCycle": [
+        {
+          "key": "Tab",
+          "focus": "pause",
+          "text": "石板缝里的灯笼全亮了。门不是被撞开的，它从里面认出你的灵纹。"
+        },
+        {
+          "key": "Enter",
+          "focus": "pause",
+          "text": "石板缝里的灯笼全亮了。门不是被撞开的，它从里面认出你的灵纹。"
+        },
+        {
+          "key": "Space",
+          "focus": "pause",
+          "text": "石板缝里的灯笼全亮了。门不是被撞开的，它从里面认出你的灵纹。"
+        },
+        {
+          "key": "Tab",
+          "focus": "dash",
+          "text": "石板缝里的灯笼全亮了。门不是被撞开的，它从里面认出你的灵纹。"
+        },
+        {
+          "key": "Enter",
+          "focus": "dash",
+          "text": "石板缝里的灯笼全亮了。门不是被撞开的，它从里面认出你的灵纹。"
+        },
+        {
+          "key": "Space",
+          "focus": "dash",
+          "text": "石板缝里的灯笼全亮了。门不是被撞开的，它从里面认出你的灵纹。"
+        },
+        {
+          "key": "Escape",
+          "focus": "dash",
+          "text": "石板缝里的灯笼全亮了。门不是被撞开的，它从里面认出你的灵纹。"
+        }
+      ]
+    },
+    "victory": {
+      "version": "4.6.0",
+      "typing": false,
+      "playing": true,
+      "beat": 1,
+      "beats": 3,
+      "title": "百目尸将 倒下",
+      "kind": "boss",
+      "ground": "torii",
+      "chapter": "1-1 · 神社外街"
+    },
+    "victoryAfter": {
+      "version": "4.6.0",
+      "typing": false,
+      "playing": false,
+      "beat": 0,
+      "beats": 0,
+      "title": "",
+      "kind": "ending",
+      "ground": "torii",
+      "chapter": "1-1 · 神社外街"
+    },
+    "errors": []
+  },
+  "ui_extended": {
+    "panels": [
+      {
+        "launcher": "commandCharacter47",
+        "id": "commandDrawer47",
+        "initial": {
+          "id": "",
+          "drawer": "commandDrawer47"
+        },
+        "inside": true,
+        "closed": true,
+        "restored": "commandCharacter47"
+      },
+      {
+        "launcher": "commandPrepare47",
+        "id": "commandDrawer47",
+        "initial": {
+          "id": "",
+          "drawer": "commandDrawer47"
+        },
+        "inside": true,
+        "closed": true,
+        "restored": "commandPrepare47"
+      },
+      {
+        "launcher": "commandHistory47",
+        "id": "commandDrawer47",
+        "initial": {
+          "id": "",
+          "drawer": "commandDrawer47"
+        },
+        "inside": true,
+        "closed": true,
+        "restored": "commandHistory47"
+      },
+      {
+        "launcher": "commandSupplies47",
+        "id": "commandDrawer47",
+        "initial": {
+          "id": "",
+          "drawer": "commandDrawer47"
+        },
+        "inside": true,
+        "closed": true,
+        "restored": "commandSupplies47"
+      },
+      {
+        "launcher": "commandMail48",
+        "id": "commandDrawer47",
+        "initial": {
+          "id": "",
+          "drawer": "commandDrawer47"
+        },
+        "inside": true,
+        "closed": true,
+        "restored": "commandMail48"
+      },
+      {
+        "launcher": "commandNotice48",
+        "id": "commandDrawer47",
+        "initial": {
+          "id": "",
+          "drawer": "commandDrawer47"
+        },
+        "inside": true,
+        "closed": true,
+        "restored": "commandNotice48"
+      },
+      {
+        "launcher": "commandLogin48",
+        "id": "commandDrawer47",
+        "initial": {
+          "id": "",
+          "drawer": "commandDrawer47"
+        },
+        "inside": true,
+        "closed": true,
+        "restored": "commandLogin48"
+      },
+      {
+        "launcher": "commandActivity48",
+        "id": "commandDrawer47",
+        "initial": {
+          "id": "",
+          "drawer": "commandDrawer47"
+        },
+        "inside": true,
+        "closed": true,
+        "restored": "commandActivity48"
+      }
+    ],
+    "dynamic": [
+      {
+        "action": "commandGuide48",
+        "id": "tutorialDrawer37",
+        "initial": {
+          "id": "",
+          "drawer": "tutorialDrawer37"
+        },
+        "inside": true,
+        "closed": true,
+        "restored": "commandSettings47"
+      },
+      {
+        "action": "commandStats48",
+        "id": "analyticsDrawer37",
+        "initial": {
+          "id": "",
+          "drawer": "analyticsDrawer37"
+        },
+        "inside": true,
+        "closed": true,
+        "restored": "commandSettings47"
+      },
+      {
+        "action": "commandSave48",
+        "id": "saveDrawer38",
+        "initial": {
+          "id": "",
+          "drawer": "saveDrawer38"
+        },
+        "inside": true,
+        "closed": true,
+        "restored": "commandSettings47"
+      },
+      {
+        "action": "commandModkit48",
+        "id": "modKitDrawer42",
+        "initial": {
+          "id": "",
+          "drawer": "modKitDrawer42"
+        },
+        "inside": true,
+        "closed": true,
+        "restored": "commandSettings47"
+      },
+      {
+        "id": "settingsDrawer37",
+        "initial": {
+          "id": "",
+          "drawer": "settingsDrawer37"
+        },
+        "inside": true,
+        "closed": true,
+        "restored": "commandSettings47"
+      }
+    ],
+    "mainGodButtons": [
+      {
+        "id": "",
+        "text": "×"
+      },
+      {
+        "id": "modeStory46",
+        "text": "回收演习肉鸽四章"
+      },
+      {
+        "id": "modeTestimony46",
+        "text": "证词模式不发升级卡"
+      },
+      {
+        "id": "modeMainGod46",
+        "text": "主神空间高难轮回"
+      },
+      {
+        "id": "",
+        "text": "已选择"
+      },
+      {
+        "id": "",
+        "text": "探索地图"
+      },
+      {
+        "id": "",
+        "text": "选择关卡"
+      },
+      {
+        "id": "",
+        "text": "探索地图"
+      },
+      {
+        "id": "",
+        "text": "选择关卡"
+      },
+      {
+        "id": "",
+        "text": "探索地图"
+      },
+      {
+        "id": "",
+        "text": "选择关卡"
+      },
+      {
+        "id": "",
+        "text": "探索地图"
+      },
+      {
+        "id": "",
+        "text": "◀"
+      },
+      {
+        "id": "",
+        "text": "▶"
+      },
+      {
+        "id": "",
+        "text": "进入轮回"
+      },
+      {
+        "id": "",
+        "text": "◈ 主神兑换大厅"
+      },
+      {
+        "id": "",
+        "text": "探索虚空圣所"
+      }
+    ],
+    "tutorialCancel": {
+      "done": false,
+      "menu": true
+    },
+    "tutorial": {
+      "pages": [
+        "只管移动，武器自动瞄准",
+        "先成型一所学校",
+        "转职、融合、飞升都看得见",
+        "认剪影，读地面"
+      ],
+      "done": true,
+      "dialogue": true
+    },
+    "victoryKeys": [
+      {
+        "key": "Tab",
+        "focus": "",
+        "beat": 1
+      },
+      {
+        "key": "Enter",
+        "focus": "",
+        "beat": 1
+      },
+      {
+        "key": "Space",
+        "focus": "",
+        "beat": 1
+      },
+      {
+        "key": "Tab",
+        "focus": "",
+        "beat": 1
+      },
+      {
+        "key": "Enter",
+        "focus": "",
+        "beat": 1
+      },
+      {
+        "key": "Space",
+        "focus": "",
+        "beat": 1
+      }
+    ],
+    "normalAutoBlink": {
+      "vanishFrames": 5,
+      "samples": [
+        {
+          "eye": 0,
+          "base": "0",
+          "blink": null
+        },
+        {
+          "eye": 0.1666666666666666,
+          "base": "0",
+          "blink": null
+        },
+        {
+          "eye": 0.3737499999999955,
+          "base": "0",
+          "blink": null
+        },
+        {
+          "eye": 0,
+          "base": "0",
+          "blink": null
+        },
+        {
+          "eye": 0.30583333333333945,
+          "base": "0",
+          "blink": null
+        }
+      ]
+    },
+    "typewriterStart": {
+      "text": "石",
+      "typing": true
+    },
+    "typewriterComplete": {
+      "text": "石板缝里的灯笼全亮了。门不是被撞开的，它从里面认出你的灵纹。",
+      "typing": false,
+      "hint": "点击继续"
+    },
+    "typewriterNext": {
+      "speaker": "小夜",
+      "typing": true
+    },
+    "typewriterFinish": {
+      "text": "三年前死在这里的人也叫小夜。门认错人，还是我认错了自己？",
+      "typing": false
+    },
+    "victoryTimer": {
+      "done": 1,
+      "version": "4.6.0",
+      "typing": false,
+      "playing": false,
+      "beat": 0,
+      "beats": 0,
+      "title": "",
+      "kind": "opening",
+      "ground": "torii",
+      "chapter": "1-1 · 神社外街"
+    },
+    "victoryCancel": {
+      "done": 0,
+      "version": "4.6.0",
+      "typing": false,
+      "playing": false,
+      "beat": 0,
+      "beats": 0,
+      "title": "",
+      "kind": "opening",
+      "ground": "torii",
+      "chapter": "1-1 · 神社外街"
+    },
+    "errors": []
+  },
+  "input": {
+    "mode": "Desktop Chromium, packaged HTML, synthetic visibility/blur; not Android device",
+    "errors": [],
+    "combatLostKeyup": {
+      "xBefore": 1885.2256000000007,
+      "xAfter": 1906.4512000000013,
+      "drift": 21.225600000000668
+    },
+    "explorationLostKeyup": {
+      "initial": {
+        "id": "shrine-outskirts",
+        "x": 640,
+        "y": 665.34,
+        "facing": "right",
+        "moving": false,
+        "visualSize": 118,
+        "collisionRadius": 16,
+        "collected": [],
+        "total": 3,
+        "walkableZones": 5,
+        "blockedMoves": 0,
+        "activeEvent": null,
+        "eventsCompleted": [],
+        "eventChoices": {}
+      },
+      "after": {
+        "id": "shrine-outskirts",
+        "x": 504.08500000000004,
+        "y": 665.34,
+        "facing": "left",
+        "moving": true,
+        "visualSize": 118,
+        "collisionRadius": 16,
+        "collected": [],
+        "total": 3,
+        "walkableZones": 5,
+        "blockedMoves": 0,
+        "activeEvent": null,
+        "eventsCompleted": [],
+        "eventChoices": {}
+      },
+      "drift": -135.91499999999996
+    },
+    "explorationKeyboard": {
+      "focusedBefore": "保留残响获得证词碎片并显形隐藏祭盒。",
+      "focusedAfter": "保留残响获得证词碎片并显形隐藏祭盒。",
+      "panelVisibleAfterEnter": true,
+      "choiceSavedAfterEnter": {},
+      "choiceSavedAfterClick": {
+        "shrine-outskirts:echo-altar": "preserve"
+      }
+    },
+    "desktopDownloadEvents": [
+      {
+        "suggestedFilename": "sakurayo-v38-save-1791191489561.json"
+      }
+    ],
+    "passed": true
+  },
+  "map_reachability": [
+    {
+      "id": "shrine-outskirts",
+      "gridStep": 5,
+      "spawnWalkable": true,
+      "reachableCells": 16635,
+      "nodes": [
+        {
+          "id": "torii-cache",
+          "minReachableDistance": 0.9303762679690596,
+          "collectible": true
+        },
+        {
+          "id": "seal-fragment",
+          "minReachableDistance": 2.464163143949678,
+          "collectible": true
+        },
+        {
+          "id": "moon-crystal",
+          "minReachableDistance": 2.126405417600348,
+          "collectible": true
+        },
+        {
+          "id": "hidden-offering",
+          "minReachableDistance": 0.9765244492586602,
+          "collectible": true
+        }
+      ]
+    },
+    {
+      "id": "rain-market",
+      "gridStep": 5,
+      "spawnWalkable": true,
+      "reachableCells": 19754,
+      "nodes": [
+        {
+          "id": "arcade-locker",
+          "minReachableDistance": 2.3375414434828636,
+          "collectible": true
+        },
+        {
+          "id": "emp-log",
+          "minReachableDistance": 0.8207313811473458,
+          "collectible": true
+        },
+        {
+          "id": "roof-drop",
+          "minReachableDistance": 2.097236276626981,
+          "collectible": true
+        },
+        {
+          "id": "hidden-terminal",
+          "minReachableDistance": 2.826464222310206,
+          "collectible": true
+        }
+      ]
+    },
+    {
+      "id": "sword-mound",
+      "gridStep": 5,
+      "spawnWalkable": true,
+      "reachableCells": 13352,
+      "nodes": [
+        {
+          "id": "left-memorial",
+          "minReachableDistance": 23.7901681372789,
+          "collectible": true
+        },
+        {
+          "id": "dojo-scroll",
+          "minReachableDistance": 2.371181140275814,
+          "collectible": true
+        },
+        {
+          "id": "ritual-core",
+          "minReachableDistance": 2.629372548727204,
+          "collectible": true
+        },
+        {
+          "id": "hidden-sword",
+          "minReachableDistance": 2.64007575648869,
+          "collectible": true
+        }
+      ]
+    },
+    {
+      "id": "mirror-core",
+      "gridStep": 5,
+      "spawnWalkable": true,
+      "reachableCells": 13910,
+      "nodes": [
+        {
+          "id": "left-timeline",
+          "minReachableDistance": 1.0332473082471711,
+          "collectible": true
+        },
+        {
+          "id": "right-timeline",
+          "minReachableDistance": 1.2278436382537208,
+          "collectible": true
+        },
+        {
+          "id": "core-gift",
+          "minReachableDistance": 1.1899999999999977,
+          "collectible": true
+        },
+        {
+          "id": "hidden-witness",
+          "minReachableDistance": 2.3199999999999363,
+          "collectible": true
+        }
+      ]
+    },
+    {
+      "id": "void-sanctum",
+      "gridStep": 5,
+      "spawnWalkable": true,
+      "reachableCells": 24757,
+      "nodes": [
+        {
+          "id": "shard-1",
+          "minReachableDistance": 2.5059928172283454,
+          "collectible": true
+        },
+        {
+          "id": "shard-2",
+          "minReachableDistance": 1.6001249951174785,
+          "collectible": true
+        },
+        {
+          "id": "echo-1",
+          "minReachableDistance": 2.526341227942042,
+          "collectible": true
+        },
+        {
+          "id": "echo-2",
+          "minReachableDistance": 2.677386785654998,
+          "collectible": true
+        },
+        {
+          "id": "clue-1",
+          "minReachableDistance": 1.5231546211727696,
+          "collectible": true
+        }
+      ]
+    }
+  ],
+  "economy_vm": {
+    "head": "1e8e2e4",
+    "vmCases": [
+      {
+        "name": "gacha price boundary",
+        "pool": "remnant",
+        "count": 1,
+        "coins": 0,
+        "result": false,
+        "balance": 0
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "remnant",
+        "count": 1,
+        "coins": 159,
+        "result": false,
+        "balance": 159
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "remnant",
+        "count": 1,
+        "coins": 160,
+        "result": true,
+        "balance": 0
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "remnant",
+        "count": 1,
+        "coins": 161,
+        "result": true,
+        "balance": 1
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "remnant",
+        "count": 10,
+        "coins": 0,
+        "result": false,
+        "balance": 0
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "remnant",
+        "count": 10,
+        "coins": 1439,
+        "result": false,
+        "balance": 1439
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "remnant",
+        "count": 10,
+        "coins": 1440,
+        "result": true,
+        "balance": 0
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "remnant",
+        "count": 10,
+        "coins": 1441,
+        "result": true,
+        "balance": 1
+      },
+      {
+        "name": "pool counters isolated",
+        "pool": "remnant",
+        "pulls": [
+          [
+            "remnant",
+            1
+          ],
+          [
+            "fashion",
+            0
+          ],
+          [
+            "weapon",
+            0
+          ]
+        ]
+      },
+      {
+        "name": "spark per-pool, one-time, exact 200",
+        "pool": "remnant",
+        "id": "fusion_magitech",
+        "shards": 200
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "fashion",
+        "count": 1,
+        "coins": 0,
+        "result": false,
+        "balance": 0
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "fashion",
+        "count": 1,
+        "coins": 159,
+        "result": false,
+        "balance": 159
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "fashion",
+        "count": 1,
+        "coins": 160,
+        "result": true,
+        "balance": 0
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "fashion",
+        "count": 1,
+        "coins": 161,
+        "result": true,
+        "balance": 1
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "fashion",
+        "count": 10,
+        "coins": 0,
+        "result": false,
+        "balance": 0
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "fashion",
+        "count": 10,
+        "coins": 1439,
+        "result": false,
+        "balance": 1439
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "fashion",
+        "count": 10,
+        "coins": 1440,
+        "result": true,
+        "balance": 0
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "fashion",
+        "count": 10,
+        "coins": 1441,
+        "result": true,
+        "balance": 1
+      },
+      {
+        "name": "pool counters isolated",
+        "pool": "fashion",
+        "pulls": [
+          [
+            "remnant",
+            0
+          ],
+          [
+            "fashion",
+            1
+          ],
+          [
+            "weapon",
+            0
+          ]
+        ]
+      },
+      {
+        "name": "spark per-pool, one-time, exact 200",
+        "pool": "fashion",
+        "id": "fashion_sayo_crown",
+        "shards": 200
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "weapon",
+        "count": 1,
+        "coins": 0,
+        "result": false,
+        "balance": 0
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "weapon",
+        "count": 1,
+        "coins": 159,
+        "result": false,
+        "balance": 159
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "weapon",
+        "count": 1,
+        "coins": 160,
+        "result": true,
+        "balance": 0
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "weapon",
+        "count": 1,
+        "coins": 161,
+        "result": true,
+        "balance": 1
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "weapon",
+        "count": 10,
+        "coins": 0,
+        "result": false,
+        "balance": 0
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "weapon",
+        "count": 10,
+        "coins": 1439,
+        "result": false,
+        "balance": 1439
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "weapon",
+        "count": 10,
+        "coins": 1440,
+        "result": true,
+        "balance": 0
+      },
+      {
+        "name": "gacha price boundary",
+        "pool": "weapon",
+        "count": 10,
+        "coins": 1441,
+        "result": true,
+        "balance": 1
+      },
+      {
+        "name": "pool counters isolated",
+        "pool": "weapon",
+        "pulls": [
+          [
+            "remnant",
+            0
+          ],
+          [
+            "fashion",
+            0
+          ],
+          [
+            "weapon",
+            1
+          ]
+        ]
+      },
+      {
+        "name": "spark per-pool, one-time, exact 200",
+        "pool": "weapon",
+        "id": "weapon_sayo_final",
+        "shards": 200
+      },
+      {
+        "name": "all six task receipts, seven mails and seven-day rewards",
+        "mail": {
+          "ok": true,
+          "reason": "",
+          "reward": 1800,
+          "count": 7
+        },
+        "reloadedNoDoubleCredit": true,
+        "finalBalance": 2700
+      }
+    ],
+    "findings": [
+      {
+        "name": "valid high balance clipped by pull",
+        "pool": "remnant",
+        "before": 123456789,
+        "shown": 99999999,
+        "after": 99999839,
+        "expected": 123456629,
+        "extraLoss": 23456790
+      },
+      {
+        "name": "valid high balance clipped by pull",
+        "pool": "fashion",
+        "before": 123456789,
+        "shown": 99999999,
+        "after": 99999839,
+        "expected": 123456629,
+        "extraLoss": 23456790
+      },
+      {
+        "name": "valid high balance clipped by pull",
+        "pool": "weapon",
+        "before": 123456789,
+        "shown": 99999999,
+        "after": 99999839,
+        "expected": 123456629,
+        "extraLoss": 23456790
+      },
+      {
+        "name": "valid high balance clipped by cheat",
+        "before": 123456789,
+        "after": 100009998,
+        "expected": 123466788
+      },
+      {
+        "name": "unowned ordinary shop weapon survives import and applies",
+        "weapon": "ammo",
+        "owned": 0,
+        "equipped": "ammo",
+        "player": {
+          "dmg": 112.00000000000001,
+          "pierce": 1,
+          "bladePower": 0.94,
+          "skillPow": 1,
+          "maxSh": 0,
+          "sh": 0,
+          "damageReduce": 0,
+          "rate": 1,
+          "initialCore40": null,
+          "initialCoreLevel40": 0,
+          "noUpgradeChallenge40": false,
+          "baitLevel40": 0,
+          "baitPulse40": 2.2,
+          "baitSpawns40": 0,
+          "upgradeChoices40": 0
+        }
+      },
+      {
+        "name": "unowned ordinary shop weapon survives import and applies",
+        "weapon": "whetstone",
+        "owned": 0,
+        "equipped": "whetstone",
+        "player": {
+          "dmg": 92,
+          "pierce": 0,
+          "bladePower": 1.18,
+          "skillPow": 1.08,
+          "maxSh": 0,
+          "sh": 0,
+          "damageReduce": 0,
+          "rate": 1,
+          "initialCore40": null,
+          "initialCoreLevel40": 0,
+          "noUpgradeChallenge40": false,
+          "baitLevel40": 0,
+          "baitPulse40": 2.2,
+          "baitSpawns40": 0,
+          "upgradeChoices40": 0
+        }
+      },
+      {
+        "name": "unowned ordinary shop weapon survives import and applies",
+        "weapon": "mirror",
+        "owned": 0,
+        "equipped": "mirror",
+        "player": {
+          "dmg": 100,
+          "pierce": 0,
+          "bladePower": 1,
+          "skillPow": 1,
+          "maxSh": 36,
+          "sh": 36,
+          "damageReduce": 0.05,
+          "rate": 1.05,
+          "initialCore40": null,
+          "initialCoreLevel40": 0,
+          "noUpgradeChallenge40": false,
+          "baitLevel40": 0,
+          "baitPulse40": 2.2,
+          "baitSpawns40": 0,
+          "upgradeChoices40": 0
+        }
+      },
+      {
+        "name": "wallet recommends already-owned outfit",
+        "owned": [
+          "default",
+          "techcoat",
+          "biodress",
+          "psirobe",
+          "haori",
+          "idol",
+          "apron",
+          "summon",
+          "festival"
+        ],
+        "next": {
+          "kind": "skin",
+          "id": "apron",
+          "name": "炼金防污围裙",
+          "cost": 190
+        }
+      }
+    ]
+  },
+  "economy_browser": {
+    "head": "1e8e2e4",
+    "cases": [
+      {
+        "name": "core max-level purchase",
+        "id": "assault",
+        "total": 875,
+        "level": 5
+      },
+      {
+        "name": "core max-level purchase",
+        "id": "bastion",
+        "total": 875,
+        "level": 5
+      },
+      {
+        "name": "core max-level purchase",
+        "id": "flow",
+        "total": 875,
+        "level": 5
+      },
+      {
+        "name": "core max-level purchase",
+        "id": "arcane",
+        "total": 875,
+        "level": 5
+      },
+      {
+        "name": "item max-level purchase",
+        "id": "ammo",
+        "total": 140,
+        "level": 1
+      },
+      {
+        "name": "item max-level purchase",
+        "id": "whetstone",
+        "total": 140,
+        "level": 1
+      },
+      {
+        "name": "item max-level purchase",
+        "id": "mirror",
+        "total": 155,
+        "level": 1
+      },
+      {
+        "name": "item max-level purchase",
+        "id": "bait",
+        "total": 480,
+        "level": 3
+      }
+    ],
+    "findings": [
+      {
+        "name": "high coins actual import + single-pull UI",
+        "pool": "remnant",
+        "before": 123456789,
+        "wallet": "樱花币 99999999寻访 0软保 65碎镜片 0 / 200",
+        "after": 99999839,
+        "expected": 123456629
+      },
+      {
+        "name": "high coins actual import + single-pull UI",
+        "pool": "fashion",
+        "before": 123456789,
+        "wallet": "樱花币 99999999寻访 0软保 65碎镜片 0 / 200",
+        "after": 99999839,
+        "expected": 123456629
+      },
+      {
+        "name": "high coins actual import + single-pull UI",
+        "pool": "weapon",
+        "before": 123456789,
+        "wallet": "樱花币 99999999寻访 0软保 65碎镜片 0 / 200",
+        "after": 99999839,
+        "expected": 123456629
+      },
+      {
+        "name": "unowned ammo actual import + start",
+        "ammoText": "🔩穿甲弹匣 · Lv.0/1枪弹伤害 +12%、穿透 +1；刀剑伤害 -6%。使用中",
+        "owned": 0,
+        "baseline": {
+          "character": "sayo",
+          "skin": "default",
+          "outfit": null,
+          "careerBranch": null,
+          "outfitFade": 0,
+          "outfitReveal": 0,
+          "outfitTitle": "",
+          "animation": "idle",
+          "portraitMode": "static",
+          "direction": "right",
+          "aim": {
+            "x": 1,
+            "y": 0,
+            "angle": 0
+          },
+          "manualAim": false,
+          "x": 1864,
+          "y": 430,
+          "radius": 16,
+          "visualSize": 96,
+          "footOffset": 18,
+          "hp": 100,
+          "maxHp": 100,
+          "shield": 0,
+          "maxShield": 0,
+          "level": 1,
+          "xp": 0,
+          "nextXp": 11,
+          "attackDamage": 19.44,
+          "attackInterval": 0.45,
+          "attackRange": 731.5999999999999,
+          "multishot": 1,
+          "pierce": 0,
+          "skillCooldown": 0,
+          "dashCooldown": 0,
+          "shotCount": 0,
+          "meleeChain": 0,
+          "perfectDodges": 0,
+          "initialCore": null,
+          "initialCoreLevel": 0,
+          "noUpgradeChallenge": false,
+          "upgradeChoices": 0,
+          "baitLevel": 0,
+          "baitSpawns": 0
+        },
+        "armed": {
+          "character": "sayo",
+          "skin": "default",
+          "outfit": null,
+          "careerBranch": null,
+          "outfitFade": 0,
+          "outfitReveal": 0,
+          "outfitTitle": "",
+          "animation": "idle",
+          "portraitMode": "static",
+          "direction": "right",
+          "aim": {
+            "x": 1,
+            "y": 0,
+            "angle": 0
+          },
+          "manualAim": false,
+          "x": 1864,
+          "y": 430,
+          "radius": 16,
+          "visualSize": 96,
+          "footOffset": 18,
+          "hp": 100,
+          "maxHp": 100,
+          "shield": 0,
+          "maxShield": 0,
+          "level": 1,
+          "xp": 0,
+          "nextXp": 11,
+          "attackDamage": 21.772800000000004,
+          "attackInterval": 0.45,
+          "attackRange": 731.5999999999999,
+          "multishot": 1,
+          "pierce": 1,
+          "skillCooldown": 0,
+          "dashCooldown": 0,
+          "shotCount": 0,
+          "meleeChain": 0,
+          "perfectDodges": 0,
+          "initialCore": null,
+          "initialCoreLevel": 0,
+          "noUpgradeChallenge": false,
+          "upgradeChoices": 0,
+          "baitLevel": 0,
+          "baitSpawns": 0
+        }
+      },
+      {
+        "name": "wallet recommends already-owned outfit after actual purchases",
+        "owned": [
+          "default",
+          "techcoat",
+          "biodress",
+          "psirobe",
+          "haori",
+          "idol",
+          "apron",
+          "summon",
+          "festival",
+          "framework_observer",
+          "phantom"
+        ],
+        "advice": {
+          "version": "4.6.0",
+          "coins": 43355,
+          "recommend": {
+            "starterId": "assault",
+            "itemId": "ammo",
+            "reason": "步枪角色先买火控核心。皮肤只改外观和职业倾向。"
+          },
+          "next": {
+            "kind": "skin",
+            "id": "framework_observer",
+            "name": "薄樱观测服",
+            "cost": 40
+          },
+          "firstClearBonus": 40,
+          "line": "步枪角色先买火控核心。皮肤只改外观和职业倾向。"
+        },
+        "wallet": "🌸 43355步枪角色先买火控核心。皮肤只改外观和职业倾向。本局可买：薄樱观测服 🌸 40"
+      }
+    ],
+    "errors": []
+  },
+  "services_ui": {
+    "cases": [
+      {
+        "name": "claim chapter4 task, mailbox duplicate disabled, remaining mail claim-all",
+        "coins": 1800,
+        "supplies": {
+          "firstRun": true,
+          "chapter1": true,
+          "chapter2": true,
+          "chapter3": true,
+          "chapter4": true,
+          "kills500": true
+        },
+        "services": {
+          "mailRead": {
+            "welcome": true,
+            "firstRun": true,
+            "chapter1": true,
+            "chapter2": true,
+            "chapter3": true,
+            "chapter4": true,
+            "kills500": true
+          },
+          "welcomeClaimed": true,
+          "loginDates": []
+        }
+      },
+      {
+        "name": "actual first login UI",
+        "coins": 1860,
+        "dates": [
+          "2026-10-05"
+        ]
+      },
+      {
+        "name": "reload keeps task/mail/login receipts and no duplicate credit",
+        "coins": 1860
+      }
+    ],
+    "errors": []
+  },
+  "combat_browser": {
+    "mode_matrix_cases": 9,
+    "fusionRestart": [
+      {
+        "fusion": "elementalbeast",
+        "restartedFusion": null,
+        "mechanics": {
+          "elementalBeast": true,
+          "plagueIdol": false,
+          "soulGun": false,
+          "nanoNinja": false,
+          "fleshShrine": false,
+          "bloodMage": false
+        }
+      },
+      {
+        "fusion": "plagueidol",
+        "restartedFusion": null,
+        "mechanics": {
+          "elementalBeast": true,
+          "plagueIdol": true,
+          "soulGun": false,
+          "nanoNinja": false,
+          "fleshShrine": false,
+          "bloodMage": false
+        }
+      },
+      {
+        "fusion": "soulgun",
+        "restartedFusion": null,
+        "mechanics": {
+          "elementalBeast": true,
+          "plagueIdol": true,
+          "soulGun": true,
+          "nanoNinja": false,
+          "fleshShrine": false,
+          "bloodMage": false
+        }
+      },
+      {
+        "fusion": "nanoninja",
+        "restartedFusion": null,
+        "mechanics": {
+          "elementalBeast": true,
+          "plagueIdol": true,
+          "soulGun": true,
+          "nanoNinja": true,
+          "fleshShrine": false,
+          "bloodMage": false
+        }
+      },
+      {
+        "fusion": "fleshshrine",
+        "restartedFusion": null,
+        "mechanics": {
+          "elementalBeast": true,
+          "plagueIdol": true,
+          "soulGun": true,
+          "nanoNinja": true,
+          "fleshShrine": true,
+          "bloodMage": false
+        }
+      },
+      {
+        "fusion": "bloodmage",
+        "restartedFusion": null,
+        "mechanics": {
+          "elementalBeast": true,
+          "plagueIdol": true,
+          "soulGun": true,
+          "nanoNinja": true,
+          "fleshShrine": true,
+          "bloodMage": true
+        }
+      }
+    ],
+    "opsRetry": {
+      "before": {
+        "version": "4.6.0",
+        "dp": 12,
+        "cap": 20,
+        "cost": 8,
+        "max": 2,
+        "units": [
+          {
+            "id": "aya",
+            "x": 1792,
+            "y": 448,
+            "n": "绫"
+          }
+        ]
+      },
+      "after": {
+        "version": "4.6.0",
+        "dp": 12,
+        "cap": 20,
+        "cost": 8,
+        "max": 2,
+        "units": [
+          {
+            "id": "aya",
+            "x": 1792,
+            "y": 448,
+            "n": "绫"
+          }
+        ]
+      }
+    },
+    "opsAgain": {
+      "version": "4.6.0",
+      "dp": 12,
+      "cap": 20,
+      "cost": 8,
+      "max": 2,
+      "units": [
+        {
+          "id": "aya",
+          "x": 1792,
+          "y": 448,
+          "n": "绫"
+        }
+      ]
+    },
+    "opsMenuStart": {
+      "version": "4.6.0",
+      "dp": 10,
+      "cap": 20,
+      "cost": 8,
+      "max": 2,
+      "units": []
+    },
+    "bossPhases": [
+      {
+        "phase": 2,
+        "previous": 1,
+        "transform": 1.3333333333333335
+      },
+      {
+        "phase": 3,
+        "previous": 2,
+        "transform": 1.3333333333333335
+      },
+      {
+        "phase": 4,
+        "previous": 3,
+        "transform": 1.3333333333333335
+      }
+    ],
+    "pageErrors": [],
+    "bossVictoryRace": {
+      "mode": "result",
+      "runMode": "story",
+      "stageKey": "story-4",
+      "stageDuration": 150,
+      "stage44": {
+        "version": "4.6.0",
+        "ground": "mirror",
+        "label": "碎镜地砖",
+        "hint": "碎镜折射一次 · 别对镜面开枪",
+        "obstacleCount": 16,
+        "earlyWindow": false,
+        "earlyFloor": 8,
+        "earlyInterval": 0.45,
+        "heroScale": 1.12,
+        "worldW": 3728,
+        "worldH": 860,
+        "cols": 4,
+        "rows": 2
+      },
+      "viewport": {
+        "width": 932,
+        "height": 430,
+        "coordinates": "origin top-left; +x right; +y down"
+      },
+      "camera": {
+        "cols": 4,
+        "rows": 2,
+        "screens": 8,
+        "viewW": 932,
+        "viewH": 430,
+        "worldW": 3728,
+        "worldH": 860,
+        "camX": 1398,
+        "camY": 215,
+        "centered": true
+      },
+      "stage": 4,
+      "runTime": 0.016666666666666666,
+      "player": {
+        "character": "sayo",
+        "skin": "default",
+        "outfit": null,
+        "careerBranch": null,
+        "outfitFade": 0,
+        "outfitReveal": 0,
+        "outfitTitle": "",
+        "animation": "idle",
+        "portraitMode": "static",
+        "direction": "right",
+        "aim": {
+          "x": 1,
+          "y": 0,
+          "angle": 0
+        },
+        "manualAim": false,
+        "x": 1864,
+        "y": 430,
+        "radius": 16,
+        "visualSize": 96,
+        "footOffset": 18,
+        "hp": 0,
+        "maxHp": 100,
+        "shield": 0,
+        "maxShield": 0,
+        "level": 1,
+        "xp": 0,
+        "nextXp": 11,
+        "attackDamage": 19.44,
+        "attackInterval": 0.45,
+        "attackRange": 731.5999999999999,
+        "multishot": 1,
+        "pierce": 0,
+        "skillCooldown": 0,
+        "dashCooldown": 0,
+        "shotCount": 1,
+        "meleeChain": 0,
+        "perfectDodges": 0,
+        "initialCore": null,
+        "initialCoreLevel": 0,
+        "noUpgradeChallenge": false,
+        "upgradeChoices": 0,
+        "baitLevel": 0,
+        "baitSpawns": 0
+      },
+      "counts": {
+        "enemies": 1,
+        "bullets": 0,
+        "enemyBullets": 0,
+        "gems": 0,
+        "pets": 0,
+        "ops": 0
+      },
+      "live": {
+        "attached": true,
+        "version": "4.6.0",
+        "eye": 1,
+        "blink": false,
+        "motion": "",
+        "lastKind": "",
+        "lookX": 0.7293198098774953,
+        "lookY": -0.8990301474609182,
+        "t": 2.1825999999999994
+      },
+      "ops": {
+        "version": "4.6.0",
+        "dp": 10,
+        "cap": 20,
+        "cost": 8,
+        "max": 2,
+        "units": []
+      },
+      "boss": null,
+      "build": {
+        "upgrades": {},
+        "fusion": null,
+        "form": null,
+        "upgradeOrder": [],
+        "fusionMechanics": {
+          "elementalBeast": true,
+          "plagueIdol": true,
+          "soulGun": true,
+          "nanoNinja": true,
+          "fleshShrine": true,
+          "bloodMage": true
+        },
+        "damageSources": {
+          "shot": 25.139808000000006
+        },
+        "attackTotal": 25.139808000000006
+      },
+      "overlays": {
+        "menu": false,
+        "hud": false,
+        "level": false,
+        "dialogue": false,
+        "event": false,
+        "paused": false,
+        "result": true,
+        "storyBeat": false
+      },
+      "mainGod": {
+        "tier": 1,
+        "points": 0,
+        "unlockedTier": 1,
+        "bestTier": 0,
+        "clears": 0,
+        "runs": 3,
+        "deepest": 0,
+        "contracts": {
+          "swarm": 2,
+          "blade": 1
+        },
+        "challenges": {},
+        "power": 0,
+        "vitality": 0,
+        "tempo": 0,
+        "resonance": 0,
+        "fortune": 0,
+        "regenBlood": 0,
+        "psiLink": 0,
+        "gunBlade": 0,
+        "mageCircuit": 0,
+        "summonPage": 0,
+        "spaceRing": 0,
+        "rebirthDoll": 0,
+        "sideKey": 0,
+        "cursedHeart": 0
+      },
+      "shop40": {
+        "starter": {
+          "assault": 0,
+          "bastion": 0,
+          "flow": 0,
+          "arcane": 0
+        },
+        "equippedStarter": null,
+        "items": {
+          "bait": 0,
+          "ammo": 0,
+          "whetstone": 0,
+          "mirror": 0
+        },
+        "equippedWeapon": null,
+        "baitEquipped": false,
+        "ownedTalismans": [],
+        "bannedSchools": [],
+        "noUpgradeChallenge": false,
+        "lastTab": "skins",
+        "ops": {
+          "pity": 0,
+          "pitySR": 0,
+          "pulls": 0,
+          "tenPulls": 0,
+          "owned": {
+            "sayo_echo": 1,
+            "aya_petal": 1,
+            "rion_edge": 0,
+            "night_radio": 0,
+            "shrine_seal": 0,
+            "void_ticket": 0,
+            "cherry_crown": 0,
+            "last_witness": 0,
+            "school_shrine": 0,
+            "school_idol": 0,
+            "school_magical": 0,
+            "school_mech": 0,
+            "school_spore": 0,
+            "school_gun": 0,
+            "school_mage": 0,
+            "school_alch": 0,
+            "school_ninja": 0,
+            "school_vamp": 0,
+            "school_cult": 0,
+            "school_necro": 0,
+            "school_gene": 0,
+            "school_summon": 0,
+            "job_swarm": 0,
+            "job_railLord": 0,
+            "job_hive": 0,
+            "job_garden": 0,
+            "job_starIdol": 0,
+            "job_miracle": 0,
+            "job_exorcist": 0,
+            "job_guardian": 0,
+            "job_warSinger": 0,
+            "job_healingIdol": 0,
+            "job_barrage": 0,
+            "job_sniper": 0,
+            "job_plagueDoctor": 0,
+            "job_philosopher": 0,
+            "job_bloodDuke": 0,
+            "job_batQueen": 0,
+            "job_element": 0,
+            "job_timeMage": 0,
+            "job_shadow": 0,
+            "job_bombNinja": 0,
+            "job_swordSaint": 0,
+            "job_thunderLord": 0,
+            "job_titan": 0,
+            "job_berserk": 0,
+            "job_beast": 0,
+            "job_heroic": 0,
+            "job_boneKing": 0,
+            "job_soulHerd": 0,
+            "fusion_magitech": 0,
+            "fusion_gunshrine": 0,
+            "fusion_bloodstar": 0,
+            "fusion_bloodmech": 0,
+            "fusion_idolgun": 0,
+            "fusion_thunderpriest": 0,
+            "fusion_plagueidol": 0,
+            "fusion_railsword": 0,
+            "fusion_flowerplague": 0,
+            "fusion_fleshshrine": 0,
+            "fusion_shadowmage": 0,
+            "fusion_bloodmage": 0,
+            "fusion_nanoninja": 0,
+            "fusion_shadowblade": 0,
+            "fusion_plagueforge": 0,
+            "fusion_biogun": 0,
+            "fusion_bloodsword": 0,
+            "fusion_chimera": 0,
+            "fusion_corpseimmortal": 0,
+            "fusion_shikigami": 0,
+            "fusion_necrospore": 0,
+            "fusion_bloodbeast": 0,
+            "fusion_elementalbeast": 0,
+            "fusion_soulgun": 0
+          },
+          "last": [],
+          "cheatUsed": 0,
+          "shards": 0,
+          "pool": "remnant",
+          "rosterTab": "scrap",
+          "supplies": {
+            "firstRun": false,
+            "chapter1": false,
+            "chapter2": false,
+            "chapter3": false,
+            "chapter4": false,
+            "kills500": false
+          },
+          "services": {
+            "mailRead": {
+              "welcome": false,
+              "firstRun": false,
+              "chapter1": false,
+              "chapter2": false,
+              "chapter3": false,
+              "chapter4": false,
+              "kills500": false
+            },
+            "welcomeClaimed": false,
+            "loginDates": []
+          },
+          "fashion": {
+            "pity": 0,
+            "pitySR": 0,
+            "pulls": 0,
+            "tenPulls": 0,
+            "owned": {
+              "fashion_sayo_plain": 0,
+              "fashion_sayo_neon": 0,
+              "fashion_sayo_night": 0,
+              "fashion_aya_suit": 0,
+              "fashion_aya_coat": 0,
+              "fashion_aya_veil": 0,
+              "fashion_rion_keiko": 0,
+              "fashion_rion_haori": 0,
+              "fashion_rion_bloom": 0,
+              "fashion_sayo_crown": 0,
+              "fashion_aya_funeral": 0,
+              "fashion_rion_bride": 0
+            },
+            "last": [],
+            "equipped": "",
+            "shards": 0
+          },
+          "weapon": {
+            "pity": 0,
+            "pitySR": 0,
+            "pulls": 0,
+            "tenPulls": 0,
+            "owned": {
+              "weapon_sayo_spare": 0,
+              "weapon_sayo_petal": 0,
+              "weapon_aya_side": 0,
+              "weapon_aya_twin": 0,
+              "weapon_rion_wood": 0,
+              "weapon_rion_under": 0,
+              "weapon_mirror_round": 0,
+              "weapon_shard_blade": 0,
+              "weapon_radio_bat": 0,
+              "weapon_sayo_final": 0,
+              "weapon_aya_mirror": 0,
+              "weapon_rion_burial": 0
+            },
+            "last": [],
+            "equipped": "",
+            "shards": 0
+          }
+        }
+      },
+      "extensions": {
+        "packs": [
+          {
+            "id": "official.framework-example",
+            "version": 1,
+            "title": "官方示例包：薄樱观测记录",
+            "apiVersion": 2,
+            "enabled": true,
+            "disabledReason": "",
+            "dependencies": []
+          },
+          {
+            "id": "official.story-exploration",
+            "version": 2,
+            "title": "官方剧情探索地图",
+            "apiVersion": 2,
+            "enabled": true,
+            "disabledReason": "",
+            "dependencies": []
+          },
+          {
+            "id": "official.feedback",
+            "version": 1,
+            "title": "官方打击反馈包",
+            "apiVersion": 2,
+            "enabled": true,
+            "disabledReason": "",
+            "dependencies": []
+          },
+          {
+            "id": "official.modkit-addon",
+            "version": 1,
+            "title": "官方 Mod Kit 依赖示例",
+            "apiVersion": 2,
+            "enabled": true,
+            "disabledReason": "",
+            "dependencies": [
+              {
+                "id": "official.framework-example",
+                "minVersion": 1
+              }
+            ]
+          },
+          {
+            "id": "official.maingod-void",
+            "version": 1,
+            "title": "主神空间 · 虚空圣所",
+            "apiVersion": 2,
+            "enabled": true,
+            "disabledReason": "",
+            "dependencies": []
+          }
+        ],
+        "errors": [],
+        "state": {
+          "official.framework-example": {
+            "__version": 1,
+            "data": {
+              "purchases": {},
+              "flags": {
+                "manualRead": false
+              }
+            }
+          },
+          "official.story-exploration": {
+            "__version": 2,
+            "data": {
+              "collected": {},
+              "visits": {},
+              "fragments": [],
+              "choices": {}
+            }
+          },
+          "official.feedback": {
+            "__version": 1,
+            "data": {}
+          },
+          "official.maingod-void": {
+            "__version": 1,
+            "data": {
+              "collected": {},
+              "visits": {},
+              "choices": {}
+            }
+          },
+          "official.modkit-addon": {
+            "__version": 1,
+            "data": {
+              "purchases": {},
+              "flags": {
+                "inspected": false
+              }
+            }
+          }
+        },
+        "exploration": null
+      },
+      "balanceSamples": 9,
+      "result": {
+        "win": false,
+        "title": "防线失守"
+      },
+      "devErrors": 0
+    }
+  }
+}

@@ -1,0 +1,31 @@
+// 15 s 看板娘录制（离线 30fps）：眨眼/呼吸 → 视线跟随 → 点头/头发/胸口/裙摆 → 伸懒腰 → 整理发夹。
+// Usage: node tools/record_mascot.mjs <frames-dir> <shots-dir> [character]
+import { chromium } from 'playwright'; import { pathToFileURL } from 'node:url'; import path from 'node:path'; import fs from 'node:fs';
+const out = process.argv[2] || '/tmp/sy/mascot', shots = process.argv[3] || '/workspace/sakurayo-shots', ch = process.argv[4] || 'sayo';
+fs.mkdirSync(out, { recursive: true }); for (const f of fs.readdirSync(out)) fs.unlinkSync(path.join(out, f));
+const browser = await chromium.launch({ args: ['--allow-file-access-from-files', '--use-gl=angle', '--use-angle=swiftshader'] });
+const ctx = await browser.newContext({ viewport: { width: 1280, height: 720 } });
+await ctx.addInitScript(ch => { if (!sessionStorage.getItem('x')) { sessionStorage.setItem('x', 1); localStorage.setItem('sakurayoV3', JSON.stringify({ coins: 0, unlock: 2, done: [1], tutorialDone: true, character: ch })); } }, ch);
+const page = await ctx.newPage();
+await page.goto(pathToFileURL(path.resolve('src/index.html')).href + '?test=1');
+await page.waitForFunction(() => window.__SAKURAYO_TEST__?.rigSnapshot46?.(), null, { timeout: 180000 });
+await page.evaluate(() => { window.__rigManual = 1; });
+const api = (fn, ...a) => page.evaluate(([fn, a]) => window.__SAKURAYO_TEST__[fn](...a), [fn, a]);
+let n = 0; const shot = async () => page.screenshot({ timeout: 180000, type: 'jpeg', quality: 90, path: `${out}/${String(n++).padStart(5, '0')}.jpg` });
+const idle = async (frames, fn) => { for (let i = 0; i < frames; i++) { if (fn) await fn(i); await page.evaluate(() => window.SakurayoRig.step(1 / 30)); await shot(); } };
+const snap = await api('rigSnapshot46'); console.log('rig', JSON.stringify(snap)); if (!snap) process.exit(2);
+const box = await page.locator('#heroLive46 canvas.heroRig46').boundingBox();
+const P = (fx, fy) => [box.x + box.width * fx, box.y + box.height * fy];
+// 20 s：待机呼吸+重心 3s → 转头联动 5s → 整理发夹 3.5s → 摸头 2s → 点胸口 2s → 裙摆 2s → 招手 2.5s
+await idle(90);
+await idle(150, async i => { const a = i / 150 * Math.PI * 2; await page.mouse.move(...P(0.5 + Math.sin(a) * 0.6, 0.25 + Math.cos(a * 2) * 0.12)); });
+await page.screenshot({ path: `${shots}/mascot-${ch}-look.png` });
+await api('rigPlay46', 'pin'); await idle(55); await page.screenshot({ path: `${shots}/mascot-${ch}-pin.png` }); await idle(50);
+const lm = await page.evaluate(() => window.SakurayoRig.current().lm), d = await page.evaluate(() => { const r = window.SakurayoRig.current(); r.fit(); return { v: r.view }; });
+const I = (x, y) => [box.x + (d.v.ox + x * d.v.sc) / d.v.dpr, box.y + (d.v.oy + y * d.v.sc) / d.v.dpr];
+const tap = async (x, y) => console.log('touch', await api('rigTouch46', ...I(x, y)));
+await tap(lm.head[0], lm.head[1]); await idle(60); 
+await tap(lm.chest[0], lm.chest[1]); await idle(60);
+await api('rigPlay46', 'skirt'); await idle(60);
+await api('rigPlay46', 'wave'); await idle(75);
+await browser.close(); console.log('frames', n);

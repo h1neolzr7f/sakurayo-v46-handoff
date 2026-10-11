@@ -39,3 +39,13 @@ V3.4 曾在合并代码时删除 `draw()`，造成第一帧抛出 `ReferenceErro
 - 内容包清单：`src/content/extensions.manifest.js`
 - 构建入口：`tools/build_game.py`
 - Android 同步：`android-app/sync-game.ps1`
+
+# 存档与界面边界（2026-10-05）
+
+- `src/runtime/sakurayo-save.js`：纯默认值、深层拷贝与校验。`normalize(raw, options)` 不写 localStorage、不操作 DOM；启动和文本导入共用，`defaults()` 返回独立副本。
+- `src/runtime/sakurayo-ui.js`：抽屉生命周期、键盘导航和入口焦点恢复；根路由切换与嵌套详情使用同一控制器，不再依赖后续覆盖 `closeDrawers` 捕获的旧函数。
+- `src/runtime/sakurayo-lobby.js`：寻访/仓库数据与渲染，样式只创建一次；后排卡片由仓库内部滚动区承载。
+- `src/runtime/sakurayo-command.js`：角色、整备及常规服务面板；`sakurayo-terminal.js` 负责大厅装配与统一外观。
+- `src/index.html`：协调存档迁移、当前出击选择与原战斗系统。构建脚本按 script 顺序内联模块，离线发布保留单文件入口。
+
+新增回归：`save_unit.mjs`、`save_import_smoke.mjs`、`ui_dom_smoke.mjs`、`ui_smoke.mjs`、`polish_rooms_smoke.mjs`。源码与离线入口均执行浏览器回归，完整命令为 `bash tools/verify.sh`。

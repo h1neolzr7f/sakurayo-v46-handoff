@@ -224,7 +224,7 @@ try {
   if (bulletBlock && /for \(const e of enemies\)/.test(bulletBlock[0])) {
     findings.push({ sev: "P1", msg: "子弹循环里又扫全部 enemies" });
   }
-  if (!/for \(const e of grid\.near\(b\.x, b\.y, 50\)\)/.test(src)) {
+  if (!bulletBlock || !/for\s*\(const e of grid\.near\(b\.x,\s*b\.y,\s*[^)]+\)\)/.test(bulletBlock[0])) {
     findings.push({ sev: "P1", msg: "子弹碰撞不再走 grid.near" });
   }
 

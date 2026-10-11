@@ -13,6 +13,7 @@ venv/
 
 # Node / editor
 node_modules/
+node_modules
 .idea/
 .vscode/
 *.iml
@@ -51,3 +52,6 @@ assets/image2/reference/expansion_refs/
 outputs/
 *.zip.bak
 .cursor/
+
+# Image generation working prompts (provenance lives in assets/image2/prompts)
+tmp/imagegen/

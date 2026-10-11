@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { verifyContentReceipts } from "./content_receipts_smoke.mjs";
 import { createHash } from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
@@ -28,7 +29,7 @@ async function loadPlaywright() {
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(here, "..");
-const sourceArg = process.argv[2] || "src/index.html";
+const sourceArg = process.env.SAKURAYO_ENTRY || process.argv[2] || "src/index.html";
 const source = /^https?:\/\//i.test(sourceArg) ? sourceArg : path.resolve(projectRoot, sourceArg);
 const sourceFile = /^https?:\/\//i.test(source) ? path.resolve(projectRoot, "src/index.html") : source;
 const artifactDir = path.resolve(projectRoot, "tests/artifacts/smoke");
@@ -94,6 +95,9 @@ let mainContext;
 let legacyContext;
 let normalContext;
 try {
+  const receiptEvidence = await verifyContentReceipts(browser, url);
+  fs.writeFileSync(path.join(artifactDir, "content-receipts.json"), JSON.stringify(receiptEvidence, null, 2));
+  pass("F22 扩展字典收据、真实购买/事件按钮、刷新后重复领取与限购拒绝");
   normalContext = await browser.newContext({ viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true });
   const normalTracker = { pageErrors: [], consoleErrors: [], externalRequests: [] };
   const normalPage = await openPage(normalContext, normalTracker, normalUrl);
@@ -135,7 +139,8 @@ try {
   const legacyTracker = { pageErrors: [], consoleErrors: [], externalRequests: [] };
   const legacyPage = await openPage(legacyContext, legacyTracker);
   const migrated = await api(legacyPage, "saveSnapshot");
-  assert.equal(migrated.coins, 7);
+  assert.ok(migrated.talRefund46 > 0 && migrated.coins === 7 + migrated.talRefund46, "frozen talents refunded once on migration");
+  assert.equal(migrated.tal.atk, 1, "legacy talent level kept");
   assert.equal(migrated.tal.atk, 1);
   assert.equal(migrated.tal.hp, 0);
   assert.equal(migrated.character, "sayo");
@@ -167,7 +172,7 @@ try {
   assert.equal(await page.locator("#characterList .charCard").count(), 3);
   assert.equal(await page.locator("#start").isVisible(), true);
   assert.equal(await page.locator("#coverTitle36").isVisible(), true);
-  assert.match(await page.locator("#menu .bg").evaluate(node => node.style.backgroundImage), /lobby_wide\.webp/);
+  assert.match(await page.locator("#menu .bg").evaluate(node => node.style.backgroundImage), /ui\/tactical\/lobby-night-v5\.webp/);
   await page.waitForFunction(() => {
     const boot = new Set(window.__SAKURAYO_ART__?.boot() || []);
     return window.__SAKURAYO_ART__?.status().filter(item => boot.has(item.path)).every(item => item.ready);
@@ -176,16 +181,14 @@ try {
   assert.equal(artStatus.length, 20);
   assert.equal(artStatus.filter(item => item.ready).length, 12);
   assert.equal(artStatus.filter(item => !item.loaded).length, 8);
-  assert.equal(await page.locator("#menu .nav img").count(), 5);
+  assert.equal(await page.locator("#menu .homeNav46 .terminalIcon48 svg").count(), 7);
   assert.ok(await page.locator("#characterList .charCard img").evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0)));
   await page.waitForFunction(() => {
     const image = document.querySelector("#menu .menuBrand35");
     return image?.complete && image.naturalWidth > 0;
   });
-  if (!(await page.locator("#statsButton37").isVisible())) {
-    await page.locator("#moreButton39").click();
-  }
-  await page.locator("#modKitButton42").click();
+  await page.locator("#commandSettings47").click();
+  await page.locator("#commandModkit48").click();
   assert.equal(await page.locator("#modKitDrawer42 .modKitPack42").count(), 5);
   assert.equal(await page.locator("#modKitDrawer42 .modKitPack42.enabled").count(), 5);
   assert.match(await page.locator("#modKitDrawer42 .modKitSummary42").textContent(), /5\/5 已启用/);
@@ -265,7 +268,7 @@ try {
   assert.equal(emptyWeapon.ok, false);
   assert.equal(emptyWeapon.reason, "coins");
   await page.locator('#gachaTabs46 [data-pool="remnant"]').click();
-  assert.match(await page.locator("#gachaDrawer").textContent(), /残片进仓库/);
+  assert.match(await page.locator("#gachaDrawer").textContent(), /收藏不增加战斗属性/);
   const coinsBeforeFail = (await api(page, "lobby46")).coins;
   const broke = await api(page, "pullGacha46", 1);
   assert.equal(broke.ok, false);
@@ -285,6 +288,7 @@ try {
   assert.equal(ten.results.length, 10);
   assert.ok(ten.tenPulls >= 1);
   await shot(page, "01h-gacha-drawer.png");
+  await page.locator("#gachaReveal46 .revealTake46").click();
   await page.locator("#gachaDrawer .close").click();
   const rosterOpen = await api(page, "openDrawer", "roster");
   assert.equal(rosterOpen.visible, true);
@@ -382,9 +386,10 @@ try {
   assert.equal(await page.locator("#guideButton37").count(), 1);
   assert.equal(await page.locator("#statsButton37").count(), 1);
   assert.equal(await page.locator("#saveButton38").count(), 1);
-  const saveManager = await api(page, "openSaveManager");
-  assert.equal(saveManager.visible, true);
-  assert.match(saveManager.text, /"mainGod"/);
+  await page.locator("#commandSettings47").click();
+  await page.locator("#commandSave48").click();
+  assert.equal(await page.locator("#saveDrawer38").isVisible(), true);
+  assert.match(await page.locator("#saveText38").inputValue(), /"mainGod"/);
   await page.locator("#saveDrawer38 .close").click();
   await page.locator("#start").click();
   assert.equal(await page.locator("#tutorialDrawer37").isVisible(), true);
@@ -395,15 +400,13 @@ try {
   assert.equal(await page.locator("#dialogueChapter").count(), 1);
   await api(page, "dismissDialogue");
   await api(page, "backMenu");
-  if (!(await page.locator("#statsButton37").isVisible())) {
-    await page.locator("#moreButton39").click();
-  }
-  assert.equal(await page.locator("#statsButton37").isVisible(), true);
-  await page.locator("#statsButton37").click();
+  await page.locator("#commandSettings47").click();
+  assert.equal(await page.locator("#commandStats48").isVisible(), true);
+  await page.locator("#commandStats48").click();
   assert.equal(await page.locator("#analyticsDrawer37").isVisible(), true);
   assert.match(await page.locator("#analyticsText37").inputValue(), /"version": "4.6.0"/);
   await page.locator("#analyticsDrawer37 .close").click();
-  await page.locator("#settingsButton37").click();
+  await page.locator("#commandSettings47").click();
   assert.equal(await page.locator("#settingsDrawer37").isVisible(), true);
   assert.equal(await page.locator("#settingsBody37 input[type=range]").count(), 3);
   assert.equal(await page.locator("#settingsBody37 [data-toggle]").count(), 2);
@@ -632,6 +635,7 @@ try {
     await api(page, "freezeProgression");
     await api(page, "clearCombat");
     await api(page, "spawnEnemyRelative", "normal", 80, 0);
+    await page.evaluate(() => window.advanceTime(17));
     let fused = await api(page, "forceFusion41", fusion.id);
     assert.equal(fused.build.fusion, fusion.id);
     assert.equal(fused.build.fusionMechanics[fusionFlag41[fusion.id]], true);
@@ -1113,6 +1117,7 @@ try {
   await api(page, "setBait40", 0, false);
   await api(page, "setBannedSchools40", []);
   const loneDurations = {};
+  const loneEvidence = { save: await api(page, "saveSnapshot"), runs: [] };
   for (const character of ["sayo", "aya", "rion"]) {
     await api(page, "backMenu");
     await api(page, "configureStarter40", "assault", 5, true);
@@ -1123,6 +1128,7 @@ try {
     await api(page, "dismissDialogue");
     await api(page, "protectPlayer");
     let loneState = await state(page);
+    const loneStart = loneState;
     for (let guard = 0; guard < 100 && loneState.mode !== "result"; guard++) {
       if (loneState.mode === "event") await api(page, "chooseEvent", 0);
       else if (loneState.mode === "dialogue") await api(page, "dismissDialogue");
@@ -1139,9 +1145,11 @@ try {
     assert.equal(loneState.player.upgradeChoices, 0);
     assert.equal(loneState.build.upgradeOrder.length, 0);
     loneDurations[character] = loneState.runTime;
+    loneEvidence.runs.push({character, start:loneStart, end:loneState});
     if (character === "sayo") await shot(page, "09-lone-proof-result.png");
   }
   const loneSave = await api(page, "saveSnapshot");
+  fs.writeFileSync(path.join(artifactDir, "lone-proof-evidence.json"), JSON.stringify(loneEvidence, null, 2));
   assert.equal(loneSave.ach.loneproof, true);
   assert.deepEqual(Object.keys(loneSave.hiddenStory40).sort(), ["aya", "rion", "sayo"]);
   assert.ok((await api(page, "balanceReport40")).samples >= 3);

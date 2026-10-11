@@ -31,10 +31,10 @@ assert.ok(L.SCHOOL_CARDS.every((card) => card.kind === "school" && Array.isArray
 assert.deepEqual([...L.DEFAULT_SHOWN], ["sayo_echo", "aya_petal"]);
 assert.deepEqual([...L.POOL_IDS], ["remnant", "fashion", "weapon"]);
 assert.equal(L.JOB_CARDS.length, 28);
-assert.ok(L.JOB_CARDS.every((card) => card.r === "SR" && card.kind === "job" && card.dmg === 0.005 && Array.isArray(card.lore) && card.lore.length === 4));
+assert.ok(L.JOB_CARDS.every((card) => card.r === "SR" && card.kind === "job" && Array.isArray(card.lore) && card.lore.length === 4));
 assert.ok(L.JOB_CARDS.every((card) => card.lore.every((line) => [...line].filter((ch) => /[\u4e00-\u9fff]/.test(ch)).length > 8)));
 assert.equal(L.FUSION_CARDS.length, 24);
-assert.ok(L.FUSION_CARDS.every((card) => card.r === "SSR" && card.kind === "fusion" && card.dmg === 0.008 && Array.isArray(card.pair) && card.pair.length === 2 && Array.isArray(card.lore) && card.lore.length === 4));
+assert.ok(L.FUSION_CARDS.every((card) => card.r === "SSR" && card.kind === "fusion" && Array.isArray(card.pair) && card.pair.length === 2 && Array.isArray(card.lore) && card.lore.length === 4));
 assert.ok(L.FUSION_CARDS.every((card) => card.id.startsWith("fusion_") && card.lore.every((line) => [...line].filter((ch) => /[\u4e00-\u9fff]/.test(ch)).length > 8)));
 assert.equal(
   L.FUSION_CARDS.map((card) => card.id).join(","),
@@ -261,84 +261,30 @@ assert.equal(fashionSave.shop40.ops.fashion.owned.fashion_sayo_crown, 1);
 assert.equal(fashionSave.shop40.ops.fashion.shards, 0);
 const equipped = L.equip(fashionSave, "fashion", "fashion_sayo_crown");
 assert.equal(equipped.ok, true);
-const wearP = { dmg: 20, character: "sayo" };
-L.applyOwnedBonus(wearP, { character: "sayo", shop40: fashionSave.shop40 });
-assert.ok(Math.abs(wearP.dmg - 20 * 1.08) < 1e-6);
-
-const bonusP = { crit: 0.05, spd: 220, dmg: 18, bladePower: 1, skillCd: 7, damageReduce: 0, maxSh: 0, sh: 0, maxHp: 100, hp: 100, character: "sayo" };
-const bonusSave = { character: "sayo", shop40: L.normalizeOps({}) };
-bonusSave.shop40.ops.owned.sayo_echo = 1;
-bonusSave.shop40.ops.owned.cherry_crown = 1;
-L.applyOwnedBonus(bonusP, bonusSave);
-assert.ok(Math.abs(bonusP.crit - 0.055) < 1e-9);
-assert.ok(Math.abs(bonusP.dmg - 18 * 1.008) < 1e-6);
-
-const allBonusP = { crit: 0.05, spd: 200, dmg: 20, bladePower: 1, skillCd: 10, damageReduce: 0, maxSh: 0, sh: 0, maxHp: 100, hp: 80, character: "rion" };
-const allBonusSave = { character: "rion", shop40: L.normalizeOps({}) };
-L.CARDS.forEach((card) => { allBonusSave.shop40.ops.owned[card.id] = 2; });
-L.applyOwnedBonus(allBonusP, allBonusSave);
-assert.ok(Math.abs(allBonusP.crit - 0.055) < 1e-9);
-assert.ok(Math.abs(allBonusP.spd - 200 * 1.005) < 1e-6);
-assert.ok(Math.abs(allBonusP.bladePower - 1.01) < 1e-9);
-assert.ok(Math.abs(allBonusP.skillCd - 10 * 0.995) < 1e-6);
-assert.ok(Math.abs(allBonusP.damageReduce - 0.004) < 1e-9);
-assert.equal(allBonusP.maxSh, 4);
-assert.equal(allBonusP.sh, 4);
-assert.ok(Math.abs(allBonusP.dmg - 20 * 1.01 * 1.008) < 1e-6);
-assert.ok(Math.abs(allBonusP.maxHp - 101) < 1e-6);
-assert.equal(allBonusP.hp, allBonusP.maxHp);
-
-const schoolP = { dmg: 20 };
+assert.equal(fashionSave.shop40.ops.fashion.equipped, "fashion_sayo_crown");
+assert.equal(L.hasSchool(fashionSave, "shrine"), true, "装备时装保留标注的流派倾向");
 const schoolSave = { shop40: L.normalizeOps({}) };
-L.SCHOOL_CARDS.slice(0, 7).forEach((card) => { schoolSave.shop40.ops.owned[card.id] = 1; });
-L.applyOwnedBonus(schoolP, schoolSave);
-const sevenMul = L.SCHOOL_CARDS.slice(0, 7).reduce((m, card) => m * (1 + card.dmg), 1) * 1.02;
-assert.ok(Math.abs(schoolP.dmg - 20 * sevenMul) < 1e-6);
+L.SCHOOL_CARDS.slice(0, 7).forEach(card => { schoolSave.shop40.ops.owned[card.id] = 1; });
 assert.equal(L.hasSchool(schoolSave, "shrine"), true);
 assert.equal(L.hasSchool(schoolSave, "summon"), false);
-L.SCHOOL_CARDS.forEach((card) => { schoolSave.shop40.ops.owned[card.id] = 1; });
-const schoolP14 = { dmg: 20 };
-L.applyOwnedBonus(schoolP14, schoolSave);
-const fourteenMul = L.SCHOOL_CARDS.reduce((m, card) => m * (1 + card.dmg), 1) * 1.02 * 1.03;
-assert.ok(Math.abs(schoolP14.dmg - 20 * fourteenMul) < 1e-6);
+L.SCHOOL_CARDS.forEach(card => { schoolSave.shop40.ops.owned[card.id] = 1; });
 assert.equal(L.snapshot(schoolSave).schoolOwned, 14);
-
-const jobP = { dmg: 20 };
 const jobSave = { shop40: L.normalizeOps({}) };
 jobSave.shop40.ops.owned.job_swarm = 1;
 jobSave.shop40.ops.owned.job_railLord = 2;
-L.applyOwnedBonus(jobP, jobSave);
-assert.ok(Math.abs(jobP.dmg - 20 * 1.005 * 1.005) < 1e-6, "每张转职 +0.5%，重复不加");
 assert.equal(L.hasJob(jobSave, "mech"), true);
 assert.equal(L.hasJob(jobSave, "spore"), false);
 assert.equal(L.hasJob({ shop40: L.normalizeOps({}) }, "mech"), false);
-const jobP2 = { dmg: 20 };
 jobSave.shop40.ops.owned.job_swarm = 9;
-L.applyOwnedBonus(jobP2, jobSave);
-assert.ok(Math.abs(jobP2.dmg - 20 * 1.005 * 1.005) < 1e-6, "同一张转职重复不叠伤");
-assert.equal(L.JOB_CARDS.length, 28);
-assert.ok(L.JOB_CARDS.every((card) => card.id.startsWith("job_") && card.r === "SR" && card.kind === "job" && card.dmg === 0.005));
-assert.equal(L.snapshot(jobSave).jobOwned, 2);
-
-const fusionP = { dmg: 20 };
+assert.equal(L.snapshot(jobSave).jobOwned, 2, "重复转职只加计数，不增加独特收藏数");
 const fusionSave = { shop40: L.normalizeOps({}) };
 fusionSave.shop40.ops.owned.fusion_magitech = 1;
 fusionSave.shop40.ops.owned.fusion_gunshrine = 2;
-L.applyOwnedBonus(fusionP, fusionSave);
-assert.ok(Math.abs(fusionP.dmg - 20 * 1.008 * 1.008) < 1e-6, "每张融合 +0.8%，重复不加");
-assert.equal(L.hasFusion(fusionSave, "mech"), true);
-assert.equal(L.hasFusion(fusionSave, "magical"), true);
-assert.equal(L.hasFusion(fusionSave, "shrine"), true);
-assert.equal(L.hasFusion(fusionSave, "gun"), true);
+for(const school of ["mech", "magical", "shrine", "gun"]) assert.equal(L.hasFusion(fusionSave, school), true);
 assert.equal(L.hasFusion(fusionSave, "spore"), false);
 assert.equal(L.hasFusion({ shop40: L.normalizeOps({}) }, "mech"), false);
-const fusionP2 = { dmg: 20 };
 fusionSave.shop40.ops.owned.fusion_magitech = 9;
-L.applyOwnedBonus(fusionP2, fusionSave);
-assert.ok(Math.abs(fusionP2.dmg - 20 * 1.008 * 1.008) < 1e-6, "同一张融合重复不叠伤");
-assert.equal(L.snapshot(fusionSave).fusionOwned, 2);
-assert.match(fs.readFileSync(path.join(root, "src/index.html"), "utf8"), /hasFusion\(save,school\)\)w\*=1\.6/);
-assert.doesNotMatch(fs.readFileSync(path.join(root, "src/index.html"), "utf8"), /12\/24|融合套装/);
+assert.equal(L.snapshot(fusionSave).fusionOwned, 2, "重复融合只加计数，不增加独特收藏数");
 
 const preferSave = { coins: 20000, shop40: L.normalizeOps({}) };
 L.FUSION_CARDS.forEach((card) => {
@@ -377,6 +323,11 @@ assert.equal(tap10.granted, true);
 
 function fakeEl(tag, attrs = {}) {
   const node = {
+    nodeType: 1,
+    get parentElement() { return this.parentNode; },
+    hasAttribute(k) { return this.attrs[k] != null; },
+    contains(other) { return this === other || collect(this).includes(other); },
+    focus() { document.activeElement = this; },
     tagName: String(tag).toUpperCase(),
     id: attrs.id || "",
     className: attrs.className || "",
@@ -421,6 +372,11 @@ function fakeEl(tag, attrs = {}) {
       this.children = parseHtml(this._html, this);
     },
   };
+  node.classList = {
+    contains(c) { return node.className.split(/\s+/).includes(c); },
+    add(c) { if (!this.contains(c)) node.className += ' '+c; },
+    remove(c) { node.className=node.className.split(/\s+/).filter(x=>x!==c).join(' '); }
+  };
   return node;
 }
 function collect(root, acc = []) {
@@ -459,6 +415,8 @@ const allNodes = () => collect(head).concat(collect(body));
 const document = {
   head,
   body,
+  addEventListener() {},
+  querySelectorAll(sel) { return allNodes().filter(n => sel.split(",").some(part => matchSel(n, part))); },
   documentElement: fakeEl("html"),
   getElementById(id) {
     return allNodes().find((n) => n.id === id) || null;
@@ -470,6 +428,9 @@ const document = {
 const vis = { document, Math, Date, Object, Array, Number, String, TEST_MODE: true, setTimeout(fn) { fn(); } };
 vis.window = vis;
 vis.globalThis = vis;
+vis.getComputedStyle = () => ({display:"block",visibility:"visible"});
+document.documentElement.contains = n => allNodes().includes(n);
+vm.runInNewContext(fs.readFileSync(path.join(root,"src/runtime/sakurayo-ui.js"),"utf8"), vis);
 vm.runInNewContext(code, vis);
 const V = vis.window.SakurayoLobby;
 V.injectStyle();
@@ -478,7 +439,7 @@ const firstCss = document.getElementById("sakurayo-lobby-css");
 V.injectStyle();
 const secondCss = document.getElementById("sakurayo-lobby-css");
 assert.ok(secondCss);
-assert.notEqual(firstCss, secondCss);
+assert.equal(firstCss, secondCss, "refresh preserves the stylesheet node and cascade order");
 assert.equal(head.children.filter((n) => n.id === "sakurayo-lobby-css").length, 1);
 
 const gachaHost = fakeEl("div", { id: "gachaBody46" });
@@ -495,6 +456,14 @@ assert.match(gachaHost.innerHTML, /data-pool="remnant"/);
 assert.match(gachaHost.innerHTML, /data-pool="fashion"/);
 assert.match(gachaHost.innerHTML, /data-pool="weapon"/);
 assert.match(gachaHost.innerHTML, /碎镜片/);
+assert.match(gachaHost.innerHTML, /收藏不增加战斗属性/, "寻访必须解释收藏规则");
+for (const pool of ["fashion", "weapon"]) {
+ V.setPool(save, pool);
+ V.renderGacha(gachaHost, save, { art: p => "game/art/" + p });
+ assert.match(gachaHost.innerHTML, /收藏不增加战斗属性/, pool + " must disclose collection policy");
+ assert.doesNotMatch(gachaHost.innerHTML, /吃满|拥有即加成/);
+}
+V.setPool(save, "remnant");
 assert.ok(gachaHost.querySelector("#gachaPull1"));
 assert.ok(gachaHost.querySelector("#gachaPull10"));
 
@@ -580,6 +549,28 @@ const peek = document.getElementById("rosterPeek46");
 assert.ok(peek);
 assert.match(peek.innerHTML, /尚未回收/);
 assert.match(peek.innerHTML, /card_back\.webp/);
+
+const unlocked = collect(rosterHost).find(n => n.getAttribute("data-card") === "sayo_echo");
+unlocked.onclick();
+assert.match(document.getElementById("rosterPeek46").innerHTML, /收藏不增加战斗属性/);
+save.shop40.ops.owned.school_shrine = 1;
+V.setRosterTab(save, "school");
+V.renderRoster(rosterHost, save, {});
+collect(rosterHost).find(n => n.getAttribute("data-card") === "school_shrine").onclick();
+assert.match(document.getElementById("rosterPeek46").innerHTML, /巫女倾向 ×1.3/);
+assert.match(document.getElementById("rosterPeek46").innerHTML, /收藏不增加战斗属性/);
+
+for (const [id, label] of [["fashion_sayo_night", "巫女"], ["fashion_aya_veil", "枪斗术"], ["fashion_rion_bloom", "修仙"], ["fashion_sayo_crown", "巫女"], ["fashion_aya_funeral", "枪斗术"], ["fashion_rion_bride", "修仙"]]) {
+  save.shop40.ops.fashion = save.shop40.ops.fashion || { owned: {} };
+  save.shop40.ops.fashion.owned = save.shop40.ops.fashion.owned || {};
+  save.shop40.ops.fashion.owned[id] = 1;
+  V.setRosterTab(save, "fashion");
+  V.renderRoster(rosterHost, save, {});
+  collect(rosterHost).find(n => n.getAttribute("data-card") === id).onclick();
+  const html = document.getElementById("rosterPeek46").innerHTML;
+  assert.match(html, new RegExp("装备时" + label + "流派倾向 ×1\\.3"), id);
+  assert.match(html, /收藏不增加战斗属性/, id);
+}
 
 const heroRoot = fakeEl("div");
 body.appendChild(heroRoot);

@@ -6,6 +6,15 @@
   var flashTimer = 0;
   var styleInjected = false;
   var victory = null;
+  var suspended = false;
+  function now() { return global.performance.now(); }
+  function armType(delay) {
+    if (!typing) return;
+    typing.remaining = delay;
+    if (suspended) return;
+    typing.due = now() + delay;
+    typing.timer = global.setTimeout(typing.step, delay);
+  }
 
   function $(id) {
     return global.document.getElementById(id);
@@ -140,9 +149,10 @@
         if (cb) cb();
         return;
       }
-      typing.timer = global.setTimeout(step, full.charCodeAt(i - 1) > 255 ? 28 : 16);
+      armType(full.charCodeAt(i - 1) > 255 ? 28 : 16);
     };
-    typing.timer = global.setTimeout(step, 16);
+    typing.step = step;
+    armType(16);
   }
 
   function isTyping() {
@@ -215,15 +225,18 @@
     node.classList.remove("hidden");
   }
 
-  function armBeatTimer() {
+  function armBeatTimer(remaining) {
     if (!victory || victory.testMode) return;
     var beat = victory.beats[victory.index];
     var hold = beat && Number(beat.hold);
     if (!Number.isFinite(hold) || hold <= 0) hold = 2200;
     clearVictoryTimer();
+    victory.remaining = remaining === undefined ? hold : remaining;
+    if (suspended) return;
+    victory.due = now() + victory.remaining;
     victory.timer = global.setTimeout(function () {
       skipBeat();
-    }, hold);
+    }, victory.remaining);
   }
 
   function finishVictory(runDone) {
@@ -288,6 +301,27 @@
     }
   }
 
+  function suspend() {
+    if (suspended) return;
+    suspended = true;
+    if (typing && typing.timer) {
+      typing.remaining = Math.max(0, typing.due - now());
+      global.clearTimeout(typing.timer);
+      typing.timer = 0;
+    }
+    if (victory && victory.timer) {
+      victory.remaining = Math.max(0, victory.due - now());
+      clearVictoryTimer();
+    }
+  }
+
+  function resume() {
+    if (!suspended) return;
+    suspended = false;
+    if (typing) armType(typing.remaining);
+    if (victory) armBeatTimer(victory.remaining);
+  }
+
   function snapshot() {
     var node = $("storyBeat44");
     return {
@@ -319,5 +353,7 @@
     stopVictory: stopVictory,
     dismiss: dismiss,
     snapshot: snapshot,
+    suspend: suspend,
+    resume: resume,
   };
 })(typeof window !== "undefined" ? window : globalThis);

@@ -1,0 +1,20 @@
+// 镜斗（KOF 式）真实键盘输入：↓↘→+J 波动、→↓↘+K 升龙、J 轻攻击、↓+K 下段扫腿、J+K 投；HUD/摇杆/按钮存在；无报错。
+import assert from 'node:assert/strict'; import path from 'node:path'; import { pathToFileURL } from 'node:url'; import { chromium } from 'playwright';
+const target = process.argv[2] || 'src/index.html';
+const b = await chromium.launch(); const page = await (await b.newContext({ viewport: { width: 960, height: 540 } })).newPage(); const errors = []; page.on('pageerror', e => errors.push(String(e)));
+await page.goto(pathToFileURL(path.resolve(target)).href + '?test=1'); await page.locator('.bootArt35').waitFor({ state: 'detached' });
+await page.evaluate(() => { window.__duelManual = 1; window.SakurayoDuel.start({ character: 'sayo', seed: 1, layer: 1 }); const g = window.SakurayoDuel.current(); g.brainE.react = 99; g.brainE.block = 0; g.ai = function () { return { dir: 5, btns: [] }; }; });
+const step = n => page.evaluate(n => { for (let i = 0; i < n; i++) window.SakurayoDuel.step(1 / 60); return window.SakurayoDuel.current().snapshot(); }, n);
+let s = await step(70); assert.equal(s.round, 1);
+const seq = async (keys, frames = 2) => { for (const k of keys) { for (const x of k) await page.keyboard.down(x); await step(frames); for (const x of k) await page.keyboard.up(x); } };
+const moveSeen = async (n, want) => { for (let i = 0; i < n; i++) { const q = await step(1); if (q.move === want) return true; } return false; };
+await seq([['ArrowDown'], ['ArrowDown', 'ArrowRight'], ['ArrowRight']]); await page.keyboard.press('j'); assert.ok(await moveSeen(4, 'A'), 'qcf + J = A special'); await step(60);
+await seq([['ArrowRight'], ['ArrowDown'], ['ArrowDown', 'ArrowRight']]); await page.keyboard.press('k'); assert.ok(await moveSeen(4, 'D'), 'dp + K = DP'); await step(90);
+await page.keyboard.press('j'); assert.ok(await moveSeen(3, 'lp'), 'J = light'); await step(30);
+await page.keyboard.down('ArrowDown'); await step(2); await page.keyboard.press('k'); assert.ok(await moveSeen(3, 'chp'), 'down + K = sweep'); await page.keyboard.up('ArrowDown'); await step(60);
+await page.evaluate(() => { const g = window.SakurayoDuel.current(); g.E.x = g.P.x + 60; }); await step(1); await page.keyboard.press('l'); assert.ok(await moveSeen(3, 'thr'), 'L / J+K = throw');
+await step(40); s = await step(1); assert.ok(s.foeHp < 1, 'damage dealt: ' + s.foeHp);
+assert.equal(await page.locator('#duel46 .dstk46').count(), 1); assert.equal(await page.locator('#duel46 .dact46 button').count(), 6);
+await page.screenshot({ path: process.env.SHOT || '/tmp/sy/duel-input.png' });
+assert.deepEqual(errors, []); await b.close();
+console.log('PASS duel input: 236+J special, 623+K DP, J light, 2+K sweep, throw; touch stick + 6 buttons');

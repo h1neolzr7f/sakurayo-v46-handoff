@@ -1,12 +1,20 @@
 # 樱夜·尸潮 v4.6 开发仓
 
+> **2026-10-10 Grok / Linux 接手包：先读 [GROK_START_HERE.md](GROK_START_HERE.md)。** 最新分支为 `codex/grok-linux-handoff-20261010`，包含收藏政策修复及未完成清单；当前完整回归有已知失败，旧的全绿 CI 不代表该分支通过。
+
 这是《樱夜·尸潮》的 **v4.6.0 预发布开发基线**，用于继续开发、回归测试和整理发布内容。玩家下载稳定版请前往 [sakurayo-zombietide](https://github.com/h1neolzr7f/sakurayo-zombietide)；当前玩家发布线仍是 v4.4.6。
 
 [玩家仓](https://github.com/h1neolzr7f/sakurayo-zombietide) · [开发交接](docs/HANDOFF.md) · [v4.6 计划](docs/PLAN_V46_ERYOU.md) · [维护手册](docs/MAINTAIN.md)
 
-![v4.6 开发版首页](docs/screenshots/development-home.png)
+![指挥大厅开发版](docs/screenshots/tactical-lobby.webp)
 
-> 截图由本仓库当前 `main` 源码以测试模式在本地浏览器启动后采集。它展示开发基线，不代表已经发布的玩家版本。
+> 截图为疏朗横屏大厅的实际浏览器画面，仍属 v4.6.0 开发预发布。完整验证及运行方法见 [大厅与服务验收记录](docs/VALIDATION_TACTICAL_LOBBY.md)；最新存档与界面重构见 [本轮验收](docs/VALIDATION_CODE_POLISH.md)。
+
+## 横屏大厅、邮箱与四章精装修
+
+大厅采用大立绘、三项悬浮主入口和六图标底栏；补齐邮箱、公告、活动、任务和七日登录签到。欢迎邮件、里程碑和签到均能实际领取并保存，任务与邮件共用收据。新增十张统一冷灰、冰蓝画风素材，覆盖大厅背景、三角色头像、三套寻访背景和三种活动插画。角色资料、出击整备、近期战绩、商店与档案沿用真实游戏数据。四章有独立新插画、可平铺地面、落樱/雨纹/灰烬/镜屑环境动画和清晰障碍边界。所有素材离线加载，存档仍使用 `sakurayoV3`。
+
+浏览器开发依赖：`npm ci && npx playwright install chromium`；美术检查需要 `python -m pip install Pillow`。Linux/macOS 运行 `bash tools/verify.sh`（完整回归）；`--static` 仅执行静态、单位检查与打包。Windows 沿用 `tools/verify.ps1`。可直接打开已同步的 `android-app/app/src/main/assets/index.html` 试玩。
 
 ## 与玩家仓的关系
 
@@ -24,7 +32,7 @@ v4.6 在原有三角色、四章、职业/转职/融合/飞升、Boss 与主神�
 核心兼容约束：
 
 - 保留本地存档键 `sakurayoV3`，迁移缺字段而不清档；
-- 保持离线优先，不加入账号、广告或每日任务；
+- 保持离线优先，不加入联网账号或广告；签到仅按本机日期记录七次有限补给；
 - 不提交签名密钥、JKS、APK、`local.properties` 或构建输出；
 - 改动战斗循环时继续遵守对象上限和现有测试 API。
 
@@ -44,7 +52,7 @@ python -m http.server 8000
 powershell -File tools/verify.ps1
 ```
 
-本地验证包含静态/语法检查、镜头与生命周期单元测试、大厅/档案/角色表现/DP 系统测试、扩展框架冒烟和真实浏览器冒烟。当前 GitHub Actions 的 `verify.yml` 只运行静态和语法子集。
+本地验证包含静态/语法检查、镜头与生命周期单元测试、大厅/档案/角色表现/DP 系统测试、扩展框架冒烟和真实浏览器冒烟。GitHub Actions 的 `verify.yml` 同时运行静态检查和完整离线游戏回归，并上传浏览器截图及测试日志。
 
 本次整理实际通过了静态检查、camera/lifecycle/lobby/chronicle/live/ops 单元测试、ops smoke 与 framework smoke 8 项检查，并在真实浏览器中启动当前源码。详细命令见 [docs/VALIDATION.md](docs/VALIDATION.md)。
 
