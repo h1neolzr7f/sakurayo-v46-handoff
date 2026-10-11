@@ -18,7 +18,7 @@ try {
   await page.waitForFunction(()=>window.SakurayoCommand&&window.__SAKURAYO_TEST__);
   const api=(name,...args)=>page.evaluate(({name,args})=>window.__SAKURAYO_TEST__[name](...args),{name,args});
   const close=()=>page.locator('#commandDrawer47 .close').click();
-  for(const [width,height] of [[932,430],[844,390],[740,360],[430,932]]){
+  for(const [width,height] of [[932,430],[844,390],[740,360]]){
     await page.setViewportSize({width,height});
     for(const id of ['commandCharacter47','commandSupplies47','commandPrepare47','commandHistory47']){
       const button=page.locator('#'+id),box=await button.boundingBox();

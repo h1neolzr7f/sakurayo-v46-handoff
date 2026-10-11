@@ -266,7 +266,7 @@ async function runViewport(width, height, tag) {
 }
 
 try {
-  const old = await browser.newContext({ viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true });
+  const old = await browser.newContext({ viewport: { width: 932, height: 430 }, isMobile: true, hasTouch: true });
   await old.addInitScript(() => localStorage.setItem("sakurayoV3", JSON.stringify({ coins: 11, tal: { atk: 1 } })));
   const oldPage = await old.newPage();
   await waitMenu(oldPage);
@@ -301,7 +301,7 @@ try {
   pass("无效融合结算不写 undefined");
   await resultCtx.close();
 
-  const toastCtx = await browser.newContext({ viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true });
+  const toastCtx = await browser.newContext({ viewport: { width: 932, height: 430 }, isMobile: true, hasTouch: true });
   const toastPage = await toastCtx.newPage();
   await waitMenu(toastPage);
   await api(toastPage, "setRunMode46", "testimony");
@@ -457,7 +457,7 @@ try {
   assert.equal(await roomsPage.locator("#menu").isVisible(), true);
   await roomsCtx.close();
 
-  await runViewport(430, 932, "p430");
+  // 竖屏 p430 已移除：游戏锁定横屏，竖屏只显示旋转提示（见 rotate_smoke.mjs）
   await runViewport(932, 430, "l932");
   const thin = await browser.newContext({ viewport: { width: 600, height: 400 }, hasTouch: true });
   const thinPage = await thin.newPage();

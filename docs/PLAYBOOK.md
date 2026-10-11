@@ -129,3 +129,14 @@
 - **字体**：Rajdhani Bold 斜体（英文）+ Noto Sans SC 800（中文），都是 OFL，必须子集化（`pyftsubset --flavor=woff2`，字表从 src 全量抽取）。
 - **实现位置**：`src/runtime/sakurayo-ui-polish.js`（动效层）、`src/runtime/sakurayo-ui-static.js`（静态视觉层）。改样式只改令牌，新组件不写死颜色。
 - **素材**：一律用中转站 gpt-image-2 生成，提示词前缀见 `/workspace/sakurayo-gen/jobs_ui3.json`。截图用 `node tools/shoot_ui.mjs <dir>`，动效录像用 `node tools/record_ui_polish.mjs <dir> [repoRoot]`。
+
+## 屏幕方向：只做横屏（2026-10-11 决定）
+
+- 游戏锁定横屏。安卓主 Activity 使用 `android:screenOrientation="sensorLandscape"`（左右横屏都可以，跟随重力翻转）。
+- 网页版竖屏时由 `src/runtime/sakurayo-rotate.js` 盖一层全屏旋转提示（手机旋转动画 + “请横屏游玩 / ROTATE YOUR DEVICE”）。提示期间：
+  - 调用 `SakurayoPlatform.suspend()`：割草战斗暂停、释放输入、暂停音频和剧情计时；
+  - 弹幕 / 格斗模块的帧循环检查 `window.__syRotateBlocked`，时钟停走；
+  - 提示层吃掉所有触摸、点击和按键；
+  - 在支持的环境里尝试调用 `screen.orientation.lock("landscape")`，失败时静默忽略。
+- 不再为竖屏写排版分支。新界面只需要适配横屏，最低保证矮横屏 844×390 和 640×360；`@media (max-height:440px)` 这类矮横屏规则要保留。
+- 巡检 `tools/sweep.mjs` 只截 1280×720 和 844×390；390×844 只跑 `rotate` 场景，检查旋转提示。测试里原来的竖屏视口都改成了对应的横屏尺寸，竖屏行为由 `tests/rotate_smoke.mjs` 单独覆盖。

@@ -1,7 +1,7 @@
 // 三角色 × 三尺寸（横屏/竖屏手机/平板）× WebGL/2D 降级：rig 正常挂载，画布有像素且人物不越界。输出拼图。
 import { chromium } from 'playwright'; import { pathToFileURL } from 'node:url'; import path from 'node:path'; import fs from 'node:fs';
 const shots = '/tmp/sy/mascot-sizes'; fs.mkdirSync(shots, { recursive: true });
-const sizes = [[1280, 720], [390, 844], [1024, 768]], out = [];
+const sizes = [[1280, 720], [844, 390], [1024, 768]], out = [];
 const browser = await chromium.launch({ args: ['--allow-file-access-from-files', '--use-gl=angle', '--use-angle=swiftshader', '--ignore-gpu-blocklist'] });
 for (const mode of ['gl', '2d']) for (const ch of ['sayo', 'aya', 'rion']) for (const [w, h] of sizes) {
   const ctx = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: w < 500 ? 2 : 1 });

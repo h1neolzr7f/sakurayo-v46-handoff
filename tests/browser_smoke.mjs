@@ -98,7 +98,7 @@ try {
   const receiptEvidence = await verifyContentReceipts(browser, url);
   fs.writeFileSync(path.join(artifactDir, "content-receipts.json"), JSON.stringify(receiptEvidence, null, 2));
   pass("F22 扩展字典收据、真实购买/事件按钮、刷新后重复领取与限购拒绝");
-  normalContext = await browser.newContext({ viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true });
+  normalContext = await browser.newContext({ viewport: { width: 932, height: 430 }, isMobile: true, hasTouch: true });
   const normalTracker = { pageErrors: [], consoleErrors: [], externalRequests: [] };
   const normalPage = await openPage(normalContext, normalTracker, normalUrl);
   await normalPage.locator(".bootArt35").waitFor({ state: "detached", timeout: 5000 });
@@ -117,7 +117,7 @@ try {
   await normalContext.close();
   normalContext = null;
 
-  for (const [width, height] of [[360, 800], [932, 430]]) {
+  for (const [width, height] of [[800, 360], [932, 430]]) {
     const layoutContext = await browser.newContext({ viewport: { width, height }, isMobile: true, hasTouch: true });
     const layoutTracker = { pageErrors: [], consoleErrors: [], externalRequests: [] };
     const layoutPage = await openPage(layoutContext, layoutTracker, normalUrl);
@@ -132,7 +132,7 @@ try {
     pass(`${width}×${height} 主菜单布局`);
   }
 
-  legacyContext = await browser.newContext({ viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true });
+  legacyContext = await browser.newContext({ viewport: { width: 932, height: 430 }, isMobile: true, hasTouch: true });
   await legacyContext.addInitScript(value => {
     localStorage.setItem("sakurayoV3", value);
   }, JSON.stringify({ coins: 7, tal: { atk: 1 }, settings: { glow: "soft" } }));
@@ -160,7 +160,7 @@ try {
   await legacyContext.close();
   legacyContext = null;
 
-  mainContext = await browser.newContext({ viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true });
+  mainContext = await browser.newContext({ viewport: { width: 932, height: 430 }, isMobile: true, hasTouch: true });
   await mainContext.addInitScript(() => {
     let seed = 0x5a17c9;
     Math.random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
@@ -1182,7 +1182,7 @@ try {
   const report = {
     source,
     sourceSha256: createHash("sha256").update(fs.readFileSync(sourceFile)).digest("hex"),
-    viewport: { width: 430, height: 932, isMobile: true, hasTouch: true },
+    viewport: { width: 932, height: 430, isMobile: true, hasTouch: true },
     passed,
     screenshots: screenshots.map(item => path.relative(projectRoot, item)),
     expectedErrors: tracker.pageErrors.filter(item => item.includes("SMOKE_EXPECTED")),

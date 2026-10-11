@@ -33,7 +33,7 @@ try{
     assert.equal(await page.evaluate(()=>{window.roomStyleObserver.disconnect();return window.roomStyleMutations.filter(r=>r.target===window.roomStyleBefore||[...r.addedNodes,...r.removedNodes].some(n=>n.id==='sakurayo-lobby-css')).length;}),0,'refresh does not rewrite unchanged CSS');
   });
   await check('warehouse scroll reaches and opens the final card in long tabs',async()=>{
-    for(const [width,height] of [[932,430],[640,360],[430,932]]){
+    for(const [width,height] of [[932,430],[640,360],[844,390]]){
       await page.setViewportSize({width,height});await open('roster');
       for(const tab of ['school','job','fusion','fashion','weapon','chronicle']){
         await page.locator('[data-roster="'+tab+'"]').click();

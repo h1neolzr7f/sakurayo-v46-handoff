@@ -34,7 +34,7 @@ async function api(page, method, ...args) {
 }
 
 try {
-  const oldContext = await browser.newContext({ viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true });
+  const oldContext = await browser.newContext({ viewport: { width: 932, height: 430 }, isMobile: true, hasTouch: true });
   await oldContext.addInitScript(() => localStorage.setItem("sakurayoV3", JSON.stringify({ coins: 90, tal: { atk: 1 }, extensions: { "official.story-exploration": { __version: 1, data: { collected: { legacy: true }, visits: {}, fragments: [] } } } })));
   const oldPage = await oldContext.newPage();
   await waitReady(oldPage);
@@ -198,7 +198,7 @@ try {
   pass("Mod Kit 契约统一文档格式、依赖排序、逐版本迁移、Hook 与单包编译隔离");
   await contractPage.close();
 
-  const brokenContext = await browser.newContext({ viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true });
+  const brokenContext = await browser.newContext({ viewport: { width: 932, height: 430 }, isMobile: true, hasTouch: true });
   const pageErrors = [];
   const brokenPage = await brokenContext.newPage();
   brokenPage.on("pageerror", error => pageErrors.push(String(error)));
@@ -212,7 +212,7 @@ try {
   pass("非法扩展被隔离，本体和其他扩展继续启动");
   await brokenContext.close();
 
-  const poisonContext = await browser.newContext({ viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true });
+  const poisonContext = await browser.newContext({ viewport: { width: 932, height: 430 }, isMobile: true, hasTouch: true });
   await poisonContext.addInitScript(() => localStorage.setItem("sakurayoV3", '{"coins":12,"tal":{"atk":2},"mainGod":{"points":3},"extraJunk424":1,"__proto__":{"pollutedSakurayo":true}}'));
   const poisonPage = await poisonContext.newPage();
   await poisonPage.goto(testUrl, { waitUntil: "domcontentloaded" });

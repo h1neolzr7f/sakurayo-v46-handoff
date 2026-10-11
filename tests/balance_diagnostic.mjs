@@ -16,7 +16,7 @@ try{
  const evidence=[],summary=[];
  for(const agent of agents)for(const seed of seeds){const rows=[];
  for(const character of ['sayo','aya','rion']){
-  const context=await browser.newContext({viewport:{width:430,height:932},isMobile:true,hasTouch:true});
+  const context=await browser.newContext({viewport:{width:932,height:430},isMobile:true,hasTouch:true});
   await context.addInitScript(()=>localStorage.setItem('sakurayoV3',JSON.stringify({coins:0,unlock:4,tutorialDone:true})));
   const page=await context.newPage();
   await page.goto(pathToFileURL(entry).href+'?test=1');
