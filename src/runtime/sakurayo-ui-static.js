@@ -97,6 +97,8 @@ html body #menu .terminalActivity48{border-radius:0!important;clip-path:polygon(
 #hud .hero img{border-radius:0!important;clip-path:polygon(25% 0,100% 0,75% 100%,0 100%)!important;border:0!important;box-shadow:none!important;filter:drop-shadow(0 0 4px var(--sy-c-cyan))}
 #hud .act,#hud #pause{border-radius:0!important;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);background:radial-gradient(circle,rgba(56,225,255,.35),rgba(4,10,22,.85) 70%)!important;border:0!important;box-shadow:none!important}
 #hud .act span{font:italic 800 12px var(--sy-font-title)}
+#hud .act,#hud button[class*="act"]{filter:drop-shadow(0 0 6px rgba(56,225,255,.85));color:#fff!important}
+#hud [id*="atk"],#hud [id*="attack"],#hud [class*="atk"],#hud [class*="main"]{background:radial-gradient(circle,rgba(255,111,174,.95),rgba(150,24,70,.92) 70%)!important;filter:drop-shadow(0 0 10px rgba(255,111,174,.9))!important}
 #hud #combo{font-family:var(--sy-font-title)!important;font-style:italic;color:var(--sy-c-gold)!important;text-shadow:3px 0 0 rgba(255,59,78,.6),0 0 12px rgba(255,201,74,.7)!important}
 /* 列表卡片：多层悬停（上浮 + 青色描边发光 + 扫描光带） */
 .wdc,.shopList>*,#stageList>*,.nc,#gachaBody46 [class*="card"],#rosterBody46 [class*="card"]{position:relative;transition:translate .2s var(--sy-ease-out),box-shadow .2s,filter .2s}

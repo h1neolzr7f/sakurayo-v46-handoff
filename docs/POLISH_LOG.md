@@ -120,6 +120,6 @@
 - [x] U3 特色演出层 `sakurayo-ui-fx.js`：SKR 樱印、动态背景、视差与推拉、出击多层反馈、加载、结算、角色出场（444c0d6）
 - [x] U4 修复：观察器自激导致开局卡死；按钮 transform 覆盖地图节点定位（216b361、1d70f8a）
 - [x] U5 战斗 HUD、通用弹窗、列表卡片多层悬停、射的和地图面板（07ee737）
-- [ ] U6 HUD 和升级弹窗的前后对比图（后台跑 `tools/shoot_hud.mjs`，产物放 `shots/polish2/compare/13_hud.png`、`14_levelup.png`）
+- [x] U6 HUD 前后对比图 `shots/polish2/compare/13_hud.png`；攻击键改为粉色主键加发光（升级弹窗截图缺测试钩子，放到第 4 轮）
 - [ ] U7 全量回归和 APK（后台跑，日志 `/tmp/sy/verify_p4.log`）；已知偶发：`browser_smoke` 竖屏底栏命中检测，单独跑能通过
 - [ ] U8 按验收表重新打分；最低分项（加载立绘层、角色出场主题色、射的 HUD）进入第 4 轮
