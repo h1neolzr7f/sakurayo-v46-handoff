@@ -47,8 +47,14 @@
     }
     show(C.idle, true, "idle");
     st.tap = function (part) {
-      var T = C.taps || {}, list = (T[part] && T[part].length ? T[part] : T.any) || [];
-      if (!list.length) return null; var f = list[(st.plays + Math.floor(Math.random() * list.length)) % list.length];
+      // 部位专属片段（head / body）与该部位通用的动作池（any）合并后一起轮换：
+      // any 用来放"拔刀、摆 pose、打招呼"这类不区分部位的表现性动作，
+      // 只保留原来"part 缺失才回退 any"的行为会让这些动作永远播不出来。
+      var T = C.taps || {};
+      var own = (T[part] && T[part].length) ? T[part] : [];
+      var pool = (T.any && T.any.length) ? own.concat(T.any) : own;
+      if (!pool.length) return null;
+      var f = pool[(st.plays + Math.floor(Math.random() * pool.length)) % pool.length];
       show(f, false, "tap"); return Array.isArray(f) ? f[0] : f;
     };
     st.onTap = function (e) { var r = wrap.getBoundingClientRect(), y = (e.clientY - r.top) / r.height; st.tap(y < 0.3 ? "head" : "body"); };

@@ -1,0 +1,35 @@
+{
+  "idle": [
+    "idle.webm",
+    "idle.mp4"
+  ],
+  "taps": {
+    "head": [
+      [
+        "tap_head.webm",
+        "tap_head.mp4"
+      ]
+    ],
+    "body": [
+      [
+        "tap_body.webm",
+        "tap_body.mp4"
+      ]
+    ],
+    "any": [
+      [
+        "act1.webm",
+        "act1.mp4"
+      ],
+      [
+        "act2.webm",
+        "act2.mp4"
+      ],
+      [
+        "act3.webm",
+        "act3.mp4"
+      ]
+    ]
+  },
+  "poster": "poster.webp"
+}
