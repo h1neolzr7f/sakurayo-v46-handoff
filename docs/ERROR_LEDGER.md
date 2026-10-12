@@ -56,3 +56,10 @@
 - **根因**：`lifecycle` / `props` 用 canvas 硬画鸟居轮廓。
 - **修法**：换成 `props/paifang.webp`、`lantern_tech.webp`、更新 `shrine.webp`（中式科技风）。
 - **预防**：全局搜 `torii`/`lantern` 绘制分支；素材命名禁止再引入和风。
+
+### E007 · 主线 Boss 关漏接「迎战方式三选一」
+- **场景/尺寸**：主线关卡地图 1-4 / 2-4 / 3-4 / 4-4 · 实机反馈
+- **现象**：夜行层主可以选割草 / 格斗 / 弹幕射击，主线章节 Boss 只能割草，没有任何入口。
+- **根因**：三选一只做在夜行（`SakurayoRun.BOSS_MODES`、`runBossMode46`、`bossmode` 弹窗），需求是「所有 Boss」，主线关卡入口 `launchLevel46` 没接；测试也只覆盖了夜行。
+- **修法**：关卡详情面板（`.lm46Sheet`）对 Boss 关显示「迎战方式」切角三段选择 `.sbm46`，默认夜行路线推荐项，选择存 `save.storyBossMode46`。格斗/弹幕复用 `SakurayoDuel` / `SakurayoShmup`，打完走一次 `startGame→finish` 正常结算（星级映射：破防=收取符卡/赢下回合；被弹=弹幕被弹/格斗承伤÷12），解锁、post 剧情、「再次迎击」都与割草一致。
+- **预防**：`tests/story_boss_mode_smoke.mjs`：三种模式各进一次主线 Boss 并结算；1024×461 详情面板无滚动、无遮挡。新增「所有 X 都要……」类需求时，先 grep 所有入口（夜行 / 主线 / 主神 / 试炼）列清单再动手。

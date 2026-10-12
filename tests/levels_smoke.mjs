@@ -68,6 +68,7 @@ async function playUntil(page, api, fn, max = 400) { let s; for (let i = 0; i < 
   await api('launchLevel46', '1-2'); await api('avgSkip46'); await api('protectPlayer');
   s = await playUntil(page, api, null, 800); await api('avgSkip46'); s = await api('levelState46'); assert.equal(s.result.got[0], true, 'clear completes');
   // 1-4 boss
+  await api('storyBossSet46', '1-4', 'mow'); // 本段验证割草路线；格斗/弹幕见 story_boss_mode_smoke
   await api('launchLevel46', '1-4'); await api('avgSkip46'); await api('protectPlayer');
   for (let i = 0; i < 200 && !(await api('snapshot')).boss; i++) await step(page, 250);
   assert.ok((await api('snapshot')).runTime < 30, 'boss node spawns the boss early');

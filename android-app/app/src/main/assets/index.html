@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" name="viewport"/>
 <meta content="#090714" name="theme-color"/>
-<title>樱夜·尸潮 0.9.0-beta</title>
+<title>樱夜·尸潮 0.9.1-beta</title>
 <style>
 :root{--p:#ff58a7;--p2:#ffb4d5;--c:#56ddff;--g:#ffd36b;--bg:#080713;--panel:rgba(18,14,39,.96);--line:rgba(170,220,255,.24);--mut:#cfc4df;--red:#ff4e72}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:#fff;font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;touch-action:none}button{border:0;color:inherit;font:inherit}button:active{transform:scale(.985)}canvas{position:fixed;inset:0;width:100%;height:100%}.hidden{display:none!important}.screen{position:fixed;inset:0;z-index:10}
@@ -96,6 +96,7 @@
 .lm46Sheet{position:absolute;right:max(14px,env(safe-area-inset-right));top:72px;bottom:max(14px,env(safe-area-inset-bottom));width:min(340px,42vw);padding:18px 20px;border-radius:18px;background:linear-gradient(180deg,rgba(30,18,44,.95),rgba(14,8,24,.96));border:1px solid rgba(255,190,225,.35);box-shadow:0 12px 40px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:8px;z-index:3;animation:lm46In .2s ease-out}
 @keyframes lm46In{from{transform:translateX(30px);opacity:0}}.lm46Sheet small{color:#ffb4d8}.lm46Sheet h3{margin:0;font-size:20px}.lm46Sheet .goal{margin:0;line-height:1.5}.lm46Sheet ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .lm46Sheet li{padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.06);color:#ccc}.lm46Sheet li.on{color:#ffd77a;background:rgba(255,215,122,.12)}.lm46Sheet .note{margin:0;font-size:11px;opacity:.6}
+.lm46Sheet .sbm46{display:flex;flex-direction:column;gap:3px;flex:none}.lm46Sheet .sbm46 em{font-style:normal;font-size:11px;letter-spacing:.12em;color:var(--c-primary)}.lm46Sheet .sbm46>div{display:flex;gap:6px}.lm46Sheet .sbm46 button{position:relative;flex:1;min-width:0;height:36px;display:flex;align-items:center;justify-content:center;gap:4px;border:1px solid rgb(var(--c-primary-rgb) / .35);background:rgb(var(--c-n0-rgb) / .7);color:var(--c-n5);font-weight:800;font-size:13px;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);cursor:pointer}.lm46Sheet .sbm46 button i{font-style:normal}.lm46Sheet .sbm46 button.on{border-color:var(--c-primary);background:linear-gradient(135deg,rgb(var(--c-primary-rgb) / .35),rgb(var(--c-accent-rgb) / .25));color:var(--c-n6);box-shadow:inset 0 0 12px rgb(var(--c-primary-rgb) / .5)}.lm46Sheet .sbm46 button small{position:absolute;right:2px;top:1px;font-size:9px;line-height:1;color:var(--c-accent)}
 .lm46Sheet .row{margin-top:auto;display:flex;gap:10px}.lm46Sheet .row button{flex:1;height:52px;border-radius:14px;border:1px solid #fff4;background:rgba(255,255,255,.08);color:#fff;font-weight:800;font-size:16px}.lm46Sheet .row .go{flex:2;border:0;background:linear-gradient(90deg,#ff6aa8,#a46cff);box-shadow:0 6px 18px rgba(255,90,170,.35)}.lm46Sheet .row button:active{transform:scale(.96)}
 .lm46X{position:absolute;top:8px;right:10px;width:36px;height:36px;border-radius:50%;border:0;background:rgba(255,255,255,.08);color:#fff;font-size:20px}
 #obj46{position:absolute;left:50%;top:max(10px,env(safe-area-inset-top));transform:translateX(-50%);display:grid;grid-template-columns:auto 1fr;column-gap:8px;align-items:center;padding:6px 16px;border-radius:12px;background:rgba(14,8,24,.72);border:1px solid rgba(255,210,150,.4);pointer-events:none;max-width:56vw}
@@ -130,7 +131,7 @@
 <div class="warn hidden" id="warning"></div><div id="toast"></div>
 <script>
 window.SAKURAYO_GAME_VERSION = "4.6.0"; // 模组 API 兼容用的引擎版本，不对玩家显示
-window.SAKURAYO_DISPLAY_VERSION = "0.9.0-beta"; // 对玩家显示的版本号，与 android versionName 同步
+window.SAKURAYO_DISPLAY_VERSION = "0.9.1-beta"; // 对玩家显示的版本号，与 android versionName 同步
 window.SAKURAYO_VERSION_CODE = 71;
 (() => {
   "use strict";
@@ -6849,7 +6850,7 @@ window.SAKURAYO_VERSION_CODE = 71;
   var SETTINGS = {master:.8,sfx:.8,music:.45,vibration:1,fx:1,hudSize:'standard',damageText:'compact',contrast:1,uiCalm:1,glow:'off',glowVersion:2,mascot:'follow'};
   var MAIN_GOD = {points:0,unlockedTier:1,bestTier:0,clears:0,runs:0,deepest:0,contracts:{},challenges:{},power:0,vitality:0,tempo:0,resonance:0,fortune:0,regenBlood:0,psiLink:0,gunBlade:0,mageCircuit:0,summonPage:0,spaceRing:0,rebirthDoll:0,sideKey:0,cursedHeart:0};
   var SHOP = {starter:{assault:0,bastion:0,flow:0,arcane:0},equippedStarter:null,items:{bait:0,ammo:0,whetstone:0,mirror:0},equippedWeapon:null,baitEquipped:false,ownedTalismans:[],bannedSchools:[],noUpgradeChallenge:false,lastTab:'skins',ops:{pity:0,pitySR:0,pulls:0,tenPulls:0,owned:{},last:[],cheatUsed:0}};
-  var DEFAULTS = {coins:0,unlock:1,done:[],kills:0,bosses:0,best:0,runs:0,tal:{atk:0,hp:0,luck:0,mag:0,flow:0},ach:{},claim:{},story:[0],forms:[],fusions:[],evo46:[],stars46:{},avgRead46:[],cg46:[],run46:null,cosmetics46:null,season46:null,pachi46:null,talRefund46:-1,endings:[],runHistory:[],banter:1,tutorialDone:false,settings:SETTINGS,character:'sayo',skin:'default',ownedSkins:['default'],mainGod:MAIN_GOD,storyChoices38:{sayo:{},aya:{},rion:{}},storySeen38:{},shop40:SHOP,balance40:{samples:[],betaSessions:0},hiddenStory40:{},pendingLoneStory40:null,extensions:{}};
+  var DEFAULTS = {coins:0,unlock:1,done:[],kills:0,bosses:0,best:0,runs:0,tal:{atk:0,hp:0,luck:0,mag:0,flow:0},ach:{},claim:{},story:[0],forms:[],fusions:[],evo46:[],stars46:{},storyBossMode46:{},avgRead46:[],cg46:[],run46:null,cosmetics46:null,season46:null,pachi46:null,talRefund46:-1,endings:[],runHistory:[],banter:1,tutorialDone:false,settings:SETTINGS,character:'sayo',skin:'default',ownedSkins:['default'],mainGod:MAIN_GOD,storyChoices38:{sayo:{},aya:{},rion:{}},storySeen38:{},shop40:SHOP,balance40:{samples:[],betaSessions:0},hiddenStory40:{},pendingLoneStory40:null,extensions:{}};
   // Lifetime counters have no gameplay cap; keep earned values within safe integer precision.
   var COUNT_MAX = Number.MAX_SAFE_INTEGER || 9007199254740991;
   var SCHOOLS = ['mech','gun','alch','gene','vamp','spore','magical','cult','mage','shrine','summon','ninja','idol','necro'];
@@ -6911,6 +6912,7 @@ window.SAKURAYO_VERSION_CODE = 71;
     clean.pachi46 = object(incoming.pachi46) && incoming.pachi46.day > 0 ? { day: incoming.pachi46.day | 0, free: Math.max(0, Math.min(9, incoming.pachi46.free | 0)), balls: Math.max(0, incoming.pachi46.balls | 0) } : null; // 樱花弹珠台每日次数
     clean.cosmetics46 = global.SakurayoWardrobe ? global.SakurayoWardrobe.sanitize(object(incoming.cosmetics46) ? copy(incoming.cosmetics46) : null) : (object(incoming.cosmetics46) ? copy(incoming.cosmetics46) : null);
     clean.run46 = object(incoming.run46) ? (global.SakurayoRun && global.SakurayoRun.sanitize ? global.SakurayoRun.sanitize(copy(incoming.run46)) : copy(incoming.run46)) : null;
+    clean.storyBossMode46 = {}; if (object(incoming.storyBossMode46)) Object.keys(incoming.storyBossMode46).forEach(function (id) {var v = incoming.storyBossMode46[id]; if (/^[1-4]-4$/.test(id) && ["mow","duel","sky"].indexOf(v) >= 0) clean.storyBossMode46[id] = v;});
     clean.stars46 = {}; if (object(incoming.stars46)) Object.keys(incoming.stars46).forEach(function (id) {if (/^[1-4]-[1-4]$/.test(id)) clean.stars46[id] = integer(incoming.stars46[id],0,3,0);});
     clean.avgRead46 = clean.avgRead46.filter(function (id) {return typeof id === 'string';}).slice(-3000); clean.cg46 = clean.cg46.filter(function (id) {return typeof id === 'string' && /^story\//.test(id);});
     clean.character = ['sayo','aya','rion'].indexOf(clean.character) >= 0 ? clean.character : 'sayo';
@@ -8212,7 +8214,7 @@ window.SAKURAYO_VERSION_CODE = 71;
   d.getElementById('commandActivity48').style.backgroundImage='linear-gradient(90deg,#14283dbb,#14283d30),url("'+activityArt+'")';
   d.getElementById('commandHeading47').querySelector('b').textContent='回收行动局';
   d.getElementById('commandProgress47').textContent='章节 '+model.completed+'/4 · 作战 '+(Number(model.save.runs)||0);
-  d.getElementById('commandSignal47').textContent='离线作战就绪 / OFFLINE MODE · v'+(global.SAKURAYO_DISPLAY_VERSION||'0.9.0-beta');
+  d.getElementById('commandSignal47').textContent='离线作战就绪 / OFFLINE MODE · v'+(global.SAKURAYO_DISPLAY_VERSION||'0.9.1-beta');
  }
  global.SakurayoTerminal={css:CSS,icon:icon,decorate:decorate};
 })(window);
@@ -8402,7 +8404,7 @@ window.SAKURAYO_VERSION_CODE = 71;
       var status=global.SakurayoServices.loginStatus(model.save),label=status.reason==='complete'?'七日补给已全部领取':status.reason==='clock'?'请检查本机日期':status.reason==='claimed'?'今日已签到':'签到领取 · 樱花币 +'+status.reward;
       body.innerHTML='<article class="cmdNotice48"><small>WELCOME BACK / '+esc(status.today)+'</small><h3>每一次归来，都有新的补给。</h3><p>累计七个登录日，无需连续签到。本机日期每日最多领取一次；七日完成后不重复循环。已完成 '+status.count+' / 7 天。</p></article><div class="cmdLogin48">'+status.rewards.map(function(reward,i){return '<article class="cmdLoginDay48 '+(i<status.count?'done':i===status.count?'on':'')+'"><small>DAY '+(i+1)+'</small>'+global.SakurayoTerminal.icon('supplies')+'<b>'+reward+'</b><span>'+(i<status.count?'已领取':i===status.count?'本次补给':'待签到')+'</span></article>';}).join('')+'</div><div class="cmdActions47"><button class="primary47" id="commandLoginClaim48" '+(status.ready?'':'disabled')+'>'+label+'</button></div>';
     }else if(kind==='notice'){
-      body.innerHTML='<article class="cmdNotice48"><small>UPDATE / CLOSED BETA</small><h3>'+esc(global.SAKURAYO_DISPLAY_VERSION||'0.9.0-beta')+' · 内测版本</h3><p>横屏锁定；寻访与各处立绘按头部安全区定位；看板娘改为往返播放并预解码，消除闪烁；新手教学与说明弹窗改为左右分栏；割草镜头按屏高固定视野，默认 60fps；场景道具统一为中式科技风。内测福利已通过邮件发放，可在邮箱一键领取。</p><p>本版本使用新的固定签名，首次安装前请卸载旧的调试版。</p></article><article class="cmdNotice48"><small>UPDATE / DEVELOPMENT BUILD</small><h3>4.6.0 · 行动终端更新</h3><p>新大厅加入邮箱、七日登录签到、任务补给与活动入口。邮件与任务共享领取状态，进度保存在本机。四章插画和场景动画已更新。</p><p>当前为开发预发布版本；新 Android 安装包尚未发布。</p></article><article class="cmdNotice48"><small>FIELD MANUAL</small><h3>关于这场回收行动</h3><p>三名作战角色，四章战场。回收演习保留职业、转职、融合与三相飞升的肉鸽构筑；证词模式侧重剧情；主神空间提供高难轮回挑战。</p><p>寻访、装备、剧情档案与历史战绩均可从大厅进入。导出存档请前往设置。</p></article><div class="cmdActions47"><button id="commandNoticeActivity48">查看活动与行动</button></div>';
+      body.innerHTML='<article class="cmdNotice48"><small>UPDATE / CLOSED BETA</small><h3>'+esc(global.SAKURAYO_DISPLAY_VERSION||'0.9.1-beta')+' · 内测版本</h3><p>横屏锁定；寻访与各处立绘按头部安全区定位；看板娘改为往返播放并预解码，消除闪烁；新手教学与说明弹窗改为左右分栏；割草镜头按屏高固定视野，默认 60fps；场景道具统一为中式科技风。内测福利已通过邮件发放，可在邮箱一键领取。</p><p>本版本使用新的固定签名，首次安装前请卸载旧的调试版。</p></article><article class="cmdNotice48"><small>UPDATE / DEVELOPMENT BUILD</small><h3>4.6.0 · 行动终端更新</h3><p>新大厅加入邮箱、七日登录签到、任务补给与活动入口。邮件与任务共享领取状态，进度保存在本机。四章插画和场景动画已更新。</p><p>当前为开发预发布版本；新 Android 安装包尚未发布。</p></article><article class="cmdNotice48"><small>FIELD MANUAL</small><h3>关于这场回收行动</h3><p>三名作战角色，四章战场。回收演习保留职业、转职、融合与三相飞升的肉鸽构筑；证词模式侧重剧情；主神空间提供高难轮回挑战。</p><p>寻访、装备、剧情档案与历史战绩均可从大厅进入。导出存档请前往设置。</p></article><div class="cmdActions47"><button id="commandNoticeActivity48">查看活动与行动</button></div>';
     }else if(kind==='activities'){
       body.innerHTML='<div class="cmdActivities48">'+[['story','回收行动 · 四章演习','三名角色出击，收集随机升级并组合职业、转职与融合。'],['testimony','证词回收 · 剧情档案','沿着四章剧情完成证词回收。此模式不发放随机升级卡。'],['mainGod','主神空间 · 高难轮回','进入独立的主神试炼与兑换界面，解锁条件沿用现有游戏规则。']].map(function(a){return '<article class="cmdNotice48 cmdActivity48" style="background-image:linear-gradient(90deg,#102332e6,#10233299),url(&quot;'+esc(options.art('ui/tactical/activity-'+(a[0]==='mainGod'?'maingod':a[0])+'-v3.webp'))+'&quot;)"><small>LOCAL OPERATION / '+a[0].toUpperCase()+'</small><h3>'+a[1]+'</h3><p>'+a[2]+'</p><div class="cmdActions47"><button data-operation="'+a[0]+'">进入行动 →</button></div></article>';}).join('')+'</div>';
     }else{
@@ -11500,7 +11502,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   }
   function backMenu() {
     releaseInputs40();
-    if (typeof activeLevel46 !== "undefined") { activeLevel46 = null; levelObj46 = null; }
+    if (typeof activeLevel46 !== "undefined") { activeLevel46 = null; levelObj46 = null; storyAlt46 = null; }
     window.SakurayoCutscene?.stopType?.();
     window.SakurayoCutscene?.dismiss?.();
     state = "menu";
@@ -16092,7 +16094,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   CONTENT41.hook("combat:after-draw",()=>{if(!activeLevel46||!levelObj46)return;const n=levelObj46.npc;window.SakurayoLevels.draw(ctx,activeLevel46,levelObj46,runTime||0,n?(()=>{const im=artImage("npc/miko/chibi.webp");return artReady(im)?im:null;})():null);},"core.levels46",35);
   function rateLevel46(win){
     const o=levelObj46||{};
-    const res={win,hits:(P.hits46||0)-(o.hitsAtStart||0),chests:P.chests46||0,time:activeLevel46.boss?Math.max(0,runTime-(boss?.born46??runTime)):(o.t||runTime),npcHp:o.npc?o.npc.hp:null,mechKills:o.mechKills||0,breaks:boss?.breaks46||0,ult:!!P.ultUsed46};
+    const A=storyAlt46&&!activeLevel46.run46?storyAlt46:null;const res=A?{win,hits:A.hits,chests:0,time:A.time,npcHp:null,mechKills:0,breaks:A.breaks,ult:false}:{win,hits:(P.hits46||0)-(o.hitsAtStart||0),chests:P.chests46||0,time:activeLevel46.boss?Math.max(0,runTime-(boss?.born46??runTime)):(o.t||runTime),npcHp:o.npc?o.npc.hp:null,mechKills:o.mechKills||0,breaks:boss?.breaks46||0,ult:!!P.ultUsed46};
     const got=window.SakurayoLevels.rate(activeLevel46,res),rec=activeLevel46.run46?{stars:got.filter(Boolean).length,best:0,improved:false}:window.SakurayoLevels.record(save,activeLevel46.id,got);
     return {got,res,...rec};
   }
@@ -16123,7 +16125,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     if(!el){el=document.createElement("section");el.id="levelMap46";el.className="screen hidden";document.body.appendChild(el);
       el.addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(!b)return;const k=b.dataset.k,v=b.dataset.v;
         if(k==="close")closeLevelMap46();else if(k==="ch"){mapCh46=+v;mapPick46=null;paintLevelMap46();}else if(k==="node"){mapPick46=v;paintLevelMap46();sound?.("click");}
-        else if(k==="go")launchLevel46(v);else if(k==="replay")playStory46(v,"pre",()=>{});else if(k==="album")openAlbum46();else if(k==="unpick"){mapPick46=null;paintLevelMap46();}});}
+        else if(k==="go")launchLevel46(v);else if(k==="replay")playStory46(v,"pre",()=>{});else if(k==="album")openAlbum46();else if(k==="unpick"){mapPick46=null;paintLevelMap46();}else if(k==="sbm"){storyBossSet46(mapPick46,v);paintLevelMap46();sound?.("click");}});}
     if(ch)mapCh46=ch;else{const open=LV.CHAPTERS.filter(c=>c.ch<=(save.unlock||1));mapCh46=open.length?open[open.length-1].ch:1;}
     mapPick46=null;el.classList.remove("hidden");paintLevelMap46();
   }
@@ -16145,7 +16147,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
           <i>${un?T.i:"🔒"}</i><b>${l.id}</b><span>${htmlEscape(l.n)}</span><em>${[0,1,2].map(k=>k<st?"★":"☆").join("")}</em></button>`;}).join("")}</div>
       ${pick?`<aside class="lm46Sheet"><button class="lm46X" data-k="unpick" aria-label="关闭">×</button><small>${LV.TYPE[pick.type].i} ${LV.TYPE[pick.type].n}${pick.boss?" · 章节 Boss":""}</small><h3>${pick.id} ${htmlEscape(pick.n)}</h3>
         <p class="goal">${htmlEscape(levelGoal46(pick))}</p><ul>${pick.stars.map((q,i)=>`<li class="${LV.stars(save,pick.id)>i?"on":""}">${LV.stars(save,pick.id)>i?"★":"☆"} ${htmlEscape(q.d)}</li>`).join("")}</ul>
-        <p class="note">首次每颗星 🌸 +40 · 星级不提供战斗属性</p>
+        ${pick.boss?storyBossPicker46(pick):`<p class="note">首次每颗星 🌸 +40 · 星级不提供战斗属性</p>`}
         <div class="row">${storyFor46(pick.id,"pre")?`<button data-k="replay" data-v="${pick.id}">剧情</button>`:""}<button class="go" data-k="go" data-v="${pick.id}">出击</button></div></aside>`:""}`;
   }
   function openAlbum46(){
@@ -16157,9 +16159,32 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     const LV=window.SakurayoLevels,L=LV&&LV.find(id);
     if(!L||!LV.unlocked(save,id))return false;
     activeLevel46=L;levelResult46=null;levelObj46=null;selected=L.ch;pendingMode46="story";runMode36="story";setTrial46(null);closeLevelMap46();
-    const go=()=>{if(state==="result"){$("#result").classList.add("hidden");state="menu";}startGame();};
+    storyAlt46=null;const bm=L.boss?storyBossMode46(id):"mow";
+    const go=()=>{if(state==="result"){$("#result").classList.add("hidden");state="menu";}if(bm!=="mow"&&launchStoryBoss46(L,bm))return;startGame();};
     if(!playStory46(id,"pre",go))go();
     return true;
+  }
+  /* 主线 Boss 关：割草 / 格斗 / 弹幕三选一（与夜行层主共用 SakurayoRun.BOSS_MODES、SakurayoShmup、SakurayoDuel）。
+     选择记在 save.storyBossMode46[关卡id]，默认取夜行路线的推荐项。格斗/弹幕打完后走一次正常 startGame→finish 结算，
+     星级、解锁下一章、剧情（post）与割草路线完全一致。 */
+  var storyAlt46=null;
+  function storyBossModes46(){const R=window.SakurayoRun;return R?R.bossModes({route:nightRoute46}):[{k:"mow",n:"割草",i:"⚔",rec:true}];}
+  function storyBossMode46(id){const ms=storyBossModes46(),v=save.storyBossMode46?.[id];return ms.some(m=>m.k===v)?v:(ms.find(m=>m.rec)||ms[0]).k;}
+  function storyBossSet46(id,k){if(!id||!storyBossModes46().some(m=>m.k===k))return false;save.storyBossMode46=save.storyBossMode46||{};save.storyBossMode46[id]=k;persist();return true;}
+  function storyBossPicker46(L){const cur=storyBossMode46(L.id);return `<div class="sbm46"><em>迎战方式</em><div>${storyBossModes46().map(m=>`<button data-k="sbm" data-v="${m.k}" class="${m.k===cur?"on":""} ${m.rec?"rec":""}" title="${htmlEscape(m.d||"")}" aria-pressed="${m.k===cur}"><i>${m.i}</i><b>${htmlEscape(m.n)}</b>${m.rec?"<small>推荐</small>":""}</button>`).join("")}</div></div>`;}
+  function launchStoryBoss46(L,k){
+    const SH={sky:window.SakurayoShmup,duel:window.SakurayoDuel}[k];if(!SH)return false;
+    state="menu";$("#menu").classList.add("hidden");const seed=((Date.now()>>>0)^(L.ch*7919))>>>0;
+    sky46=SH.start({character:save.character||"sayo",seed,layer:Math.min(3,L.ch),form:null,weapons:{},hpFrac:1,power:1+0.12*(L.ch-1),
+      art:p=>artUrl(p),okText:"结算",boss:k==="duel",kind:k==="sky"?"boss":undefined,route:nightRoute46,
+      onClose:r=>storyBossDone46(L,k,r)});
+    return !!sky46;
+  }
+  function storyBossDone46(L,k,r){
+    sky46=null;if(activeLevel46!==L)return;
+    // 星级映射：破防 = 弹幕收取符卡 / 格斗赢下的回合；被弹 = 弹幕被弹 / 格斗承伤折算
+    storyAlt46={mode:k,win:!!r.win,breaks:k==="sky"?(r.caps|0):((r.rounds&&r.rounds[0])|0),hits:k==="sky"?(r.hits|0):Math.round((r.taken||0)/12),time:r.time||0};
+    startGame();finish(storyAlt46.win);
   }
   document.addEventListener("click",e=>{if(e.target.closest("#levelMapBtn46")){openLevelMap46();}});
   (function(){const b=document.createElement("button");b.className="levelMapBtn46";b.id="levelMapBtn46";b.type="button";b.innerHTML="<b>主线关卡</b><small>章节地图 · 三星评价</small>";modeRow46().appendChild(b);})();
@@ -16660,7 +16685,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       fieldProbe(n=6){const near=(arr)=>arr.filter(o=>o&&!o.dead).map(o=>({dx:o.x-P.x,dy:o.y-P.y,r:o.r||0,boss:o.type==="boss"})).sort((a,b)=>Math.hypot(a.dx,a.dy)-Math.hypot(b.dx,b.dy)).slice(0,n);const cam=window.SakurayoCamera?.size?.();return {enemies:near(enemies),gems:near(gems),x:P.x,y:P.y,worldW:cam?.worldW||W,worldH:cam?.worldH||H,level:P.level,range:P.range};},
       spawnBossNow(){if(state!=="play")throw new Error("spawnBossNow requires play mode");spawnBoss();return snapshot35();},
       levels46(){return window.SakurayoLevels.LEVELS.map(l=>({id:l.id,type:l.type,unlocked:window.SakurayoLevels.unlocked(save,l.id),stars:window.SakurayoLevels.stars(save,l.id)}));},
-      launchLevel46(id){return launchLevel46(id);},
+      launchLevel46(id){return launchLevel46(id);},storyBossSet46(id,k){return storyBossSet46(id,k);},storyBossMode46(id){return storyBossMode46(id);},storyBoss46(){const M=modeCur46();return {alt:storyAlt46?{...storyAlt46}:null,mode:state,running:!!M,kind:M===window.SakurayoShmup?"sky":M===window.SakurayoDuel?"duel":null};},storyBossEnd46(win=true){const M=modeCur46();if(!M)throw new Error("no mode running");M.current().end(!!win);const ok=document.querySelector(".res .ok");if(!ok)throw new Error("no result button");ok.click();return snapshot35();},
       runStart46(seed){return !!startRun46(seed);},
       runState46(){const r=run46||runLoad46();return {active:!!r,mode:state,screen:!$("#run46")?.classList.contains("hidden"),layer:r?.layer||0,at:r?.at||null,path:r?[...r.path]:[],shards:r?.shards||0,relics:r?[...r.relics]:[],pending:r?JSON.parse(JSON.stringify(r.pending)):[],available:r?window.SakurayoRun.available(r).map(n=>({id:n.id,type:n.type})):[],modal:runModal46?{kind:runModal46.kind||"node",n:(runModal46.offer||runModal46.opts||[]).length}:null,build:r?.build?{level:r.build.level,hp:r.build.hp,maxHp:r.build.maxHp,up:Object.keys(r.build.up||{}).length,weapons:Object.keys(r.build.weapons46||{})}:null,node:activeLevel46?.run46?activeLevel46.id:null,player:{level:P.level,hp:P.hp,maxHp:P.maxHp,dmg:P.dmg,up:Object.keys(P.up||{}).length},saved:!!save.run46,coins:save.coins,talRefund46:save.talRefund46};},
       openPachi46(o){const g=openPachi46(o||{});return !!g;},pachiFire46(x,y){const g=window.SakurayoShateki?.current();if(!g)return false;if(!g.S||g.S.shots<=0){if(!g.begin())return false;}if(x==null){const it=g.S.items.find(i=>i.up&&i.x>30&&i.x<330);x=it?it.x:180;y=it?window.SakurayoShateki.SHELF_Y[it.K.shelf]-it.K.h+3:300;}return g.fire(x,y);},pachiStep46(sec=1){const g=window.SakurayoShateki?.current();if(!g)return null;for(let t=0;t<sec;t+=1/60)g.step(1/60);return {got:g.got.map(q=>q.n),shots:g.S?g.S.shots:0,st:pachiSt46(),coins:save.coins};},pachiClose46(){window.SakurayoShateki?.stop();return true;},
@@ -16759,7 +16784,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   $("#resume").onclick = resumeGame;
   $("#retryP").onclick = () => startGame();
   $("#quit").onclick = backMenu;
-  $("#again").onclick = () => startGame();
+  $("#again").onclick = () => { if (storyAlt46 && activeLevel46 && !activeLevel46.run46) { const id = activeLevel46.id; $("#result").classList.add("hidden"); state = "menu"; launchLevel46(id); return; } startGame(); };
   $("#back").onclick = backMenu;
   $("#skill").onclick = (e) => {
     e.stopPropagation();
