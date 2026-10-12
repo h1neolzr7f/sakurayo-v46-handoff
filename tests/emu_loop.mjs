@@ -201,7 +201,11 @@ async function runViewport(width, height, tag) {
 
   const before = await snap(page);
   await api(page, "protectPlayer");
-  await holdStick(page, width, height, -140, 0, 30000); // 镜头固定 900 世界单位纵向视野后战场按视野放大，走到左缘需要更久
+  // 镜头固定 900 世界单位纵向视野后战场按视野放大，走到左缘需要更久；分段走，途中升级/对话先处理
+  for (let k = 0; k < 6; k++) {
+    await holdStick(page, width, height, -140, 0, 5000);
+    for (let j = 0; j < 4; j++) { const m = (await snap(page)).mode; if (m === "level") await api(page, "chooseUpgrade", 0); else if (m === "dialogue") await api(page, "dismissDialogue"); else break; }
+  }
   const edge = await snap(page);
   assert.ok(edge.camera.camX >= -0.01, `${tag} camX 不许负值`);
   assert.ok(Math.abs(edge.camera.camX) < 0.05, `${tag} 走到左缘 camX 必须≈0，实际 ${edge.camera.camX}`);
