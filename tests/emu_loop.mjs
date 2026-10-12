@@ -200,7 +200,8 @@ async function runViewport(width, height, tag) {
 
 
   const before = await snap(page);
-  await holdStick(page, width, height, -140, 0, 12000);
+  await api(page, "protectPlayer");
+  await holdStick(page, width, height, -140, 0, 30000); // 镜头固定 900 世界单位纵向视野后战场按视野放大，走到左缘需要更久
   const edge = await snap(page);
   assert.ok(edge.camera.camX >= -0.01, `${tag} camX 不许负值`);
   assert.ok(Math.abs(edge.camera.camX) < 0.05, `${tag} 走到左缘 camX 必须≈0，实际 ${edge.camera.camX}`);

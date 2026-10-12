@@ -19,9 +19,9 @@
   function configure(w, h, sw, sh) {
     viewW = Math.max(1, Number(w) || 1);
     viewH = Math.max(1, Number(h) || 1);
-    // 世界尺寸按屏幕尺寸（sw/sh，CSS px）定，不随镜头缩放变大；且至少容得下一个视野
-    worldW = Math.max(viewW, COLS * (Number(sw) || viewW));
-    worldH = Math.max(viewH, ROWS * (Number(sh) || viewH));
+    // 世界 = 4×2 个视野（世界单位）。镜头按屏高固定 900 单位后，各尺寸下战场大小一致
+    worldW = COLS * viewW;
+    worldH = ROWS * viewH;
     return size();
   }
 
