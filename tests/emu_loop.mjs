@@ -57,6 +57,21 @@ async function startRun(page, id) {
   await api(page, "freezeProgression");
 }
 
+// 处理完所有弹窗/升级队列，确认回到 play 模式
+async function settlePlay(page, tag) {
+  let m = "";
+  for (let j = 0; j < 40; j++) {
+    m = (await snap(page)).mode;
+    if (m === "play") return;
+    if (m === "level") await api(page, "chooseUpgrade", 0);
+    else if (m === "dialogue") await api(page, "dismissDialogue");
+    else if (m === "event") await page.evaluate(() => document.querySelector("#eventChoices .eventChoice")?.click());
+    else if (m === "paused") await page.evaluate(() => document.querySelector("#resume")?.click());
+    await page.waitForTimeout(120);
+  }
+  throw new Error(`${tag} 无法回到 play 模式，当前 mode=${m}`);
+}
+
 async function holdStick(page, width, height, dx, dy, ms) {
   const jx = Math.round(width * 0.2);
   const jy = Math.round(height * 0.82);
@@ -204,7 +219,7 @@ async function runViewport(width, height, tag) {
   // 镜头固定 900 世界单位纵向视野后战场按视野放大，走到左缘需要更久；分段走，途中升级/对话先处理
   for (let k = 0; k < 6; k++) {
     await holdStick(page, width, height, -140, 0, 5000);
-    for (let j = 0; j < 4; j++) { const m = (await snap(page)).mode; if (m === "level") await api(page, "chooseUpgrade", 0); else if (m === "dialogue") await api(page, "dismissDialogue"); else break; }
+    await settlePlay(page, tag);
   }
   const edge = await snap(page);
   assert.ok(edge.camera.camX >= -0.01, `${tag} camX 不许负值`);
@@ -215,6 +230,7 @@ async function runViewport(width, height, tag) {
   assert.ok(bgDraws <= 1, `${tag} 4×2 每帧战场图只许铺 1 次，实际 ${bgDraws}`);
   pass(`${tag} 镜头夹边且战场图不按格重铺`);
 
+  await settlePlay(page, tag);
   const spawned = await api(page, "spawnFromEdge50");
   assert.equal(spawned.inside, false, `${tag} 怪应从视口外刷`);
   await page.locator("#dash").click({ force: true });
