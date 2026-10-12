@@ -16,11 +16,12 @@
     return v < a ? a : v > b ? b : v;
   }
 
-  function configure(w, h) {
+  function configure(w, h, sw, sh) {
     viewW = Math.max(1, Number(w) || 1);
     viewH = Math.max(1, Number(h) || 1);
-    worldW = COLS * viewW;
-    worldH = ROWS * viewH;
+    // 世界尺寸按屏幕尺寸（sw/sh，CSS px）定，不随镜头缩放变大；且至少容得下一个视野
+    worldW = Math.max(viewW, COLS * (Number(sw) || viewW));
+    worldH = Math.max(viewH, ROWS * (Number(sh) || viewH));
     return size();
   }
 

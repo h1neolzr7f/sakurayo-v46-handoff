@@ -2314,7 +2314,7 @@ window.SAKURAYO_VERSION_CODE = 71;
     cv.height = Math.floor(view.h * D);
     ctx.setTransform(D * ZOOM46, 0, 0, D * ZOOM46, 0, 0);
     if (window.SakurayoCamera) {
-      const next = window.SakurayoCamera.configure(W, H);
+      const next = window.SakurayoCamera.configure(W, H, view.w, view.h);
       if (P && Number.isFinite(P.x) && prev && prev.worldW && prev.worldH) {
         P.x *= next.worldW / prev.worldW;
         P.y *= next.worldH / prev.worldH;
@@ -7936,7 +7936,7 @@ window.SAKURAYO_VERSION_CODE = 71;
       soloBonus46(){return soloBonus46();},
       setInv46(t=3){P.inv=t;return P.inv;},
       setReduceFlash46(on){save.settings.reduceFlash46=!!on;return reduceFlash46();},
-      playerScreen46(){const c=window.SakurayoCamera;const p=c&&c.worldToScreen?c.worldToScreen(P.x,P.y):{x:P.x,y:P.y};return {x:p.x,y:p.y};},
+      playerScreen46(){const c=window.SakurayoCamera;const p=c&&c.worldToScreen?c.worldToScreen(P.x,P.y):{x:P.x,y:P.y};return {x:p.x*ZOOM46,y:p.y*ZOOM46};},
       openEvoCodex46(){return openEvoCodex46();},
       rebootSave46(){return JSON.parse(JSON.stringify(bootLoadSave()));},
       skyEnter46(auto=true,type="sky"){if(!run46)return null;const R=window.SakurayoRun;let nd=R.available(run46).find(n=>n.type===type)||null;
