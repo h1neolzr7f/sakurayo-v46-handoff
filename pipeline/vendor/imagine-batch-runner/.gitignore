@@ -1,0 +1,15 @@
+node_modules/
+profiles/
+GrokBatchRuns/
+*.log
+.DS_Store
+debug/
+logs/
+cache/
+autorun-configs/
+downloads/
+
+# User-specific config files (may contain account info, permalinks, prompts)
+batch-config.json
+batch-config-*.json
+*config-test.json

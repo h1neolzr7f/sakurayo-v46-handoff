@@ -1,0 +1,184 @@
+---- 队列开始 ----
+Grok 开始 cg-rewind
+Grok 完成 cg-rewind 2.37MB exit=0
+判定 cg-rewind.mp4 首尾 7.01 中段 7.10 门槛 18
+装入 cg_rewind.mp4 1354KB + cg_rewind.webm 1082KB
+标记 cg-rewind: installed ends 7.01 mid 7.10
+Grok 开始 cg-ema
+Grok 完成 cg-ema 1.54MB exit=0
+判定 cg-ema.mp4 首尾 4.95 中段 4.86 门槛 18
+装入 cg_ema.mp4 834KB + cg_ema.webm 601KB
+标记 cg-ema: installed ends 4.95 mid 4.86
+Grok 开始 cg-kawaraban
+Grok 完成 cg-kawaraban 2.38MB exit=0
+判定 cg-kawaraban.mp4 首尾 6.00 中段 7.56 门槛 18
+装入 cg_kawaraban.mp4 1196KB + cg_kawaraban.webm 1007KB
+标记 cg-kawaraban: installed ends 6.00 mid 7.56
+Grok 开始 cg-ashes
+Grok 完成 cg-ashes 2.00MB exit=0
+判定 cg-ashes.mp4 首尾 5.12 中段 5.17 门槛 18
+装入 cg_ashes.mp4 1098KB + cg_ashes.webm 798KB
+标记 cg-ashes: installed ends 5.12 mid 5.17
+Grok 开始 cg-reveal
+Grok 完成 cg-reveal 2.39MB exit=0
+判定 cg-reveal.mp4 首尾 6.24 中段 6.89 门槛 18
+装入 cg_reveal.mp4 1223KB + cg_reveal.webm 1053KB
+标记 cg-reveal: installed ends 6.24 mid 6.89
+Grok 开始 cg-dawn
+Grok 完成 cg-dawn 2.38MB exit=0
+判定 cg-dawn.mp4 首尾 8.43 中段 10.91 门槛 18
+装入 cg_dawn.mp4 1248KB + cg_dawn.webm 1138KB
+标记 cg-dawn: installed ends 8.43 mid 10.91
+Grok 开始 aya-collar
+---- 队列开始 ----
+跳过已处理 cg-rewind: installed ends 7.01 mid 7.10
+跳过已处理 cg-ema: installed ends 4.95 mid 4.86
+跳过已处理 cg-kawaraban: installed ends 6.00 mid 7.56
+跳过已处理 cg-ashes: installed ends 5.12 mid 5.17
+跳过已处理 cg-reveal: installed ends 6.24 mid 6.89
+跳过已处理 cg-dawn: installed ends 8.43 mid 10.91
+Grok 开始 aya-collar
+Grok 没有产出 aya-collar exit=0
+标记 aya-collar: no video
+Grok 开始 rion-tsuba
+Grok 完成 rion-tsuba 1.54MB exit=0
+判定 rion-tsuba 首尾 3.89 中段 4.17
+大厅 rion tap_head2 目录 6.48MB pack=0
+标记 rion-tsuba: packed ends 3.89 mid 4.17
+Grok 开始 sayo-ready
+Grok 完成 sayo-ready 1.80MB exit=0
+判定 sayo-ready 首尾 4.09 中段 11.02
+大厅 sayo tap_body 目录 7.38MB pack=0
+标记 sayo-ready: packed ends 4.09 mid 11.02
+Grok 开始 skill-sayo
+Grok 完成 skill-sayo 1.23MB exit=0
+技能峰值 sayo t-index 2 diff 20.51 / 收招 3
+写入 characters\sayo\default\anim_skill.webp 55KB / anim_skill_b.webp 37KB
+标记 skill-sayo: extracted
+Grok 开始 skill-aya
+Grok 完成 skill-aya 1.25MB exit=0
+技能峰值 aya t-index 5 diff 20.66 / 收招 6
+写入 characters\aya\default\anim_skill.webp 39KB / anim_skill_b.webp 36KB
+标记 skill-aya: extracted
+Grok 开始 skill-rion
+Grok 完成 skill-rion 1.27MB exit=0
+技能峰值 rion t-index 6 diff 19.81 / 收招 7
+写入 characters\rion\default\anim_skill.webp 39KB / anim_skill_b.webp 37KB
+标记 skill-rion: extracted
+Grok 开始 boss-s1
+Grok 完成 boss-s1 2.59MB exit=0
+判定 boss-s1.mp4 首尾 3.97 中段 4.56 门槛 30
+装入 stage1_phase2.mp4 2444KB + stage1_phase2.webm 2198KB
+标记 boss-s1: installed ends 3.97 mid 4.56
+Grok 开始 boss-s2
+Grok 完成 boss-s2 2.51MB exit=0
+判定 boss-s2.mp4 首尾 3.48 中段 4.43 门槛 30
+装入 stage2_phase2.mp4 2435KB + stage2_phase2.webm 2344KB
+标记 boss-s2: installed ends 3.48 mid 4.43
+Grok 开始 boss-s3
+Grok 完成 boss-s3 3.66MB exit=0
+判定 boss-s3.mp4 首尾 3.81 中段 29.38 门槛 30
+装入 stage3_phase2.mp4 3678KB + stage3_phase2.webm 3589KB
+标记 boss-s3: installed ends 3.81 mid 29.38
+Grok 开始 boss-s4
+Grok 完成 boss-s4 3.31MB exit=0
+判定 boss-s4.mp4 首尾 4.51 中段 9.13 门槛 30
+装入 stage4_phase2.mp4 3245KB + stage4_phase2.webm 3145KB
+标记 boss-s4: installed ends 4.51 mid 9.13
+Grok 开始 gacha-sayo
+Grok 完成 gacha-sayo 3.16MB exit=0
+判定 gacha-sayo.mp4 首尾 4.03 中段 14.83 门槛 30
+装入 sayo.mp4 1770KB + sayo.webm 1788KB
+标记 gacha-sayo: installed ends 4.03 mid 14.83
+Grok 开始 gacha-aya
+Grok 完成 gacha-aya 2.82MB exit=0
+判定 gacha-aya.mp4 首尾 4.29 中段 6.12 门槛 30
+装入 aya.mp4 1514KB + aya.webm 1489KB
+标记 gacha-aya: installed ends 4.29 mid 6.12
+Grok 开始 gacha-rion
+Grok 完成 gacha-rion 3.30MB exit=0
+判定 gacha-rion.mp4 首尾 3.65 中段 5.82 门槛 30
+装入 rion.mp4 1826KB + rion.webm 1649KB
+标记 gacha-rion: installed ends 3.65 mid 5.82
+Grok 开始 ascend-sayo
+Grok 完成 ascend-sayo 2.00MB exit=0
+判定 ascend-sayo.mp4 首尾 4.10 中段 4.62 门槛 30
+装入 sayo.mp4 1009KB + sayo.webm 941KB
+标记 ascend-sayo: installed ends 4.10 mid 4.62
+Grok 开始 ascend-aya
+Grok 完成 ascend-aya 2.09MB exit=0
+判定 ascend-aya.mp4 首尾 4.38 中段 4.34 门槛 30
+装入 aya.mp4 1058KB + aya.webm 1012KB
+标记 ascend-aya: installed ends 4.38 mid 4.34
+Grok 开始 ascend-rion
+Grok 完成 ascend-rion 2.18MB exit=0
+判定 ascend-rion.mp4 首尾 3.99 中段 4.55 门槛 30
+装入 rion.mp4 1132KB + rion.webm 1083KB
+标记 ascend-rion: installed ends 3.99 mid 4.55
+---- 队列结束 ----
+---- 队列开始 ----
+跳过已处理 cg-rewind: installed ends 7.01 mid 7.10
+跳过已处理 cg-ema: installed ends 4.95 mid 4.86
+跳过已处理 cg-kawaraban: installed ends 6.00 mid 7.56
+跳过已处理 cg-ashes: installed ends 5.12 mid 5.17
+跳过已处理 cg-reveal: installed ends 6.24 mid 6.89
+跳过已处理 cg-dawn: installed ends 8.43 mid 10.91
+Grok 开始 aya-collar
+Grok 完成 aya-collar 1.62MB exit=0
+判定 aya-collar 首尾 4.12 中段 12.44
+大厅 aya tap_head2 目录 5.99MB pack=0
+标记 aya-collar: packed ends 4.12 mid 12.44
+跳过已处理 rion-tsuba: packed ends 3.89 mid 4.17
+跳过已处理 sayo-ready: packed ends 4.09 mid 11.02
+跳过已处理 skill-sayo: extracted
+跳过已处理 skill-aya: extracted
+跳过已处理 skill-rion: extracted
+跳过已处理 boss-s1: installed ends 3.97 mid 4.56
+跳过已处理 boss-s2: installed ends 3.48 mid 4.43
+跳过已处理 boss-s3: installed ends 3.81 mid 29.38
+跳过已处理 boss-s4: installed ends 4.51 mid 9.13
+跳过已处理 gacha-sayo: installed ends 4.03 mid 14.83
+跳过已处理 gacha-aya: installed ends 4.29 mid 6.12
+跳过已处理 gacha-rion: installed ends 3.65 mid 5.82
+跳过已处理 ascend-sayo: installed ends 4.10 mid 4.62
+跳过已处理 ascend-aya: installed ends 4.38 mid 4.34
+跳过已处理 ascend-rion: installed ends 3.99 mid 4.55
+---- 队列结束 ----
+---- 队列开始 ----
+跳过已处理 cg-rewind: installed ends 7.01 mid 7.10
+跳过已处理 cg-ema: installed ends 4.95 mid 4.86
+跳过已处理 cg-kawaraban: installed ends 6.00 mid 7.56
+跳过已处理 cg-ashes: installed ends 5.12 mid 5.17
+跳过已处理 cg-reveal: installed ends 6.24 mid 6.89
+跳过已处理 cg-dawn: installed ends 8.43 mid 10.91
+跳过已处理 aya-collar: packed ends 4.12 mid 12.44
+跳过已处理 rion-tsuba: packed ends 3.89 mid 4.17
+跳过已处理 sayo-ready: packed ends 4.09 mid 11.02
+跳过已处理 skill-sayo: extracted
+跳过已处理 skill-aya: extracted
+跳过已处理 skill-rion: extracted
+跳过已处理 boss-s1: installed ends 3.97 mid 4.56
+跳过已处理 boss-s2: installed ends 3.48 mid 4.43
+跳过已处理 boss-s3: installed ends 3.81 mid 29.38
+跳过已处理 boss-s4: installed ends 4.51 mid 9.13
+跳过已处理 gacha-sayo: installed ends 4.03 mid 14.83
+跳过已处理 gacha-aya: installed ends 4.29 mid 6.12
+跳过已处理 gacha-rion: installed ends 3.65 mid 5.82
+跳过已处理 ascend-sayo: installed ends 4.10 mid 4.62
+跳过已处理 ascend-aya: installed ends 4.38 mid 4.34
+跳过已处理 ascend-rion: installed ends 3.99 mid 4.55
+Grok 开始 amb-story-ch1-bg_v3_pre
+Grok 完成 amb-story-ch1-bg_v3_pre 0.67MB exit=0
+判定 amb-story-ch1-bg_v3_pre.mp4 首尾 65.32 中段 65.51 门槛 22
+标记 amb-story-ch1-bg_v3_pre: reject ends 65.32
+Grok 开始 amb-story-ch1-bg_v3_end
+Grok 完成 amb-story-ch1-bg_v3_end 2.30MB exit=0
+判定 amb-story-ch1-bg_v3_end.mp4 首尾 7.34 中段 8.15 门槛 22
+装入 bg_v3_end.mp4 1297KB + bg_v3_end.webm 1004KB
+标记 amb-story-ch1-bg_v3_end: installed ends 7.34 mid 8.15
+Grok 开始 amb-story-ch2-bg_street
+Grok 完成 amb-story-ch2-bg_street 3.11MB exit=0
+判定 amb-story-ch2-bg_street.mp4 首尾 8.84 中段 7.98 门槛 22
+装入 bg_street.mp4 1579KB + bg_street.webm 1228KB
+标记 amb-story-ch2-bg_street: installed ends 8.84 mid 7.98
+Grok 开始 amb-story-ch2-bg_shateki

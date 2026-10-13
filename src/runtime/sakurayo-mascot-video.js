@@ -38,7 +38,7 @@
       var go = function () { if (done) return; done = true; back.removeEventListener("canplay", go);
         back.currentTime = 0; var pr = back.play(); if (pr && pr.catch) pr.catch(function (e) { st.err = String(e); });
         back.classList.add("on"); front.classList.remove("on"); setTimeout(function () { front.pause(); }, 220);
-        st.front = 1 - st.front; st.clip = name === "idle" ? "idle" : "tap:" + src; st.plays++;
+        st.front = 1 - st.front; st.clip = name === "idle" ? "idle" : (name === "greet" ? "greet" : "tap:" + src); st.plays++;
         back.onended = loop ? null : function () { show(C.idle, true, "idle"); }; };
       back.addEventListener("canplay", go);
       if (back.getAttribute("data-src") !== src) { back.setAttribute("data-src", src); back.src = base(src); back.load(); }
@@ -46,15 +46,31 @@
       setTimeout(go, 1500); // 兜底：缓存命中时 canplay 可能不再触发
     }
     show(C.idle, true, "idle");
+    // 等 idle 真正开播后再留一拍，然后播一次招呼。点按会把 plays 推高，招呼就让位。
+    if (C.greet) {
+      var ticks = 0;
+      var arm = setInterval(function () {
+        if (cur !== st || st.stop || ++ticks > 40) { clearInterval(arm); return; }
+        if (st.plays > 1) { clearInterval(arm); return; }
+        if (st.plays !== 1 || st.clip !== "idle") return;
+        clearInterval(arm);
+        setTimeout(function () {
+          if (cur !== st || st.stop || st.plays !== 1 || st.clip !== "idle") return;
+          show(C.greet, false, "greet");
+        }, 600);
+      }, 150);
+    }
     st.tap = function (part) {
-      // 部位专属片段（head / body）与该部位通用的动作池（any）合并后一起轮换：
-      // any 用来放"拔刀、摆 pose、打招呼"这类不区分部位的表现性动作，
-      // 只保留原来"part 缺失才回退 any"的行为会让这些动作永远播不出来。
+      // 点头和点身体各用各的动作表，连续点按按顺序换下一个。
+      // any 只在这个部位没有专属片段时才用。
       var T = C.taps || {};
       var own = (T[part] && T[part].length) ? T[part] : [];
-      var pool = (T.any && T.any.length) ? own.concat(T.any) : own;
+      var pool = own.length ? own : ((T.any && T.any.length) ? T.any : []);
       if (!pool.length) return null;
-      var f = pool[(st.plays + Math.floor(Math.random() * pool.length)) % pool.length];
+      st.seq = st.seq || {};
+      var i = st.seq[part] || 0;
+      st.seq[part] = i + 1;
+      var f = pool[i % pool.length];
       show(f, false, "tap"); return Array.isArray(f) ? f[0] : f;
     };
     st.onTap = function (e) { var r = wrap.getBoundingClientRect(), y = (e.clientY - r.top) / r.height; st.tap(y < 0.3 ? "head" : "body"); };

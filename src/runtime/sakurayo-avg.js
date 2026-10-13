@@ -7,8 +7,10 @@
   "use strict";
   var CSS = "#avg46{position:fixed;inset:0;z-index:90;background:#07060c;color:#fff;font-family:inherit;overflow:hidden;user-select:none;-webkit-user-select:none}" +
     "#avg46.hidden{display:none}#avg46 .a46bg{position:absolute;inset:0;background:#000 center/cover no-repeat;transition:background-image .4s,opacity .4s;filter:saturate(1.05)}" +
-    "#avg46 .a46bg:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05) 50%,rgba(6,4,14,.7))}" +
+    "#avg46 .a46bg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;z-index:0}#avg46 .a46bg video.on{opacity:1}" +
+    "#avg46 .a46bg:after{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,.05) 50%,rgba(6,4,14,.7))}" +
     "#avg46 .a46cg{position:absolute;inset:0;background:#000 center/cover no-repeat;opacity:0;transition:opacity .5s;pointer-events:none}#avg46 .a46cg.on{opacity:1}" +
+    "#avg46 .a46cg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0}#avg46 .a46cg video.on{opacity:1}" +
     "#avg46 .a46st{position:absolute;bottom:0;height:96%;max-width:46%;object-fit:contain;object-position:bottom;transition:filter .25s,transform .25s,opacity .25s;opacity:0;filter:brightness(.7) saturate(.85);transform:translateY(8px)}" +
     "#avg46 .a46st.L{left:4%}#avg46 .a46st.R{right:4%}#avg46 .a46st.on{opacity:1;transform:none}#avg46 .a46st.talk{filter:none;transform:scale(1.02)}" +
     "#avg46 .a46box{position:absolute;left:50%;transform:translateX(-50%);bottom:max(14px,env(safe-area-inset-bottom));width:min(880px,92vw);min-height:118px;padding:24px 28px 18px;border-radius:16px;" +
@@ -70,14 +72,91 @@
     root.classList.remove("hidden"); next();
   }
   function url(p) { return cur.o.url ? cur.o.url(p) : p; }
+  function showCg(cg) {
+    var vid = els.cgVid;
+    if (!vid) {
+      vid = document.createElement("video");
+      vid.className = "a46cgv";
+      vid.muted = true;
+      vid.loop = true;
+      vid.playsInline = true;
+      vid.setAttribute("playsinline", "");
+      els.cg.appendChild(vid);
+      els.cgVid = vid;
+    }
+    if (!cg) {
+      els.cg.classList.remove("on");
+      els.cg.style.backgroundImage = "";
+      vid.pause();
+      vid.classList.remove("on");
+      vid.removeAttribute("src");
+      return;
+    }
+    els.cg.style.backgroundImage = "url(\"" + url(cg) + "\")";
+    els.cg.classList.add("on");
+    vid.classList.remove("on");
+    var stem = String(cg).replace(/\.webp$/i, "");
+    var probe = document.createElement("video");
+    var preferWebm = probe.canPlayType && probe.canPlayType('video/webm; codecs="vp9"');
+    var primary = stem + (preferWebm ? ".webm" : ".mp4");
+    var secondary = stem + (preferWebm ? ".mp4" : ".webm");
+    vid.onloadeddata = function () { vid.classList.add("on"); vid.play().catch(function () {}); };
+    vid.onerror = function () {
+      if (vid.getAttribute("data-fallback") !== "1" && secondary !== cg) {
+        vid.setAttribute("data-fallback", "1");
+        vid.src = url(secondary);
+        return;
+      }
+      vid.classList.remove("on");
+    };
+    vid.setAttribute("data-fallback", "0");
+    if (primary !== cg) vid.src = url(primary);
+    if (cur.o.onCg) cur.o.onCg(cg);
+  }
+  function showBg(bg) {
+    if (!bg) return;
+    els.bg.style.backgroundImage = "url(\"" + url(bg) + "\")";
+    var vid = els.bgVid;
+    if (!vid) {
+      vid = document.createElement("video");
+      vid.muted = true;
+      vid.loop = true;
+      vid.playsInline = true;
+      vid.setAttribute("playsinline", "");
+      els.bg.appendChild(vid);
+      els.bgVid = vid;
+    }
+    var reduce = global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) { vid.classList.remove("on"); vid.removeAttribute("src"); return; }
+    var stem = String(bg).replace(/\.webp$/i, "");
+    var probe = document.createElement("video");
+    var preferWebm = probe.canPlayType && probe.canPlayType('video/webm; codecs="vp9"');
+    var primary = stem + (preferWebm ? ".webm" : ".mp4");
+    var secondary = stem + (preferWebm ? ".mp4" : ".webm");
+    if (vid.getAttribute("data-stem") === primary) return;
+    vid.classList.remove("on");
+    vid.onloadeddata = function () { vid.classList.add("on"); vid.play().catch(function () {}); };
+    vid.onerror = function () {
+      if (vid.getAttribute("data-fallback") !== "1" && secondary !== bg) {
+        vid.setAttribute("data-fallback", "1");
+        vid.src = url(secondary);
+        return;
+      }
+      vid.classList.remove("on");
+      vid.removeAttribute("src");
+    };
+    vid.setAttribute("data-fallback", "0");
+    vid.setAttribute("data-stem", primary);
+    vid.src = url(primary);
+  }
   function next() {
     if (!cur) return;
     if (cur.typing) { finishType(); return; }
     cur.i++;
     var ln = cur.s[cur.i];
     if (!ln) { end(false); return; }
-    if (ln.bg) els.bg.style.backgroundImage = "url(\"" + url(ln.bg) + "\")";
-    if (ln.cg !== undefined) { if (ln.cg) { els.cg.style.backgroundImage = "url(\"" + url(ln.cg) + "\")"; els.cg.classList.add("on"); cur.o.onCg && cur.o.onCg(ln.cg); } else els.cg.classList.remove("on"); }
+    if (ln.bg) showBg(ln.bg);
+    if (ln.cg !== undefined) showCg(ln.cg);
     if (ln.chap) { els.chap.querySelector("small").textContent = ln.chap[0]; els.chap.querySelector("b").textContent = ln.chap[1]; els.chap.classList.add("on"); setTimeout(function () { els.chap.classList.remove("on"); }, 1800); }
     ["L", "R"].forEach(function (side) {
       var v = ln[side]; if (v === undefined) return; var im = els[side];
@@ -114,7 +193,7 @@
     if (cur.auto) cur.timer = setTimeout(next, (900 + cur.full.length * 55) / SPEED[cur.auto]);
   }
   function end(skipped) {
-    if (!cur) return; var c = cur; cur = null; clearTimeout(c.timer); root.classList.add("hidden");
+    if (!cur) return; var c = cur; cur = null; clearTimeout(c.timer); if (els.bgVid) els.bgVid.pause(); root.classList.add("hidden");
     if (skipped) for (var i = c.i + 1; i < c.s.length; i++) { var ln = c.s[i]; if (ln.cg) c.o.onCg && c.o.onCg(ln.cg); if (ln.id && c.o.onRead) c.o.onRead(ln.id); }
     c.o.onDone && c.o.onDone({ skipped: !!skipped });
   }

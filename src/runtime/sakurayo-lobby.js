@@ -54,6 +54,30 @@
     { id: "fashion_sayo_crown", n: "终夜樱冠", r: "SSR", kind: "fashion", face: "sayo", school: "shrine", legend: true, d: "冠亮着，夜已经结束。", lore: ["这是最后一顶还给小夜的冠。", "金边裂开以后还在发光。", "我把它戴上，像把失败戴正。", "冠比头骨更持久，夜已经结束。"] },
     { id: "fashion_aya_funeral", n: "零号葬仪", r: "SSR", kind: "fashion", face: "aya", school: "gun", legend: true, d: "企业为零件举行葬礼。", lore: ["零号企业给拆开的人格开葬仪。", "白花不是安慰，是清单。", "我穿着黑大衣去领自己的那一份。", "没有遗像，只剩下工号。"] },
     { id: "fashion_rion_bride", n: "黄泉花嫁", r: "SSR", kind: "fashion", face: "rion", school: "cult", legend: true, d: "嫁妆是一把葬刀。", lore: ["黄泉不收活人的聘礼。", "红盖头下面还是凛音。", "葬刀比誓词更早落地。", "没有人赶来掀开盖头。"] },
+    { id: "shop_sayo_techcoat", n: "霓虹战术风衣·小夜", r: "R", kind: "fashion", face: "sayo", school: "mech", d: "常服立绘。局内仍穿 Q 版战术风衣。", lore: ["小夜把霓虹战术风衣披在步枪外面，线路比樱花更先亮。", "冷光顺着袖口走到枪管，夜巡还没有人来交接。", "这身衣服让机械师和枪斗术更常出现，本身不加伤害。", "卡面上是常服的她，局里的小人仍是原来的样子。"] },
+    { id: "shop_aya_techcoat", n: "霓虹战术风衣·绫", r: "R", kind: "fashion", face: "aya", school: "mech", d: "常服立绘。局内仍穿 Q 版战术风衣。", lore: ["绫把风衣扣到枪套上面，蓝丝带仍别在银发里。", "霓虹先照见准星，太刀还安静地挂在腰侧。", "机械师和枪斗术因此更常出现，衣服不改弹道。", "卡池里是这身常服，战斗里仍用原来的 Q 版。"] },
+    { id: "shop_rion_techcoat", n: "霓虹战术风衣·凛音", r: "R", kind: "fashion", face: "rion", school: "mech", d: "常服立绘。局内仍穿 Q 版战术风衣。", lore: ["凛音让风衣盖住刀鞘，红绳仍系在黑发上。", "霓虹映在刀镡上，她没有因此把刀拔出来。", "机械师和枪斗术更常被写进选项，刃本身不变。", "这张卡是常服，局里出战的仍是原来的 Q 版。"] },
+    { id: "shop_sayo_biodress", n: "绯血生体礼服·小夜", r: "R", kind: "fashion", face: "sayo", school: "gene", d: "常服立绘。局内仍穿 Q 版生体礼服。", lore: ["小夜穿着绯血生体礼服，步枪仍横在身前。", "礼服上的脉络比伤口更亮，花瓣粘在裙摆上。", "基因、血族和菌群术因此更常出现，礼服不吸血。", "卡面是常服立绘，战斗小人保持原来的 Q 版。"] },
+    { id: "shop_aya_biodress", n: "绯血生体礼服·绫", r: "R", kind: "fashion", face: "aya", school: "gene", d: "常服立绘。局内仍穿 Q 版生体礼服。", lore: ["绫把生体礼服穿在制服外面，手枪没有离手。", "绯红脉络沿着腰封走到太刀的鞘口。", "基因战士、血族和菌群术更常出现在三选一里。", "寻访看到的是常服，局内造型仍是 Q 版。"] },
+    { id: "shop_rion_biodress", n: "绯血生体礼服·凛音", r: "R", kind: "fashion", face: "rion", school: "gene", d: "常服立绘。局内仍穿 Q 版生体礼服。", lore: ["凛音让礼服的下摆避开刀刃，红绳没有换成别的颜色。", "生体纹路亮着，剑还在鞘里等她自己决定。", "基因、血族和菌群术的选项因此更常被写出来。", "这张卡只收录常服，出战仍用原来的 Q 版。"] },
+    { id: "shop_sayo_psirobe", n: "星辉灵能裙装·小夜", r: "R", kind: "fashion", face: "sayo", school: "magical", d: "常服立绘。局内仍穿 Q 版灵能裙。", lore: ["小夜穿着星辉灵能裙，步枪上仍沾着樱花。", "裙摆的星光比枪口的火更安静，夜空因此近了一点。", "魔法少女、魔法师和巫女更常出现，裙子不施法。", "卡池收的是常服，游戏里用的是原来的 Q 版。"] },
+    { id: "shop_aya_psirobe", n: "星辉灵能裙装·绫", r: "R", kind: "fashion", face: "aya", school: "magical", d: "常服立绘。局内仍穿 Q 版灵能裙。", lore: ["绫把灵能裙穿得像另一套制服，蓝眼睛仍看着准星。", "星辉落在太刀鞘上，她没有把刀当成法杖。", "魔法少女、魔法师与巫女的路线因此更常被抽到。", "寻访卡是常服画风，战斗贴图仍是 Q 版。"] },
+    { id: "shop_rion_psirobe", n: "星辉灵能裙装·凛音", r: "R", kind: "fashion", face: "rion", school: "magical", d: "常服立绘。局内仍穿 Q 版灵能裙。", lore: ["凛音让星辉裙盖住刀鞘，红眼在星光里没有变色。", "裙摆亮着，她仍先看剑，再看天空。", "魔法少女、魔法师和巫女因此更容易出现。", "这张卡是常服，局内小人没有换成写实比例。"] },
+    { id: "shop_sayo_idol", n: "末日舞台演出服·小夜", r: "R", kind: "fashion", face: "sayo", school: "idol", d: "常服立绘。局内仍穿 Q 版演出服。", lore: ["小夜站上末日舞台，步枪被灯照得像话筒架。", "演出服的亮片比樱花更吵，她仍把枪口放低。", "战场歌姬、魔法少女和枪斗术更常出现。", "卡面是舞台上的常服，战斗里仍是 Q 版。"] },
+    { id: "shop_aya_idol", n: "末日舞台演出服·绫", r: "R", kind: "fashion", face: "aya", school: "idol", d: "常服立绘。局内仍穿 Q 版演出服。", lore: ["绫把演出服穿得一丝不苟，手枪藏在披风内侧。", "舞台灯先找到蓝丝带，太刀在聚光外保持安静。", "歌姬、魔法少女和枪斗术的选项因此更常出现。", "寻访展示常服，出战模型仍用原来的 Q 版。"] },
+    { id: "shop_rion_idol", n: "末日舞台演出服·凛音", r: "R", kind: "fashion", face: "rion", school: "idol", d: "常服立绘。局内仍穿 Q 版演出服。", lore: ["凛音穿着演出服走上残破舞台，刀鞘比话筒更长。", "聚光灯打在红绳上，她没有对空座位鞠躬。", "战场歌姬、魔法少女和枪斗术更常被写进升级。", "这张卡收录常服，游戏战斗仍使用 Q 版。"] },
+    { id: "shop_sayo_apron", n: "炼金防污围裙·小夜", r: "R", kind: "fashion", face: "sayo", school: "alch", d: "常服立绘。局内仍穿 Q 版围裙。", lore: ["小夜把炼金围裙系在步枪背带外面，口袋里满是试剂。", "围裙声称防污，樱花和火药仍一起沾在下摆。", "炼金术和菌群术因此更常出现，围裙不保证干净。", "卡池是常服立绘，局里的她仍是原来的 Q 版。"] },
+    { id: "shop_aya_apron", n: "炼金防污围裙·绫", r: "R", kind: "fashion", face: "aya", school: "alch", d: "常服立绘。局内仍穿 Q 版围裙。", lore: ["绫把围裙穿成实验记录的一部分，手枪放在台面边缘。", "试剂瓶比工牌更诚实，太刀靠在实验桌旁。", "炼金术与菌群术的路线因此更常被选中。", "寻访卡画的是常服，战斗贴图保持 Q 版。"] },
+    { id: "shop_rion_apron", n: "炼金防污围裙·凛音", r: "R", kind: "fashion", face: "rion", school: "alch", d: "常服立绘。局内仍穿 Q 版围裙。", lore: ["凛音系上炼金围裙，刀仍横在身前，没有换成搅拌棒。", "污渍先落在红绳上，她把瓶子推到刀够不着的地方。", "炼金术和菌群术更常出现，刀的数值没有变。", "这张卡是常服，出战时仍穿原来的 Q 版围裙。"] },
+    { id: "shop_sayo_summon", n: "百鬼召唤睡衣·小夜", r: "R", kind: "fashion", face: "sayo", school: "summon", d: "常服立绘。局内仍穿 Q 版睡衣。", lore: ["小夜穿着百鬼召唤睡衣，步枪横在松垮的袖子外面。", "符纸贴在枪托上，鬼火比樱花更先围过来。", "召唤师和死灵术士因此更常出现在升级里。", "卡面是常服的她，战斗小人仍是 Q 版。"] },
+    { id: "shop_aya_summon", n: "百鬼召唤睡衣·绫", r: "R", kind: "fashion", face: "aya", school: "summon", d: "常服立绘。局内仍穿 Q 版睡衣。", lore: ["绫把睡衣的带子系紧，手枪没有放进枕头底下。", "符纸沿着太刀鞘排开，她仍像在值夜班。", "召唤师与死灵术士的选项因此更常被看见。", "寻访用常服画风，局内继续用原来的 Q 版。"] },
+    { id: "shop_rion_summon", n: "百鬼召唤睡衣·凛音", r: "R", kind: "fashion", face: "rion", school: "summon", d: "常服立绘。局内仍穿 Q 版睡衣。", lore: ["凛音穿着召唤睡衣站在符阵里，刀鞘比睡袍更直。", "百鬼先看红绳，再看她有没有把刀拔出来。", "召唤师和死灵术士因此更容易出现。", "这张卡只是常服，游戏里的造型仍是 Q 版。"] },
+    { id: "shop_sayo_haori", n: "剑道部夜羽织·小夜", r: "SR", kind: "fashion", face: "sayo", school: "cult", d: "常服立绘。局内仍穿 Q 版羽织。", lore: ["小夜把剑道部的夜羽织披在步枪上，袖口宽得能藏下一发。", "羽织的家纹比樱花安静，她没有因此换成刀。", "修仙和忍者的选项因此更常出现，枪仍是枪。", "卡池收录这身常服，战斗里还是原来的 Q 版。"] },
+    { id: "shop_aya_haori", n: "剑道部夜羽织·绫", r: "SR", kind: "fashion", face: "aya", school: "cult", d: "常服立绘。局内仍穿 Q 版羽织。", lore: ["绫穿着夜羽织，手枪收在宽袖里，太刀露在外面。", "剑道部的夜色比企业走廊更黑，蓝丝带仍清晰。", "修仙与忍者因此更常被写进三选一。", "寻访看到常服，出战贴图保持 Q 版羽织。"] },
+    { id: "shop_rion_haori", n: "剑道部夜羽织·凛音", r: "SR", kind: "fashion", face: "rion", school: "cult", d: "常服立绘。局内仍穿 Q 版羽织。", lore: ["凛音把夜羽织穿在刀鞘外面，红绳和羽织是同一种夜。", "宽袖盖住握刀的手，她仍先确认刀在鞘中。", "修仙和忍者的路线因此更常出现。", "这张卡是常服立绘，局里用的是原来的 Q 版。"] },
+    { id: "shop_sayo_festival", n: "镜夜灯会巫女服·小夜", r: "SR", kind: "fashion", face: "sayo", school: "shrine", d: "常服立绘。局内仍穿 Q 版巫女服。", lore: ["小夜穿着镜夜灯会的巫女服，步枪横过红白的衣带。", "灯笼比月亮更近，花簪仍插在长发上。", "巫女、魔法少女和修仙因此更常出现。", "卡池里是灯会常服，战斗小人仍是原来的 Q 版。"] },
+    { id: "shop_aya_festival", n: "镜夜灯会巫女服·绫", r: "SR", kind: "fashion", face: "aya", school: "shrine", d: "常服立绘。局内仍穿 Q 版巫女服。", lore: ["绫把巫女服穿得像另一套制服，手枪贴在袖中。", "灯会的红白衣带绑住太刀，蓝丝带没有摘下。", "巫女、魔法少女与修仙的选项因此更常出现。", "寻访展示常服画风，游戏里继续用 Q 版。"] },
+    { id: "shop_rion_festival", n: "镜夜灯会巫女服·凛音", r: "SR", kind: "fashion", face: "rion", school: "shrine", d: "常服立绘。局内仍穿 Q 版巫女服。", lore: ["凛音穿着灯会巫女服，刀鞘从红白下摆里露出来。", "灯笼照见红绳，她没有把祭典当成收刀的理由。", "巫女、魔法少女和修仙因此更容易出现。", "这张卡是常服，出战仍是原来的 Q 版巫女。"] },
   ]);
   var WEAPON_CARDS = Object.freeze([
     { id: "weapon_sayo_spare", n: "备用夜樱弹", r: "N", kind: "weapon", face: "sayo", d: "备用弹也不够打穿镜核。", lore: ["备用弹匣侧面只印着夜樱，名字已经薄了。", "我一匣一匣数过，还是不够打穿镜核。", "空仓响了一下，最后一发留给没回来的人。", "备用弹也用尽以后，步枪比我更先承认结束。"] },
@@ -1270,6 +1294,48 @@
     return info;
   }
 
+  function obtainFace(items) {
+    for (var i = 0; i < items.length; i++) {
+      var card = cardOf(items[i].id) || items[i];
+      var rarity = items[i].r || card.r || "";
+      var legend = !!(items[i].legend || card.legend || rarity === "LEGEND");
+      if (!(legend || rarity === "SSR")) continue;
+      var face = card.face || "";
+      if (face === "sayo" || face === "aya" || face === "rion") return face;
+    }
+    return "";
+  }
+
+  function playObtain(overlay, handlers, face, then) {
+    var probe = global.document.createElement("video");
+    if (!probe || typeof probe.canPlayType !== "function") { then(); return; }
+    var ext = probe.canPlayType('video/webm; codecs="vp9"') ? ".webm" : ".mp4";
+    var v = global.document.createElement("video");
+    v.className = "revealPv46";
+    v.muted = true;
+    v.playsInline = true;
+    v.setAttribute("playsinline", "");
+    v.style.cssText = "position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:8;pointer-events:none;background:#05030b";
+    var done = false;
+    function finish() {
+      if (done) return;
+      done = true;
+      v.onended = null;
+      v.onerror = null;
+      try { v.pause(); } catch (err) {}
+      if (v.parentNode) v.parentNode.removeChild(v);
+      then();
+    }
+    v.onerror = finish;
+    v.onended = finish;
+    v.src = artSrc(handlers, "pv/gacha/" + face + ext);
+    overlay.appendChild(v);
+    var pr = v.play && v.play();
+    if (pr && typeof pr.catch === "function") pr.catch(finish);
+    else if (!pr) finish();
+    global.setTimeout(finish, 9000);
+  }
+
   function showReveal(results, handlers) {
     injectStyle();
     if (!global.document) return;
@@ -1342,13 +1408,21 @@
           if (typeof sfx === "function") sfx(/r-(SSR|LEGEND)/.test(node.className) ? "revealSSR" : /r-SR/.test(node.className) ? "revealSR" : "flip");
         }
         node.onclick = flip;
-        if (!instant) {
-          setTimeout(function () {
-            if (node.isConnected) flip();
-          }, 240 + delay * 110);
-        }
       })(cards[i], i);
     }
+    function scheduleFlips() {
+      if (instant) return;
+      for (var j = 0; j < cards.length; j++) {
+        (function (node, delay) {
+          setTimeout(function () {
+            if (node.isConnected && node.onclick) node.onclick();
+          }, 240 + delay * 110);
+        })(cards[j], j);
+      }
+    }
+    var obtain = instant ? "" : obtainFace(items);
+    if (obtain) playObtain(overlay, handlers, obtain, scheduleFlips);
+    else scheduleFlips();
     var take = overlay.querySelector(".revealTake46");
     global.SakurayoUI.open(overlay, {nested:true,initialFocus:take,onClose:function(){
       if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
@@ -1359,7 +1433,16 @@
       };
     }
     var skip = overlay.querySelector(".revealSkip46");
-    if (skip) skip.onclick = flipAll;
+    if (skip) skip.onclick = function () {
+      var pv = overlay.querySelector(".revealPv46");
+      if (pv) {
+        pv.onended = null;
+        pv.onerror = null;
+        try { pv.pause(); } catch (err) {}
+        if (pv.parentNode) pv.parentNode.removeChild(pv);
+      }
+      flipAll();
+    };
     var again = overlay.querySelector(".revealAgain46");
     if (again) {
       again.onclick = function () {
