@@ -107,3 +107,10 @@
 - **修法**：live_video 编码改 CRF≥24，超 1.45MB 递增 CRF 至 ≤30（已写入 `video_enhance.sh`）；act1–3 用原 SR 帧重压装入（0c73226）。idle/其余片段同一管线跑完后复测 PSNR；若仍 <35 再跑 mascot_fit 接缝。
 - **预防**：增强看板娘视频后必须跑 `mascot_seam_check.py`；体积门禁写进 enhance 脚本而不是事后发现。
 
+### E015 · AVG 结束后视频回调读空 cur.o
+- **场景**：`levels_smoke` / 关卡内 AVG 播完或跳过；背景/CG 尝试加载 mp4/webm
+- **现象**：控制台 `TypeError: Cannot read properties of null (reading 'o')`（偶发两条）
+- **根因**：`showBg`/`showCg` 的 `video.onerror` 异步回调里调用 `url()`，而 `end()` 已把 `cur` 置 null；`url()` 无防护直接读 `cur.o`
+- **修法**：`url()` / `onCg` 判空；`end()` 时清空 bg/cg video 的 onerror/onloadeddata
+- **预防**：异步 DOM 回调不得假设会话对象仍存活；AVG 回归保留 `errors` 必须为空
+

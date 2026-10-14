@@ -4809,7 +4809,7 @@ window.SAKURAYO_VERSION_CODE = 73;
     els.L.className = "a46st L"; els.R.className = "a46st R"; els.cg.className = "a46cg"; els.log.classList.add("hidden"); els.confirm.classList.add("hidden");
     root.classList.remove("hidden"); next();
   }
-  function url(p) { return cur.o.url ? cur.o.url(p) : p; }
+  function url(p) { return cur && cur.o && cur.o.url ? cur.o.url(p) : p; }
   function showCg(cg) {
     var vid = els.cgVid;
     if (!vid) {
@@ -4849,7 +4849,7 @@ window.SAKURAYO_VERSION_CODE = 73;
     };
     vid.setAttribute("data-fallback", "0");
     if (primary !== cg) vid.src = url(primary);
-    if (cur.o.onCg) cur.o.onCg(cg);
+    if (cur && cur.o && cur.o.onCg) cur.o.onCg(cg);
   }
   function showBg(bg) {
     if (!bg) return;
@@ -4931,7 +4931,11 @@ window.SAKURAYO_VERSION_CODE = 73;
     if (cur.auto) cur.timer = setTimeout(next, (900 + cur.full.length * 55) / SPEED[cur.auto]);
   }
   function end(skipped) {
-    if (!cur) return; var c = cur; cur = null; clearTimeout(c.timer); if (els.bgVid) els.bgVid.pause(); root.classList.add("hidden");
+    if (!cur) return; var c = cur; cur = null; clearTimeout(c.timer);
+    // 异步 video onerror/onloadeddata 可能在 end 后触发；清掉回调，避免读空 cur.o（levels_smoke / ERROR_LEDGER E015）
+    if (els.bgVid) { els.bgVid.onerror = null; els.bgVid.onloadeddata = null; els.bgVid.pause(); }
+    if (els.cgVid) { els.cgVid.onerror = null; els.cgVid.onloadeddata = null; els.cgVid.pause(); }
+    root.classList.add("hidden");
     if (skipped) for (var i = c.i + 1; i < c.s.length; i++) { var ln = c.s[i]; if (ln.cg) c.o.onCg && c.o.onCg(ln.cg); if (ln.id && c.o.onRead) c.o.onRead(ln.id); }
     c.o.onDone && c.o.onDone({ skipped: !!skipped });
   }
