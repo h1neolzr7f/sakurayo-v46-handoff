@@ -32,8 +32,8 @@
     var t = global.document.createElement("video");
     var webm = base + ".webm";
     var mp4 = base + ".mp4";
+    if (t.canPlayType('video/mp4; codecs="avc1.42E01E"')) return mp4; // H.264 优先：安卓包只带 mp4
     if (t.canPlayType('video/webm; codecs="vp9"')) return webm;
-    if (t.canPlayType('video/mp4; codecs="avc1.42E01E"')) return mp4;
     return webm;
   }
 

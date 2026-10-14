@@ -43,6 +43,11 @@ android {
         }
     }
 
+    // APK 体积：WebView 统一走 H.264（运行时 mp4 优先），webm 只留给桌面 Chromium 调试；_demo 示例与离线工作文件不进包
+    androidResources {
+        ignoreAssetsPattern = "!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~:!*.webm:!<dir>_demo:!_clips.json"
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17

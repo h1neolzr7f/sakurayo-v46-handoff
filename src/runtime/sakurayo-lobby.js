@@ -1774,7 +1774,7 @@
     var face = info.face;
     var probe = global.document.createElement("video");
     if (!probe || typeof probe.canPlayType !== "function") { then(); return; }
-    var ext = probe.canPlayType('video/webm; codecs="vp9"') ? ".webm" : ".mp4";
+    var ext = !probe.canPlayType('video/mp4; codecs="avc1.42E01E"') && probe.canPlayType('video/webm; codecs="vp9"') ? ".webm" : ".mp4";
     var box = global.document.createElement("div");
     box.className = "revealPv46 revealPvSplit48" + (info.legend ? " legend" : "");
     var card = info.card || {};

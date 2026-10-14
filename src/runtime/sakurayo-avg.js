@@ -97,7 +97,7 @@
     vid.classList.remove("on");
     var stem = String(cg).replace(/\.webp$/i, "");
     var probe = document.createElement("video");
-    var preferWebm = probe.canPlayType && probe.canPlayType('video/webm; codecs="vp9"');
+    var preferWebm = probe.canPlayType && !probe.canPlayType('video/mp4; codecs="avc1.42E01E"') && probe.canPlayType('video/webm; codecs="vp9"');
     var primary = stem + (preferWebm ? ".webm" : ".mp4");
     var secondary = stem + (preferWebm ? ".mp4" : ".webm");
     vid.onloadeddata = function () { vid.classList.add("on"); vid.play().catch(function () {}); };
@@ -130,7 +130,7 @@
     if (reduce) { vid.classList.remove("on"); vid.removeAttribute("src"); return; }
     var stem = String(bg).replace(/\.webp$/i, "");
     var probe = document.createElement("video");
-    var preferWebm = probe.canPlayType && probe.canPlayType('video/webm; codecs="vp9"');
+    var preferWebm = probe.canPlayType && !probe.canPlayType('video/mp4; codecs="avc1.42E01E"') && probe.canPlayType('video/webm; codecs="vp9"');
     var primary = stem + (preferWebm ? ".webm" : ".mp4");
     var secondary = stem + (preferWebm ? ".mp4" : ".webm");
     if (vid.getAttribute("data-stem") === primary) return;

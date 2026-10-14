@@ -29,7 +29,8 @@
     var st = { id: id, wrap: wrap, v: v, front: 0, clip: "idle", plays: 0 };
     function pick(src) { // 片段可写成数组 ["x.webm","x.mp4"]：按浏览器能力挑第一个能播的（Android WebView: H.264/VP9 都行；桌面 Chromium 测试环境只有 VP9）
       if (!Array.isArray(src)) return src; var t = document.createElement("video");
-      for (var i = 0; i < src.length; i++) { var m = /\.webm$/i.test(src[i]) ? 'video/webm; codecs="vp9"' : 'video/mp4; codecs="avc1.42E01E"'; if (t.canPlayType(m)) return src[i]; }
+      var order = src.filter(function (s) { return !/\.webm$/i.test(s); }).concat(src.filter(function (s) { return /\.webm$/i.test(s); })); // H.264 优先：安卓包只带 mp4
+      for (var i = 0; i < order.length; i++) { var m = /\.webm$/i.test(order[i]) ? 'video/webm; codecs="vp9"' : 'video/mp4; codecs="avc1.42E01E"'; if (t.canPlayType(m)) return order[i]; }
       return src[src.length - 1];
     }
     function show(src, loop, name) {
