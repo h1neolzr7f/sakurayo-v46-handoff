@@ -82,7 +82,7 @@ async function openPage(context, tracker, targetUrl = url) {
     if (message.type() !== "error") return;
     const text = `${message.text()} ${message.location()?.url || ""}`;
     if (/(?:career_|form_|fusion_)[A-Za-z]+\/anim_|fusions\/[A-Za-z]+\/splash/.test(text)) return;
-    tracker.consoleErrors.push(message.text());
+    tracker.consoleErrors.push(`${message.text()} ${(message.location()?.url || "").replace(/^.*\/game\/art\//, "art/")}`);
   });
   page.on("request", request => {
     if (/^https?:/i.test(request.url()) && new URL(request.url()).origin !== new URL(targetUrl).origin) tracker.externalRequests.push(request.url());
@@ -307,7 +307,8 @@ try {
   assert.equal(await page.locator("#rosterDrawer").textContent().then((t) => t.includes("后续写入")), false);
   assert.equal(await page.locator("#rosterDrawer").textContent().then((t) => /星核机甲|血炼剑仙|瘟炼菌海/.test(t)), false);
   await page.locator('#rosterTabs46 [data-roster="fashion"]').click();
-  assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 12);
+  // 12 张寻访时装 + 24 张补给商店时装（719a6f6 引入，可在仓库装备）
+  assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 36);
   await page.locator('#rosterTabs46 [data-roster="weapon"]').click();
   assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 12);
   await page.locator('#rosterTabs46 [data-roster="chronicle"]').click();

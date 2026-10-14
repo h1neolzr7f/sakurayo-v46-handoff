@@ -246,6 +246,9 @@ window.SAKURAYO_VERSION_CODE = 71;
     ];
   function artUrl(path) { return `${ART_ROOT}/${path}`; }
   window.SakurayoArtBase = ART_ROOT + "/";
+  // 有同名 mp4/webm 动态版的静图清单（新增动态背景时登记在这里）
+  const STILL_PV46 = new Set([]);
+  window.SakurayoStillPv = stem => STILL_PV46.has(String(stem).replace(/^.*\/game\/art\//, "").replace(/^art\//, ""));
   function attachStillVideo46(el, artPath, shade) {
     if (!el || !artPath) return;
     if (!document.getElementById("stillPv46")) {
@@ -255,6 +258,8 @@ window.SAKURAYO_VERSION_CODE = 71;
       document.head.appendChild(st);
     }
     const stem = String(artPath).replace(/\.webp$/i, "");
+    // 0.9.2：只给真的有动态版的静图挂视频；以前对每张图盲探 mp4+webm，发布版控制台报 14 个 404（ERROR_LEDGER E012）
+    if (!STILL_PV46.has(stem)) return;
     let vid = el.querySelector(":scope > video.stillPv46");
     const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) { vid?.remove(); el.querySelector(":scope > .stillShade46")?.remove(); return; }

@@ -207,6 +207,12 @@
       return;
     }
     var stem = String(bgUrl).replace(/\.webp(\?.*)?$/i, "");
+    if (typeof global.SakurayoStillPv === "function" && !global.SakurayoStillPv(stem)) { /* 没登记动态版就不探测，避免 404（E012） */
+      vid.classList.remove("on");
+      vid.removeAttribute("src");
+      vid.removeAttribute("data-stem");
+      return;
+    }
     var probe = document.createElement("video");
     var preferWebm = probe.canPlayType && !probe.canPlayType('video/mp4; codecs="avc1.42E01E"') && probe.canPlayType('video/webm; codecs="vp9"');
     var primary = stem + (preferWebm ? ".webm" : ".mp4");

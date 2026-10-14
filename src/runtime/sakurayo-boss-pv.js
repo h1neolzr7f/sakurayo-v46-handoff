@@ -94,6 +94,7 @@
    * @param {boolean} [force] 忽略"同局只播一次"的限制
    * @returns {boolean} 是否真的起播
    */
+  var STAGED_PHASES = { 2: true }; /* pv/boss/stage{1-4}_phase2.* 存在；phase3/4 只有通用 boss_phase*.* */
   function play(phase, force, stageId) {
     var shared = CLIPS[phase];
     if (!shared) return false;
@@ -103,7 +104,7 @@
     played[phase] = true;
     ensure();
 
-    var staged = (phase === 2 || phase === 3 || phase === 4) && stageId ? "stage" + stageId + "_phase" + phase : "";
+    var staged = STAGED_PHASES[phase] && stageId ? "stage" + stageId + "_phase" + phase : ""; /* 只有登记过的阶段才有按章节的专属 PV，其余直接用通用片，免得先 404 再回落 */
     var fellBack = false;
     function setSrc(base) {
       vid.onerror = function () {
