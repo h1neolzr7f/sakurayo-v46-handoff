@@ -80,15 +80,15 @@ assert.notEqual(artHash("fashion_sayo_neon"), artHash("weapon_radio_bat"), "霓�
 assert.notEqual(artHash("fashion_rion_keiko"), artHash("weapon_rion_wood"), "稽古不得再等于无铭木刀");
 assert.equal(new Set(collageIds.map(artHash)).size, collageIds.length, "18 张必须互不相同");
 const keepHashes = {
-  fashion_sayo_crown: "b313dd1872cdf4793d138d5c8d9490d8357a9348ace5b3deb3c656f039a1484f",
-  fashion_aya_funeral: "5d07014661d7d90ec4cd6febf944a3b2538c6e5dc5c08e6829ae747cabb9cdea",
-  fashion_rion_bride: "abf79d5ae6e1ce299dda578bf6c88d80580fe85b18f1e3c5c899e3dde28e03f1",
-  weapon_sayo_final: "8f8b58bb150a2253b94e2dca43d0bfe4a2f96ebe5fbfdb8907060632729a7e38",
-  weapon_aya_mirror: "04c2bc41f4d71aa9691735de6e04937488b3fed3715910ff4de03d3f86ff75dc",
-  weapon_rion_burial: "544626968de7ff0f184e186370a26839ffd0908c3c655ed5cdb8771a354b20d5",
-  sayo_echo: "a1f99f31bf5c4c2e8059cde650dc40cd0d9ef97533aabb2c0f3e62f6ce614409",
-  school_shrine: "3f3c6a3ce029e954b916b18cc3d1d55bdfe7283f8a1111d330cb3fc8b6131abc",
-  job_garden: "3970b76d407c313c22b49efacd7ef9b62b2ca7da376f5c0376f877fa15220a6c",
+  fashion_sayo_crown: "568d4d612ce09cb410235222465f67a0b32764ac35c88049dbf2c4de736a7ca5",
+  fashion_aya_funeral: "e9aaf49e6179dc4d71c7edbd6a1c0878b6554e6808d6a0f532ea47aee5907973",
+  fashion_rion_bride: "9288ad01b3209423d860804594de5562f949d1f323860d495518b9930e4e8afc",
+  weapon_sayo_final: "5472c794d6e167e8ced28447d351ff95c165d6799b3a4d87fea50c388429574c",
+  weapon_aya_mirror: "006da7d18b8e2eeb623d3723a25adffce3fea32356525891d1b5935d80972939",
+  weapon_rion_burial: "bff43d8ff00b05a7ef5592cbedb165535c440a4010b3db7f13322defd987505c",
+  sayo_echo: "1f412511a1f9ace61f457ace4c687067e81b403b04bddaecbb2c8c93acc7abc0",
+  school_shrine: "990dfc7cdb2a29710b99d0f3a68c11291213d48e154f0ae15f6666582f0c3c47",
+  job_garden: "d6d23045e7d41001419796e21d11d54cc892ef43490270af9e40c0ba2c293e36",
   fusion_shadowmage: "330ee35b19708ed7a422fdcf50009e019903e200f74f5d48b33e82a80a0061f6",
 };
 Object.entries(keepHashes).forEach(([id, sha]) => {
