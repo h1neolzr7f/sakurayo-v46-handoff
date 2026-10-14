@@ -1135,7 +1135,10 @@ try {
       else if (loneState.mode === "dialogue") await api(page, "dismissDialogue");
       else if (loneState.mode === "level") throw new Error("孤证试炼不应打开局内升级选择");
       else if (loneState.mode === "play") {
-        if (loneState.player.skillCooldown <= 0) await page.locator("#skill").click();
+        if (loneState.player.skillCooldown <= 0) {
+          // 长局偶发 toast/遮罩挡住 Playwright 命中检测；DOM click 与 force 双保险
+          await page.locator("#skill").click({ force: true, timeout: 5000 }).catch(() => page.evaluate(() => document.querySelector("#skill")?.click()));
+        }
         await page.evaluate(() => window.advanceTime(5000));
       }
       loneState = await state(page);
