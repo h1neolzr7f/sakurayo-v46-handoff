@@ -34,7 +34,7 @@
     for (var i = 0; i < fs.length; i++) tone(ctx, out, t + i * step, fs[i], dur, vol, type || "triangle", 0, 0.01);
   }
   /* min gap (s) per key so dense combat does not turn into static */
-  var GAP = { hit: 0.035, crit: 0.06, kill: 0.04, shot: 0.03, rifle: 0.03, pistol: 0.03, bossShot: 0.06, tap: 0.03, flip: 0.05 };
+  var GAP = { click: 0.03, loot: 0.05, slash: 0.05, bossShot: 0.06, hit: 0.035, crit: 0.06, kill: 0.04, shot: 0.03, rifle: 0.03, pistol: 0.03, bossShot: 0.06, tap: 0.03, flip: 0.05 };
   var R = {
     tap: function (c, o, t) { tone(c, o, t, 1480, 0.05, 0.05, "sine", 1100); },
     open: function (c, o, t) { hiss(c, o, t, 0.16, 0.05, "bandpass", 600, 2600, 1.4); tone(c, o, t + 0.02, 660, 0.12, 0.035, "sine", 990); },
@@ -59,6 +59,16 @@
     flip: function (c, o, t) { hiss(c, o, t, 0.07, 0.06, "highpass", 2500, 4000, 0.8); },
     revealSR: function (c, o, t) { chord(c, o, t, [784, 988, 1175], 0.05, 0.45, 0.06, "triangle"); },
     revealSSR: function (c, o, t) { tone(c, o, t, 98, 0.9, 0.12, "sine", 65); chord(c, o, t + 0.05, [523, 659, 784, 1047, 1319, 1568], 0.07, 1.1, 0.06, "triangle"); hiss(c, o, t, 1.0, 0.05, "highpass", 4000, 9000, 0.5); },
+    /* 0.9.2：补齐此前回落到单振荡器的键 + 新演出 */
+    click: function (c, o, t) { tone(c, o, t, 1760, 0.035, 0.045, "sine", 1320); hiss(c, o, t, 0.03, 0.025, "highpass", 4000, 6000, 0.7); },
+    loot: function (c, o, t) { chord(c, o, t, [1175, 1568, 2093], 0.045, 0.16, 0.045, "triangle"); hiss(c, o, t, 0.12, 0.02, "highpass", 5000, 8000, 0.6); },
+    bossShot: function (c, o, t) { tone(c, o, t, 320, 0.12, 0.05, "sawtooth", 120); hiss(c, o, t, 0.08, 0.04, "bandpass", 1200, 500, 1.2); },
+    slash: function (c, o, t) { hiss(c, o, t, 0.12, 0.09, "bandpass", 5200, 1400, 2.2); tone(c, o, t, 1100, 0.08, 0.035, "triangle", 2400); },
+    pistol: function (c, o, t) { hiss(c, o, t, 0.05, 0.09, "highpass", 2200, 900, 0.9); tone(c, o, t, 420, 0.05, 0.05, "square", 160); },
+    boom: function (c, o, t) { tone(c, o, t, 80, 0.5, 0.15, "sine", 36); hiss(c, o, t, 0.45, 0.12, "lowpass", 1600, 90, 0.7); },
+    break: function (c, o, t) { tone(c, o, t, 60, 1.1, 0.16, "sawtooth", 32); hiss(c, o, t, 0.25, 0.1, "highpass", 1500, 9000, 0.9); hiss(c, o, t + 0.2, 0.8, 0.09, "lowpass", 2400, 120, 0.7); chord(c, o, t + 0.12, [392, 587, 784, 1175, 1568], 0.05, 0.9, 0.05, "triangle"); },
+    pact: function (c, o, t) { tone(c, o, t, 196, 0.6, 0.07, "sine", 392, 0.04); chord(c, o, t + 0.08, [659, 988, 1319], 0.08, 0.6, 0.05, "sine"); },
+    ascend: function (c, o, t) { hiss(c, o, t, 0.9, 0.06, "bandpass", 300, 6000, 2.2); chord(c, o, t + 0.1, [523, 784, 1047, 1568, 2093], 0.09, 1.0, 0.055, "triangle"); },
     trial: function (c, o, t) { tone(c, o, t, 196, 0.5, 0.09, "sawtooth", 392, 0.03); chord(c, o, t + 0.12, [587, 880], 0.08, 0.4, 0.05, "triangle"); }
   };
   function play(ctx, k, gain) {

@@ -347,6 +347,12 @@
     ".rosterPeekCard46 b{display:block;font-size:16px;letter-spacing:.08em}" +
     ".rosterPeekCard46 em{display:block;margin:4px 0 8px;color:#ffe7a3;font-size:11px;font-style:normal;letter-spacing:.16em}" +
     ".rosterPeekCard46 p{margin:0;color:#e7d7ef;font-size:12px;line-height:1.55}" +
+    /* 0.9.2 横屏左右分栏：左立绘、右信息，信息区独立滚动，整卡不再竖向滚动 */
+    "@media (orientation:landscape){.rosterPeekCard46{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);width:min(92vw,760px);height:min(100%,420px);overflow:hidden;border-radius:6px;clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px))}" +
+    ".rosterPeekCard46 img{grid-column:1;grid-row:1;height:100%;object-fit:cover;object-position:50% 18%;-webkit-mask-image:linear-gradient(90deg,#000 82%,transparent);mask-image:linear-gradient(90deg,#000 82%,transparent)}" +
+    ".rosterPeekCard46>div{grid-column:2;grid-row:1;overflow:auto;overscroll-behavior:contain;padding:18px 20px 16px 10px}" +
+    ".rosterPeekCard46 b{font-size:20px}.rosterPeekCard46 p{font-size:12.5px}" +
+    "#rosterPeekClose46{position:absolute;top:8px;right:10px;margin:0}}" +
     ".heroTap46{position:absolute;z-index:2;left:8%;width:36%;top:18%;bottom:28%;pointer-events:auto;background:transparent;border:0}" +
     "@keyframes wishDrift46{0%,100%{transform:translate3d(0,0,0);opacity:.88}50%{transform:translate3d(1.4%,-1%,0);opacity:1}}" +
     "@keyframes petalFall46{0%{transform:translate3d(0,-10%,0) rotate(0)}100%{transform:translate3d(18px,120vh,0) rotate(220deg)}}" +
@@ -1584,7 +1590,7 @@
         if (ev && ev.stopPropagation) ev.stopPropagation();
         closeRosterPeek();
         var r = typeof handlers.pact === "function" ? handlers.pact(card.id) : setPact(handlers.save, card.id);
-        if (typeof global.SakurayoSfx === "function") global.SakurayoSfx(r && r.pact ? "revealSR" : "flip");
+        if (typeof global.SakurayoSfx === "function") global.SakurayoSfx(r && r.pact ? "pact" : "close");
       };
     }
     drawer.appendChild(overlay);
