@@ -8265,6 +8265,8 @@ window.SAKURAYO_VERSION_CODE = 71;
       forceLevelDone46(){if(levelObj46)levelObj46.done=true;},
       avgState46(){return window.SakurayoAvg?.state()||null;},
       avgNext46(n=1){for(let i=0;i<n;i++)window.SakurayoAvg?.next();return window.SakurayoAvg?.state()||null;},
+      pactState48(){return {pact:P.pact48||null,bursts:P.breakBursts48||0};},
+      breakBurst48(n=6){for(let i=0;i<n;i++)ebullets.push({x:P.x+40,y:P.y,vx:0,vy:0,r:5,life:3,dmg:1});const before=ebullets.filter(x=>x.life>0).length;breakBurst48();return {before,after:ebullets.filter(x=>x.life>0).length,bursts:P.breakBursts48};},
       formState46(){const st=run46;const f=st?.form;return {form:f?{...f}:null,p:P.form46||null,spd:P.spd,dmg:P.dmg,rate:P.rate,maxHp:P.maxHp,dmgTaken:P.dmgTaken46||1,pick:!!$("#formPick46"),pause:formPause46,cut:!!$("#formCut46"),btn:$("#awaken46")&&!$("#awaken46").classList.contains("hidden")?$("#awaken46").className:null};},formPickFirst46(){const b=$("#formPick46 .cards button");if(!b)return false;b.click();return true;},formCharge46(v=100){if(run46?.form)run46.form.gauge=v;return run46?.form?.gauge;},formAwaken46(){return formAwaken46();},bossPhase46(p){advanceBossPhase(boss,p);return boss.phase;},storyPlay46(id,part){return playStory46(id,part,()=>{});},avgSkip46(){window.SakurayoAvg?.skip();return state;},
       openLevelMap46(ch){openLevelMap46(ch);return !!$("#levelMap46:not(.hidden)");},
       saveSnapshot46(){return JSON.parse(JSON.stringify({stars46:save.stars46,cg46:save.cg46,avgRead46:(save.avgRead46||[]).length,done:save.done,unlock:save.unlock,coins:save.coins}));},
