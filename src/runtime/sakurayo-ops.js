@@ -8,13 +8,19 @@
   var CAP = 20;
   var START = 10;
   var REGEN = 0.4;
-  var RANGE = 220;
-  var BLADE_RANGE = 78;
-  var RATE = 1.15;
-  var DMG = 0.32;
+  var RANGE = 280;
+  var BLADE_RANGE = 115;
+  var RATE = 0.72;
+  var DMG = 0.55;
+  var FOLLOW_DIST = 230;
   var IDS = Object.freeze(["sayo", "aya", "rion"]);
   var NAMES = Object.freeze({ sayo: "小夜", aya: "绫", rion: "凛音" });
   var WEAPON = Object.freeze({ sayo: "rifle", aya: "pistol", rion: "blade" });
+  var BURST_NAMES = Object.freeze({
+    sayo: "终夜樱雨·全域狙击",
+    aya: "月切·镜反风暴",
+    rion: "黄泉·剑冢万刃",
+  });
 
   var CSS =
     "#opsDock46{position:absolute;z-index:6;left:max(8px,env(safe-area-inset-left));bottom:max(168px,calc(env(safe-area-inset-bottom) + 150px));width:min(168px,42vw);padding:8px;border-radius:16px;background:#0b0818d8;border:1px solid #ffe6a344;pointer-events:auto}" +
@@ -141,8 +147,19 @@
     }
     if (state.dp >= CAP) state.regen = 0;
     var dmg = Math.max(1, (Number(world.dmg) || 8) * DMG * (Number(world.petPow) || 1));
+    var hasPlayer = typeof world.px === "number" && typeof world.py === "number";
     for (var i = 0; i < state.units.length; i++) {
       var u = state.units[i];
+      if (hasPlayer) {
+        var dx = world.px - u.x;
+        var dy = world.py - u.y;
+        var dist = Math.hypot(dx, dy);
+        if (dist > FOLLOW_DIST) {
+          var pin = pinAt(i, world.px, world.py, world.w || 3440, world.h || 7456);
+          u.x += (pin.x - u.x) * Math.min(1, (Number(dt) || 0.016) * 5.5);
+          u.y += (pin.y - u.y) * Math.min(1, (Number(dt) || 0.016) * 5.5);
+        }
+      }
       u.clock -= dt;
       if (u.clock > 0) continue;
       u.clock = RATE;
@@ -159,6 +176,41 @@
       });
     }
     return { shots: shots, snapshot: snapshot() };
+  }
+
+  function fireBurst(id, x, y, world) {
+    if (!world) return 0;
+    var baseDmg = Math.max(12, (Number(world.dmg) || 14) * 2.2 * (Number(world.petPow) || 1));
+    var count = 0;
+    if (typeof world.aoe === "function") {
+      var color = id === "sayo" ? "#ff9bcc" : id === "aya" ? "#9be7ff" : "#ff6b8b";
+      var radius = id === "rion" ? 185 : 155;
+      world.aoe(x, y, radius, baseDmg, color, id === "aya", { source: "summon", school: "summon" });
+      count += 1;
+    }
+    if (typeof world.pushBullet === "function") {
+      var rings = id === "sayo" ? 10 : id === "aya" ? 8 : 6;
+      var spd = id === "sayo" ? 460 : 380;
+      for (var i = 0; i < rings; i++) {
+        var ang = (Math.PI * 2 * i) / rings;
+        world.pushBullet({
+          x: x,
+          y: y,
+          vx: Math.cos(ang) * spd,
+          vy: Math.sin(ang) * spd,
+          r: 5,
+          life: 1.25,
+          dmg: baseDmg * 0.45,
+          pierce: 2,
+          home: id === "sayo" ? 2.4 : 1.2,
+          source: "summon",
+          school: "summon",
+          hit: new Set(),
+        });
+        count += 1;
+      }
+    }
+    return count;
   }
 
   function fireShots(shots, world) {
@@ -237,6 +289,7 @@
     START: START,
     IDS: IDS,
     NAMES: NAMES,
+    BURST_NAMES: BURST_NAMES,
     injectStyle: injectStyle,
     reset: reset,
     snapshot: snapshot,
@@ -247,6 +300,7 @@
     retreat: retreat,
     grant: grant,
     tick: tick,
+    fireBurst: fireBurst,
     fireShots: fireShots,
     renderDock: renderDock,
   };
