@@ -120,3 +120,38 @@
 - **根因**：本测专验 WebGL/2D mesh rig，与默认视频看板娘互斥；未强制禁视频
 - **修法**：`mountRig46` 支持 `?novideo=1`；测试 URL 带该参数，并等待非 vid46 且 canvas>50px
 - **预防**：rig 尺寸回归必须 `novideo=1`；视频路径由 `mascot_video_smoke` 覆盖
+
+### E017 · 结算“坚持”显示 -1:-1
+- **场景**：夜间 QA `result` 1024×461；开局倒计时内即结算（finishNow46）
+- **现象**：战绩“坚持 -1:-1”
+- **根因**：`fmt()` 未对负数 runTime 取下限，Math.floor(-0.x)=-1
+- **修法**：`fmt` 统一 `Math.max(0, Number(x)||0)`
+- **对比**：/workspace/sakurayo-plan/shots/night_qa/compare/E017_E018_result_r.png
+
+### E018 · 矮横屏结算按钮两行吸底压住战绩
+- **场景**：1024×461 结算
+- **现象**：“再次迎击 / 返回主界面”竖排两行（约 100px）吸底，盖住战绩中段
+- **根因**：并排按钮的紧凑规则只在 `max-height:440px` 生效，461 落在空档；吸底渐变 30% 才变实，文字从按钮下透出
+- **修法**：阈值放宽为 `max-height:560px and landscape`，吸底底色 10px 内变实
+- **预防**：矮横屏规则统一用 560px 阈值（与 levelup/商店一致），sweep 固定跑 r=1024×461
+- **对比**：/workspace/sakurayo-plan/shots/night_qa/compare/E017_E018_result_r.png
+
+### E019 · 设置抽屉透底 + 单列堆叠
+- **场景**：大厅“声音设置”，1280×720 / 1024×461
+- **现象**：玻璃底透出整个大厅立绘与按钮，文字难读；9 项单列竖排，横屏需滚 2 屏，开关按钮落在屏外
+- **根因**：`#settingsDrawer37` 是后加抽屉，没有专属样式也没有页头美术，只吃到通用半透明玻璃
+- **修法**：实色深底；横屏双列网格（`.settingGroup39` display:contents 并入网格），行距压缩；竖屏仍单列
+- **对比**：/workspace/sakurayo-plan/shots/night_qa/compare/E019_settings_d.png、/workspace/sakurayo-plan/shots/night_qa/compare/E019_settings_r.png
+
+### E020 · 矮横屏商店首行购买按钮在屏外 + 编号徽标压余额
+- **场景**：商店·服饰 1024×461
+- **现象**：卡片立绘 140px，首行“已装备/价格”按钮被屏幕底部截断；页头 DEP-03 徽标盖住右上樱花币余额
+- **修法**：`max-height:560px` 横屏下立绘 96px、简介两行截断；商店徽标左移避开余额
+- **对比**：/workspace/sakurayo-plan/shots/night_qa/compare/E020_shop_r.png
+
+### E021 · 弹幕 STG 侧栏“Spell Card”被触屏键盖住
+- **场景**：shmup 1024×461
+- **现象**：侧栏底部“Spell Card / 道中”与 觉醒/低速/符卡 三键重叠
+- **根因**：侧栏底部预留按“画布高度<480”猜 70px，但 CSS 只在视口≤440 才缩小按钮，461 时按钮实际 66+28px
+- **修法**：预留量按视口与 CSS 同一阈值取 80/108 CSS px 并换算到画布像素；行距下限 1.35f→1.2f
+- **对比**：/workspace/sakurayo-plan/shots/night_qa/compare/E021_shmup_r.png

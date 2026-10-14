@@ -3,7 +3,7 @@
 import {chromium} from 'playwright';import path from 'node:path';import fs from 'node:fs';import {pathToFileURL,fileURLToPath} from 'node:url';
 const out=process.argv[2]||'/tmp/sweep';const only=process.argv[3];fs.mkdirSync(out,{recursive:true});
 const URL=pathToFileURL(path.resolve('src/index.html')).href+'?test=1';
-const VPS=[['d',1280,720],['l',844,390],['r',1024,461],['w',2400,1080]];const VP_P=['p',390,844];
+const VPS=[['d',1280,720],['l',844,390],['r',1024,461],['w',2400,1080]].filter(v=>!process.env.SWEEP_VPS||process.env.SWEEP_VPS.split(',').includes(v[0]));const VP_P=['p',390,844];
 const SAVE={coins:2400,unlock:5,done:[1,2,3,4],tutorialDone:true,character:'sayo'};
 const W=(p,ms)=>p.waitForTimeout(ms);const T=(p,code,...a)=>p.evaluate(([c,a])=>window.__SAKURAYO_TEST__[c](...a),[code,a]);
 const drawer=k=>async p=>{await T(p,'openDrawer',k);await W(p,900);};
@@ -31,6 +31,12 @@ const S={
     await p.evaluate(()=>{try{window.SakurayoDuel?.stop?.()}catch(e){}try{window.SakurayoShmup?.stop?.()}catch(e){}document.querySelectorAll('#duel46,#shm46').forEach(e=>e.remove());});const a=st.available||[];const n=a.find(q=>q.type==='boss')||a.find(q=>!['sky','duel'].includes(q.type))||a[0];if(!n)break;await T(p,'runEnter46',n.id);}await W(p,900);},
   shmup:{frames:3,go:async p=>{await p.evaluate(()=>window.SakurayoShmup.start({character:'sayo',seed:9,layer:3,kind:'boss',auto:true,skill:0.6,route:'tech',power:1.2}));await W(p,2500);}},
   duelcmd:{go:async p=>{await p.evaluate(()=>window.SakurayoDuel.start({character:'aya',seed:3,layer:1,auto:true,skill:0.85,route:'tech',power:1.2}));await W(p,1800);await p.locator('#duel46 .cmdT46').click();await W(p,400);}},
+  settings:async p=>{await p.evaluate(()=>document.getElementById('settingsButton37')?.click());await W(p,900);},
+  boss:{frames:2,go:async p=>{await T(p,'selectStage',2);await T(p,'start');await T(p,'dismissDialogue');await T(p,'realtime46');await W(p,1200);await T(p,'spawnBossNow');await W(p,1200);await T(p,'dismissDialogue').catch(()=>{});await W(p,1600);}},
+  gachapv:{url:'nontest',go:async p=>{await p.evaluate(()=>{const s=JSON.parse(localStorage.getItem('sakurayoV3')||'{}');s.coins=999999;localStorage.setItem('sakurayoV3',JSON.stringify(s));sessionStorage.setItem('syKeep','1');});await p.reload();await p.locator('.bootArt35').waitFor({state:'detached',timeout:20000});
+    await p.evaluate(()=>document.querySelector('[data-open="gacha"]')?.click());await W(p,1200);
+    for(let k=0;k<12;k++){await p.evaluate(()=>document.getElementById('gachaPull10')?.click());await W(p,1500);if(await p.locator('.revealPv46').count())break;await p.evaluate(()=>{const o=document.getElementById('gachaReveal46');o&&o.remove();});await W(p,300);}
+    await W(p,1500);}},
   duel:{frames:3,go:async p=>{await p.evaluate(()=>window.SakurayoDuel.start({character:'sayo',seed:5,layer:2,auto:true,skill:0.85,route:'bio',power:1.2}));await W(p,2500);}},
 };
 /* 横屏纵向滚动白名单：只有真正的长列表允许纵向滚动（理由写在值里），其余弹窗/面板出现纵向滚动即报「竖屏式堆叠」 */
@@ -46,7 +52,7 @@ for(const [name,sc] of Object.entries(S)){ if(only&&!only.split(',').includes(na
  for(const [v,w,h] of (sc.vps||VPS)){const key=`${name}_${v}`;const ctx=await b.newContext({viewport:{width:w,height:h},hasTouch:v!=='d',isMobile:v!=='d'});
   await ctx.addInitScript(w=>{window.__syVScrollWL=w;},VSCROLL_WL);await ctx.addInitScript({path:path.join(path.dirname(fileURLToPath(import.meta.url)),'ui_audit.js')});await ctx.addInitScript(s=>{if(!sessionStorage.getItem('syKeep'))localStorage.setItem('sakurayoV3',JSON.stringify(s));},SAVE);const p=await ctx.newPage();const errs=[],miss=[];
   p.on('pageerror',e=>errs.push(String(e).slice(0,200)));p.on('console',m=>{if(m.type()==='error')errs.push(m.text().slice(0,200));});p.on('requestfailed',r=>miss.push(r.url().split('/').slice(-3).join('/')));p.on('response',r=>{if(r.status()>=400)miss.push(r.status()+' '+r.url().split('/').slice(-3).join('/'));});
-  try{await p.goto(URL);await p.locator('.bootArt35').waitFor({state:'detached',timeout:15000});const go=sc.go||sc;await go(p);
+  try{await p.goto(sc.url==='nontest'?URL.replace('?test=1',''):URL);await p.locator('.bootArt35').waitFor({state:'detached',timeout:15000});const go=sc.go||sc;await go(p);
    const n=sc.frames||1;for(let i=0;i<n;i++){await p.screenshot({path:`${out}/${key}${n>1?'_'+i:''}.png`});if(i<n-1)await W(p,900);}
    const info=await p.evaluate(async()=>{const vw=innerWidth,vh=innerHeight,o=[];document.querySelectorAll('body *').forEach(e=>{if(!e.offsetParent&&getComputedStyle(e).position!=='fixed')return;const c=getComputedStyle(e);if(c.visibility==='hidden'||+c.opacity===0)return;const r=e.getBoundingClientRect();if(!r.width||!r.height)return;
      if(e.children.length===0&&e.textContent.trim()&&(e.scrollWidth>e.clientWidth+2&&c.overflow!=='visible'&&c.textOverflow!=='ellipsis'))o.push('clip:'+(e.id||e.className)+':'+e.textContent.trim().slice(0,16));

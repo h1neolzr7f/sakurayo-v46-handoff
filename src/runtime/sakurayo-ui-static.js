@@ -241,6 +241,20 @@ html body:not(#sy0) #dialogue .dialogueArt{background-size:auto 115%!important;b
 @media (max-height:440px){html body:not(#sy0) #dialogue .dialogueArt{height:34vh!important;min-height:120px!important}
 html body:not(#sy0) #dialogue .modal{max-height:calc(100dvh - 12px);overflow-y:auto}
 html body:not(#sy0) #dialogue .dialogueText{font-size:13px!important;line-height:1.5!important}}
+/* 夜视 QA（2026-10-15）E019：设置抽屉没有专属样式，玻璃底透出整个大厅，单列竖排 9 项，横屏要滚 2 屏。改为实色底 + 横屏双列网格 */
+html body:not(#sy0):not(#sy1) #settingsDrawer37{background:var(--sy-scan),linear-gradient(180deg,rgb(var(--c-n0-rgb) / .97),rgb(var(--c-n0-rgb) / .985))!important}
+#settingsDrawer37 .dhead,#settingsDrawer37 .dbody{max-width:1040px}
+#settingsDrawer37 .dhead{min-height:0!important;padding-top:10px!important;padding-bottom:8px!important}
+#settingsDrawer37 .dbody{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px;align-content:start;padding:8px 4px 16px}
+#settingsDrawer37 .settingGroup39{display:contents}
+#settingsDrawer37 .settingRow37{margin:0!important;padding:8px 12px!important}
+#settingsDrawer37 .settingRow37 span{margin-bottom:4px!important}
+#settingsDrawer37 .settingToggle37{margin:0!important;min-height:44px;padding:8px 12px!important}
+#settingsDrawer37 .routeNote{grid-column:1/-1;margin:2px 0 0;font-size:12px!important;line-height:1.5;color:var(--c-text-2,#c9c3dd)}
+#settingsDrawer37 .settingRow37:nth-child(-n+3){grid-column:auto}
+@media (orientation:portrait){#settingsDrawer37 .dbody{grid-template-columns:1fr}}
+/* E020：1024×461 商店首行卡片立绘 140px，购买按钮落在屏幕外；编号徽标盖住樱花币余额 */
+@media (max-height:560px) and (orientation:landscape){#shopDrawer .skinPreview{height:96px!important}#shopDrawer .skinCard p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}#shopDrawer .dhead::before{right:200px!important}}
 `;
   var st = document.createElement("style"); st.id = "syStatic"; st.textContent = css; document.head.appendChild(st);
   // 底栏选中态：最近打开的入口保持高亮，直到它的面板关掉

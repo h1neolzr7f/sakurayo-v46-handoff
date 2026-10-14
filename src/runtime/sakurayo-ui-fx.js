@@ -126,7 +126,8 @@ html body:not(#sy0):not(#sy1) #level .choice[data-rec]{outline:1px solid var(--c
 html body:not(#sy0) #result .modal{max-height:calc(100dvh - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow-y:auto!important;overscroll-behavior:contain}
 html body:not(#sy0) #result .actions{position:sticky;bottom:-1px;z-index:3;padding:10px 0 4px;background:linear-gradient(transparent,var(--c-surface-1) 30%)}
 html body:not(#sy0) #result .resultIcon{display:none!important}
-@media (max-height:440px){html body:not(#sy0) #result .actions{display:flex!important;gap:8px}html body:not(#sy0) #result .actions button{flex:1;min-height:40px!important;margin:0!important}html body:not(#sy0) #result .rankBig{font-size:48px!important;line-height:1!important}}
+/* 夜视 QA E018：原阈值 440px 漏掉 1024×461 等矮横屏，按钮两行竖排吸底压住战绩；放宽到 560px，吸底底色改实色 */
+@media (max-height:560px) and (orientation:landscape){html body:not(#sy0) #result .actions{display:flex!important;gap:8px;background:linear-gradient(transparent,var(--c-surface-1) 10px)!important;padding-top:14px!important}html body:not(#sy0) #result .actions button{flex:1;min-height:40px!important;margin:0!important}html body:not(#sy0) #result .rankBig{font-size:48px!important;line-height:1!important}}
 html body:not(#sy0) #result .modal .sy-win{position:fixed;height:min(110dvh,900px);right:max(0px,calc(50vw - 520px))}
 /* 矮横屏（844×390）升级弹窗：三张卡加按钮超出屏幕，“重抽 / 全部拿 / 图鉴”看不到。压缩卡片，弹窗内可滚动，按钮行并排 */
 @media (max-height:440px){html body:not(#sy0):not(#sy1) #level .modal{max-height:calc(100dvh - 12px);overflow-y:auto!important;padding-top:10px!important;padding-bottom:10px!important}
