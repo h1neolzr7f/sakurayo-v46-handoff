@@ -256,6 +256,19 @@
     ".wishSpark46{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;max-height:72px;overflow:auto}" +
     ".wishSpark46 button{min-height:28px;padding:0 8px;border-radius:999px;border:1px solid #ffe6a355;background:#0b0818cc;color:#ffe7a3;font:800 10px/1 system-ui}" +
     ".wishSpark46 button.poor{opacity:.42}" +
+    ".revealPvSplit48{position:absolute;inset:0;z-index:8;display:grid;grid-template-columns:minmax(0,46%) minmax(0,1fr);align-items:center;gap:clamp(12px,3vw,40px);padding:clamp(10px,3vh,28px) clamp(16px,4vw,56px);background:radial-gradient(120% 90% at 22% 50%,#0f2a44 0%,#060a16 62%,#04050c 100%);cursor:pointer;animation:rpvIn48 .28s ease-out}" +
+    ".revealPvSplit48.legend{background:radial-gradient(120% 90% at 22% 50%,#3a2a0e 0%,#0b0a14 62%,#05050c 100%)}" +
+    ".rpvStage48{position:relative;height:100%;min-height:0;clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,22px 100%,0 calc(100% - 22px));background:#030611;box-shadow:inset 0 0 0 1px #6ff3ff55}" +
+    ".rpvStage48 video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}" +
+    ".rpvScan48{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 3px,#6ff3ff0d 3px 4px)}" +
+    ".rpvInfo48{display:flex;flex-direction:column;gap:8px;min-width:0;color:#eaf6ff}" +
+    ".revealPvSplit48 .rpvTag48{align-self:flex-start;padding:4px 12px;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);background:linear-gradient(90deg,#ffd36b,#ff9ec4);color:#1a0f05;font:800 12px/1.2 system-ui;letter-spacing:.12em}" +
+    ".rpvInfo48 b{font:900 clamp(22px,3.4vw,40px)/1.15 system-ui;text-shadow:0 0 18px #6ff3ff66}" +
+    ".rpvInfo48 em{font-style:normal;color:#9fdcff;font:700 14px/1.2 system-ui;letter-spacing:.2em}" +
+    ".rpvInfo48 p{margin:6px 0 0;max-width:34em;padding-left:10px;border-left:2px solid #ff7fb0;color:#d8e6f5;font:500 14px/1.6 system-ui}" +
+    ".rpvHint48{margin-top:10px;color:#8aa6c0;font:600 12px/1 system-ui}" +
+    "@keyframes rpvIn48{from{opacity:0}to{opacity:1}}" +
+    "@media (orientation:portrait){.revealPvSplit48{grid-template-columns:1fr;grid-template-rows:62% auto}}" +
     ".rosterSlot46 .rosterArt46{position:relative}" +
     ".rosterStars48{display:block;margin:4px 0 0;color:#ffd77a;font:700 11px/1 system-ui;letter-spacing:1px;text-shadow:0 0 6px #ffb84a88}" +
     ".rosterArt46 .rosterStars48{position:absolute;left:4px;right:4px;bottom:4px;margin:0;padding:2px 0;text-align:center;font-size:10px;background:linear-gradient(90deg,transparent,#06101ecc 20%,#06101ecc 80%,transparent)}" +
@@ -1737,28 +1750,45 @@
     return info;
   }
 
-  function obtainFace(items) {
+  function obtainCard(items) {
     for (var i = 0; i < items.length; i++) {
       var card = cardOf(items[i].id) || items[i];
       var rarity = items[i].r || card.r || "";
       var legend = !!(items[i].legend || card.legend || rarity === "LEGEND");
       if (!(legend || rarity === "SSR")) continue;
       var face = card.face || "";
-      if (face === "sayo" || face === "aya" || face === "rion") return face;
+      if (face === "sayo" || face === "aya" || face === "rion") return { face: face, card: card, legend: legend };
     }
-    return "";
+    return null;
+  }
+  function obtainFace(items) {
+    var o = obtainCard(items);
+    return o ? o.face : "";
   }
 
-  function playObtain(overlay, handlers, face, then) {
+  var FACE_NAME = { sayo: "月城小夜", aya: "神代绫", rion: "黑羽凛音" };
+  /* 证人降临演出（横屏左右分栏）：竖版 PV 放左栏完整显示（contain，不裁人物），
+   * 右栏是卡名 / 稀有度 / 角色 / 一句证词。整层叫 revealPv46，跳过按钮照旧能移除它。 */
+  function playObtain(overlay, handlers, faceOrInfo, then) {
+    var info = typeof faceOrInfo === "string" ? { face: faceOrInfo, card: null, legend: false } : faceOrInfo;
+    var face = info.face;
     var probe = global.document.createElement("video");
     if (!probe || typeof probe.canPlayType !== "function") { then(); return; }
     var ext = probe.canPlayType('video/webm; codecs="vp9"') ? ".webm" : ".mp4";
-    var v = global.document.createElement("video");
-    v.className = "revealPv46";
+    var box = global.document.createElement("div");
+    box.className = "revealPv46 revealPvSplit48" + (info.legend ? " legend" : "");
+    var card = info.card || {};
+    var lore = card.lore && card.lore.length ? card.lore[0] : "";
+    box.innerHTML =
+      '<div class="rpvStage48"><video muted playsinline></video><i class="rpvScan48"></i></div>' +
+      '<div class="rpvInfo48"><small class="rpvTag48">' + (info.legend ? "LEGEND · 传说证人" : "SSR · 证人降临") + "</small>" +
+      "<b>" + escapeHtml(card.n || FACE_NAME[face] || "") + "</b>" +
+      "<em>" + escapeHtml(FACE_NAME[face] || "") + "</em>" +
+      (lore ? "<p>" + escapeHtml(lore) + "</p>" : "") +
+      '<span class="rpvHint48">点击任意处跳过</span></div>';
+    var v = box.querySelector("video");
     v.muted = true;
     v.playsInline = true;
-    v.setAttribute("playsinline", "");
-    v.style.cssText = "position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:8;pointer-events:none;background:#05030b";
     var done = false;
     function finish() {
       if (done) return;
@@ -1766,13 +1796,15 @@
       v.onended = null;
       v.onerror = null;
       try { v.pause(); } catch (err) {}
-      if (v.parentNode) v.parentNode.removeChild(v);
+      if (box.parentNode) box.parentNode.removeChild(box);
       then();
     }
+    box.pause = function () { try { v.pause(); } catch (err) {} };
+    box.onclick = finish;
     v.onerror = finish;
     v.onended = finish;
     v.src = artSrc(handlers, "pv/gacha/" + face + ext);
-    overlay.appendChild(v);
+    overlay.appendChild(box);
     var pr = v.play && v.play();
     if (pr && typeof pr.catch === "function") pr.catch(finish);
     else if (!pr) finish();
@@ -1874,7 +1906,7 @@
         })(cards[j], j);
       }
     }
-    var obtain = instant ? "" : obtainFace(items);
+    var obtain = instant ? null : obtainCard(items);
     if (obtain) playObtain(overlay, handlers, obtain, scheduleFlips);
     else scheduleFlips();
     var take = overlay.querySelector(".revealTake46");
