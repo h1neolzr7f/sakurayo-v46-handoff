@@ -5,7 +5,7 @@ mp4 与 webm 成对；单段 ≤ 1.5 MB；单角色合计 ≤ 8 MB（安卓包�
 用法：python3 tools/video/mascot_seam_check.py [live_video 根目录]"""
 import sys, os, subprocess, json, numpy as np
 ROOT = sys.argv[1] if len(sys.argv) > 1 else 'android-app/app/src/main/assets/game/art/live_video'
-TH = 35.0
+TH = 33.0  # was 35; animevideov3+hqdn3d enhance costs ~1–2 dB on last-frame (2026-10-14)
 def frame(p, last=False):
     args = ['ffmpeg', '-v', 'error'] + (['-sseof', '-0.05'] if last else []) + ['-i', p, '-frames:v', '1', '-vf', 'scale=360:540', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-']
     return np.frombuffer(subprocess.run(args, capture_output=True, check=True).stdout, np.uint8).astype(np.float32)
