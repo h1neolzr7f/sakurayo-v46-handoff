@@ -600,14 +600,17 @@ const modes = V.renderStageModes("testimony");
 assert.match(modes, /id="modeBar46"/);
 assert.match(modes, /id="modeTestimony46"/);
 assert.match(modes, /id="modeFever46"/);
+assert.match(modes, /id="modeBossRush46"/);
 assert.match(modes, /id="modeStory46"/);
 assert.match(modes, /id="modeMainGod46"/);
 assert.match(modes, /回收演习/);
 assert.match(modes, /证词模式/);
 assert.match(modes, /镜界狂潮/);
+assert.match(modes, /剑鬼讨伐/);
 assert.match(modes, /主神空间/);
 assert.match(modes, /id="modeTestimony46"[^>]*class="on"/);
 assert.match(V.renderStageModes("fever"), /id="modeFever46"[^>]*class="on"/);
+assert.match(V.renderStageModes("bossRush"), /id="modeBossRush46"[^>]*class="on"/);
 assert.match(V.renderStageModes("story"), /id="modeStory46"[^>]*class="on"/);
 
 const archiveHost = fakeEl("div", { className: "archiveDock46" });
