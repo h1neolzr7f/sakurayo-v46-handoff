@@ -600,4 +600,45 @@ const storyBtn = archiveHost.children.find((n) => n.getAttribute("data-open") ==
 assert.match(storyBtn.innerHTML, /<b>剧情档案<\/b><small>四章证词<\/small>/);
 assert.match(archiveHost.children[0].innerHTML, /永久天赋/);
 
+// Test new Epitomized Path (setFocus + fatePoints) & Novice 80% discount 10-pull
+{
+  const focusSave = { coins: 10000, shop40: V.normalizeOps({ ops: { pity: 79 } }) };
+  const fRes = V.setFocus(focusSave, "remnant", "fusion_bloodsword");
+  assert.equal(fRes.ok, true);
+  assert.equal(fRes.focusId, "fusion_bloodsword");
+  assert.equal(fRes.fatePoints, 0);
+  // First SSR with rng >= 0.5 misses 50/50 -> gains 1 fatePoint
+  const miss = V.pull(focusSave, 1, () => 0.85, "remnant");
+  assert.equal(miss.ok, true);
+  assert.equal(miss.fatePoints, 1);
+  // Next SSR with fatePoints === 1 is 100% guaranteed to be fusion_bloodsword and resets fatePoints to 0
+  focusSave.shop40.ops.pity = 79;
+  const hit = V.pull(focusSave, 1, () => 0.99, "remnant");
+  assert.equal(hit.ok, true);
+  assert.equal(hit.results[0].id, "fusion_bloodsword");
+  assert.equal(hit.fatePoints, 0);
+
+  // Novice 10-pull: costs 1150, guarantees at least 1 SSR on first novice 10-pull even if rng is always 0.99
+  const novSave = { coins: 3000, shop40: V.normalizeOps({}) };
+  const nov1 = V.pullNovice(novSave, () => 0.99);
+  assert.equal(nov1.ok, true);
+  assert.equal(nov1.coins, 3000 - V.NOVICE_COST);
+  assert.equal(nov1.noviceUsed, 1);
+  assert.equal(nov1.results.length, 10);
+  assert.equal(nov1.results.some((r) => r.r === "SSR"), true);
+  const nov2 = V.pullNovice(novSave, () => 0.99);
+  assert.equal(nov2.ok, true);
+  assert.equal(nov2.noviceUsed, 2);
+  const nov3 = V.pullNovice(novSave, () => 0.99);
+  assert.equal(nov3.ok, false);
+  assert.equal(nov3.reason, "limit");
+
+  // School multipliers summary
+  novSave.shop40.ops.owned.school_shrine = 1;
+  novSave.shop40.ops.owned.job_exorcist = 1;
+  const muls = V.schoolMultipliers(novSave);
+  const shrineMul = muls.find((m) => m.school === "shrine");
+  assert.ok(shrineMul && shrineMul.mul === 1.95);
+}
+
 console.log("PASS lobby unit: rates, default two cards, pity, ten-pull, cheat taps, stage modes");

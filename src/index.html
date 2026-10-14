@@ -2779,6 +2779,9 @@ window.SAKURAYO_VERSION_CODE = 71;
     runWin = false;
     eventIndex = 0;
     levelRerolls = 2;
+    pinnedUpgradeId46 = null;
+    banishedSet46 = new Set();
+    levelBanishes46 = 2;
     acc = 0;
     resetP();
     if (typeof runNodeStart46 === "function") runNodeStart46();
@@ -4214,8 +4217,20 @@ window.SAKURAYO_VERSION_CODE = 71;
     }
     return arr[arr.length - 1];
   }
+  let pinnedUpgradeId46 = null, banishedSet46 = new Set(), levelBanishes46 = 2;
+  function wishResonanceMul46(u) {
+    const L = window.SakurayoLobby;
+    if (!L || !u) return 1;
+    const school = u.s || u.school;
+    if (!school) return 1;
+    let mul = 1;
+    if (L.hasSchool(save, school)) mul *= 1.3;
+    if (L.hasJob(save, school)) mul *= 1.5;
+    if (L.hasFusion(save, school)) mul *= 1.6;
+    return Number(mul.toFixed(2));
+  }
   function getPool() {
-    let asc=eligibleAsc(),fus=eligibleFusion(),care=careerOptions(),pool=U.filter(u=>lv(u.id)<u.m&&(!u.req||u.req())&&!isSchoolBanned40(u.s)),out=[];
+    let asc=eligibleAsc(),fus=eligibleFusion(),care=careerOptions(),pool=U.filter(u=>lv(u.id)<u.m&&(!u.req||u.req())&&!isSchoolBanned40(u.s)&&!banishedSet46.has(u.id)),out=[];
     if(care.length){let first=care.sort(()=>Math.random()-.5)[0];out.push(first);let same=care.find(x=>x.school===first.school&&x.id!==first.id);if(same&&first.rank===1)out.push(same);}
     if (fus.length && out.length < 3) {
       const pick = fus.slice().sort(() => Math.random() - 0.5);
@@ -4252,6 +4267,23 @@ window.SAKURAYO_VERSION_CODE = 71;
       let u = pickWeighted(pool);
       out.push(u);
       pool = pool.filter((x) => x !== u);
+    }
+    if (pinnedUpgradeId46 && !out.some(x => x && x.id === pinnedUpgradeId46)) {
+      let pinnedObj = pool.find(x => x.id === pinnedUpgradeId46) || care.find(x => x.id === pinnedUpgradeId46);
+      if (!pinnedObj) {
+        const pf = fus.find(x => x.id === pinnedUpgradeId46);
+        if (pf) pinnedObj = { ...pf, fusion: true, r: "legend", s: "fusion", tag: "职业融合" };
+      }
+      if (!pinnedObj) {
+        const pa = asc.find(x => x.id === pinnedUpgradeId46);
+        if (pa) pinnedObj = { ...pa, asc: true, r: "legend", s: "asc", tag: "飞升" };
+      }
+      if (pinnedObj) {
+        if (out.length >= 3) out[out.length - 1] = pinnedObj;
+        else out.unshift(pinnedObj);
+      } else {
+        pinnedUpgradeId46 = null;
+      }
     }
     if (!out.length) {
       let fallback = U.find((u) => u.id === "dmg");
@@ -4313,8 +4345,36 @@ window.SAKURAYO_VERSION_CODE = 71;
         b.dataset.rec = "1";
       }
       b.style.borderLeft = `5px solid ${special ? u.c : SCHOOL[u.s]?.c || SCHOOL[u.school]?.c || "#ffb2d4"}`;
-      b.innerHTML = `<img src="${iconData(u)}"><div><div class="meta"><span style="color:${special ? u.c : SCHOOL[u.s]?.c || "#fff"}">${school}</span><span class="${rar46(u)}">${u.career?`职业${u.rank}阶`:u.fusion?"唯一融合":u.asc?"唯一飞升":RAR46[rar46(u)]||u.r}</span></div><b>${u.n}${u.weapon46&&evolvesNext46(u)?` → <em class="evoName46">${globalThis.SakurayoWeapons.DEF[u.weapon46].evo}</em>`:""}</b><p>${desc}</p><div class="dots">${special ? "◆ 选择后改变战斗规则" : "●".repeat(Math.min(u.m||6, (lv(u.id) || 0) + 1)) + "○".repeat(Math.max(0, Math.min(6, u.m||6) - (lv(u.id) || 0) - 1))}</div></div>`;
+      const wishMul = wishResonanceMul46(u);
+      const isPinned = pinnedUpgradeId46 === u.id;
+      const wishBadge = wishMul > 1.01 ? `<em class="wishBoostBadge46" style="font-style:normal;color:#ffe08a;background:#261a3bcc;border:1px solid #ffd77a88;padding:1px 6px;border-radius:999px;margin-left:6px;font-weight:800">🪞 镜界共鸣 ×${wishMul}</em>` : "";
+      const opsHtml = `<span class="choiceOps46" style="float:right;display:inline-flex;gap:6px"><i class="pinChoice46${isPinned ? " on" : ""}" role="button" tabindex="0" style="font-style:normal;cursor:pointer;padding:1px 7px;border-radius:999px;border:1px solid ${isPinned ? "#ffd77a" : "#96e4f566"};background:${isPinned ? "#3b2a14cc" : "#0b1326cc"};color:${isPinned ? "#ffe08a" : "#cfe6f5"}">${isPinned ? "🔒 已锁定" : "🔓 锁定"}</i>${!special && levelBanishes46 > 0 ? `<i class="banishChoice46" role="button" tabindex="0" style="font-style:normal;cursor:pointer;padding:1px 7px;border-radius:999px;border:1px solid #ff86a866;background:#26101ecc;color:#ffc4d6">🚫 封印(${levelBanishes46})</i>` : ""}</span>`;
+      b.innerHTML = `<img src="${iconData(u)}"><div><div class="meta"><span style="color:${special ? u.c : SCHOOL[u.s]?.c || "#fff"}">${school}${wishBadge}</span><span class="${rar46(u)}">${u.career?`职业${u.rank}阶`:u.fusion?"唯一融合":u.asc?"唯一飞升":RAR46[rar46(u)]||u.r}</span></div><b>${u.n}${u.weapon46&&evolvesNext46(u)?` → <em class="evoName46">${globalThis.SakurayoWeapons.DEF[u.weapon46].evo}</em>`:""}</b><p>${desc}</p><div class="dots">${special ? "◆ 选择后改变战斗规则" : "●".repeat(Math.min(u.m||6, (lv(u.id) || 0) + 1)) + "○".repeat(Math.max(0, Math.min(6, u.m||6) - (lv(u.id) || 0) - 1))}${opsHtml}</div></div>`;
       b.classList.add("rar46-" + rar46(u));
+      if (isPinned) b.style.boxShadow = "0 0 18px #ffd77a44";
+      const pinEl = b.querySelector(".pinChoice46");
+      if (pinEl) {
+        pinEl.onclick = (ev) => {
+          ev.stopPropagation();
+          ev.preventDefault();
+          pinnedUpgradeId46 = pinnedUpgradeId46 === u.id ? null : u.id;
+          toast(pinnedUpgradeId46 ? `已锁定「${u.n}」：重抽或下次升级将保留此卡` : `已解除锁定「${u.n}」`);
+          renderChoices();
+        };
+      }
+      const banishEl = b.querySelector(".banishChoice46");
+      if (banishEl) {
+        banishEl.onclick = (ev) => {
+          ev.stopPropagation();
+          ev.preventDefault();
+          if (levelBanishes46 <= 0) return;
+          levelBanishes46--;
+          banishedSet46.add(u.id);
+          if (pinnedUpgradeId46 === u.id) pinnedUpgradeId46 = null;
+          toast(`已封印「${u.n}」：本局不再刷出（剩余 ${levelBanishes46} 次封印）`);
+          renderChoices();
+        };
+      }
       const choiceImage = b.querySelector("img"), fallbackIcon = choiceImage.src;
       choiceImage.onerror = () => {
         choiceImage.onerror = null;
@@ -4352,6 +4412,7 @@ window.SAKURAYO_VERSION_CODE = 71;
     $("#reroll").disabled = levelRerolls <= 0;
   }
   function chooseUpgrade(u) {
+    if (u && pinnedUpgradeId46 === u.id) pinnedUpgradeId46 = null;
     P.upgradeChoices40++;
     if(u.career){applyCareer(u);
     } else if (u.fusion) {
@@ -8488,13 +8549,32 @@ window.SAKURAYO_VERSION_CODE = 71;
   function lobbyHandlers46(){
     return {
       pull:n=>doPull46(n),
+      pullNovice:()=>doPullNovice46(),
       art:artUrl,
       character:save.character,
       setPool(id){const L=window.SakurayoLobby;if(!L)return;L.setPool(save,id);persist();refreshLobby46();},
+      setFocus(pool,id){const L=window.SakurayoLobby;if(!L)return;const r=L.setFocus(save,pool,id);toast(r.focusId?`已定轨「${r.n}」：出同阶 50% 命中，命定 1/1 必出`:"已取消定轨");persist();refreshLobby46();},
       setRosterTab(id){const L=window.SakurayoLobby;if(!L)return;L.setRosterTab(save,id);persist();refreshLobby46();},
       spark(id){const L=window.SakurayoLobby;if(!L)return;const r=L.spark(save,save.shop40.ops.pool,id);toast(r.ok?("Spark："+r.n):r.reason==="shards"?"碎镜片不足":r.reason==="owned"?"已经拥有":r.reason==="scrap"?"残件不能 Spark":"无法 Spark");persist();refreshLobby46();if(r.ok&&L.showReveal)L.showReveal([{id:r.id,n:r.n,r:r.r,legend:r.legend}],{art:artUrl});},
       equip(tab,id){const L=window.SakurayoLobby;if(!L)return;const r=L.equip(save,tab,id);toast(r.ok?"已装备":"不能装备");persist();refreshLobby46();},
     };
+  }
+  function doPullNovice46(){
+    const L=window.SakurayoLobby;
+    if(!L||typeof L.pullNovice!=="function")return {ok:false,reason:"lobby",results:[]};
+    const result=L.pullNovice(save);
+    if(!result.ok){
+      toast(result.reason==="coins"?"樱花币不足（需 1150 樱花币或 8 张寻访券）":result.reason==="limit"?"初夜迎新特惠次数已用尽":"寻访失败");
+      refreshLobby46();
+      return result;
+    }
+    const names=result.results.map(x=>x.n).slice(0,3).join("、");
+    toast(`迎新十连完成：${names}…`);
+    checkAch();
+    persist();
+    refreshLobby46();
+    if(L.showReveal)L.showReveal(result.results,{art:artUrl});
+    return result;
   }
   function refreshLobby46(){
     const L=window.SakurayoLobby;

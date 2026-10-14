@@ -491,7 +491,36 @@
     ".wishSheetCard46 p{font-size:12px;line-height:1.7}" +
     ".wishSheetActions46{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}.wishSheetActions46 .wishSheetClose46{margin:0}" +
     ".wishSheetCancel46{min-height:44px;padding:0 18px;border-radius:999px;border:1px solid #96e4f566;background:#09101ee0;color:#dbe9f8;font:800 12px/1 system-ui}" +
-    ".wishSheetClose46{min-height:44px!important;display:block;margin:14px 0 0 auto;min-height:34px;padding:0 18px;border-radius:999px;border:0;background:linear-gradient(120deg,#ff6fae,#8fe6f5);color:#081426;font:800 12px/1 system-ui}";
+    ".wishSheetClose46{min-height:44px!important;display:block;margin:14px 0 0 auto;min-height:34px;padding:0 18px;border-radius:999px;border:0;background:linear-gradient(120deg,#ff6fae,#8fe6f5);color:#081426;font:800 12px/1 system-ui}" +
+    "#gachaDrawer .wishV2 .wishUp46{cursor:pointer;transition:transform .15s,box-shadow .15s}" +
+    "#gachaDrawer .wishV2 .wishUp46:hover{transform:translateY(-1px);box-shadow:0 4px 14px #ffd77a44}" +
+    "#gachaDrawer .wishV2 .wishUp46 .fateBadge46{padding:2px 6px;border-radius:999px;background:#25183ecc;border:1px solid #ff9bcc88;color:#ffd8ec;font:800 10px/1 system-ui}" +
+    "#gachaDrawer .wishV2 .wishUp46 .fateBadge46.full{background:linear-gradient(120deg,#ffe08a,#ff8fc4);color:#26101e;border-color:#fff}" +
+    ".wishTicketPill46{padding:5px 9px;border-radius:999px;background:linear-gradient(120deg,#ff6fae33,#8fe6f533);border:1px solid #ff9fcf66;color:#ffe9f5;font:800 10px/1 system-ui;letter-spacing:.06em}" +
+    ".wishFocusGrid46,.wishSparkGrid46{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:8px;margin-top:10px;max-height:46vh;overflow-y:auto;padding-right:4px}" +
+    ".wishFocusItem46{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 6px;border-radius:12px;border:1px solid #96e4f533;background:#101b33cc;color:#e4eef9;text-align:center;cursor:pointer}" +
+    ".wishFocusItem46.on{border-color:#ffd77a;background:linear-gradient(180deg,#2c2142f0,#151d33f0);box-shadow:0 0 16px #ffd77a44}" +
+    ".wishFocusItem46 img{width:54px;height:68px;object-fit:cover;border-radius:8px;border:1px solid #ffffff22}" +
+    ".wishFocusItem46 b{font-size:11px;line-height:1.2;color:#fff}" +
+    ".wishFocusItem46 small{font-size:9px;color:#96e4f5}" +
+    ".wishFocusFilter46{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}" +
+    ".wishFocusFilter46 button{min-height:28px;padding:0 10px;border-radius:999px;border:1px solid #96e4f544;background:#09101ecc;color:#cfe6f5;font:700 11px/1 system-ui}" +
+    ".wishFocusFilter46 button.on{background:linear-gradient(120deg,#ffe08a,#ff9fcf);color:#1d0e1a;border-color:#fff}" +
+    ".wishLogList46{display:grid;gap:5px;max-height:42vh;overflow-y:auto;margin-top:8px;padding-right:4px}" +
+    ".wishLogRow46{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-radius:8px;background:#101a30cc;border:1px solid #ffffff14;font-size:11px}" +
+    ".wishLogRow46.r-SSR{border-color:#ffd77a88;background:linear-gradient(90deg,#332418cc,#101a30cc);color:#ffe8a3}" +
+    ".wishLogRow46.r-SR{border-color:#d58cff66;background:linear-gradient(90deg,#261638cc,#101a30cc);color:#f0d6ff}" +
+    ".revealOmen46{text-align:center;margin:0 0 10px;padding:5px 16px;border-radius:999px;font:900 12px/1.2 system-ui;letter-spacing:.24em;background:#0d1528cc;border:1px solid #96e4f555;color:#dbe9f8}" +
+    ".revealOmen46.omen-SSR{background:linear-gradient(90deg,#2a180800,#ffd77a33 50%,#2a180800);border-color:#ffd77aaa;color:#ffe89e;text-shadow:0 0 14px #ffd77a}" +
+    ".revealOmen46.omen-SR{background:linear-gradient(90deg,#200f3300,#d58cff33 50%,#200f3300);border-color:#d58cffaa;color:#f3d4ff;text-shadow:0 0 12px #d58cff}" +
+    ".revealCard46.r-SSR:not(.flipped) .revealFace46.back,.revealCard46.r-LEGEND:not(.flipped) .revealFace46.back{border-color:#ffd77acc;box-shadow:0 0 22px #ffd77a66}" +
+    ".revealCard46.r-SR:not(.flipped) .revealFace46.back{border-color:#d58cffaa;box-shadow:0 0 16px #d58cff44}" +
+    ".revealDupe46{position:absolute;top:8px;right:8px;z-index:2;padding:2px 6px;border-radius:999px;background:#09101ed9;border:1px solid #96e4f577;color:#96e4f5;font:800 9px/1.2 system-ui}" +
+    ".rosterResonance46{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 10px;padding:8px 12px;border-radius:12px;background:#120d24cc;border:1px solid #ffe6a344;font-size:11px;color:#e7d7ef}" +
+    ".rosterResonance46 em{font-style:normal;padding:3px 8px;border-radius:999px;background:#26183ecc;border:1px solid #ff9bcc55;color:#ffe6a3;font:800 10px/1 system-ui}" +
+    ".rosterFilter46{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}" +
+    ".rosterFilter46 button{min-height:28px;padding:0 10px;border-radius:999px;border:1px solid #ff9bcc44;background:#140e24cc;color:#e7d7ef;font:700 11px/1 system-ui}" +
+    ".rosterFilter46 button.on{background:linear-gradient(120deg,#ffe08a,#d8892b);color:#2a1608;border-color:#ffe6a3}";
 
   function injectStyle() {
     if (!global.document) return;
@@ -525,6 +554,7 @@
     list.forEach(function (card) {
       owned[card.id] = clampInt(rawOwned[card.id], 0, 9999);
     });
+    var focusId = typeof incoming.focusId === "string" && list.some(function (c) { return c.id === incoming.focusId; }) ? incoming.focusId : "";
     return {
       pity: clampInt(incoming.pity, 0, RATES.pitySSR),
       pitySR: clampInt(incoming.pitySR, 0, RATES.pitySR),
@@ -532,8 +562,11 @@
       tenPulls: clampInt(incoming.tenPulls, 0, 999999),
       owned: owned,
       last: Array.isArray(incoming.last) ? incoming.last.slice(0, 20) : [],
+      history: Array.isArray(incoming.history) ? incoming.history.slice(0, 40) : [],
       equipped: typeof incoming.equipped === "string" ? incoming.equipped : "",
       shards: clampInt(incoming.shards, 0, 999999),
+      focusId: focusId,
+      fatePoints: focusId ? clampInt(incoming.fatePoints, 0, 1) : 0,
     };
   }
 
@@ -556,6 +589,8 @@
     var rosterTab = incoming.rosterTab === "school" || incoming.rosterTab === "job" || incoming.rosterTab === "fusion" || incoming.rosterTab === "fashion" || incoming.rosterTab === "weapon" || incoming.rosterTab === "chronicle"
       ? incoming.rosterTab
       : "scrap";
+    var focusId = typeof incoming.focusId === "string" && catalog.some(function (c) { return c.id === incoming.focusId; }) ? incoming.focusId : "";
+    var rosterFilter = typeof incoming.rosterFilter === "string" ? incoming.rosterFilter : "all";
     shop.ops = {
       pity: clampInt(incoming.pity, 0, RATES.pitySSR),
       pitySR: clampInt(incoming.pitySR, 0, RATES.pitySR),
@@ -563,10 +598,15 @@
       tenPulls: clampInt(incoming.tenPulls, 0, 999999),
       owned: owned,
       last: Array.isArray(incoming.last) ? incoming.last.slice(0, 20) : [],
+      history: Array.isArray(incoming.history) ? incoming.history.slice(0, 40) : [],
       cheatUsed: incoming.cheatUsed ? 1 : 0,
       shards: clampInt(incoming.shards, 0, 999999),
       pool: pool,
       rosterTab: rosterTab,
+      rosterFilter: rosterFilter,
+      focusId: focusId,
+      fatePoints: focusId ? clampInt(incoming.fatePoints, 0, 1) : 0,
+      noviceUsed: clampInt(incoming.noviceUsed, 0, 2),
       supplies: ['firstRun','chapter1','chapter2','chapter3','chapter4','kills500'].reduce(function(receipts,id){
         receipts[id] = !!(incoming.supplies && incoming.supplies[id] === true);
         return receipts;
@@ -715,13 +755,38 @@
     return ops;
   }
 
-  function applyPull(ops, rng, list, shardHost) {
-    var want = rollWant(ops, rng);
+  function applyPull(ops, rng, list, shardHost, forceSsr) {
+    var want = forceSsr ? "SSR" : rollWant(ops, rng);
     var rarity = downgradeRarity(want, list);
-    var card = pickOfRarity(rarity, rng, list, ops.owned, want);
+    var focusCard = ops.focusId ? cardOf(ops.focusId) : null;
+    if (focusCard && !list.some(function (c) { return c.id === focusCard.id; })) focusCard = null;
+    var card = null;
+    var hitFocus = false;
+    if (focusCard && (rarity === focusCard.r || (want === "SSR" && focusCard.r === "SSR"))) {
+      if ((ops.fatePoints || 0) >= 1) {
+        card = focusCard;
+        ops.fatePoints = 0;
+        hitFocus = true;
+      } else if (rng() < 0.5) {
+        card = focusCard;
+        ops.fatePoints = 0;
+        hitFocus = true;
+      } else {
+        card = pickOfRarity(rarity, rng, list, ops.owned, want);
+        if (card && card.id === focusCard.id) {
+          ops.fatePoints = 0;
+          hitFocus = true;
+        } else {
+          ops.fatePoints = 1;
+        }
+      }
+    } else {
+      card = pickOfRarity(rarity, rng, list, ops.owned, want);
+    }
     if (!card) return null;
     ops.pity += 1;
     ops.pitySR += 1;
+    var pullAtPity = ops.pity;
     if (card.r === "SSR" || want === "SSR") {
       ops.pity = 0;
       ops.pitySR = 0;
@@ -733,7 +798,11 @@
     ops.pulls += 1;
     shardHost.shards = clampInt((shardHost.shards || 0) + RATES.shardPull, 0, 999999);
     if (prev > 0) shardHost.shards = clampInt(shardHost.shards + RATES.shardDupe, 0, 999999);
-    return { id: card.id, r: card.r, n: card.n, pity: ops.pity, isNew: prev === 0, kind: card.kind || "", legend: !!card.legend };
+    var row = { id: card.id, r: card.r, n: card.n, pity: ops.pity, pullAtPity: pullAtPity, isNew: prev === 0, kind: card.kind || "", legend: !!card.legend, hitFocus: hitFocus };
+    if (!Array.isArray(ops.history)) ops.history = [];
+    ops.history.unshift(row);
+    if (ops.history.length > 40) ops.history.length = 40;
+    return row;
   }
 
   function pull(save, count, rng, poolId) {
@@ -757,7 +826,7 @@
     var shardHost = pool === "remnant" ? save.shop40.ops : state;
     var results = [];
     for (var i = 0; i < n; i++) {
-      var row = applyPull(state, rand, list, shardHost);
+      var row = applyPull(state, rand, list, shardHost, false);
       if (row) results.push(row);
     }
     if (n === 10) state.tenPulls += 1;
@@ -774,7 +843,94 @@
       pulls: save.shop40.ops.pulls,
       tenPulls: save.shop40.ops.tenPulls,
       shards: save.shop40.ops.shards,
+      focusId: state.focusId || "",
+      fatePoints: state.fatePoints || 0,
     };
+  }
+
+  var NOVICE_COST = 1150;
+  function pullNovice(save, rng) {
+    if (!save || typeof save !== "object") return { ok: false, reason: "save", results: [] };
+    save.shop40 = normalizeOps(save.shop40 || {});
+    var ops = save.shop40.ops;
+    if ((ops.noviceUsed || 0) >= 2) {
+      return { ok: false, reason: "limit", results: [], coins: save.coins, noviceUsed: ops.noviceUsed };
+    }
+    var tickets = Math.max(0, Number(save.wishTickets46) || 0), useTicket = tickets >= 8;
+    if (!useTicket && save.coins < NOVICE_COST) {
+      return { ok: false, reason: "coins", results: [], coins: save.coins, noviceUsed: ops.noviceUsed };
+    }
+    var rand = typeof rng === "function" ? rng : Math.random;
+    var list = cardsForPool("remnant");
+    var isFirstNovice = (ops.noviceUsed || 0) === 0;
+    var results = [];
+    var hasSsrInBatch = false;
+    for (var i = 0; i < 10; i++) {
+      var forceSsr = isFirstNovice && i === 9 && !hasSsrInBatch;
+      var row = applyPull(ops, rand, list, ops, forceSsr);
+      if (row) {
+        if (row.r === "SSR" || row.legend) hasSsrInBatch = true;
+        results.push(row);
+      }
+    }
+    ops.tenPulls += 1;
+    ops.noviceUsed = clampInt((ops.noviceUsed || 0) + 1, 0, 2);
+    ops.last = results.slice();
+    if (useTicket) save.wishTickets46 = tickets - 8; else save.coins = save.coins - NOVICE_COST;
+    return {
+      ok: true,
+      novice: true,
+      noviceUsed: ops.noviceUsed,
+      results: results,
+      coins: save.coins,
+      pool: "remnant",
+      pity: ops.pity,
+      pitySR: ops.pitySR,
+      owned: ops.owned,
+      pulls: ops.pulls,
+      tenPulls: ops.tenPulls,
+      shards: ops.shards,
+    };
+  }
+
+  function setFocus(save, poolId, cardId) {
+    if (!save || typeof save !== "object") return { ok: false, reason: "save" };
+    save.shop40 = normalizeOps(save.shop40 || {});
+    var pool = poolId || save.shop40.ops.pool || "remnant";
+    if (POOL_IDS.indexOf(pool) < 0) pool = "remnant";
+    var state = poolState(save.shop40.ops, pool);
+    if (!cardId) {
+      state.focusId = "";
+      state.fatePoints = 0;
+      return { ok: true, pool: pool, focusId: "", fatePoints: 0 };
+    }
+    var list = cardsForPool(pool);
+    var target = null;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].id === cardId) { target = list[i]; break; }
+    }
+    if (!target || (target.r !== "SSR" && target.r !== "SR")) {
+      return { ok: false, reason: "card", pool: pool };
+    }
+    if (state.focusId !== target.id) {
+      state.focusId = target.id;
+      state.fatePoints = 0;
+    }
+    return { ok: true, pool: pool, focusId: state.focusId, fatePoints: state.fatePoints, n: target.n, r: target.r };
+  }
+
+  function schoolMultipliers(save) {
+    var out = [];
+    Object.keys(SCHOOL_LABEL).forEach(function (sid) {
+      var mul = 1;
+      if (hasSchool(save, sid)) mul *= 1.3;
+      if (hasJob(save, sid)) mul *= 1.5;
+      if (hasFusion(save, sid)) mul *= 1.6;
+      if (mul > 1.01) {
+        out.push({ school: sid, name: SCHOOL_LABEL[sid], mul: Number(mul.toFixed(2)) });
+      }
+    });
+    return out;
   }
 
   function grantCheat(save) {
@@ -805,6 +961,11 @@
       rosterTabs: ROSTER_TABS.slice(),
       pool: ops.pool,
       rosterTab: ops.rosterTab,
+      rosterFilter: ops.rosterFilter || "all",
+      focusId: ops.focusId || "",
+      fatePoints: ops.fatePoints || 0,
+      noviceUsed: ops.noviceUsed || 0,
+      history: (ops.history || []).slice(),
       cards: CARDS.map(function (card) {
         return { id: card.id, n: card.n, r: card.r, kind: card.kind || "scrap", count: ops.owned[card.id] || 0 };
       }),
@@ -830,6 +991,7 @@
       fashion: ops.fashion,
       weapon: ops.weapon,
       coins: save ? save.coins : 0,
+      wishTickets: save ? Math.max(0, Number(save.wishTickets46) || 0) : 0,
       cheatUsed: !!ops.cheatUsed,
     };
   }
@@ -955,7 +1117,11 @@
     weapon: { tab: "武器", kind: "武器寻访", name: "兵装回收", time: "常驻卡池 · 不限时" }
   });
 
-  function featuredCard(pool) {
+  function featuredCard(pool, focusId) {
+    if (focusId) {
+      var focused = cardOf(focusId);
+      if (focused) return focused;
+    }
     var list = cardsForPool(pool) || [];
     for (var i = 0; i < list.length; i++) if (list[i].legend) return list[i];
     for (var j = 0; j < list.length; j++) if (list[j].r === "SSR") return list[j];
@@ -966,26 +1132,182 @@
     return String(v == null ? "" : v).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; });
   }
 
-  function bindWishSheet(host, pool, state) {
+  function cardHeroTag(card) {
+    if (!card) return "all";
+    if (card.face) return card.face;
+    if (card.hero) return card.hero;
+    var id = String(card.id || "");
+    if (id.indexOf("sayo") >= 0 || card.school === "gun" || card.school === "mech" || card.school === "mage" || card.school === "star") return "sayo";
+    if (id.indexOf("aya") >= 0 || card.school === "shrine" || card.school === "alch" || card.school === "ward" || card.school === "puppet") return "aya";
+    if (id.indexOf("rion") >= 0 || card.school === "sword" || card.school === "vamp" || card.school === "cult" || card.school === "ice") return "rion";
+    return "all";
+  }
+
+  function cardTendencyText(card) {
+    if (!card) return "";
+    if (card.kind === "school" && card.school) return (SCHOOL_LABEL[card.school] || card.school) + "流派倾向 ×1.3";
+    if (card.kind === "job" && card.school) return (SCHOOL_LABEL[card.school] || card.school) + "流派倾向 ×1.5";
+    if (card.kind === "fusion" && Array.isArray(card.pair)) {
+      return card.pair.map(function (s) { return SCHOOL_LABEL[s] || s; }).join(" + ") + " 倾向 ×1.6";
+    }
+    if (card.kind === "fashion" && card.school) return "穿戴时" + (SCHOOL_LABEL[card.school] || card.school) + "流派倾向 ×1.3";
+    return "纯外观与证词收藏";
+  }
+
+  function bindWishSheet(host, pool, state, save, handlers) {
     var sheet = host.querySelector("#gachaSheet46");
     if (!sheet) return;
     function open(html) {
       sheet.innerHTML = '<div class="wishSheetCard46">' + html + '<button type="button" class="wishSheetClose46">知道了</button></div>';
       sheet.classList.remove("hidden");
-      sheet.querySelector(".wishSheetClose46").onclick = function () { sheet.classList.add("hidden"); };
+      hideBrokenArt(sheet);
+      var closeBtn = sheet.querySelector(".wishSheetClose46");
+      if (closeBtn) closeBtn.onclick = function () { sheet.classList.add("hidden"); };
     }
     sheet.onclick = function (e) { if (e.target === sheet) sheet.classList.add("hidden"); };
-    var info = host.querySelector("#gachaInfo46"), log = host.querySelector("#gachaLog46");
+    var info = host.querySelector("#gachaInfo46"),
+      log = host.querySelector("#gachaLog46"),
+      focusBtn = host.querySelector("#gachaFocusBtn46"),
+      sparkBtn = host.querySelector("#gachaSparkShop46"),
+      noviceBtn = host.querySelector("#gachaNovice46");
     if (info) info.onclick = function () {
+      var curPity = (state && state.pity) || 0;
+      var curSsrPct = (ssrRate(curPity) * 100).toFixed(1);
+      var poolCards = cardsForPool(pool);
+      var ssrCount = poolCards.filter(function (c) { return c.r === "SSR"; }).length;
+      var srCount = poolCards.filter(function (c) { return c.r === "SR"; }).length;
       open("<h4>寻访详情</h4><ul>" +
-        "<li>证人（SSR）基础概率 " + (RATES.SSR * 100).toFixed(1) + "%，第 " + RATES.softPity + " 抽起提升，" + RATES.pitySSR + " 抽必出</li>" +
+        "<li>证人（SSR）基础概率 " + (RATES.SSR * 100).toFixed(1) + "%，第 " + RATES.softPity + " 抽起提升，" + RATES.pitySSR + " 抽必出（当前下一抽实时概率：<b style=\"color:#ffd77a\">" + curSsrPct + "%</b>）</li>" +
         "<li>稀有（SR）基础概率 " + (RATES.SR * 100).toFixed(1) + "%，每 " + RATES.pitySR + " 抽至少一张</li>" +
-        "<li>R " + (RATES.R * 100).toFixed(0) + "% · N " + (RATES.N * 100).toFixed(0) + "%</li>" +
+        "<li>R " + (RATES.R * 100).toFixed(0) + "% · N " + (RATES.N * 100).toFixed(0) + "%（本池含 SSR " + ssrCount + " 张 · SR " + srCount + " 张）</li>" +
+        "<li>命定定轨：点击主界面 UP 胶囊可自选定轨目标，出对应稀有度时 50% 概率命中；若未命中获 1 点命定值，下次必出定轨卡</li>" +
         "<li>每抽获得碎镜片 " + RATES.shardPull + "，重复卡 +" + RATES.shardDupe + "；集满 " + RATES.spark + " 可兑换指定卡</li>" +
         "<li>收藏不增加战斗属性</li></ul>");
     };
     if (log) log.onclick = function () {
-      open("<h4>寻访记录</h4><p>" + (POOL_META[pool] || POOL_META.remnant).name + " 累计 " + ((state && state.pulls) || 0) + " 次 · 当前保底计数 " + ((state && state.pity) || 0) + " / " + RATES.pitySSR + "</p>");
+      var hist = (state && Array.isArray(state.history) && state.history.length) ? state.history : (state && Array.isArray(state.last)) ? state.last : [];
+      var rowsHtml = "";
+      if (hist.length) {
+        rowsHtml = '<div class="wishLogList46">' + hist.slice(0, 30).map(function (h) {
+          var badge = h.legend ? "传说" : h.r || "N";
+          return '<div class="wishLogRow46 r-' + (h.r || "N") + '"><span><b>[' + badge + ']</b> ' + escapeHtml(h.n || h.id) + (h.isNew ? ' <em style="color:#78ffb0;font-style:normal">NEW</em>' : "") + (h.hitFocus ? ' <em style="color:#ffd77a;font-style:normal">定轨命中</em>' : "") + '</span><small>' + (h.pullAtPity ? "第 " + h.pullAtPity + " 抽" : "近期回收") + "</small></div>";
+        }).join("") + "</div>";
+      } else {
+        rowsHtml = '<p style="color:#9db4cc">暂无近期寻访明细，开始寻访后将自动记录最近 40 条回收档案。</p>';
+      }
+      open("<h4>寻访记录</h4><p>" + (POOL_META[pool] || POOL_META.remnant).name + " 累计 " + ((state && state.pulls) || 0) + " 次 · 当前保底计数 " + ((state && state.pity) || 0) + " / " + RATES.pitySSR + (state && state.focusId ? " · 命定值 " + (state.fatePoints || 0) + " / 1" : "") + "</p>" + rowsHtml);
+    };
+    function openFocusSheet(filterChar) {
+      var curChar = filterChar || "all";
+      var candidates = cardsForPool(pool).filter(function (c) {
+        return (c.r === "SSR" || c.r === "SR") && c.kind !== "scrap";
+      });
+      var filtered = curChar === "all" ? candidates : candidates.filter(function (c) { return cardHeroTag(c) === curChar; });
+      var curFocus = (state && state.focusId) || "";
+      var html = "<h4>命定定轨 · 自选 UP 目标</h4>" +
+        "<p>选定目标后，抽出同稀有度卡时 <b>50%</b> 概率直接为定轨卡；若歪出其他卡则命定值 <b>+1（上限 1/1）</b>，下次必出定轨目标！收藏不增加战斗属性。</p>" +
+        '<div class="wishFocusFilter46">' +
+        '<button type="button" data-fchar="all"' + (curChar === "all" ? ' class="on"' : "") + ">全部 (" + candidates.length + ")</button>" +
+        '<button type="button" data-fchar="sayo"' + (curChar === "sayo" ? ' class="on"' : "") + ">月城小夜</button>" +
+        '<button type="button" data-fchar="aya"' + (curChar === "aya" ? ' class="on"' : "") + ">神代绫</button>" +
+        '<button type="button" data-fchar="rion"' + (curChar === "rion" ? ' class="on"' : "") + ">黑羽凛音</button>" +
+        (curFocus ? '<button type="button" data-fclear="1">取消定轨</button>' : "") +
+        "</div>" +
+        '<div class="wishFocusGrid46">' +
+        filtered.map(function (c) {
+          var count = (state && state.owned && state.owned[c.id]) || 0;
+          var isOn = curFocus === c.id;
+          return '<button type="button" class="wishFocusItem46' + (isOn ? " on" : "") + '" data-focus-pick="' + c.id + '">' +
+            '<img data-art alt="" src="' + artSrc(handlers, "gacha/" + c.id + ".webp") + '">' +
+            "<b>[" + c.r + "] " + escapeHtml(c.n) + "</b>" +
+            "<small>" + escapeHtml(cardTendencyText(c)) + "</small>" +
+            "<small>" + (isOn ? "🎯 当前定轨" : count > 0 ? "已回收 ×" + count : "未回收") + "</small>" +
+            "</button>";
+        }).join("") +
+        "</div>";
+      open(html);
+      var fbtns = sheet.querySelectorAll("[data-fchar]");
+      for (var fi = 0; fi < fbtns.length; fi++) {
+        fbtns[fi].onclick = function () { openFocusSheet(this.getAttribute("data-fchar")); };
+      }
+      var clearBtn = sheet.querySelector("[data-fclear]");
+      if (clearBtn) {
+        clearBtn.onclick = function () {
+          setFocus(save, pool, "");
+          sheet.classList.add("hidden");
+          if (handlers && typeof handlers.setFocus === "function") handlers.setFocus(pool, "");
+          else renderGacha(host, save, handlers);
+        };
+      }
+      var picks = sheet.querySelectorAll("[data-focus-pick]");
+      for (var pk = 0; pk < picks.length; pk++) {
+        picks[pk].onclick = function () {
+          var cid = this.getAttribute("data-focus-pick");
+          setFocus(save, pool, cid);
+          sheet.classList.add("hidden");
+          if (handlers && typeof handlers.setFocus === "function") handlers.setFocus(pool, cid);
+          else renderGacha(host, save, handlers);
+        };
+      }
+    }
+    if (focusBtn) focusBtn.onclick = function () { openFocusSheet("all"); };
+    if (sparkBtn) sparkBtn.onclick = function () {
+      var curShards = pool === "remnant" ? (save && save.shop40 && save.shop40.ops && save.shop40.ops.shards) || 0 : (state && state.shards) || 0;
+      var ssrList = cardsForPool(pool).filter(function (c) { return (c.legend || c.r === "SSR") && c.kind !== "scrap"; });
+      var html = "<h4>碎镜工坊 · 指定证人兑换</h4>" +
+        "<p>当前碎镜片：<b>" + curShards + " / " + RATES.spark + "</b>（每抽 +1，重复卡 +8）。集满 " + RATES.spark + " 枚可直接指定兑换任意未拥有的证人 SSR 卡。收藏不增加战斗属性。</p>" +
+        '<div class="wishSparkGrid46">' +
+        ssrList.map(function (c) {
+          var owned = ((state && state.owned && state.owned[c.id]) || 0) > 0;
+          var canSpark = !owned && curShards >= RATES.spark;
+          return '<button type="button" class="wishFocusItem46' + (canSpark ? " on" : "") + '" data-workshop-spark="' + c.id + '"' + (owned || !canSpark ? " disabled" : "") + ">" +
+            '<img data-art alt="" src="' + artSrc(handlers, "gacha/" + c.id + ".webp") + '">' +
+            "<b>" + escapeHtml(c.n) + "</b>" +
+            "<small>" + escapeHtml(cardTendencyText(c)) + "</small>" +
+            "<small>" + (owned ? "✓ 已点亮" : canSpark ? "💎 200 碎镜兑换" : "需 200 碎镜片") + "</small>" +
+            "</button>";
+        }).join("") +
+        "</div>";
+      open(html);
+      var sbtns = sheet.querySelectorAll("[data-workshop-spark]");
+      for (var si = 0; si < sbtns.length; si++) {
+        sbtns[si].onclick = function () {
+          var id = this.getAttribute("data-workshop-spark");
+          sheet.classList.add("hidden");
+          if (handlers && typeof handlers.spark === "function") handlers.spark(id);
+          else {
+            spark(save, pool, id);
+            renderGacha(host, save, handlers);
+          }
+        };
+      }
+    };
+    if (noviceBtn) noviceBtn.onclick = function () {
+      var used = (save && save.shop40 && save.shop40.ops && save.shop40.ops.noviceUsed) || 0;
+      var left = Math.max(0, 2 - used);
+      var html = "<h4>初夜迎新 · 新手特惠十连</h4>" +
+        "<p>迎新特惠：前 2 次十连享 <b>8 折（" + NOVICE_COST + " 樱花币 或 8 张寻访券）</b>，且<b>首次迎新十连必出至少 1 张 SSR 证人/融合卡</b>！当前剩余次数：<b>" + left + " / 2</b>。收藏不增加战斗属性。</p>" +
+        (left > 0
+          ? '<div class="wishSheetActions46"><button type="button" class="wishSheetCancel46">稍后再说</button><button type="button" class="wishSheetClose46" id="gachaNoviceConfirm46">立即迎新十连（' + NOVICE_COST + '）</button></div>'
+          : "");
+      sheet.innerHTML = '<div class="wishSheetCard46">' + html + (left <= 0 ? '<button type="button" class="wishSheetClose46">知道了</button>' : "") + "</div>";
+      sheet.classList.remove("hidden");
+      var cancel = sheet.querySelector(".wishSheetCancel46");
+      if (cancel) cancel.onclick = function () { sheet.classList.add("hidden"); };
+      var closeOrGo = sheet.querySelector(".wishSheetClose46");
+      if (closeOrGo) {
+        closeOrGo.onclick = function () {
+          sheet.classList.add("hidden");
+          if (left > 0) {
+            if (handlers && typeof handlers.pullNovice === "function") handlers.pullNovice();
+            else {
+              var res = pullNovice(save);
+              renderGacha(host, save, handlers);
+              if (res && res.ok) showReveal(res.results, handlers);
+            }
+          }
+        };
+      }
     };
   }
 
@@ -1000,16 +1322,19 @@
     var pitySR = state.pitySR || 0;
     var pulls = state.pulls || 0;
     var shards = pool === "remnant" ? info.shards : state.shards || 0;
+    var tickets = info.wishTickets || 0;
     var ssrLeft = Math.max(0, RATES.pitySSR - pity);
     var srLeft = Math.max(0, RATES.pitySR - pitySR);
     var ssrPct = Math.max(0, Math.min(100, Math.round((pity / RATES.pitySSR) * 100)));
     var srPct = Math.max(0, Math.min(100, Math.round((pitySR / RATES.pitySR) * 100)));
     var empty = !cardsForPool(pool).length;
-    var poor1 = info.coins < RATES.single || empty;
-    var poor10 = info.coins < RATES.ten || empty;
+    var poor1 = (tickets < 1 && info.coins < RATES.single) || empty;
+    var poor10 = (tickets < 10 && info.coins < RATES.ten) || empty;
     var sub = "收藏不增加战斗属性 · " + (pool === "fashion" ? "时装装备保留展示与标注倾向" : pool === "weapon" ? "武器装备仅作收藏展示" : "职业卡仅影响标注流派倾向");
     var meta = POOL_META[pool] || POOL_META.remnant;
-    var up = featuredCard(pool);
+    var focusId = state.focusId || "";
+    var fatePoints = state.fatePoints || 0;
+    var up = featuredCard(pool, focusId);
     var coinIcon = '<img class="wishCoin46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/icon_coin.webp") + '">';
     var shardIcon = '<img class="wishCoin46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/icon_shard.webp") + '">';
     var tabHtml = "";
@@ -1017,6 +1342,7 @@
       var pid = POOL_IDS[pi], pm = POOL_META[pid];
       tabHtml += '<button type="button" data-pool="' + pid + '"' + (pool === pid ? ' class="on" aria-current="true"' : "") + "><b>" + pm.tab + "</b><small>" + pm.kind + "</small></button>";
     }
+    var noviceLeft = Math.max(0, 2 - (info.noviceUsed || 0));
     host.innerHTML =
       '<div class="wishStage46 wishV2">' +
       '<img class="wishBanner46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/banner_" + pool + ".webp") + '">' +
@@ -1024,19 +1350,24 @@
       '<img class="wishHero46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/up_" + (pool === "fashion" ? "crown" : hero) + ".webp") + '">' +
       '<div class="wishPetals46">' + petalMarks() + "</div>" +
       '<nav class="wishTabs46" id="gachaTabs46" aria-label="卡池">' + tabHtml + "</nav>" +
-      '<div class="wishWallet46" aria-label="货币">' + coinIcon + "<b>" + info.coins + '</b><span class="wishShardPill46">' + shardIcon + '碎镜片 ' + shards + " / " + RATES.spark + "</span></div>" +
+      '<div class="wishWallet46" aria-label="货币">' +
+      coinIcon + "<b>" + info.coins + "</b>" +
+      (tickets > 0 ? '<span class="wishTicketPill46">🎫 寻访券 ×' + tickets + "</span>" : "") +
+      '<span class="wishShardPill46">' + shardIcon + '碎镜片 ' + shards + " / " + RATES.spark + "</span></div>" +
       '<div class="wishTitle46"><span class="wishTag46">' + meta.kind + "</span><h3>" + meta.name + "</h3>" +
-      (up ? '<div class="wishUp46"><em>UP</em><b>' + escapeHtml(up.n) + "</b><i>" + up.r + "</i></div>" : "") +
+      (up ? '<div class="wishUp46" id="gachaFocusBtn46" role="button" tabindex="0" title="点击切换定轨 UP 目标"><em>' + (focusId ? "定轨" : "UP") + "</em><b>" + escapeHtml(up.n) + "</b><i>" + up.r + "</i>" + (focusId ? '<span class="fateBadge46' + (fatePoints >= 1 ? " full" : "") + '">命定 ' + fatePoints + "/1</span>" : '<span class="fateBadge46">切换定轨</span>') + "</div>" : "") +
       "<p>" + sub + '</p><small class="wishTime46">' + meta.time + "</small></div>" +
       '<div class="wishPity46"><div class="pityRow46"><span>距证人保底还有 ' + ssrLeft + ' 抽</span><div class="pityRail46"><i style="width:' + ssrPct + '%"></i></div></div><div class="pityRow46 sr"><span>距稀有保底还有 ' + srLeft + ' 抽</span><div class="pityRail46"><i style="width:' + srPct + '%"></i></div></div></div>' +
-      '<div class="wishLinks46"><button type="button" id="gachaInfo46">详情</button><button type="button" id="gachaLog46">记录</button><span class="wishPills46"><b>已寻访 ' + pulls + "</b><b>软保 " + RATES.softPity + "</b></span></div>" +
+      '<div class="wishLinks46"><button type="button" id="gachaInfo46">详情</button><button type="button" id="gachaLog46">记录</button><button type="button" id="gachaSparkShop46">工坊</button>' +
+      (pool === "remnant" && noviceLeft > 0 ? '<button type="button" id="gachaNovice46">迎新8折</button>' : "") +
+      '<span class="wishPills46"><b>已寻访 ' + pulls + "</b><b>软保 " + RATES.softPity + "</b></span></div>" +
       '<div class="wishDock46">' +
-      '<div class="gachaActions46"><button type="button" id="gachaPull1"' + (poor1 ? ' class="poor"' : "") + "><span>单次寻访</span><small>" + coinIcon + RATES.single + '</small></button><button type="button" id="gachaPull10"' + (poor10 ? ' class="poor"' : "") + "><span>十连寻访</span><small>" + coinIcon + RATES.ten + "</small></button></div>" +
+      '<div class="gachaActions46"><button type="button" id="gachaPull1"' + (poor1 ? ' class="poor"' : "") + "><span>单次寻访</span><small>" + (tickets >= 1 ? "🎫 寻访券 ×1" : coinIcon + RATES.single) + '</small></button><button type="button" id="gachaPull10"' + (poor10 ? ' class="poor"' : "") + "><span>十连寻访</span><small>" + (tickets >= 10 ? "🎫 寻访券 ×10" : coinIcon + RATES.ten) + "</small></button></div>" +
       sparkRow(pool, state, shards) +
       "</div>" +
       '<div class="wishSheet46 hidden" id="gachaSheet46" role="dialog" aria-modal="true"></div>' +
       "</div>";
-    bindWishSheet(host, pool, state);
+    bindWishSheet(host, pool, state, save, handlers);
     hideBrokenArt(host);
     var tabs = host.querySelectorAll("#gachaTabs46 [data-pool]");
     for (var t = 0; t < tabs.length; t++) {
@@ -1113,9 +1444,9 @@
     if (peek) global.SakurayoUI.close(peek);
   }
 
-  function showRosterPeek(card, locked, count, handlers, tab, source) {
+  function showRosterPeek(card, locked, count, handlers, tab, source, containerOverride) {
     if (!global.document) return;
-    var drawer = global.document.getElementById("rosterDrawer");
+    var drawer = containerOverride || global.document.getElementById("rosterDrawer") || global.document.getElementById("gachaDrawer");
     if (!drawer) return;
     closeRosterPeek();
     var overlay = global.document.createElement("div");
@@ -1123,7 +1454,8 @@
     overlay.setAttribute("role", "dialog");
     overlay.setAttribute("aria-modal", "true");
     overlay.setAttribute("aria-labelledby", "rosterPeekTitle46");
-    var canEquip = !locked && (tab === "fashion" || tab === "weapon");
+    var equipPool = card && (card.kind === "fashion" || card.kind === "weapon") ? card.kind : (tab === "fashion" || tab === "weapon" ? tab : "");
+    var canEquip = !locked && !!equipPool;
     overlay.innerHTML =
       '<div class="rosterPeekCard46' +
       (locked ? " lock" : "") +
@@ -1150,8 +1482,8 @@
     if (eq) {
       eq.onclick = function (ev) {
         if (ev && ev.stopPropagation) ev.stopPropagation();
-        if (handlers && typeof handlers.equip === "function") handlers.equip(tab, card.id);
-        else equip(handlers && handlers.save, tab, card.id);
+        if (handlers && typeof handlers.equip === "function") handlers.equip(equipPool, card.id);
+        else equip(handlers && handlers.save, equipPool, card.id);
         closeRosterPeek();
       };
     }
@@ -1190,10 +1522,37 @@
     closeRosterPeek();
     var info = snapshot(save);
     var tab = info.rosterTab || "scrap";
+    var filter = info.rosterFilter || "all";
     var list = rosterList(tab);
     var ownedMap = rosterOwned(info, tab);
     var got = 0;
     list.forEach(function (card) { if ((ownedMap[card.id] || 0) > 0) got += 1; });
+    var visibleList = list;
+    if (tab !== "chronicle" && tab !== "scrap" && filter !== "all") {
+      if (filter === "owned") {
+        visibleList = list.filter(function (c) { return (ownedMap[c.id] || 0) > 0; });
+      } else if (filter === "missing") {
+        visibleList = list.filter(function (c) { return (ownedMap[c.id] || 0) < 1; });
+      } else {
+        visibleList = list.filter(function (c) { return cardHeroTag(c) === filter; });
+      }
+    }
+    var muls = schoolMultipliers(save);
+    var resonanceHtml = '<div class="rosterResonance46"><span><b>流派共鸣倾向</b>（收藏不增加战斗属性，仅提高局内对应流派升级卡出现权重）：</span>' +
+      (muls.length
+        ? muls.map(function (m) { return "<em>" + m.name + " ×" + m.mul + "</em>"; }).join("")
+        : "<em>暂未激活额外流派倾向</em>") +
+      "</div>";
+    var filterHtml = (tab !== "chronicle" && tab !== "scrap")
+      ? '<div class="rosterFilter46" id="rosterFilter46">' +
+        '<button type="button" data-rfilter="all"' + (filter === "all" ? ' class="on"' : "") + ">全部</button>" +
+        '<button type="button" data-rfilter="sayo"' + (filter === "sayo" ? ' class="on"' : "") + ">月城小夜</button>" +
+        '<button type="button" data-rfilter="aya"' + (filter === "aya" ? ' class="on"' : "") + ">神代绫</button>" +
+        '<button type="button" data-rfilter="rion"' + (filter === "rion" ? ' class="on"' : "") + ">黑羽凛音</button>" +
+        '<button type="button" data-rfilter="owned"' + (filter === "owned" ? ' class="on"' : "") + ">已点亮</button>" +
+        '<button type="button" data-rfilter="missing"' + (filter === "missing" ? ' class="on"' : "") + ">未回收</button>" +
+        "</div>"
+      : "";
     var wall = "";
     if (tab === "chronicle") {
       wall = '<div class="chronicleBox46"><h4>月城小夜 · 未写完的夜</h4>' + CHRONICLE.map(function (item) {
@@ -1206,7 +1565,7 @@
     } else if (tab === "job" && !JOB_CARDS.length) {
       wall = '<div class="rosterLater46">后续写入</div>';
     } else {
-      wall = list.map(function (card) {
+      wall = visibleList.map(function (card) {
         var count = ownedMap[card.id] || 0;
         var locked = count < 1 && DEFAULT_SHOWN.indexOf(card.id) < 0;
         var mark = card.legend ? "LEGEND" : card.r;
@@ -1234,6 +1593,7 @@
       '<div class="rosterStage46"><div class="rosterHead46"><h3>镜界仓库</h3><span>' +
       (tab === "chronicle" ? "月城小夜 · 未写完的夜" : "已点亮 " + got + " / " + list.length) +
       "</span></div>" +
+      resonanceHtml +
       '<div class="rosterTabs46" id="rosterTabs46">' +
       '<button type="button" data-roster="scrap"' + (tab === "scrap" ? ' class="on"' : "") + ">残件</button>" +
       '<button type="button" data-roster="school"' + (tab === "school" ? ' class="on"' : "") + ">基础</button>" +
@@ -1242,7 +1602,9 @@
       '<button type="button" data-roster="fashion"' + (tab === "fashion" ? ' class="on"' : "") + ">时装</button>" +
       '<button type="button" data-roster="weapon"' + (tab === "weapon" ? ' class="on"' : "") + ">武器</button>" +
       '<button type="button" data-roster="chronicle"' + (tab === "chronicle" ? ' class="on"' : "") + ">编年</button>" +
-      "</div><div id=\"rosterWall46\">" +
+      "</div>" +
+      filterHtml +
+      '<div id="rosterWall46">' +
       wall +
       "</div></div>";
     hideBrokenArt(host);
@@ -1253,6 +1615,16 @@
         setRosterTab(save, next);
         if (handlers && typeof handlers.setRosterTab === "function") handlers.setRosterTab(next);
         else renderRoster(host, save, handlers);
+      };
+    }
+    var rfilters = host.querySelectorAll("#rosterFilter46 [data-rfilter]");
+    for (var rf = 0; rf < rfilters.length; rf++) {
+      rfilters[rf].onclick = function () {
+        var nf = this.getAttribute("data-rfilter") || "all";
+        save = save || {};
+        save.shop40 = normalizeOps(save.shop40 || {});
+        save.shop40.ops.rosterFilter = nf;
+        renderRoster(host, save, handlers);
       };
     }
     var slots = host.querySelectorAll(".rosterSlot46");
@@ -1287,8 +1659,13 @@
     if (revealBg) overlay.style.backgroundImage = "linear-gradient(#05030bb3,#05030bcc),url(\"" + revealBg + "\")";
     overlay.style.backgroundSize = "cover";
     overlay.style.backgroundPosition = "center";
+    var hasSsr = items.some(function (x) { return x && (x.r === "SSR" || x.legend || x.r === "LEGEND"); });
+    var hasSr = !hasSsr && items.some(function (x) { return x && x.r === "SR"; });
+    var omenClass = hasSsr ? "omen-SSR" : hasSr ? "omen-SR" : "omen-N";
+    var omenText = hasSsr ? "✦ 终夜金虹 · 证人降临 ✦" : hasSr ? "◈ 紫电共鸣 · 稀有显现 ◈" : "❀ 夜樱寻访 · 残响回收 ❀";
     var gridClass = items.length > 1 ? "revealGrid46 ten" : "revealGrid46 one";
     overlay.innerHTML =
+      '<div class="revealOmen46 ' + omenClass + '">' + omenText + "</div>" +
       '<div class="' +
       gridClass +
       '">' +
@@ -1296,7 +1673,8 @@
         .map(function (item) {
           var card = cardOf(item.id) || item;
           var rarity = item.r || card.r || "N";
-          var isNew = !!item.isNew;
+          var isNew = item.isNew !== false && !!item.isNew;
+          var showDupe = item.isNew === false;
           return (
             '<div class="revealCard46 r-' +
             rarity +
@@ -1311,7 +1689,7 @@
             rarity +
             "</span>" +
             (card.legend || rarity === "LEGEND" ? '<span class="revealLegend46">传说</span>' : "") +
-            (isNew ? '<span class="revealNew46">NEW</span>' : "") +
+            (isNew ? '<span class="revealNew46">NEW</span>' : showDupe ? '<span class="revealDupe46">+' + RATES.shardDupe + ' 碎镜</span>' : "") +
             "<b>" +
             (card.n || item.n || "") +
             "</b></div></div></div>"
@@ -1336,7 +1714,12 @@
     for (var i = 0; i < cards.length; i++) {
       (function (node, delay) {
         function flip() {
-          if (node.classList.contains("flipped")) return;
+          if (node.classList.contains("flipped")) {
+            var cid = node.getAttribute("data-card");
+            var cobj = cardOf(cid);
+            if (cobj) showRosterPeek(cobj, false, 1, handlers, cobj.kind || "scrap", node, drawer);
+            return;
+          }
           node.classList.add("flipped");
           var sfx = global.SakurayoSfx;
           if (typeof sfx === "function") sfx(/r-(SSR|LEGEND)/.test(node.className) ? "revealSSR" : /r-SR/.test(node.className) ? "revealSR" : "flip");
@@ -1344,7 +1727,7 @@
         node.onclick = flip;
         if (!instant) {
           setTimeout(function () {
-            if (node.isConnected) flip();
+            if (node.isConnected && !node.classList.contains("flipped")) flip();
           }, 240 + delay * 110);
         }
       })(cards[i], i);
@@ -1472,6 +1855,10 @@
     normalizeOps: normalizeOps,
     snapshot: snapshot,
     pull: pull,
+    pullNovice: pullNovice,
+    NOVICE_COST: NOVICE_COST,
+    setFocus: setFocus,
+    schoolMultipliers: schoolMultipliers,
     grantCheat: grantCheat,
     portraitTap: portraitTap,
     setPool: setPool,
