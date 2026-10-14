@@ -256,6 +256,17 @@
     ".wishSpark46{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;max-height:72px;overflow:auto}" +
     ".wishSpark46 button{min-height:28px;padding:0 8px;border-radius:999px;border:1px solid #ffe6a355;background:#0b0818cc;color:#ffe7a3;font:800 10px/1 system-ui}" +
     ".wishSpark46 button.poor{opacity:.42}" +
+    ".rosterSlot46 .rosterArt46{position:relative}" +
+    ".rosterStars48{display:block;margin:4px 0 0;color:#ffd77a;font:700 11px/1 system-ui;letter-spacing:1px;text-shadow:0 0 6px #ffb84a88}" +
+    ".rosterArt46 .rosterStars48{position:absolute;left:4px;right:4px;bottom:4px;margin:0;padding:2px 0;text-align:center;font-size:10px;background:linear-gradient(90deg,transparent,#06101ecc 20%,#06101ecc 80%,transparent)}" +
+    ".rosterSlot46.star3 .rosterArt46{box-shadow:0 0 0 1px #6ff3ff88,0 0 10px #3fe0ff55}" +
+    ".rosterSlot46.star5 .rosterArt46{box-shadow:0 0 0 1px #ffe08acc,0 0 14px #ffc84a77;animation:rosterStar48 2.6s ease-in-out infinite}" +
+    "@keyframes rosterStar48{50%{box-shadow:0 0 0 1px #fff2c0,0 0 20px #ffd36baa}}" +
+    "@media (prefers-reduced-motion: reduce){.rosterSlot46.star5 .rosterArt46{animation:none}}" +
+    ".rosterPactTag48{position:absolute;top:4px;right:4px;padding:2px 6px;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);background:linear-gradient(90deg,#ff5f8f,#ff9ec4);color:#fff;font:800 10px/1.3 system-ui;font-style:normal}" +
+    ".rosterSlot46.pact48 .rosterArt46{outline:2px solid #ff7fb0;outline-offset:-2px}" +
+    ".rosterPact48{margin-left:8px;background:linear-gradient(180deg,#6ff3ff,#2aa7d8);border-color:#9ff6ff88;color:#04121c}.rosterPact48.on{background:linear-gradient(180deg,#ff9ec4,#e2558a);color:#fff}" +
+    ".rosterPactHint48{display:block;margin-top:6px;color:#bfefff;font:600 11px/1.4 system-ui}" +
     ".rosterEquip46{margin-top:8px;min-height:36px;padding:0 12px;border-radius:10px;border:1px solid #ffe6a366;background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;font:800 12px/1 system-ui}" +
     ".chronicleBox46{display:grid;gap:10px}" +
     "#rosterWall46>.chronicleBox46{grid-column:1/-1}" +
@@ -631,6 +642,7 @@
       focusId: focusId,
       fatePoints: focusId ? clampInt(incoming.fatePoints, 0, 1) : 0,
       noviceUsed: clampInt(incoming.noviceUsed, 0, 2),
+      pact: typeof incoming.pact === "string" && PACT_KINDS[(cardOf(incoming.pact) || {}).kind] && (owned[incoming.pact] || 0) > 0 ? incoming.pact : "",
       supplies: ['firstRun','chapter1','chapter2','chapter3','chapter4','kills500'].reduce(function(receipts,id){
         receipts[id] = !!(incoming.supplies && incoming.supplies[id] === true);
         return receipts;
@@ -943,6 +955,42 @@
     return { ok: true, pool: pool, focusId: state.focusId, fatePoints: state.fatePoints, n: target.n, r: target.r };
   }
 
+  /* 本命契约（移植 #33 设计，重写）：从已回收的流派 / 转职 / 融合卡里选一张缔结。
+   * 只影响开局（自动习得该流派一张入门技）和该流派的刷新权重 ×1.25，不加面板数值。 */
+  var PACT_KINDS = { school: 1, job: 1, fusion: 1 };
+  var PACT_MUL = 1.25;
+  function pactOf(save) {
+    var ops = save && save.shop40 && save.shop40.ops;
+    var id = ops && ops.pact;
+    var card = id && cardOf(id);
+    if (!card || !PACT_KINDS[card.kind] || !((ops.owned || {})[id] > 0)) return null;
+    return { id: id, n: card.n, kind: card.kind, face: card.face || "", schools: card.kind === "fusion" ? (card.pair || []).slice() : [card.school] };
+  }
+  function setPact(save, id) {
+    if (!save || typeof save !== "object") return { ok: false, reason: "save" };
+    save.shop40 = normalizeOps(save.shop40 || {});
+    var ops = save.shop40.ops;
+    if (!id) { ops.pact = ""; return { ok: true, pact: "" }; }
+    var card = cardOf(id);
+    if (!card || !PACT_KINDS[card.kind]) return { ok: false, reason: "card" };
+    if (!((ops.owned || {})[id] > 0)) return { ok: false, reason: "owned" };
+    ops.pact = ops.pact === id ? "" : id;
+    return { ok: true, pact: ops.pact };
+  }
+  function pactMul(save, school) {
+    var p = pactOf(save);
+    return p && school && p.schools.indexOf(school) >= 0 ? PACT_MUL : 1;
+  }
+  /* 共鸣星级：重复回收只点亮星与卡框，不加任何数值（守住「收藏不增加战斗属性」）。 */
+  function starOf(count) {
+    return Math.max(0, Math.min(5, Math.floor(Number(count) || 0)));
+  }
+  function starRow(count) {
+    var n = starOf(count), out = "";
+    for (var i = 0; i < 5; i++) out += i < n ? "★" : "☆";
+    return out;
+  }
+
   function schoolMultipliers(save) {
     var out = [];
     Object.keys(SCHOOL_LABEL).forEach(function (sid) {
@@ -950,6 +998,7 @@
       if (hasSchool(save, sid)) mul *= 1.3;
       if (hasJob(save, sid)) mul *= 1.5;
       if (hasFusion(save, sid)) mul *= 1.6;
+      mul *= pactMul(save, sid);
       if (mul > 1.01) {
         out.push({ school: sid, name: SCHOOL_LABEL[sid], mul: Number(mul.toFixed(2)) });
       }
@@ -1480,6 +1529,8 @@
     overlay.setAttribute("aria-labelledby", "rosterPeekTitle46");
     var equipPool = card && (card.kind === "fashion" || card.kind === "weapon") ? card.kind : (tab === "fashion" || tab === "weapon" ? tab : "");
     var canEquip = !locked && !!equipPool;
+    var canPact = !locked && card && PACT_KINDS[card.kind] && handlers && handlers.save;
+    var pactNow = canPact && (pactOf(handlers.save) || {}).id === card.id;
     overlay.innerHTML =
       '<div class="rosterPeekCard46' +
       (locked ? " lock" : "") +
@@ -1491,11 +1542,14 @@
       rarityLabel(card.r, card.legend) +
       (card.legend ? " · 传说" : "") +
       (locked ? "" : " · ×" + count) +
-      "</em><p>" +
+      "</em>" +
+      (locked ? "" : '<span class="rosterStars48 s' + starOf(count) + '" aria-label="共鸣 ' + starOf(count) + ' 星">' + starRow(count) + "</span>") +
+      "<p>" +
       (locked ? "尚未回收。寻访点亮后才会露出立绘。" : loreText(card)) +
       "</p>" +
       (locked ? "" : '<p class="collectionRule46">收藏不增加战斗属性 · ' + card.d + (card.kind === "fashion" && card.school ? " 装备时" + (SCHOOL_LABEL[card.school] || card.school) + "流派倾向 ×1.3。" : "") + "</p>") +
       (canEquip ? '<button type="button" class="rosterEquip46" data-equip="' + card.id + '">装备</button>' : "") +
+      (canPact ? '<button type="button" class="rosterEquip46 rosterPact48' + (pactNow ? " on" : "") + '" data-pact="' + card.id + '">' + (pactNow ? "解除本命契约" : "缔结本命契约") + "</button>" + '<small class="rosterPactHint48">本命：开局习得该流派入门技，刷新倾向 ×1.25</small>' : "") +
       "</div></div>";
     overlay.onclick = function (event) {
       if (event && event.target === overlay) closeRosterPeek();
@@ -1509,6 +1563,15 @@
         if (handlers && typeof handlers.equip === "function") handlers.equip(equipPool, card.id);
         else equip(handlers && handlers.save, equipPool, card.id);
         closeRosterPeek();
+      };
+    }
+    var pb = overlay.querySelector("[data-pact]");
+    if (pb) {
+      pb.onclick = function (ev) {
+        if (ev && ev.stopPropagation) ev.stopPropagation();
+        closeRosterPeek();
+        var r = typeof handlers.pact === "function" ? handlers.pact(card.id) : setPact(handlers.save, card.id);
+        if (typeof global.SakurayoSfx === "function") global.SakurayoSfx(r && r.pact ? "revealSR" : "flip");
       };
     }
     drawer.appendChild(overlay);
@@ -1589,14 +1652,20 @@
     } else if (tab === "job" && !JOB_CARDS.length) {
       wall = '<div class="rosterLater46">后续写入</div>';
     } else {
+      var pactId = (pactOf(save) || {}).id || "";
       wall = visibleList.map(function (card) {
         var count = ownedMap[card.id] || 0;
         var locked = count < 1 && DEFAULT_SHOWN.indexOf(card.id) < 0;
         var mark = card.legend ? "LEGEND" : card.r;
+        var stars = locked ? 0 : starOf(count);
+        var isPact = !locked && pactId === card.id;
         return (
           '<button type="button" class="rosterSlot46 r-' +
           mark +
           (locked ? " lock" : "") +
+          (stars >= 3 ? " star3" : "") +
+          (stars >= 5 ? " star5" : "") +
+          (isPact ? " pact48" : "") +
           '" data-card="' +
           card.id +
           '"><div class="rosterArt46"><img data-art alt="" src="' +
@@ -1605,6 +1674,8 @@
           (card.legend ? "传说" : card.r) +
           "</i>" +
           (locked ? '<em class="rosterVeil46">未回收</em>' : "") +
+          (isPact ? '<em class="rosterPactTag48">本命</em>' : "") +
+          (stars > 1 ? '<span class="rosterStars48 s' + stars + '">' + starRow(count) + "</span>" : "") +
           "</div><b>" +
           (locked ? "待寻访" : card.n) +
           "</b><small>" +
@@ -1948,6 +2019,10 @@
     setRosterTab: setRosterTab,
     spark: spark,
     equip: equip,
+    pactOf: pactOf,
+    setPact: setPact,
+    pactMul: pactMul,
+    starOf: starOf,
     renderGacha: renderGacha,
     renderRoster: renderRoster,
     showReveal: showReveal,
