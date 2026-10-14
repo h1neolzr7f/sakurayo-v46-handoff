@@ -101,3 +101,9 @@
 - **修法**：暂停空转重试；噪声>4.5 清单见 `/workspace/sakurayo-plan/work/still/noise_gt45_pending.txt`（34 张），等账号恢复后再重画并视觉 QA。期间推视频全量增强与不依赖中转站的 UI/回归。
 - **预防**：生图前先用单张探针；连续 503/`no_available_account` 立即停，不要后台空转；在 ERROR_LEDGER / PROGRESS 标明「等中转站」。
 
+### E014 · 看板娘增强后单段超 1.5MB / 与 idle 接缝 PSNR 短暂下降
+- **场景**：`video_enhance.sh` CRF 20 输出 live_video；`mascot_seam_check.py` 门禁单段 ≤1.5MB、角色合计 ≤8MB、动作首尾对 idle PSNR ≥35。
+- **现象**：aya act2 增强后 1.57MB；act1–3 对尚未增强的 idle PSNR ~28（原版 ~36–42）。
+- **修法**：live_video 编码改 CRF≥24，超 1.45MB 递增 CRF 至 ≤30（已写入 `video_enhance.sh`）；act1–3 用原 SR 帧重压装入（0c73226）。idle/其余片段同一管线跑完后复测 PSNR；若仍 <35 再跑 mascot_fit 接缝。
+- **预防**：增强看板娘视频后必须跑 `mascot_seam_check.py`；体积门禁写进 enhance 脚本而不是事后发现。
+
