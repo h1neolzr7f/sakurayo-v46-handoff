@@ -28,8 +28,8 @@
       ],
       "source_bytes": 2194224,
       "source_sha256": "93450cc66a4e039795514331c33b1635a73ea4522071c6a2e7be94bedeaa1b16",
-      "production_bytes": 203412,
-      "production_sha256": "3caefecf4fd168328d86667a5b0d951628ad7dc3a90fc96dbd3f834266998e86",
+      "production_bytes": 188366,
+      "production_sha256": "15f61ad28d1a61e4838f8d50eba45e620684e73bcd9201ce2af31ec0be91d6e5",
       "production_size": [
         1536,
         1024
@@ -112,8 +112,8 @@
       ],
       "source_bytes": 2198305,
       "source_sha256": "727ccbb3859b81bdfd59b56d79bd3050bb53be050bc4faecdcedc62f7ab94937",
-      "production_bytes": 198194,
-      "production_sha256": "9fab29ea80787f7961442bafd33ae958581579800b7c54affd843ae406bf7d0c",
+      "production_bytes": 183470,
+      "production_sha256": "9b62a14d5a58b2547ed0f1d3b82673f36b8accede7ad42a8a1391e1edeff1fb2",
       "production_size": [
         1536,
         1024
@@ -154,8 +154,8 @@
       ],
       "source_bytes": 2704499,
       "source_sha256": "2a4e8f8eccee9e49bee69e8282c7c1609ad356e6036e93e1f5338a0e545400e0",
-      "production_bytes": 361394,
-      "production_sha256": "ba01da28d41ee6720bbe256a22fc2491b8bc0a3db4951b26612d237f5081f592",
+      "production_bytes": 346158,
+      "production_sha256": "2286c265b4701f436f667dc4357ed0f32e0a0415777741cb58225bb5bc6dfb96",
       "production_size": [
         1536,
         1024
@@ -196,8 +196,8 @@
       ],
       "source_bytes": 2221950,
       "source_sha256": "cd451d3ca81456f8c176c9fe89c5acb407b06b1ed16d72342a4983691291bcf7",
-      "production_bytes": 232318,
-      "production_sha256": "aa4c56d7a1151a61abeeb827909f5835eee451af22b0f25a70efbd06bd4d0067",
+      "production_bytes": 223104,
+      "production_sha256": "b7f908a507cc9df6fc226fe0df6a1fc13d99dd073d253d6600a3d1d75aee3317",
       "production_size": [
         1536,
         1024
@@ -278,8 +278,8 @@
       ],
       "source_bytes": 2270311,
       "source_sha256": "93a4c271448e64c8cbbc3b4bceb41b43c934618b0632aa5bf9d668829f8c2813",
-      "production_bytes": 227488,
-      "production_sha256": "0e795af453f9de2b5db6aa68fd4743b263f26071ba5a3b2ca2480d300e3a24a2",
+      "production_bytes": 202708,
+      "production_sha256": "8907984d644949257566520188cd556063f675e43d035f6276ed736eb03469c2",
       "production_size": [
         1536,
         1024
@@ -313,8 +313,8 @@
       ],
       "source_bytes": 2454791,
       "source_sha256": "8288e4e8569c89c97e3380afeea6c6dc44854e202457dfc1f4333386168bdfda",
-      "production_bytes": 297416,
-      "production_sha256": "b17bd4fb9ef942abb028ea87378824d16193697d934a9993ce75bbd5766adfbe",
+      "production_bytes": 286124,
+      "production_sha256": "46a5ec05c98d3819a77706f127b087ef62ccf4b8ba9fc5f50f9ffc8624253f12",
       "production_size": [
         1536,
         1024
