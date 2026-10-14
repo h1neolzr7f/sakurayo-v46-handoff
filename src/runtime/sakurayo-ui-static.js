@@ -28,7 +28,20 @@
 .drawer .dhead>*,#wd46 .box>header>*,#night46 .box>header>*{position:relative;z-index:1}
 .drawer .dhead h2,#wd46 .box>header>b,#night46 .box>header>b{padding:2px 26px 2px 12px;background:linear-gradient(90deg,rgb(var(--c-accent-rgb) / .0),rgb(var(--c-accent-rgb) / 0));border-left:4px solid var(--sy-c-pink)}
 #stageDrawer .dhead{background-image:${U("ui/polish2/ban_stage.webp")}!important}
-#gachaDrawer .dhead{background-image:${U("ui/polish2/ban_gacha.webp")}!important}
+/* 0.9.2 寻访：顶栏不再叠一条模糊横幅（和全幅卡池图打架），只留透明栏+编号；页签整体下移不被裁 */
+html body:not(#sy0):not(#sy1) #gachaDrawer .dhead{background-image:none!important;min-height:0!important;background:transparent!important}
+html body:not(#sy0):not(#sy1) #gachaDrawer .dhead::after{display:none!important}
+html body:not(#sy0):not(#sy1) #gachaDrawer #gachaTabs46{top:72px!important}
+html body:not(#sy0):not(#sy1) #gachaDrawer #gachaTabs46 button{background:rgb(var(--c-n0-rgb) / .78)!important;color:var(--sy-c-ink)!important;border:1px solid var(--c-line)!important;border-left:3px solid transparent!important}
+html body:not(#sy0):not(#sy1) #gachaDrawer #gachaTabs46 button b{color:var(--sy-c-ink)!important}
+html body:not(#sy0):not(#sy1) #gachaDrawer #gachaTabs46 button.on{background:linear-gradient(90deg,rgb(var(--c-accent-rgb) / .34),rgb(var(--c-n0-rgb) / .86))!important;border-left-color:var(--sy-c-cyan)!important}
+html body:not(#sy0):not(#sy1) #gachaDrawer #gachaTabs46 button.on b{color:var(--sy-c-cyan)!important}
+html body:not(#sy0):not(#sy1) #gachaDrawer .wishV2 .gachaActions46 #gachaPull1{background:linear-gradient(180deg,var(--sy-c-panel),var(--sy-c-bg))!important;color:var(--sy-c-ink)!important;border:1px solid var(--sy-c-cyan)!important;box-shadow:inset 0 0 18px rgb(var(--c-accent-rgb) / .25)!important}
+html body:not(#sy0):not(#sy1) #gachaDrawer .wishV2 .gachaActions46 #gachaPull10{background:linear-gradient(120deg,var(--sy-c-gold),var(--sy-c-pink))!important;color:var(--sy-c-bg)!important;border:1px solid var(--sy-c-gold)!important}
+html body:not(#sy0):not(#sy1) #gachaDrawer .wishV2 .gachaActions46 button small{background:rgb(var(--c-n0-rgb) / .55)!important;color:var(--sy-c-ink)!important;border-radius:999px;padding:3px 10px!important;opacity:1!important}
+html body:not(#sy0):not(#sy1) #gachaDrawer .wishV2 .gachaActions46 button,html body:not(#sy0):not(#sy1) #gachaDrawer .wishV2 .gachaActions46 button span{text-shadow:none!important}
+html body:not(#sy0):not(#sy1) #gachaInfo46,html body:not(#sy0):not(#sy1) #gachaLog46,html body:not(#sy0):not(#sy1) #gachaSparkShop46,html body:not(#sy0):not(#sy1) #gachaNovice46,html body:not(#sy0):not(#sy1) #gachaDrawer .wishSpark46 button{background:rgb(var(--c-n0-rgb) / .82)!important;color:var(--sy-c-ink)!important;border:1px solid var(--c-line-strong)!important}
+html body:not(#sy0):not(#sy1) #gachaDrawer .dhead::before{display:none!important}
 #shopDrawer .dhead{background-image:${U("ui/polish2/ban_shop.webp")}!important}
 #rosterDrawer .dhead,#archiveDrawer .dhead,#storyDrawer .dhead,#achDrawer .dhead,#talentDrawer .dhead,#ascDrawer .dhead,#trialsDrawer .dhead{background-image:${U("ui/polish2/ban_stage.webp")}!important}
 #wd46 .box>header{background-image:${U("ui/polish2/ban_wardrobe.webp")}!important}
