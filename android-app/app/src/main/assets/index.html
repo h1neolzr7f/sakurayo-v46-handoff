@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" name="viewport"/>
 <meta content="#090714" name="theme-color"/>
-<title>樱夜·尸潮 0.9.1-beta</title>
+<title>樱夜·尸潮 0.9.2-beta</title>
 <style>
 :root{--p:#ff58a7;--p2:#ffb4d5;--c:#56ddff;--g:#ffd36b;--bg:#080713;--panel:rgba(18,14,39,.96);--line:rgba(170,220,255,.24);--mut:#cfc4df;--red:#ff4e72}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:#fff;font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif;touch-action:none}button{border:0;color:inherit;font:inherit}button:active{transform:scale(.985)}canvas{position:fixed;inset:0;width:100%;height:100%}.hidden{display:none!important}.screen{position:fixed;inset:0;z-index:10}
@@ -131,8 +131,8 @@
 <div class="warn hidden" id="warning"></div><div id="toast"></div>
 <script>
 window.SAKURAYO_GAME_VERSION = "4.6.0"; // 模组 API 兼容用的引擎版本，不对玩家显示
-window.SAKURAYO_DISPLAY_VERSION = "0.9.1-beta"; // 对玩家显示的版本号，与 android versionName 同步
-window.SAKURAYO_VERSION_CODE = 71;
+window.SAKURAYO_DISPLAY_VERSION = "0.9.2-beta"; // 对玩家显示的版本号，与 android versionName 同步
+window.SAKURAYO_VERSION_CODE = 73;
 (() => {
   "use strict";
   const enabled = /(?:\?|&)(?:debug|test)=1(?:&|$)/.test(location.search || "");
@@ -1941,6 +1941,12 @@ window.SAKURAYO_VERSION_CODE = 71;
       return;
     }
     var stem = String(bgUrl).replace(/\.webp(\?.*)?$/i, "");
+    if (typeof global.SakurayoStillPv === "function" && !global.SakurayoStillPv(stem)) { /* 没登记动态版就不探测，避免 404（E012） */
+      vid.classList.remove("on");
+      vid.removeAttribute("src");
+      vid.removeAttribute("data-stem");
+      return;
+    }
     var probe = document.createElement("video");
     var preferWebm = probe.canPlayType && !probe.canPlayType('video/mp4; codecs="avc1.42E01E"') && probe.canPlayType('video/webm; codecs="vp9"');
     var primary = stem + (preferWebm ? ".webm" : ".mp4");
@@ -2234,6 +2240,7 @@ window.SAKURAYO_VERSION_CODE = 71;
    * @param {boolean} [force] 忽略"同局只播一次"的限制
    * @returns {boolean} 是否真的起播
    */
+  var STAGED_PHASES = { 2: true }; /* pv/boss/stage{1-4}_phase2.* 存在；phase3/4 只有通用 boss_phase*.* */
   function play(phase, force, stageId) {
     var shared = CLIPS[phase];
     if (!shared) return false;
@@ -2243,7 +2250,7 @@ window.SAKURAYO_VERSION_CODE = 71;
     played[phase] = true;
     ensure();
 
-    var staged = (phase === 2 || phase === 3 || phase === 4) && stageId ? "stage" + stageId + "_phase" + phase : "";
+    var staged = STAGED_PHASES[phase] && stageId ? "stage" + stageId + "_phase" + phase : ""; /* 只有登记过的阶段才有按章节的专属 PV，其余直接用通用片，免得先 404 再回落 */
     var fellBack = false;
     function setSrc(base) {
       vid.onerror = function () {
@@ -2722,7 +2729,7 @@ window.SAKURAYO_VERSION_CODE = 71;
     for (var i = 0; i < fs.length; i++) tone(ctx, out, t + i * step, fs[i], dur, vol, type || "triangle", 0, 0.01);
   }
   /* min gap (s) per key so dense combat does not turn into static */
-  var GAP = { hit: 0.035, crit: 0.06, kill: 0.04, shot: 0.03, rifle: 0.03, pistol: 0.03, bossShot: 0.06, tap: 0.03, flip: 0.05 };
+  var GAP = { click: 0.03, loot: 0.05, slash: 0.05, bossShot: 0.06, hit: 0.035, crit: 0.06, kill: 0.04, shot: 0.03, rifle: 0.03, pistol: 0.03, bossShot: 0.06, tap: 0.03, flip: 0.05 };
   var R = {
     tap: function (c, o, t) { tone(c, o, t, 1480, 0.05, 0.05, "sine", 1100); },
     open: function (c, o, t) { hiss(c, o, t, 0.16, 0.05, "bandpass", 600, 2600, 1.4); tone(c, o, t + 0.02, 660, 0.12, 0.035, "sine", 990); },
@@ -2747,6 +2754,16 @@ window.SAKURAYO_VERSION_CODE = 71;
     flip: function (c, o, t) { hiss(c, o, t, 0.07, 0.06, "highpass", 2500, 4000, 0.8); },
     revealSR: function (c, o, t) { chord(c, o, t, [784, 988, 1175], 0.05, 0.45, 0.06, "triangle"); },
     revealSSR: function (c, o, t) { tone(c, o, t, 98, 0.9, 0.12, "sine", 65); chord(c, o, t + 0.05, [523, 659, 784, 1047, 1319, 1568], 0.07, 1.1, 0.06, "triangle"); hiss(c, o, t, 1.0, 0.05, "highpass", 4000, 9000, 0.5); },
+    /* 0.9.2：补齐此前回落到单振荡器的键 + 新演出 */
+    click: function (c, o, t) { tone(c, o, t, 1760, 0.035, 0.045, "sine", 1320); hiss(c, o, t, 0.03, 0.025, "highpass", 4000, 6000, 0.7); },
+    loot: function (c, o, t) { chord(c, o, t, [1175, 1568, 2093], 0.045, 0.16, 0.045, "triangle"); hiss(c, o, t, 0.12, 0.02, "highpass", 5000, 8000, 0.6); },
+    bossShot: function (c, o, t) { tone(c, o, t, 320, 0.12, 0.05, "sawtooth", 120); hiss(c, o, t, 0.08, 0.04, "bandpass", 1200, 500, 1.2); },
+    slash: function (c, o, t) { hiss(c, o, t, 0.12, 0.09, "bandpass", 5200, 1400, 2.2); tone(c, o, t, 1100, 0.08, 0.035, "triangle", 2400); },
+    pistol: function (c, o, t) { hiss(c, o, t, 0.05, 0.09, "highpass", 2200, 900, 0.9); tone(c, o, t, 420, 0.05, 0.05, "square", 160); },
+    boom: function (c, o, t) { tone(c, o, t, 80, 0.5, 0.15, "sine", 36); hiss(c, o, t, 0.45, 0.12, "lowpass", 1600, 90, 0.7); },
+    break: function (c, o, t) { tone(c, o, t, 60, 1.1, 0.16, "sawtooth", 32); hiss(c, o, t, 0.25, 0.1, "highpass", 1500, 9000, 0.9); hiss(c, o, t + 0.2, 0.8, 0.09, "lowpass", 2400, 120, 0.7); chord(c, o, t + 0.12, [392, 587, 784, 1175, 1568], 0.05, 0.9, 0.05, "triangle"); },
+    pact: function (c, o, t) { tone(c, o, t, 196, 0.6, 0.07, "sine", 392, 0.04); chord(c, o, t + 0.08, [659, 988, 1319], 0.08, 0.6, 0.05, "sine"); },
+    ascend: function (c, o, t) { hiss(c, o, t, 0.9, 0.06, "bandpass", 300, 6000, 2.2); chord(c, o, t + 0.1, [523, 784, 1047, 1568, 2093], 0.09, 1.0, 0.055, "triangle"); },
     trial: function (c, o, t) { tone(c, o, t, 196, 0.5, 0.09, "sawtooth", 392, 0.03); chord(c, o, t + 0.12, [587, 880], 0.08, 0.4, 0.05, "triangle"); }
   };
   function play(ctx, k, gain) {
@@ -5963,6 +5980,12 @@ window.SAKURAYO_VERSION_CODE = 71;
     ".rosterPeekCard46 b{display:block;font-size:16px;letter-spacing:.08em}" +
     ".rosterPeekCard46 em{display:block;margin:4px 0 8px;color:#ffe7a3;font-size:11px;font-style:normal;letter-spacing:.16em}" +
     ".rosterPeekCard46 p{margin:0;color:#e7d7ef;font-size:12px;line-height:1.55}" +
+    /* 0.9.2 横屏左右分栏：左立绘、右信息，信息区独立滚动，整卡不再竖向滚动 */
+    "@media (orientation:landscape){.rosterPeekCard46{display:grid;grid-template-columns:minmax(0,42%) minmax(0,1fr);width:min(92vw,760px);height:min(100%,420px);overflow:hidden;border-radius:6px;clip-path:polygon(0 0,calc(100% - 18px) 0,100% 18px,100% 100%,18px 100%,0 calc(100% - 18px))}" +
+    ".rosterPeekCard46 img{grid-column:1;grid-row:1;height:100%;object-fit:cover;object-position:50% 18%;-webkit-mask-image:linear-gradient(90deg,#000 82%,transparent);mask-image:linear-gradient(90deg,#000 82%,transparent)}" +
+    ".rosterPeekCard46>div{grid-column:2;grid-row:1;overflow:auto;overscroll-behavior:contain;padding:18px 20px 16px 10px}" +
+    ".rosterPeekCard46 b{font-size:20px}.rosterPeekCard46 p{font-size:12.5px}" +
+    "#rosterPeekClose46{position:absolute;top:8px;right:10px;margin:0}}" +
     ".heroTap46{position:absolute;z-index:2;left:8%;width:36%;top:18%;bottom:28%;pointer-events:auto;background:transparent;border:0}" +
     "@keyframes wishDrift46{0%,100%{transform:translate3d(0,0,0);opacity:.88}50%{transform:translate3d(1.4%,-1%,0);opacity:1}}" +
     "@keyframes petalFall46{0%{transform:translate3d(0,-10%,0) rotate(0)}100%{transform:translate3d(18px,120vh,0) rotate(220deg)}}" +
@@ -7200,7 +7223,7 @@ window.SAKURAYO_VERSION_CODE = 71;
         if (ev && ev.stopPropagation) ev.stopPropagation();
         closeRosterPeek();
         var r = typeof handlers.pact === "function" ? handlers.pact(card.id) : setPact(handlers.save, card.id);
-        if (typeof global.SakurayoSfx === "function") global.SakurayoSfx(r && r.pact ? "revealSR" : "flip");
+        if (typeof global.SakurayoSfx === "function") global.SakurayoSfx(r && r.pact ? "pact" : "close");
       };
     }
     drawer.appendChild(overlay);
@@ -9188,7 +9211,7 @@ window.SAKURAYO_VERSION_CODE = 71;
   d.getElementById('commandActivity48').style.backgroundImage='linear-gradient(90deg,#14283dbb,#14283d30),url("'+activityArt+'")';
   d.getElementById('commandHeading47').querySelector('b').textContent='回收行动局';
   d.getElementById('commandProgress47').textContent='章节 '+model.completed+'/4 · 作战 '+(Number(model.save.runs)||0);
-  d.getElementById('commandSignal47').textContent='离线作战就绪 / OFFLINE MODE · v'+(global.SAKURAYO_DISPLAY_VERSION||'0.9.1-beta');
+  d.getElementById('commandSignal47').textContent='离线作战就绪 / OFFLINE MODE · v'+(global.SAKURAYO_DISPLAY_VERSION||'0.9.2-beta');
  }
  global.SakurayoTerminal={css:CSS,icon:icon,decorate:decorate};
 })(window);
@@ -9378,7 +9401,7 @@ window.SAKURAYO_VERSION_CODE = 71;
       var status=global.SakurayoServices.loginStatus(model.save),label=status.reason==='complete'?'七日补给已全部领取':status.reason==='clock'?'请检查本机日期':status.reason==='claimed'?'今日已签到':'签到领取 · 樱花币 +'+status.reward;
       body.innerHTML='<article class="cmdNotice48"><small>WELCOME BACK / '+esc(status.today)+'</small><h3>每一次归来，都有新的补给。</h3><p>累计七个登录日，无需连续签到。本机日期每日最多领取一次；七日完成后不重复循环。已完成 '+status.count+' / 7 天。</p></article><div class="cmdLogin48">'+status.rewards.map(function(reward,i){return '<article class="cmdLoginDay48 '+(i<status.count?'done':i===status.count?'on':'')+'"><small>DAY '+(i+1)+'</small>'+global.SakurayoTerminal.icon('supplies')+'<b>'+reward+'</b><span>'+(i<status.count?'已领取':i===status.count?'本次补给':'待签到')+'</span></article>';}).join('')+'</div><div class="cmdActions47"><button class="primary47" id="commandLoginClaim48" '+(status.ready?'':'disabled')+'>'+label+'</button></div>';
     }else if(kind==='notice'){
-      body.innerHTML='<article class="cmdNotice48"><small>UPDATE / CLOSED BETA</small><h3>'+esc(global.SAKURAYO_DISPLAY_VERSION||'0.9.1-beta')+' · 内测版本</h3><p>横屏锁定；寻访与各处立绘按头部安全区定位；看板娘改为往返播放并预解码，消除闪烁；新手教学与说明弹窗改为左右分栏；割草镜头按屏高固定视野，默认 60fps；场景道具统一为中式科技风。内测福利已通过邮件发放，可在邮箱一键领取。</p><p>本版本使用新的固定签名，首次安装前请卸载旧的调试版。</p></article><article class="cmdNotice48"><small>UPDATE / DEVELOPMENT BUILD</small><h3>4.6.0 · 行动终端更新</h3><p>新大厅加入邮箱、七日登录签到、任务补给与活动入口。邮件与任务共享领取状态，进度保存在本机。四章插画和场景动画已更新。</p><p>当前为开发预发布版本；新 Android 安装包尚未发布。</p></article><article class="cmdNotice48"><small>FIELD MANUAL</small><h3>关于这场回收行动</h3><p>三名作战角色，四章战场。回收演习保留职业、转职、融合与三相飞升的肉鸽构筑；证词模式侧重剧情；主神空间提供高难轮回挑战。</p><p>寻访、装备、剧情档案与历史战绩均可从大厅进入。导出存档请前往设置。</p></article><div class="cmdActions47"><button id="commandNoticeActivity48">查看活动与行动</button></div>';
+      body.innerHTML='<article class="cmdNotice48"><small>UPDATE / CLOSED BETA</small><h3>'+esc(global.SAKURAYO_DISPLAY_VERSION||'0.9.2-beta')+' · 内测版本</h3><p>横屏锁定；寻访与各处立绘按头部安全区定位；看板娘改为往返播放并预解码，消除闪烁；新手教学与说明弹窗改为左右分栏；割草镜头按屏高固定视野，默认 60fps；场景道具统一为中式科技风。内测福利已通过邮件发放，可在邮箱一键领取。</p><p>本版本使用新的固定签名，首次安装前请卸载旧的调试版。</p></article><article class="cmdNotice48"><small>UPDATE / DEVELOPMENT BUILD</small><h3>4.6.0 · 行动终端更新</h3><p>新大厅加入邮箱、七日登录签到、任务补给与活动入口。邮件与任务共享领取状态，进度保存在本机。四章插画和场景动画已更新。</p><p>当前为开发预发布版本；新 Android 安装包尚未发布。</p></article><article class="cmdNotice48"><small>FIELD MANUAL</small><h3>关于这场回收行动</h3><p>三名作战角色，四章战场。回收演习保留职业、转职、融合与三相飞升的肉鸽构筑；证词模式侧重剧情；主神空间提供高难轮回挑战。</p><p>寻访、装备、剧情档案与历史战绩均可从大厅进入。导出存档请前往设置。</p></article><div class="cmdActions47"><button id="commandNoticeActivity48">查看活动与行动</button></div>';
     }else if(kind==='activities'){
       body.innerHTML='<div class="cmdActivities48">'+[['story','回收行动 · 四章演习','三名角色出击，收集随机升级并组合职业、转职与融合。'],['testimony','证词回收 · 剧情档案','沿着四章剧情完成证词回收。此模式不发放随机升级卡。'],['mainGod','主神空间 · 高难轮回','进入独立的主神试炼与兑换界面，解锁条件沿用现有游戏规则。']].map(function(a){return '<article class="cmdNotice48 cmdActivity48" style="background-image:linear-gradient(90deg,#102332e6,#10233299),url(&quot;'+esc(options.art('ui/tactical/activity-'+(a[0]==='mainGod'?'maingod':a[0])+'-v3.webp'))+'&quot;)"><small>LOCAL OPERATION / '+a[0].toUpperCase()+'</small><h3>'+a[1]+'</h3><p>'+a[2]+'</p><div class="cmdActions47"><button data-operation="'+a[0]+'">进入行动 →</button></div></article>';}).join('')+'</div>';
     }else{
@@ -9913,6 +9936,9 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     ];
   function artUrl(path) { return `${ART_ROOT}/${path}`; }
   window.SakurayoArtBase = ART_ROOT + "/";
+  // 有同名 mp4/webm 动态版的静图清单（新增动态背景时登记在这里）
+  const STILL_PV46 = new Set([]);
+  window.SakurayoStillPv = stem => STILL_PV46.has(String(stem).replace(/^.*\/game\/art\//, "").replace(/^art\//, ""));
   function attachStillVideo46(el, artPath, shade) {
     if (!el || !artPath) return;
     if (!document.getElementById("stillPv46")) {
@@ -9922,6 +9948,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       document.head.appendChild(st);
     }
     const stem = String(artPath).replace(/\.webp$/i, "");
+    // 0.9.2：只给真的有动态版的静图挂视频；以前对每张图盲探 mp4+webm，发布版控制台报 14 个 404（ERROR_LEDGER E012）
+    if (!STILL_PV46.has(stem)) return;
     let vid = el.querySelector(":scope > video.stillPv46");
     const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) { vid?.remove(); el.querySelector(":scope > .stillShade46")?.remove(); return; }
@@ -17431,7 +17459,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   }
   /* 飞升 PV（pv/ascend/<角色>.mp4，竖版 720×1068）：不暂停战斗，右侧斜切窗完整播放（contain）+ 左侧名牌，0.6 倍慢动作与无敌兜底。 */
   function ascendCut48(u){if(!u||state!=="play"||document.documentElement.classList.contains("reduceMotion46")||matchMedia?.("(prefers-reduced-motion: reduce)").matches)return;const id=save.character||"sayo";$("#ascCut48")?.remove();const el=document.createElement("div");el.id="ascCut48";const probe=document.createElement("video"),ext=!probe.canPlayType?.('video/mp4; codecs="avc1.42E01E"')&&probe.canPlayType?.('video/webm; codecs="vp9"')?".webm":".mp4";
-    el.innerHTML=`<div class="ac48v"><video muted playsinline></video></div><div class="ac48t"><small>ASCENSION · 飞升</small><b>${htmlEscape(u.n||"")}</b></div>`;const v=el.querySelector("video");v.muted=true;v.playsInline=true;let done=false;const end=()=>{if(done)return;done=true;el.classList.add("out");setTimeout(()=>el.remove(),260);};v.onended=end;v.onerror=end;el.onclick=end;v.src=artUrl("pv/ascend/"+id+ext);document.body.appendChild(el);v.play?.()?.catch?.(end);setTimeout(end,5600);slowmo46=Math.max(slowmo46,.6);P.inv=Math.max(P.inv,1.2);}
+    el.innerHTML=`<div class="ac48v"><video muted playsinline></video></div><div class="ac48t"><small>ASCENSION · 飞升</small><b>${htmlEscape(u.n||"")}</b></div>`;const v=el.querySelector("video");v.muted=true;v.playsInline=true;let done=false;const end=()=>{if(done)return;done=true;el.classList.add("out");setTimeout(()=>el.remove(),260);};v.onended=end;v.onerror=end;el.onclick=end;v.src=artUrl("pv/ascend/"+id+ext);document.body.appendChild(el);v.play?.()?.catch?.(end);setTimeout(end,5600);sound("ascend");slowmo46=Math.max(slowmo46,.6);P.inv=Math.max(P.inv,1.2);}
   if(!document.getElementById("ascCutCss48")){const st=document.createElement("style");st.id="ascCutCss48";st.textContent=`#ascCut48{position:fixed;inset:0;z-index:40;pointer-events:none;display:grid;grid-template-columns:1fr minmax(0,34vw);align-items:stretch}#ascCut48 .ac48v{grid-column:2;position:relative;margin:4vh 2vw 4vh 0;clip-path:polygon(28px 0,100% 0,100% 100%,0 100%);background:linear-gradient(180deg,#071425ee,#0a0717ee);box-shadow:inset 0 0 0 1px #6ff3ff66;pointer-events:auto;animation:ac48in .32s cubic-bezier(.2,.9,.2,1)}#ascCut48 video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}#ascCut48 .ac48t{grid-column:1;grid-row:1;align-self:end;justify-self:end;margin:0 2vw 8vh 0;padding:10px 18px;clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);background:linear-gradient(90deg,#0b1830e6,#1a0f2ee6);color:#eaf6ff;animation:ac48in .32s ease-out}#ascCut48 .ac48t small{display:block;color:#ffd36b;font:800 11px/1.2 system-ui;letter-spacing:.2em}#ascCut48 .ac48t b{font:900 22px/1.3 system-ui;text-shadow:0 0 14px #6ff3ff77}#ascCut48.out{opacity:0;transition:opacity .25s}@keyframes ac48in{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}`;document.head.appendChild(st);}
   const _chooseUpgrade48=chooseUpgrade;chooseUpgrade=function(u){const r=_chooseUpgrade48.apply(this,arguments);if(u&&u.asc)ascendCut48(u);return r;};
   function paintFormHud46(){
@@ -17451,7 +17479,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     aoe(P.x,P.y,1100,dmg,BREAK_COLOR48[id],true,{source:"skill",school:id==="sayo"?"shrine":id==="aya"?"ninja":"cult",break48:1});
     if(id==="aya")for(let i=0;i<10;i++){const a=i/10*Math.PI*2;pushBullet({x:P.x,y:P.y,vx:Math.cos(a)*520,vy:Math.sin(a)*520,r:11,life:1.1,dmg:P.dmg*1.4,pierce:9,home:.05,source:"blade",school:"ninja",hit:new Set()});}
     if(cut>0)P.sh=Math.min(P.maxSh,P.sh+Math.min(30,cut*.5));
-    shake=Math.max(shake,12);P.inv=Math.max(P.inv,.8);if(typeof haptic37==="function")haptic37([20,30,40]);sound("phase");toast("破界奥义 · "+BREAK_NAMES48[id]);P.breakBursts48=(P.breakBursts48||0)+1;}
+    shake=Math.max(shake,12);P.inv=Math.max(P.inv,.8);if(typeof haptic37==="function")haptic37([20,30,40]);sound("break");toast("破界奥义 · "+BREAK_NAMES48[id]);P.breakBursts48=(P.breakBursts48||0)+1;}
   const _formAwaken48=formAwaken46;formAwaken46=function(){const ok=_formAwaken48();if(ok)breakBurst48();return ok;};
   function formOffer46(src){
     const st=formSt46();if(!st)return false;const F=window.SakurayoForms,offer=F.offer(st).filter(f=>F.canSwitch(st,f.id,src));if(!offer.length)return false;
