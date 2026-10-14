@@ -250,7 +250,7 @@ html body:not(#sy0):not(#sy1) #settingsDrawer37{background:var(--sy-scan),linear
 #settingsDrawer37 .settingRow37{margin:0!important;padding:8px 12px!important}
 #settingsDrawer37 .settingRow37 span{margin-bottom:4px!important}
 #settingsDrawer37 .settingToggle37{margin:0!important;min-height:44px;padding:8px 12px!important}
-#settingsDrawer37 .routeNote{grid-column:1/-1;margin:2px 0 0;font-size:12px!important;line-height:1.5;color:var(--c-text-2,#c9c3dd)}
+#settingsDrawer37 .routeNote{grid-column:1/-1;margin:2px 0 0;font-size:12px!important;line-height:1.5;color:var(--c-text-2)}
 #settingsDrawer37 .settingRow37:nth-child(-n+3){grid-column:auto}
 @media (orientation:portrait){#settingsDrawer37 .dbody{grid-template-columns:1fr}}
 /* E020：1024×461 商店首行卡片立绘 140px，购买按钮落在屏幕外；编号徽标盖住樱花币余额 */
