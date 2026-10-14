@@ -2755,7 +2755,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     bossBorn = false;
     runWin = false;
     eventIndex = 0;
-    levelRerolls = 2;
+    levelRerolls = 4;
     acc = 0;
     resetP();
     if (window.SakurayoCamera) window.SakurayoCamera.snap(P.x, P.y);
@@ -2805,6 +2805,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       ? window.SakurayoEconomy.rewardParts(P.kills, P.level, P.eliteKills, win, stage().reward, save.done.includes(selected))
       : null;
     let reward = pay44 ? pay44.total : Math.floor(P.kills*.32 + P.level*3 + P.eliteKills*4) + (win ? stage().reward : 0);
+    if (runMode36 === "fever") reward = Math.floor(reward * 1.8);
     save.coins += reward;
     if (win) { save.bosses++; if(!save.done.includes(selected))save.done.push(selected); save.unlock=Math.max(save.unlock,Math.min(ST.length,selected+1)); if(!save.story.includes(stage().story))save.story.push(stage().story); }
     if(P.form&&!save.forms.includes(P.form))save.forms.push(P.form);
@@ -3846,7 +3847,17 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     P.killsByType[e.type]=(P.killsByType[e.type]||0)+1;
     P.combo++;
     P.comboClock = 2.5;
-    if (e.elite && e.type !== "boss") P.eliteKills++;
+    if (e.elite && e.type !== "boss") {
+      P.eliteKills++;
+      for (const g of gems) g.magnet = 1;
+      P.skill = Math.max(0, P.skill - 2.2);
+      P.dash = Math.max(0, P.dash - 1.5);
+      if (window.SakurayoOps && window.SakurayoOps.enabled(runMode36)) window.SakurayoOps.grant(3);
+      if (chance(0.45)) levelRerolls++;
+      fxStamp("shatter", e.x, e.y, { size: 78, life: 0.35, color: "#ffe08a" });
+    } else if (window.SakurayoOps && window.SakurayoOps.enabled(runMode36) && P.kills % 10 === 0) {
+      window.SakurayoOps.grant(1);
+    }
     if (e.guardFor && boss) {
       boss.guard = Math.max(0, (boss.guard || 0) - 1);
       toast(
@@ -4055,6 +4066,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
             school: "magical",
           });
       }, 160);
+    P.fusionClock = Math.max(0, (P.fusionClock || 0) - 1.2);
+    P.fusionClock41 = Math.max(0, (P.fusionClock41 || 0) - 1.2);
+    P.fireballClock = Math.max(0, (P.fireballClock || 0) - 0.9);
+    P.kunaiClock = Math.max(0, (P.kunaiClock || 0) - 0.9);
     sound("skill");
   }
   function dash() {
@@ -4074,6 +4089,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     P.dash = P.dashCd;
     if(P.shadowstep||P.shadowBladeFusion){aoe(P.x,P.y,70+(P.shadowstep||0)*8,P.dmg*(.55+(P.shadowstep||0)*.16),"#a890ff",false,{source:"kunai",school:"ninja"});for(const e of grid.near(P.x,P.y,115))if(e.mark>0)damageEnemy(e,P.dmg*(P.shadowBladeFusion?1.4:.65),{source:"blade",school:"cult"});}
     if(P.shadowMage)aoe(P.x,P.y,82,P.dmg*.62*P.spellPow,"#8c80ff",false,{source:"spell",school:"mage"});
+    P.fusionClock = Math.max(0, (P.fusionClock || 0) - 0.65);
+    P.fusionClock41 = Math.max(0, (P.fusionClock41 || 0) - 0.65);
     fxStamp("dash", P.x, P.y, { size: 54, life: 0.28, rot: Math.atan2(dy, dx) });
     particles(
       P.x,
@@ -4883,12 +4900,15 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
           Math.max(0.24, 0.78 - runTime * 0.00235) /
           (stage().scale * intensity);
       if (window.SakurayoLifecycle) interval = window.SakurayoLifecycle.spawnInterval(interval, lifecycleWorld44());
+      if (runMode36 === "fever") interval *= 0.62;
       if (spawnClock <= 0) {
         spawnClock = interval;
         spawnEnemy();
+        if (runMode36 === "fever" && chance(0.55)) spawnEnemy();
         let eliteChance =
           0.055 + phaseIndex() * 0.045 + Math.max(0, planFactor() - 1) * 0.2;
-        if (runTime > stage().dur * 0.42 && chance(eliteChance))
+        if (runMode36 === "fever") eliteChance *= 1.8;
+        if ((runTime > stage().dur * 0.42 || runMode36 === "fever") && chance(eliteChance))
           spawnEnemy(null, true);
       }
       if (window.SakurayoLifecycle) {
@@ -5120,8 +5140,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     for (const g of gems) {
       g.bob += dt * 4;
       let d = Math.hypot(P.x - g.x, P.y - g.y);
-      if (d < P.mag) {
-        let sp = 180 + (P.mag - d) * 2.5;
+      if (d < P.mag || g.magnet) {
+        let sp = g.magnet ? 540 : 180 + (P.mag - d) * 2.5;
         g.x += ((P.x - g.x) / (d || 1)) * sp * dt;
         g.y += ((P.y - g.y) / (d || 1)) * sp * dt;
       }
@@ -7069,7 +7089,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         throw new Error(`Unknown outfit kind: ${kind}`);
       },
       selectStage(id){const value=Number(id);if(!ST.some(s=>s.id===value))throw new Error(`Unknown stage: ${id}`);runMode36="story";pendingMode46="story";selected=value;menuUpdate();return snapshot35();},
-      setRunMode46(mode){if(!["story","testimony","mainGod"].includes(mode))throw new Error(`Unknown mode: ${mode}`);runMode36=mode;pendingMode46=mode;menuUpdate();return snapshot35();},
+      setRunMode46(mode){if(!["story","testimony","fever","mainGod"].includes(mode))throw new Error(`Unknown mode: ${mode}`);runMode36=mode;pendingMode46=mode;menuUpdate();return snapshot35();},
       unlockMainGod(){if(!save.done.includes(4))save.done.push(4);save.unlock=Math.max(save.unlock,4);persist();return snapshot35();},
       selectMainGodTier(tier=1){const value=clamp(Math.floor(Number(tier)||1),1,4);runMode36="mainGod";selectedMainGodTier36=value;save.mainGod.unlockedTier=Math.max(save.mainGod.unlockedTier,value);menuUpdate();return snapshot35();},
       grantMainGodPoints(points){save.mainGod.points+=Math.max(0,Math.floor(Number(points)||0));persist();return snapshot35();},
@@ -7506,7 +7526,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     bar.querySelectorAll("button").forEach(btn=>{
       btn.onclick=()=>{
         const mode=btn.getAttribute("data-mode");
-        pendingMode46=mode==="testimony"?"testimony":mode==="mainGod"?"mainGod":"story";
+        pendingMode46=mode==="testimony"?"testimony":mode==="fever"?"fever":mode==="mainGod"?"mainGod":"story";
         renderStages();
         if(pendingMode46==="mainGod") $("#stageList .mainGodCard36")?.scrollIntoView({block:"nearest"});
       };
@@ -7521,13 +7541,54 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
           return;
         }
         const s=ST.find(x=>x.id===id);
-        runMode36=pendingMode46==="testimony"?"testimony":"story";
+        runMode36=pendingMode46==="testimony"?"testimony":pendingMode46==="fever"?"fever":"story";
         selected=id;
         menuUpdate();
         closeDrawers();
-        toast(runMode36==="testimony"?`证词模式 · ${s?.short||""}`:`已选择 ${s?.short||""}`);
+        toast(runMode36==="testimony"?`证词模式 · ${s?.short||""}`:runMode36==="fever"?`镜界狂潮 · ${s?.short||""}`:`已选择 ${s?.short||""}`);
       };
     });
+  }
+  function autoAwakenTestimony46(){
+    P.hp=Math.min(P.maxHp,P.hp+P.maxHp*.12);
+    P.sh=Math.min(P.maxSh,P.sh+18);
+    const cid=save.character||P.character||"sayo";
+    const prefSchools=cid==="sayo"?["gun","shrine","mech"]:cid==="aya"?["cult","magical","ninja"]:["cult","necro","gene"];
+    const L=window.SakurayoLobby;
+    const ct=L?.contractsOf?L.contractsOf(save):{};
+    if(ct.school&&!prefSchools.includes(ct.school))prefSchools.unshift(ct.school);
+    let picked=null;
+    for(const sc of prefSchools){
+      const core=PROFILE[sc]?.core||[];
+      for(const id of core){
+        const u=U.find(x=>x.id===id);
+        if(u&&lv(u.id)<u.m){picked=u;break;}
+      }
+      if(picked)break;
+    }
+    if(picked){
+      P.up[picked.id]=(P.up[picked.id]||0)+1;
+      picked.a();
+      if(picked.t)P.aff[picked.t]=(P.aff[picked.t]||0)+1;
+      updateCareerFormation();
+    }
+    if(P.level>=4){
+      const sc=prefSchools[0];
+      if(P.careers?.[sc]&&!P.careers[sc].branch&&CAREERS[sc]){
+        const b=CAREERS[sc].a;
+        applyCareer({school:sc,id:`career:${sc}:${b.id}:1`,rank:1});
+      }
+    }
+    if(P.level>=6&&!P.fusion){
+      const f=FUSION.find(x=>x.id===ct.fusionKey)||FUSION.find(x=>x.id===(cid==="sayo"?"gunshrine":cid==="aya"?"spellblade":"bloodmoon"))||FUSION[0];
+      if(f){f.a();if(typeof beginOutfitSwap35==="function")beginOutfitSwap35();}
+    }
+    if(P.level>=8&&!P.form){
+      const a=ASC.find(x=>x.id===(cid==="sayo"?"tech":cid==="aya"?"psi":"bio"))||ASC[0];
+      if(a){a.a();if(typeof beginOutfitSwap35==="function")beginOutfitSwap35();}
+    }
+    refreshPlan();
+    updateHud();
   }
   function installLobby46(){
     const L=window.SakurayoLobby;
@@ -7543,6 +7604,25 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       resetP=function(){
         const out=_resetPLobby46();
         L.applyOwnedBonus(P,save);
+        const ct=L.contractsOf?L.contractsOf(save):{};
+        if(ct.school&&PROFILE[ct.school]?.core?.[0]){
+          const firstId=PROFILE[ct.school].core[0];
+          const u=U.find(x=>x.id===firstId);
+          if(u&&!P.up[u.id]){P.up[u.id]=1;u.a();if(u.t)P.aff[u.t]=(P.aff[u.t]||0)+1;}
+        }
+        if(runMode36==="fever"){
+          P.feverMode46=1;
+          levelRerolls=Math.max(levelRerolls,8);
+          P.rate*=.78;
+          P.skillCd*=.72;
+          P.dashCd*=.75;
+          P.spd*=1.16;
+          P.mag*=1.75;
+          P.maxSh+=45;
+          P.sh=P.maxSh;
+          P.next=Math.max(4,Math.floor(P.next*.58));
+          if(window.SakurayoOps)window.SakurayoOps.grant(10);
+        }
         return out;
       };
     }
@@ -7555,6 +7635,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         if(school&&L.hasSchool(save,school))w*=1.3;
         if(school&&L.hasJob(save,school))w*=1.5;
         if(school&&L.hasFusion(save,school))w*=1.6;
+        const ct=L.contractsOf?L.contractsOf(save):{};
+        if(school&&(school===ct.school||school===ct.jobSchool||(ct.fusionPair&&ct.fusionPair.includes(school))))w*=2.4;
         return w;
       };
     }
@@ -7577,8 +7659,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     const _openLevel46=openLevel;
     openLevel=function(){
       if(runMode36==="testimony"&&state==="play"){
-        P.hp=Math.min(P.maxHp,P.hp+P.maxHp*.018);
-        toast(`证词模式 · Lv.${P.level}（不发放升级卡）`);
+        autoAwakenTestimony46();
+        toast(`证词模式 · Lv.${P.level}（神装共鸣觉醒·不发放升级卡）`);
         return;
       }
       return _openLevel46();
@@ -7595,17 +7677,20 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
           }
         }else{
           runMode36=pendingMode46==="testimony"?"testimony":"story";
+          if(pendingMode46==="fever")runMode36="fever";
         }
       }
       const result=_startGame46();
       if(runMode36==="testimony"&&$("#stageHud")) $("#stageHud").textContent=`证词 · ${stage().short}`;
+      if(runMode36==="fever"&&$("#stageHud")) $("#stageHud").textContent=`狂潮 · ${stage().short}`;
       return result;
     };
     const _menuUpdateRoom46=menuUpdate;
     menuUpdate=function(){
       const result=_menuUpdateRoom46();
       if(runMode36==="mainGod") pendingMode46="mainGod";
-      if(runMode36==="testimony"&&$("#sdesc")) $("#sdesc").textContent="证词模式 · 不发放升级卡";
+      if(runMode36==="testimony"&&$("#sdesc")) $("#sdesc").textContent="证词模式 · 自动神装觉醒 · 不发放升级卡";
+      if(runMode36==="fever"&&$("#sdesc")) $("#sdesc").textContent="镜界狂潮 · 超频攻速 · 双倍经验与重抽 · 爽快割草";
       refreshLobby46();
       paintHomeBg46();
       return result;
@@ -7649,7 +7734,15 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     }
     const bound=window.SakurayoCamera?window.SakurayoCamera.size():{worldW:W,worldH:H};
     const r=O.deploy(id,save.character||P.character,P.x,P.y,bound.worldW,bound.worldH);
-    if(r.ok)toast(`${name} 已部署`);
+    if(r.ok){
+      const deployed=r.snapshot.units.find(u=>u.id===id);
+      if(deployed&&typeof O.fireBurst==="function"){
+        O.fireBurst(id,deployed.x,deployed.y,{dmg:P.dmg,petPow:P.petPow||1,aoe,pushBullet});
+        fxStamp("shatter",deployed.x,deployed.y,{size:92,life:.42,color:"#ff9bcc"});
+      }
+      const bname=(O.BURST_NAMES&&O.BURST_NAMES[id])||"协同爆发";
+      toast(`${name} 已部署 · ${bname}`);
+    }
     else if(r.reason==="dp")toast("部署点不足");
     else if(r.reason==="full")toast("最多两名干员");
     else if(r.reason==="self")toast("不能部署当前角色");
@@ -7664,7 +7757,8 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     opsDock46();
     CONTENT41.hook("combat:after-update",payload=>{
       if(state==="play"&&O.enabled(runMode36)){
-        const world={play:true,mode:runMode36,dmg:P.dmg,petPow:P.petPow||1,nearest,pushBullet,aoe};
+        const bound=window.SakurayoCamera?window.SakurayoCamera.size():{worldW:W,worldH:H};
+        const world={play:true,mode:runMode36,dmg:P.dmg,petPow:P.petPow||1,px:P.x,py:P.y,w:bound.worldW,h:bound.worldH,nearest,pushBullet,aoe};
         const out=O.tick(payload?.dt||0,world);
         O.fireShots(out.shots,world);
       }
@@ -7678,20 +7772,22 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         ctx.translate(u.x,u.y);
         ctx.fillStyle="#0008";
         ctx.beginPath();
-        ctx.ellipse(0,16,13,5,0,0,Math.PI*2);
+        ctx.ellipse(0,16,15,6,0,0,Math.PI*2);
         ctx.fill();
-        const img=artImage(`characters/${u.id}/default/portrait.webp`);
-        if(artReady(img))ctx.drawImage(img,-16,-30,32,36);
+        const idleImg=artImage(`characters/${u.id}/default/anim_idle.webp`);
+        const portImg=artImage(`characters/${u.id}/default/portrait.webp`);
+        const img=artReady(idleImg)?idleImg:portImg;
+        if(artReady(img))ctx.drawImage(img,-22,-36,44,48);
         else{
           ctx.fillStyle="#ffe6a3";
           ctx.beginPath();
           ctx.arc(0,-8,11,0,Math.PI*2);
           ctx.fill();
         }
-        ctx.strokeStyle="#ffe6a366";
-        ctx.lineWidth=2;
+        ctx.strokeStyle=u.id==="sayo"?"#ff9bcc99":u.id==="aya"?"#7be3ff99":"#ff6b8b99";
+        ctx.lineWidth=2.2;
         ctx.beginPath();
-        ctx.arc(0,2,20,0,Math.PI*2);
+        ctx.arc(0,4,22,0,Math.PI*2);
         ctx.stroke();
         ctx.restore();
       }
