@@ -601,9 +601,13 @@ assert.match(modes, /id="modeBar46"/);
 assert.match(modes, /id="modeTestimony46"/);
 assert.match(modes, /id="modeFever46"/);
 assert.match(modes, /id="modeBossRush46"/);
+assert.match(modes, /id="modeSky46"/);
+assert.match(modes, /id="modeDuel46"/);
 assert.match(modes, /id="modeStory46"/);
 assert.match(modes, /id="modeMainGod46"/);
 assert.match(modes, /回收演习/);
+assert.match(modes, /镜空弹幕/);
+assert.match(modes, /镜斗演武/);
 assert.match(modes, /证词模式/);
 assert.match(modes, /镜界狂潮/);
 assert.match(modes, /剑鬼讨伐/);
@@ -611,7 +615,26 @@ assert.match(modes, /主神空间/);
 assert.match(modes, /id="modeTestimony46"[^>]*class="on"/);
 assert.match(V.renderStageModes("fever"), /id="modeFever46"[^>]*class="on"/);
 assert.match(V.renderStageModes("bossRush"), /id="modeBossRush46"[^>]*class="on"/);
+assert.match(V.renderStageModes("sky"), /id="modeSky46"[^>]*class="on"/);
+assert.match(V.renderStageModes("duel"), /id="modeDuel46"[^>]*class="on"/);
 assert.match(V.renderStageModes("story"), /id="modeStory46"[^>]*class="on"/);
+
+// 验证东方雷霆弹幕射击（SakurayoShmup）与全女格斗（SakurayoDuel）核心逻辑
+{
+  const mctx = { console, Math, performance: { now: () => 0 } };
+  mctx.globalThis = mctx;
+  vm.createContext(mctx);
+  vm.runInContext(fs.readFileSync(path.join(root, "src/runtime/sakurayo-shmup.js"), "utf8"), mctx);
+  vm.runInContext(fs.readFileSync(path.join(root, "src/runtime/sakurayo-duel.js"), "utf8"), mctx);
+  const S = mctx.SakurayoShmup;
+  const D = mctx.SakurayoDuel;
+  assert.ok(S && typeof S.simulate === "function", "SakurayoShmup 必须导出 simulate");
+  assert.ok(D && typeof D.simulate === "function", "SakurayoDuel 必须导出 simulate");
+  const sr = S.simulate({ character: "sayo", seed: 7, layer: 1 }, 500);
+  assert.equal(sr.win, true, "镜空弹幕模式自动驾驶应可通关");
+  const dr = D.simulate({ character: "rion", seed: 5, layer: 1 }, 400);
+  assert.equal(dr.done, true, "全女格斗模式模拟对局应正常完赛");
+}
 
 const archiveHost = fakeEl("div", { className: "archiveDock46" });
 for (const [id, label] of [["talent", "永久天赋"], ["story", "剧情档案"], ["asc", "职业与飞升"], ["ach", "成就图鉴"]]) {

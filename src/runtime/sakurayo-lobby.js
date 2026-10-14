@@ -350,7 +350,7 @@
     "#shopDrawer .shopTabs40 button.on{background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;border-color:#ffe6a3aa}" +
     "#shopDrawer .skinCard,#shopDrawer .shopItem40{border:1px solid #ff9bcc33;background:linear-gradient(135deg,#1a132cf2,#100c1cee);border-radius:16px}" +
     "#shopWallet44{border:1px solid #ffe6a344;border-radius:14px;background:#120c20cc}" +
-    ".modeBar46{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:0 0 12px}" +
+    ".modeBar46{display:grid;grid-template-columns:repeat(auto-fit,minmax(86px,1fr));gap:6px;margin:0 0 12px}" +
     ".modeBar46 button{min-height:56px;padding:7px 4px;border-radius:14px;border:1px solid #ff9bcc44;background:linear-gradient(180deg,#221436,#120c20);color:#fff7fb;font:800 12px/1.15 system-ui;letter-spacing:.05em}" +
     ".modeBar46 button small{display:block;margin-top:4px;color:#ffe7a3;font:700 10px/1 system-ui;letter-spacing:.1em}" +
     ".modeBar46 button.on{border-color:#ffe6a3aa;background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;box-shadow:0 8px 20px #05020d66}" +
@@ -1365,9 +1365,9 @@
   }
 
   function renderStageModes(mode) {
-    var current = mode === "testimony" ? "testimony" : mode === "fever" ? "fever" : mode === "bossRush" ? "bossRush" : mode === "mainGod" ? "mainGod" : "story";
+    var current = mode === "testimony" ? "testimony" : mode === "fever" ? "fever" : mode === "bossRush" ? "bossRush" : mode === "sky" ? "sky" : mode === "duel" ? "duel" : mode === "mainGod" ? "mainGod" : "story";
     function pill(id, title, sub) {
-      var nid = id === "story" ? "Story" : id === "testimony" ? "Testimony" : id === "fever" ? "Fever" : id === "bossRush" ? "BossRush" : "MainGod";
+      var nid = id === "story" ? "Story" : id === "testimony" ? "Testimony" : id === "fever" ? "Fever" : id === "bossRush" ? "BossRush" : id === "sky" ? "Sky" : id === "duel" ? "Duel" : "MainGod";
       return (
         '<button type="button" id="mode' +
         nid +
@@ -1385,9 +1385,11 @@
     return (
       '<div id="modeBar46" class="modeBar46">' +
       pill("story", "回收演习", "肉鸽四章") +
-      pill("testimony", "证词模式", "神装叙事") +
+      pill("sky", "镜空弹幕", "东方雷霆STG") +
+      pill("duel", "镜斗演武", "全女格斗1v1") +
       pill("fever", "镜界狂潮", "超频割草") +
       pill("bossRush", "剑鬼讨伐", "首领速战") +
+      pill("testimony", "证词模式", "神装叙事") +
       pill("mainGod", "主神空间", "轮回试炼") +
       "</div>"
     );

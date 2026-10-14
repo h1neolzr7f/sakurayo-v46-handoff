@@ -152,6 +152,10 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
 <script src="runtime/sakurayo-camera.js"></script>
 <script src="runtime/sakurayo-cutscene.js"></script>
 <script src="runtime/sakurayo-economy.js"></script>
+<script src="runtime/sakurayo-ui-tokens.js"></script>
+<script src="runtime/sakurayo-ui-kit.js"></script>
+<script src="runtime/sakurayo-shmup.js"></script>
+<script src="runtime/sakurayo-duel.js"></script>
 <script src="runtime/sakurayo-lobby.js"></script>
 <script src="runtime/sakurayo-chronicle.js"></script>
 <script src="runtime/sakurayo-live.js"></script>
@@ -7133,7 +7137,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
         throw new Error(`Unknown outfit kind: ${kind}`);
       },
       selectStage(id){const value=Number(id);if(!ST.some(s=>s.id===value))throw new Error(`Unknown stage: ${id}`);runMode36="story";pendingMode46="story";selected=value;menuUpdate();return snapshot35();},
-      setRunMode46(mode){if(!["story","testimony","fever","bossRush","mainGod"].includes(mode))throw new Error(`Unknown mode: ${mode}`);runMode36=mode;pendingMode46=mode;menuUpdate();return snapshot35();},
+      setRunMode46(mode){if(!["story","testimony","fever","bossRush","sky","duel","mainGod"].includes(mode))throw new Error(`Unknown mode: ${mode}`);runMode36=mode;pendingMode46=mode;menuUpdate();return snapshot35();},
+      launchArcadeMode46(mode=runMode36,opts={}){return launchArcadeMode46(mode,opts);},
+      skyState46(){const g=modeCur46()?.current();return g?g.snapshot():null;},
+      skyStep46(sec=1,dt=1/60){const SH=modeCur46(),g=SH?.current();if(!g)return null;for(let t=0;t<sec&&!g.done;t+=dt){SH.step(dt);}return g.snapshot();},
+      skyClose46(){const ok=document.querySelector("#shm46 .res .ok,#duel46 .res .ok");if(ok){ok.click();return true;}return closeArcadeMode46();},
       unlockMainGod(){if(!save.done.includes(4))save.done.push(4);save.unlock=Math.max(save.unlock,4);persist();return snapshot35();},
       selectMainGodTier(tier=1){const value=clamp(Math.floor(Number(tier)||1),1,4);runMode36="mainGod";selectedMainGodTier36=value;save.mainGod.unlockedTier=Math.max(save.mainGod.unlockedTier,value);menuUpdate();return snapshot35();},
       grantMainGodPoints(points){save.mainGod.points+=Math.max(0,Math.floor(Number(points)||0));persist();return snapshot35();},
@@ -7494,7 +7502,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
   const _resume45=resumeGame;
   resumeGame=function(){clearOutfitModal45("#paused");return _resume45();};
   const _backMenu45=backMenu;
-  backMenu=function(){clearOutfitModal45("#result");clearOutfitModal45("#paused");return _backMenu45();};
+  backMenu=function(){clearOutfitModal45("#result");clearOutfitModal45("#paused");window.SakurayoShmup?.stop();window.SakurayoDuel?.stop();sky46=null;return _backMenu45();};
   const _shoot45=shoot;
   shoot=function(){
     const before=P.shotCount,result=_shoot45();
@@ -7560,6 +7568,129 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     bg.style.backgroundSize="cover";
     $("#menu")?.classList.add("lobbyWide46");
   }
+  let sky46=null;
+  function modeCur46(){return [window.SakurayoShmup,window.SakurayoDuel].find(m=>m?.current())||null;}
+  function arcadeBuildFromSave46(){
+    const L=window.SakurayoLobby,ct=L?.contractsOf?L.contractsOf(save):{};
+    const cid=save.character||"sayo";
+    const sc=ct.school||(cid==="sayo"?"shrine":cid==="aya"?"gun":"cult");
+    const starBonus=ct.schoolId&&L?.starOf?Math.max(0,L.starOf(save,ct.schoolId)-1):1;
+    const weapons={};
+    if(["shrine","magical","idol","mage"].includes(sc)){weapons.homing={lv:2+starBonus};weapons.spread={lv:2};}
+    else if(["mech","gun"].includes(sc)){weapons.spread={lv:2+starBonus,evo:starBonus>=2?1:0};weapons.laser={lv:2};}
+    else if(["cult","ninja"].includes(sc)){weapons.pierce={lv:2+starBonus,evo:starBonus>=2?1:0};weapons.orbit={lv:2};}
+    else if(["spore","alch","summon","necro"].includes(sc)){weapons.orbit={lv:2+starBonus};weapons.bomb={lv:2,evo:1};}
+    else{weapons.bomb={lv:2+starBonus,evo:1};weapons.pierce={lv:2};}
+    const route=["gene","vamp","spore","necro","cult"].includes(sc)?"bio":"tech";
+    const slot=ct.fusionId?"burst":ct.jobId?"speed":"guard";
+    const form=(ct.fusionId||ct.jobId)?{slot,name:L?.cardOf?.(ct.fusionId||ct.jobId)?.n||"契约共鸣"}:null;
+    const power=+(1+0.14*(Math.max(1,Number(selected)||1)-1)+(save.tal?.atk||0)*0.04+starBonus*0.08).toFixed(2);
+    return {character:cid,layer:Math.min(3,Math.max(1,Number(selected)||1)),weapons,route,form,power};
+  }
+  function closeArcadeMode46(){
+    window.SakurayoShmup?.stop();
+    window.SakurayoDuel?.stop();
+    sky46=null;
+    if(state==="sky"||state==="duel"){
+      state="menu";
+      $("#menu")?.classList.remove("hidden");
+      menuUpdate();
+    }
+    return true;
+  }
+  function launchArcadeMode46(mode=runMode36,opts={}){
+    const SH={sky:window.SakurayoShmup,duel:window.SakurayoDuel}[mode];
+    if(!SH)return false;
+    closeDrawers();
+    $("#result")?.classList.add("hidden");
+    $("#paused")?.classList.add("hidden");
+    $("#hud")?.classList.add("hidden");
+    $("#menu")?.classList.add("hidden");
+    state=mode;
+    const cfg=arcadeBuildFromSave46();
+    const seed=(opts.seed!=null?opts.seed:((Date.now()>>>0)^((Number(selected)||1)*7919)))>>>0;
+    const isBossStage=opts.boss!=null?!!opts.boss:(Number(selected)>=4);
+    sky46=SH.start({
+      character:opts.character||cfg.character,
+      seed,
+      layer:opts.layer||cfg.layer,
+      form:opts.form!==undefined?opts.form:cfg.form,
+      weapons:opts.weapons||cfg.weapons,
+      hpFrac:1,
+      power:opts.power||cfg.power,
+      route:opts.route||cfg.route,
+      boss:mode==="duel"&&isBossStage,
+      kind:mode==="sky"&&isBossStage?"boss":undefined,
+      auto:!!opts.auto,
+      art:p=>artUrl(p),
+      okText:"结算并返回大厅",
+      onClose:r=>{
+        sky46=null;
+        const win=!!r?.win;
+        const reward=(win?180+(Number(selected)||1)*45:75)+(r?.caps||0)*25+(r?.maxCombo||0)*3;
+        save.coins=(save.coins||0)+reward;
+        save.runs=(save.runs||0)+1;
+        if(win){
+          save.bosses=(save.bosses||0)+1;
+          if(!save.done.includes(selected))save.done.push(selected);
+          save.unlock=Math.max(save.unlock||1,Math.min(4,(Number(selected)||1)+1));
+        }
+        persist();
+        checkAch();
+        state="menu";
+        $("#menu")?.classList.remove("hidden");
+        menuUpdate();
+        toast(`${mode==="sky"?(win?"镜空突破":"镜空返航"):(win?"镜斗制霸":"镜斗演武")} · 结算 +${reward} 樱花币`);
+      }
+    });
+    const root=document.querySelector(mode==="sky"?"#shm46":"#duel46");
+    if(root&&!root.querySelector(".arcadeExit46")){
+      const exitBtn=document.createElement("button");
+      exitBtn.type="button";
+      exitBtn.className="arcadeExit46 sy-nofx";
+      exitBtn.textContent="← 返回大厅";
+      exitBtn.style.cssText="position:absolute;top:max(10px,env(safe-area-inset-top));left:max(12px,env(safe-area-inset-left));z-index:10;padding:5px 12px;border-radius:999px;border:1px solid #ff9bcc66;background:#0b0818cc;color:#fff7fb;font:700 12px/1.2 system-ui;cursor:pointer";
+      exitBtn.onclick=()=>closeArcadeMode46();
+      root.appendChild(exitBtn);
+    }
+    return !!sky46;
+  }
+  function paintHomeModeBar46(){
+    const mini=$("#menu .stageMini");
+    if(!mini||!mini.parentNode)return;
+    let bar=$("#homeModeBar46");
+    if(!bar){
+      bar=document.createElement("div");
+      bar.id="homeModeBar46";
+      bar.style.cssText="width:min(100%,560px);margin:0 auto 6px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;z-index:4";
+      mini.parentNode.insertBefore(bar,mini);
+      mini.style.cursor="pointer";
+      mini.onclick=()=>{openDrawer("stage");renderStages();};
+    }
+    const items=[
+      ["story","夜战割草"],
+      ["sky","东方弹幕"],
+      ["duel","全女格斗"],
+      ["fever","镜界狂潮"],
+      ["bossRush","剑鬼讨伐"],
+    ];
+    const cur=runMode36||pendingMode46||"story";
+    bar.innerHTML=items.map(([id,label])=>{
+      const on=cur===id;
+      return `<button type="button" data-home-mode="${id}" class="${on?"on":""}" style="padding:5px 2px;border-radius:10px;border:1px solid ${on?"#ffe6a3cc":"#ff9bcc44"};background:${on?"linear-gradient(180deg,#ffe08a,#d8892b)":"#0b0818d8"};color:${on?"#2a1608":"#fff7fb"};font:800 11px/1.15 system-ui;letter-spacing:.04em">${label}</button>`;
+    }).join("");
+    bar.querySelectorAll("[data-home-mode]").forEach(btn=>{
+      btn.onclick=e=>{
+        e.stopPropagation();
+        const m=btn.getAttribute("data-home-mode");
+        runMode36=m;
+        pendingMode46=m;
+        menuUpdate();
+        const labelMap={story:"回收演习 · 肉鸽割草",sky:"镜空弹幕 · 东方雷霆战机STG",duel:"镜斗演武 · 全女格斗1v1",fever:"镜界狂潮 · 超频割草",bossRush:"剑鬼讨伐 · 首领速战"};
+        toast(`已切换：${labelMap[m]||m}`);
+      };
+    });
+  }
   function bindStageModes46(){
     const L=window.SakurayoLobby;
     const box=$("#stageList");
@@ -7570,7 +7701,7 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
     bar.querySelectorAll("button").forEach(btn=>{
       btn.onclick=()=>{
         const mode=btn.getAttribute("data-mode");
-        pendingMode46=mode==="testimony"?"testimony":mode==="fever"?"fever":mode==="bossRush"?"bossRush":mode==="mainGod"?"mainGod":"story";
+        pendingMode46=mode==="testimony"?"testimony":mode==="fever"?"fever":mode==="bossRush"?"bossRush":mode==="sky"?"sky":mode==="duel"?"duel":mode==="mainGod"?"mainGod":"story";
         renderStages();
         if(pendingMode46==="mainGod") $("#stageList .mainGodCard36")?.scrollIntoView({block:"nearest"});
       };
@@ -7585,11 +7716,11 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
           return;
         }
         const s=ST.find(x=>x.id===id);
-        runMode36=pendingMode46==="testimony"?"testimony":pendingMode46==="fever"?"fever":pendingMode46==="bossRush"?"bossRush":"story";
+        runMode36=pendingMode46==="testimony"?"testimony":pendingMode46==="fever"?"fever":pendingMode46==="bossRush"?"bossRush":pendingMode46==="sky"?"sky":pendingMode46==="duel"?"duel":"story";
         selected=id;
         menuUpdate();
         closeDrawers();
-        toast(runMode36==="testimony"?`证词模式 · ${s?.short||""}`:runMode36==="fever"?`镜界狂潮 · ${s?.short||""}`:runMode36==="bossRush"?`剑鬼讨伐 · ${s?.short||""}`:`已选择 ${s?.short||""}`);
+        toast(runMode36==="testimony"?`证词模式 · ${s?.short||""}`:runMode36==="fever"?`镜界狂潮 · ${s?.short||""}`:runMode36==="bossRush"?`剑鬼讨伐 · ${s?.short||""}`:runMode36==="sky"?`镜空弹幕 · ${s?.short||""}`:runMode36==="duel"?`镜斗演武 · ${s?.short||""}`:`已选择 ${s?.short||""}`);
       };
     });
   }
@@ -7733,7 +7864,12 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
           runMode36=pendingMode46==="testimony"?"testimony":"story";
           if(pendingMode46==="fever")runMode36="fever";
           if(pendingMode46==="bossRush")runMode36="bossRush";
+          if(pendingMode46==="sky")runMode36="sky";
+          if(pendingMode46==="duel")runMode36="duel";
         }
+      }
+      if(runMode36==="sky"||runMode36==="duel"){
+        return launchArcadeMode46(runMode36);
       }
       const result=_startGame46();
       if(runMode36==="testimony"&&$("#stageHud")) $("#stageHud").textContent=`证词 · ${stage().short}`;
@@ -7748,6 +7884,17 @@ window.SAKURAYO_GAME_VERSION = "4.6.0";
       if(runMode36==="testimony"&&$("#sdesc")) $("#sdesc").textContent="证词模式 · 自动神装觉醒 · 不发放升级卡";
       if(runMode36==="fever"&&$("#sdesc")) $("#sdesc").textContent="镜界狂潮 · 超频攻速 · 双倍经验与重抽 · 爽快割草";
       if(runMode36==="bossRush"&&$("#sdesc")) $("#sdesc").textContent="剑鬼讨伐 · 开局三连觉醒 · 12秒首领降临 · 双倍讨伐赏金";
+      if(runMode36==="sky"){
+        if($("#sname")) $("#sname").textContent=`${stage().name} · 镜空弹幕`;
+        if($("#sdesc")) $("#sdesc").textContent="东方雷霆STG · 按住低速显3px判定点 · 22px擦弹充能 · 符卡决死";
+        if($("#sno")) $("#sno").textContent="弹幕STG";
+      }
+      if(runMode36==="duel"){
+        if($("#sname")) $("#sname").textContent=`${stage().name} · 全女格斗`;
+        if($("#sdesc")) $("#sdesc").textContent="全女格斗1v1 · 三局两胜 · ↓↘→波动 / →↓↘升龙 / ↓↘→↓↘→超必杀";
+        if($("#sno")) $("#sno").textContent="格斗1V1";
+      }
+      paintHomeModeBar46();
       refreshLobby46();
       paintHomeBg46();
       return result;
