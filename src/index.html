@@ -8473,8 +8473,8 @@ window.SAKURAYO_VERSION_CODE = 73;
   let rigTap46 = [0, 0];
   function mountRig46(root, id, ok) {
     const V = window.SakurayoMascotVideo, vbox = root.querySelector(".heroLiveBreath46");
-    // 视频看板娘优先：art/live_video/<角色>/clips.js 存在就播视频（循环 idle + 点击片段），否则走原 rig
-    if (V && ok && vbox && save.settings.fx !== 0) {
+    // 视频看板娘优先：art/live_video/<角色>/clips.js 存在就播视频（循环 idle + 点击片段），否则走原 rig；?novideo=1 强制走 mesh rig（mascot_sizes_smoke）
+    if (V && ok && vbox && save.settings.fx !== 0 && !/[?&]novideo=1/.test(location.search || "")) {
       root.dataset.vid = id;
       V.load(id, artUrl).then(has => { if (root.dataset.vid !== id) return; if (!has) { root.classList.remove("vid46"); return; }
         window.SakurayoRig?.unmount(); root.querySelector("canvas.heroRig46")?.remove(); V.mount(vbox, id, artUrl); root.classList.add("rig46", "vid46"); });

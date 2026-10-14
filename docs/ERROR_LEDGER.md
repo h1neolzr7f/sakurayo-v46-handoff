@@ -114,3 +114,9 @@
 - **修法**：`url()` / `onCg` 判空；`end()` 时清空 bg/cg video 的 onerror/onloadeddata
 - **预防**：异步 DOM 回调不得假设会话对象仍存活；AVG 回归保留 `errors` 必须为空
 
+### E016 · mascot_sizes_smoke 在全员 live_video 后画布 0×0 / 超时
+- **场景**：三角色均登记 `live_video/*/clips.js`；`mountRig46` 优先挂视频并 `unmount` mesh canvas
+- **现象**：`mascot_sizes_smoke` 等 `rigSnapshot46` 偶发超时，或 `getBoundingClientRect` 得 w=0/h=0（vid46 路径无 canvas）
+- **根因**：本测专验 WebGL/2D mesh rig，与默认视频看板娘互斥；未强制禁视频
+- **修法**：`mountRig46` 支持 `?novideo=1`；测试 URL 带该参数，并等待非 vid46 且 canvas>50px
+- **预防**：rig 尺寸回归必须 `novideo=1`；视频路径由 `mascot_video_smoke` 覆盖
