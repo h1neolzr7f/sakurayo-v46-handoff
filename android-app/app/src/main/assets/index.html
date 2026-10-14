@@ -3823,7 +3823,7 @@ window.SAKURAYO_VERSION_CODE = 73;
     g.strokeStyle = TKS("accent", 0.9); g.lineWidth = 1.5; g.beginPath(); g.moveTo(x + pad + 12, py); g.lineTo(x + w - pad, py); g.lineTo(x + w - pad, py + ph - 12); g.lineTo(x + w - pad - 12, py + ph); g.lineTo(x + pad, py + ph); g.lineTo(x + pad, py + 12); g.closePath(); g.stroke();
     g.font = "800 " + Math.round(f * 1.05) + "px SyTitle, sans-serif"; g.textBaseline = "bottom"; g.textAlign = "left"; g.lineWidth = 3; g.strokeStyle = TKS("n0", 0.9); var nm = this.ch.name + (this.form && this.form.name ? " · " + this.form.name : ""); g.strokeText(nm, x + pad + 6, py + ph - 4); g.fillStyle = TKS("n6", 1); g.fillText(nm, x + pad + 6, py + ph - 4);
     // 数值行
-    var rsv, hi = Math.max(this.hiScore || 0, this.score), fmt = function (v) { v = Math.min(999999999, Math.max(0, Math.round(v * 100))); return ("000000000" + v).slice(-9); }, rows = [["HiScore", fmt(hi), "n5"], ["Score", fmt(this.score), "n6"]], ry = py + ph + f * 1.2, rsv = (short ? 70 : 92) * Math.min(global.devicePixelRatio || 1, 2), lh = Math.min(f * 2.4, Math.max(f * 1.35, (y + h - rsv - ry) / 7.4)); // 底部留给触屏按键
+    var rsv, hi = Math.max(this.hiScore || 0, this.score), fmt = function (v) { v = Math.min(999999999, Math.max(0, Math.round(v * 100))); return ("000000000" + v).slice(-9); }, rows = [["HiScore", fmt(hi), "n5"], ["Score", fmt(this.score), "n6"]], ry = py + ph + f * 1.2, rsv = ((global.innerHeight || 720) <= 440 ? 80 : 108) * (L.H / Math.max(1, global.innerHeight || L.H)), lh = Math.min(f * 2.4, Math.max(f * 1.2, (y + h - rsv - ry) / 7.8)); // 底部留给触屏按键：按键 66/52px + 底边距 28/14px（CSS 媒体查询 max-height:440 切换），按画布像素换算
     g.textBaseline = "middle";
     var label = function (t, yy) { g.font = "700 " + Math.round(f * 0.82) + "px SyTitleEn, SyTitle, sans-serif"; g.textAlign = "left"; g.fillStyle = TKS("primary-strong", 1); g.fillText(t, x + pad, yy); };
     rows.forEach(function (r, k) { var yy = ry + k * lh; label(r[0], yy); g.font = "800 " + Math.round(f * 1.02) + "px SyTitleEn, monospace"; g.textAlign = "right"; g.fillStyle = TKS(r[2], 1); g.fillText(r[1], x + w - pad, yy); });
@@ -12042,8 +12042,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   const mainGodTier36=()=>MAIN_GOD_TIERS36[selectedMainGodTier36-1]||MAIN_GOD_TIERS36[0];
   const mainGodStage36=()=>{const t=mainGodTier36(),depth=t.endless?Math.max(1,P?.mgDepth||(save.mainGod.deepest||0)+1):0,deepMul=t.endless?1+(depth-1)*.09:1;return {id:4,mechanicsId:4,key:t.endless?`mainGod-4-${depth}`:`mainGod-${t.tier}`,no:t.endless?`∞-${depth}`:`EX-${t.tier}`,name:`主神空间 · ${t.name}${depth?` 第${depth}层`:""}`,short:t.endless?`无限回廊 · 第${depth}层`:`主神空间 T${t.tier}`,desc:"白色回廊每三层换一次色温。高压尸潮、加速成长，活到最后才能带走奖励点。",dur:t.dur+Math.min(45,Math.max(0,depth-1)*4),scale:t.scale*deepMul,reward:0,pointReward:t.points+Math.min(30,Math.max(0,depth-1)*3)+(P?.mgChallengeBonus||0),boss:"主神投影·轮回监察者",story:null,img:ST[3].img,depth};};
   const stage = () => isMainGodRun36()?mainGodStage36():ST[selected - 1],
-    fmt = (x) =>
-      `${String(Math.floor(x / 60)).padStart(2, "0")}:${String(Math.floor(x % 60)).padStart(2, "0")}`;
+    fmt = (x) => (x = Math.max(0, Number(x) || 0),
+      `${String(Math.floor(x / 60)).padStart(2, "0")}:${String(Math.floor(x % 60)).padStart(2, "0")}`); /* 夜视 QA E017：开局前倒计时 runTime<0 时曾显示 -1:-1 */
   function viewportSize46() {
     const vv = window.visualViewport;
     const w = Math.round(vv && vv.width ? vv.width : innerWidth);
@@ -19001,6 +19001,20 @@ html body:not(#sy0) #dialogue .dialogueArt{background-size:auto 115%!important;b
 @media (max-height:440px){html body:not(#sy0) #dialogue .dialogueArt{height:34vh!important;min-height:120px!important}
 html body:not(#sy0) #dialogue .modal{max-height:calc(100dvh - 12px);overflow-y:auto}
 html body:not(#sy0) #dialogue .dialogueText{font-size:13px!important;line-height:1.5!important}}
+/* 夜视 QA（2026-10-15）E019：设置抽屉没有专属样式，玻璃底透出整个大厅，单列竖排 9 项，横屏要滚 2 屏。改为实色底 + 横屏双列网格 */
+html body:not(#sy0):not(#sy1) #settingsDrawer37{background:var(--sy-scan),linear-gradient(180deg,rgb(var(--c-n0-rgb) / .97),rgb(var(--c-n0-rgb) / .985))!important}
+#settingsDrawer37 .dhead,#settingsDrawer37 .dbody{max-width:1040px}
+#settingsDrawer37 .dhead{min-height:0!important;padding-top:10px!important;padding-bottom:8px!important}
+#settingsDrawer37 .dbody{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 14px;align-content:start;padding:8px 4px 16px}
+#settingsDrawer37 .settingGroup39{display:contents}
+#settingsDrawer37 .settingRow37{margin:0!important;padding:8px 12px!important}
+#settingsDrawer37 .settingRow37 span{margin-bottom:4px!important}
+#settingsDrawer37 .settingToggle37{margin:0!important;min-height:44px;padding:8px 12px!important}
+#settingsDrawer37 .routeNote{grid-column:1/-1;margin:2px 0 0;font-size:12px!important;line-height:1.5;color:var(--c-text-2)}
+#settingsDrawer37 .settingRow37:nth-child(-n+3){grid-column:auto}
+@media (orientation:portrait){#settingsDrawer37 .dbody{grid-template-columns:1fr}}
+/* E020：1024×461 商店首行卡片立绘 140px，购买按钮落在屏幕外；编号徽标盖住樱花币余额 */
+@media (max-height:560px) and (orientation:landscape){#shopDrawer .skinPreview{height:96px!important}#shopDrawer .skinCard p{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}#shopDrawer .dhead::before{right:200px!important}}
 `;
   var st = document.createElement("style"); st.id = "syStatic"; st.textContent = css; document.head.appendChild(st);
   // 底栏选中态：最近打开的入口保持高亮，直到它的面板关掉
@@ -19147,7 +19161,8 @@ html body:not(#sy0):not(#sy1) #level .choice[data-rec]{outline:1px solid var(--c
 html body:not(#sy0) #result .modal{max-height:calc(100dvh - 24px - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow-y:auto!important;overscroll-behavior:contain}
 html body:not(#sy0) #result .actions{position:sticky;bottom:-1px;z-index:3;padding:10px 0 4px;background:linear-gradient(transparent,var(--c-surface-1) 30%)}
 html body:not(#sy0) #result .resultIcon{display:none!important}
-@media (max-height:440px){html body:not(#sy0) #result .actions{display:flex!important;gap:8px}html body:not(#sy0) #result .actions button{flex:1;min-height:40px!important;margin:0!important}html body:not(#sy0) #result .rankBig{font-size:48px!important;line-height:1!important}}
+/* 夜视 QA E018：原阈值 440px 漏掉 1024×461 等矮横屏，按钮两行竖排吸底压住战绩；放宽到 560px，吸底底色改实色 */
+@media (max-height:560px) and (orientation:landscape){html body:not(#sy0) #result .actions{display:flex!important;gap:8px;background:linear-gradient(transparent,var(--c-surface-1) 10px)!important;padding-top:14px!important}html body:not(#sy0) #result .actions button{flex:1;min-height:40px!important;margin:0!important}html body:not(#sy0) #result .rankBig{font-size:48px!important;line-height:1!important}}
 html body:not(#sy0) #result .modal .sy-win{position:fixed;height:min(110dvh,900px);right:max(0px,calc(50vw - 520px))}
 /* 矮横屏（844×390）升级弹窗：三张卡加按钮超出屏幕，“重抽 / 全部拿 / 图鉴”看不到。压缩卡片，弹窗内可滚动，按钮行并排 */
 @media (max-height:440px){html body:not(#sy0):not(#sy1) #level .modal{max-height:calc(100dvh - 12px);overflow-y:auto!important;padding-top:10px!important;padding-bottom:10px!important}
