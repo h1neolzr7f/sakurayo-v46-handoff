@@ -24,6 +24,9 @@ x = (W - cut.width) // 2; y = H - cut.height + int(H * .015)
 # 地面投影
 sh = Image.new('L', (W, H), 0); ImageDraw.Draw(sh).ellipse((W / 2 - cut.width * .38, H - 46, W / 2 + cut.width * .38, H - 6), fill=150)
 card = Image.composite(Image.new('RGBA', (W, H), (0, 0, 0, 255)), card, sh.filter(ImageFilter.GaussianBlur(14)))
+# 人物身后压暗一圈，让剪影从繁忙背景里跳出来
+halo = Image.new('L', (W, H), 0); halo.paste(cut.getchannel('A'), (x, y)); halo = halo.filter(ImageFilter.MaxFilter(31)).filter(ImageFilter.GaussianBlur(38)).point(lambda v: int(v * .55))
+card = Image.composite(Image.new('RGBA', (W, H), (4, 6, 16, 255)), card, halo)
 # 轮廓光
 al = Image.new('L', (W, H), 0); al.paste(cut.getchannel('A'), (x, y))
 rim = ImageChops.subtract(al.filter(ImageFilter.MaxFilter(9)), al).filter(ImageFilter.GaussianBlur(5))
