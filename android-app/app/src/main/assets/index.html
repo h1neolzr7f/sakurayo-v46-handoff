@@ -1782,6 +1782,7 @@ window.SAKURAYO_VERSION_CODE = 71;
       "#storyBeat44{position:fixed;inset:0;z-index:38;overflow:hidden;background:#05040e;color:#fff}" +
       "#storyBeat44.hidden{display:none!important}" +
       "#storyBeat44 .storyBeatBg{position:absolute;inset:-10%;background:#120b22 center 38%/cover no-repeat;transform-origin:center 30%;animation:sakurayoKenBurns 14s linear alternate infinite;filter:saturate(1.08) brightness(.68)}" +
+      "#storyBeat44 .storyBeatBg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;pointer-events:none}#storyBeat44 .storyBeatBg video.on{opacity:1}" +
       "#storyBeat44 .storyBeatShade{position:absolute;inset:0;background:linear-gradient(180deg,#05040e55 0%,#05040e22 38%,#05040ef0 78%);pointer-events:none}" +
       "#storyBeat44 .storyBeatPortrait{position:absolute;right:-8%;bottom:-10%;width:min(92vw,520px);height:78%;background:transparent right bottom/contain no-repeat;pointer-events:none;animation:sakurayoCutIn .55s ease}" +
       "#storyBeat44 .storyBeatPortrait.empty{display:none}" +
@@ -1839,7 +1840,10 @@ window.SAKURAYO_VERSION_CODE = 71;
 
   function hideVictory() {
     var node = $("storyBeat44");
-    if (node) node.classList.add("hidden");
+    if (!node) return;
+    node.classList.add("hidden");
+    var vid = node.querySelector(".storyBeatBg video");
+    if (vid && typeof vid.pause === "function") vid.pause();
   }
 
   function present(opts) {
@@ -1919,6 +1923,45 @@ window.SAKURAYO_VERSION_CODE = 71;
     node.dataset.phase = String(phase || 0);
   }
 
+  function playBeatVideo(bgEl, bgUrl) {
+    var vid = bgEl.querySelector("video");
+    if (!vid) {
+      vid = document.createElement("video");
+      vid.muted = true;
+      vid.loop = true;
+      vid.playsInline = true;
+      vid.setAttribute("playsinline", "");
+      bgEl.appendChild(vid);
+    }
+    var reduce = global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce || !bgUrl || !/\.webp(\?.*)?$/i.test(bgUrl)) {
+      vid.classList.remove("on");
+      vid.removeAttribute("src");
+      vid.removeAttribute("data-stem");
+      return;
+    }
+    var stem = String(bgUrl).replace(/\.webp(\?.*)?$/i, "");
+    var probe = document.createElement("video");
+    var preferWebm = probe.canPlayType && !probe.canPlayType('video/mp4; codecs="avc1.42E01E"') && probe.canPlayType('video/webm; codecs="vp9"');
+    var primary = stem + (preferWebm ? ".webm" : ".mp4");
+    var secondary = stem + (preferWebm ? ".mp4" : ".webm");
+    if (vid.getAttribute("data-stem") === primary) return;
+    vid.classList.remove("on");
+    vid.onloadeddata = function () { vid.classList.add("on"); vid.play().catch(function () {}); };
+    vid.onerror = function () {
+      if (vid.getAttribute("data-fallback") !== "1") {
+        vid.setAttribute("data-fallback", "1");
+        vid.src = secondary;
+        return;
+      }
+      vid.classList.remove("on");
+      vid.removeAttribute("src");
+    };
+    vid.setAttribute("data-fallback", "0");
+    vid.setAttribute("data-stem", primary);
+    vid.src = primary;
+  }
+
   function renderBeat(beat) {
     var node = ensureVictoryNode();
     if (!node || !beat) return;
@@ -1930,6 +1973,7 @@ window.SAKURAYO_VERSION_CODE = 71;
       bg.style.backgroundImage = beat.bg
         ? "linear-gradient(#05040e33,#05040e88),url('" + String(beat.bg).replace(/'/g, "%27") + "')"
         : "";
+      playBeatVideo(bg, beat.bg || "");
     }
     if (portrait) {
       if (beat.portrait) {
@@ -2089,6 +2133,183 @@ window.SAKURAYO_VERSION_CODE = 71;
     snapshot: snapshot,
     suspend: suspend,
     resume: resume,
+  };
+})(typeof window !== "undefined" ? window : globalThis);
+
+</script>
+<script>
+/* Boss 转阶段 PV：在 Boss 换阶段时叠一层全屏视频演出。
+ *
+ * 接入方式：包装 window.SakurayoCutscene.flashPhase。
+ * index.html 在 Boss 每次转阶段时都会调 `SakurayoCutscene?.flashPhase?.(p)`（第 3244 行），
+ * 并在第 4 阶段再调一次（3402 行）。这里在原有 520ms 闪光之外叠加 PV，
+ * 不动 cutscene 自身逻辑，也不改 index.html 的游戏流程。
+ *
+ * 素材：art/pv/boss/boss_phase2|3|4.mp4（+ .webm）。
+ * 阶段 2/3/4 若存在 art/pv/boss/stage{章}_phase{阶段}，就用这一章的片子，否则仍播共用片。
+ * PV 是纯表现层：播放期间不阻塞游戏状态，播完自动移除；同一局同一阶段只播一次。
+ */
+(function (global) {
+  "use strict";
+
+  var DIR = "pv/boss/";
+  var CLIPS = { 2: "boss_phase2", 3: "boss_phase3", 4: "boss_phase4" };
+  var HOLD_MS = 5200; // PV 展示时长（Grok 出的是 6 秒，留一点淡出余量）
+
+  var played = {}; // phase -> true，同一局内只播一次
+  var box = null;
+  var vid = null;
+  var timer = 0;
+  var endTimer = 0;
+
+  function artUrl(p) {
+    var a = global.artUrl;
+    return a ? a(p) : "art/" + p;
+  }
+
+  /** 按浏览器能力挑格式：安卓 WebView 两种都行，桌面 Chromium 只吃 VP9。 */
+  function pick(base) {
+    var t = global.document.createElement("video");
+    var webm = base + ".webm";
+    var mp4 = base + ".mp4";
+    if (t.canPlayType('video/mp4; codecs="avc1.42E01E"')) return mp4; // H.264 优先：安卓包只带 mp4
+    if (t.canPlayType('video/webm; codecs="vp9"')) return webm;
+    return webm;
+  }
+
+  function injectStyle() {
+    if (global.document.getElementById("bossPvCss")) return;
+    var st = global.document.createElement("style");
+    st.id = "bossPvCss";
+    st.textContent = [
+      ".bossPvWrap{position:fixed;inset:0;z-index:2147483000;pointer-events:none;",
+      "opacity:0;transition:opacity .38s ease;background:#05040e}",
+      ".bossPvWrap.on{opacity:1}",
+      ".bossPvWrap video{width:100%;height:100%;object-fit:cover;display:block}",
+    ].join("");
+    global.document.head.appendChild(st);
+  }
+
+  function ensure() {
+    if (box && box.parentNode) return box;
+    injectStyle();
+    box = global.document.createElement("div");
+    box.className = "bossPvWrap";
+    box.id = "bossPvWrap";
+    vid = global.document.createElement("video");
+    vid.muted = true;
+    vid.playsInline = true;
+    vid.setAttribute("playsinline", "");
+    vid.preload = "auto";
+    box.appendChild(vid);
+    global.document.body.appendChild(box);
+    return box;
+  }
+
+  function hide() {
+    if (!box) return;
+    box.classList.remove("on");
+    if (vid) {
+      var v = vid;
+      global.setTimeout(function () {
+        try {
+          v.pause();
+          v.removeAttribute("src");
+        } catch (e) {}
+      }, 420);
+    }
+    if (timer) {
+      global.clearTimeout(timer);
+      timer = 0;
+    }
+    if (endTimer) {
+      global.clearTimeout(endTimer);
+      endTimer = 0;
+    }
+  }
+
+  /**
+   * 播放某个阶段的 PV。
+   * @param {number} phase Boss 阶段（2/3/4 有素材）
+   * @param {boolean} [force] 忽略"同局只播一次"的限制
+   * @returns {boolean} 是否真的起播
+   */
+  function play(phase, force, stageId) {
+    var shared = CLIPS[phase];
+    if (!shared) return false;
+    if (!force && played[phase]) return false;
+    if (!global.document || !global.document.body) return false;
+
+    played[phase] = true;
+    ensure();
+
+    var staged = (phase === 2 || phase === 3 || phase === 4) && stageId ? "stage" + stageId + "_phase" + phase : "";
+    var fellBack = false;
+    function setSrc(base) {
+      vid.onerror = function () {
+        if (fellBack || !staged || base === shared) return;
+        fellBack = true;
+        setSrc(shared);
+      };
+      vid.setAttribute("src", artUrl(DIR + pick(base)));
+      try {
+        vid.currentTime = 0;
+      } catch (e) {}
+      var started = vid.play();
+      if (started && started.catch) started.catch(function () {});
+    }
+    setSrc(staged || shared);
+
+    // 先让浏览器拿到第一帧再淡入，避免闪出黑框
+    requestAnimationFrame(function () {
+      box.classList.add("on");
+    });
+
+    if (timer) global.clearTimeout(timer);
+    timer = global.setTimeout(hide, HOLD_MS);
+    return true;
+  }
+
+  /** 新一局开始时重置"已播"记录。 */
+  function reset() {
+    played = {};
+    hide();
+  }
+
+  function state() {
+    return {
+      playing: !!(box && box.classList.contains("on")),
+      playedPhases: Object.keys(played).map(Number),
+      src: vid ? vid.getAttribute("src") : null,
+    };
+  }
+
+  // ---- 包装 flashPhase ----
+  var C = global.SakurayoCutscene;
+  if (C && typeof C.flashPhase === "function" && !C.flashPhase.__bossPvWrapped) {
+    var origFlash = C.flashPhase;
+    var wrapped = function (phase, stageId) {
+      var r = origFlash.apply(this, arguments);
+      try {
+        // index.html 在两处调它：阶段 2/3，以及击败时的阶段 4。
+        // 第二个参数是章节 id，用来挑 stageN_phaseN。
+        play(phase, false, stageId);
+      } catch (e) {}
+      return r;
+    };
+    wrapped.__bossPvWrapped = true;
+    C.flashPhase = wrapped;
+  }
+
+  global.SakurayoBossPv = {
+    play: play,
+    reset: reset,
+    hide: hide,
+    state: state,
+    // flashPhase(4) 会走这里（第 4 阶段在 index.html 里单独调用）
+    onPhaseFlash: function (p, stageId) {
+      return play(p, false, stageId);
+    },
   };
 })(typeof window !== "undefined" ? window : globalThis);
 
@@ -2800,35 +3021,45 @@ window.SAKURAYO_VERSION_CODE = 71;
   function aimAngle(api, range) { var t = api.target(range); var P = api.P; return t ? Math.atan2(t.y - P.y, t.x - P.x) : (P.weaponAngle || 0); }
   function tick(dt, api) {
     var P = api.P, W = state(P), id, w, s, i, a;
+    var fslot = (P.form46 && P.form46.slot) || "base", awk = !!(P.form46 && P.form46.awakenT > 0);
+    var cdMul = (fslot === "speed" ? 0.85 : 1) * (awk ? 0.8 : 1);
+    var dmgMul = (fslot === "burst" ? 1.2 : 1) * (awk ? 1.25 : 1);
     for (id in W) {
       w = W[id]; if (!w.lv) continue; s = stats(id, w.lv, w.evo); w.t -= dt;
       if (id === "orbit") {
-        w.a = (w.a + dt * (w.evo ? 4.6 : 3.4)) % TAU;
-        var rad = 62 + w.lv * 4;
+        w.a = (w.a + dt * (w.evo ? 4.8 : 3.4) * (fslot === "speed" ? 1.25 : 1)) % TAU;
+        var rad = 62 + w.lv * 4 + (fslot === "guard" ? 14 : 0);
         for (i = 0; i < s.c; i++) {
           a = w.a + i * TAU / s.c;
           var bx = P.x + Math.cos(a) * rad, by = P.y + Math.sin(a) * rad;
-          var near = api.enemiesNear(bx, by, 16);
-          for (var j = 0; j < near.length; j++) { var e = near[j]; if ((e.orb46 || 0) > api.now) continue; e.orb46 = api.now + 0.32; api.hit(e, P.dmg * s.dmg, "orbit"); }
+          var near = api.enemiesNear(bx, by, w.evo ? 22 : 16);
+          for (var j = 0; j < near.length; j++) { var e = near[j]; if ((e.orb46 || 0) > api.now) continue; e.orb46 = api.now + (w.evo ? 0.24 : 0.32); api.hit(e, P.dmg * s.dmg * dmgMul, "orbit"); }
+          if (w.evo && fslot === "guard") {
+            var r2 = rad * 0.56, bx2 = P.x + Math.cos(-a * 1.3) * r2, by2 = P.y + Math.sin(-a * 1.3) * r2;
+            var near2 = api.enemiesNear(bx2, by2, 16);
+            for (var j2 = 0; j2 < near2.length; j2++) { var e2 = near2[j2]; if ((e2.orb46 || 0) > api.now) continue; e2.orb46 = api.now + 0.28; api.hit(e2, P.dmg * s.dmg * 0.65 * dmgMul, "orbit"); }
+          }
         }
         continue;
       }
       if (!DEF[id].cd || w.t > 0) continue;
-      w.t = s.cd;
+      w.t = s.cd * cdMul;
       if (id === "spread") {
-        a = aimAngle(api, 320); var fan = 0.9 + (w.evo ? 0.5 : 0);
-        for (i = 0; i < s.c; i++) { var q = a - fan / 2 + fan * i / Math.max(1, s.c - 1); api.push({ x: P.x, y: P.y, vx: Math.cos(q) * 760, vy: Math.sin(q) * 760, r: 4, life: 0.42, dmg: P.dmg * s.dmg, pierce: 0, source: "shot", school: "gun", tracer46: "#ffd0e4", hit: new Set() }); }
+        a = aimAngle(api, 320); var fan = 0.9 + (w.evo ? 0.55 : 0);
+        for (i = 0; i < s.c; i++) { var q = a - fan / 2 + fan * i / Math.max(1, s.c - 1); api.push({ x: P.x, y: P.y, vx: Math.cos(q) * 760, vy: Math.sin(q) * 760, r: w.evo ? 5 : 4, life: w.evo ? 0.5 : 0.42, dmg: P.dmg * s.dmg * dmgMul, pierce: (w.evo ? 1 : 0) + (fslot === "burst" ? 1 : 0), source: "shot", school: "gun", tracer46: w.evo ? "#ff92c8" : "#ffd0e4", hit: new Set() }); }
+        if (w.evo) { for (i = 0; i < 6; i++) { var rAng = a + Math.PI + (i - 2.5) * 0.28; api.push({ x: P.x, y: P.y, vx: Math.cos(rAng) * 640, vy: Math.sin(rAng) * 640, r: 4, life: 0.36, dmg: P.dmg * s.dmg * 0.7 * dmgMul, pierce: 1, source: "shot", school: "gun", tracer46: "#ffe3f1", hit: new Set() }); } }
         api.fx("muzzle", P.x + Math.cos(a) * 24, P.y + Math.sin(a) * 24); api.sound("pistol");
       } else if (id === "homing") {
-        for (i = 0; i < s.c; i++) { var h = (P.weaponAngle || 0) + Math.PI + (i - (s.c - 1) / 2) * 0.5; api.push({ x: P.x, y: P.y, vx: Math.cos(h) * 360, vy: Math.sin(h) * 360, r: 6, life: 2.2, dmg: P.dmg * s.dmg, pierce: 0, home: 0.16, crane46: 1, source: "star", school: "magical", tracer46: "#bfe9ff", hit: new Set() }); }
+        for (i = 0; i < s.c; i++) { var h = (P.weaponAngle || 0) + Math.PI + (i - (s.c - 1) / 2) * 0.5; api.push({ x: P.x, y: P.y, vx: Math.cos(h) * (fslot === "speed" ? 430 : 360), vy: Math.sin(h) * (fslot === "speed" ? 430 : 360), r: 6, life: 2.2, dmg: P.dmg * s.dmg * dmgMul, pierce: w.evo ? 1 : 0, home: w.evo ? 0.22 : 0.16, crane46: w.evo ? 2 : 1, boom46: w.evo ? 42 : 0, boomDmg46: w.evo ? P.dmg * s.dmg * 0.55 * dmgMul : 0, source: "star", school: "magical", tracer46: w.evo ? "#ffd88a" : "#bfe9ff", hit: new Set() }); }
       } else if (id === "bomb") {
         var tg = api.target(420); a = aimAngle(api, 420);
-        api.push({ x: P.x, y: P.y, vx: Math.cos(a) * 440, vy: Math.sin(a) * 440, r: 8, life: tg ? Math.min(1, Math.hypot(tg.x - P.x, tg.y - P.y) / 440) : 0.8, dmg: P.dmg * s.dmg * 0.3, pierce: 0, boom46: s.r, boomDmg46: P.dmg * s.dmg, source: "shot", school: "gun", tracer46: "#ffb070", hit: new Set() });
+        api.push({ x: P.x, y: P.y, vx: Math.cos(a) * 440, vy: Math.sin(a) * 440, r: 8, life: tg ? Math.min(1, Math.hypot(tg.x - P.x, tg.y - P.y) / 440) : 0.8, dmg: P.dmg * s.dmg * 0.3 * dmgMul, pierce: 0, boom46: s.r * (fslot === "burst" ? 1.2 : 1), boomDmg46: P.dmg * s.dmg * dmgMul, cluster46: w.evo ? 4 : 0, source: "shot", school: "gun", tracer46: "#ffb070", hit: new Set() });
       } else if (id === "laser") {
-        w.beam = { a: aimAngle(api, 700), t: s.t, len: 640, tick: 0 };
+        w.beam = { a: aimAngle(api, 700), t: s.t, len: w.evo ? 720 : 640, tick: 0, twin: !!(w.evo || fslot === "burst") };
       } else if (id === "boomerang") {
         a = aimAngle(api, 380);
-        for (i = 0; i < s.c; i++) { var g = a + i * Math.PI; api.push({ x: P.x, y: P.y, vx: Math.cos(g) * 620, vy: Math.sin(g) * 620, r: 14, life: 1.25, dmg: P.dmg * s.dmg, pierce: 99, rang46: 1.25, source: "blade", school: "ninja", tracer46: "#e9d4ff", hit: new Set() }); }
+        var bCnt = s.c + (w.evo ? 1 : 0);
+        for (i = 0; i < bCnt; i++) { var g = a + i * (TAU / bCnt); api.push({ x: P.x, y: P.y, vx: Math.cos(g) * 620, vy: Math.sin(g) * 620, r: w.evo ? 18 : 14, life: w.evo ? 1.45 : 1.25, dmg: P.dmg * s.dmg * dmgMul, pierce: 99, rang46: w.evo ? 1.45 : 1.25, source: "blade", school: "ninja", tracer46: w.evo ? "#ffd6ff" : "#e9d4ff", hit: new Set() }); }
       }
     }
     var L = W.laser;
@@ -2836,26 +3067,53 @@ window.SAKURAYO_VERSION_CODE = 71;
       var B = L.beam; B.t -= dt; B.tick -= dt; B.a = aimAngle(api, 700) * 0.15 + B.a * 0.85;
       if (B.tick <= 0) {
         B.tick = 0.1; var ls = stats("laser", L.lv, L.evo), cx = Math.cos(B.a), cy = Math.sin(B.a);
-        var cand = api.enemiesNear(P.x + cx * B.len / 2, P.y + cy * B.len / 2, B.len / 2 + 30);
-        for (i = 0; i < cand.length; i++) { var en = cand[i], px = en.x - P.x, py = en.y - P.y, along = px * cx + py * cy; if (along < 0 || along > B.len) continue; if (Math.abs(px * cy - py * cx) < en.r + (L.evo ? 20 : 12)) api.hit(en, P.dmg * ls.dmg * 0.1 / ls.t * 0.6, "laser"); }
+        var cand = api.enemiesNear(P.x + cx * B.len / 2, P.y + cy * B.len / 2, B.len / 2 + 40);
+        for (i = 0; i < cand.length; i++) {
+          var en = cand[i], px = en.x - P.x, py = en.y - P.y, along = px * cx + py * cy;
+          if (along >= 0 && along <= B.len && Math.abs(px * cy - py * cx) < en.r + (L.evo ? 22 : 12)) api.hit(en, P.dmg * ls.dmg * 0.1 / ls.t * 0.6 * dmgMul, "laser");
+          else if (B.twin && along >= -B.len * 0.65 && along <= 0 && Math.abs(px * cy - py * cx) < en.r + 16) api.hit(en, P.dmg * ls.dmg * 0.1 / ls.t * 0.42 * dmgMul, "laser");
+        }
       }
       if (B.t <= 0) L.beam = null;
     }
   }
   // Called by the bullet loop after a hit. Returns true when the bullet should stop.
   function onHit(b, e, api) {
-    if (b.boom46) { api.aoe(b.x, b.y, b.boom46, b.boomDmg46, "#ff9a4a"); api.fx("shatter", b.x, b.y); return true; }
+    if (b.boom46) {
+      api.aoe(b.x, b.y, b.boom46, b.boomDmg46, "#ff9a4a"); api.fx("shatter", b.x, b.y);
+      if (b.cluster46 && api.push) {
+        for (var ci = 0; ci < b.cluster46; ci++) {
+          var ca = ci * TAU / b.cluster46 + 0.4;
+          api.push({ x: b.x, y: b.y, vx: Math.cos(ca) * 280, vy: Math.sin(ca) * 280, r: 5, life: 0.35, dmg: b.boomDmg46 * 0.25, pierce: 0, boom46: b.boom46 * 0.55, boomDmg46: b.boomDmg46 * 0.45, source: "shot", school: "gun", tracer46: "#ffd090", hit: new Set() });
+        }
+        b.cluster46 = 0;
+      }
+      return !b.crane46;
+    }
     var W = state(api.P);
-    if (!b.bounced46 && b.source === "shot" && W.ricochet && W.ricochet.lv && !b.tracer46) b.bounce46 = stats("ricochet", W.ricochet.lv, W.ricochet.evo).c, b.bounced46 = 1;
+    if (!b.bounced46 && b.source === "shot" && W.ricochet && W.ricochet.lv && !b.tracer46) b.bounce46 = stats("ricochet", W.ricochet.lv, W.ricochet.evo).c, b.bounced46 = 1, b.ricoEvo46 = !!W.ricochet.evo;
     if (b.bounce46 > 0) {
       var best = null, bd = 260, list = api.enemiesNear(e.x, e.y, 260);
       for (var i = 0; i < list.length; i++) { var o = list[i]; if (o.dead || b.hit.has(o)) continue; var d = Math.hypot(o.x - e.x, o.y - e.y); if (d < bd) { bd = d; best = o; } }
-      if (best) { var sp = Math.hypot(b.vx, b.vy), a = Math.atan2(best.y - e.y, best.x - e.x); b.x = e.x; b.y = e.y; b.vx = Math.cos(a) * sp; b.vy = Math.sin(a) * sp; b.life = Math.max(b.life, bd / sp + 0.05); b.bounce46--; b.pierce = Math.max(b.pierce, 1); b.tracer46 = "#9ff3ff"; return false; }
+      if (best) {
+        if (b.ricoEvo46 && api.aoe) api.aoe(e.x, e.y, 38, b.dmg * 0.4, "#8ff6ff");
+        var sp = Math.hypot(b.vx, b.vy), a = Math.atan2(best.y - e.y, best.x - e.x); b.x = e.x; b.y = e.y; b.vx = Math.cos(a) * sp; b.vy = Math.sin(a) * sp; b.life = Math.max(b.life, bd / sp + 0.05); b.bounce46--; b.pierce = Math.max(b.pierce, 1); b.tracer46 = "#9ff3ff"; return false;
+      }
     }
     return false;
   }
   function update(b, dt, api) {
-    if (b.boom46 && b.life - dt <= 0) { api.aoe(b.x, b.y, b.boom46, b.boomDmg46, "#ff9a4a"); api.fx("shatter", b.x, b.y); b.boom46 = 0; }
+    if (b.boom46 && b.life - dt <= 0) {
+      api.aoe(b.x, b.y, b.boom46, b.boomDmg46, "#ff9a4a"); api.fx("shatter", b.x, b.y);
+      if (b.cluster46 && api.push) {
+        for (var ci = 0; ci < b.cluster46; ci++) {
+          var ca = ci * TAU / b.cluster46 + 0.4;
+          api.push({ x: b.x, y: b.y, vx: Math.cos(ca) * 280, vy: Math.sin(ca) * 280, r: 5, life: 0.35, dmg: b.boomDmg46 * 0.25, pierce: 0, boom46: b.boom46 * 0.55, boomDmg46: b.boomDmg46 * 0.45, source: "shot", school: "gun", tracer46: "#ffd090", hit: new Set() });
+        }
+        b.cluster46 = 0;
+      }
+      b.boom46 = 0;
+    }
     if (b.rang46) { var P = api.P, t = b.rang46 - b.life; if (t > b.rang46 * 0.45) { var a = Math.atan2(P.y - b.y, P.x - b.x), sp = Math.hypot(b.vx, b.vy); b.vx += (Math.cos(a) * sp - b.vx) * Math.min(1, dt * 6); b.vy += (Math.sin(a) * sp - b.vy) * Math.min(1, dt * 6); if (Math.hypot(P.x - b.x, P.y - b.y) < 20) b.life = 0; if (t > b.rang46 * 0.5 && !b.back46) { b.back46 = 1; b.hit = new Set(); } } }
   }
   function draw(ctx, P, now) {
@@ -2875,7 +3133,9 @@ window.SAKURAYO_VERSION_CODE = 71;
     if (L && L.beam) {
       var B = L.beam, w = (L.evo ? 20 : 12) * (0.9 + Math.sin(now * TAU * 1.5) * 0.1);
       ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
-      ctx.strokeStyle = "rgba(140,220,255,.45)"; ctx.lineWidth = w * 2.2; var o = global.__reduceFlash46 !== false ? 38 : 0; ctx.beginPath(); ctx.moveTo(P.x + Math.cos(B.a) * o, P.y + Math.sin(B.a) * o); ctx.lineTo(P.x + Math.cos(B.a) * B.len, P.y + Math.sin(B.a) * B.len); ctx.stroke();
+      ctx.strokeStyle = "rgba(140,220,255,.45)"; ctx.lineWidth = w * 2.2; var o = global.__reduceFlash46 !== false ? 38 : 0; ctx.beginPath(); ctx.moveTo(P.x + Math.cos(B.a) * o, P.y + Math.sin(B.a) * o); ctx.lineTo(P.x + Math.cos(B.a) * B.len, P.y + Math.sin(B.a) * B.len);
+      if (B.twin) { ctx.moveTo(P.x - Math.cos(B.a) * o, P.y - Math.sin(B.a) * o); ctx.lineTo(P.x - Math.cos(B.a) * B.len * 0.65, P.y - Math.sin(B.a) * B.len * 0.65); }
+      ctx.stroke();
       ctx.strokeStyle = "#f4fdff"; ctx.lineWidth = w * 0.6; ctx.stroke(); ctx.restore();
     }
   }
@@ -3180,6 +3440,7 @@ window.SAKURAYO_VERSION_CODE = 71;
     1: { name: "百目神舆姬", spr: "boss_girl_1", alt: "boss1", cards: [{ non: 1, p: "aimFan", hp: 1, t: 26 }, { n: "眼符「百目回廊」", p: "eyeRose", hp: 1.2, t: 34 }, { non: 1, p: "ringAim", hp: 1, t: 26 }, { n: "舆符「神轿巡游」", p: "spiral2", hp: 1.25, t: 36 }, { n: "「千目之夜」", p: "eyeFinal", hp: 1.4, t: 40, last: 1 }] },
     2: { name: "唐伞雨姬", spr: "boss_girl_2", alt: "boss2", cards: [{ non: 1, p: "rainNon", hp: 1, t: 26 }, { n: "雨符「骤雨回旋伞」", p: "umbrella", hp: 1.2, t: 34 }, { non: 1, p: "aimFan", hp: 1, t: 26 }, { n: "伞符「破伞返雨」", p: "rainReturn", hp: 1.25, t: 36 }, { n: "「百鬼夜雨」", p: "rainFinal", hp: 1.4, t: 40, last: 1 }] },
     3: { name: "黄泉门守", spr: "boss_girl_3", alt: "boss3", cards: [{ non: 1, p: "ringAim", hp: 1, t: 26 }, { n: "门符「千本全息牌楼」", p: "torii", hp: 1.2, t: 34 }, { non: 1, p: "spiral2", hp: 1, t: 26 }, { n: "冥符「黄泉比良坂」", p: "lattice", hp: 1.25, t: 36 }, { n: "「常夜之门」", p: "yomiFinal", hp: 1.45, t: 42, last: 1 }] },
+    4: { name: "鬼·朔夜", spr: "boss_girl_3", alt: "boss3", cards: [{ non: 1, p: "spiral2", hp: 1.05, t: 26 }, { n: "千夜「四百一十二夜的纸面具」", p: "sakuyaMask", hp: 1.25, t: 35 }, { non: 1, p: "ringAim", hp: 1.05, t: 26 }, { n: "回环「二百年前的斩鬼刀」", p: "sakuyaBlade", hp: 1.3, t: 36 }, { n: "终夜「散场花火·千樱一闪」", p: "sakuyaFinal", hp: 1.5, t: 42, last: 1 }] },
     mid: { name: "镜卫", spr: "boss3", alt: "boss3", cards: [{ non: 1, p: "aimFan", hp: 1, t: 22 }, { n: "镜符「对镜回廊」", p: "mirror", hp: 1.1, t: 30 }] }
   };
   function Game(o) {
@@ -3188,12 +3449,13 @@ window.SAKURAYO_VERSION_CODE = 71;
     var f = o.form || {}; this.form = f; var slot = f.slot || "base"; this.slot = slot;
     var up = o.weapons || {}, lv = function (k) { return up[k] ? (up[k].lv || 1) + (up[k].evo ? 2 : 0) : 0; };
     this.lv = lv; this.route = o.route === "bio" ? "bio" : o.route === "tech" ? "tech" : null;
-    this.pw = clamp(o.power || 1, 0.7, 2.6) * (slot === "burst" ? 1.3 : 1);
+    var rels = Array.isArray(o.relics) ? o.relics : [], hasRel = function (id) { return rels.indexOf(id) >= 0; };
+    this.pw = clamp(o.power || 1, 0.7, 2.6) * (slot === "burst" ? 1.3 : 1) * (1 + (hasRel("coil") ? 0.12 : 0) + (hasRel("mirror") ? 0.12 : 0));
     var hp0 = clamp(o.hpFrac == null ? 1 : o.hpFrac, 0.05, 1); this.hp0 = hp0;
-    var lives = Math.max(1, Math.ceil(hp0 * 3)) + (slot === "guard" ? 1 : 0) - (slot === "burst" ? 1 : 0) + (lv("orbit") >= 5 ? 0 : 0);
+    var lives = Math.max(1, Math.ceil(hp0 * 3)) + (slot === "guard" ? 1 : 0) - (slot === "burst" ? 1 : 0) + (hasRel("omamori") ? 1 : 0);
     lives = Math.max(1, lives); this.lives0 = lives;
-    this.P = { x: FW / 2, y: FH - 140, hit: slot === "speed" ? 2 : 3, gr: slot === "speed" ? 28 : 22, spd: c.spd * (slot === "guard" ? 0.9 : 1), slow: c.slow,
-      lives: lives, bombs: 2 + (lv("bomb") ? 1 : 0), power: 1 + Math.min(1.5, (o.power || 1) - 1) + 0.25 * Math.min(4, lv("spread") + lv("homing")) / 2, inv: 2, cd: 0, cd2: 0, focus: false,
+    this.P = { x: FW / 2, y: FH - 140, hit: slot === "speed" ? 2 : 3, gr: (slot === "speed" ? 28 : 22) + (hasRel("drone") ? 6 : 0), spd: c.spd * (slot === "guard" ? 0.9 : 1) * (hasRel("geta") ? 1.12 : 1), slow: c.slow,
+      lives: lives, bombs: 2 + (lv("bomb") ? 1 : 0) + (hasRel("core") ? 1 : 0), power: 1 + Math.min(1.5, (o.power || 1) - 1) + 0.25 * Math.min(4, lv("spread") + lv("homing")) / 2, inv: 2, cd: 0, cd2: 0, focus: false,
       graze: 0, gauge: 0, hits: 0, bombsUsed: 0, deathT: -1, bombT: 0, frag: 0, awakenUntil: -1, moving: 0 };
     this.P.power = clamp(this.P.power, 1, 4);
     this.E = []; this.B = []; this.S = []; this.FX = []; this.items = []; this.kills = 0; this.score = 0; try { this.hiScore = typeof localStorage !== "undefined" ? +(localStorage.getItem("sakurayoShmupHi") || 0) : 0; } catch (e) { this.hiScore = 0; } this.boss = null; this.caps = 0; this.cardsSeen = 0;
@@ -3207,7 +3469,7 @@ window.SAKURAYO_VERSION_CODE = 71;
     if (!s) return this.end(true);
     if (s.pick) { this.pause = true; this.o.onPick && this.o.onPick(this.pickOptions()); }
     if (s.mid) this.spawnBoss("mid");
-    if (s.boss) this.spawnBoss(String(((this.layer - 1) % 3) + 1));
+    if (s.boss) this.spawnBoss(this.o.bossKey || (this.layer === 4 ? "4" : String(((this.layer - 1) % 3) + 1)));
   };
   Game.prototype.pickOptions = function () { return [{ k: "power", n: "P 点结晶", d: "火力等级 +1" }, { k: "bomb", n: "符卡札", d: "Bomb +1" }, { k: "life", n: "残机碎片", d: "残机 +1" }]; };
   Game.prototype.choose = function (k) { var P = this.P; if (k === "power") P.power = Math.min(4, P.power + 1); else if (k === "bomb") P.bombs = Math.min(6, P.bombs + 1); else P.lives = Math.min(8, P.lives + 1); this.pause = false; this.next(); };
@@ -3263,6 +3525,9 @@ window.SAKURAYO_VERSION_CODE = 71;
       case "lattice": for (k = 0; k < 2; k++) for (i = 0; i < 6; i++) { var sx = k ? FW + 5 : -5, sy = 80 + i * 70 + (t * 40 % 70); this.eb(sx, sy, k ? Math.PI * 0.82 : Math.PI * 0.18, 120 * v, "laser", k ? "#c86bff" : "#ff6bd0"); } b.pt = 1.0; this.ringShot(b.x, b.y, 10, this.aim(b.x, b.y), 170 * v, "orb", "#ff3b5c"); break;
       case "yomiFinal": for (k = 0; k < 3; k++) this.eb(b.x, b.y, b.ang + k * TAU / 3, 160 * v, "big", "#ff2a4a"); for (k = 0; k < 3; k++) this.eb(b.x, b.y, -b.ang + k * TAU / 3 + 0.5, 190 * v, "rice", "#ffffff", { turn: 0.25 }); b.ang += 0.19; b.pt = 0.11; if (Math.floor(t * 2) % 7 === 0 && !b.tw) { b.tw = 1; this.ringShot(b.x, b.y, 28, 0, 110 * v, "star", "#ffd166"); } else if (Math.floor(t * 2) % 7) b.tw = 0; break;
       case "mirror": for (k = -1; k <= 1; k += 2) { x = FW / 2 + k * (FW / 2 - 40); this.eb(x, 120, this.aim(x, 120), 200 * v, "knife", "#cfe6ff"); } this.ringShot(b.x, b.y, 12, b.ang += 0.25, 150 * v, "orb", "#8fd0ff"); b.pt = 0.42; break;
+      case "sakuyaMask": for (k = 0; k < 4; k++) { var mx = k < 2 ? 70 : FW - 70, my = k % 2 ? 230 : 120; this.eb(mx, my, this.aim(mx, my) + Math.sin(t * 2 + k) * 0.22, 185 * v, "amulet", k % 2 ? "#ffd166" : "#ff6ad5"); } this.ringShot(b.x, b.y, Math.round(14 * dens), b.ang += 0.23, 145 * v, "orb", "#ff3b5c"); b.pt = 0.56; break;
+      case "sakuyaBlade": a = this.aim(b.x, b.y); for (i = -2; i <= 2; i++) this.eb(b.x, b.y, a + i * 0.14, 240 * v, "knife", "#ffffff"); for (k = -1; k <= 1; k += 2) for (i = 0; i < 6; i++) this.eb(b.x, b.y, b.ang * k + i * TAU / 6, 155 * v, "scale", k > 0 ? "#ff5fa2" : "#7af0c0", { turn: k * 0.32 }); b.ang += 0.26; b.pt = 0.46; break;
+      case "sakuyaFinal": for (k = 0; k < 4; k++) this.eb(b.x, b.y, b.ang + k * TAU / 4, 165 * v, "big", "#ff3b6e"); for (k = 0; k < 4; k++) this.eb(b.x, b.y, -b.ang * 1.2 + k * TAU / 4 + 0.4, 195 * v, "knife", "#ffe082", { turn: 0.22 }); b.ang += 0.18; b.pt = 0.11; if (Math.floor(t * 2) % 6 === 0 && !b.tw) { b.tw = 1; this.ringShot(b.x, b.y, 24, this.aim(b.x, b.y), 125 * v, "star", "#ff9ec7"); } else if (Math.floor(t * 2) % 6) b.tw = 0; break;
     }
     b.pt *= (b.card.non ? 0.8 : 0.62) * (this.o.dens || 1); // 符卡更密
   };
@@ -3770,6 +4035,15 @@ window.SAKURAYO_VERSION_CODE = 71;
   var STRONG = { hp: 1, chp: 1, jatk: 1, dp: 1, rush: 1, super: 1, special: 1 };
   var CMD = [ // 按优先级匹配
     { m: "S", seq: [2, 3, 6, 2, 3, 6], win: 34 }, { m: "D", seq: [6, 2, 3], win: 16 }, { m: "A", seq: [2, 3, 6], win: 14 }, { m: "B", seq: [2, 1, 4], win: 14 }];
+  var TINT_CACHE = {};
+  function tintSprite(im, key, filterStr) {
+    if (!im || !im.width || typeof document === "undefined") return im;
+    var k = (im.src || "") + "|" + key;
+    if (TINT_CACHE[k]) return TINT_CACHE[k];
+    var c = document.createElement("canvas"); c.width = im.width; c.height = im.height;
+    var cg = c.getContext("2d"); cg.filter = filterStr; cg.drawImage(im, 0, 0);
+    return (TINT_CACHE[k] = c);
+  }
   function Fighter(side, cid, o) { return { side: side, cid: cid, ch: CH[cid], x: side < 0 ? 300 : 660, y: 0, vx: 0, vy: 0, face: side < 0 ? 1 : -1, hp: 100, max: 100, white: 0, meter: 0, stun: 0, guard: 0, st: "stand", stT: 0, mv: null, mf: 0, hit: false, hitstop: 0, combo: 0, juggle: 0, inv: 0, armor: 0, o: o, buf: [], btn: [], crouch: false, blockH: null, hits: 0, taken: 0, dealt: 0, landed: 0, blocked: 0, thrTech: 0, chain: 0, kdT: 0, wins: 0, cancelOK: 0, aiT: 0, maxCombo: 0 }; }
   function Game(o) {
     this.o = o; this.r = rng(o.seed || 1); this.cid = CH[o.character] ? o.character : "sayo"; this.ch = CH[this.cid]; this.layer = o.layer || 1; this.boss = !!o.boss;
@@ -3781,9 +4055,18 @@ window.SAKURAYO_VERSION_CODE = 71;
     var foe = o.foe && CH[o.foe] ? o.foe : ["aya", "rion", "sayo"][["sayo", "aya", "rion"].indexOf(this.cid)];
     this.P = Fighter(-1, this.cid, { dmg: this.ch.dmg * pw * (this.slot === "burst" ? 1.3 : 1) * (this.spLv ? 1 + 0.03 * this.spLv : 1), taken: this.slot === "burst" ? 1.2 : 1, walk: this.ch.walk * (this.slot === "speed" ? 1.2 : 1), chain: this.slot === "speed" ? 4 : 3, noChip: this.slot === "guard", guardK: this.slot === "guard" ? 0.5 : 1, meterK: this.route === "tech" ? 1.25 : 1, white: this.route === "bio", armorHP: this.route === "bio" });
     this.P.hp = this.P.max = 100; this.hpIn = clamp(o.hpFrac == null ? 1 : o.hpFrac, 0.3, 1); this.P.hp = 100 * this.hpIn;
+    if (o.boons && Array.isArray(o.boons)) {
+      var P0 = this.P;
+      o.boons.forEach(function (bn) {
+        if (bn === "dmg") P0.o.dmg *= 1.18;
+        else if (bn === "meter") { P0.meter = Math.min(3, P0.meter + 1); P0.o.meterK *= 1.25; }
+        else if (bn === "guard") { P0.o.noChip = true; P0.o.guardK *= 0.55; }
+        else if (bn === "speed") { P0.o.walk *= 1.15; P0.o.chain = Math.max(P0.o.chain, 4); }
+      });
+    }
     var L = this.layer, boss = this.boss;
     this.E = Fighter(1, foe, { dmg: (boss ? 0.8 + 0.1 * L : 0.66 + 0.07 * L), taken: boss ? 0.84 : 1, walk: CH[foe].walk * (0.95 + 0.03 * L), chain: 3, guardK: 1, meterK: 1, boss: boss });
-    this.E.name = (boss ? "镜灵 · " : "镜影 · ") + CH[foe].name; this.E.hp = this.E.max = 100;
+    this.E.name = o.bossName || ((boss ? "镜灵 · " : "镜影 · ") + CH[foe].name); this.E.hp = this.E.max = 100;
     this.brainE = brain(boss ? { react: 11 - L, block: 0.55 + 0.08 * L, aa: 0.45 + 0.1 * L, punish: 0.55 + 0.1 * L, combo: 0.6 + 0.1 * L, thr: 0.12, tech: 0.3 + 0.1 * L, jump: 0.012, fb: 0.02, tele: 1 } : { react: 14 - L, block: 0.42 + 0.08 * L, aa: 0.3 + 0.1 * L, punish: 0.4 + 0.1 * L, combo: 0.45 + 0.1 * L, thr: 0.1, tech: 0.2 + 0.1 * L, jump: 0.01, fb: 0.018 });
     var sk = o.skill == null ? 0.75 : o.skill; // 自动驾驶（测试/录像）用的我方大脑
     this.brainP = brain({ react: Math.round(16 - 10 * sk), block: 0.35 + 0.5 * sk, aa: 0.3 + 0.55 * sk, punish: 0.35 + 0.55 * sk, combo: 0.45 + 0.5 * sk, thr: 0.1, tech: 0.2 + 0.5 * sk, jump: 0.012, fb: 0.02 });
@@ -3826,7 +4109,12 @@ window.SAKURAYO_VERSION_CODE = 71;
   Game.prototype.tryMoves = function (f, dir, btns) {
     var crouch = dir <= 3, cmd = this.matchCmd(f), has = function (b) { return btns.indexOf(b) >= 0; }, E = this.opp(f), dist = Math.abs(E.x - f.x);
     var L = has("L"), H = has("H"), T = has("T") || (L && H), SP = has("SP"), SU = has("SU");
-    if (SU) cmd = "S", L = true; if (SP) cmd = cmd || "A", L = true;
+    if (SU) cmd = "S", L = true;
+    if (SP) {
+      if (!cmd && !this.auto && f === this.P) cmd = (dir === 6 || dir === 3) ? "D" : (dir === 4 || dir === 1) ? "B" : "A";
+      else cmd = cmd || "A";
+      L = true;
+    }
     if (!(L || H || T)) return false;
     // 防御反击（防御硬直中 →+J+K）
     if (f.st === "block" && T && f.meter >= 1) { f.st = "stand"; f.stT = 0; return this.start(f, "gc"); }
@@ -4089,10 +4377,10 @@ window.SAKURAYO_VERSION_CODE = 71;
       // 残影：发生帧、突进、冲刺、超必杀时，画出前几帧位置的半透明拖影
       f.trail = f.trail || []; var ghost = (ph === 1 && STRONG[m.pose]) || f.st === "dash" || (m && m.dash && ph < 2);
       if (ghost && f.hitstop <= 0) f.trail.push({ x: x, y: y, im: im }); else if (!ghost) f.trail.length = 0; if (f.trail.length > 4) f.trail.shift();
-      f.trail.forEach(function (q, i) { if (!q.im || !q.im.width) return; var ww = h * q.im.width / q.im.height; g.save(); g.translate(q.x, q.y); g.scale(f.face, 1); g.globalAlpha = 0.12 + 0.07 * i; g.filter = "brightness(1.6) sepia(1) hue-rotate(" + (pr[2] ? 220 : 280) + "deg) saturate(3)"; g.drawImage(q.im, -ww / 2, -h, ww, h); g.restore(); });
+      f.trail.forEach(function (q, i) { if (!q.im || !q.im.width) return; var ww = h * q.im.width / q.im.height, tim = tintSprite(q.im, pr[2] ? "trE" : "trP", "brightness(1.6) sepia(1) hue-rotate(" + (pr[2] ? 220 : 280) + "deg) saturate(3)"); g.save(); g.translate(q.x, q.y); g.scale(f.face, 1); g.globalAlpha = 0.12 + 0.07 * i; g.drawImage(tim, -ww / 2, -h, ww, h); g.restore(); });
       g.save(); g.translate(x + jit, y); g.scale(f.face * sx, sy); g.rotate(rot);
       if (f.st === "down" || f.st === "dead") { g.translate(0, 0); }
-      if (im && im.width) { var w = h * im.width / im.height; if (pr[2]) g.filter = "brightness(.8) saturate(.7) contrast(1.1) drop-shadow(0 0 6px " + (self.E.o.boss ? "#ff3355" : "#b06cff") + ")"; if (f.hitstop > 0 && f.st === "hitstun") g.filter = "brightness(1.8)"; g.drawImage(im, -w / 2, -h, w, h); g.filter = "none"; }
+      if (im && im.width) { var w = h * im.width / im.height, dim = im; if (f.hitstop > 0 && f.st === "hitstun") dim = tintSprite(im, "hs", "brightness(1.8)"); else if (pr[2]) dim = tintSprite(im, self.E.o.boss ? "foeB" : "foeN", "brightness(.8) saturate(.7) contrast(1.1) drop-shadow(0 0 6px " + (self.E.o.boss ? "#ff3355" : "#b06cff") + ")"); g.drawImage(dim, -w / 2, -h, w, h); }
       else { g.fillStyle = pr[2] ? "#6a4a9a" : CH[f.cid].col; var crouch = ps === "crouch" || ps === "clp" || ps === "chp" || ps === "cblock"; g.fillRect(-26, crouch ? -120 : -210, 52, crouch ? 120 : 210); if (ps === "lp" || ps === "hp" || ps === "clp" || ps === "chp" || ps === "jatk" || ps === "dp" || ps === "rush" || ps === "super") { g.fillStyle = "#fff"; g.fillRect(20, crouch ? -60 : -140, (f.mv && f.mv.reach) || 60, 14); } }
       if (ph === 1 && STRONG[m.pose]) { // 刀光（程序化的涂抹帧）：沿攻击方向画一道渐隐弧光
         var k = (f.mf - m.st) / Math.max(1, m.ac), cy = -(m.y || 120) - 20, R0 = (m.reach || 90) + 20; g.save(); g.globalCompositeOperation = "lighter";
@@ -4172,9 +4460,9 @@ window.SAKURAYO_VERSION_CODE = 71;
     root.innerHTML = '<canvas></canvas><div class="dstk46"><i></i></div><div class="dact46">'
       + '<button class="sykBtn dia b-L" data-p="L">轻<small>J</small></button><button class="sykBtn dia b-H pri" data-p="H">重<small>K</small></button>'
       + '<button class="sykBtn dia b-T" data-p="T">投<small>J+K</small></button><button class="sykBtn dia b-BK" data-p="BK">防<small>←</small></button>'
-      + '<button class="sykBtn hex b-SP acc" data-p="SP">必杀<small>↓↘→</small></button><button class="sykBtn hex b-SU su" data-p="SU">超必<small>1 气</small></button></div>'
+      + '<button class="sykBtn hex b-SP acc" data-p="SP">必杀<small>方向+SP</small></button><button class="sykBtn hex b-SU su" data-p="SU">超必<small>1 气</small></button></div>'
       + '<button class="cmdT46" type="button" aria-expanded="false">出招表</button><div class="cmd46 sykPanel" hidden><div class="t">COMMAND LIST · 出招表</div><dl>'
-      + [["波动", "↓↘→ + 拳"], ["升龙", "→↓↘ + 拳"], ["突进", "↓↙← + 拳"], ["超必杀", "↓↘→↓↘→ + 拳（1 气）"], ["冲刺", "→→"], ["后撤", "←←"], ["投技", "J + K（近身）"], ["防御反击", "防御中 → + J + K（1 气）"], ["下段", "↓ + K"]].map(function (r) { return "<dt>" + r[0] + "</dt><dd>" + r[1] + "</dd>"; }).join("")
+      + [["波动", "↓↘→ + 拳（或中立+必杀）"], ["升龙", "→↓↘ + 拳（或 →+必杀）"], ["突进/当身", "↓↙← + 拳（或 ←+必杀）"], ["超必杀", "↓↘→↓↘→ + 拳（或超必键，1 气）"], ["冲刺", "→→"], ["后撤", "←←"], ["投技", "J + K（近身）"], ["防御反击", "防御中 → + J + K（1 气）"], ["下段", "↓ + K"]].map(function (r) { return "<dt>" + r[0] + "</dt><dd>" + r[1] + "</dd>"; }).join("")
       + '</dl></div>';
     (o.parent || document.body).appendChild(root);
     var cmdT = root.querySelector(".cmdT46"), cmdP = root.querySelector(".cmd46"); cmdT.addEventListener("click", function () { var open = cmdP.hidden; cmdP.hidden = !open; cmdT.setAttribute("aria-expanded", String(open)); cmdT.classList.toggle("on", open); });
@@ -4231,9 +4519,9 @@ window.SAKURAYO_VERSION_CODE = 71;
      Boss 前三种模式（割草 / 格斗 / 弹幕）都可以自由选，路线只决定推荐项。 */
   var ROUTES = {
     tech: { id: "tech", n: "科技线", i: "⚙", rec: "sky", tint: "#5fd8ff", d: "式神机关与符文电路：激光、追踪、浮游炮。Boss 战推荐弹幕射击。",
-      relics: ["sake", "mirror", "gear", "coil", "lantern", "coin"], up: { laser: 3, homing: 3, orbit: 3, spread: 1, pierce: 1, bomb: 1 } },
+      relics: ["sake", "mirror", "gear", "coil", "lantern", "coin", "drone", "core", "prism"], up: { laser: 3, homing: 3, orbit: 3, spread: 1, pierce: 1, bomb: 1 } },
     bio: { id: "bio", n: "生物线", i: "🌿", rec: "duel", tint: "#ff5f7a", d: "血藤、蛊虫与妖化：散射孢子、贯穿荆棘、爆裂瘤。Boss 战推荐格斗。",
-      relics: ["petal", "bell", "omamori", "geta", "vine", "fang"], up: { spread: 3, pierce: 3, bomb: 3, laser: 1, homing: 1, orbit: 1 } }
+      relics: ["petal", "bell", "omamori", "geta", "vine", "fang", "blood", "carapace", "spore"], up: { spread: 3, pierce: 3, bomb: 3, laser: 1, homing: 1, orbit: 1 } }
   };
   var BOSS_MODES = [{ k: "mow", n: "割草", i: "⚔", d: "原本的俯视角乱战：走位、拾取、构筑全开。" }, { k: "duel", n: "格斗", i: "🥋", d: "一对一格斗：搓招、连段、超必杀。构筑映射为招式。" }, { k: "sky", n: "弹幕射击", i: "✦", d: "本人飞行的弹幕 STG：低速判定点、擦弹、Bomb、符卡。" }];
   function route(st) { return ROUTES[st && st.route] || ROUTES.tech; }
@@ -4251,7 +4539,13 @@ window.SAKURAYO_VERSION_CODE = 71;
     { id: "gear", n: "式神齿轮", i: "⚙", d: "射速 +10%（科技线）", fx: { rateMul: 0.91 } },
     { id: "coil", n: "雷符线圈", i: "⚡", d: "暴击率 +8%（科技线）", fx: { crit: 0.08 } },
     { id: "vine", n: "血藤心", i: "🌿", d: "最大生命 +30（生物线）", fx: { maxHp: 30 } },
-    { id: "fang", n: "妖牙", i: "🦷", d: "攻击力 +10%、移速 +4%（生物线）", fx: { dmgMul: 1.1, spdMul: 1.04 } }
+    { id: "fang", n: "妖牙", i: "🦷", d: "攻击力 +10%、移速 +4%（生物线）", fx: { dmgMul: 1.1, spdMul: 1.04 } },
+    { id: "drone", n: "八咫浮游", i: "🛸", d: "拾取范围 +50、攻击力 +8%（科技线）", fx: { mag: 50, dmgMul: 1.08 } },
+    { id: "core", n: "超导炉心", i: "🔋", d: "射速 +9%、暴击率 +5%（科技线）", fx: { rateMul: 0.917, crit: 0.05 } },
+    { id: "prism", n: "分光棱镜", i: "💎", d: "攻击力 +10%、暴击率 +6%（科技线）", fx: { dmgMul: 1.1, crit: 0.06 } },
+    { id: "blood", n: "狂血逆鳞", i: "🩸", d: "攻击力 +15%、移速 +5%（生物线）", fx: { dmgMul: 1.15, spdMul: 1.05 } },
+    { id: "carapace", n: "鬼骨重甲", i: "🛡", d: "最大生命 +35、战斗节点回复 +5%（生物线）", fx: { maxHp: 35, nodeHeal: 0.05 } },
+    { id: "spore", n: "腐生孢囊", i: "🍄", d: "攻击力 +8%、魂晶收益 +20%（生物线）", fx: { dmgMul: 1.08, shardMul: 1.2 } }
   ];
   var GOALS = [ // objective templates per layer (from SakurayoLevels types)
     [{ type: "escort", goal: { path: [[0.18, 0.5], [0.4, 0.38], [0.62, 0.6], [0.84, 0.48]] }, npc: "miko", n: "送灯" }, { type: "mech", goal: { n: 2 }, n: "符咒机关" }],
@@ -4391,6 +4685,7 @@ window.SAKURAYO_VERSION_CODE = 71;
       if (q.levels) lv += q.levels;
     });
     if (st.relics.indexOf("omamori") >= 0) P.hp = Math.min(P.maxHp, P.hp + P.maxHp * 0.08);
+    if (st.relics.indexOf("carapace") >= 0) P.hp = Math.min(P.maxHp, P.hp + P.maxHp * 0.05);
     return { levels: lv };
   }
   var TRANSIENT = ["x", "y", "vx", "vy", "fire", "inv", "skill", "dash", "banterSeen", "hitStop46", "fx", "fy", "angle", "ultUsed46", "postAvg46", "chestCoins46", "chests46"];
@@ -4433,8 +4728,10 @@ window.SAKURAYO_VERSION_CODE = 71;
   "use strict";
   var CSS = "#avg46{position:fixed;inset:0;z-index:90;background:#07060c;color:#fff;font-family:inherit;overflow:hidden;user-select:none;-webkit-user-select:none}" +
     "#avg46.hidden{display:none}#avg46 .a46bg{position:absolute;inset:0;background:#000 center/cover no-repeat;transition:background-image .4s,opacity .4s;filter:saturate(1.05)}" +
-    "#avg46 .a46bg:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05) 50%,rgba(6,4,14,.7))}" +
+    "#avg46 .a46bg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;z-index:0}#avg46 .a46bg video.on{opacity:1}" +
+    "#avg46 .a46bg:after{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(0,0,0,.05) 50%,rgba(6,4,14,.7))}" +
     "#avg46 .a46cg{position:absolute;inset:0;background:#000 center/cover no-repeat;opacity:0;transition:opacity .5s;pointer-events:none}#avg46 .a46cg.on{opacity:1}" +
+    "#avg46 .a46cg video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0}#avg46 .a46cg video.on{opacity:1}" +
     "#avg46 .a46st{position:absolute;bottom:0;height:96%;max-width:46%;object-fit:contain;object-position:bottom;transition:filter .25s,transform .25s,opacity .25s;opacity:0;filter:brightness(.7) saturate(.85);transform:translateY(8px)}" +
     "#avg46 .a46st.L{left:4%}#avg46 .a46st.R{right:4%}#avg46 .a46st.on{opacity:1;transform:none}#avg46 .a46st.talk{filter:none;transform:scale(1.02)}" +
     "#avg46 .a46box{position:absolute;left:50%;transform:translateX(-50%);bottom:max(14px,env(safe-area-inset-bottom));width:min(880px,92vw);min-height:118px;padding:24px 28px 18px;border-radius:16px;" +
@@ -4496,14 +4793,91 @@ window.SAKURAYO_VERSION_CODE = 71;
     root.classList.remove("hidden"); next();
   }
   function url(p) { return cur.o.url ? cur.o.url(p) : p; }
+  function showCg(cg) {
+    var vid = els.cgVid;
+    if (!vid) {
+      vid = document.createElement("video");
+      vid.className = "a46cgv";
+      vid.muted = true;
+      vid.loop = true;
+      vid.playsInline = true;
+      vid.setAttribute("playsinline", "");
+      els.cg.appendChild(vid);
+      els.cgVid = vid;
+    }
+    if (!cg) {
+      els.cg.classList.remove("on");
+      els.cg.style.backgroundImage = "";
+      vid.pause();
+      vid.classList.remove("on");
+      vid.removeAttribute("src");
+      return;
+    }
+    els.cg.style.backgroundImage = "url(\"" + url(cg) + "\")";
+    els.cg.classList.add("on");
+    vid.classList.remove("on");
+    var stem = String(cg).replace(/\.webp$/i, "");
+    var probe = document.createElement("video");
+    var preferWebm = probe.canPlayType && !probe.canPlayType('video/mp4; codecs="avc1.42E01E"') && probe.canPlayType('video/webm; codecs="vp9"');
+    var primary = stem + (preferWebm ? ".webm" : ".mp4");
+    var secondary = stem + (preferWebm ? ".mp4" : ".webm");
+    vid.onloadeddata = function () { vid.classList.add("on"); vid.play().catch(function () {}); };
+    vid.onerror = function () {
+      if (vid.getAttribute("data-fallback") !== "1" && secondary !== cg) {
+        vid.setAttribute("data-fallback", "1");
+        vid.src = url(secondary);
+        return;
+      }
+      vid.classList.remove("on");
+    };
+    vid.setAttribute("data-fallback", "0");
+    if (primary !== cg) vid.src = url(primary);
+    if (cur.o.onCg) cur.o.onCg(cg);
+  }
+  function showBg(bg) {
+    if (!bg) return;
+    els.bg.style.backgroundImage = "url(\"" + url(bg) + "\")";
+    var vid = els.bgVid;
+    if (!vid) {
+      vid = document.createElement("video");
+      vid.muted = true;
+      vid.loop = true;
+      vid.playsInline = true;
+      vid.setAttribute("playsinline", "");
+      els.bg.appendChild(vid);
+      els.bgVid = vid;
+    }
+    var reduce = global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) { vid.classList.remove("on"); vid.removeAttribute("src"); return; }
+    var stem = String(bg).replace(/\.webp$/i, "");
+    var probe = document.createElement("video");
+    var preferWebm = probe.canPlayType && !probe.canPlayType('video/mp4; codecs="avc1.42E01E"') && probe.canPlayType('video/webm; codecs="vp9"');
+    var primary = stem + (preferWebm ? ".webm" : ".mp4");
+    var secondary = stem + (preferWebm ? ".mp4" : ".webm");
+    if (vid.getAttribute("data-stem") === primary) return;
+    vid.classList.remove("on");
+    vid.onloadeddata = function () { vid.classList.add("on"); vid.play().catch(function () {}); };
+    vid.onerror = function () {
+      if (vid.getAttribute("data-fallback") !== "1" && secondary !== bg) {
+        vid.setAttribute("data-fallback", "1");
+        vid.src = url(secondary);
+        return;
+      }
+      vid.classList.remove("on");
+      vid.removeAttribute("src");
+    };
+    vid.setAttribute("data-fallback", "0");
+    vid.setAttribute("data-stem", primary);
+    vid.src = url(primary);
+  }
   function next() {
     if (!cur) return;
     if (cur.typing) { finishType(); return; }
     cur.i++;
     var ln = cur.s[cur.i];
     if (!ln) { end(false); return; }
-    if (ln.bg) els.bg.style.backgroundImage = "url(\"" + url(ln.bg) + "\")";
-    if (ln.cg !== undefined) { if (ln.cg) { els.cg.style.backgroundImage = "url(\"" + url(ln.cg) + "\")"; els.cg.classList.add("on"); cur.o.onCg && cur.o.onCg(ln.cg); } else els.cg.classList.remove("on"); }
+    if (ln.bg) showBg(ln.bg);
+    if (ln.cg !== undefined) showCg(ln.cg);
     if (ln.chap) { els.chap.querySelector("small").textContent = ln.chap[0]; els.chap.querySelector("b").textContent = ln.chap[1]; els.chap.classList.add("on"); setTimeout(function () { els.chap.classList.remove("on"); }, 1800); }
     ["L", "R"].forEach(function (side) {
       var v = ln[side]; if (v === undefined) return; var im = els[side];
@@ -4540,7 +4914,7 @@ window.SAKURAYO_VERSION_CODE = 71;
     if (cur.auto) cur.timer = setTimeout(next, (900 + cur.full.length * 55) / SPEED[cur.auto]);
   }
   function end(skipped) {
-    if (!cur) return; var c = cur; cur = null; clearTimeout(c.timer); root.classList.add("hidden");
+    if (!cur) return; var c = cur; cur = null; clearTimeout(c.timer); if (els.bgVid) els.bgVid.pause(); root.classList.add("hidden");
     if (skipped) for (var i = c.i + 1; i < c.s.length; i++) { var ln = c.s[i]; if (ln.cg) c.o.onCg && c.o.onCg(ln.cg); if (ln.id && c.o.onRead) c.o.onRead(ln.id); }
     c.o.onDone && c.o.onDone({ skipped: !!skipped });
   }
@@ -5296,6 +5670,30 @@ window.SAKURAYO_VERSION_CODE = 71;
     { id: "fashion_sayo_crown", n: "终夜樱冠", r: "SSR", kind: "fashion", face: "sayo", school: "shrine", legend: true, d: "冠亮着，夜已经结束。", lore: ["这是最后一顶还给小夜的冠。", "金边裂开以后还在发光。", "我把它戴上，像把失败戴正。", "冠比头骨更持久，夜已经结束。"] },
     { id: "fashion_aya_funeral", n: "零号葬仪", r: "SSR", kind: "fashion", face: "aya", school: "gun", legend: true, d: "企业为零件举行葬礼。", lore: ["零号企业给拆开的人格开葬仪。", "白花不是安慰，是清单。", "我穿着黑大衣去领自己的那一份。", "没有遗像，只剩下工号。"] },
     { id: "fashion_rion_bride", n: "黄泉花嫁", r: "SSR", kind: "fashion", face: "rion", school: "cult", legend: true, d: "嫁妆是一把葬刀。", lore: ["黄泉不收活人的聘礼。", "红盖头下面还是凛音。", "葬刀比誓词更早落地。", "没有人赶来掀开盖头。"] },
+    { id: "shop_sayo_techcoat", n: "霓虹战术风衣·小夜", r: "R", kind: "fashion", face: "sayo", school: "mech", d: "常服立绘。局内仍穿 Q 版战术风衣。", lore: ["小夜把霓虹战术风衣披在步枪外面，线路比樱花更先亮。", "冷光顺着袖口走到枪管，夜巡还没有人来交接。", "这身衣服让机械师和枪斗术更常出现，本身不加伤害。", "卡面上是常服的她，局里的小人仍是原来的样子。"] },
+    { id: "shop_aya_techcoat", n: "霓虹战术风衣·绫", r: "R", kind: "fashion", face: "aya", school: "mech", d: "常服立绘。局内仍穿 Q 版战术风衣。", lore: ["绫把风衣扣到枪套上面，蓝丝带仍别在银发里。", "霓虹先照见准星，太刀还安静地挂在腰侧。", "机械师和枪斗术因此更常出现，衣服不改弹道。", "卡池里是这身常服，战斗里仍用原来的 Q 版。"] },
+    { id: "shop_rion_techcoat", n: "霓虹战术风衣·凛音", r: "R", kind: "fashion", face: "rion", school: "mech", d: "常服立绘。局内仍穿 Q 版战术风衣。", lore: ["凛音让风衣盖住刀鞘，红绳仍系在黑发上。", "霓虹映在刀镡上，她没有因此把刀拔出来。", "机械师和枪斗术更常被写进选项，刃本身不变。", "这张卡是常服，局里出战的仍是原来的 Q 版。"] },
+    { id: "shop_sayo_biodress", n: "绯血生体礼服·小夜", r: "R", kind: "fashion", face: "sayo", school: "gene", d: "常服立绘。局内仍穿 Q 版生体礼服。", lore: ["小夜穿着绯血生体礼服，步枪仍横在身前。", "礼服上的脉络比伤口更亮，花瓣粘在裙摆上。", "基因、血族和菌群术因此更常出现，礼服不吸血。", "卡面是常服立绘，战斗小人保持原来的 Q 版。"] },
+    { id: "shop_aya_biodress", n: "绯血生体礼服·绫", r: "R", kind: "fashion", face: "aya", school: "gene", d: "常服立绘。局内仍穿 Q 版生体礼服。", lore: ["绫把生体礼服穿在制服外面，手枪没有离手。", "绯红脉络沿着腰封走到太刀的鞘口。", "基因战士、血族和菌群术更常出现在三选一里。", "寻访看到的是常服，局内造型仍是 Q 版。"] },
+    { id: "shop_rion_biodress", n: "绯血生体礼服·凛音", r: "R", kind: "fashion", face: "rion", school: "gene", d: "常服立绘。局内仍穿 Q 版生体礼服。", lore: ["凛音让礼服的下摆避开刀刃，红绳没有换成别的颜色。", "生体纹路亮着，剑还在鞘里等她自己决定。", "基因、血族和菌群术的选项因此更常被写出来。", "这张卡只收录常服，出战仍用原来的 Q 版。"] },
+    { id: "shop_sayo_psirobe", n: "星辉灵能裙装·小夜", r: "R", kind: "fashion", face: "sayo", school: "magical", d: "常服立绘。局内仍穿 Q 版灵能裙。", lore: ["小夜穿着星辉灵能裙，步枪上仍沾着樱花。", "裙摆的星光比枪口的火更安静，夜空因此近了一点。", "魔法少女、魔法师和巫女更常出现，裙子不施法。", "卡池收的是常服，游戏里用的是原来的 Q 版。"] },
+    { id: "shop_aya_psirobe", n: "星辉灵能裙装·绫", r: "R", kind: "fashion", face: "aya", school: "magical", d: "常服立绘。局内仍穿 Q 版灵能裙。", lore: ["绫把灵能裙穿得像另一套制服，蓝眼睛仍看着准星。", "星辉落在太刀鞘上，她没有把刀当成法杖。", "魔法少女、魔法师与巫女的路线因此更常被抽到。", "寻访卡是常服画风，战斗贴图仍是 Q 版。"] },
+    { id: "shop_rion_psirobe", n: "星辉灵能裙装·凛音", r: "R", kind: "fashion", face: "rion", school: "magical", d: "常服立绘。局内仍穿 Q 版灵能裙。", lore: ["凛音让星辉裙盖住刀鞘，红眼在星光里没有变色。", "裙摆亮着，她仍先看剑，再看天空。", "魔法少女、魔法师和巫女因此更容易出现。", "这张卡是常服，局内小人没有换成写实比例。"] },
+    { id: "shop_sayo_idol", n: "末日舞台演出服·小夜", r: "R", kind: "fashion", face: "sayo", school: "idol", d: "常服立绘。局内仍穿 Q 版演出服。", lore: ["小夜站上末日舞台，步枪被灯照得像话筒架。", "演出服的亮片比樱花更吵，她仍把枪口放低。", "战场歌姬、魔法少女和枪斗术更常出现。", "卡面是舞台上的常服，战斗里仍是 Q 版。"] },
+    { id: "shop_aya_idol", n: "末日舞台演出服·绫", r: "R", kind: "fashion", face: "aya", school: "idol", d: "常服立绘。局内仍穿 Q 版演出服。", lore: ["绫把演出服穿得一丝不苟，手枪藏在披风内侧。", "舞台灯先找到蓝丝带，太刀在聚光外保持安静。", "歌姬、魔法少女和枪斗术的选项因此更常出现。", "寻访展示常服，出战模型仍用原来的 Q 版。"] },
+    { id: "shop_rion_idol", n: "末日舞台演出服·凛音", r: "R", kind: "fashion", face: "rion", school: "idol", d: "常服立绘。局内仍穿 Q 版演出服。", lore: ["凛音穿着演出服走上残破舞台，刀鞘比话筒更长。", "聚光灯打在红绳上，她没有对空座位鞠躬。", "战场歌姬、魔法少女和枪斗术更常被写进升级。", "这张卡收录常服，游戏战斗仍使用 Q 版。"] },
+    { id: "shop_sayo_apron", n: "炼金防污围裙·小夜", r: "R", kind: "fashion", face: "sayo", school: "alch", d: "常服立绘。局内仍穿 Q 版围裙。", lore: ["小夜把炼金围裙系在步枪背带外面，口袋里满是试剂。", "围裙声称防污，樱花和火药仍一起沾在下摆。", "炼金术和菌群术因此更常出现，围裙不保证干净。", "卡池是常服立绘，局里的她仍是原来的 Q 版。"] },
+    { id: "shop_aya_apron", n: "炼金防污围裙·绫", r: "R", kind: "fashion", face: "aya", school: "alch", d: "常服立绘。局内仍穿 Q 版围裙。", lore: ["绫把围裙穿成实验记录的一部分，手枪放在台面边缘。", "试剂瓶比工牌更诚实，太刀靠在实验桌旁。", "炼金术与菌群术的路线因此更常被选中。", "寻访卡画的是常服，战斗贴图保持 Q 版。"] },
+    { id: "shop_rion_apron", n: "炼金防污围裙·凛音", r: "R", kind: "fashion", face: "rion", school: "alch", d: "常服立绘。局内仍穿 Q 版围裙。", lore: ["凛音系上炼金围裙，刀仍横在身前，没有换成搅拌棒。", "污渍先落在红绳上，她把瓶子推到刀够不着的地方。", "炼金术和菌群术更常出现，刀的数值没有变。", "这张卡是常服，出战时仍穿原来的 Q 版围裙。"] },
+    { id: "shop_sayo_summon", n: "百鬼召唤睡衣·小夜", r: "R", kind: "fashion", face: "sayo", school: "summon", d: "常服立绘。局内仍穿 Q 版睡衣。", lore: ["小夜穿着百鬼召唤睡衣，步枪横在松垮的袖子外面。", "符纸贴在枪托上，鬼火比樱花更先围过来。", "召唤师和死灵术士因此更常出现在升级里。", "卡面是常服的她，战斗小人仍是 Q 版。"] },
+    { id: "shop_aya_summon", n: "百鬼召唤睡衣·绫", r: "R", kind: "fashion", face: "aya", school: "summon", d: "常服立绘。局内仍穿 Q 版睡衣。", lore: ["绫把睡衣的带子系紧，手枪没有放进枕头底下。", "符纸沿着太刀鞘排开，她仍像在值夜班。", "召唤师与死灵术士的选项因此更常被看见。", "寻访用常服画风，局内继续用原来的 Q 版。"] },
+    { id: "shop_rion_summon", n: "百鬼召唤睡衣·凛音", r: "R", kind: "fashion", face: "rion", school: "summon", d: "常服立绘。局内仍穿 Q 版睡衣。", lore: ["凛音穿着召唤睡衣站在符阵里，刀鞘比睡袍更直。", "百鬼先看红绳，再看她有没有把刀拔出来。", "召唤师和死灵术士因此更容易出现。", "这张卡只是常服，游戏里的造型仍是 Q 版。"] },
+    { id: "shop_sayo_haori", n: "剑道部夜羽织·小夜", r: "SR", kind: "fashion", face: "sayo", school: "cult", d: "常服立绘。局内仍穿 Q 版羽织。", lore: ["小夜把剑道部的夜羽织披在步枪上，袖口宽得能藏下一发。", "羽织的家纹比樱花安静，她没有因此换成刀。", "修仙和忍者的选项因此更常出现，枪仍是枪。", "卡池收录这身常服，战斗里还是原来的 Q 版。"] },
+    { id: "shop_aya_haori", n: "剑道部夜羽织·绫", r: "SR", kind: "fashion", face: "aya", school: "cult", d: "常服立绘。局内仍穿 Q 版羽织。", lore: ["绫穿着夜羽织，手枪收在宽袖里，太刀露在外面。", "剑道部的夜色比企业走廊更黑，蓝丝带仍清晰。", "修仙与忍者因此更常被写进三选一。", "寻访看到常服，出战贴图保持 Q 版羽织。"] },
+    { id: "shop_rion_haori", n: "剑道部夜羽织·凛音", r: "SR", kind: "fashion", face: "rion", school: "cult", d: "常服立绘。局内仍穿 Q 版羽织。", lore: ["凛音把夜羽织穿在刀鞘外面，红绳和羽织是同一种夜。", "宽袖盖住握刀的手，她仍先确认刀在鞘中。", "修仙和忍者的路线因此更常出现。", "这张卡是常服立绘，局里用的是原来的 Q 版。"] },
+    { id: "shop_sayo_festival", n: "镜夜灯会巫女服·小夜", r: "SR", kind: "fashion", face: "sayo", school: "shrine", d: "常服立绘。局内仍穿 Q 版巫女服。", lore: ["小夜穿着镜夜灯会的巫女服，步枪横过红白的衣带。", "灯笼比月亮更近，花簪仍插在长发上。", "巫女、魔法少女和修仙因此更常出现。", "卡池里是灯会常服，战斗小人仍是原来的 Q 版。"] },
+    { id: "shop_aya_festival", n: "镜夜灯会巫女服·绫", r: "SR", kind: "fashion", face: "aya", school: "shrine", d: "常服立绘。局内仍穿 Q 版巫女服。", lore: ["绫把巫女服穿得像另一套制服，手枪贴在袖中。", "灯会的红白衣带绑住太刀，蓝丝带没有摘下。", "巫女、魔法少女与修仙的选项因此更常出现。", "寻访展示常服画风，游戏里继续用 Q 版。"] },
+    { id: "shop_rion_festival", n: "镜夜灯会巫女服·凛音", r: "SR", kind: "fashion", face: "rion", school: "shrine", d: "常服立绘。局内仍穿 Q 版巫女服。", lore: ["凛音穿着灯会巫女服，刀鞘从红白下摆里露出来。", "灯笼照见红绳，她没有把祭典当成收刀的理由。", "巫女、魔法少女和修仙因此更容易出现。", "这张卡是常服，出战仍是原来的 Q 版巫女。"] },
   ]);
   var WEAPON_CARDS = Object.freeze([
     { id: "weapon_sayo_spare", n: "备用夜樱弹", r: "N", kind: "weapon", face: "sayo", d: "备用弹也不够打穿镜核。", lore: ["备用弹匣侧面只印着夜樱，名字已经薄了。", "我一匣一匣数过，还是不够打穿镜核。", "空仓响了一下，最后一发留给没回来的人。", "备用弹也用尽以后，步枪比我更先承认结束。"] },
@@ -5474,6 +5872,30 @@ window.SAKURAYO_VERSION_CODE = 71;
     ".wishSpark46{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;max-height:72px;overflow:auto}" +
     ".wishSpark46 button{min-height:28px;padding:0 8px;border-radius:999px;border:1px solid #ffe6a355;background:#0b0818cc;color:#ffe7a3;font:800 10px/1 system-ui}" +
     ".wishSpark46 button.poor{opacity:.42}" +
+    ".revealPvSplit48{position:absolute;inset:0;z-index:8;display:grid;grid-template-columns:minmax(0,46%) minmax(0,1fr);align-items:center;gap:clamp(12px,3vw,40px);padding:clamp(10px,3vh,28px) clamp(16px,4vw,56px);background:radial-gradient(120% 90% at 22% 50%,#0f2a44 0%,#060a16 62%,#04050c 100%);cursor:pointer;animation:rpvIn48 .28s ease-out}" +
+    ".revealPvSplit48.legend{background:radial-gradient(120% 90% at 22% 50%,#3a2a0e 0%,#0b0a14 62%,#05050c 100%)}" +
+    ".rpvStage48{position:relative;height:100%;min-height:0;clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,22px 100%,0 calc(100% - 22px));background:#030611;box-shadow:inset 0 0 0 1px #6ff3ff55}" +
+    ".rpvStage48 video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}" +
+    ".rpvScan48{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 3px,#6ff3ff0d 3px 4px)}" +
+    ".rpvInfo48{display:flex;flex-direction:column;gap:8px;min-width:0;color:#eaf6ff}" +
+    ".revealPvSplit48 .rpvTag48{align-self:flex-start;padding:4px 12px;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);background:linear-gradient(90deg,#ffd36b,#ff9ec4);color:#1a0f05;font:800 12px/1.2 system-ui;letter-spacing:.12em}" +
+    ".rpvInfo48 b{font:900 clamp(22px,3.4vw,40px)/1.15 system-ui;text-shadow:0 0 18px #6ff3ff66}" +
+    ".rpvInfo48 em{font-style:normal;color:#9fdcff;font:700 14px/1.2 system-ui;letter-spacing:.2em}" +
+    ".rpvInfo48 p{margin:6px 0 0;max-width:34em;padding-left:10px;border-left:2px solid #ff7fb0;color:#d8e6f5;font:500 14px/1.6 system-ui}" +
+    ".rpvHint48{margin-top:10px;color:#8aa6c0;font:600 12px/1 system-ui}" +
+    "@keyframes rpvIn48{from{opacity:0}to{opacity:1}}" +
+    "@media (orientation:portrait){.revealPvSplit48{grid-template-columns:1fr;grid-template-rows:62% auto}}" +
+    ".rosterSlot46 .rosterArt46{position:relative}" +
+    ".rosterStars48{display:block;margin:4px 0 0;color:#ffd77a;font:700 11px/1 system-ui;letter-spacing:1px;text-shadow:0 0 6px #ffb84a88}" +
+    ".rosterArt46 .rosterStars48{position:absolute;left:4px;right:4px;bottom:4px;margin:0;padding:2px 0;text-align:center;font-size:10px;background:linear-gradient(90deg,transparent,#06101ecc 20%,#06101ecc 80%,transparent)}" +
+    ".rosterSlot46.star3 .rosterArt46{box-shadow:0 0 0 1px #6ff3ff88,0 0 10px #3fe0ff55}" +
+    ".rosterSlot46.star5 .rosterArt46{box-shadow:0 0 0 1px #ffe08acc,0 0 14px #ffc84a77;animation:rosterStar48 2.6s ease-in-out infinite}" +
+    "@keyframes rosterStar48{50%{box-shadow:0 0 0 1px #fff2c0,0 0 20px #ffd36baa}}" +
+    "@media (prefers-reduced-motion: reduce){.rosterSlot46.star5 .rosterArt46{animation:none}}" +
+    ".rosterPactTag48{position:absolute;top:4px;right:4px;padding:2px 6px;clip-path:polygon(6px 0,100% 0,calc(100% - 6px) 100%,0 100%);background:linear-gradient(90deg,#ff5f8f,#ff9ec4);color:#fff;font:800 10px/1.3 system-ui;font-style:normal}" +
+    ".rosterSlot46.pact48 .rosterArt46{outline:2px solid #ff7fb0;outline-offset:-2px}" +
+    ".rosterPact48{margin-left:8px;background:linear-gradient(180deg,#6ff3ff,#2aa7d8);border-color:#9ff6ff88;color:#04121c}.rosterPact48.on{background:linear-gradient(180deg,#ff9ec4,#e2558a);color:#fff}" +
+    ".rosterPactHint48{display:block;margin-top:6px;color:#bfefff;font:600 11px/1.4 system-ui}" +
     ".rosterEquip46{margin-top:8px;min-height:36px;padding:0 12px;border-radius:10px;border:1px solid #ffe6a366;background:linear-gradient(180deg,#ffe08a,#d8892b);color:#2a1608;font:800 12px/1 system-ui}" +
     ".chronicleBox46{display:grid;gap:10px}" +
     "#rosterWall46>.chronicleBox46{grid-column:1/-1}" +
@@ -5733,7 +6155,36 @@ window.SAKURAYO_VERSION_CODE = 71;
     ".wishSheetCard46 p{font-size:12px;line-height:1.7}" +
     ".wishSheetActions46{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}.wishSheetActions46 .wishSheetClose46{margin:0}" +
     ".wishSheetCancel46{min-height:44px;padding:0 18px;border-radius:999px;border:1px solid #96e4f566;background:#09101ee0;color:#dbe9f8;font:800 12px/1 system-ui}" +
-    ".wishSheetClose46{min-height:44px!important;display:block;margin:14px 0 0 auto;min-height:34px;padding:0 18px;border-radius:999px;border:0;background:linear-gradient(120deg,#ff6fae,#8fe6f5);color:#081426;font:800 12px/1 system-ui}";
+    ".wishSheetClose46{min-height:44px!important;display:block;margin:14px 0 0 auto;min-height:34px;padding:0 18px;border-radius:999px;border:0;background:linear-gradient(120deg,#ff6fae,#8fe6f5);color:#081426;font:800 12px/1 system-ui}" +
+    "#gachaDrawer .wishV2 .wishUp46{cursor:pointer;transition:transform .15s,box-shadow .15s}" +
+    "#gachaDrawer .wishV2 .wishUp46:hover{transform:translateY(-1px);box-shadow:0 4px 14px #ffd77a44}" +
+    "#gachaDrawer .wishV2 .wishUp46 .fateBadge46{padding:2px 6px;border-radius:999px;background:#25183ecc;border:1px solid #ff9bcc88;color:#ffd8ec;font:800 10px/1 system-ui}" +
+    "#gachaDrawer .wishV2 .wishUp46 .fateBadge46.full{background:linear-gradient(120deg,#ffe08a,#ff8fc4);color:#26101e;border-color:#fff}" +
+    ".wishTicketPill46{padding:5px 9px;border-radius:999px;background:linear-gradient(120deg,#ff6fae33,#8fe6f533);border:1px solid #ff9fcf66;color:#ffe9f5;font:800 10px/1 system-ui;letter-spacing:.06em}" +
+    ".wishFocusGrid46,.wishSparkGrid46{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:8px;margin-top:10px;max-height:46vh;overflow-y:auto;padding-right:4px}" +
+    ".wishFocusItem46{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 6px;border-radius:12px;border:1px solid #96e4f533;background:#101b33cc;color:#e4eef9;text-align:center;cursor:pointer}" +
+    ".wishFocusItem46.on{border-color:#ffd77a;background:linear-gradient(180deg,#2c2142f0,#151d33f0);box-shadow:0 0 16px #ffd77a44}" +
+    ".wishFocusItem46 img{width:54px;height:68px;object-fit:cover;border-radius:8px;border:1px solid #ffffff22}" +
+    ".wishFocusItem46 b{font-size:11px;line-height:1.2;color:#fff}" +
+    ".wishFocusItem46 small{font-size:9px;color:#96e4f5}" +
+    ".wishFocusFilter46{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}" +
+    ".wishFocusFilter46 button{min-height:28px;padding:0 10px;border-radius:999px;border:1px solid #96e4f544;background:#09101ecc;color:#cfe6f5;font:700 11px/1 system-ui}" +
+    ".wishFocusFilter46 button.on{background:linear-gradient(120deg,#ffe08a,#ff9fcf);color:#1d0e1a;border-color:#fff}" +
+    ".wishLogList46{display:grid;gap:5px;max-height:42vh;overflow-y:auto;margin-top:8px;padding-right:4px}" +
+    ".wishLogRow46{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;border-radius:8px;background:#101a30cc;border:1px solid #ffffff14;font-size:11px}" +
+    ".wishLogRow46.r-SSR{border-color:#ffd77a88;background:linear-gradient(90deg,#332418cc,#101a30cc);color:#ffe8a3}" +
+    ".wishLogRow46.r-SR{border-color:#d58cff66;background:linear-gradient(90deg,#261638cc,#101a30cc);color:#f0d6ff}" +
+    ".revealOmen46{text-align:center;margin:0 0 10px;padding:5px 16px;border-radius:999px;font:900 12px/1.2 system-ui;letter-spacing:.24em;background:#0d1528cc;border:1px solid #96e4f555;color:#dbe9f8}" +
+    ".revealOmen46.omen-SSR{background:linear-gradient(90deg,#2a180800,#ffd77a33 50%,#2a180800);border-color:#ffd77aaa;color:#ffe89e;text-shadow:0 0 14px #ffd77a}" +
+    ".revealOmen46.omen-SR{background:linear-gradient(90deg,#200f3300,#d58cff33 50%,#200f3300);border-color:#d58cffaa;color:#f3d4ff;text-shadow:0 0 12px #d58cff}" +
+    ".revealCard46.r-SSR:not(.flipped) .revealFace46.back,.revealCard46.r-LEGEND:not(.flipped) .revealFace46.back{border-color:#ffd77acc;box-shadow:0 0 22px #ffd77a66}" +
+    ".revealCard46.r-SR:not(.flipped) .revealFace46.back{border-color:#d58cffaa;box-shadow:0 0 16px #d58cff44}" +
+    ".revealDupe46{position:absolute;top:8px;right:8px;z-index:2;padding:2px 6px;border-radius:999px;background:#09101ed9;border:1px solid #96e4f577;color:#96e4f5;font:800 9px/1.2 system-ui}" +
+    ".rosterResonance46{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 10px;padding:8px 12px;border-radius:12px;background:#120d24cc;border:1px solid #ffe6a344;font-size:11px;color:#e7d7ef}" +
+    ".rosterResonance46 em{font-style:normal;padding:3px 8px;border-radius:999px;background:#26183ecc;border:1px solid #ff9bcc55;color:#ffe6a3;font:800 10px/1 system-ui}" +
+    ".rosterFilter46{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}" +
+    ".rosterFilter46 button{min-height:28px;padding:0 10px;border-radius:999px;border:1px solid #ff9bcc44;background:#140e24cc;color:#e7d7ef;font:700 11px/1 system-ui}" +
+    ".rosterFilter46 button.on{background:linear-gradient(120deg,#ffe08a,#d8892b);color:#2a1608;border-color:#ffe6a3}";
 
   function injectStyle() {
     if (!global.document) return;
@@ -5767,6 +6218,7 @@ window.SAKURAYO_VERSION_CODE = 71;
     list.forEach(function (card) {
       owned[card.id] = clampInt(rawOwned[card.id], 0, 9999);
     });
+    var focusId = typeof incoming.focusId === "string" && list.some(function (c) { return c.id === incoming.focusId; }) ? incoming.focusId : "";
     return {
       pity: clampInt(incoming.pity, 0, RATES.pitySSR),
       pitySR: clampInt(incoming.pitySR, 0, RATES.pitySR),
@@ -5774,8 +6226,11 @@ window.SAKURAYO_VERSION_CODE = 71;
       tenPulls: clampInt(incoming.tenPulls, 0, 999999),
       owned: owned,
       last: Array.isArray(incoming.last) ? incoming.last.slice(0, 20) : [],
+      history: Array.isArray(incoming.history) ? incoming.history.slice(0, 40) : [],
       equipped: typeof incoming.equipped === "string" ? incoming.equipped : "",
       shards: clampInt(incoming.shards, 0, 999999),
+      focusId: focusId,
+      fatePoints: focusId ? clampInt(incoming.fatePoints, 0, 1) : 0,
     };
   }
 
@@ -5798,6 +6253,8 @@ window.SAKURAYO_VERSION_CODE = 71;
     var rosterTab = incoming.rosterTab === "school" || incoming.rosterTab === "job" || incoming.rosterTab === "fusion" || incoming.rosterTab === "fashion" || incoming.rosterTab === "weapon" || incoming.rosterTab === "chronicle"
       ? incoming.rosterTab
       : "scrap";
+    var focusId = typeof incoming.focusId === "string" && catalog.some(function (c) { return c.id === incoming.focusId; }) ? incoming.focusId : "";
+    var rosterFilter = typeof incoming.rosterFilter === "string" ? incoming.rosterFilter : "all";
     shop.ops = {
       pity: clampInt(incoming.pity, 0, RATES.pitySSR),
       pitySR: clampInt(incoming.pitySR, 0, RATES.pitySR),
@@ -5805,10 +6262,16 @@ window.SAKURAYO_VERSION_CODE = 71;
       tenPulls: clampInt(incoming.tenPulls, 0, 999999),
       owned: owned,
       last: Array.isArray(incoming.last) ? incoming.last.slice(0, 20) : [],
+      history: Array.isArray(incoming.history) ? incoming.history.slice(0, 40) : [],
       cheatUsed: incoming.cheatUsed ? 1 : 0,
       shards: clampInt(incoming.shards, 0, 999999),
       pool: pool,
       rosterTab: rosterTab,
+      rosterFilter: rosterFilter,
+      focusId: focusId,
+      fatePoints: focusId ? clampInt(incoming.fatePoints, 0, 1) : 0,
+      noviceUsed: clampInt(incoming.noviceUsed, 0, 2),
+      pact: typeof incoming.pact === "string" && PACT_KINDS[(cardOf(incoming.pact) || {}).kind] && (owned[incoming.pact] || 0) > 0 ? incoming.pact : "",
       supplies: ['firstRun','chapter1','chapter2','chapter3','chapter4','kills500'].reduce(function(receipts,id){
         receipts[id] = !!(incoming.supplies && incoming.supplies[id] === true);
         return receipts;
@@ -5957,13 +6420,38 @@ window.SAKURAYO_VERSION_CODE = 71;
     return ops;
   }
 
-  function applyPull(ops, rng, list, shardHost) {
-    var want = rollWant(ops, rng);
+  function applyPull(ops, rng, list, shardHost, forceSsr) {
+    var want = forceSsr ? "SSR" : rollWant(ops, rng);
     var rarity = downgradeRarity(want, list);
-    var card = pickOfRarity(rarity, rng, list, ops.owned, want);
+    var focusCard = ops.focusId ? cardOf(ops.focusId) : null;
+    if (focusCard && !list.some(function (c) { return c.id === focusCard.id; })) focusCard = null;
+    var card = null;
+    var hitFocus = false;
+    if (focusCard && (rarity === focusCard.r || (want === "SSR" && focusCard.r === "SSR"))) {
+      if ((ops.fatePoints || 0) >= 1) {
+        card = focusCard;
+        ops.fatePoints = 0;
+        hitFocus = true;
+      } else if (rng() < 0.5) {
+        card = focusCard;
+        ops.fatePoints = 0;
+        hitFocus = true;
+      } else {
+        card = pickOfRarity(rarity, rng, list, ops.owned, want);
+        if (card && card.id === focusCard.id) {
+          ops.fatePoints = 0;
+          hitFocus = true;
+        } else {
+          ops.fatePoints = 1;
+        }
+      }
+    } else {
+      card = pickOfRarity(rarity, rng, list, ops.owned, want);
+    }
     if (!card) return null;
     ops.pity += 1;
     ops.pitySR += 1;
+    var pullAtPity = ops.pity;
     if (card.r === "SSR" || want === "SSR") {
       ops.pity = 0;
       ops.pitySR = 0;
@@ -5975,7 +6463,11 @@ window.SAKURAYO_VERSION_CODE = 71;
     ops.pulls += 1;
     shardHost.shards = clampInt((shardHost.shards || 0) + RATES.shardPull, 0, 999999);
     if (prev > 0) shardHost.shards = clampInt(shardHost.shards + RATES.shardDupe, 0, 999999);
-    return { id: card.id, r: card.r, n: card.n, pity: ops.pity, isNew: prev === 0, kind: card.kind || "", legend: !!card.legend };
+    var row = { id: card.id, r: card.r, n: card.n, pity: ops.pity, pullAtPity: pullAtPity, isNew: prev === 0, kind: card.kind || "", legend: !!card.legend, hitFocus: hitFocus };
+    if (!Array.isArray(ops.history)) ops.history = [];
+    ops.history.unshift(row);
+    if (ops.history.length > 40) ops.history.length = 40;
+    return row;
   }
 
   function pull(save, count, rng, poolId) {
@@ -5999,7 +6491,7 @@ window.SAKURAYO_VERSION_CODE = 71;
     var shardHost = pool === "remnant" ? save.shop40.ops : state;
     var results = [];
     for (var i = 0; i < n; i++) {
-      var row = applyPull(state, rand, list, shardHost);
+      var row = applyPull(state, rand, list, shardHost, false);
       if (row) results.push(row);
     }
     if (n === 10) state.tenPulls += 1;
@@ -6016,7 +6508,131 @@ window.SAKURAYO_VERSION_CODE = 71;
       pulls: save.shop40.ops.pulls,
       tenPulls: save.shop40.ops.tenPulls,
       shards: save.shop40.ops.shards,
+      focusId: state.focusId || "",
+      fatePoints: state.fatePoints || 0,
     };
+  }
+
+  var NOVICE_COST = 1150;
+  function pullNovice(save, rng) {
+    if (!save || typeof save !== "object") return { ok: false, reason: "save", results: [] };
+    save.shop40 = normalizeOps(save.shop40 || {});
+    var ops = save.shop40.ops;
+    if ((ops.noviceUsed || 0) >= 2) {
+      return { ok: false, reason: "limit", results: [], coins: save.coins, noviceUsed: ops.noviceUsed };
+    }
+    var tickets = Math.max(0, Number(save.wishTickets46) || 0), useTicket = tickets >= 8;
+    if (!useTicket && save.coins < NOVICE_COST) {
+      return { ok: false, reason: "coins", results: [], coins: save.coins, noviceUsed: ops.noviceUsed };
+    }
+    var rand = typeof rng === "function" ? rng : Math.random;
+    var list = cardsForPool("remnant");
+    var isFirstNovice = (ops.noviceUsed || 0) === 0;
+    var results = [];
+    var hasSsrInBatch = false;
+    for (var i = 0; i < 10; i++) {
+      var forceSsr = isFirstNovice && i === 9 && !hasSsrInBatch;
+      var row = applyPull(ops, rand, list, ops, forceSsr);
+      if (row) {
+        if (row.r === "SSR" || row.legend) hasSsrInBatch = true;
+        results.push(row);
+      }
+    }
+    ops.tenPulls += 1;
+    ops.noviceUsed = clampInt((ops.noviceUsed || 0) + 1, 0, 2);
+    ops.last = results.slice();
+    if (useTicket) save.wishTickets46 = tickets - 8; else save.coins = save.coins - NOVICE_COST;
+    return {
+      ok: true,
+      novice: true,
+      noviceUsed: ops.noviceUsed,
+      results: results,
+      coins: save.coins,
+      pool: "remnant",
+      pity: ops.pity,
+      pitySR: ops.pitySR,
+      owned: ops.owned,
+      pulls: ops.pulls,
+      tenPulls: ops.tenPulls,
+      shards: ops.shards,
+    };
+  }
+
+  function setFocus(save, poolId, cardId) {
+    if (!save || typeof save !== "object") return { ok: false, reason: "save" };
+    save.shop40 = normalizeOps(save.shop40 || {});
+    var pool = poolId || save.shop40.ops.pool || "remnant";
+    if (POOL_IDS.indexOf(pool) < 0) pool = "remnant";
+    var state = poolState(save.shop40.ops, pool);
+    if (!cardId) {
+      state.focusId = "";
+      state.fatePoints = 0;
+      return { ok: true, pool: pool, focusId: "", fatePoints: 0 };
+    }
+    var list = cardsForPool(pool);
+    var target = null;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].id === cardId) { target = list[i]; break; }
+    }
+    if (!target || (target.r !== "SSR" && target.r !== "SR")) {
+      return { ok: false, reason: "card", pool: pool };
+    }
+    if (state.focusId !== target.id) {
+      state.focusId = target.id;
+      state.fatePoints = 0;
+    }
+    return { ok: true, pool: pool, focusId: state.focusId, fatePoints: state.fatePoints, n: target.n, r: target.r };
+  }
+
+  /* 本命契约（移植 #33 设计，重写）：从已回收的流派 / 转职 / 融合卡里选一张缔结。
+   * 只影响开局（自动习得该流派一张入门技）和该流派的刷新权重 ×1.25，不加面板数值。 */
+  var PACT_KINDS = { school: 1, job: 1, fusion: 1 };
+  var PACT_MUL = 1.25;
+  function pactOf(save) {
+    var ops = save && save.shop40 && save.shop40.ops;
+    var id = ops && ops.pact;
+    var card = id && cardOf(id);
+    if (!card || !PACT_KINDS[card.kind] || !((ops.owned || {})[id] > 0)) return null;
+    return { id: id, n: card.n, kind: card.kind, face: card.face || "", schools: card.kind === "fusion" ? (card.pair || []).slice() : [card.school] };
+  }
+  function setPact(save, id) {
+    if (!save || typeof save !== "object") return { ok: false, reason: "save" };
+    save.shop40 = normalizeOps(save.shop40 || {});
+    var ops = save.shop40.ops;
+    if (!id) { ops.pact = ""; return { ok: true, pact: "" }; }
+    var card = cardOf(id);
+    if (!card || !PACT_KINDS[card.kind]) return { ok: false, reason: "card" };
+    if (!((ops.owned || {})[id] > 0)) return { ok: false, reason: "owned" };
+    ops.pact = ops.pact === id ? "" : id;
+    return { ok: true, pact: ops.pact };
+  }
+  function pactMul(save, school) {
+    var p = pactOf(save);
+    return p && school && p.schools.indexOf(school) >= 0 ? PACT_MUL : 1;
+  }
+  /* 共鸣星级：重复回收只点亮星与卡框，不加任何数值（守住「收藏不增加战斗属性」）。 */
+  function starOf(count) {
+    return Math.max(0, Math.min(5, Math.floor(Number(count) || 0)));
+  }
+  function starRow(count) {
+    var n = starOf(count), out = "";
+    for (var i = 0; i < 5; i++) out += i < n ? "★" : "☆";
+    return out;
+  }
+
+  function schoolMultipliers(save) {
+    var out = [];
+    Object.keys(SCHOOL_LABEL).forEach(function (sid) {
+      var mul = 1;
+      if (hasSchool(save, sid)) mul *= 1.3;
+      if (hasJob(save, sid)) mul *= 1.5;
+      if (hasFusion(save, sid)) mul *= 1.6;
+      mul *= pactMul(save, sid);
+      if (mul > 1.01) {
+        out.push({ school: sid, name: SCHOOL_LABEL[sid], mul: Number(mul.toFixed(2)) });
+      }
+    });
+    return out;
   }
 
   function grantCheat(save) {
@@ -6047,6 +6663,11 @@ window.SAKURAYO_VERSION_CODE = 71;
       rosterTabs: ROSTER_TABS.slice(),
       pool: ops.pool,
       rosterTab: ops.rosterTab,
+      rosterFilter: ops.rosterFilter || "all",
+      focusId: ops.focusId || "",
+      fatePoints: ops.fatePoints || 0,
+      noviceUsed: ops.noviceUsed || 0,
+      history: (ops.history || []).slice(),
       cards: CARDS.map(function (card) {
         return { id: card.id, n: card.n, r: card.r, kind: card.kind || "scrap", count: ops.owned[card.id] || 0 };
       }),
@@ -6072,6 +6693,7 @@ window.SAKURAYO_VERSION_CODE = 71;
       fashion: ops.fashion,
       weapon: ops.weapon,
       coins: save ? save.coins : 0,
+      wishTickets: save ? Math.max(0, Number(save.wishTickets46) || 0) : 0,
       cheatUsed: !!ops.cheatUsed,
     };
   }
@@ -6197,7 +6819,11 @@ window.SAKURAYO_VERSION_CODE = 71;
     weapon: { tab: "武器", kind: "武器寻访", name: "兵装回收", time: "常驻卡池 · 不限时" }
   });
 
-  function featuredCard(pool) {
+  function featuredCard(pool, focusId) {
+    if (focusId) {
+      var focused = cardOf(focusId);
+      if (focused) return focused;
+    }
     var list = cardsForPool(pool) || [];
     for (var i = 0; i < list.length; i++) if (list[i].legend) return list[i];
     for (var j = 0; j < list.length; j++) if (list[j].r === "SSR") return list[j];
@@ -6208,26 +6834,182 @@ window.SAKURAYO_VERSION_CODE = 71;
     return String(v == null ? "" : v).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; });
   }
 
-  function bindWishSheet(host, pool, state) {
+  function cardHeroTag(card) {
+    if (!card) return "all";
+    if (card.face) return card.face;
+    if (card.hero) return card.hero;
+    var id = String(card.id || "");
+    if (id.indexOf("sayo") >= 0 || card.school === "gun" || card.school === "mech" || card.school === "mage" || card.school === "star") return "sayo";
+    if (id.indexOf("aya") >= 0 || card.school === "shrine" || card.school === "alch" || card.school === "ward" || card.school === "puppet") return "aya";
+    if (id.indexOf("rion") >= 0 || card.school === "sword" || card.school === "vamp" || card.school === "cult" || card.school === "ice") return "rion";
+    return "all";
+  }
+
+  function cardTendencyText(card) {
+    if (!card) return "";
+    if (card.kind === "school" && card.school) return (SCHOOL_LABEL[card.school] || card.school) + "流派倾向 ×1.3";
+    if (card.kind === "job" && card.school) return (SCHOOL_LABEL[card.school] || card.school) + "流派倾向 ×1.5";
+    if (card.kind === "fusion" && Array.isArray(card.pair)) {
+      return card.pair.map(function (s) { return SCHOOL_LABEL[s] || s; }).join(" + ") + " 倾向 ×1.6";
+    }
+    if (card.kind === "fashion" && card.school) return "穿戴时" + (SCHOOL_LABEL[card.school] || card.school) + "流派倾向 ×1.3";
+    return "纯外观与证词收藏";
+  }
+
+  function bindWishSheet(host, pool, state, save, handlers) {
     var sheet = host.querySelector("#gachaSheet46");
     if (!sheet) return;
     function open(html) {
       sheet.innerHTML = '<div class="wishSheetCard46">' + html + '<button type="button" class="wishSheetClose46">知道了</button></div>';
       sheet.classList.remove("hidden");
-      sheet.querySelector(".wishSheetClose46").onclick = function () { sheet.classList.add("hidden"); };
+      hideBrokenArt(sheet);
+      var closeBtn = sheet.querySelector(".wishSheetClose46");
+      if (closeBtn) closeBtn.onclick = function () { sheet.classList.add("hidden"); };
     }
     sheet.onclick = function (e) { if (e.target === sheet) sheet.classList.add("hidden"); };
-    var info = host.querySelector("#gachaInfo46"), log = host.querySelector("#gachaLog46");
+    var info = host.querySelector("#gachaInfo46"),
+      log = host.querySelector("#gachaLog46"),
+      focusBtn = host.querySelector("#gachaFocusBtn46"),
+      sparkBtn = host.querySelector("#gachaSparkShop46"),
+      noviceBtn = host.querySelector("#gachaNovice46");
     if (info) info.onclick = function () {
+      var curPity = (state && state.pity) || 0;
+      var curSsrPct = (ssrRate(curPity) * 100).toFixed(1);
+      var poolCards = cardsForPool(pool);
+      var ssrCount = poolCards.filter(function (c) { return c.r === "SSR"; }).length;
+      var srCount = poolCards.filter(function (c) { return c.r === "SR"; }).length;
       open("<h4>寻访详情</h4><ul>" +
-        "<li>证人（SSR）基础概率 " + (RATES.SSR * 100).toFixed(1) + "%，第 " + RATES.softPity + " 抽起提升，" + RATES.pitySSR + " 抽必出</li>" +
+        "<li>证人（SSR）基础概率 " + (RATES.SSR * 100).toFixed(1) + "%，第 " + RATES.softPity + " 抽起提升，" + RATES.pitySSR + " 抽必出（当前下一抽实时概率：<b style=\"color:#ffd77a\">" + curSsrPct + "%</b>）</li>" +
         "<li>稀有（SR）基础概率 " + (RATES.SR * 100).toFixed(1) + "%，每 " + RATES.pitySR + " 抽至少一张</li>" +
-        "<li>R " + (RATES.R * 100).toFixed(0) + "% · N " + (RATES.N * 100).toFixed(0) + "%</li>" +
+        "<li>R " + (RATES.R * 100).toFixed(0) + "% · N " + (RATES.N * 100).toFixed(0) + "%（本池含 SSR " + ssrCount + " 张 · SR " + srCount + " 张）</li>" +
+        "<li>命定定轨：点击主界面 UP 胶囊可自选定轨目标，出对应稀有度时 50% 概率命中；若未命中获 1 点命定值，下次必出定轨卡</li>" +
         "<li>每抽获得碎镜片 " + RATES.shardPull + "，重复卡 +" + RATES.shardDupe + "；集满 " + RATES.spark + " 可兑换指定卡</li>" +
         "<li>收藏不增加战斗属性</li></ul>");
     };
     if (log) log.onclick = function () {
-      open("<h4>寻访记录</h4><p>" + (POOL_META[pool] || POOL_META.remnant).name + " 累计 " + ((state && state.pulls) || 0) + " 次 · 当前保底计数 " + ((state && state.pity) || 0) + " / " + RATES.pitySSR + "</p>");
+      var hist = (state && Array.isArray(state.history) && state.history.length) ? state.history : (state && Array.isArray(state.last)) ? state.last : [];
+      var rowsHtml = "";
+      if (hist.length) {
+        rowsHtml = '<div class="wishLogList46">' + hist.slice(0, 30).map(function (h) {
+          var badge = h.legend ? "传说" : h.r || "N";
+          return '<div class="wishLogRow46 r-' + (h.r || "N") + '"><span><b>[' + badge + ']</b> ' + escapeHtml(h.n || h.id) + (h.isNew ? ' <em style="color:#78ffb0;font-style:normal">NEW</em>' : "") + (h.hitFocus ? ' <em style="color:#ffd77a;font-style:normal">定轨命中</em>' : "") + '</span><small>' + (h.pullAtPity ? "第 " + h.pullAtPity + " 抽" : "近期回收") + "</small></div>";
+        }).join("") + "</div>";
+      } else {
+        rowsHtml = '<p style="color:#9db4cc">暂无近期寻访明细，开始寻访后将自动记录最近 40 条回收档案。</p>';
+      }
+      open("<h4>寻访记录</h4><p>" + (POOL_META[pool] || POOL_META.remnant).name + " 累计 " + ((state && state.pulls) || 0) + " 次 · 当前保底计数 " + ((state && state.pity) || 0) + " / " + RATES.pitySSR + (state && state.focusId ? " · 命定值 " + (state.fatePoints || 0) + " / 1" : "") + "</p>" + rowsHtml);
+    };
+    function openFocusSheet(filterChar) {
+      var curChar = filterChar || "all";
+      var candidates = cardsForPool(pool).filter(function (c) {
+        return (c.r === "SSR" || c.r === "SR") && c.kind !== "scrap";
+      });
+      var filtered = curChar === "all" ? candidates : candidates.filter(function (c) { return cardHeroTag(c) === curChar; });
+      var curFocus = (state && state.focusId) || "";
+      var html = "<h4>命定定轨 · 自选 UP 目标</h4>" +
+        "<p>选定目标后，抽出同稀有度卡时 <b>50%</b> 概率直接为定轨卡；若歪出其他卡则命定值 <b>+1（上限 1/1）</b>，下次必出定轨目标！收藏不增加战斗属性。</p>" +
+        '<div class="wishFocusFilter46">' +
+        '<button type="button" data-fchar="all"' + (curChar === "all" ? ' class="on"' : "") + ">全部 (" + candidates.length + ")</button>" +
+        '<button type="button" data-fchar="sayo"' + (curChar === "sayo" ? ' class="on"' : "") + ">月城小夜</button>" +
+        '<button type="button" data-fchar="aya"' + (curChar === "aya" ? ' class="on"' : "") + ">神代绫</button>" +
+        '<button type="button" data-fchar="rion"' + (curChar === "rion" ? ' class="on"' : "") + ">黑羽凛音</button>" +
+        (curFocus ? '<button type="button" data-fclear="1">取消定轨</button>' : "") +
+        "</div>" +
+        '<div class="wishFocusGrid46">' +
+        filtered.map(function (c) {
+          var count = (state && state.owned && state.owned[c.id]) || 0;
+          var isOn = curFocus === c.id;
+          return '<button type="button" class="wishFocusItem46' + (isOn ? " on" : "") + '" data-focus-pick="' + c.id + '">' +
+            '<img data-art alt="" src="' + artSrc(handlers, "gacha/" + c.id + ".webp") + '">' +
+            "<b>[" + c.r + "] " + escapeHtml(c.n) + "</b>" +
+            "<small>" + escapeHtml(cardTendencyText(c)) + "</small>" +
+            "<small>" + (isOn ? "🎯 当前定轨" : count > 0 ? "已回收 ×" + count : "未回收") + "</small>" +
+            "</button>";
+        }).join("") +
+        "</div>";
+      open(html);
+      var fbtns = sheet.querySelectorAll("[data-fchar]");
+      for (var fi = 0; fi < fbtns.length; fi++) {
+        fbtns[fi].onclick = function () { openFocusSheet(this.getAttribute("data-fchar")); };
+      }
+      var clearBtn = sheet.querySelector("[data-fclear]");
+      if (clearBtn) {
+        clearBtn.onclick = function () {
+          setFocus(save, pool, "");
+          sheet.classList.add("hidden");
+          if (handlers && typeof handlers.setFocus === "function") handlers.setFocus(pool, "");
+          else renderGacha(host, save, handlers);
+        };
+      }
+      var picks = sheet.querySelectorAll("[data-focus-pick]");
+      for (var pk = 0; pk < picks.length; pk++) {
+        picks[pk].onclick = function () {
+          var cid = this.getAttribute("data-focus-pick");
+          setFocus(save, pool, cid);
+          sheet.classList.add("hidden");
+          if (handlers && typeof handlers.setFocus === "function") handlers.setFocus(pool, cid);
+          else renderGacha(host, save, handlers);
+        };
+      }
+    }
+    if (focusBtn) focusBtn.onclick = function () { openFocusSheet("all"); };
+    if (sparkBtn) sparkBtn.onclick = function () {
+      var curShards = pool === "remnant" ? (save && save.shop40 && save.shop40.ops && save.shop40.ops.shards) || 0 : (state && state.shards) || 0;
+      var ssrList = cardsForPool(pool).filter(function (c) { return (c.legend || c.r === "SSR") && c.kind !== "scrap"; });
+      var html = "<h4>碎镜工坊 · 指定证人兑换</h4>" +
+        "<p>当前碎镜片：<b>" + curShards + " / " + RATES.spark + "</b>（每抽 +1，重复卡 +8）。集满 " + RATES.spark + " 枚可直接指定兑换任意未拥有的证人 SSR 卡。收藏不增加战斗属性。</p>" +
+        '<div class="wishSparkGrid46">' +
+        ssrList.map(function (c) {
+          var owned = ((state && state.owned && state.owned[c.id]) || 0) > 0;
+          var canSpark = !owned && curShards >= RATES.spark;
+          return '<button type="button" class="wishFocusItem46' + (canSpark ? " on" : "") + '" data-workshop-spark="' + c.id + '"' + (owned || !canSpark ? " disabled" : "") + ">" +
+            '<img data-art alt="" src="' + artSrc(handlers, "gacha/" + c.id + ".webp") + '">' +
+            "<b>" + escapeHtml(c.n) + "</b>" +
+            "<small>" + escapeHtml(cardTendencyText(c)) + "</small>" +
+            "<small>" + (owned ? "✓ 已点亮" : canSpark ? "💎 200 碎镜兑换" : "需 200 碎镜片") + "</small>" +
+            "</button>";
+        }).join("") +
+        "</div>";
+      open(html);
+      var sbtns = sheet.querySelectorAll("[data-workshop-spark]");
+      for (var si = 0; si < sbtns.length; si++) {
+        sbtns[si].onclick = function () {
+          var id = this.getAttribute("data-workshop-spark");
+          sheet.classList.add("hidden");
+          if (handlers && typeof handlers.spark === "function") handlers.spark(id);
+          else {
+            spark(save, pool, id);
+            renderGacha(host, save, handlers);
+          }
+        };
+      }
+    };
+    if (noviceBtn) noviceBtn.onclick = function () {
+      var used = (save && save.shop40 && save.shop40.ops && save.shop40.ops.noviceUsed) || 0;
+      var left = Math.max(0, 2 - used);
+      var html = "<h4>初夜迎新 · 新手特惠十连</h4>" +
+        "<p>迎新特惠：前 2 次十连享 <b>8 折（" + NOVICE_COST + " 樱花币 或 8 张寻访券）</b>，且<b>首次迎新十连必出至少 1 张 SSR 证人/融合卡</b>！当前剩余次数：<b>" + left + " / 2</b>。收藏不增加战斗属性。</p>" +
+        (left > 0
+          ? '<div class="wishSheetActions46"><button type="button" class="wishSheetCancel46">稍后再说</button><button type="button" class="wishSheetClose46" id="gachaNoviceConfirm46">立即迎新十连（' + NOVICE_COST + '）</button></div>'
+          : "");
+      sheet.innerHTML = '<div class="wishSheetCard46">' + html + (left <= 0 ? '<button type="button" class="wishSheetClose46">知道了</button>' : "") + "</div>";
+      sheet.classList.remove("hidden");
+      var cancel = sheet.querySelector(".wishSheetCancel46");
+      if (cancel) cancel.onclick = function () { sheet.classList.add("hidden"); };
+      var closeOrGo = sheet.querySelector(".wishSheetClose46");
+      if (closeOrGo) {
+        closeOrGo.onclick = function () {
+          sheet.classList.add("hidden");
+          if (left > 0) {
+            if (handlers && typeof handlers.pullNovice === "function") handlers.pullNovice();
+            else {
+              var res = pullNovice(save);
+              renderGacha(host, save, handlers);
+              if (res && res.ok) showReveal(res.results, handlers);
+            }
+          }
+        };
+      }
     };
   }
 
@@ -6242,16 +7024,19 @@ window.SAKURAYO_VERSION_CODE = 71;
     var pitySR = state.pitySR || 0;
     var pulls = state.pulls || 0;
     var shards = pool === "remnant" ? info.shards : state.shards || 0;
+    var tickets = info.wishTickets || 0;
     var ssrLeft = Math.max(0, RATES.pitySSR - pity);
     var srLeft = Math.max(0, RATES.pitySR - pitySR);
     var ssrPct = Math.max(0, Math.min(100, Math.round((pity / RATES.pitySSR) * 100)));
     var srPct = Math.max(0, Math.min(100, Math.round((pitySR / RATES.pitySR) * 100)));
     var empty = !cardsForPool(pool).length;
-    var poor1 = info.coins < RATES.single || empty;
-    var poor10 = info.coins < RATES.ten || empty;
+    var poor1 = (tickets < 1 && info.coins < RATES.single) || empty;
+    var poor10 = (tickets < 10 && info.coins < RATES.ten) || empty;
     var sub = "收藏不增加战斗属性 · " + (pool === "fashion" ? "时装装备保留展示与标注倾向" : pool === "weapon" ? "武器装备仅作收藏展示" : "职业卡仅影响标注流派倾向");
     var meta = POOL_META[pool] || POOL_META.remnant;
-    var up = featuredCard(pool);
+    var focusId = state.focusId || "";
+    var fatePoints = state.fatePoints || 0;
+    var up = featuredCard(pool, focusId);
     var coinIcon = '<img class="wishCoin46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/icon_coin.webp") + '">';
     var shardIcon = '<img class="wishCoin46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/icon_shard.webp") + '">';
     var tabHtml = "";
@@ -6259,6 +7044,7 @@ window.SAKURAYO_VERSION_CODE = 71;
       var pid = POOL_IDS[pi], pm = POOL_META[pid];
       tabHtml += '<button type="button" data-pool="' + pid + '"' + (pool === pid ? ' class="on" aria-current="true"' : "") + "><b>" + pm.tab + "</b><small>" + pm.kind + "</small></button>";
     }
+    var noviceLeft = Math.max(0, 2 - (info.noviceUsed || 0));
     host.innerHTML =
       '<div class="wishStage46 wishV2">' +
       '<img class="wishBanner46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/banner_" + pool + ".webp") + '">' +
@@ -6266,19 +7052,24 @@ window.SAKURAYO_VERSION_CODE = 71;
       '<img class="wishHero46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/up_" + (pool === "fashion" ? "crown" : hero) + ".webp") + '">' +
       '<div class="wishPetals46">' + petalMarks() + "</div>" +
       '<nav class="wishTabs46" id="gachaTabs46" aria-label="卡池">' + tabHtml + "</nav>" +
-      '<div class="wishWallet46" aria-label="货币">' + coinIcon + "<b>" + info.coins + '</b><span class="wishShardPill46">' + shardIcon + '碎镜片 ' + shards + " / " + RATES.spark + "</span></div>" +
+      '<div class="wishWallet46" aria-label="货币">' +
+      coinIcon + "<b>" + info.coins + "</b>" +
+      (tickets > 0 ? '<span class="wishTicketPill46">🎫 寻访券 ×' + tickets + "</span>" : "") +
+      '<span class="wishShardPill46">' + shardIcon + '碎镜片 ' + shards + " / " + RATES.spark + "</span></div>" +
       '<div class="wishTitle46"><span class="wishTag46">' + meta.kind + "</span><h3>" + meta.name + "</h3>" +
-      (up ? '<div class="wishUp46"><em>UP</em><b>' + escapeHtml(up.n) + "</b><i>" + up.r + "</i></div>" : "") +
+      (up ? '<div class="wishUp46" id="gachaFocusBtn46" role="button" tabindex="0" title="点击切换定轨 UP 目标"><em>' + (focusId ? "定轨" : "UP") + "</em><b>" + escapeHtml(up.n) + "</b><i>" + up.r + "</i>" + (focusId ? '<span class="fateBadge46' + (fatePoints >= 1 ? " full" : "") + '">命定 ' + fatePoints + "/1</span>" : '<span class="fateBadge46">切换定轨</span>') + "</div>" : "") +
       "<p>" + sub + '</p><small class="wishTime46">' + meta.time + "</small></div>" +
       '<div class="wishPity46"><div class="pityRow46"><span>距证人保底还有 ' + ssrLeft + ' 抽</span><div class="pityRail46"><i style="width:' + ssrPct + '%"></i></div></div><div class="pityRow46 sr"><span>距稀有保底还有 ' + srLeft + ' 抽</span><div class="pityRail46"><i style="width:' + srPct + '%"></i></div></div></div>' +
-      '<div class="wishLinks46"><button type="button" id="gachaInfo46">详情</button><button type="button" id="gachaLog46">记录</button><span class="wishPills46"><b>已寻访 ' + pulls + "</b><b>软保 " + RATES.softPity + "</b></span></div>" +
+      '<div class="wishLinks46"><button type="button" id="gachaInfo46">详情</button><button type="button" id="gachaLog46">记录</button><button type="button" id="gachaSparkShop46">工坊</button>' +
+      (pool === "remnant" && noviceLeft > 0 ? '<button type="button" id="gachaNovice46">迎新8折</button>' : "") +
+      '<span class="wishPills46"><b>已寻访 ' + pulls + "</b><b>软保 " + RATES.softPity + "</b></span></div>" +
       '<div class="wishDock46">' +
-      '<div class="gachaActions46"><button type="button" id="gachaPull1"' + (poor1 ? ' class="poor"' : "") + "><span>单次寻访</span><small>" + coinIcon + RATES.single + '</small></button><button type="button" id="gachaPull10"' + (poor10 ? ' class="poor"' : "") + "><span>十连寻访</span><small>" + coinIcon + RATES.ten + "</small></button></div>" +
+      '<div class="gachaActions46"><button type="button" id="gachaPull1"' + (poor1 ? ' class="poor"' : "") + "><span>单次寻访</span><small>" + (tickets >= 1 ? "🎫 寻访券 ×1" : coinIcon + RATES.single) + '</small></button><button type="button" id="gachaPull10"' + (poor10 ? ' class="poor"' : "") + "><span>十连寻访</span><small>" + (tickets >= 10 ? "🎫 寻访券 ×10" : coinIcon + RATES.ten) + "</small></button></div>" +
       sparkRow(pool, state, shards) +
       "</div>" +
       '<div class="wishSheet46 hidden" id="gachaSheet46" role="dialog" aria-modal="true"></div>' +
       "</div>";
-    bindWishSheet(host, pool, state);
+    bindWishSheet(host, pool, state, save, handlers);
     hideBrokenArt(host);
     var tabs = host.querySelectorAll("#gachaTabs46 [data-pool]");
     for (var t = 0; t < tabs.length; t++) {
@@ -6355,9 +7146,9 @@ window.SAKURAYO_VERSION_CODE = 71;
     if (peek) global.SakurayoUI.close(peek);
   }
 
-  function showRosterPeek(card, locked, count, handlers, tab, source) {
+  function showRosterPeek(card, locked, count, handlers, tab, source, containerOverride) {
     if (!global.document) return;
-    var drawer = global.document.getElementById("rosterDrawer");
+    var drawer = containerOverride || global.document.getElementById("rosterDrawer") || global.document.getElementById("gachaDrawer");
     if (!drawer) return;
     closeRosterPeek();
     var overlay = global.document.createElement("div");
@@ -6365,7 +7156,10 @@ window.SAKURAYO_VERSION_CODE = 71;
     overlay.setAttribute("role", "dialog");
     overlay.setAttribute("aria-modal", "true");
     overlay.setAttribute("aria-labelledby", "rosterPeekTitle46");
-    var canEquip = !locked && (tab === "fashion" || tab === "weapon");
+    var equipPool = card && (card.kind === "fashion" || card.kind === "weapon") ? card.kind : (tab === "fashion" || tab === "weapon" ? tab : "");
+    var canEquip = !locked && !!equipPool;
+    var canPact = !locked && card && PACT_KINDS[card.kind] && handlers && handlers.save;
+    var pactNow = canPact && (pactOf(handlers.save) || {}).id === card.id;
     overlay.innerHTML =
       '<div class="rosterPeekCard46' +
       (locked ? " lock" : "") +
@@ -6377,11 +7171,14 @@ window.SAKURAYO_VERSION_CODE = 71;
       rarityLabel(card.r, card.legend) +
       (card.legend ? " · 传说" : "") +
       (locked ? "" : " · ×" + count) +
-      "</em><p>" +
+      "</em>" +
+      (locked ? "" : '<span class="rosterStars48 s' + starOf(count) + '" aria-label="共鸣 ' + starOf(count) + ' 星">' + starRow(count) + "</span>") +
+      "<p>" +
       (locked ? "尚未回收。寻访点亮后才会露出立绘。" : loreText(card)) +
       "</p>" +
       (locked ? "" : '<p class="collectionRule46">收藏不增加战斗属性 · ' + card.d + (card.kind === "fashion" && card.school ? " 装备时" + (SCHOOL_LABEL[card.school] || card.school) + "流派倾向 ×1.3。" : "") + "</p>") +
       (canEquip ? '<button type="button" class="rosterEquip46" data-equip="' + card.id + '">装备</button>' : "") +
+      (canPact ? '<button type="button" class="rosterEquip46 rosterPact48' + (pactNow ? " on" : "") + '" data-pact="' + card.id + '">' + (pactNow ? "解除本命契约" : "缔结本命契约") + "</button>" + '<small class="rosterPactHint48">本命：开局习得该流派入门技，刷新倾向 ×1.25</small>' : "") +
       "</div></div>";
     overlay.onclick = function (event) {
       if (event && event.target === overlay) closeRosterPeek();
@@ -6392,9 +7189,18 @@ window.SAKURAYO_VERSION_CODE = 71;
     if (eq) {
       eq.onclick = function (ev) {
         if (ev && ev.stopPropagation) ev.stopPropagation();
-        if (handlers && typeof handlers.equip === "function") handlers.equip(tab, card.id);
-        else equip(handlers && handlers.save, tab, card.id);
+        if (handlers && typeof handlers.equip === "function") handlers.equip(equipPool, card.id);
+        else equip(handlers && handlers.save, equipPool, card.id);
         closeRosterPeek();
+      };
+    }
+    var pb = overlay.querySelector("[data-pact]");
+    if (pb) {
+      pb.onclick = function (ev) {
+        if (ev && ev.stopPropagation) ev.stopPropagation();
+        closeRosterPeek();
+        var r = typeof handlers.pact === "function" ? handlers.pact(card.id) : setPact(handlers.save, card.id);
+        if (typeof global.SakurayoSfx === "function") global.SakurayoSfx(r && r.pact ? "revealSR" : "flip");
       };
     }
     drawer.appendChild(overlay);
@@ -6432,10 +7238,37 @@ window.SAKURAYO_VERSION_CODE = 71;
     closeRosterPeek();
     var info = snapshot(save);
     var tab = info.rosterTab || "scrap";
+    var filter = info.rosterFilter || "all";
     var list = rosterList(tab);
     var ownedMap = rosterOwned(info, tab);
     var got = 0;
     list.forEach(function (card) { if ((ownedMap[card.id] || 0) > 0) got += 1; });
+    var visibleList = list;
+    if (tab !== "chronicle" && tab !== "scrap" && filter !== "all") {
+      if (filter === "owned") {
+        visibleList = list.filter(function (c) { return (ownedMap[c.id] || 0) > 0; });
+      } else if (filter === "missing") {
+        visibleList = list.filter(function (c) { return (ownedMap[c.id] || 0) < 1; });
+      } else {
+        visibleList = list.filter(function (c) { return cardHeroTag(c) === filter; });
+      }
+    }
+    var muls = schoolMultipliers(save);
+    var resonanceHtml = '<div class="rosterResonance46"><span><b>流派共鸣倾向</b>（收藏不增加战斗属性，仅提高局内对应流派升级卡出现权重）：</span>' +
+      (muls.length
+        ? muls.map(function (m) { return "<em>" + m.name + " ×" + m.mul + "</em>"; }).join("")
+        : "<em>暂未激活额外流派倾向</em>") +
+      "</div>";
+    var filterHtml = (tab !== "chronicle" && tab !== "scrap")
+      ? '<div class="rosterFilter46" id="rosterFilter46">' +
+        '<button type="button" data-rfilter="all"' + (filter === "all" ? ' class="on"' : "") + ">全部</button>" +
+        '<button type="button" data-rfilter="sayo"' + (filter === "sayo" ? ' class="on"' : "") + ">月城小夜</button>" +
+        '<button type="button" data-rfilter="aya"' + (filter === "aya" ? ' class="on"' : "") + ">神代绫</button>" +
+        '<button type="button" data-rfilter="rion"' + (filter === "rion" ? ' class="on"' : "") + ">黑羽凛音</button>" +
+        '<button type="button" data-rfilter="owned"' + (filter === "owned" ? ' class="on"' : "") + ">已点亮</button>" +
+        '<button type="button" data-rfilter="missing"' + (filter === "missing" ? ' class="on"' : "") + ">未回收</button>" +
+        "</div>"
+      : "";
     var wall = "";
     if (tab === "chronicle") {
       wall = '<div class="chronicleBox46"><h4>月城小夜 · 未写完的夜</h4>' + CHRONICLE.map(function (item) {
@@ -6448,14 +7281,20 @@ window.SAKURAYO_VERSION_CODE = 71;
     } else if (tab === "job" && !JOB_CARDS.length) {
       wall = '<div class="rosterLater46">后续写入</div>';
     } else {
-      wall = list.map(function (card) {
+      var pactId = (pactOf(save) || {}).id || "";
+      wall = visibleList.map(function (card) {
         var count = ownedMap[card.id] || 0;
         var locked = count < 1 && DEFAULT_SHOWN.indexOf(card.id) < 0;
         var mark = card.legend ? "LEGEND" : card.r;
+        var stars = locked ? 0 : starOf(count);
+        var isPact = !locked && pactId === card.id;
         return (
           '<button type="button" class="rosterSlot46 r-' +
           mark +
           (locked ? " lock" : "") +
+          (stars >= 3 ? " star3" : "") +
+          (stars >= 5 ? " star5" : "") +
+          (isPact ? " pact48" : "") +
           '" data-card="' +
           card.id +
           '"><div class="rosterArt46"><img data-art alt="" src="' +
@@ -6464,6 +7303,8 @@ window.SAKURAYO_VERSION_CODE = 71;
           (card.legend ? "传说" : card.r) +
           "</i>" +
           (locked ? '<em class="rosterVeil46">未回收</em>' : "") +
+          (isPact ? '<em class="rosterPactTag48">本命</em>' : "") +
+          (stars > 1 ? '<span class="rosterStars48 s' + stars + '">' + starRow(count) + "</span>" : "") +
           "</div><b>" +
           (locked ? "待寻访" : card.n) +
           "</b><small>" +
@@ -6476,6 +7317,7 @@ window.SAKURAYO_VERSION_CODE = 71;
       '<div class="rosterStage46"><div class="rosterHead46"><h3>镜界仓库</h3><span>' +
       (tab === "chronicle" ? "月城小夜 · 未写完的夜" : "已点亮 " + got + " / " + list.length) +
       "</span></div>" +
+      resonanceHtml +
       '<div class="rosterTabs46" id="rosterTabs46">' +
       '<button type="button" data-roster="scrap"' + (tab === "scrap" ? ' class="on"' : "") + ">残件</button>" +
       '<button type="button" data-roster="school"' + (tab === "school" ? ' class="on"' : "") + ">基础</button>" +
@@ -6484,7 +7326,9 @@ window.SAKURAYO_VERSION_CODE = 71;
       '<button type="button" data-roster="fashion"' + (tab === "fashion" ? ' class="on"' : "") + ">时装</button>" +
       '<button type="button" data-roster="weapon"' + (tab === "weapon" ? ' class="on"' : "") + ">武器</button>" +
       '<button type="button" data-roster="chronicle"' + (tab === "chronicle" ? ' class="on"' : "") + ">编年</button>" +
-      "</div><div id=\"rosterWall46\">" +
+      "</div>" +
+      filterHtml +
+      '<div id="rosterWall46">' +
       wall +
       "</div></div>";
     hideBrokenArt(host);
@@ -6495,6 +7339,16 @@ window.SAKURAYO_VERSION_CODE = 71;
         setRosterTab(save, next);
         if (handlers && typeof handlers.setRosterTab === "function") handlers.setRosterTab(next);
         else renderRoster(host, save, handlers);
+      };
+    }
+    var rfilters = host.querySelectorAll("#rosterFilter46 [data-rfilter]");
+    for (var rf = 0; rf < rfilters.length; rf++) {
+      rfilters[rf].onclick = function () {
+        var nf = this.getAttribute("data-rfilter") || "all";
+        save = save || {};
+        save.shop40 = normalizeOps(save.shop40 || {});
+        save.shop40.ops.rosterFilter = nf;
+        renderRoster(host, save, handlers);
       };
     }
     var slots = host.querySelectorAll(".rosterSlot46");
@@ -6510,6 +7364,67 @@ window.SAKURAYO_VERSION_CODE = 71;
       })(slots[i]);
     }
     return info;
+  }
+
+  function obtainCard(items) {
+    for (var i = 0; i < items.length; i++) {
+      var card = cardOf(items[i].id) || items[i];
+      var rarity = items[i].r || card.r || "";
+      var legend = !!(items[i].legend || card.legend || rarity === "LEGEND");
+      if (!(legend || rarity === "SSR")) continue;
+      var face = card.face || "";
+      if (face === "sayo" || face === "aya" || face === "rion") return { face: face, card: card, legend: legend };
+    }
+    return null;
+  }
+  function obtainFace(items) {
+    var o = obtainCard(items);
+    return o ? o.face : "";
+  }
+
+  var FACE_NAME = { sayo: "月城小夜", aya: "神代绫", rion: "黑羽凛音" };
+  /* 证人降临演出（横屏左右分栏）：竖版 PV 放左栏完整显示（contain，不裁人物），
+   * 右栏是卡名 / 稀有度 / 角色 / 一句证词。整层叫 revealPv46，跳过按钮照旧能移除它。 */
+  function playObtain(overlay, handlers, faceOrInfo, then) {
+    var info = typeof faceOrInfo === "string" ? { face: faceOrInfo, card: null, legend: false } : faceOrInfo;
+    var face = info.face;
+    var probe = global.document.createElement("video");
+    if (!probe || typeof probe.canPlayType !== "function") { then(); return; }
+    var ext = !probe.canPlayType('video/mp4; codecs="avc1.42E01E"') && probe.canPlayType('video/webm; codecs="vp9"') ? ".webm" : ".mp4";
+    var box = global.document.createElement("div");
+    box.className = "revealPv46 revealPvSplit48" + (info.legend ? " legend" : "");
+    var card = info.card || {};
+    var lore = card.lore && card.lore.length ? card.lore[0] : "";
+    box.innerHTML =
+      '<div class="rpvStage48"><video muted playsinline></video><i class="rpvScan48"></i></div>' +
+      '<div class="rpvInfo48"><small class="rpvTag48">' + (info.legend ? "LEGEND · 传说证人" : "SSR · 证人降临") + "</small>" +
+      "<b>" + escapeHtml(card.n || FACE_NAME[face] || "") + "</b>" +
+      "<em>" + escapeHtml(FACE_NAME[face] || "") + "</em>" +
+      (lore ? "<p>" + escapeHtml(lore) + "</p>" : "") +
+      '<span class="rpvHint48">点击任意处跳过</span></div>';
+    var v = box.querySelector("video");
+    v.muted = true;
+    v.playsInline = true;
+    var done = false;
+    function finish() {
+      if (done) return;
+      done = true;
+      v.onended = null;
+      v.onerror = null;
+      try { v.pause(); } catch (err) {}
+      if (box.parentNode) box.parentNode.removeChild(box);
+      then();
+    }
+    box.pause = function () { try { v.pause(); } catch (err) {} };
+    box.onclick = finish;
+    v.onerror = finish;
+    v.onended = finish;
+    v.src = artSrc(handlers, "pv/gacha/" + face + ext);
+    overlay.appendChild(box);
+    var pr = v.play && v.play();
+    if (pr && typeof pr.catch === "function") pr.catch(finish);
+    else if (!pr) finish();
+    global.setTimeout(finish, 9000);
   }
 
   function showReveal(results, handlers) {
@@ -6529,8 +7444,13 @@ window.SAKURAYO_VERSION_CODE = 71;
     if (revealBg) overlay.style.backgroundImage = "linear-gradient(#05030bb3,#05030bcc),url(\"" + revealBg + "\")";
     overlay.style.backgroundSize = "cover";
     overlay.style.backgroundPosition = "center";
+    var hasSsr = items.some(function (x) { return x && (x.r === "SSR" || x.legend || x.r === "LEGEND"); });
+    var hasSr = !hasSsr && items.some(function (x) { return x && x.r === "SR"; });
+    var omenClass = hasSsr ? "omen-SSR" : hasSr ? "omen-SR" : "omen-N";
+    var omenText = hasSsr ? "✦ 终夜金虹 · 证人降临 ✦" : hasSr ? "◈ 紫电共鸣 · 稀有显现 ◈" : "❀ 夜樱寻访 · 残响回收 ❀";
     var gridClass = items.length > 1 ? "revealGrid46 ten" : "revealGrid46 one";
     overlay.innerHTML =
+      '<div class="revealOmen46 ' + omenClass + '">' + omenText + "</div>" +
       '<div class="' +
       gridClass +
       '">' +
@@ -6538,7 +7458,8 @@ window.SAKURAYO_VERSION_CODE = 71;
         .map(function (item) {
           var card = cardOf(item.id) || item;
           var rarity = item.r || card.r || "N";
-          var isNew = !!item.isNew;
+          var isNew = item.isNew !== false && !!item.isNew;
+          var showDupe = item.isNew === false;
           return (
             '<div class="revealCard46 r-' +
             rarity +
@@ -6553,7 +7474,7 @@ window.SAKURAYO_VERSION_CODE = 71;
             rarity +
             "</span>" +
             (card.legend || rarity === "LEGEND" ? '<span class="revealLegend46">传说</span>' : "") +
-            (isNew ? '<span class="revealNew46">NEW</span>' : "") +
+            (isNew ? '<span class="revealNew46">NEW</span>' : showDupe ? '<span class="revealDupe46">+' + RATES.shardDupe + ' 碎镜</span>' : "") +
             "<b>" +
             (card.n || item.n || "") +
             "</b></div></div></div>"
@@ -6578,19 +7499,32 @@ window.SAKURAYO_VERSION_CODE = 71;
     for (var i = 0; i < cards.length; i++) {
       (function (node, delay) {
         function flip() {
-          if (node.classList.contains("flipped")) return;
+          if (node.classList.contains("flipped")) {
+            var cid = node.getAttribute("data-card");
+            var cobj = cardOf(cid);
+            if (cobj) showRosterPeek(cobj, false, 1, handlers, cobj.kind || "scrap", node, drawer);
+            return;
+          }
           node.classList.add("flipped");
           var sfx = global.SakurayoSfx;
           if (typeof sfx === "function") sfx(/r-(SSR|LEGEND)/.test(node.className) ? "revealSSR" : /r-SR/.test(node.className) ? "revealSR" : "flip");
         }
         node.onclick = flip;
-        if (!instant) {
-          setTimeout(function () {
-            if (node.isConnected) flip();
-          }, 240 + delay * 110);
-        }
       })(cards[i], i);
     }
+    function scheduleFlips() {
+      if (instant) return;
+      for (var j = 0; j < cards.length; j++) {
+        (function (node, delay) {
+          setTimeout(function () {
+            if (node.isConnected && node.onclick && !node.classList.contains("flipped")) node.onclick();
+          }, 240 + delay * 110);
+        })(cards[j], j);
+      }
+    }
+    var obtain = instant ? null : obtainCard(items);
+    if (obtain) playObtain(overlay, handlers, obtain, scheduleFlips);
+    else scheduleFlips();
     var take = overlay.querySelector(".revealTake46");
     global.SakurayoUI.open(overlay, {nested:true,initialFocus:take,onClose:function(){
       if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
@@ -6601,7 +7535,16 @@ window.SAKURAYO_VERSION_CODE = 71;
       };
     }
     var skip = overlay.querySelector(".revealSkip46");
-    if (skip) skip.onclick = flipAll;
+    if (skip) skip.onclick = function () {
+      var pv = overlay.querySelector(".revealPv46");
+      if (pv) {
+        pv.onended = null;
+        pv.onerror = null;
+        try { pv.pause(); } catch (err) {}
+        if (pv.parentNode) pv.parentNode.removeChild(pv);
+      }
+      flipAll();
+    };
     var again = overlay.querySelector(".revealAgain46");
     if (again) {
       again.onclick = function () {
@@ -6714,12 +7657,20 @@ window.SAKURAYO_VERSION_CODE = 71;
     normalizeOps: normalizeOps,
     snapshot: snapshot,
     pull: pull,
+    pullNovice: pullNovice,
+    NOVICE_COST: NOVICE_COST,
+    setFocus: setFocus,
+    schoolMultipliers: schoolMultipliers,
     grantCheat: grantCheat,
     portraitTap: portraitTap,
     setPool: setPool,
     setRosterTab: setRosterTab,
     spark: spark,
     equip: equip,
+    pactOf: pactOf,
+    setPact: setPact,
+    pactMul: pactMul,
+    starOf: starOf,
     renderGacha: renderGacha,
     renderRoster: renderRoster,
     showReveal: showReveal,
@@ -8019,7 +8970,8 @@ window.SAKURAYO_VERSION_CODE = 71;
     var st = { id: id, wrap: wrap, v: v, front: 0, clip: "idle", plays: 0 };
     function pick(src) { // 片段可写成数组 ["x.webm","x.mp4"]：按浏览器能力挑第一个能播的（Android WebView: H.264/VP9 都行；桌面 Chromium 测试环境只有 VP9）
       if (!Array.isArray(src)) return src; var t = document.createElement("video");
-      for (var i = 0; i < src.length; i++) { var m = /\.webm$/i.test(src[i]) ? 'video/webm; codecs="vp9"' : 'video/mp4; codecs="avc1.42E01E"'; if (t.canPlayType(m)) return src[i]; }
+      var order = src.filter(function (s) { return !/\.webm$/i.test(s); }).concat(src.filter(function (s) { return /\.webm$/i.test(s); })); // H.264 优先：安卓包只带 mp4
+      for (var i = 0; i < order.length; i++) { var m = /\.webm$/i.test(order[i]) ? 'video/webm; codecs="vp9"' : 'video/mp4; codecs="avc1.42E01E"'; if (t.canPlayType(m)) return order[i]; }
       return src[src.length - 1];
     }
     function show(src, loop, name) {
@@ -8028,7 +8980,7 @@ window.SAKURAYO_VERSION_CODE = 71;
       var go = function () { if (done) return; done = true; back.removeEventListener("canplay", go);
         back.currentTime = 0; var pr = back.play(); if (pr && pr.catch) pr.catch(function (e) { st.err = String(e); });
         back.classList.add("on"); front.classList.remove("on"); setTimeout(function () { front.pause(); }, 220);
-        st.front = 1 - st.front; st.clip = name === "idle" ? "idle" : "tap:" + src; st.plays++;
+        st.front = 1 - st.front; st.clip = name === "idle" ? "idle" : (name === "greet" ? "greet" : "tap:" + src); st.plays++;
         back.onended = loop ? null : function () { show(C.idle, true, "idle"); }; };
       back.addEventListener("canplay", go);
       if (back.getAttribute("data-src") !== src) { back.setAttribute("data-src", src); back.src = base(src); back.load(); }
@@ -8036,9 +8988,31 @@ window.SAKURAYO_VERSION_CODE = 71;
       setTimeout(go, 1500); // 兜底：缓存命中时 canplay 可能不再触发
     }
     show(C.idle, true, "idle");
+    // 等 idle 真正开播后再留一拍，然后播一次招呼。点按会把 plays 推高，招呼就让位。
+    if (C.greet) {
+      var ticks = 0;
+      var arm = setInterval(function () {
+        if (cur !== st || st.stop || ++ticks > 40) { clearInterval(arm); return; }
+        if (st.plays > 1) { clearInterval(arm); return; }
+        if (st.plays !== 1 || st.clip !== "idle") return;
+        clearInterval(arm);
+        setTimeout(function () {
+          if (cur !== st || st.stop || st.plays !== 1 || st.clip !== "idle") return;
+          show(C.greet, false, "greet");
+        }, 600);
+      }, 150);
+    }
     st.tap = function (part) {
-      var T = C.taps || {}, list = (T[part] && T[part].length ? T[part] : T.any) || [];
-      if (!list.length) return null; var f = list[(st.plays + Math.floor(Math.random() * list.length)) % list.length];
+      // 点头和点身体各用各的动作表，连续点按按顺序换下一个。
+      // any 只在这个部位没有专属片段时才用。
+      var T = C.taps || {};
+      var own = (T[part] && T[part].length) ? T[part] : [];
+      var pool = own.length ? own : ((T.any && T.any.length) ? T.any : []);
+      if (!pool.length) return null;
+      st.seq = st.seq || {};
+      var i = st.seq[part] || 0;
+      st.seq[part] = i + 1;
+      var f = pool[i % pool.length];
       show(f, false, "tap"); return Array.isArray(f) ? f[0] : f;
     };
     st.onTap = function (e) { var r = wrap.getBoundingClientRect(), y = (e.clientY - r.top) / r.height; st.tap(y < 0.3 ? "head" : "body"); };
@@ -8939,7 +9913,47 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     ];
   function artUrl(path) { return `${ART_ROOT}/${path}`; }
   window.SakurayoArtBase = ART_ROOT + "/";
-  { const boot=document.getElementById("bootArt35"); if(boot) boot.style.setProperty("--bootArt46",`url("${artUrl("ui/loading_v5.webp")}")`); }
+  function attachStillVideo46(el, artPath, shade) {
+    if (!el || !artPath) return;
+    if (!document.getElementById("stillPv46")) {
+      const st = document.createElement("style");
+      st.id = "stillPv46";
+      st.textContent = "video.stillPv46{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;opacity:0}video.stillPv46.on{opacity:1}.stageCard>video.stillPv46.on{opacity:.74}#result>video.stillPv46,#bootArt35>video.stillPv46{z-index:0}#result>.modal,#bootArt35>.bootCore411{position:relative;z-index:2}.stillShade46{position:absolute;inset:0;z-index:1;pointer-events:none}#result>.stillShade46{background:radial-gradient(circle at 50% 30%,rgba(5,4,14,.35),rgba(5,4,14,.86) 70%)}#bootArt35>.stillShade46{background:linear-gradient(0deg,rgba(9,7,19,.55),rgba(9,7,19,.2) 55%,rgba(9,7,19,.55))}";
+      document.head.appendChild(st);
+    }
+    const stem = String(artPath).replace(/\.webp$/i, "");
+    let vid = el.querySelector(":scope > video.stillPv46");
+    const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) { vid?.remove(); el.querySelector(":scope > .stillShade46")?.remove(); return; }
+    if (vid && vid.dataset.stem === stem) return;
+    vid?.remove();
+    vid = document.createElement("video");
+    vid.className = "stillPv46";
+    vid.muted = true;
+    vid.loop = true;
+    vid.playsInline = true;
+    vid.dataset.stem = stem;
+    const probe = document.createElement("video");
+    const webm = probe.canPlayType && !probe.canPlayType('video/mp4; codecs="avc1.42E01E"') && probe.canPlayType('video/webm; codecs="vp9"');
+    const primary = artUrl(stem + (webm ? ".webm" : ".mp4"));
+    const secondary = artUrl(stem + (webm ? ".mp4" : ".webm"));
+    const armShade = () => {
+      if (!shade || el.querySelector(":scope > .stillShade46")) return;
+      const dim = document.createElement("div");
+      dim.className = "stillShade46";
+      el.appendChild(dim);
+    };
+    vid.onloadeddata = () => { vid.classList.add("on"); armShade(); vid.play().catch(() => {}); };
+    vid.onerror = () => {
+      if (vid.dataset.fb !== "1") { vid.dataset.fb = "1"; vid.src = secondary; return; }
+      vid.remove();
+      el.querySelector(":scope > .stillShade46")?.remove();
+    };
+    vid.src = primary;
+    if (el.classList.contains("stageCard")) el.appendChild(vid);
+    else el.prepend(vid);
+  }
+  { const boot=document.getElementById("bootArt35"); if(boot) { boot.style.setProperty("--bootArt46",`url("${artUrl("ui/loading_v5.webp")}")`); attachStillVideo46(boot, "ui/loading_v5.webp", true); } }
   function artImage(path) {
     if (!ART_CACHE.has(path)) {
       const image = new Image();
@@ -11216,6 +12230,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       d.dataset.stageId = String(s.id);
       let rank = save.done.includes(s.id) ? "已净化" : "未通关";
       d.innerHTML = `<img src="${artUrl(`stages/stage_${s.id}/chapter_keyart_v2.webp`)}"><div class="i"><h3>${s.name}</h3><p>${s.desc}<br>Boss：${s.boss} · 预计 ${Math.round(s.dur / 60)} 分钟</p><button ${lock ? "disabled" : ""}>${lock ? "尚未解锁" : selected === s.id ? "已选择" : "选择关卡"}</button></div><div class="rankTag">${rank}</div>${lock ? '<div class="lockmark">🔒</div>' : ""}`;
+      attachStillVideo46(d, `stages/stage_${s.id}/chapter_keyart_v2.webp`);
       if (!lock)
         d.querySelector("button").onclick = () => {
           runMode36 = "story";
@@ -11473,6 +12488,9 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     runWin = false;
     eventIndex = 0;
     levelRerolls = 2;
+    pinnedUpgradeId46 = null;
+    banishedSet46 = new Set();
+    levelBanishes46 = 2;
     acc = 0;
     resetP();
     if (typeof runNodeStart46 === "function") runNodeStart46();
@@ -11553,7 +12571,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     $("#rtitle").textContent=win?"镜界节点已净化":"防线失守";
     $("#rsub").textContent=win?`${stage().short} 已封回证词。${stage().boss} 不再开口。${P.fusion?`「${fusionData()?.n||P.fusion}」`:"未融合"} / ${P.form?ASC.find(a=>a.id===P.form)?.n||P.form:"未飞升"}`:`${stage().short}被尸潮吞没。${window.SakurayoLifecycle?.hint?.(lifecycleWorld44())||"下次可以在暂停页看清短板，再决定补什么。"} ${runCoach45(false)}`;
     $("#rstats").innerHTML=`坚持 <b>${fmt(runTime)}</b><br>击破 <b>${P.kills}</b> · 精英 <b>${P.eliteKills}</b> · 等级 <b>${P.level}</b><br>职业：<b>${careerSummary()}</b><br>融合：<b>${P.fusion?fusionData()?.n||P.fusion:"未融合"}</b><br>飞升：<b>${P.form?ASC.find(a=>a.id===P.form)?.n||P.form:"未飞升"}</b><br>获得樱花币 <b style="color:var(--g)">🌸 ${reward}</b>${pay44&&window.SakurayoEconomy?window.SakurayoEconomy.rewardHtml(pay44):""}${P.chestCoins46?`<br><small>宝箱 +${P.chestCoins46}</small>`:""}`;
-    renderRunReport(); $("#result").style.setProperty("--resultArt46",`url("${artUrl(`ui/result_${win?"win":"lose"}_v5.webp`)}")`); $("#result").classList.remove("hidden"); sound(win?"win":"over");
+    renderRunReport(); $("#result").style.setProperty("--resultArt46",`url("${artUrl(`ui/result_${win?"win":"lose"}_v5.webp`)}")`); attachStillVideo46($("#result"), `ui/result_${win?"win":"lose"}_v5.webp`, true); $("#result").classList.remove("hidden"); sound(win?"win":"over");
   }
   function pauseGame() {
     if (state !== "play") return;
@@ -11935,7 +12953,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
         e.adapt = P.plan?.dom || "base";
       }
     }
-    window.SakurayoCutscene?.flashPhase?.(p);
+    window.SakurayoCutscene?.flashPhase?.(p, stage().id);
     showDialogue(bossPhaseDialogue(p), () => {
       state = "play";
       last = performance.now();
@@ -12093,7 +13111,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     const talk = () => showDialogue(endingDialogue(), () => finish(true), "ending");
     const mg = typeof isMainGodRun36 === "function" && isMainGodRun36();
     const profile = window.SakurayoLifecycle?.stageProfile?.(selected, { mainGod: mg });
-    window.SakurayoCutscene?.flashPhase?.(4);
+    window.SakurayoCutscene?.flashPhase?.(4, stage().id);
     if (!window.SakurayoCutscene?.playVictory) {
       talk();
       return;
@@ -12908,8 +13926,21 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     }
     return arr[arr.length - 1];
   }
+  let pinnedUpgradeId46 = null, banishedSet46 = new Set(), levelBanishes46 = 2;
+  function wishResonanceMul46(u) {
+    const L = window.SakurayoLobby;
+    if (!L || !u) return 1;
+    const school = u.s || u.school;
+    if (!school) return 1;
+    let mul = 1;
+    if (L.hasSchool(save, school)) mul *= 1.3;
+    if (L.hasJob(save, school)) mul *= 1.5;
+    if (L.hasFusion(save, school)) mul *= 1.6;
+    if (L.pactMul) mul *= L.pactMul(save, school);
+    return Number(mul.toFixed(2));
+  }
   function getPool() {
-    let asc=eligibleAsc(),fus=eligibleFusion(),care=careerOptions(),pool=U.filter(u=>lv(u.id)<u.m&&(!u.req||u.req())&&!isSchoolBanned40(u.s)),out=[];
+    let asc=eligibleAsc(),fus=eligibleFusion(),care=careerOptions(),pool=U.filter(u=>lv(u.id)<u.m&&(!u.req||u.req())&&!isSchoolBanned40(u.s)&&!banishedSet46.has(u.id)),out=[];
     if(care.length){let first=care.sort(()=>Math.random()-.5)[0];out.push(first);let same=care.find(x=>x.school===first.school&&x.id!==first.id);if(same&&first.rank===1)out.push(same);}
     if (fus.length && out.length < 3) {
       const pick = fus.slice().sort(() => Math.random() - 0.5);
@@ -12946,6 +13977,23 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       let u = pickWeighted(pool);
       out.push(u);
       pool = pool.filter((x) => x !== u);
+    }
+    if (pinnedUpgradeId46 && !out.some(x => x && x.id === pinnedUpgradeId46)) {
+      let pinnedObj = pool.find(x => x.id === pinnedUpgradeId46) || care.find(x => x.id === pinnedUpgradeId46);
+      if (!pinnedObj) {
+        const pf = fus.find(x => x.id === pinnedUpgradeId46);
+        if (pf) pinnedObj = { ...pf, fusion: true, r: "legend", s: "fusion", tag: "职业融合" };
+      }
+      if (!pinnedObj) {
+        const pa = asc.find(x => x.id === pinnedUpgradeId46);
+        if (pa) pinnedObj = { ...pa, asc: true, r: "legend", s: "asc", tag: "飞升" };
+      }
+      if (pinnedObj) {
+        if (out.length >= 3) out[out.length - 1] = pinnedObj;
+        else out.unshift(pinnedObj);
+      } else {
+        pinnedUpgradeId46 = null;
+      }
     }
     if (!out.length) {
       let fallback = U.find((u) => u.id === "dmg");
@@ -13007,8 +14055,36 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
         b.dataset.rec = "1";
       }
       b.style.borderLeft = `5px solid ${special ? u.c : SCHOOL[u.s]?.c || SCHOOL[u.school]?.c || "#ffb2d4"}`;
-      b.innerHTML = `<img src="${iconData(u)}"><div><div class="meta"><span style="color:${special ? u.c : SCHOOL[u.s]?.c || "#fff"}">${school}</span><span class="${rar46(u)}">${u.career?`职业${u.rank}阶`:u.fusion?"唯一融合":u.asc?"唯一飞升":RAR46[rar46(u)]||u.r}</span></div><b>${u.n}${u.weapon46&&evolvesNext46(u)?` → <em class="evoName46">${globalThis.SakurayoWeapons.DEF[u.weapon46].evo}</em>`:""}</b><p>${desc}</p><div class="dots">${special ? "◆ 选择后改变战斗规则" : "●".repeat(Math.min(u.m||6, (lv(u.id) || 0) + 1)) + "○".repeat(Math.max(0, Math.min(6, u.m||6) - (lv(u.id) || 0) - 1))}</div></div>`;
+      const wishMul = wishResonanceMul46(u);
+      const isPinned = pinnedUpgradeId46 === u.id;
+      const wishBadge = wishMul > 1.01 ? `<em class="wishBoostBadge46" style="font-style:normal;color:#ffe08a;background:#261a3bcc;border:1px solid #ffd77a88;padding:1px 6px;border-radius:999px;margin-left:6px;font-weight:800">🪞 镜界共鸣 ×${wishMul}</em>` : "";
+      const opsHtml = `<span class="choiceOps46" style="float:right;display:inline-flex;gap:6px"><i class="pinChoice46${isPinned ? " on" : ""}" role="button" tabindex="0" style="font-style:normal;cursor:pointer;padding:1px 7px;border-radius:999px;border:1px solid ${isPinned ? "#ffd77a" : "#96e4f566"};background:${isPinned ? "#3b2a14cc" : "#0b1326cc"};color:${isPinned ? "#ffe08a" : "#cfe6f5"}">${isPinned ? "🔒 已锁定" : "🔓 锁定"}</i>${!special && levelBanishes46 > 0 ? `<i class="banishChoice46" role="button" tabindex="0" style="font-style:normal;cursor:pointer;padding:1px 7px;border-radius:999px;border:1px solid #ff86a866;background:#26101ecc;color:#ffc4d6">🚫 封印(${levelBanishes46})</i>` : ""}</span>`;
+      b.innerHTML = `<img src="${iconData(u)}"><div><div class="meta"><span style="color:${special ? u.c : SCHOOL[u.s]?.c || "#fff"}">${school}${wishBadge}</span><span class="${rar46(u)}">${u.career?`职业${u.rank}阶`:u.fusion?"唯一融合":u.asc?"唯一飞升":RAR46[rar46(u)]||u.r}</span></div><b>${u.n}${u.weapon46&&evolvesNext46(u)?` → <em class="evoName46">${globalThis.SakurayoWeapons.DEF[u.weapon46].evo}</em>`:""}</b><p>${desc}</p><div class="dots">${special ? "◆ 选择后改变战斗规则" : "●".repeat(Math.min(u.m||6, (lv(u.id) || 0) + 1)) + "○".repeat(Math.max(0, Math.min(6, u.m||6) - (lv(u.id) || 0) - 1))}${opsHtml}</div></div>`;
       b.classList.add("rar46-" + rar46(u));
+      if (isPinned) b.style.boxShadow = "0 0 18px #ffd77a44";
+      const pinEl = b.querySelector(".pinChoice46");
+      if (pinEl) {
+        pinEl.onclick = (ev) => {
+          ev.stopPropagation();
+          ev.preventDefault();
+          pinnedUpgradeId46 = pinnedUpgradeId46 === u.id ? null : u.id;
+          toast(pinnedUpgradeId46 ? `已锁定「${u.n}」：重抽或下次升级将保留此卡` : `已解除锁定「${u.n}」`);
+          renderChoices();
+        };
+      }
+      const banishEl = b.querySelector(".banishChoice46");
+      if (banishEl) {
+        banishEl.onclick = (ev) => {
+          ev.stopPropagation();
+          ev.preventDefault();
+          if (levelBanishes46 <= 0) return;
+          levelBanishes46--;
+          banishedSet46.add(u.id);
+          if (pinnedUpgradeId46 === u.id) pinnedUpgradeId46 = null;
+          toast(`已封印「${u.n}」：本局不再刷出（剩余 ${levelBanishes46} 次封印）`);
+          renderChoices();
+        };
+      }
       const choiceImage = b.querySelector("img"), fallbackIcon = choiceImage.src;
       choiceImage.onerror = () => {
         choiceImage.onerror = null;
@@ -13046,6 +14122,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     $("#reroll").disabled = levelRerolls <= 0;
   }
   function chooseUpgrade(u) {
+    if (u && pinnedUpgradeId46 === u.id) pinnedUpgradeId46 = null;
     P.upgradeChoices40++;
     if(u.career){applyCareer(u);
     } else if (u.fusion) {
@@ -15348,7 +16425,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function facingName36(a=P.weaponAngle||0){const x=Math.cos(a),y=Math.sin(a);return Math.abs(x)>Math.abs(y)?(x>=0?"right":"left"):(y>=0?"down":"up");}
   function angleDelta36(a,b){return Math.atan2(Math.sin(a-b),Math.cos(a-b));}
   function directionalHit36(distance,enemyRadius,radius,angleOffset,halfArc){if(distance>=radius+enemyRadius)return false;const edge=distance>enemyRadius?Math.asin(clamp(enemyRadius/distance,0,1)):Math.PI;return Math.abs(angleDelta36(angleOffset,0))<=halfArc+edge;}
-  function directionalSlash36(radius,dmg,big=false,angle=P.weaponAngle||Math.atan2(P.fy,P.fx),halfArc=big?1.66:1.05){fxStamp("slash",P.x,P.y,{size:Math.max(48,radius*.42),life:.28,rot:angle});const color=char35().id==="rion"?"#ff526f":"#7db8ff";slashes.push({x:P.x,y:P.y,max:radius,life:.32,total:.32,color,dir:angle,arc:halfArc*2});for(const e of grid.near(P.x,P.y,radius+grid.maxRadius)){if(e.dead)continue;const dx=e.x-P.x,dy=e.y-P.y,d=Math.hypot(dx,dy),off=angleDelta36(Math.atan2(dy,dx),angle);if(directionalHit36(d,e.r,radius,off,halfArc))damageEnemy(e,dmg,{source:"blade",school:char35().id==="aya"?"ninja":"cult"});}particles(P.x+Math.cos(angle)*radius*.55,P.y+Math.sin(angle)*radius*.55,18,color);P.inv=Math.max(P.inv,big?.16:.07);return true;}
+  function directionalSlash36(radius,dmg,big=false,angle=P.weaponAngle||Math.atan2(P.fy,P.fx),halfArc=big?1.66:1.05){fxStamp("slash",P.x,P.y,{size:Math.max(48,radius*.42),life:.28,rot:angle});const color=char35().id==="rion"?"#ff526f":"#7db8ff";slashes.push({x:P.x,y:P.y,max:radius,life:.32,total:.32,color,dir:angle,arc:halfArc*2});for(const e of grid.near(P.x,P.y,radius+grid.maxRadius)){if(e.dead)continue;const dx=e.x-P.x,dy=e.y-P.y,d=Math.hypot(dx,dy),off=angleDelta36(Math.atan2(dy,dx),angle);if(directionalHit36(d,e.r,radius,off,halfArc))damageEnemy(e,dmg,{source:"blade",school:char35().id==="aya"?"ninja":"cult"});}let cutEb=0;for(const b of ebullets){if(b.life<=0)continue;const dx=b.x-P.x,dy=b.y-P.y,d=Math.hypot(dx,dy),off=angleDelta36(Math.atan2(dy,dx),angle);if(directionalHit36(d,b.r||5,radius+8,off,halfArc)){b.life=0;cutEb++;particles(b.x,b.y,3,"#ffe6a8");if((big||char35().id==="rion")&&cutEb<=3)pushBullet({x:b.x,y:b.y,vx:Math.cos(angle)*380,vy:Math.sin(angle)*380,r:7,life:.75,dmg:P.dmg*1.2*(P.bladePower||1),pierce:3,home:.08,source:"blade",school:char35().id==="aya"?"ninja":"cult",reflect48:1,hit:new Set()});}}if(cutEb>0)P.sh=Math.min(P.maxSh,P.sh+cutEb*(char35().id==="rion"?1.5:.8));particles(P.x+Math.cos(angle)*radius*.55,P.y+Math.sin(angle)*radius*.55,18,color);P.inv=Math.max(P.inv,big?.16:.07);return true;}
   slash35=function(radius,dmg,big=false){return directionalSlash36(radius,dmg,big);};
 
   function casing46(x,y,a){if(!globalThis.casings46)globalThis.casings46=[];const C=globalThis.casings46;if(C.length>60)C.shift();const b=a+Math.PI/2*(Math.random()<.5?1:-1)*.8+Math.PI;C.push({x,y,vx:Math.cos(b)*rnd(60,120),vy:Math.sin(b)*rnd(60,120)-90,t:.55,r:rnd(0,TAU)});}
@@ -15398,10 +16475,10 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   const _endingData36=endingData;endingData=function(){if(isMainGodRun36())return {name:`主神空间 T${selectedMainGodTier36} · 轮回存续`,text:"监察投影被击碎，白色大厅却没有关闭。奖励点和强化被保留，说明这不是一次挑战，而是一份仍在续签的轮回契约。"};return _endingData36();};
   const _spawnBoss36=spawnBoss;spawnBoss=function(){const result=_spawnBoss36();if(isMainGodRun36()&&boss){const mul=1+selectedMainGodTier36*.16;boss.hp*=mul;boss.max=boss.hp;boss.dmg*=1+selectedMainGodTier36*.08;boss.bossRes=boss.bossRes||{};boss.color="#d8a7ff";}return result;};
 
-  function finishMainGod36(win){if(state==="result")return;runWin=win;hideTransient();state="result";$("#hud").classList.add("hidden");const phasePoints=win?0:Math.max(0,Math.min(3,(boss?.phase||1)-1)),points=win?stage().pointReward+Math.min(4,P.eliteKills)+save.mainGod.sideKey*2:phasePoints;save.mainGod.points+=points;save.mainGod.runs++;save.kills+=P.kills;save.best=Math.max(save.best,runTime);save.runs++;if(win){save.mainGod.clears++;save.mainGod.bestTier=Math.max(save.mainGod.bestTier,selectedMainGodTier36);if(selectedMainGodTier36===4)save.mainGod.deepest=Math.max(save.mainGod.deepest||0,stage().depth||1);save.mainGod.unlockedTier=Math.min(4,Math.max(save.mainGod.unlockedTier,selectedMainGodTier36+1));}const ed=endingData(),top=Object.entries(P.damageSources).sort((a,b)=>b[1]-a[1])[0]?.[0]||"shot";save.runHistory.unshift({time:Date.now(),mode:"mainGod",character:save.character,skin:save.skin,duration:runTime,tier:selectedMainGodTier36,depth:stage().depth||0,contract:P.mgContract?.id||null,challenge:P.mgChallenge?.id||null,challengeDone:!!P.mgChallengeDone,points,win,kills:P.kills,level:P.level,fusion:P.fusion,form:P.form,careers:careerSummary(),top,rank:P.plan?.rank||"?",ending:ed.name});save.runHistory=save.runHistory.slice(0,30);persist();$("#ricon").textContent=win?"◈":"☠️";$("#rankBig").textContent=win?(P.plan?.rank||"S"):(runTime>stage().dur*.65?"B":"C");$("#rtitle").textContent=win?(selectedMainGodTier36===4?`无限回廊第 ${stage().depth} 层完成`:"主神试炼完成"):"轮回中断";$("#rsub").textContent=win?`本轮已结算；兑换强化保留，局内构筑清空。`:"失败不会清空既有主神兑换，Boss 阶段提供少量保底点。";$("#rstats").innerHTML=`坚持 <b>${fmt(runTime)}</b><br>击破 <b>${P.kills}</b> · 等级 <b>${P.level}</b><br>职业：<b>${careerSummary()}</b><br>契约：<b>${P.mgContract?.n||"未签署"}</b><br>挑战：<b>${P.mgChallenge?.n||"无"} ${P.mgChallengeDone?"✓":"×"}</b><br>本轮获得奖励点 <b style="color:var(--g)">◈ ${points}</b><br>主神账户余额 <b>◈ ${save.mainGod.points}</b>`;renderRunReport();$("#result").classList.remove("hidden");sound(win?"win":"over");}
+  function finishMainGod36(win){if(state==="result")return;runWin=win;hideTransient();state="result";$("#hud").classList.add("hidden");const phasePoints=win?0:Math.max(0,Math.min(3,(boss?.phase||1)-1)),points=win?stage().pointReward+Math.min(4,P.eliteKills)+save.mainGod.sideKey*2:phasePoints;save.mainGod.points+=points;save.mainGod.runs++;save.kills+=P.kills;save.best=Math.max(save.best,runTime);save.runs++;if(win){save.mainGod.clears++;save.mainGod.bestTier=Math.max(save.mainGod.bestTier,selectedMainGodTier36);if(selectedMainGodTier36===4)save.mainGod.deepest=Math.max(save.mainGod.deepest||0,stage().depth||1);save.mainGod.unlockedTier=Math.min(4,Math.max(save.mainGod.unlockedTier,selectedMainGodTier36+1));}const ed=endingData(),top=Object.entries(P.damageSources).sort((a,b)=>b[1]-a[1])[0]?.[0]||"shot";save.runHistory.unshift({time:Date.now(),mode:"mainGod",character:save.character,skin:save.skin,duration:runTime,tier:selectedMainGodTier36,depth:stage().depth||0,contract:P.mgContract?.id||null,challenge:P.mgChallenge?.id||null,challengeDone:!!P.mgChallengeDone,points,win,kills:P.kills,level:P.level,fusion:P.fusion,form:P.form,careers:careerSummary(),top,rank:P.plan?.rank||"?",ending:ed.name});save.runHistory=save.runHistory.slice(0,30);persist();$("#ricon").textContent=win?"◈":"☠️";$("#rankBig").textContent=win?(P.plan?.rank||"S"):(runTime>stage().dur*.65?"B":"C");$("#rtitle").textContent=win?(selectedMainGodTier36===4?`无限回廊第 ${stage().depth} 层完成`:"主神试炼完成"):"轮回中断";$("#rsub").textContent=win?`本轮已结算；兑换强化保留，局内构筑清空。`:"失败不会清空既有主神兑换，Boss 阶段提供少量保底点。";$("#rstats").innerHTML=`坚持 <b>${fmt(runTime)}</b><br>击破 <b>${P.kills}</b> · 等级 <b>${P.level}</b><br>职业：<b>${careerSummary()}</b><br>契约：<b>${P.mgContract?.n||"未签署"}</b><br>挑战：<b>${P.mgChallenge?.n||"无"} ${P.mgChallengeDone?"✓":"×"}</b><br>本轮获得奖励点 <b style="color:var(--g)">◈ ${points}</b><br>主神账户余额 <b>◈ ${save.mainGod.points}</b>`;renderRunReport();$("#result").style.setProperty("--resultArt46",`url("${artUrl(`ui/result_${win?"win":"lose"}_v5.webp`)}")`);attachStillVideo46($("#result"),`ui/result_${win?"win":"lose"}_v5.webp`,true);$("#result").classList.remove("hidden");sound(win?"win":"over");}
   const _damagePlayer36=damagePlayer;damagePlayer=function(amount){return _damagePlayer36(amount*(P.lordRisk||1));};
 
-  function installCover36(){const bg=$("#menu .bg");if(bg){bg.style.backgroundImage=`linear-gradient(180deg,#05051212 0%,#0505120a 38%,#080713b8 72%,#080713 100%),url('${artUrl("ui/cover_v36_main_god.webp")}')`;bg.style.backgroundPosition="center 30%";bg.style.backgroundSize="cover";}if(!$("#coverTitle36")){const title=document.createElement("div");title.id="coverTitle36";title.className="coverTitle36";title.innerHTML="<b>樱夜·尸潮</b><span>四章 · 证词尚未结束</span>";$("#menu").appendChild(title);}}
+  function installCover36(){const bg=$("#menu .bg");if(bg){bg.style.backgroundImage=`linear-gradient(180deg,#05051212 0%,#0505120a 38%,#080713b8 72%,#080713 100%),url('${artUrl("ui/cover_v36_main_god.webp")}')`;bg.style.backgroundPosition="center 30%";bg.style.backgroundSize="cover";attachStillVideo46(bg,"ui/cover_v36_main_god.webp");}if(!$("#coverTitle36")){const title=document.createElement("div");title.id="coverTitle36";title.className="coverTitle36";title.innerHTML="<b>樱夜·尸潮</b><span>四章 · 证词尚未结束</span>";$("#menu").appendChild(title);}}
   const _menuUpdate36=menuUpdate;menuUpdate=function(){_menuUpdate36();installCover36();renderMainGodShop36();};
 
   /* ================= V3.7 主神长期循环 ================= */
@@ -15743,6 +16820,9 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   upgradeWeight=function(u){const w=_upgradeWeight40(u);return u.conflict40?w*.62:w;};
 
   function applyShopRun40(){const id=save.shop40.equippedStarter,lv=id?(save.shop40.starter[id]||0):0,m=starterChapterMul40();P.initialCore40=id;P.initialCoreLevel40=lv;P.noUpgradeChallenge40=!!save.shop40.noUpgradeChallenge;P.baitLevel40=save.shop40.baitEquipped?(save.shop40.items.bait||0):0;P.baitPulse40=2.2;P.baitSpawns40=0;P.upgradeChoices40=0;if(id&&lv)STARTERS40[id].apply(lv,m);const weapon=save.shop40.equippedWeapon;if(weapon==="ammo"){P.dmg*=1.12;P.pierce++;P.bladePower*=.94;}else if(weapon==="whetstone"){P.bladePower*=1.18;P.skillPow*=1.08;P.dmg*=.92;}else if(weapon==="mirror"){P.maxSh+=36;P.sh=P.maxSh;P.damageReduce+=.05;P.rate*=1.05;}}
+  /* 本命契约开局：为契约流派各习得一张入门技（无前置、普通/稀有里第一张），走与正常选卡相同的落地路径。 */
+  function pactRun48(){const L=window.SakurayoLobby,p=L&&L.pactOf?L.pactOf(save):null;P.pact48=null;if(!p||typeof activeTrial46!=="undefined"&&activeTrial46==="solo")return;const got=[];for(const sc of p.schools){const u=U.find(x=>x.s===sc&&!x.req&&lv(x.id)<x.m&&(x.r==="common"||x.r==="rare"));if(!u)continue;P.up[u.id]=(P.up[u.id]||0)+1;if(u.aff&&P.aff)P.aff[u.aff]=(P.aff[u.aff]||0)+1;u.a();P.upgradeOrder.push(u.id);got.push(u.n);}if(got.length){P.pact48={id:p.id,got};setTimeout(()=>{if(state==="play")toast(`本命契约 · ${p.n}：习得「${got.join("」「")}」`);},900);}}
+  const _applyShopRun48=applyShopRun40;applyShopRun40=function(){const r=_applyShopRun48.apply(this,arguments);pactRun48();return r;};
   const _update40=update;
   update=function(dt){const result=_update40(dt);if(state==="play"&&!bossBorn&&(P.baitLevel40||0)>0){P.baitPulse40-=dt;if(P.baitPulse40<=0){P.baitPulse40=Math.max(2.3,5.4-P.baitLevel40*.75);const before=enemies.length;spawnEnemy();if(P.baitLevel40>=2&&chance(.45))spawnEnemy("fast",P.baitLevel40>=3&&chance(.22));P.baitSpawns40+=Math.max(0,enemies.length-before);}}return result;};
 
@@ -16149,6 +17229,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
         <p class="goal">${htmlEscape(levelGoal46(pick))}</p><ul>${pick.stars.map((q,i)=>`<li class="${LV.stars(save,pick.id)>i?"on":""}">${LV.stars(save,pick.id)>i?"★":"☆"} ${htmlEscape(q.d)}</li>`).join("")}</ul>
         ${pick.boss?storyBossPicker46(pick):`<p class="note">首次每颗星 🌸 +40 · 星级不提供战斗属性</p>`}
         <div class="row">${storyFor46(pick.id,"pre")?`<button data-k="replay" data-v="${pick.id}">剧情</button>`:""}<button class="go" data-k="go" data-v="${pick.id}">出击</button></div></aside>`:""}`;
+    attachStillVideo46(el.querySelector(".lm46Bg"), mapCh46===1?"story/ch1/map.webp":`stages/stage_${mapCh46}/chapter_keyart_v2.webp`);
   }
   function openAlbum46(){
     const list=(window.SakurayoStory?.CG||[]).filter(c=>(save.cg46||[]).includes(c.id));
@@ -16175,7 +17256,9 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function launchStoryBoss46(L,k){
     const SH={sky:window.SakurayoShmup,duel:window.SakurayoDuel}[k];if(!SH)return false;
     state="menu";$("#menu").classList.add("hidden");const seed=((Date.now()>>>0)^(L.ch*7919))>>>0;
-    sky46=SH.start({character:save.character||"sayo",seed,layer:Math.min(3,L.ch),form:null,weapons:{},hpFrac:1,power:1+0.12*(L.ch-1),
+    const ch=save.character||"sayo",wpByCh={sayo:{spread:{lv:L.ch>=3?3:2},homing:{lv:2}},aya:{homing:{lv:L.ch>=3?3:2},orbit:{lv:2}},rion:{orbit:{lv:L.ch>=3?3:2},spread:{lv:2}}};
+    const bNames={1:"百目尸将",2:"射的屋大将",3:"鬼宗一",4:"鬼·朔夜"};
+    sky46=SH.start({character:ch,seed,layer:Math.min(4,L.ch),bossKey:L.ch>=4?"4":String(L.ch),bossName:bNames[L.ch],form:null,weapons:wpByCh[ch]||{},hpFrac:1,power:1+0.15*(L.ch-1),
       art:p=>artUrl(p),okText:"结算",boss:k==="duel",kind:k==="sky"?"boss":undefined,route:nightRoute46,
       onClose:r=>storyBossDone46(L,k,r)});
     return !!sky46;
@@ -16240,6 +17323,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       ${sheet}
       <footer class="r46Foot"><span>${window.SakurayoForms?`🎭 ${htmlEscape(window.SakurayoForms.get(window.SakurayoForms.init(run46).id).name)} · `:""}Lv ${run46.build?.level||1} · 强化 ${Object.values(run46.build?.up||{}).reduce((a,b)=>a+(+b||0),0)} 项 · 构筑跨节点保留</span><button class="ab" data-k="abandon">放弃夜行</button></footer>
       ${runModalHtml46()}`;
+    attachStillVideo46(el.querySelector(".r46Bg"), RUN_BG46[Math.max(0, Math.min(RUN_BG46.length - 1, run46.layer - 1))]);
   }
   function runModalHtml46(){
     const m=runModal46;if(!m)return "";
@@ -16280,7 +17364,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     const b=run46.build||{},FM=window.SakurayoForms,fm=run46.form&&FM?FM.get(run46.form.id):null;
     $("#run46")?.classList.add("hidden");runNode46=nd;
     sky46=SH.start({character:run46.character||save.character||"sayo",seed:(run46.seed^(nd.layer*7919+nd.row*131+nd.col))>>>0,layer:nd.layer,
-      form:fm?{slot:fm.slot,name:fm.name,tint:fm.tint}:null,weapons:b.weapons46||{},hpFrac:b.maxHp?b.hp/b.maxHp:run46.hpFrac??1,power:1+0.06*(run46.nodesWon||0),
+      form:fm?{slot:fm.slot,name:fm.name,tint:fm.tint}:null,weapons:b.weapons46||{},relics:run46.relics||[],hpFrac:b.maxHp?b.hp/b.maxHp:run46.hpFrac??1,power:1+0.06*(run46.nodesWon||0),
       art:p=>artUrl(p),auto:!!opts.auto,okText:"返回夜行地图",boss:as==="duel"&&(isBoss||nd.layer>=3),kind:as==="sky"&&(isBoss||nd.layer>=3)?"boss":undefined,route:R.route(run46).id,
       onClose:r=>skyDone46(nd,r)});
     return true;
@@ -16345,6 +17429,11 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     document.body.appendChild(el);setTimeout(()=>el.remove(),1700);sound?.("skill");
     if(state==="play"){slowmo46=Math.max(slowmo46,0.6);P.inv=Math.max(P.inv,1);fxStamp?.("skill",P.x,P.y,{size:220,life:.7});shake=Math.max(shake,8);}
   }
+  /* 飞升 PV（pv/ascend/<角色>.mp4，竖版 720×1068）：不暂停战斗，右侧斜切窗完整播放（contain）+ 左侧名牌，0.6 倍慢动作与无敌兜底。 */
+  function ascendCut48(u){if(!u||state!=="play"||document.documentElement.classList.contains("reduceMotion46")||matchMedia?.("(prefers-reduced-motion: reduce)").matches)return;const id=save.character||"sayo";$("#ascCut48")?.remove();const el=document.createElement("div");el.id="ascCut48";const probe=document.createElement("video"),ext=!probe.canPlayType?.('video/mp4; codecs="avc1.42E01E"')&&probe.canPlayType?.('video/webm; codecs="vp9"')?".webm":".mp4";
+    el.innerHTML=`<div class="ac48v"><video muted playsinline></video></div><div class="ac48t"><small>ASCENSION · 飞升</small><b>${htmlEscape(u.n||"")}</b></div>`;const v=el.querySelector("video");v.muted=true;v.playsInline=true;let done=false;const end=()=>{if(done)return;done=true;el.classList.add("out");setTimeout(()=>el.remove(),260);};v.onended=end;v.onerror=end;el.onclick=end;v.src=artUrl("pv/ascend/"+id+ext);document.body.appendChild(el);v.play?.()?.catch?.(end);setTimeout(end,5600);slowmo46=Math.max(slowmo46,.6);P.inv=Math.max(P.inv,1.2);}
+  if(!document.getElementById("ascCutCss48")){const st=document.createElement("style");st.id="ascCutCss48";st.textContent=`#ascCut48{position:fixed;inset:0;z-index:40;pointer-events:none;display:grid;grid-template-columns:1fr minmax(0,34vw);align-items:stretch}#ascCut48 .ac48v{grid-column:2;position:relative;margin:4vh 2vw 4vh 0;clip-path:polygon(28px 0,100% 0,100% 100%,0 100%);background:linear-gradient(180deg,#071425ee,#0a0717ee);box-shadow:inset 0 0 0 1px #6ff3ff66;pointer-events:auto;animation:ac48in .32s cubic-bezier(.2,.9,.2,1)}#ascCut48 video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}#ascCut48 .ac48t{grid-column:1;grid-row:1;align-self:end;justify-self:end;margin:0 2vw 8vh 0;padding:10px 18px;clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);background:linear-gradient(90deg,#0b1830e6,#1a0f2ee6);color:#eaf6ff;animation:ac48in .32s ease-out}#ascCut48 .ac48t small{display:block;color:#ffd36b;font:800 11px/1.2 system-ui;letter-spacing:.2em}#ascCut48 .ac48t b{font:900 22px/1.3 system-ui;text-shadow:0 0 14px #6ff3ff77}#ascCut48.out{opacity:0;transition:opacity .25s}@keyframes ac48in{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}`;document.head.appendChild(st);}
+  const _chooseUpgrade48=chooseUpgrade;chooseUpgrade=function(u){const r=_chooseUpgrade48.apply(this,arguments);if(u&&u.asc)ascendCut48(u);return r;};
   function paintFormHud46(){
     const st=formSt46();let b=$("#awaken46");
     if(!st||state!=="play"){b?.classList.add("hidden");return;}
@@ -16355,6 +17444,15 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     b.querySelector("small").textContent=on?`${Math.ceil(f.awakenUntil-runTime)}s`:ph>=4?(ready?"F / 点击":`${Math.floor(f.gauge)}%`):"第 4 阶段";
   }
   function formAwaken46(){const st=formSt46();if(!st||state!=="play"||formPause46)return false;const F=window.SakurayoForms;if(!F.awaken(st,boss&&!boss.dead?boss.phase:0,runTime))return false;const f=formSync46();formCut46(f);return true;}
+  /* 破界奥义（移植自 #33 的干员大招，改为本人释放，不换人）：觉醒发动瞬间清空敌弹并对视野内全体造成一次角色专属爆发。 */
+  const BREAK_NAMES48={sayo:"终夜樱雨·全域狙击",aya:"月切·镜反风暴",rion:"黄泉·剑冢万刃"},BREAK_COLOR48={sayo:"#ff8fc8",aya:"#8fd0ff",rion:"#ff5a74"};
+  function breakBurst48(){const c=char35(),id=c.id||"sayo";let cut=0;for(const b of ebullets)if(b.life>0){b.life=0;cut++;if(cut<40&&quality>=.62)particles(b.x,b.y,2,"#fff0c8");}
+    const dmg=P.dmg*(5.5+Math.min(4,cut*.04))*(id==="rion"?(P.bladePower||1):1);
+    aoe(P.x,P.y,1100,dmg,BREAK_COLOR48[id],true,{source:"skill",school:id==="sayo"?"shrine":id==="aya"?"ninja":"cult",break48:1});
+    if(id==="aya")for(let i=0;i<10;i++){const a=i/10*Math.PI*2;pushBullet({x:P.x,y:P.y,vx:Math.cos(a)*520,vy:Math.sin(a)*520,r:11,life:1.1,dmg:P.dmg*1.4,pierce:9,home:.05,source:"blade",school:"ninja",hit:new Set()});}
+    if(cut>0)P.sh=Math.min(P.maxSh,P.sh+Math.min(30,cut*.5));
+    shake=Math.max(shake,12);P.inv=Math.max(P.inv,.8);if(typeof haptic37==="function")haptic37([20,30,40]);sound("phase");toast("破界奥义 · "+BREAK_NAMES48[id]);P.breakBursts48=(P.breakBursts48||0)+1;}
+  const _formAwaken48=formAwaken46;formAwaken46=function(){const ok=_formAwaken48();if(ok)breakBurst48();return ok;};
   function formOffer46(src){
     const st=formSt46();if(!st)return false;const F=window.SakurayoForms,offer=F.offer(st).filter(f=>F.canSwitch(st,f.id,src));if(!offer.length)return false;
     formPause46=true;let el=document.createElement("div");el.id="formPick46";el.className="fp46";
@@ -16449,6 +17547,139 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function paintRunBtn46(){modeRow46();const b=$("#runBtn46");if(!b)return;const r=runLoad46();b.innerHTML=r?`<b>继续夜行</b><small>第 ${r.layer} 层 · 💠 ${r.shards}</small>`:`<b>夜行<span class="mx46"> · 肉鸽</span></b><small>三层地图 · 构筑跨节点</small>`;}
   (function(){const b=document.createElement("button");b.className="levelMapBtn46 runBtn46";b.id="runBtn46";b.type="button";modeRow46().prepend(b);paintRunBtn46();})();
   (function(){const b=document.createElement("button");b.className="levelMapBtn46 wdBtn46";b.id="wdBtn46";b.type="button";b.innerHTML="<b>衣橱</b><small>华彩 · 传说 · 武器 · 特效</small>";modeRow46().append(b);})();
+  /* ===== 百夜演武场 · 三大独立爽玩模式（百鬼讨伐 Boss Rush / 镜空符卡演武 / 镜斗武道擂台） ===== */
+  var dojoCfg46={form:"base",skyCh:1,skyKind:"boss",skyWp:"spread",rushIdx:0,rushMode:"mow",rushActive:false,tourIdx:0,tourBoons:[]};
+  function openDojo46(){
+    let el=$("#dojo46");if(!el){el=document.createElement("div");el.id="dojo46";document.body.appendChild(el);}
+    const ch=save.character||"sayo",CHN={sayo:"月城小夜",aya:"神代绫",rion:"黑羽凛音"},FM=window.SakurayoForms;
+    const forms=["base","guard","speed","burst"].map(sl=>{const f=FM?FM.get(ch+"_"+sl):null;return {slot:sl,n:f?f.name:sl,mask:f?f.mask:sl,tint:f?.tint||"#ff8fc0"};});
+    const wps=[["spread","🌸 散射樱扇"],["homing","🕊️ 追踪纸鹤"],["orbit","🗡️ 环绕樱刃"],["laser","🔆 月光激光"],["bomb","💥 爆裂樱弹"],["pierce","🔁 贯穿弹链"]];
+    const chs=[[1,"第 1 章 · 百目神舆姬"],[2,"第 2 章 · 唐伞雨姬"],[3,"第 3 章 · 黄泉门守"],[4,"终章 · 鬼·朔夜"]];
+    el.innerHTML=`<div class="box"><header><b>百夜演武场 · 独立畅玩模式</b><span>出战角色：${htmlEscape(CHN[ch]||ch)}</span><button class="x" data-dx>✕</button></header>
+      <div class="djForm"><em>出战面具形态：</em>${forms.map(f=>`<button data-dform="${f.slot}" class="${dojoCfg46.form===f.slot?"on":""}" style="--t:${f.tint}">${htmlEscape(f.mask==="无"?"素面":f.mask)} · ${htmlEscape(f.n)}</button>`).join("")}</div>
+      <div class="cards">
+        <div class="nc rush"><small>模式一 · 首领连战（Boss Rush）</small><b>👹 百鬼讨伐 · 四章首领连战</b>
+          <p>无需跑图，直接连续讨伐四章首领（百目尸将 → 射的屋大将 → 鬼宗一 → 鬼·朔夜）！每关可选迎战方式，通关获丰厚樱花币与镜屑。</p>
+          <div class="rt">${[["mow","⚔ 割草乱战"],["duel","🥋 1v1 格斗"],["sky","✦ 东方弹幕"]].map(([k,n])=>`<button data-drushm="${k}" class="${dojoCfg46.rushMode===k?"on":""}">${n}</button>`).join("")}</div>
+          <button class="go" data-drushgo>开启四连讨伐（第 1 战 → 第 4 战）</button></div>
+        <div class="nc sky"><small>模式二 · 东方 Project 式弹幕 STG</small><b>✦ 镜空演武 · 符卡修行</b>
+          <p>随时进入角色本人飞行的东方弹幕模式：低速判定点、擦弹回符、决死 Bomb、Boss 符卡收取练习（含第 4 章终局「鬼·朔夜」专属符卡）。</p>
+          <div class="rt">${chs.map(([c,n])=>`<button data-dskych="${c}" class="${dojoCfg46.skyCh===c?"on":""}">${n}</button>`).join("")}</div>
+          <div class="rt">${[["boss","👹 直面首领符卡"],["node","✨ 道中 + 中Boss"]].map(([k,n])=>`<button data-dskyk="${k}" class="${dojoCfg46.skyKind===k?"on":""}">${n}</button>`).join("")}</div>
+          <div class="rt">${wps.slice(0,3).map(([k,n])=>`<button data-dskyw="${k}" class="${dojoCfg46.skyWp===k?"on":""}">${n}</button>`).join("")}</div>
+          <button class="go" data-dskygo>进入镜空演武</button></div>
+        <div class="nc duel"><small>模式三 · 全女格斗街机擂台</small><b>🥋 镜斗大会 · 百夜武道会</b>
+          <p>KOF 式横版 1v1 全女格斗 4 连战（镜影前哨 → 宿敌对决 → 鬼宗一 → 鬼·朔夜）！支持方向+必杀一键派生升龙/突进，每胜一场二选一「武道秘传」。</p>
+          <div class="rt">${wps.map(([k,n])=>`<button data-dskyw="${k}" class="${dojoCfg46.skyWp===k?"on":""}">${n}</button>`).join("")}</div>
+          <button class="go" data-dtourgo>开启武道会四连战</button></div>
+      </div></div>`;
+    el.classList.remove("hidden");return true;
+  }
+  function dojoFormObj46(){const ch=save.character||"sayo",FM=window.SakurayoForms,f=FM?FM.get(ch+"_"+(dojoCfg46.form||"base")):null;return f?{slot:f.slot,name:f.name,tint:f.tint}:{slot:dojoCfg46.form||"base"};}
+  function startDojoSky46(opts={}){
+    const SH=window.SakurayoShmup;if(!SH)return false;
+    $("#dojo46")?.classList.add("hidden");$("#menu").classList.add("hidden");state="menu";
+    const ch=opts.character||save.character||"sayo",L=opts.layer||dojoCfg46.skyCh||1,wp=opts.wp||dojoCfg46.skyWp||"spread";
+    const wobj={[wp]:{lv:4,evo:1},orbit:{lv:2}};
+    sky46=SH.start({character:ch,seed:opts.seed||((Date.now()>>>0)^(L*9973)),layer:L,bossKey:L>=4?"4":String(L),
+      form:dojoFormObj46(),weapons:wobj,relics:["coil","geta"],hpFrac:1,power:1.35+0.12*(L-1),
+      art:p=>artUrl(p),auto:!!opts.auto,okText:"演武结算",kind:opts.kind||dojoCfg46.skyKind||"boss",route:nightRoute46,
+      onClose:r=>{sky46=null;$("#menu").classList.remove("hidden");if(r.win){const c=60+L*25+(r.caps||0)*15;save.coins+=c;kyoGain46("sky");persist();toast(`镜空演武突破！符卡收取 ${r.caps||0}/${r.cards||0} · 🌸 +${c}`);}else toast("镜空演武结束");menuUpdate?.();}});
+    return !!sky46;
+  }
+  const TOUR_FOES46=[
+    {layer:1,boss:false,title:"第一战 · 镜影前哨"},
+    {layer:2,boss:false,title:"第二战 · 宿敌镜影"},
+    {layer:3,boss:true,bossName:"鬼宗一 · 斩鬼刀传人",title:"准决赛 · 鬼宗一"},
+    {layer:4,boss:true,bossName:"鬼·朔夜 · 四百一十二夜",title:"决胜战 · 鬼·朔夜"}
+  ];
+  const TOUR_BOONS46=[
+    {id:"dmg",n:"🔥 猛火秘传",d:"全招式伤害 +18%"},
+    {id:"meter",n:"⚡ 灵流秘传",d:"开局自带 1 格气，集气效率 +25%"},
+    {id:"guard",n:"🛡 不动秘传",d:"免疫必杀削血，防御崩解槽减半"},
+    {id:"speed",n:"🌪 疾风秘传",d:"移动与冲刺速度 +15%，轻攻击可 4 连"}
+  ];
+  function startDojoTour46(idx=0,boons=[],opts={}){
+    const D=window.SakurayoDuel;if(!D)return false;
+    dojoCfg46.tourIdx=idx;dojoCfg46.tourBoons=boons.slice();
+    const stg=TOUR_FOES46[idx]||TOUR_FOES46[0],ch=opts.character||save.character||"sayo",foes=["aya","rion","sayo"].filter(c=>c!==ch);
+    const foe=stg.boss?(idx>=3?"rion":"aya"):foes[idx%foes.length],wp=opts.wp||dojoCfg46.skyWp||"spread";
+    $("#dojo46")?.classList.add("hidden");$("#menu").classList.add("hidden");state="menu";
+    sky46=D.start({character:ch,foe,seed:opts.seed||((Date.now()>>>0)^((idx+1)*65537)),layer:Math.min(3,stg.layer),boss:stg.boss,bossName:stg.bossName,
+      form:dojoFormObj46(),weapons:{[wp]:{lv:4,evo:1}},boons:dojoCfg46.tourBoons,hpFrac:1,power:1.25+idx*0.18,
+      art:p=>artUrl(p),auto:!!opts.auto,okText:idx+1<TOUR_FOES46.length?"下一战 ▶":"捧起优胜杯",route:nightRoute46,
+      onClose:r=>{sky46=null;
+        if(!r.win){$("#menu").classList.remove("hidden");const c=idx*35;if(c){save.coins+=c;persist();}toast(`武道会止步第 ${idx+1} 战${c?` · 🌸 +${c}`:""}`);menuUpdate?.();return;}
+        if(idx+1>=TOUR_FOES46.length){$("#menu").classList.remove("hidden");save.coins+=220;kyoGain46("boss");persist();toast("🏆 百夜武道会全胜制霸！🌸 +220");menuUpdate?.();return;}
+        if(opts.auto){startDojoTour46(idx+1,[...dojoCfg46.tourBoons,TOUR_BOONS46[idx%TOUR_BOONS46.length].id],opts);return;}
+        openTourBoonModal46(idx+1);}});
+    return !!sky46;
+  }
+  function openTourBoonModal46(nextIdx){
+    let el=$("#tourBoon46");if(el)el.remove();el=document.createElement("div");el.id="tourBoon46";el.className="fp46";
+    const pool=TOUR_BOONS46.filter(b=>!dojoCfg46.tourBoons.includes(b.id)),pick=pool.length>=2?pool.slice(0,2):TOUR_BOONS46.slice(0,2);
+    el.innerHTML=`<div class="box"><small>百夜武道会 · 连胜晋级</small><h3>即将进入：${htmlEscape(TOUR_FOES46[nextIdx].title)}</h3><p style="color:#d8cdea;margin:0 0 12px">选择一项武道秘传带入后续擂台：</p><div class="cards">${pick.map(b=>`<button data-tboon="${b.id}" style="--t:#ffd76a;padding:16px"><b>${htmlEscape(b.n)}</b><span>${htmlEscape(b.d)}</span></button>`).join("")}</div></div>`;
+    el.addEventListener("click",e=>{const b=e.target.closest("[data-tboon]");if(!b)return;el.remove();startDojoTour46(nextIdx,[...dojoCfg46.tourBoons,b.dataset.tboon]);});
+    document.body.appendChild(el);
+  }
+  const RUSH_LEVELS46=["1-4","2-4","3-4","4-4"];
+  function startBossRush46(idx=0,mode=dojoCfg46.rushMode||"mow"){
+    const LV=window.SakurayoLevels;if(!LV)return false;
+    dojoCfg46.rushIdx=idx;dojoCfg46.rushMode=mode;dojoCfg46.rushActive=true;
+    const lid=RUSH_LEVELS46[idx]||"1-4",L=LV.find(lid);if(!L)return false;
+    $("#dojo46")?.classList.add("hidden");
+    activeLevel46=Object.assign({},L,{rush46:true,rushIdx46:idx,goal:{bossAt:4}});
+    levelResult46=null;levelObj46=null;selected=L.ch;pendingMode46="story";runMode36="story";setTrial46(null);storyAlt46=null;
+    if(mode!=="mow"){launchStoryBoss46(activeLevel46,mode);return true;}
+    if(state==="result"){$("#result").classList.add("hidden");state="menu";}
+    startGame();
+    // Boss Rush 割草模式开局赋予成型构筑（Lv4 + 主副武器 + 选定面具形态），立刻畅享高潮首领战
+    const wp=dojoCfg46.skyWp||"spread";
+    if(window.SakurayoWeapons){for(let i=0;i<3;i++)window.SakurayoWeapons.gain(P,wp);window.SakurayoWeapons.gain(P,"orbit");}
+    P.dmg*=1.25+idx*0.12;P.maxHp+=20*idx;P.hp=P.maxHp;
+    const fobj=dojoFormObj46();P.form46={id:(save.character||"sayo")+"_"+fobj.slot,slot:fobj.slot,tint:fobj.tint};
+    toast(`百鬼讨伐 · 第 ${idx+1}/4 战：${L.n}`);
+    return true;
+  }
+  const _finishBossRush46=finish;
+  finish=function(win){
+    const r=_finishBossRush46(win);
+    if(dojoCfg46.rushActive&&activeLevel46?.rush46&&state==="result"){
+      const idx=activeLevel46.rushIdx46||0,hasNext=win&&idx+1<RUSH_LEVELS46.length;
+      if(win&&!hasNext){save.coins+=260;kyoGain46("boss");persist();dojoCfg46.rushActive=false;}
+      else if(!win){const c=idx*45;if(c){save.coins+=c;persist();}dojoCfg46.rushActive=false;}
+      let box=$("#rushRes46");if(!box){box=document.createElement("div");box.id="rushRes46";($("#levelStars46")||$("#rtitle")).after(box);}
+      box.innerHTML=`<div class="rr46"><b>${win?(hasNext?`百鬼讨伐 · 第 ${idx+1}/4 战突破！`:"🏆 百鬼讨伐 · 四章首领全破！"):`百鬼讨伐 · 止步第 ${idx+1} 战`}</b><span>${win?(hasNext?`下一战：${RUSH_LEVELS46[idx+1]}`:"奖励 🌸 +260 · 镜屑已入账"):(idx?`突破 ${idx} 战奖励 🌸 +${idx*45}`:"再接再厉")}</span><button class="primary" id="rushNextBtn46">${hasNext?"迎战下一位首领 ▶":"返回百夜演武场"}</button></div>`;
+    }else{$("#rushRes46")?.remove();}
+    return r;
+  };
+  (function(){const b=document.createElement("button");b.className="levelMapBtn46 dojoBtn46";b.id="dojoBtn46";b.type="button";b.innerHTML="<b>百夜演武</b><small>首领连战 · 弹幕 · 擂台</small>";modeRow46().append(b);})();
+  document.addEventListener("click",e=>{
+    if(e.target.closest("#dojoBtn46")){openDojo46();return;}
+    if(e.target.closest("#rushNextBtn46")){const idx=activeLevel46?.rushIdx46||0,hasNext=dojoCfg46.rushActive&&idx+1<RUSH_LEVELS46.length;$("#rushRes46")?.remove();if(hasNext)startBossRush46(idx+1,dojoCfg46.rushMode);else{backMenu();openDojo46();}return;}
+    const t=e.target.closest("#dojo46 [data-dx],#dojo46 [data-dform],#dojo46 [data-drushm],#dojo46 [data-dskych],#dojo46 [data-dskyk],#dojo46 [data-dskyw],#dojo46 [data-drushgo],#dojo46 [data-dskygo],#dojo46 [data-dtourgo]");
+    if(!t)return;
+    if(t.dataset.dx!==undefined)$("#dojo46")?.classList.add("hidden");
+    else if(t.dataset.dform){dojoCfg46.form=t.dataset.dform;openDojo46();}
+    else if(t.dataset.drushm){dojoCfg46.rushMode=t.dataset.drushm;openDojo46();}
+    else if(t.dataset.dskych){dojoCfg46.skyCh=+t.dataset.dskych;openDojo46();}
+    else if(t.dataset.dskyk){dojoCfg46.skyKind=t.dataset.dskyk;openDojo46();}
+    else if(t.dataset.dskyw){dojoCfg46.skyWp=t.dataset.dskyw;openDojo46();}
+    else if(t.dataset.drushgo!==undefined)startBossRush46(0,dojoCfg46.rushMode);
+    else if(t.dataset.dskygo!==undefined)startDojoSky46();
+    else if(t.dataset.dtourgo!==undefined)startDojoTour46(0,[]);
+  });
+  style37.textContent+=`.dojoBtn46{background:linear-gradient(135deg,#ff4d79,#7c4dff)!important}
+#dojo46{position:fixed;inset:0;z-index:130;background:#08050fcc;display:grid;place-items:center;padding:12px}#dojo46.hidden{display:none}
+#dojo46 .box{width:min(1020px,100%);max-height:100%;overflow:auto;background:#1a1228;border:1px solid #ffffff22;border-radius:16px;padding:12px 16px;color:#fff}
+#dojo46 header{display:flex;align-items:center;gap:12px}#dojo46 header b{font-size:20px}#dojo46 header span{flex:1;color:#ffd76a;font-size:13px}#dojo46 .x{background:none;border:0;color:#fff;font-size:20px}
+#dojo46 .djForm{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0}#dojo46 .djForm em{font-style:normal;font-size:12px;color:#c9b8e8}
+#dojo46 .djForm button{padding:5px 10px;border-radius:999px;border:1px solid var(--t,#fff4);background:#120c20;color:#fff;font-size:12px;opacity:.65}#dojo46 .djForm button.on{opacity:1;background:color-mix(in srgb,var(--t,#ff8fc0) 35%,#120c20);box-shadow:0 0 10px var(--t,#ff8fc0)}
+#dojo46 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:8px}
+#dojo46 .nc{background:#251a38;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;border:1px solid #ffffff18}
+#dojo46 .nc small{color:#ffb2d4}#dojo46 .nc b{font-size:17px}#dojo46 .nc p{font-size:12px;color:#d8cdea;flex:1;margin:0}
+#dojo46 .rt{display:flex;flex-wrap:wrap;gap:5px;margin:2px 0}#dojo46 .rt button{flex:1 1 auto;padding:5px 7px;border-radius:8px;border:1px solid #ffffff28;background:#140d22;color:#eee;font-size:11px;opacity:.7}#dojo46 .rt button.on{opacity:1;border-color:#ffd76a;background:#3a2458;box-shadow:0 0 8px #ffd76a66}
+#dojo46 .go{padding:9px;border-radius:10px;border:0;background:linear-gradient(135deg,#ff4d79,#7c4dff);color:#fff;font-weight:bold;margin-top:4px}`;
   const _menuUpdateRun46=menuUpdate;menuUpdate=function(){const r=_menuUpdateRun46.apply(this,arguments);paintRunBtn46();return r;};
   // 永久数值天赋冻结（DESIGN_V5 §5）：按已投入返还樱花币，一次性；旧 tal 字段原样保留。
   (function(){if(!(save.talRefund46<0))return;let sum=0;for(const [id,a] of Object.entries(TAL)){const l=Math.max(0,save.tal?.[id]|0);for(let i=0;i<l;i++)sum+=window.SakurayoCatalog.price(a,i);}save.coins+=sum;save.talRefund46=sum;if(sum)setTimeout(()=>toast(`永久天赋已冻结：返还 🌸 ${sum}`),1500);})();
@@ -16665,6 +17896,10 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       skyClose46(){const ok=document.querySelector("#shm46 .res .ok,#pin46 .res .ok,#duel46 .res .ok");if(ok){ok.click();return true;}return false;},
       openWardrobe46(tab){return openWardrobe46(tab);},
       openNight46(){return openNight46();},
+      openDojo46(){return openDojo46();},
+      startBossRush46(idx=0,mode="mow"){return startBossRush46(idx,mode);},
+      startDojoSky46(opts){return startDojoSky46(opts||{});},
+      startDojoTour46(idx=0,boons=[],opts){return startDojoTour46(idx,boons,opts||{});},
       avgCast46(who,ex){return avgCast46(who,ex);},
       seasonState46(){const s=season46();return s?JSON.parse(JSON.stringify(Object.assign({},s,{level:window.SakurayoSeason.level(s),daily:window.SakurayoSeason.daily(),coins:save.coins}))):null;},
       seasonClaim46(){return seasonClaim46();},
@@ -16702,6 +17937,8 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       forceLevelDone46(){if(levelObj46)levelObj46.done=true;},
       avgState46(){return window.SakurayoAvg?.state()||null;},
       avgNext46(n=1){for(let i=0;i<n;i++)window.SakurayoAvg?.next();return window.SakurayoAvg?.state()||null;},
+      pactState48(){return {pact:P.pact48||null,bursts:P.breakBursts48||0};},
+      breakBurst48(n=6){for(let i=0;i<n;i++)ebullets.push({x:P.x+40,y:P.y,vx:0,vy:0,r:5,life:3,dmg:1});const before=ebullets.filter(x=>x.life>0).length;breakBurst48();return {before,after:ebullets.filter(x=>x.life>0).length,bursts:P.breakBursts48};},
       formState46(){const st=run46;const f=st?.form;return {form:f?{...f}:null,p:P.form46||null,spd:P.spd,dmg:P.dmg,rate:P.rate,maxHp:P.maxHp,dmgTaken:P.dmgTaken46||1,pick:!!$("#formPick46"),pause:formPause46,cut:!!$("#formCut46"),btn:$("#awaken46")&&!$("#awaken46").classList.contains("hidden")?$("#awaken46").className:null};},formPickFirst46(){const b=$("#formPick46 .cards button");if(!b)return false;b.click();return true;},formCharge46(v=100){if(run46?.form)run46.form.gauge=v;return run46?.form?.gauge;},formAwaken46(){return formAwaken46();},bossPhase46(p){advanceBossPhase(boss,p);return boss.phase;},storyPlay46(id,part){return playStory46(id,part,()=>{});},avgSkip46(){window.SakurayoAvg?.skip();return state;},
       openLevelMap46(ch){openLevelMap46(ch);return !!$("#levelMap46:not(.hidden)");},
       saveSnapshot46(){return JSON.parse(JSON.stringify({stars46:save.stars46,cg46:save.cg46,avgRead46:(save.avgRead46||[]).length,done:save.done,unlock:save.unlock,coins:save.coins}));},
@@ -16860,33 +18097,27 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     const root = $("#heroLive46");
     if (!root) return;
     const mid = window.SakurayoMascot ? window.SakurayoMascot.resolve(save.settings?.mascot, save.character) : save.character;
-    const own = mid === save.character;
-    const c = CHARACTERS35[mid] || char35(),
-      sk = own ? skin35() : { id: "default" },
-      skinId = sk.id || "default";
+    const c = CHARACTERS35[mid] || char35();
     root.dataset.mascot = c.id;
     window.SakurayoMascot?.adopt($("#menu"));
     const name = $("#menu .heroLiveName46 b");
     const weapon = $("#menu .heroLiveName46 small");
     if (name) name.textContent = c.name;
     if (weapon) weapon.textContent = c.weapon;
-    const livePath = skinId === "default" ? `characters/${c.id}/default/lobby_idle.webp` : "";
-    const key = `${c.id}|${skinId}|${livePath || charArtPath35(c, "dialogue", sk)}`;
+    /* 看板娘只跟角色换。商店皮肤只换战斗里的 Q 版，不换大厅视频。 */
+    const livePath = `characters/${c.id}/default/lobby_idle.webp`;
+    const key = `${c.id}|mascot`;
     if (key === heroLiveKey46) return;
     heroLiveKey46 = key;
     const base = root.querySelector(".heroLiveBase46");
     root.classList.remove("lobbyArt46", "expr46");
-    if (livePath) {
-      setLiveLayer46(base, livePath, ok => {
-        if (ok) { root.classList.add("lobbyArt46"); return; }
-        setLiveLayer46(base, `characters/${c.id}/default/live_idle.webp`, ok2 => {
-          if (!ok2) setCharacterImage35(base, c, "dialogue", sk);
-        });
+    setLiveLayer46(base, livePath, ok => {
+      if (ok) { root.classList.add("lobbyArt46"); return; }
+      setLiveLayer46(base, `characters/${c.id}/default/live_idle.webp`, ok2 => {
+        if (!ok2) setCharacterImage35(base, c, "dialogue", { id: "default" });
       });
-    } else {
-      setCharacterImage35(base, c, "dialogue", sk);
-    }
-    mountRig46(root, c.id, skinId === "default");
+    });
+    mountRig46(root, c.id, true);
     const blink = root.querySelector(".heroLiveBlink46");
     const hair = root.querySelector(".heroLiveHair46");
     if (hair) {
@@ -16895,15 +18126,9 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
       root.classList.remove("hasHair");
     }
     if (blink) {
-      if (skinId === "default") {
-        setLiveLayer46(blink, `characters/${c.id}/default/live_blink.webp`, ok => {
-          root.classList.toggle("hasBlink", !!ok);
-        });
-      } else {
-        blink.removeAttribute("src");
-        blink.classList.add("off");
-        root.classList.remove("hasBlink");
-      }
+      setLiveLayer46(blink, `characters/${c.id}/default/live_blink.webp`, ok => {
+        root.classList.toggle("hasBlink", !!ok);
+      });
     }
   }
   /* 看板娘网格变形（runtime/sakurayo-rig.js；数据由 tools/anim-pipeline 一条命令生成）。失败时保留旧的图片层。 */
@@ -16935,8 +18160,10 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     const root = $("#heroLive46");
     if (!root) return;
     if (L) L.bindHeroTap(root, () => grantCheat46(), kind => {
-      const part = root.classList.contains("rig46") ? window.SakurayoRig?.touch(rigTap46[0], rigTap46[1]) : null;
+      const vid = root.classList.contains("vid46");
+      const part = !vid && root.classList.contains("rig46") ? window.SakurayoRig?.touch(rigTap46[0], rigTap46[1]) : null;
       if (part) { kind = part === "head" || part === "hair" ? "tapHead" : "tapBody"; window.SakurayoRig.say(1.4); }
+      else if (vid) window.SakurayoMascotVideo?.tap(kind === "tapHead" ? "head" : "body");
       else if (Live) Live.trigger(kind);
       const M = window.SakurayoMascot, id = root.dataset.mascot || save.character;
       if (M) { M.say($("#menu"), id, CHARACTERS35[id]?.name, kind); M.express(root, id, kind, artUrl); }
@@ -17043,13 +18270,34 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
   function lobbyHandlers46(){
     return {
       pull:n=>doPull46(n),
+      pullNovice:()=>doPullNovice46(),
       art:artUrl,
       character:save.character,
       setPool(id){const L=window.SakurayoLobby;if(!L)return;L.setPool(save,id);persist();refreshLobby46();},
+      setFocus(pool,id){const L=window.SakurayoLobby;if(!L)return;const r=L.setFocus(save,pool,id);toast(r.focusId?`已定轨「${r.n}」：出同阶 50% 命中，命定 1/1 必出`:"已取消定轨");persist();refreshLobby46();},
       setRosterTab(id){const L=window.SakurayoLobby;if(!L)return;L.setRosterTab(save,id);persist();refreshLobby46();},
       spark(id){const L=window.SakurayoLobby;if(!L)return;const r=L.spark(save,save.shop40.ops.pool,id);toast(r.ok?("Spark："+r.n):r.reason==="shards"?"碎镜片不足":r.reason==="owned"?"已经拥有":r.reason==="scrap"?"残件不能 Spark":"无法 Spark");persist();refreshLobby46();if(r.ok&&L.showReveal)L.showReveal([{id:r.id,n:r.n,r:r.r,legend:r.legend}],{art:artUrl});},
       equip(tab,id){const L=window.SakurayoLobby;if(!L)return;const r=L.equip(save,tab,id);toast(r.ok?"已装备":"不能装备");persist();refreshLobby46();},
+      save,
+      pact(id){const L=window.SakurayoLobby;if(!L||!L.setPact)return {ok:false};const r=L.setPact(save,id);if(r.ok){const c=L.cardOf(id);toast(r.pact?`本命契约：${c?c.n:""} · 开局习得入门技`:"已解除本命契约");}persist();refreshLobby46();return r;},
     };
+  }
+  function doPullNovice46(){
+    const L=window.SakurayoLobby;
+    if(!L||typeof L.pullNovice!=="function")return {ok:false,reason:"lobby",results:[]};
+    const result=L.pullNovice(save);
+    if(!result.ok){
+      toast(result.reason==="coins"?"樱花币不足（需 1150 樱花币或 8 张寻访券）":result.reason==="limit"?"初夜迎新特惠次数已用尽":"寻访失败");
+      refreshLobby46();
+      return result;
+    }
+    const names=result.results.map(x=>x.n).slice(0,3).join("、");
+    toast(`迎新十连完成：${names}…`);
+    checkAch();
+    persist();
+    refreshLobby46();
+    if(L.showReveal)L.showReveal(result.results,{art:artUrl});
+    return result;
   }
   function refreshLobby46(){
     const L=window.SakurayoLobby;
@@ -17091,6 +18339,7 @@ if (/(?:\?|&)brokenExtension=1(?:&|$)/.test(location.search||"")){SakurayoConten
     bg.style.backgroundImage=`url('${artUrl("ui/tactical/lobby-night-v5.webp")}')`;
     bg.style.backgroundPosition="center 30%";
     bg.style.backgroundSize="cover";
+    attachStillVideo46(bg, "ui/tactical/lobby-night-v5.webp");
     $("#menu")?.classList.add("lobbyWide46");
   }
   function setTrial46(id){

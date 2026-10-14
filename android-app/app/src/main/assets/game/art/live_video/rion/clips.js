@@ -5,7 +5,7 @@
 (window.SakurayoMascotVideoClips = window.SakurayoMascotVideoClips || {})["rion"] = {
   idle: ["idle.webm", "idle.mp4"],
   taps: {
-    head: [["tap_head2.webm", "tap_head2.mp4"], ["tap_head.webm", "tap_head.mp4"]],
+    head: [["tap_head2.webm", "tap_head2.mp4"]],
     body: [["act1.webm", "act1.mp4"], ["act3.webm", "act3.mp4"], ["act2.webm", "act2.mp4"], ["tap_body.webm", "tap_body.mp4"]]
   },
   greet: ["act2.webm", "act2.mp4"],

@@ -51,3 +51,9 @@ ffmpeg -i in.mp4 -vf "scale=720:1080,fps=30" -c:v libvpx-vp9 -b:v 0 -crf 36 -row
 - 画面设置里的「特效 = 0」（省电/减弱动态）时不播放视频，显示静态立绘。
 - 演示素材：`art/live_video/_demo/`（从现有录像裁出来的绫，只用于测试）。清单里写 `dir: "_demo"` 就可以指向它。
 - 测试：`tests/mascot_video_smoke.mjs`（idle 循环 → 点击片段 → 回到 idle，并且不挂载 rig）。
+
+## 入包门禁（0.9.2 起）
+- 整形：`/workspace/sakurayo-tools/venv/bin/python tools/video/mascot_fit.py <live_video/角色>`。Grok 的 6 秒闭环片段不截断动作：去掉首尾静止帧、整体提速到 ≤4 秒（≤1.8 倍），首尾用 RIFE v4.25 补帧接回 idle 首帧；idle 尾部 6 帧换成 RIFE 9 帧过渡回首帧。
+- 片段首/尾与 idle 首帧 PSNR < 25 dB（换机位或换模型）会被拒绝，必须重新生成，不靠变形硬接（0.9.2 因此移除了凛音 tap_head，摸头由 tap_head2 承担）。
+- 检查：`python3 tools/video/mascot_seam_check.py`，idle 4–8 秒且首尾 ≥35 dB；点击 1.5–4 秒且首尾帧对 idle 首帧 ≥35 dB；单段 ≤1.5 MB；单角色 mp4 合计 ≤8 MB。不达标退出码 1，回归里会跑。
+- 安卓包只带 mp4（运行时凡能播 H.264 一律先选 mp4；webm 只留给桌面 Chromium 调试）。

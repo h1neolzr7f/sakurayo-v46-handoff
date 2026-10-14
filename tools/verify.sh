@@ -12,6 +12,7 @@ python tools/check_content_packs.py
 python tools/check_command_art.py
 python tools/check_tactical_art.py
 python tools/readability.py
+python tools/video/mascot_seam_check.py
 python tools/build_game.py --output android-app/app/src/main/assets/index.html --asset-root android-app/app/src/main/assets/game/art
 python tools/static_check.py android-app/app/src/main/assets/index.html --require-bundled --out tests/artifacts/static/android.bundle.extracted.js
 node --check tests/artifacts/static/android.bundle.extracted.js
