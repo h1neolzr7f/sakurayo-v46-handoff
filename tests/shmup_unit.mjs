@@ -28,4 +28,9 @@ assert.ok(new S.Game({ character: 'sayo', route: 'tech' }).options().length > ne
 // “人类水平”自动驾驶（反应延迟 0.15 s + 判断噪声）打满构筑以外的普通 Boss：胜率 ≥ 75%
 let w = 0, n = 0; for (const ch of ['sayo', 'aya', 'rion']) for (let L = 1; L <= 3; L++) for (let s = 1; s <= 3; s++) { const r = S.simulate({ character: ch, seed: s * 13, layer: L, kind: 'boss', power: 1 + 0.3 * L, skill: 0.3, route: s % 2 ? 'tech' : 'bio' }, 500); w += r.win ? 1 : 0; n++; }
 assert.ok(w / n >= 0.75, 'boss win rate (skill 0.3) ' + (w / n).toFixed(2));
+// Chapter 4 final boss (鬼·朔夜) + relic integration
+{
+  const r4 = S.simulate({ character: 'sayo', seed: 9, layer: 4, kind: 'boss', power: 1.5, relics: ['coil', 'omamori', 'geta', 'core'], weapons: { spread: { lv: 4, evo: 1 } } });
+  assert.ok(r4.done && r4.win && r4.cards >= 3, 'chapter 4 final boss 鬼·朔夜 spell cards clearable');
+}
 console.log('PASS shmup unit (touhou-style): deterministic, chars/forms/routes clear, time ratio', ratio.toFixed(2), JSON.stringify(Object.fromEntries(Object.entries(T).map(([k, x]) => [k, +x.toFixed(1)]))), 'focus/graze/deathbomb/lives OK, boss winrate', (w / n).toFixed(2));

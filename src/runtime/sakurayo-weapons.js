@@ -38,35 +38,45 @@
   function aimAngle(api, range) { var t = api.target(range); var P = api.P; return t ? Math.atan2(t.y - P.y, t.x - P.x) : (P.weaponAngle || 0); }
   function tick(dt, api) {
     var P = api.P, W = state(P), id, w, s, i, a;
+    var fslot = (P.form46 && P.form46.slot) || "base", awk = !!(P.form46 && P.form46.awakenT > 0);
+    var cdMul = (fslot === "speed" ? 0.85 : 1) * (awk ? 0.8 : 1);
+    var dmgMul = (fslot === "burst" ? 1.2 : 1) * (awk ? 1.25 : 1);
     for (id in W) {
       w = W[id]; if (!w.lv) continue; s = stats(id, w.lv, w.evo); w.t -= dt;
       if (id === "orbit") {
-        w.a = (w.a + dt * (w.evo ? 4.6 : 3.4)) % TAU;
-        var rad = 62 + w.lv * 4;
+        w.a = (w.a + dt * (w.evo ? 4.8 : 3.4) * (fslot === "speed" ? 1.25 : 1)) % TAU;
+        var rad = 62 + w.lv * 4 + (fslot === "guard" ? 14 : 0);
         for (i = 0; i < s.c; i++) {
           a = w.a + i * TAU / s.c;
           var bx = P.x + Math.cos(a) * rad, by = P.y + Math.sin(a) * rad;
-          var near = api.enemiesNear(bx, by, 16);
-          for (var j = 0; j < near.length; j++) { var e = near[j]; if ((e.orb46 || 0) > api.now) continue; e.orb46 = api.now + 0.32; api.hit(e, P.dmg * s.dmg, "orbit"); }
+          var near = api.enemiesNear(bx, by, w.evo ? 22 : 16);
+          for (var j = 0; j < near.length; j++) { var e = near[j]; if ((e.orb46 || 0) > api.now) continue; e.orb46 = api.now + (w.evo ? 0.24 : 0.32); api.hit(e, P.dmg * s.dmg * dmgMul, "orbit"); }
+          if (w.evo && fslot === "guard") {
+            var r2 = rad * 0.56, bx2 = P.x + Math.cos(-a * 1.3) * r2, by2 = P.y + Math.sin(-a * 1.3) * r2;
+            var near2 = api.enemiesNear(bx2, by2, 16);
+            for (var j2 = 0; j2 < near2.length; j2++) { var e2 = near2[j2]; if ((e2.orb46 || 0) > api.now) continue; e2.orb46 = api.now + 0.28; api.hit(e2, P.dmg * s.dmg * 0.65 * dmgMul, "orbit"); }
+          }
         }
         continue;
       }
       if (!DEF[id].cd || w.t > 0) continue;
-      w.t = s.cd;
+      w.t = s.cd * cdMul;
       if (id === "spread") {
-        a = aimAngle(api, 320); var fan = 0.9 + (w.evo ? 0.5 : 0);
-        for (i = 0; i < s.c; i++) { var q = a - fan / 2 + fan * i / Math.max(1, s.c - 1); api.push({ x: P.x, y: P.y, vx: Math.cos(q) * 760, vy: Math.sin(q) * 760, r: 4, life: 0.42, dmg: P.dmg * s.dmg, pierce: 0, source: "shot", school: "gun", tracer46: "#ffd0e4", hit: new Set() }); }
+        a = aimAngle(api, 320); var fan = 0.9 + (w.evo ? 0.55 : 0);
+        for (i = 0; i < s.c; i++) { var q = a - fan / 2 + fan * i / Math.max(1, s.c - 1); api.push({ x: P.x, y: P.y, vx: Math.cos(q) * 760, vy: Math.sin(q) * 760, r: w.evo ? 5 : 4, life: w.evo ? 0.5 : 0.42, dmg: P.dmg * s.dmg * dmgMul, pierce: (w.evo ? 1 : 0) + (fslot === "burst" ? 1 : 0), source: "shot", school: "gun", tracer46: w.evo ? "#ff92c8" : "#ffd0e4", hit: new Set() }); }
+        if (w.evo) { for (i = 0; i < 6; i++) { var rAng = a + Math.PI + (i - 2.5) * 0.28; api.push({ x: P.x, y: P.y, vx: Math.cos(rAng) * 640, vy: Math.sin(rAng) * 640, r: 4, life: 0.36, dmg: P.dmg * s.dmg * 0.7 * dmgMul, pierce: 1, source: "shot", school: "gun", tracer46: "#ffe3f1", hit: new Set() }); } }
         api.fx("muzzle", P.x + Math.cos(a) * 24, P.y + Math.sin(a) * 24); api.sound("pistol");
       } else if (id === "homing") {
-        for (i = 0; i < s.c; i++) { var h = (P.weaponAngle || 0) + Math.PI + (i - (s.c - 1) / 2) * 0.5; api.push({ x: P.x, y: P.y, vx: Math.cos(h) * 360, vy: Math.sin(h) * 360, r: 6, life: 2.2, dmg: P.dmg * s.dmg, pierce: 0, home: 0.16, crane46: 1, source: "star", school: "magical", tracer46: "#bfe9ff", hit: new Set() }); }
+        for (i = 0; i < s.c; i++) { var h = (P.weaponAngle || 0) + Math.PI + (i - (s.c - 1) / 2) * 0.5; api.push({ x: P.x, y: P.y, vx: Math.cos(h) * (fslot === "speed" ? 430 : 360), vy: Math.sin(h) * (fslot === "speed" ? 430 : 360), r: 6, life: 2.2, dmg: P.dmg * s.dmg * dmgMul, pierce: w.evo ? 1 : 0, home: w.evo ? 0.22 : 0.16, crane46: w.evo ? 2 : 1, boom46: w.evo ? 42 : 0, boomDmg46: w.evo ? P.dmg * s.dmg * 0.55 * dmgMul : 0, source: "star", school: "magical", tracer46: w.evo ? "#ffd88a" : "#bfe9ff", hit: new Set() }); }
       } else if (id === "bomb") {
         var tg = api.target(420); a = aimAngle(api, 420);
-        api.push({ x: P.x, y: P.y, vx: Math.cos(a) * 440, vy: Math.sin(a) * 440, r: 8, life: tg ? Math.min(1, Math.hypot(tg.x - P.x, tg.y - P.y) / 440) : 0.8, dmg: P.dmg * s.dmg * 0.3, pierce: 0, boom46: s.r, boomDmg46: P.dmg * s.dmg, source: "shot", school: "gun", tracer46: "#ffb070", hit: new Set() });
+        api.push({ x: P.x, y: P.y, vx: Math.cos(a) * 440, vy: Math.sin(a) * 440, r: 8, life: tg ? Math.min(1, Math.hypot(tg.x - P.x, tg.y - P.y) / 440) : 0.8, dmg: P.dmg * s.dmg * 0.3 * dmgMul, pierce: 0, boom46: s.r * (fslot === "burst" ? 1.2 : 1), boomDmg46: P.dmg * s.dmg * dmgMul, cluster46: w.evo ? 4 : 0, source: "shot", school: "gun", tracer46: "#ffb070", hit: new Set() });
       } else if (id === "laser") {
-        w.beam = { a: aimAngle(api, 700), t: s.t, len: 640, tick: 0 };
+        w.beam = { a: aimAngle(api, 700), t: s.t, len: w.evo ? 720 : 640, tick: 0, twin: !!(w.evo || fslot === "burst") };
       } else if (id === "boomerang") {
         a = aimAngle(api, 380);
-        for (i = 0; i < s.c; i++) { var g = a + i * Math.PI; api.push({ x: P.x, y: P.y, vx: Math.cos(g) * 620, vy: Math.sin(g) * 620, r: 14, life: 1.25, dmg: P.dmg * s.dmg, pierce: 99, rang46: 1.25, source: "blade", school: "ninja", tracer46: "#e9d4ff", hit: new Set() }); }
+        var bCnt = s.c + (w.evo ? 1 : 0);
+        for (i = 0; i < bCnt; i++) { var g = a + i * (TAU / bCnt); api.push({ x: P.x, y: P.y, vx: Math.cos(g) * 620, vy: Math.sin(g) * 620, r: w.evo ? 18 : 14, life: w.evo ? 1.45 : 1.25, dmg: P.dmg * s.dmg * dmgMul, pierce: 99, rang46: w.evo ? 1.45 : 1.25, source: "blade", school: "ninja", tracer46: w.evo ? "#ffd6ff" : "#e9d4ff", hit: new Set() }); }
       }
     }
     var L = W.laser;
@@ -74,26 +84,53 @@
       var B = L.beam; B.t -= dt; B.tick -= dt; B.a = aimAngle(api, 700) * 0.15 + B.a * 0.85;
       if (B.tick <= 0) {
         B.tick = 0.1; var ls = stats("laser", L.lv, L.evo), cx = Math.cos(B.a), cy = Math.sin(B.a);
-        var cand = api.enemiesNear(P.x + cx * B.len / 2, P.y + cy * B.len / 2, B.len / 2 + 30);
-        for (i = 0; i < cand.length; i++) { var en = cand[i], px = en.x - P.x, py = en.y - P.y, along = px * cx + py * cy; if (along < 0 || along > B.len) continue; if (Math.abs(px * cy - py * cx) < en.r + (L.evo ? 20 : 12)) api.hit(en, P.dmg * ls.dmg * 0.1 / ls.t * 0.6, "laser"); }
+        var cand = api.enemiesNear(P.x + cx * B.len / 2, P.y + cy * B.len / 2, B.len / 2 + 40);
+        for (i = 0; i < cand.length; i++) {
+          var en = cand[i], px = en.x - P.x, py = en.y - P.y, along = px * cx + py * cy;
+          if (along >= 0 && along <= B.len && Math.abs(px * cy - py * cx) < en.r + (L.evo ? 22 : 12)) api.hit(en, P.dmg * ls.dmg * 0.1 / ls.t * 0.6 * dmgMul, "laser");
+          else if (B.twin && along >= -B.len * 0.65 && along <= 0 && Math.abs(px * cy - py * cx) < en.r + 16) api.hit(en, P.dmg * ls.dmg * 0.1 / ls.t * 0.42 * dmgMul, "laser");
+        }
       }
       if (B.t <= 0) L.beam = null;
     }
   }
   // Called by the bullet loop after a hit. Returns true when the bullet should stop.
   function onHit(b, e, api) {
-    if (b.boom46) { api.aoe(b.x, b.y, b.boom46, b.boomDmg46, "#ff9a4a"); api.fx("shatter", b.x, b.y); return true; }
+    if (b.boom46) {
+      api.aoe(b.x, b.y, b.boom46, b.boomDmg46, "#ff9a4a"); api.fx("shatter", b.x, b.y);
+      if (b.cluster46 && api.push) {
+        for (var ci = 0; ci < b.cluster46; ci++) {
+          var ca = ci * TAU / b.cluster46 + 0.4;
+          api.push({ x: b.x, y: b.y, vx: Math.cos(ca) * 280, vy: Math.sin(ca) * 280, r: 5, life: 0.35, dmg: b.boomDmg46 * 0.25, pierce: 0, boom46: b.boom46 * 0.55, boomDmg46: b.boomDmg46 * 0.45, source: "shot", school: "gun", tracer46: "#ffd090", hit: new Set() });
+        }
+        b.cluster46 = 0;
+      }
+      return !b.crane46;
+    }
     var W = state(api.P);
-    if (!b.bounced46 && b.source === "shot" && W.ricochet && W.ricochet.lv && !b.tracer46) b.bounce46 = stats("ricochet", W.ricochet.lv, W.ricochet.evo).c, b.bounced46 = 1;
+    if (!b.bounced46 && b.source === "shot" && W.ricochet && W.ricochet.lv && !b.tracer46) b.bounce46 = stats("ricochet", W.ricochet.lv, W.ricochet.evo).c, b.bounced46 = 1, b.ricoEvo46 = !!W.ricochet.evo;
     if (b.bounce46 > 0) {
       var best = null, bd = 260, list = api.enemiesNear(e.x, e.y, 260);
       for (var i = 0; i < list.length; i++) { var o = list[i]; if (o.dead || b.hit.has(o)) continue; var d = Math.hypot(o.x - e.x, o.y - e.y); if (d < bd) { bd = d; best = o; } }
-      if (best) { var sp = Math.hypot(b.vx, b.vy), a = Math.atan2(best.y - e.y, best.x - e.x); b.x = e.x; b.y = e.y; b.vx = Math.cos(a) * sp; b.vy = Math.sin(a) * sp; b.life = Math.max(b.life, bd / sp + 0.05); b.bounce46--; b.pierce = Math.max(b.pierce, 1); b.tracer46 = "#9ff3ff"; return false; }
+      if (best) {
+        if (b.ricoEvo46 && api.aoe) api.aoe(e.x, e.y, 38, b.dmg * 0.4, "#8ff6ff");
+        var sp = Math.hypot(b.vx, b.vy), a = Math.atan2(best.y - e.y, best.x - e.x); b.x = e.x; b.y = e.y; b.vx = Math.cos(a) * sp; b.vy = Math.sin(a) * sp; b.life = Math.max(b.life, bd / sp + 0.05); b.bounce46--; b.pierce = Math.max(b.pierce, 1); b.tracer46 = "#9ff3ff"; return false;
+      }
     }
     return false;
   }
   function update(b, dt, api) {
-    if (b.boom46 && b.life - dt <= 0) { api.aoe(b.x, b.y, b.boom46, b.boomDmg46, "#ff9a4a"); api.fx("shatter", b.x, b.y); b.boom46 = 0; }
+    if (b.boom46 && b.life - dt <= 0) {
+      api.aoe(b.x, b.y, b.boom46, b.boomDmg46, "#ff9a4a"); api.fx("shatter", b.x, b.y);
+      if (b.cluster46 && api.push) {
+        for (var ci = 0; ci < b.cluster46; ci++) {
+          var ca = ci * TAU / b.cluster46 + 0.4;
+          api.push({ x: b.x, y: b.y, vx: Math.cos(ca) * 280, vy: Math.sin(ca) * 280, r: 5, life: 0.35, dmg: b.boomDmg46 * 0.25, pierce: 0, boom46: b.boom46 * 0.55, boomDmg46: b.boomDmg46 * 0.45, source: "shot", school: "gun", tracer46: "#ffd090", hit: new Set() });
+        }
+        b.cluster46 = 0;
+      }
+      b.boom46 = 0;
+    }
     if (b.rang46) { var P = api.P, t = b.rang46 - b.life; if (t > b.rang46 * 0.45) { var a = Math.atan2(P.y - b.y, P.x - b.x), sp = Math.hypot(b.vx, b.vy); b.vx += (Math.cos(a) * sp - b.vx) * Math.min(1, dt * 6); b.vy += (Math.sin(a) * sp - b.vy) * Math.min(1, dt * 6); if (Math.hypot(P.x - b.x, P.y - b.y) < 20) b.life = 0; if (t > b.rang46 * 0.5 && !b.back46) { b.back46 = 1; b.hit = new Set(); } } }
   }
   function draw(ctx, P, now) {
@@ -113,7 +150,9 @@
     if (L && L.beam) {
       var B = L.beam, w = (L.evo ? 20 : 12) * (0.9 + Math.sin(now * TAU * 1.5) * 0.1);
       ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.lineCap = "round";
-      ctx.strokeStyle = "rgba(140,220,255,.45)"; ctx.lineWidth = w * 2.2; var o = global.__reduceFlash46 !== false ? 38 : 0; ctx.beginPath(); ctx.moveTo(P.x + Math.cos(B.a) * o, P.y + Math.sin(B.a) * o); ctx.lineTo(P.x + Math.cos(B.a) * B.len, P.y + Math.sin(B.a) * B.len); ctx.stroke();
+      ctx.strokeStyle = "rgba(140,220,255,.45)"; ctx.lineWidth = w * 2.2; var o = global.__reduceFlash46 !== false ? 38 : 0; ctx.beginPath(); ctx.moveTo(P.x + Math.cos(B.a) * o, P.y + Math.sin(B.a) * o); ctx.lineTo(P.x + Math.cos(B.a) * B.len, P.y + Math.sin(B.a) * B.len);
+      if (B.twin) { ctx.moveTo(P.x - Math.cos(B.a) * o, P.y - Math.sin(B.a) * o); ctx.lineTo(P.x - Math.cos(B.a) * B.len * 0.65, P.y - Math.sin(B.a) * B.len * 0.65); }
+      ctx.stroke();
       ctx.strokeStyle = "#f4fdff"; ctx.lineWidth = w * 0.6; ctx.stroke(); ctx.restore();
     }
   }

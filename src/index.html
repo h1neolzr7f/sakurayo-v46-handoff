@@ -6654,7 +6654,7 @@ window.SAKURAYO_VERSION_CODE = 71;
   function facingName36(a=P.weaponAngle||0){const x=Math.cos(a),y=Math.sin(a);return Math.abs(x)>Math.abs(y)?(x>=0?"right":"left"):(y>=0?"down":"up");}
   function angleDelta36(a,b){return Math.atan2(Math.sin(a-b),Math.cos(a-b));}
   function directionalHit36(distance,enemyRadius,radius,angleOffset,halfArc){if(distance>=radius+enemyRadius)return false;const edge=distance>enemyRadius?Math.asin(clamp(enemyRadius/distance,0,1)):Math.PI;return Math.abs(angleDelta36(angleOffset,0))<=halfArc+edge;}
-  function directionalSlash36(radius,dmg,big=false,angle=P.weaponAngle||Math.atan2(P.fy,P.fx),halfArc=big?1.66:1.05){fxStamp("slash",P.x,P.y,{size:Math.max(48,radius*.42),life:.28,rot:angle});const color=char35().id==="rion"?"#ff526f":"#7db8ff";slashes.push({x:P.x,y:P.y,max:radius,life:.32,total:.32,color,dir:angle,arc:halfArc*2});for(const e of grid.near(P.x,P.y,radius+grid.maxRadius)){if(e.dead)continue;const dx=e.x-P.x,dy=e.y-P.y,d=Math.hypot(dx,dy),off=angleDelta36(Math.atan2(dy,dx),angle);if(directionalHit36(d,e.r,radius,off,halfArc))damageEnemy(e,dmg,{source:"blade",school:char35().id==="aya"?"ninja":"cult"});}particles(P.x+Math.cos(angle)*radius*.55,P.y+Math.sin(angle)*radius*.55,18,color);P.inv=Math.max(P.inv,big?.16:.07);return true;}
+  function directionalSlash36(radius,dmg,big=false,angle=P.weaponAngle||Math.atan2(P.fy,P.fx),halfArc=big?1.66:1.05){fxStamp("slash",P.x,P.y,{size:Math.max(48,radius*.42),life:.28,rot:angle});const color=char35().id==="rion"?"#ff526f":"#7db8ff";slashes.push({x:P.x,y:P.y,max:radius,life:.32,total:.32,color,dir:angle,arc:halfArc*2});for(const e of grid.near(P.x,P.y,radius+grid.maxRadius)){if(e.dead)continue;const dx=e.x-P.x,dy=e.y-P.y,d=Math.hypot(dx,dy),off=angleDelta36(Math.atan2(dy,dx),angle);if(directionalHit36(d,e.r,radius,off,halfArc))damageEnemy(e,dmg,{source:"blade",school:char35().id==="aya"?"ninja":"cult"});}let cutEb=0;for(const b of ebullets){if(b.life<=0)continue;const dx=b.x-P.x,dy=b.y-P.y,d=Math.hypot(dx,dy),off=angleDelta36(Math.atan2(dy,dx),angle);if(directionalHit36(d,b.r||5,radius+8,off,halfArc)){b.life=0;cutEb++;particles(b.x,b.y,3,"#ffe6a8");}}if(cutEb>0&&char35().id==="rion")P.sh=Math.min(P.maxSh,P.sh+cutEb*1.5);particles(P.x+Math.cos(angle)*radius*.55,P.y+Math.sin(angle)*radius*.55,18,color);P.inv=Math.max(P.inv,big?.16:.07);return true;}
   slash35=function(radius,dmg,big=false){return directionalSlash36(radius,dmg,big);};
 
   function casing46(x,y,a){if(!globalThis.casings46)globalThis.casings46=[];const C=globalThis.casings46;if(C.length>60)C.shift();const b=a+Math.PI/2*(Math.random()<.5?1:-1)*.8+Math.PI;C.push({x,y,vx:Math.cos(b)*rnd(60,120),vy:Math.sin(b)*rnd(60,120)-90,t:.55,r:rnd(0,TAU)});}
@@ -7481,7 +7481,9 @@ window.SAKURAYO_VERSION_CODE = 71;
   function launchStoryBoss46(L,k){
     const SH={sky:window.SakurayoShmup,duel:window.SakurayoDuel}[k];if(!SH)return false;
     state="menu";$("#menu").classList.add("hidden");const seed=((Date.now()>>>0)^(L.ch*7919))>>>0;
-    sky46=SH.start({character:save.character||"sayo",seed,layer:Math.min(3,L.ch),form:null,weapons:{},hpFrac:1,power:1+0.12*(L.ch-1),
+    const ch=save.character||"sayo",wpByCh={sayo:{spread:{lv:L.ch>=3?3:2},homing:{lv:2}},aya:{homing:{lv:L.ch>=3?3:2},orbit:{lv:2}},rion:{orbit:{lv:L.ch>=3?3:2},spread:{lv:2}}};
+    const bNames={1:"百目尸将",2:"射的屋大将",3:"鬼宗一",4:"鬼·朔夜"};
+    sky46=SH.start({character:ch,seed,layer:Math.min(4,L.ch),bossKey:L.ch>=4?"4":String(L.ch),bossName:bNames[L.ch],form:null,weapons:wpByCh[ch]||{},hpFrac:1,power:1+0.15*(L.ch-1),
       art:p=>artUrl(p),okText:"结算",boss:k==="duel",kind:k==="sky"?"boss":undefined,route:nightRoute46,
       onClose:r=>storyBossDone46(L,k,r)});
     return !!sky46;
@@ -7586,7 +7588,7 @@ window.SAKURAYO_VERSION_CODE = 71;
     const b=run46.build||{},FM=window.SakurayoForms,fm=run46.form&&FM?FM.get(run46.form.id):null;
     $("#run46")?.classList.add("hidden");runNode46=nd;
     sky46=SH.start({character:run46.character||save.character||"sayo",seed:(run46.seed^(nd.layer*7919+nd.row*131+nd.col))>>>0,layer:nd.layer,
-      form:fm?{slot:fm.slot,name:fm.name,tint:fm.tint}:null,weapons:b.weapons46||{},hpFrac:b.maxHp?b.hp/b.maxHp:run46.hpFrac??1,power:1+0.06*(run46.nodesWon||0),
+      form:fm?{slot:fm.slot,name:fm.name,tint:fm.tint}:null,weapons:b.weapons46||{},relics:run46.relics||[],hpFrac:b.maxHp?b.hp/b.maxHp:run46.hpFrac??1,power:1+0.06*(run46.nodesWon||0),
       art:p=>artUrl(p),auto:!!opts.auto,okText:"返回夜行地图",boss:as==="duel"&&(isBoss||nd.layer>=3),kind:as==="sky"&&(isBoss||nd.layer>=3)?"boss":undefined,route:R.route(run46).id,
       onClose:r=>skyDone46(nd,r)});
     return true;
@@ -7755,6 +7757,139 @@ window.SAKURAYO_VERSION_CODE = 71;
   function paintRunBtn46(){modeRow46();const b=$("#runBtn46");if(!b)return;const r=runLoad46();b.innerHTML=r?`<b>继续夜行</b><small>第 ${r.layer} 层 · 💠 ${r.shards}</small>`:`<b>夜行<span class="mx46"> · 肉鸽</span></b><small>三层地图 · 构筑跨节点</small>`;}
   (function(){const b=document.createElement("button");b.className="levelMapBtn46 runBtn46";b.id="runBtn46";b.type="button";modeRow46().prepend(b);paintRunBtn46();})();
   (function(){const b=document.createElement("button");b.className="levelMapBtn46 wdBtn46";b.id="wdBtn46";b.type="button";b.innerHTML="<b>衣橱</b><small>华彩 · 传说 · 武器 · 特效</small>";modeRow46().append(b);})();
+  /* ===== 百夜演武场 · 三大独立爽玩模式（百鬼讨伐 Boss Rush / 镜空符卡演武 / 镜斗武道擂台） ===== */
+  var dojoCfg46={form:"base",skyCh:1,skyKind:"boss",skyWp:"spread",rushIdx:0,rushMode:"mow",rushActive:false,tourIdx:0,tourBoons:[]};
+  function openDojo46(){
+    let el=$("#dojo46");if(!el){el=document.createElement("div");el.id="dojo46";document.body.appendChild(el);}
+    const ch=save.character||"sayo",CHN={sayo:"月城小夜",aya:"神代绫",rion:"黑羽凛音"},FM=window.SakurayoForms;
+    const forms=["base","guard","speed","burst"].map(sl=>{const f=FM?FM.get(ch+"_"+sl):null;return {slot:sl,n:f?f.name:sl,mask:f?f.mask:sl,tint:f?.tint||"#ff8fc0"};});
+    const wps=[["spread","🌸 散射樱扇"],["homing","🕊️ 追踪纸鹤"],["orbit","🗡️ 环绕樱刃"],["laser","🔆 月光激光"],["bomb","💥 爆裂樱弹"],["pierce","🔁 贯穿弹链"]];
+    const chs=[[1,"第 1 章 · 百目神舆姬"],[2,"第 2 章 · 唐伞雨姬"],[3,"第 3 章 · 黄泉门守"],[4,"终章 · 鬼·朔夜"]];
+    el.innerHTML=`<div class="box"><header><b>百夜演武场 · 独立畅玩模式</b><span>出战角色：${htmlEscape(CHN[ch]||ch)}</span><button class="x" data-dx>✕</button></header>
+      <div class="djForm"><em>出战面具形态：</em>${forms.map(f=>`<button data-dform="${f.slot}" class="${dojoCfg46.form===f.slot?"on":""}" style="--t:${f.tint}">${htmlEscape(f.mask==="无"?"素面":f.mask)} · ${htmlEscape(f.n)}</button>`).join("")}</div>
+      <div class="cards">
+        <div class="nc rush"><small>模式一 · 首领连战（Boss Rush）</small><b>👹 百鬼讨伐 · 四章首领连战</b>
+          <p>无需跑图，直接连续讨伐四章首领（百目尸将 → 射的屋大将 → 鬼宗一 → 鬼·朔夜）！每关可选迎战方式，通关获丰厚樱花币与镜屑。</p>
+          <div class="rt">${[["mow","⚔ 割草乱战"],["duel","🥋 1v1 格斗"],["sky","✦ 东方弹幕"]].map(([k,n])=>`<button data-drushm="${k}" class="${dojoCfg46.rushMode===k?"on":""}">${n}</button>`).join("")}</div>
+          <button class="go" data-drushgo>开启四连讨伐（第 1 战 → 第 4 战）</button></div>
+        <div class="nc sky"><small>模式二 · 东方 Project 式弹幕 STG</small><b>✦ 镜空演武 · 符卡修行</b>
+          <p>随时进入角色本人飞行的东方弹幕模式：低速判定点、擦弹回符、决死 Bomb、Boss 符卡收取练习（含第 4 章终局「鬼·朔夜」专属符卡）。</p>
+          <div class="rt">${chs.map(([c,n])=>`<button data-dskych="${c}" class="${dojoCfg46.skyCh===c?"on":""}">${n}</button>`).join("")}</div>
+          <div class="rt">${[["boss","👹 直面首领符卡"],["node","✨ 道中 + 中Boss"]].map(([k,n])=>`<button data-dskyk="${k}" class="${dojoCfg46.skyKind===k?"on":""}">${n}</button>`).join("")}</div>
+          <div class="rt">${wps.slice(0,3).map(([k,n])=>`<button data-dskyw="${k}" class="${dojoCfg46.skyWp===k?"on":""}">${n}</button>`).join("")}</div>
+          <button class="go" data-dskygo>进入镜空演武</button></div>
+        <div class="nc duel"><small>模式三 · 全女格斗街机擂台</small><b>🥋 镜斗大会 · 百夜武道会</b>
+          <p>KOF 式横版 1v1 全女格斗 4 连战（镜影前哨 → 宿敌对决 → 鬼宗一 → 鬼·朔夜）！支持方向+必杀一键派生升龙/突进，每胜一场二选一「武道秘传」。</p>
+          <div class="rt">${wps.map(([k,n])=>`<button data-dskyw="${k}" class="${dojoCfg46.skyWp===k?"on":""}">${n}</button>`).join("")}</div>
+          <button class="go" data-dtourgo>开启武道会四连战</button></div>
+      </div></div>`;
+    el.classList.remove("hidden");return true;
+  }
+  function dojoFormObj46(){const ch=save.character||"sayo",FM=window.SakurayoForms,f=FM?FM.get(ch+"_"+(dojoCfg46.form||"base")):null;return f?{slot:f.slot,name:f.name,tint:f.tint}:{slot:dojoCfg46.form||"base"};}
+  function startDojoSky46(opts={}){
+    const SH=window.SakurayoShmup;if(!SH)return false;
+    $("#dojo46")?.classList.add("hidden");$("#menu").classList.add("hidden");state="menu";
+    const ch=opts.character||save.character||"sayo",L=opts.layer||dojoCfg46.skyCh||1,wp=opts.wp||dojoCfg46.skyWp||"spread";
+    const wobj={[wp]:{lv:4,evo:1},orbit:{lv:2}};
+    sky46=SH.start({character:ch,seed:opts.seed||((Date.now()>>>0)^(L*9973)),layer:L,bossKey:L>=4?"4":String(L),
+      form:dojoFormObj46(),weapons:wobj,relics:["coil","geta"],hpFrac:1,power:1.35+0.12*(L-1),
+      art:p=>artUrl(p),auto:!!opts.auto,okText:"演武结算",kind:opts.kind||dojoCfg46.skyKind||"boss",route:nightRoute46,
+      onClose:r=>{sky46=null;$("#menu").classList.remove("hidden");if(r.win){const c=60+L*25+(r.caps||0)*15;save.coins+=c;kyoGain46("sky");persist();toast(`镜空演武突破！符卡收取 ${r.caps||0}/${r.cards||0} · 🌸 +${c}`);}else toast("镜空演武结束");menuUpdate?.();}});
+    return !!sky46;
+  }
+  const TOUR_FOES46=[
+    {layer:1,boss:false,title:"第一战 · 镜影前哨"},
+    {layer:2,boss:false,title:"第二战 · 宿敌镜影"},
+    {layer:3,boss:true,bossName:"鬼宗一 · 斩鬼刀传人",title:"准决赛 · 鬼宗一"},
+    {layer:4,boss:true,bossName:"鬼·朔夜 · 四百一十二夜",title:"决胜战 · 鬼·朔夜"}
+  ];
+  const TOUR_BOONS46=[
+    {id:"dmg",n:"🔥 猛火秘传",d:"全招式伤害 +18%"},
+    {id:"meter",n:"⚡ 灵流秘传",d:"开局自带 1 格气，集气效率 +25%"},
+    {id:"guard",n:"🛡 不动秘传",d:"免疫必杀削血，防御崩解槽减半"},
+    {id:"speed",n:"🌪 疾风秘传",d:"移动与冲刺速度 +15%，轻攻击可 4 连"}
+  ];
+  function startDojoTour46(idx=0,boons=[],opts={}){
+    const D=window.SakurayoDuel;if(!D)return false;
+    dojoCfg46.tourIdx=idx;dojoCfg46.tourBoons=boons.slice();
+    const stg=TOUR_FOES46[idx]||TOUR_FOES46[0],ch=opts.character||save.character||"sayo",foes=["aya","rion","sayo"].filter(c=>c!==ch);
+    const foe=stg.boss?(idx>=3?"rion":"aya"):foes[idx%foes.length],wp=opts.wp||dojoCfg46.skyWp||"spread";
+    $("#dojo46")?.classList.add("hidden");$("#menu").classList.add("hidden");state="menu";
+    sky46=D.start({character:ch,foe,seed:opts.seed||((Date.now()>>>0)^((idx+1)*65537)),layer:Math.min(3,stg.layer),boss:stg.boss,bossName:stg.bossName,
+      form:dojoFormObj46(),weapons:{[wp]:{lv:4,evo:1}},boons:dojoCfg46.tourBoons,hpFrac:1,power:1.25+idx*0.18,
+      art:p=>artUrl(p),auto:!!opts.auto,okText:idx+1<TOUR_FOES46.length?"下一战 ▶":"捧起优胜杯",route:nightRoute46,
+      onClose:r=>{sky46=null;
+        if(!r.win){$("#menu").classList.remove("hidden");const c=idx*35;if(c){save.coins+=c;persist();}toast(`武道会止步第 ${idx+1} 战${c?` · 🌸 +${c}`:""}`);menuUpdate?.();return;}
+        if(idx+1>=TOUR_FOES46.length){$("#menu").classList.remove("hidden");save.coins+=220;kyoGain46("boss");persist();toast("🏆 百夜武道会全胜制霸！🌸 +220");menuUpdate?.();return;}
+        if(opts.auto){startDojoTour46(idx+1,[...dojoCfg46.tourBoons,TOUR_BOONS46[idx%TOUR_BOONS46.length].id],opts);return;}
+        openTourBoonModal46(idx+1);}});
+    return !!sky46;
+  }
+  function openTourBoonModal46(nextIdx){
+    let el=$("#tourBoon46");if(el)el.remove();el=document.createElement("div");el.id="tourBoon46";el.className="fp46";
+    const pool=TOUR_BOONS46.filter(b=>!dojoCfg46.tourBoons.includes(b.id)),pick=pool.length>=2?pool.slice(0,2):TOUR_BOONS46.slice(0,2);
+    el.innerHTML=`<div class="box"><small>百夜武道会 · 连胜晋级</small><h3>即将进入：${htmlEscape(TOUR_FOES46[nextIdx].title)}</h3><p style="color:#d8cdea;margin:0 0 12px">选择一项武道秘传带入后续擂台：</p><div class="cards">${pick.map(b=>`<button data-tboon="${b.id}" style="--t:#ffd76a;padding:16px"><b>${htmlEscape(b.n)}</b><span>${htmlEscape(b.d)}</span></button>`).join("")}</div></div>`;
+    el.addEventListener("click",e=>{const b=e.target.closest("[data-tboon]");if(!b)return;el.remove();startDojoTour46(nextIdx,[...dojoCfg46.tourBoons,b.dataset.tboon]);});
+    document.body.appendChild(el);
+  }
+  const RUSH_LEVELS46=["1-4","2-4","3-4","4-4"];
+  function startBossRush46(idx=0,mode=dojoCfg46.rushMode||"mow"){
+    const LV=window.SakurayoLevels;if(!LV)return false;
+    dojoCfg46.rushIdx=idx;dojoCfg46.rushMode=mode;dojoCfg46.rushActive=true;
+    const lid=RUSH_LEVELS46[idx]||"1-4",L=LV.find(lid);if(!L)return false;
+    $("#dojo46")?.classList.add("hidden");
+    activeLevel46=Object.assign({},L,{rush46:true,rushIdx46:idx,goal:{bossAt:4}});
+    levelResult46=null;levelObj46=null;selected=L.ch;pendingMode46="story";runMode36="story";setTrial46(null);storyAlt46=null;
+    if(mode!=="mow"){launchStoryBoss46(activeLevel46,mode);return true;}
+    if(state==="result"){$("#result").classList.add("hidden");state="menu";}
+    startGame();
+    // Boss Rush 割草模式开局赋予成型构筑（Lv4 + 主副武器 + 选定面具形态），立刻畅享高潮首领战
+    const wp=dojoCfg46.skyWp||"spread";
+    if(window.SakurayoWeapons){for(let i=0;i<3;i++)window.SakurayoWeapons.gain(P,wp);window.SakurayoWeapons.gain(P,"orbit");}
+    P.dmg*=1.25+idx*0.12;P.maxHp+=20*idx;P.hp=P.maxHp;
+    const fobj=dojoFormObj46();P.form46={id:(save.character||"sayo")+"_"+fobj.slot,slot:fobj.slot,tint:fobj.tint};
+    toast(`百鬼讨伐 · 第 ${idx+1}/4 战：${L.n}`);
+    return true;
+  }
+  const _finishBossRush46=finish;
+  finish=function(win){
+    const r=_finishBossRush46(win);
+    if(dojoCfg46.rushActive&&activeLevel46?.rush46&&state==="result"){
+      const idx=activeLevel46.rushIdx46||0,hasNext=win&&idx+1<RUSH_LEVELS46.length;
+      if(win&&!hasNext){save.coins+=260;kyoGain46("boss");persist();dojoCfg46.rushActive=false;}
+      else if(!win){const c=idx*45;if(c){save.coins+=c;persist();}dojoCfg46.rushActive=false;}
+      let box=$("#rushRes46");if(!box){box=document.createElement("div");box.id="rushRes46";($("#levelStars46")||$("#rtitle")).after(box);}
+      box.innerHTML=`<div class="rr46"><b>${win?(hasNext?`百鬼讨伐 · 第 ${idx+1}/4 战突破！`:"🏆 百鬼讨伐 · 四章首领全破！"):`百鬼讨伐 · 止步第 ${idx+1} 战`}</b><span>${win?(hasNext?`下一战：${RUSH_LEVELS46[idx+1]}`:"奖励 🌸 +260 · 镜屑已入账"):(idx?`突破 ${idx} 战奖励 🌸 +${idx*45}`:"再接再厉")}</span><button class="primary" id="rushNextBtn46">${hasNext?"迎战下一位首领 ▶":"返回百夜演武场"}</button></div>`;
+    }else{$("#rushRes46")?.remove();}
+    return r;
+  };
+  (function(){const b=document.createElement("button");b.className="levelMapBtn46 dojoBtn46";b.id="dojoBtn46";b.type="button";b.innerHTML="<b>百夜演武</b><small>首领连战 · 弹幕 · 擂台</small>";modeRow46().append(b);})();
+  document.addEventListener("click",e=>{
+    if(e.target.closest("#dojoBtn46")){openDojo46();return;}
+    if(e.target.closest("#rushNextBtn46")){const idx=activeLevel46?.rushIdx46||0,hasNext=dojoCfg46.rushActive&&idx+1<RUSH_LEVELS46.length;$("#rushRes46")?.remove();if(hasNext)startBossRush46(idx+1,dojoCfg46.rushMode);else{backMenu();openDojo46();}return;}
+    const t=e.target.closest("#dojo46 [data-dx],#dojo46 [data-dform],#dojo46 [data-drushm],#dojo46 [data-dskych],#dojo46 [data-dskyk],#dojo46 [data-dskyw],#dojo46 [data-drushgo],#dojo46 [data-dskygo],#dojo46 [data-dtourgo]");
+    if(!t)return;
+    if(t.dataset.dx!==undefined)$("#dojo46")?.classList.add("hidden");
+    else if(t.dataset.dform){dojoCfg46.form=t.dataset.dform;openDojo46();}
+    else if(t.dataset.drushm){dojoCfg46.rushMode=t.dataset.drushm;openDojo46();}
+    else if(t.dataset.dskych){dojoCfg46.skyCh=+t.dataset.dskych;openDojo46();}
+    else if(t.dataset.dskyk){dojoCfg46.skyKind=t.dataset.dskyk;openDojo46();}
+    else if(t.dataset.dskyw){dojoCfg46.skyWp=t.dataset.dskyw;openDojo46();}
+    else if(t.dataset.drushgo!==undefined)startBossRush46(0,dojoCfg46.rushMode);
+    else if(t.dataset.dskygo!==undefined)startDojoSky46();
+    else if(t.dataset.dtourgo!==undefined)startDojoTour46(0,[]);
+  });
+  style37.textContent+=`.dojoBtn46{background:linear-gradient(135deg,#ff4d79,#7c4dff)!important}
+#dojo46{position:fixed;inset:0;z-index:130;background:#08050fcc;display:grid;place-items:center;padding:12px}#dojo46.hidden{display:none}
+#dojo46 .box{width:min(1020px,100%);max-height:100%;overflow:auto;background:#1a1228;border:1px solid #ffffff22;border-radius:16px;padding:12px 16px;color:#fff}
+#dojo46 header{display:flex;align-items:center;gap:12px}#dojo46 header b{font-size:20px}#dojo46 header span{flex:1;color:#ffd76a;font-size:13px}#dojo46 .x{background:none;border:0;color:#fff;font-size:20px}
+#dojo46 .djForm{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0}#dojo46 .djForm em{font-style:normal;font-size:12px;color:#c9b8e8}
+#dojo46 .djForm button{padding:5px 10px;border-radius:999px;border:1px solid var(--t,#fff4);background:#120c20;color:#fff;font-size:12px;opacity:.65}#dojo46 .djForm button.on{opacity:1;background:color-mix(in srgb,var(--t,#ff8fc0) 35%,#120c20);box-shadow:0 0 10px var(--t,#ff8fc0)}
+#dojo46 .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin-top:8px}
+#dojo46 .nc{background:#251a38;border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px;border:1px solid #ffffff18}
+#dojo46 .nc small{color:#ffb2d4}#dojo46 .nc b{font-size:17px}#dojo46 .nc p{font-size:12px;color:#d8cdea;flex:1;margin:0}
+#dojo46 .rt{display:flex;flex-wrap:wrap;gap:5px;margin:2px 0}#dojo46 .rt button{flex:1 1 auto;padding:5px 7px;border-radius:8px;border:1px solid #ffffff28;background:#140d22;color:#eee;font-size:11px;opacity:.7}#dojo46 .rt button.on{opacity:1;border-color:#ffd76a;background:#3a2458;box-shadow:0 0 8px #ffd76a66}
+#dojo46 .go{padding:9px;border-radius:10px;border:0;background:linear-gradient(135deg,#ff4d79,#7c4dff);color:#fff;font-weight:bold;margin-top:4px}`;
   const _menuUpdateRun46=menuUpdate;menuUpdate=function(){const r=_menuUpdateRun46.apply(this,arguments);paintRunBtn46();return r;};
   // 永久数值天赋冻结（DESIGN_V5 §5）：按已投入返还樱花币，一次性；旧 tal 字段原样保留。
   (function(){if(!(save.talRefund46<0))return;let sum=0;for(const [id,a] of Object.entries(TAL)){const l=Math.max(0,save.tal?.[id]|0);for(let i=0;i<l;i++)sum+=window.SakurayoCatalog.price(a,i);}save.coins+=sum;save.talRefund46=sum;if(sum)setTimeout(()=>toast(`永久天赋已冻结：返还 🌸 ${sum}`),1500);})();
@@ -7971,6 +8106,10 @@ window.SAKURAYO_VERSION_CODE = 71;
       skyClose46(){const ok=document.querySelector("#shm46 .res .ok,#pin46 .res .ok,#duel46 .res .ok");if(ok){ok.click();return true;}return false;},
       openWardrobe46(tab){return openWardrobe46(tab);},
       openNight46(){return openNight46();},
+      openDojo46(){return openDojo46();},
+      startBossRush46(idx=0,mode="mow"){return startBossRush46(idx,mode);},
+      startDojoSky46(opts){return startDojoSky46(opts||{});},
+      startDojoTour46(idx=0,boons=[],opts){return startDojoTour46(idx,boons,opts||{});},
       avgCast46(who,ex){return avgCast46(who,ex);},
       seasonState46(){const s=season46();return s?JSON.parse(JSON.stringify(Object.assign({},s,{level:window.SakurayoSeason.level(s),daily:window.SakurayoSeason.daily(),coins:save.coins}))):null;},
       seasonClaim46(){return seasonClaim46();},

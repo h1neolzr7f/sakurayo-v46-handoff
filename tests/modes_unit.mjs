@@ -24,6 +24,11 @@ for (const w of ks) { const r = D.simulate({ character: 'sayo', seed: 3, layer: 
   const E = g.E; E.holdDir = 1; E.st = 'crouch'; assert.ok(g.blocks(E, D.MV.lp) && g.blocks(E, D.MV.clp) && !g.blocks(E, D.MV.jhp), 'crouch block: mid/low yes, overhead no');
   E.holdDir = 4; E.st = 'stand'; assert.ok(g.blocks(E, D.MV.jhp) && !g.blocks(E, D.MV.clp), 'stand block: overhead yes, low no');
   P.st = 'move'; P.mv = D.MV.clp; P.mf = 6; P.hit = true; assert.ok(g.canCancel(P, 'sp') && g.canCancel(P, 'n'), 'light normal cancels into special / chains');
+  // 触屏方向+SP便捷派生：6+SP=升龙(D)，4+SP=突进(B)，5+SP=波动(A)
+  const g2 = new D.Game({ character: 'rion', seed: 2, layer: 1, boss: true, bossName: '鬼·朔夜', boons: ['dmg', 'meter'] });
+  assert.equal(g2.E.name, '鬼·朔夜'); assert.equal(g2.P.meter, 1);
+  g2.P.st = 'stand'; g2.tryMoves(g2.P, 6, ['SP']); assert.equal(g2.P.mn, 'D', 'forward + SP -> DP');
+  g2.P.st = 'stand'; g2.P.mv = null; g2.tryMoves(g2.P, 4, ['SP']); assert.equal(g2.P.mn, 'B', 'back + SP -> rush/parry');
 }
 { // 庙会射的（庙会抽奖）：确定性；即使“最优瞄准”期望收益也低于每局价格（镜屑按 60 币折算）；奖品只含货币
   assert.deepEqual(J(PK.simulate(9, 'best')), J(PK.simulate(9, 'best')), 'shateki deterministic');

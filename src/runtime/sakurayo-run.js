@@ -22,9 +22,9 @@
      Boss 前三种模式（割草 / 格斗 / 弹幕）都可以自由选，路线只决定推荐项。 */
   var ROUTES = {
     tech: { id: "tech", n: "科技线", i: "⚙", rec: "sky", tint: "#5fd8ff", d: "式神机关与符文电路：激光、追踪、浮游炮。Boss 战推荐弹幕射击。",
-      relics: ["sake", "mirror", "gear", "coil", "lantern", "coin"], up: { laser: 3, homing: 3, orbit: 3, spread: 1, pierce: 1, bomb: 1 } },
+      relics: ["sake", "mirror", "gear", "coil", "lantern", "coin", "drone", "core", "prism"], up: { laser: 3, homing: 3, orbit: 3, spread: 1, pierce: 1, bomb: 1 } },
     bio: { id: "bio", n: "生物线", i: "🌿", rec: "duel", tint: "#ff5f7a", d: "血藤、蛊虫与妖化：散射孢子、贯穿荆棘、爆裂瘤。Boss 战推荐格斗。",
-      relics: ["petal", "bell", "omamori", "geta", "vine", "fang"], up: { spread: 3, pierce: 3, bomb: 3, laser: 1, homing: 1, orbit: 1 } }
+      relics: ["petal", "bell", "omamori", "geta", "vine", "fang", "blood", "carapace", "spore"], up: { spread: 3, pierce: 3, bomb: 3, laser: 1, homing: 1, orbit: 1 } }
   };
   var BOSS_MODES = [{ k: "mow", n: "割草", i: "⚔", d: "原本的俯视角乱战：走位、拾取、构筑全开。" }, { k: "duel", n: "格斗", i: "🥋", d: "一对一格斗：搓招、连段、超必杀。构筑映射为招式。" }, { k: "sky", n: "弹幕射击", i: "✦", d: "本人飞行的弹幕 STG：低速判定点、擦弹、Bomb、符卡。" }];
   function route(st) { return ROUTES[st && st.route] || ROUTES.tech; }
@@ -42,7 +42,13 @@
     { id: "gear", n: "式神齿轮", i: "⚙", d: "射速 +10%（科技线）", fx: { rateMul: 0.91 } },
     { id: "coil", n: "雷符线圈", i: "⚡", d: "暴击率 +8%（科技线）", fx: { crit: 0.08 } },
     { id: "vine", n: "血藤心", i: "🌿", d: "最大生命 +30（生物线）", fx: { maxHp: 30 } },
-    { id: "fang", n: "妖牙", i: "🦷", d: "攻击力 +10%、移速 +4%（生物线）", fx: { dmgMul: 1.1, spdMul: 1.04 } }
+    { id: "fang", n: "妖牙", i: "🦷", d: "攻击力 +10%、移速 +4%（生物线）", fx: { dmgMul: 1.1, spdMul: 1.04 } },
+    { id: "drone", n: "八咫浮游", i: "🛸", d: "拾取范围 +50、攻击力 +8%（科技线）", fx: { mag: 50, dmgMul: 1.08 } },
+    { id: "core", n: "超导炉心", i: "🔋", d: "射速 +9%、暴击率 +5%（科技线）", fx: { rateMul: 0.917, crit: 0.05 } },
+    { id: "prism", n: "分光棱镜", i: "💎", d: "攻击力 +10%、暴击率 +6%（科技线）", fx: { dmgMul: 1.1, crit: 0.06 } },
+    { id: "blood", n: "狂血逆鳞", i: "🩸", d: "攻击力 +15%、移速 +5%（生物线）", fx: { dmgMul: 1.15, spdMul: 1.05 } },
+    { id: "carapace", n: "鬼骨重甲", i: "🛡", d: "最大生命 +35、战斗节点回复 +5%（生物线）", fx: { maxHp: 35, nodeHeal: 0.05 } },
+    { id: "spore", n: "腐生孢囊", i: "🍄", d: "攻击力 +8%、魂晶收益 +20%（生物线）", fx: { dmgMul: 1.08, shardMul: 1.2 } }
   ];
   var GOALS = [ // objective templates per layer (from SakurayoLevels types)
     [{ type: "escort", goal: { path: [[0.18, 0.5], [0.4, 0.38], [0.62, 0.6], [0.84, 0.48]] }, npc: "miko", n: "送灯" }, { type: "mech", goal: { n: 2 }, n: "符咒机关" }],
@@ -182,6 +188,7 @@
       if (q.levels) lv += q.levels;
     });
     if (st.relics.indexOf("omamori") >= 0) P.hp = Math.min(P.maxHp, P.hp + P.maxHp * 0.08);
+    if (st.relics.indexOf("carapace") >= 0) P.hp = Math.min(P.maxHp, P.hp + P.maxHp * 0.05);
     return { levels: lv };
   }
   var TRANSIENT = ["x", "y", "vx", "vy", "fire", "inv", "skill", "dash", "banterSeen", "hitStop46", "fx", "fy", "angle", "ultUsed46", "postAvg46", "chestCoins46", "chests46"];

@@ -45,6 +45,15 @@
   var STRONG = { hp: 1, chp: 1, jatk: 1, dp: 1, rush: 1, super: 1, special: 1 };
   var CMD = [ // 按优先级匹配
     { m: "S", seq: [2, 3, 6, 2, 3, 6], win: 34 }, { m: "D", seq: [6, 2, 3], win: 16 }, { m: "A", seq: [2, 3, 6], win: 14 }, { m: "B", seq: [2, 1, 4], win: 14 }];
+  var TINT_CACHE = {};
+  function tintSprite(im, key, filterStr) {
+    if (!im || !im.width || typeof document === "undefined") return im;
+    var k = (im.src || "") + "|" + key;
+    if (TINT_CACHE[k]) return TINT_CACHE[k];
+    var c = document.createElement("canvas"); c.width = im.width; c.height = im.height;
+    var cg = c.getContext("2d"); cg.filter = filterStr; cg.drawImage(im, 0, 0);
+    return (TINT_CACHE[k] = c);
+  }
   function Fighter(side, cid, o) { return { side: side, cid: cid, ch: CH[cid], x: side < 0 ? 300 : 660, y: 0, vx: 0, vy: 0, face: side < 0 ? 1 : -1, hp: 100, max: 100, white: 0, meter: 0, stun: 0, guard: 0, st: "stand", stT: 0, mv: null, mf: 0, hit: false, hitstop: 0, combo: 0, juggle: 0, inv: 0, armor: 0, o: o, buf: [], btn: [], crouch: false, blockH: null, hits: 0, taken: 0, dealt: 0, landed: 0, blocked: 0, thrTech: 0, chain: 0, kdT: 0, wins: 0, cancelOK: 0, aiT: 0, maxCombo: 0 }; }
   function Game(o) {
     this.o = o; this.r = rng(o.seed || 1); this.cid = CH[o.character] ? o.character : "sayo"; this.ch = CH[this.cid]; this.layer = o.layer || 1; this.boss = !!o.boss;
@@ -56,9 +65,18 @@
     var foe = o.foe && CH[o.foe] ? o.foe : ["aya", "rion", "sayo"][["sayo", "aya", "rion"].indexOf(this.cid)];
     this.P = Fighter(-1, this.cid, { dmg: this.ch.dmg * pw * (this.slot === "burst" ? 1.3 : 1) * (this.spLv ? 1 + 0.03 * this.spLv : 1), taken: this.slot === "burst" ? 1.2 : 1, walk: this.ch.walk * (this.slot === "speed" ? 1.2 : 1), chain: this.slot === "speed" ? 4 : 3, noChip: this.slot === "guard", guardK: this.slot === "guard" ? 0.5 : 1, meterK: this.route === "tech" ? 1.25 : 1, white: this.route === "bio", armorHP: this.route === "bio" });
     this.P.hp = this.P.max = 100; this.hpIn = clamp(o.hpFrac == null ? 1 : o.hpFrac, 0.3, 1); this.P.hp = 100 * this.hpIn;
+    if (o.boons && Array.isArray(o.boons)) {
+      var P0 = this.P;
+      o.boons.forEach(function (bn) {
+        if (bn === "dmg") P0.o.dmg *= 1.18;
+        else if (bn === "meter") { P0.meter = Math.min(3, P0.meter + 1); P0.o.meterK *= 1.25; }
+        else if (bn === "guard") { P0.o.noChip = true; P0.o.guardK *= 0.55; }
+        else if (bn === "speed") { P0.o.walk *= 1.15; P0.o.chain = Math.max(P0.o.chain, 4); }
+      });
+    }
     var L = this.layer, boss = this.boss;
     this.E = Fighter(1, foe, { dmg: (boss ? 0.8 + 0.1 * L : 0.66 + 0.07 * L), taken: boss ? 0.84 : 1, walk: CH[foe].walk * (0.95 + 0.03 * L), chain: 3, guardK: 1, meterK: 1, boss: boss });
-    this.E.name = (boss ? "镜灵 · " : "镜影 · ") + CH[foe].name; this.E.hp = this.E.max = 100;
+    this.E.name = o.bossName || ((boss ? "镜灵 · " : "镜影 · ") + CH[foe].name); this.E.hp = this.E.max = 100;
     this.brainE = brain(boss ? { react: 11 - L, block: 0.55 + 0.08 * L, aa: 0.45 + 0.1 * L, punish: 0.55 + 0.1 * L, combo: 0.6 + 0.1 * L, thr: 0.12, tech: 0.3 + 0.1 * L, jump: 0.012, fb: 0.02, tele: 1 } : { react: 14 - L, block: 0.42 + 0.08 * L, aa: 0.3 + 0.1 * L, punish: 0.4 + 0.1 * L, combo: 0.45 + 0.1 * L, thr: 0.1, tech: 0.2 + 0.1 * L, jump: 0.01, fb: 0.018 });
     var sk = o.skill == null ? 0.75 : o.skill; // 自动驾驶（测试/录像）用的我方大脑
     this.brainP = brain({ react: Math.round(16 - 10 * sk), block: 0.35 + 0.5 * sk, aa: 0.3 + 0.55 * sk, punish: 0.35 + 0.55 * sk, combo: 0.45 + 0.5 * sk, thr: 0.1, tech: 0.2 + 0.5 * sk, jump: 0.012, fb: 0.02 });
@@ -101,7 +119,12 @@
   Game.prototype.tryMoves = function (f, dir, btns) {
     var crouch = dir <= 3, cmd = this.matchCmd(f), has = function (b) { return btns.indexOf(b) >= 0; }, E = this.opp(f), dist = Math.abs(E.x - f.x);
     var L = has("L"), H = has("H"), T = has("T") || (L && H), SP = has("SP"), SU = has("SU");
-    if (SU) cmd = "S", L = true; if (SP) cmd = cmd || "A", L = true;
+    if (SU) cmd = "S", L = true;
+    if (SP) {
+      if (!cmd && !this.auto && f === this.P) cmd = (dir === 6 || dir === 3) ? "D" : (dir === 4 || dir === 1) ? "B" : "A";
+      else cmd = cmd || "A";
+      L = true;
+    }
     if (!(L || H || T)) return false;
     // 防御反击（防御硬直中 →+J+K）
     if (f.st === "block" && T && f.meter >= 1) { f.st = "stand"; f.stT = 0; return this.start(f, "gc"); }
@@ -364,10 +387,10 @@
       // 残影：发生帧、突进、冲刺、超必杀时，画出前几帧位置的半透明拖影
       f.trail = f.trail || []; var ghost = (ph === 1 && STRONG[m.pose]) || f.st === "dash" || (m && m.dash && ph < 2);
       if (ghost && f.hitstop <= 0) f.trail.push({ x: x, y: y, im: im }); else if (!ghost) f.trail.length = 0; if (f.trail.length > 4) f.trail.shift();
-      f.trail.forEach(function (q, i) { if (!q.im || !q.im.width) return; var ww = h * q.im.width / q.im.height; g.save(); g.translate(q.x, q.y); g.scale(f.face, 1); g.globalAlpha = 0.12 + 0.07 * i; g.filter = "brightness(1.6) sepia(1) hue-rotate(" + (pr[2] ? 220 : 280) + "deg) saturate(3)"; g.drawImage(q.im, -ww / 2, -h, ww, h); g.restore(); });
+      f.trail.forEach(function (q, i) { if (!q.im || !q.im.width) return; var ww = h * q.im.width / q.im.height, tim = tintSprite(q.im, pr[2] ? "trE" : "trP", "brightness(1.6) sepia(1) hue-rotate(" + (pr[2] ? 220 : 280) + "deg) saturate(3)"); g.save(); g.translate(q.x, q.y); g.scale(f.face, 1); g.globalAlpha = 0.12 + 0.07 * i; g.drawImage(tim, -ww / 2, -h, ww, h); g.restore(); });
       g.save(); g.translate(x + jit, y); g.scale(f.face * sx, sy); g.rotate(rot);
       if (f.st === "down" || f.st === "dead") { g.translate(0, 0); }
-      if (im && im.width) { var w = h * im.width / im.height; if (pr[2]) g.filter = "brightness(.8) saturate(.7) contrast(1.1) drop-shadow(0 0 6px " + (self.E.o.boss ? "#ff3355" : "#b06cff") + ")"; if (f.hitstop > 0 && f.st === "hitstun") g.filter = "brightness(1.8)"; g.drawImage(im, -w / 2, -h, w, h); g.filter = "none"; }
+      if (im && im.width) { var w = h * im.width / im.height, dim = im; if (f.hitstop > 0 && f.st === "hitstun") dim = tintSprite(im, "hs", "brightness(1.8)"); else if (pr[2]) dim = tintSprite(im, self.E.o.boss ? "foeB" : "foeN", "brightness(.8) saturate(.7) contrast(1.1) drop-shadow(0 0 6px " + (self.E.o.boss ? "#ff3355" : "#b06cff") + ")"); g.drawImage(dim, -w / 2, -h, w, h); }
       else { g.fillStyle = pr[2] ? "#6a4a9a" : CH[f.cid].col; var crouch = ps === "crouch" || ps === "clp" || ps === "chp" || ps === "cblock"; g.fillRect(-26, crouch ? -120 : -210, 52, crouch ? 120 : 210); if (ps === "lp" || ps === "hp" || ps === "clp" || ps === "chp" || ps === "jatk" || ps === "dp" || ps === "rush" || ps === "super") { g.fillStyle = "#fff"; g.fillRect(20, crouch ? -60 : -140, (f.mv && f.mv.reach) || 60, 14); } }
       if (ph === 1 && STRONG[m.pose]) { // 刀光（程序化的涂抹帧）：沿攻击方向画一道渐隐弧光
         var k = (f.mf - m.st) / Math.max(1, m.ac), cy = -(m.y || 120) - 20, R0 = (m.reach || 90) + 20; g.save(); g.globalCompositeOperation = "lighter";
@@ -447,9 +470,9 @@
     root.innerHTML = '<canvas></canvas><div class="dstk46"><i></i></div><div class="dact46">'
       + '<button class="sykBtn dia b-L" data-p="L">轻<small>J</small></button><button class="sykBtn dia b-H pri" data-p="H">重<small>K</small></button>'
       + '<button class="sykBtn dia b-T" data-p="T">投<small>J+K</small></button><button class="sykBtn dia b-BK" data-p="BK">防<small>←</small></button>'
-      + '<button class="sykBtn hex b-SP acc" data-p="SP">必杀<small>↓↘→</small></button><button class="sykBtn hex b-SU su" data-p="SU">超必<small>1 气</small></button></div>'
+      + '<button class="sykBtn hex b-SP acc" data-p="SP">必杀<small>方向+SP</small></button><button class="sykBtn hex b-SU su" data-p="SU">超必<small>1 气</small></button></div>'
       + '<button class="cmdT46" type="button" aria-expanded="false">出招表</button><div class="cmd46 sykPanel" hidden><div class="t">COMMAND LIST · 出招表</div><dl>'
-      + [["波动", "↓↘→ + 拳"], ["升龙", "→↓↘ + 拳"], ["突进", "↓↙← + 拳"], ["超必杀", "↓↘→↓↘→ + 拳（1 气）"], ["冲刺", "→→"], ["后撤", "←←"], ["投技", "J + K（近身）"], ["防御反击", "防御中 → + J + K（1 气）"], ["下段", "↓ + K"]].map(function (r) { return "<dt>" + r[0] + "</dt><dd>" + r[1] + "</dd>"; }).join("")
+      + [["波动", "↓↘→ + 拳（或中立+必杀）"], ["升龙", "→↓↘ + 拳（或 →+必杀）"], ["突进/当身", "↓↙← + 拳（或 ←+必杀）"], ["超必杀", "↓↘→↓↘→ + 拳（或超必键，1 气）"], ["冲刺", "→→"], ["后撤", "←←"], ["投技", "J + K（近身）"], ["防御反击", "防御中 → + J + K（1 气）"], ["下段", "↓ + K"]].map(function (r) { return "<dt>" + r[0] + "</dt><dd>" + r[1] + "</dd>"; }).join("")
       + '</dl></div>';
     (o.parent || document.body).appendChild(root);
     var cmdT = root.querySelector(".cmdT46"), cmdP = root.querySelector(".cmd46"); cmdT.addEventListener("click", function () { var open = cmdP.hidden; cmdP.hidden = !open; cmdT.setAttribute("aria-expanded", String(open)); cmdT.classList.toggle("on", open); });

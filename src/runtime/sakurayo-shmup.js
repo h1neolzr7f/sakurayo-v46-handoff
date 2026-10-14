@@ -38,6 +38,7 @@
     1: { name: "百目神舆姬", spr: "boss_girl_1", alt: "boss1", cards: [{ non: 1, p: "aimFan", hp: 1, t: 26 }, { n: "眼符「百目回廊」", p: "eyeRose", hp: 1.2, t: 34 }, { non: 1, p: "ringAim", hp: 1, t: 26 }, { n: "舆符「神轿巡游」", p: "spiral2", hp: 1.25, t: 36 }, { n: "「千目之夜」", p: "eyeFinal", hp: 1.4, t: 40, last: 1 }] },
     2: { name: "唐伞雨姬", spr: "boss_girl_2", alt: "boss2", cards: [{ non: 1, p: "rainNon", hp: 1, t: 26 }, { n: "雨符「骤雨回旋伞」", p: "umbrella", hp: 1.2, t: 34 }, { non: 1, p: "aimFan", hp: 1, t: 26 }, { n: "伞符「破伞返雨」", p: "rainReturn", hp: 1.25, t: 36 }, { n: "「百鬼夜雨」", p: "rainFinal", hp: 1.4, t: 40, last: 1 }] },
     3: { name: "黄泉门守", spr: "boss_girl_3", alt: "boss3", cards: [{ non: 1, p: "ringAim", hp: 1, t: 26 }, { n: "门符「千本全息牌楼」", p: "torii", hp: 1.2, t: 34 }, { non: 1, p: "spiral2", hp: 1, t: 26 }, { n: "冥符「黄泉比良坂」", p: "lattice", hp: 1.25, t: 36 }, { n: "「常夜之门」", p: "yomiFinal", hp: 1.45, t: 42, last: 1 }] },
+    4: { name: "鬼·朔夜", spr: "boss_girl_3", alt: "boss3", cards: [{ non: 1, p: "spiral2", hp: 1.05, t: 26 }, { n: "千夜「四百一十二夜的纸面具」", p: "sakuyaMask", hp: 1.25, t: 35 }, { non: 1, p: "ringAim", hp: 1.05, t: 26 }, { n: "回环「二百年前的斩鬼刀」", p: "sakuyaBlade", hp: 1.3, t: 36 }, { n: "终夜「散场花火·千樱一闪」", p: "sakuyaFinal", hp: 1.5, t: 42, last: 1 }] },
     mid: { name: "镜卫", spr: "boss3", alt: "boss3", cards: [{ non: 1, p: "aimFan", hp: 1, t: 22 }, { n: "镜符「对镜回廊」", p: "mirror", hp: 1.1, t: 30 }] }
   };
   function Game(o) {
@@ -46,12 +47,13 @@
     var f = o.form || {}; this.form = f; var slot = f.slot || "base"; this.slot = slot;
     var up = o.weapons || {}, lv = function (k) { return up[k] ? (up[k].lv || 1) + (up[k].evo ? 2 : 0) : 0; };
     this.lv = lv; this.route = o.route === "bio" ? "bio" : o.route === "tech" ? "tech" : null;
-    this.pw = clamp(o.power || 1, 0.7, 2.6) * (slot === "burst" ? 1.3 : 1);
+    var rels = Array.isArray(o.relics) ? o.relics : [], hasRel = function (id) { return rels.indexOf(id) >= 0; };
+    this.pw = clamp(o.power || 1, 0.7, 2.6) * (slot === "burst" ? 1.3 : 1) * (1 + (hasRel("coil") ? 0.12 : 0) + (hasRel("mirror") ? 0.12 : 0));
     var hp0 = clamp(o.hpFrac == null ? 1 : o.hpFrac, 0.05, 1); this.hp0 = hp0;
-    var lives = Math.max(1, Math.ceil(hp0 * 3)) + (slot === "guard" ? 1 : 0) - (slot === "burst" ? 1 : 0) + (lv("orbit") >= 5 ? 0 : 0);
+    var lives = Math.max(1, Math.ceil(hp0 * 3)) + (slot === "guard" ? 1 : 0) - (slot === "burst" ? 1 : 0) + (hasRel("omamori") ? 1 : 0);
     lives = Math.max(1, lives); this.lives0 = lives;
-    this.P = { x: FW / 2, y: FH - 140, hit: slot === "speed" ? 2 : 3, gr: slot === "speed" ? 28 : 22, spd: c.spd * (slot === "guard" ? 0.9 : 1), slow: c.slow,
-      lives: lives, bombs: 2 + (lv("bomb") ? 1 : 0), power: 1 + Math.min(1.5, (o.power || 1) - 1) + 0.25 * Math.min(4, lv("spread") + lv("homing")) / 2, inv: 2, cd: 0, cd2: 0, focus: false,
+    this.P = { x: FW / 2, y: FH - 140, hit: slot === "speed" ? 2 : 3, gr: (slot === "speed" ? 28 : 22) + (hasRel("drone") ? 6 : 0), spd: c.spd * (slot === "guard" ? 0.9 : 1) * (hasRel("geta") ? 1.12 : 1), slow: c.slow,
+      lives: lives, bombs: 2 + (lv("bomb") ? 1 : 0) + (hasRel("core") ? 1 : 0), power: 1 + Math.min(1.5, (o.power || 1) - 1) + 0.25 * Math.min(4, lv("spread") + lv("homing")) / 2, inv: 2, cd: 0, cd2: 0, focus: false,
       graze: 0, gauge: 0, hits: 0, bombsUsed: 0, deathT: -1, bombT: 0, frag: 0, awakenUntil: -1, moving: 0 };
     this.P.power = clamp(this.P.power, 1, 4);
     this.E = []; this.B = []; this.S = []; this.FX = []; this.items = []; this.kills = 0; this.score = 0; try { this.hiScore = typeof localStorage !== "undefined" ? +(localStorage.getItem("sakurayoShmupHi") || 0) : 0; } catch (e) { this.hiScore = 0; } this.boss = null; this.caps = 0; this.cardsSeen = 0;
@@ -65,7 +67,7 @@
     if (!s) return this.end(true);
     if (s.pick) { this.pause = true; this.o.onPick && this.o.onPick(this.pickOptions()); }
     if (s.mid) this.spawnBoss("mid");
-    if (s.boss) this.spawnBoss(String(((this.layer - 1) % 3) + 1));
+    if (s.boss) this.spawnBoss(this.o.bossKey || (this.layer === 4 ? "4" : String(((this.layer - 1) % 3) + 1)));
   };
   Game.prototype.pickOptions = function () { return [{ k: "power", n: "P 点结晶", d: "火力等级 +1" }, { k: "bomb", n: "符卡札", d: "Bomb +1" }, { k: "life", n: "残机碎片", d: "残机 +1" }]; };
   Game.prototype.choose = function (k) { var P = this.P; if (k === "power") P.power = Math.min(4, P.power + 1); else if (k === "bomb") P.bombs = Math.min(6, P.bombs + 1); else P.lives = Math.min(8, P.lives + 1); this.pause = false; this.next(); };
@@ -121,6 +123,9 @@
       case "lattice": for (k = 0; k < 2; k++) for (i = 0; i < 6; i++) { var sx = k ? FW + 5 : -5, sy = 80 + i * 70 + (t * 40 % 70); this.eb(sx, sy, k ? Math.PI * 0.82 : Math.PI * 0.18, 120 * v, "laser", k ? "#c86bff" : "#ff6bd0"); } b.pt = 1.0; this.ringShot(b.x, b.y, 10, this.aim(b.x, b.y), 170 * v, "orb", "#ff3b5c"); break;
       case "yomiFinal": for (k = 0; k < 3; k++) this.eb(b.x, b.y, b.ang + k * TAU / 3, 160 * v, "big", "#ff2a4a"); for (k = 0; k < 3; k++) this.eb(b.x, b.y, -b.ang + k * TAU / 3 + 0.5, 190 * v, "rice", "#ffffff", { turn: 0.25 }); b.ang += 0.19; b.pt = 0.11; if (Math.floor(t * 2) % 7 === 0 && !b.tw) { b.tw = 1; this.ringShot(b.x, b.y, 28, 0, 110 * v, "star", "#ffd166"); } else if (Math.floor(t * 2) % 7) b.tw = 0; break;
       case "mirror": for (k = -1; k <= 1; k += 2) { x = FW / 2 + k * (FW / 2 - 40); this.eb(x, 120, this.aim(x, 120), 200 * v, "knife", "#cfe6ff"); } this.ringShot(b.x, b.y, 12, b.ang += 0.25, 150 * v, "orb", "#8fd0ff"); b.pt = 0.42; break;
+      case "sakuyaMask": for (k = 0; k < 4; k++) { var mx = k < 2 ? 70 : FW - 70, my = k % 2 ? 230 : 120; this.eb(mx, my, this.aim(mx, my) + Math.sin(t * 2 + k) * 0.22, 185 * v, "amulet", k % 2 ? "#ffd166" : "#ff6ad5"); } this.ringShot(b.x, b.y, Math.round(14 * dens), b.ang += 0.23, 145 * v, "orb", "#ff3b5c"); b.pt = 0.56; break;
+      case "sakuyaBlade": a = this.aim(b.x, b.y); for (i = -2; i <= 2; i++) this.eb(b.x, b.y, a + i * 0.14, 240 * v, "knife", "#ffffff"); for (k = -1; k <= 1; k += 2) for (i = 0; i < 6; i++) this.eb(b.x, b.y, b.ang * k + i * TAU / 6, 155 * v, "scale", k > 0 ? "#ff5fa2" : "#7af0c0", { turn: k * 0.32 }); b.ang += 0.26; b.pt = 0.46; break;
+      case "sakuyaFinal": for (k = 0; k < 4; k++) this.eb(b.x, b.y, b.ang + k * TAU / 4, 165 * v, "big", "#ff3b6e"); for (k = 0; k < 4; k++) this.eb(b.x, b.y, -b.ang * 1.2 + k * TAU / 4 + 0.4, 195 * v, "knife", "#ffe082", { turn: 0.22 }); b.ang += 0.18; b.pt = 0.11; if (Math.floor(t * 2) % 6 === 0 && !b.tw) { b.tw = 1; this.ringShot(b.x, b.y, 24, this.aim(b.x, b.y), 125 * v, "star", "#ff9ec7"); } else if (Math.floor(t * 2) % 6) b.tw = 0; break;
     }
     b.pt *= (b.card.non ? 0.8 : 0.62) * (this.o.dens || 1); // 符卡更密
   };
