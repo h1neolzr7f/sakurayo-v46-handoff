@@ -55,3 +55,10 @@ outputs/
 
 # Image generation working prompts (provenance lives in assets/image2/prompts)
 tmp/imagegen/
+
+# Sprite-batch intermediates and local browser state
+*.orange.png
+pipeline/vendor/**/profiles/
+
+# AI asset pipeline lives in h1neolzr7f/sakurayo-handoff, not here
+pipeline/
