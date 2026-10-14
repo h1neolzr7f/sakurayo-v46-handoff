@@ -1543,6 +1543,8 @@
     closeRosterPeek();
     var overlay = global.document.createElement("div");
     overlay.id = "rosterPeek46";
+    var hint46 = global.document.querySelector(".syHint46"); /* 详情打开时一次性提示会压住面板底部 */
+    if (hint46 && hint46.remove) hint46.remove();
     overlay.setAttribute("role", "dialog");
     overlay.setAttribute("aria-modal", "true");
     overlay.setAttribute("aria-labelledby", "rosterPeekTitle46");

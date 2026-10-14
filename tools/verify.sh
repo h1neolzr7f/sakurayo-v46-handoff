@@ -5,6 +5,8 @@ cd "$root_dir"
 
 python tools/static_check.py src/index.html
 python tools/check_colors.py
+QPY=/workspace/sakurayo-tools/venv/bin/python; [ -x "$QPY" ] || QPY=python
+"$QPY" tools/asset-pipeline/quality_score.py android-app/app/src/main/assets/game/art --gate
 node --check tests/artifacts/static/index.extracted.js
 for runtime_file in src/runtime/*.js; do node --check "$runtime_file"; done
 for unit_file in tests/*_unit.mjs; do node "$unit_file"; done
