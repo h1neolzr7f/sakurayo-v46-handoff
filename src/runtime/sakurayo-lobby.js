@@ -1388,7 +1388,7 @@
       pill("testimony", "证词模式", "神装叙事") +
       pill("fever", "镜界狂潮", "超频割草") +
       pill("bossRush", "剑鬼讨伐", "首领速战") +
-      pill("mainGod", "主神空间", "万机神使") +
+      pill("mainGod", "主神空间", "轮回试炼") +
       "</div>"
     );
   }
