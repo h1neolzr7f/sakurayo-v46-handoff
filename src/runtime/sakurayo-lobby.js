@@ -256,13 +256,20 @@
     ".wishSpark46{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;max-height:72px;overflow:auto}" +
     ".wishSpark46 button{min-height:28px;padding:0 8px;border-radius:999px;border:1px solid #ffe6a355;background:#0b0818cc;color:#ffe7a3;font:800 10px/1 system-ui}" +
     ".wishSpark46 button.poor{opacity:.42}" +
-    ".revealPvSplit48{position:absolute;inset:0;z-index:8;display:grid;grid-template-columns:minmax(0,46%) minmax(0,1fr);align-items:center;gap:clamp(12px,3vw,40px);padding:clamp(10px,3vh,28px) clamp(16px,4vw,56px);background:radial-gradient(120% 90% at 22% 50%,#0f2a44 0%,#060a16 62%,#04050c 100%);cursor:pointer;animation:rpvIn48 .28s ease-out}" +
+    ".revealPvSplit48{position:absolute;inset:0;z-index:8;display:grid;grid-template-columns:minmax(0,50%) minmax(0,1fr);align-items:stretch;gap:clamp(14px,3vw,40px);padding:0 clamp(16px,4vw,56px) 0 0;background:radial-gradient(120% 90% at 22% 50%,#0f2a44 0%,#060a16 62%,#04050c 100%);cursor:pointer;animation:rpvIn48 .28s ease-out}" +
     ".revealPvSplit48.legend{background:radial-gradient(120% 90% at 22% 50%,#3a2a0e 0%,#0b0a14 62%,#05050c 100%)}" +
     ".rpvStage48{position:relative;height:100%;min-height:0;clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,22px 100%,0 calc(100% - 22px));background:#030611;box-shadow:inset 0 0 0 1px #6ff3ff55}" +
-    ".rpvStage48 video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}" +
+    ".rpvStage48 video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 6%}" +
+    ".rpvCorner48{position:absolute;width:26px;height:26px;border:2px solid var(--sy-c-cyan,#6ff3ff);pointer-events:none}.rpvCorner48.a{left:8px;top:8px;border-right:0;border-bottom:0}.rpvCorner48.b{right:8px;bottom:8px;border-left:0;border-top:0}" +
+    ".rpvCode48{font:italic 700 11px/1 system-ui;letter-spacing:.28em;color:var(--sy-c-cyan,#6ff3ff);opacity:.8;padding-bottom:6px;border-bottom:1px solid #6ff3ff33}" +
+    ".rpvStars48{color:var(--sy-c-gold,#ffd36b);font-size:16px;letter-spacing:.18em;text-shadow:0 0 10px #ffd36b88}" +
+    ".rpvMeta48{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:4px 0 0}" +
+    ".rpvMeta48 div{padding:6px 8px;background:#0b1830cc;border:1px solid #6ff3ff33;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%)}" +
+    ".rpvMeta48 dt{font:600 10px/1 system-ui;color:#8aa6c0;letter-spacing:.12em}.rpvMeta48 dd{margin:4px 0 0;font:800 13px/1.2 system-ui;color:#eaf6ff}" +
+    ".rpvDesc48{border-left-color:#6ff3ff!important;color:#9fb8cc!important;font-size:12px!important}" +
     ".rpvScan48{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 3px,#6ff3ff0d 3px 4px)}" +
-    ".rpvInfo48{display:flex;flex-direction:column;gap:8px;min-width:0;color:#eaf6ff}" +
-    ".revealPvSplit48 .rpvTag48{align-self:flex-start;padding:4px 12px;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);background:linear-gradient(90deg,#ffd36b,#ff9ec4);color:#1a0f05;font:800 12px/1.2 system-ui;letter-spacing:.12em}" +
+    ".rpvInfo48{display:flex;flex-direction:column;justify-content:center;gap:8px;min-width:0;color:#eaf6ff;background:linear-gradient(90deg,transparent,#6ff3ff08 30%,transparent),repeating-linear-gradient(90deg,transparent 0 46px,#6ff3ff0a 46px 47px)}" +
+    ".revealPvSplit48 .rpvTag48{align-self:flex-start;padding:5px 14px;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);background:#120a02;box-shadow:inset 0 0 0 1px #ffd36b;color:#ffd36b;text-shadow:0 0 8px #ffd36b66;font:800 12px/1.2 system-ui;letter-spacing:.12em}" +
     ".rpvInfo48 b{font:900 clamp(22px,3.4vw,40px)/1.15 system-ui;text-shadow:0 0 18px #6ff3ff66}" +
     ".rpvInfo48 em{font-style:normal;color:#9fdcff;font:700 14px/1.2 system-ui;letter-spacing:.2em}" +
     ".rpvInfo48 p{margin:6px 0 0;max-width:34em;padding-left:10px;border-left:2px solid #ff7fb0;color:#d8e6f5;font:500 14px/1.6 system-ui}" +
@@ -1787,13 +1794,24 @@
     box.className = "revealPv46 revealPvSplit48" + (info.legend ? " legend" : "");
     var card = info.card || {};
     var lore = card.lore && card.lore.length ? card.lore[0] : "";
+    var KIND_LABEL = { fashion: "时装", weapon: "武器", scrap: "残件", job: "职业卡", fusion: "融合卡", school: "流派卡" };
+    var ROLE = { sayo: "夜樱突击 · 突击步枪", aya: "镜面射手 · 双枪", rion: "黄泉剑客 · 太刀" };
+    var rar = info.legend ? "LEGEND" : (card.r || "SSR");
+    var meta = [];
+    if (card.kind && KIND_LABEL[card.kind]) meta.push(["类型", KIND_LABEL[card.kind]]);
+    if (card.school) meta.push(["流派倾向", SCHOOL_LABEL[card.school] || card.school]);
+    meta.push(["定位", ROLE[face] || "证人"]);
     box.innerHTML =
-      '<div class="rpvStage48"><video muted playsinline></video><i class="rpvScan48"></i></div>' +
-      '<div class="rpvInfo48"><small class="rpvTag48">' + (info.legend ? "LEGEND · 传说证人" : "SSR · 证人降临") + "</small>" +
+      '<div class="rpvStage48"><video muted playsinline></video><i class="rpvScan48"></i><i class="rpvCorner48 a"></i><i class="rpvCorner48 b"></i></div>' +
+      '<div class="rpvInfo48"><div class="rpvCode48">WITNESS // ' + escapeHtml(String(card.id || face).toUpperCase()) + '</div>' +
+      '<small class="rpvTag48">' + (info.legend ? "LEGEND · 传说证人" : rar + " · 证人降临") + "</small>" +
+      '<span class="rpvStars48" aria-label="稀有度">' + (info.legend ? "★★★★★★" : "★★★★★") + "</span>" +
       "<b>" + escapeHtml(card.n || FACE_NAME[face] || "") + "</b>" +
       "<em>" + escapeHtml(FACE_NAME[face] || "") + "</em>" +
+      '<dl class="rpvMeta48">' + meta.map(function (m) { return "<div><dt>" + m[0] + "</dt><dd>" + escapeHtml(m[1]) + "</dd></div>"; }).join("") + "</dl>" +
       (lore ? "<p>" + escapeHtml(lore) + "</p>" : "") +
-      '<span class="rpvHint48">点击任意处跳过</span></div>';
+      (card.d ? '<p class="rpvDesc48">' + escapeHtml(card.d) + "</p>" : "") +
+      '<span class="rpvHint48">点击任意处跳过 ▸</span></div>';
     var v = box.querySelector("video");
     v.muted = true;
     v.playsInline = true;
