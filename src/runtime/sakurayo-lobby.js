@@ -260,16 +260,16 @@
     ".revealPvSplit48.legend{background:radial-gradient(120% 90% at 22% 50%,#3a2a0e 0%,#0b0a14 62%,#05050c 100%)}" +
     ".rpvStage48{position:relative;height:100%;min-height:0;clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,22px 100%,0 calc(100% - 22px));background:#030611;box-shadow:inset 0 0 0 1px #6ff3ff55}" +
     ".rpvStage48 video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 6%}" +
-    ".rpvCorner48{position:absolute;width:26px;height:26px;border:2px solid var(--sy-c-cyan,#6ff3ff);pointer-events:none}.rpvCorner48.a{left:8px;top:8px;border-right:0;border-bottom:0}.rpvCorner48.b{right:8px;bottom:8px;border-left:0;border-top:0}" +
-    ".rpvCode48{font:italic 700 11px/1 system-ui;letter-spacing:.28em;color:var(--sy-c-cyan,#6ff3ff);opacity:.8;padding-bottom:6px;border-bottom:1px solid #6ff3ff33}" +
-    ".rpvStars48{color:var(--sy-c-gold,#ffd36b);font-size:16px;letter-spacing:.18em;text-shadow:0 0 10px #ffd36b88}" +
+    ".rpvCorner48{position:absolute;width:26px;height:26px;border:2px solid var(--sy-c-cyan);pointer-events:none}.rpvCorner48.a{left:8px;top:8px;border-right:0;border-bottom:0}.rpvCorner48.b{right:8px;bottom:8px;border-left:0;border-top:0}" +
+    ".rpvCode48{font:italic 700 11px/1 system-ui;letter-spacing:.28em;color:var(--sy-c-cyan);opacity:.8;padding-bottom:6px;border-bottom:1px solid var(--c-line)}" +
+    ".rpvStars48{color:var(--sy-c-gold);font-size:16px;letter-spacing:.18em;text-shadow:0 0 10px var(--sy-c-gold)}" +
     ".rpvMeta48{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:4px 0 0}" +
-    ".rpvMeta48 div{padding:6px 8px;background:#0b1830cc;border:1px solid #6ff3ff33;clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%)}" +
-    ".rpvMeta48 dt{font:600 10px/1 system-ui;color:#8aa6c0;letter-spacing:.12em}.rpvMeta48 dd{margin:4px 0 0;font:800 13px/1.2 system-ui;color:#eaf6ff}" +
-    ".rpvDesc48{border-left-color:#6ff3ff!important;color:#9fb8cc!important;font-size:12px!important}" +
+    ".rpvMeta48 div{padding:6px 8px;background:var(--c-surface-1);border:1px solid var(--c-line);clip-path:polygon(0 0,calc(100% - 8px) 0,100% 8px,100% 100%,0 100%)}" +
+    ".rpvMeta48 dt{font:600 10px/1 system-ui;color:var(--c-text-2);letter-spacing:.12em}.rpvMeta48 dd{margin:4px 0 0;font:800 13px/1.2 system-ui;color:var(--c-text-1)}" +
+    ".rpvDesc48{border-left-color:var(--sy-c-cyan)!important;color:var(--c-text-2)!important;font-size:12px!important}" +
     ".rpvScan48{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,transparent 0 3px,#6ff3ff0d 3px 4px)}" +
-    ".rpvInfo48{display:flex;flex-direction:column;justify-content:center;gap:8px;min-width:0;color:#eaf6ff;background:linear-gradient(90deg,transparent,#6ff3ff08 30%,transparent),repeating-linear-gradient(90deg,transparent 0 46px,#6ff3ff0a 46px 47px)}" +
-    ".revealPvSplit48 .rpvTag48{align-self:flex-start;padding:5px 14px;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);background:#120a02;box-shadow:inset 0 0 0 1px #ffd36b;color:#ffd36b;text-shadow:0 0 8px #ffd36b66;font:800 12px/1.2 system-ui;letter-spacing:.12em}" +
+    ".rpvInfo48{display:flex;flex-direction:column;justify-content:center;gap:8px;min-width:0;color:#eaf6ff}" +
+    ".revealPvSplit48 .rpvTag48{align-self:flex-start;padding:5px 14px;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);background:var(--sy-c-bg);box-shadow:inset 0 0 0 1px var(--sy-c-gold);color:var(--sy-c-gold);text-shadow:none;font:800 12px/1.2 system-ui;letter-spacing:.12em}" +
     ".rpvInfo48 b{font:900 clamp(22px,3.4vw,40px)/1.15 system-ui;text-shadow:0 0 18px #6ff3ff66}" +
     ".rpvInfo48 em{font-style:normal;color:#9fdcff;font:700 14px/1.2 system-ui;letter-spacing:.2em}" +
     ".rpvInfo48 p{margin:6px 0 0;max-width:34em;padding-left:10px;border-left:2px solid #ff7fb0;color:#d8e6f5;font:500 14px/1.6 system-ui}" +
