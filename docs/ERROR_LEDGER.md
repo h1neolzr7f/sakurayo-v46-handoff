@@ -155,3 +155,10 @@
 - **根因**：侧栏底部预留按“画布高度<480”猜 70px，但 CSS 只在视口≤440 才缩小按钮，461 时按钮实际 66+28px
 - **修法**：预留量按视口与 CSS 同一阈值取 80/108 CSS px 并换算到画布像素；行距下限 1.35f→1.2f
 - **对比**：/workspace/sakurayo-plan/shots/night_qa/compare/E021_shmup_r.png
+
+### E022 · run_smoke 高负载下偶发挂（升级弹窗 / 非战斗 modal 未就绪）
+- **场景**：完整 verify 中途 `tests/run_smoke.mjs`（092e）
+- **现象**：① `runWinNode46` 后 mode=`level` 非 `result`；② 进非战斗节点后 `st.modal` 为 null
+- **根因**：① 末帧停在升级选择，`runWinNode46` 要求 `state==="play"` 直接 return；② 进节点后 modal 晚一帧挂上，立刻读 state 拿不到
+- **修法**：赢节点前消掉升级弹窗；进节点后最多等 ~1.5s 直到 play 或 modal
+- **预防**：run 相关 smoke 在断言 mode/modal 前先等就绪；高负载下勿假设同步挂载

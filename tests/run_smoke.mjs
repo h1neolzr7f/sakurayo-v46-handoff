@@ -29,6 +29,9 @@ await api('runEnter46', st.available[0].id); await api('protectPlayer');
 st = await api('runState46'); assert.equal(st.mode, 'play'); assert.ok(/^R1-0-0$/.test(st.node));
 // 站桩玩家拾取经验靠随机掉落位置，30s 内不一定升级（高负载时尤其）→ 以 30s 为单位推进，最多 120s 游戏时间
 for (let k = 0; k < 4; k++) { await play(250, 120); st = await api('runState46'); if (st.player.level >= 2 || st.mode !== 'play') break; } const grown = st.player; assert.ok(grown.level >= 2, 'levelled during node ' + grown.level);
+// 高负载下末帧可能停在升级弹窗，runWinNode46 要求 play；先消掉升级再结算（E022）
+for (let u = 0; u < 8 && (await api('runState46')).mode === 'level'; u++) await api('chooseUpgrade', 0);
+assert.equal((await api('runState46')).mode, 'play', 'back to play before win');
 await api('runWinNode46'); st = await api('runState46');
 assert.equal(st.mode, 'result'); assert.ok(st.shards >= 22, 'shards for the fight'); assert.equal(st.build.level, grown.level, 'build snapshot taken');
 assert.ok(await page.locator('#runCont46').isVisible()); assert.equal(await page.locator('#again').isVisible(), false, 'normal replay hidden in a run');
@@ -43,8 +46,10 @@ await page.click('#runBtn46');
 let combat = null, sawModal = false;
 for (let k = 0; k < 6 && !combat; k++) {
   st = await api('runState46'); const n = st.available.find(q => !['sky', 'duel'].includes(q.type)) || st.available[0];
-  await api('runEnter46', n.id); st = await api('runState46');
-  if (st.mode === 'play') combat = n; else { assert.ok(st.modal && st.modal.n >= 1, 'non-combat node shows choices'); sawModal = true; await api('runChoose46', 0); st = await api('runState46'); if (st.modal) await api('runSkipModal46'); }
+  await api('runEnter46', n.id);
+  // 进节点后 modal/play 可能晚一帧挂上（E022）；最多等 ~1.5s
+  for (let w = 0; w < 15; w++) { st = await api('runState46'); if (st.mode === 'play' || (st.modal && st.modal.n >= 1)) break; await page.waitForTimeout(100); }
+  if (st.mode === 'play') combat = n; else { assert.ok(st.modal && st.modal.n >= 1, 'non-combat node shows choices ' + JSON.stringify({mode:st.mode,modal:st.modal,type:n.type})); sawModal = true; await api('runChoose46', 0); st = await api('runState46'); if (st.modal) await api('runSkipModal46'); }
 }
 assert.ok(combat, 'reached another combat node');
 st = await api('runState46'); assert.equal(st.player.level, before.build.level, 'player level carried into next node'); assert.ok(st.player.up >= before.build.up, 'upgrades carried');
