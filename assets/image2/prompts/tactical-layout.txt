@@ -1,0 +1,18 @@
+Layout concept reference — 2026-10-05 Asia/Shanghai
+Output: docs/screenshots/tactical-concept.webp
+Generated with the built-in image generation tool; its deployment model version is not exposed.
+This is a planning reference, not a runtime background or a promise of pixel-identical output.
+
+Brief: original landscape anime action-game lobby with a luminous alpine city outpost,
+snow mountains, pale cherry blossoms and restrained cool gray/white/cyan colors.
+A large heroine stands left of center. Keep the right side airy, with only three floating
+main entries for operators, equipment and sortie; place one small stage strip beneath.
+Profile and title sit upper left. Currency, mail, announcements and settings sit upper right.
+An activity banner, three compact portrait switches, tasks and login sit lower left.
+Six small monochrome feature icons run along the lower right. Clear readable Chinese labels,
+restrained translucent surfaces, generous open scenery, no copied franchise art or logos.
+
+Production images use the user's authorized LitangKing proxy and requested gpt-image-2.5
+aliases; exact prompts, returned sizes and hashes are recorded in the separate tactical
+portraits/scenes manifests and JSONL prompt logs. Generated text in this concept is not
+used in the game: all final labels, numbers, icons and interactive controls are native HTML/SVG.

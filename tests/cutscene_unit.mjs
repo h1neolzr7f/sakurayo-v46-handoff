@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import vm from 'node:vm';
+let now=0,id=0,timers=new Map();
+const nodes=new Map();
+const node=()=>({classList:{add(){},remove(){},contains(){return false;}},style:{},dataset:{},appendChild(){},addEventListener(){},querySelector(){return node();},removeAttribute(){}});
+const w={document:{getElementById:id=>nodes.get(id),createElement:node,head:{appendChild(){}},body:{appendChild:n=>nodes.set(n.id,n)}},performance:{now:()=>now},setTimeout:(fn,ms)=>{timers.set(++id,{fn,due:now+ms});return id;},clearTimeout:id=>timers.delete(id)};
+const advance=ms=>{const end=now+ms;while(true){const next=[...timers].sort((a,b)=>a[1].due-b[1].due)[0];if(!next||next[1].due>end)break;now=next[1].due;timers.delete(next[0]);next[1].fn();}now=end;};
+vm.runInNewContext(fs.readFileSync('src/runtime/sakurayo-cutscene.js','utf8'),{window:w});
+const c=w.SakurayoCutscene;
+assert.equal(typeof c.suspend,'function','cutscene must suspend actual timers');
+const el={textContent:''};let done=0;
+c.typeLine(el,'abcd',()=>done++,false);advance(8);c.suspend();advance(5000);assert.equal(el.textContent,'');assert.equal(done,0);c.resume();advance(7);assert.equal(el.textContent,'');advance(1);assert.equal(el.textContent,'a');advance(100);assert.equal(el.textContent,'abcd');assert.equal(done,1);
+c.playVictory({beats:[{title:'一',hold:100},{title:'二',hold:200}],onDone:()=>done++});advance(40);c.suspend();advance(5000);assert.equal(c.snapshot().beat,1);c.resume();advance(59);assert.equal(c.snapshot().beat,1);advance(1);assert.equal(c.snapshot().beat,2);advance(200);assert.equal(done,2);
+c.playVictory({beats:[{hold:100}],onDone:()=>done++});c.suspend();c.stopVictory();c.resume();advance(1000);assert.equal(done,2);assert.equal(c.isPlaying(),false);
+console.log('cutscene_unit PASS: typing/victory remaining timers, cancellation');

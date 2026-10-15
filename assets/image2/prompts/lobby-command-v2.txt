@@ -1,0 +1,7 @@
+Use case: stylized-concept
+Asset type: production 16:9 anime game lobby background, environment only.
+Primary request: premium hand-painted Japanese shrine command room at midnight after a supernatural catastrophe, for an original anime roguelike called Sakurayo.
+Scene: open-air veranda and an elegant modern shrine safehouse, glossy dark wooden floor, fine golden metal accents, paper lanterns, a round moon window and layered cherry trees, distant neon city lights through the rain. A subtle circular tactical hologram table on the far right.
+Composition: cinematic wide 16:9 with clear open floor and calm subdued wall across central-left 60 percent for a separate full-body heroine overlay. Horizon low, depth from veranda posts; right 35 percent dark quiet negative space for readable game buttons. The left side must be attractive even without a character.
+Style: refined 2D anime environment concept painting, detailed architecture, restrained bloom, strong dimensional lighting, elegant dark indigo, desaturated cherry pink, pale moonlight, tiny amber lights. Full bleed to every edge, no black margins.
+Constraints: no people, no characters, no silhouettes, no text, no UI, no letters, no logos, no watermarks; no white or black border. Clear visual hierarchy, not excessively busy.

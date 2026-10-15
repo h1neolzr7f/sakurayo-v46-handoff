@@ -1,0 +1,20 @@
+import { chromium } from 'playwright'; import { pathToFileURL } from 'node:url'; import path from 'node:path';
+const O='/workspace/sakurayo-shots/';
+const browser = await chromium.launch({ args: ['--allow-file-access-from-files'] });
+const ctx = await browser.newContext({ viewport: { width: 1280, height: 720 } });
+await ctx.addInitScript(() => { if (!sessionStorage.getItem('x')) { sessionStorage.setItem('x',1); localStorage.setItem('sakurayoV3', JSON.stringify({ coins: 0, unlock: 1, tutorialDone: true, character:'sayo', stars46:{'1-1':3,'1-2':2} })); } });
+const page = await ctx.newPage(); page.on('pageerror', e => console.log('ERR', String(e)));
+await page.goto(pathToFileURL(path.resolve('src/index.html')).href + '?test=1'); await page.locator('.bootArt35').waitFor({ state: 'detached' });
+const api = (fn, ...a) => page.evaluate(([fn, a]) => window.__SAKURAYO_TEST__[fn](...a), [fn, a]);
+await page.waitForTimeout(400); await page.screenshot({ path: O+'v10-lobby-levelmap-entry.png' });
+await page.click('#levelMapBtn46'); await page.waitForTimeout(500); await page.screenshot({ path: O+'v10-levelmap-ch1.png' });
+await page.click('.lm46Node >> nth=2'); await page.waitForTimeout(400); await page.screenshot({ path: O+'v10-levelmap-detail.png' });
+await page.click('.lm46Sheet .go'); await page.waitForTimeout(300);
+await api('avgNext46', 3); await page.waitForTimeout(1600); await page.screenshot({ path: O+'v10-avg-miko.png' });
+await api('avgSkip46'); await api('protectPlayer');
+for (let i=0;i<60;i++) await page.evaluate(()=>{const a=window.__SAKURAYO_TEST__;const m=a.snapshot().mode;if(m==='level')a.chooseUpgrade(0);else if(m==='event')a.chooseEvent(0);else if(m==='dialogue')a.dismissDialogue();else{const s=a.levelState46();if(s.npc)a.teleport46(s.npc.x+70,s.npc.y+10);window.advanceTime(250);}});
+await page.screenshot({ path: O+'v10-escort-combat.png' });
+for (let i=0;i<700;i++){ const s=await page.evaluate(()=>{const a=window.__SAKURAYO_TEST__;const m=a.snapshot().mode;if(m==='level')a.chooseUpgrade(0);else if(m==='event')a.chooseEvent(0);else if(m==='dialogue')a.dismissDialogue();else if(m==='play'){const s=a.levelState46();if(s.npc)a.teleport46(s.npc.x+70,s.npc.y+10);window.advanceTime(250);}return m;}); if(s==='avg'||s==='result')break; }
+await page.waitForTimeout(1500); await page.screenshot({ path: O+'v10-avg-cg-lanterns.png' });
+await api('avgSkip46'); await page.waitForTimeout(500); await page.screenshot({ path: O+'v10-result-stars.png' });
+await browser.close();

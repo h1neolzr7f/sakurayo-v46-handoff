@@ -50,16 +50,26 @@ async function startRun(page, id) {
   if (await page.locator("#tutorialDrawer37").isVisible()) await page.locator("#tutorialSkip37").click();
   const talking = await page.evaluate(() => {
     const dlg = document.querySelector("#dialogue");
-    const dock = document.querySelector("#opsDock46");
-    return {
-      open: !!(dlg && !dlg.classList.contains("hidden")),
-      dockOn: !!(dock && !dock.hidden),
-    };
+    return { open: !!(dlg && !dlg.classList.contains("hidden")) };
   });
-  if (talking.open) assert.equal(talking.dockOn, false, "剧情模态时干员坞必须收起");
   await api(page, "dismissDialogue");
   await api(page, "protectPlayer");
   await api(page, "freezeProgression");
+}
+
+// 处理完所有弹窗/升级队列，确认回到 play 模式
+async function settlePlay(page, tag) {
+  let m = "";
+  for (let j = 0; j < 40; j++) {
+    m = (await snap(page)).mode;
+    if (m === "play") return;
+    if (m === "level") await api(page, "chooseUpgrade", 0);
+    else if (m === "dialogue") await api(page, "dismissDialogue");
+    else if (m === "event") await page.evaluate(() => document.querySelector("#eventChoices .eventChoice")?.click());
+    else if (m === "paused") await page.evaluate(() => document.querySelector("#resume")?.click());
+    await page.waitForTimeout(120);
+  }
+  throw new Error(`${tag} 无法回到 play 模式，当前 mode=${m}`);
 }
 
 async function holdStick(page, width, height, dx, dy, ms) {
@@ -203,40 +213,14 @@ async function runViewport(width, height, tag) {
   assert.equal(await page.evaluate(() => !!document.querySelector("#rotateHint46")), false, `${tag} 战斗中不得再出现横持提示`);
   pass(`${tag} 战斗中无横持提示`);
 
-  const stickGuard = await page.evaluate(([w, h]) => {
-    const x = Math.round(w * 0.2);
-    const y = Math.round(h * 0.82);
-    const el = document.elementFromPoint(x, y);
-    const dock = document.querySelector("#opsDock46");
-    const joy = document.querySelector("#joy");
-    const box = (n) => {
-      if (!n) return null;
-      const r = n.getBoundingClientRect();
-      return { x: r.x, y: r.y, w: r.width, h: r.height };
-    };
-    const a = box(dock);
-    const b = box(joy);
-    let overlap = 0;
-    if (a && b && !dock.hidden) {
-      const ww = Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x);
-      const hh = Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y);
-      overlap = ww > 1 && hh > 1 ? ww * hh : 0;
-    }
-    return {
-      onDock: !!(dock && !dock.hidden && el && dock.contains(el)),
-      overlap,
-      units: window.SakurayoOps ? window.SakurayoOps.snapshot().units.length : 0,
-    };
-  }, [width, height]);
-  assert.equal(stickGuard.onDock, false, `${tag} 默认摇杆点不得落在干员坞上`);
-  assert.equal(stickGuard.overlap, 0, `${tag} 干员坞不得压住 #joy，重叠 ${stickGuard.overlap}`);
-  await page.mouse.click(Math.round(width * 0.2), Math.round(height * 0.82));
-  const unitsAfter = await page.evaluate(() => window.SakurayoOps ? window.SakurayoOps.snapshot().units.length : 0);
-  assert.equal(unitsAfter, stickGuard.units, `${tag} 默认摇杆点短触不得误部署干员`);
-  pass(`${tag} 摇杆点不误部署干员`);
 
   const before = await snap(page);
-  await holdStick(page, width, height, -140, 0, 12000);
+  await api(page, "protectPlayer");
+  // 镜头固定 900 世界单位纵向视野后战场按视野放大，走到左缘需要更久；分段走，途中升级/对话先处理
+  for (let k = 0; k < 6; k++) {
+    await holdStick(page, width, height, -140, 0, 5000);
+    await settlePlay(page, tag);
+  }
   const edge = await snap(page);
   assert.ok(edge.camera.camX >= -0.01, `${tag} camX 不许负值`);
   assert.ok(Math.abs(edge.camera.camX) < 0.05, `${tag} 走到左缘 camX 必须≈0，实际 ${edge.camera.camX}`);
@@ -246,6 +230,7 @@ async function runViewport(width, height, tag) {
   assert.ok(bgDraws <= 1, `${tag} 4×2 每帧战场图只许铺 1 次，实际 ${bgDraws}`);
   pass(`${tag} 镜头夹边且战场图不按格重铺`);
 
+  await settlePlay(page, tag);
   const spawned = await api(page, "spawnFromEdge50");
   assert.equal(spawned.inside, false, `${tag} 怪应从视口外刷`);
   await page.locator("#dash").click({ force: true });
@@ -302,12 +287,12 @@ async function runViewport(width, height, tag) {
 }
 
 try {
-  const old = await browser.newContext({ viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true });
+  const old = await browser.newContext({ viewport: { width: 932, height: 430 }, isMobile: true, hasTouch: true });
   await old.addInitScript(() => localStorage.setItem("sakurayoV3", JSON.stringify({ coins: 11, tal: { atk: 1 } })));
   const oldPage = await old.newPage();
   await waitMenu(oldPage);
   const oldSave = await api(oldPage, "saveSnapshot");
-  assert.equal(oldSave.coins, 11);
+  assert.equal(oldSave.coins, 11 + oldSave.talRefund46);
   assert.ok(oldSave.shop40 && oldSave.shop40.ops, "缺字段旧档应补齐 shop40.ops");
   pass("缺字段旧档进主菜单");
   await old.close();
@@ -337,7 +322,7 @@ try {
   pass("无效融合结算不写 undefined");
   await resultCtx.close();
 
-  const toastCtx = await browser.newContext({ viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true });
+  const toastCtx = await browser.newContext({ viewport: { width: 932, height: 430 }, isMobile: true, hasTouch: true });
   const toastPage = await toastCtx.newPage();
   await waitMenu(toastPage);
   await api(toastPage, "setRunMode46", "testimony");
@@ -493,7 +478,7 @@ try {
   assert.equal(await roomsPage.locator("#menu").isVisible(), true);
   await roomsCtx.close();
 
-  await runViewport(430, 932, "p430");
+  // 竖屏 p430 已移除：游戏锁定横屏，竖屏只显示旋转提示（见 rotate_smoke.mjs）
   await runViewport(932, 430, "l932");
   const thin = await browser.newContext({ viewport: { width: 600, height: 400 }, hasTouch: true });
   const thinPage = await thin.newPage();

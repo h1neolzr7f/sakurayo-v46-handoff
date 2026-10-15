@@ -1,0 +1,21 @@
+// 视频横屏适配截图：寻访证人 PV 左右分栏、飞升 PV 侧窗、Boss 阶段 PV、剧情背景视频。用法: node tests/video_layout_shots.mjs <outPrefix> [w h]
+import assert from 'node:assert/strict';
+import { chromium } from 'playwright';
+import { pathToFileURL } from 'node:url';
+import path from 'node:path';
+const out = process.argv[2] || '/tmp/vl'; const W = +process.argv[3] || 1280, H = +process.argv[4] || 576;
+const browser = await chromium.launch({ args: ['--allow-file-access-from-files', '--autoplay-policy=no-user-gesture-required'] });
+const ctx = await browser.newContext({ viewport: { width: W, height: H } });
+await ctx.addInitScript(() => { localStorage.setItem('sakurayoV3', JSON.stringify({ coins: 0, unlock: 4, done: [1, 2, 3], tutorialDone: true, character: 'sayo' })); });
+const page = await ctx.newPage(); const errors = []; page.on('pageerror', e => errors.push(String(e)));
+await page.goto(pathToFileURL(path.resolve('src/index.html')).href); await page.locator('.bootArt35').waitFor({ state: 'detached', timeout: 30000 });
+await page.evaluate(() => { document.querySelector('#gachaDrawer')?.classList.remove('hidden'); window.SakurayoLobby.showReveal([{ id: 'fashion_sayo_crown', n: '终夜樱冠', r: 'SSR', isNew: true }], { art: (p) => artUrl(p) }); });
+await page.waitForTimeout(1800);
+const split = await page.locator('.revealPvSplit48').count();
+await page.screenshot({ path: out + '_gacha_pv.png' });
+assert.equal(split, 1, 'gacha PV split layout present');
+const box = await page.evaluate(() => { const v = document.querySelector('.revealPvSplit48 video'); const r = v.getBoundingClientRect(); return { w: r.width, h: r.height, vw: v.videoWidth, vh: v.videoHeight }; });
+console.log('gacha pv box', JSON.stringify(box));
+await browser.close();
+assert.deepEqual(errors, []);
+console.log('PASS video layout shots', out);

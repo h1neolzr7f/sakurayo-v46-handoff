@@ -3,6 +3,8 @@ package com.sakurayo.zombietide;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.content.Intent;
+import android.content.ActivityNotFoundException;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -15,6 +17,7 @@ import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.webkit.ConsoleMessage;
+import android.webkit.JavascriptInterface;
 import android.webkit.CookieManager;
 import android.webkit.PermissionRequest;
 import android.webkit.WebChromeClient;
@@ -27,6 +30,12 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 public final class MainActivity extends Activity {
@@ -34,19 +43,12 @@ public final class MainActivity extends Activity {
     private static final String GAME_URL = "file:///android_asset/index.html";
     private static final long EXIT_CONFIRM_WINDOW_MS = 1800L;
 
-    private static final String ANDROID_BACK_SCRIPT =
-            "(function(){" +
-            "const visible=e=>!!e&&!e.classList.contains('hidden');" +
-            "const click=id=>{const e=document.querySelector(id);if(e){e.click();return true;}return false;};" +
-            "const drawer=[...document.querySelectorAll('.drawer')].find(visible);" +
-            "if(drawer){const close=drawer.querySelector('.close');if(close)close.click();return true;}" +
-            "if(visible(document.querySelector('#result')))return click('#back');" +
-            "if(visible(document.querySelector('#paused')))return click('#resume');" +
-            "if(visible(document.querySelector('#level'))||visible(document.querySelector('#event'))||" +
-            "visible(document.querySelector('#dialogue')))return true;" +
-            "if(visible(document.querySelector('#hud')))return click('#pause');" +
-            "return false;" +
-            "})()";
+    private static final String ANDROID_BACK_SCRIPT = "window.SakurayoPlatform ? window.SakurayoPlatform.back() : false";
+    private static final int EXPORT_JSON_REQUEST = 48;
+    private static final String EXPORT_PENDING = "exportPending";
+    private boolean exportPending;
+    private boolean appResumed;
+    private File exportPayload;
 
     private WebView webView;
     private long lastExitRequestAt;
@@ -56,6 +58,10 @@ public final class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         configureWindow();
+        exportPayload = new File(getCacheDir(), "pending-export.json");
+        exportPending = savedInstanceState != null
+                && savedInstanceState.getBoolean(EXPORT_PENDING, false) && exportPayload.isFile();
+        if (!exportPending) deleteExportPayload();
         webView = createWebView();
 
         FrameLayout root = new FrameLayout(this);
@@ -65,10 +71,9 @@ public final class MainActivity extends Activity {
                 FrameLayout.LayoutParams.MATCH_PARENT));
         setContentView(root);
 
-        boolean restored = savedInstanceState != null && webView.restoreState(savedInstanceState) != null;
-        if (!restored) {
-            webView.loadUrl(GAME_URL);
-        }
+        // WebView history cannot restore a live JS battle. Start a clean lobby;
+        // localStorage retains progress and the pending SAF payload remains on disk.
+        webView.loadUrl(GAME_URL);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
@@ -127,6 +132,7 @@ public final class MainActivity extends Activity {
         CookieManager.getInstance().setAcceptThirdPartyCookies(view, false);
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG);
 
+        view.addJavascriptInterface(new AndroidBridge(), "SakurayoAndroid");
         view.setWebViewClient(new OfflineWebViewClient());
         view.setWebChromeClient(new WebChromeClient() {
             @Override
@@ -153,13 +159,13 @@ public final class MainActivity extends Activity {
     private final class OfflineWebViewClient extends WebViewClient {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-            return !isLocalUri(request.getUrl());
+            return !GAME_URL.equals(request.getUrl().toString());
         }
 
         @SuppressWarnings("deprecation")
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            return !isLocalUri(Uri.parse(url));
+            return !GAME_URL.equals(url);
         }
 
         @Override
@@ -181,17 +187,74 @@ public final class MainActivity extends Activity {
             super.onPageFinished(view, url);
             applyImmersiveMode();
             view.requestFocus(View.FOCUS_DOWN);
+            dispatchPlatform(appResumed ? "resume" : "suspend");
         }
     }
 
-    private static boolean isLocalUri(Uri uri) {
-        if (uri == null) return false;
-        String scheme = uri.getScheme();
-        return scheme == null
-                || "file".equalsIgnoreCase(scheme)
-                || "data".equalsIgnoreCase(scheme)
-                || "blob".equalsIgnoreCase(scheme)
-                || "about".equalsIgnoreCase(scheme);
+    private final class AndroidBridge {
+        @JavascriptInterface
+        public void exportJson(String filename, String json) {
+            runOnUiThread(() -> beginJsonExport(filename, json));
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private void beginJsonExport(String filename, String json) {
+        if (exportPending) {
+            Toast.makeText(this, "请先完成或取消当前导出", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        try {
+            try (FileOutputStream output = new FileOutputStream(exportPayload)) {
+                output.write(json.getBytes(StandardCharsets.UTF_8));
+            }
+            Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("application/json");
+            intent.putExtra(Intent.EXTRA_TITLE, filename.replaceAll("[/\\\\]", "_") );
+            exportPending = true;
+            startActivityForResult(intent, EXPORT_JSON_REQUEST);
+        } catch (IOException | ActivityNotFoundException error) {
+            exportPending = false;
+            deleteExportPayload();
+            Log.e(TAG, "Could not begin JSON export", error);
+            Toast.makeText(this, "无法创建导出文件", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode != EXPORT_JSON_REQUEST || !exportPending) return;
+        exportPending = false;
+        try {
+            if (resultCode != RESULT_OK || data == null || data.getData() == null) return;
+            try (FileInputStream input = new FileInputStream(exportPayload);
+                 OutputStream output = getContentResolver().openOutputStream(data.getData(), "wt")) {
+                if (output == null) throw new IOException("No output stream for selected document");
+                byte[] buffer = new byte[8192];
+                int count;
+                while ((count = input.read(buffer)) != -1) output.write(buffer, 0, count);
+            }
+            Toast.makeText(this, "JSON 已导出", Toast.LENGTH_SHORT).show();
+        } catch (IOException error) {
+            Log.e(TAG, "Could not write JSON export", error);
+            Toast.makeText(this, "导出失败，请重新选择文件", Toast.LENGTH_LONG).show();
+        } finally {
+            deleteExportPayload();
+        }
+    }
+
+    private void deleteExportPayload() {
+        if (exportPayload != null && exportPayload.exists() && !exportPayload.delete()) {
+            Log.w(TAG, "Could not remove pending export cache");
+        }
+    }
+
+    private void dispatchPlatform(String method) {
+        if (webView != null) webView.evaluateJavascript(
+                "window.SakurayoPlatform && window.SakurayoPlatform." + method + "()", null);
     }
 
     @SuppressWarnings("deprecation")
@@ -224,10 +287,6 @@ public final class MainActivity extends Activity {
         }
         webView.evaluateJavascript(ANDROID_BACK_SCRIPT, value -> {
             if ("true".equals(value)) return;
-            if (webView.canGoBack()) {
-                webView.goBack();
-                return;
-            }
             long now = SystemClock.elapsedRealtime();
             if (now - lastExitRequestAt <= EXIT_CONFIRM_WINDOW_MS) {
                 finish();
@@ -247,12 +306,14 @@ public final class MainActivity extends Activity {
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        if (webView != null) webView.saveState(outState);
+        outState.putBoolean(EXPORT_PENDING, exportPending);
         super.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onPause() {
+        appResumed = false;
+        dispatchPlatform("suspend");
         if (webView != null) webView.onPause();
         super.onPause();
     }
@@ -260,7 +321,9 @@ public final class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        appResumed = true;
         if (webView != null) webView.onResume();
+        dispatchPlatform("resume");
         applyImmersiveMode();
     }
 
@@ -273,6 +336,7 @@ public final class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         if (webView != null) {
+            webView.removeJavascriptInterface("SakurayoAndroid");
             webView.stopLoading();
             webView.setWebChromeClient(null);
             webView.setWebViewClient(null);

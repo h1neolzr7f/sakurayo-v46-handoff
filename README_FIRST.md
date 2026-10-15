@@ -1,51 +1,11 @@
 # 接手检查清单
 
-当前：**V4.6.0 源码，未发版。** 公开玩家仓是 https://github.com/h1neolzr7f/sakurayo-zombietide ，已发布 APK 仍是 v4.4.6。
+当前 **4.6.0 / Android code61 开发预发布**，存档 `sakurayoV3`。玩家稳定仓仍为 [sakurayo-zombietide](https://github.com/h1neolzr7f/sakurayo-zombietide)。
 
-按这个顺序读：
+先读 [README.md](README.md)、[AGENTS.md](AGENTS.md)、[交接](docs/HANDOFF.md) 与 [全项目审查](docs/AUDIT_2026-10-05.md)。此次修复对应 [执行计划](docs/plans/2026-10-05-full-repair.md)。
 
-1. [README.md](README.md)
-2. [docs/HANDOFF.md](docs/HANDOFF.md)
-3. [AGENTS.md](AGENTS.md)
-4. [docs/PLAN_V46_ERYOU.md](docs/PLAN_V46_ERYOU.md)
-5. [docs/MAINTAIN.md](docs/MAINTAIN.md)
+当前已有疏朗横屏大厅、三主入口、六图标底栏、邮箱/公告/活动/任务/有限七日登录、三卡池寻访、名册、商店、四章环境动画、证词/主神模式、最多2名干员与仿Live角色表现。素材全部离线；不另加账号联网。
 
-然后打开 `src/index.html`。存档键 `sakurayoV3`。不要清档。
+开发打开 `src/index.html`，交付单文件 `android-app/app/src/main/assets/index.html`。Linux/macOS `bash tools/verify.sh`，Windows `powershell -File tools/verify.ps1`；`--static` / `-Static` 不启动浏览器。
 
-## 立刻能跑
-
-```powershell
-start src/index.html
-node tests/lobby_unit.mjs
-node tests/live_unit.mjs
-node tests/ops_unit.mjs
-```
-
-全量：`powershell -File tools/verify.ps1`
-
-## 这一版已经有了
-
-横屏大厅、五房、镜界寻访（只收藏）、证词模式、局内 2 干员 DP、仿 Live2D。版本号仍是 4.6.0。
-
-## 你接下来做
-
-I2V 绿幕站桩、融合 skill/dash、寻访卡扩到 16、全量 verify、再发版。细节在 `docs/HANDOFF.md`。
-
-## 不要做
-
-- 再包 `update`
-- 改存档键或清档
-- 抽卡/商店卖永久伤害
-- 改名 `startGame` / `update` / `draw` / `spawnEnemy` / `showDialogue` 却不改调用点
-- 提交 `keystore.properties`、`local.properties`、APK、`assets/image2/source/`
-- 卸掉模拟器上签名对不上的旧正式包（会清档）
-- 删 `progress.md` 顶部 Original prompt
-- 把竖屏重新做成主体验
-
-## 目录
-
-- `src/` 唯一代码基线
-- `src/runtime/sakurayo-lobby.js` 大厅/寻访
-- `src/runtime/sakurayo-live.js` 立绘
-- `src/runtime/sakurayo-ops.js` 干员
-- `android-app/app/src/main/assets/game/art` 运行时美术
+不要改版本或存档键、清档、叠加update包装、恢复逐弹全敌遍历、提交凭据/APK/签名/源PNG，或卸载旧正式包。代码与回归先验证，再同步单HTML和现有PR；未完成真机验收仍保持预发布。

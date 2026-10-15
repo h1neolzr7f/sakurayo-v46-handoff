@@ -34,12 +34,12 @@ async function api(page, method, ...args) {
 }
 
 try {
-  const oldContext = await browser.newContext({ viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true });
+  const oldContext = await browser.newContext({ viewport: { width: 932, height: 430 }, isMobile: true, hasTouch: true });
   await oldContext.addInitScript(() => localStorage.setItem("sakurayoV3", JSON.stringify({ coins: 90, tal: { atk: 1 }, extensions: { "official.story-exploration": { __version: 1, data: { collected: { legacy: true }, visits: {}, fragments: [] } } } })));
   const oldPage = await oldContext.newPage();
   await waitReady(oldPage);
   const oldSave = await api(oldPage, "saveSnapshot");
-  assert.equal(oldSave.coins, 90);
+  assert.equal(oldSave.coins, 90 + oldSave.talRefund46); assert.equal(oldSave.tal.atk, 1);
   assert.equal(oldSave.tal.atk, 1);
   assert.equal(oldSave.extensions["official.framework-example"].__version, 1);
   assert.deepEqual(oldSave.extensions["official.framework-example"].data.purchases, {});
@@ -50,7 +50,7 @@ try {
   const oldLobby = await api(oldPage, "lobby46");
   assert.ok(oldLobby.shown.includes("sayo_echo"));
   assert.ok(oldLobby.shown.includes("aya_petal"));
-  assert.equal(oldLobby.coins, 90, "旧存档樱花币不应被寻访字段清空");
+  assert.equal(oldLobby.coins, 90 + oldSave.talRefund46, "旧存档樱花币不应被寻访字段清空（另含冻结天赋返还）");
   pass("旧 sakurayoV3 存档保留并补齐扩展默认字段");
 
   const status = await api(oldPage, "extensionStatus41");
@@ -65,7 +65,7 @@ try {
   assert.match(feedbackAssets.audio.reward, /reward\.ogg$/);
   assert.match(feedbackAssets.vfx.muzzle, /muzzle\.png$/);
   const lifecycleHooks = await oldPage.evaluate(() => window.SakurayoContent.hookStatus());
-  assert.deepEqual(lifecycleHooks["combat:after-draw"].map(entry => entry.owner), ["core.ops46", "core.boss-pointer38", "core.outfit-reveal45", "core.mechanics39", "core.boss-stage412"]);
+  assert.deepEqual(lifecycleHooks["combat:after-draw"].map(entry => entry.owner), ["core.boss-pointer38", "core.outfit-reveal45", "core.mechanics39", "core.levels46", "core.boss-stage412"]);
   assert.equal(lifecycleHooks["combat:after-update"].some(entry => entry.owner === "core.boss-art412"), true);
   pass("官方扩展通过注册表提供服饰、商店、成就和档案数据");
 
@@ -198,7 +198,7 @@ try {
   pass("Mod Kit 契约统一文档格式、依赖排序、逐版本迁移、Hook 与单包编译隔离");
   await contractPage.close();
 
-  const brokenContext = await browser.newContext({ viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true });
+  const brokenContext = await browser.newContext({ viewport: { width: 932, height: 430 }, isMobile: true, hasTouch: true });
   const pageErrors = [];
   const brokenPage = await brokenContext.newPage();
   brokenPage.on("pageerror", error => pageErrors.push(String(error)));
@@ -212,14 +212,14 @@ try {
   pass("非法扩展被隔离，本体和其他扩展继续启动");
   await brokenContext.close();
 
-  const poisonContext = await browser.newContext({ viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true });
+  const poisonContext = await browser.newContext({ viewport: { width: 932, height: 430 }, isMobile: true, hasTouch: true });
   await poisonContext.addInitScript(() => localStorage.setItem("sakurayoV3", '{"coins":12,"tal":{"atk":2},"mainGod":{"points":3},"extraJunk424":1,"__proto__":{"pollutedSakurayo":true}}'));
   const poisonPage = await poisonContext.newPage();
   await poisonPage.goto(testUrl, { waitUntil: "domcontentloaded" });
   await poisonPage.locator(".bootArt35").waitFor({ state: "detached", timeout: 8000 });
   assert.equal(await poisonPage.evaluate(() => ({}).pollutedSakurayo), undefined);
   const poisonSave = await api(poisonPage, "saveSnapshot");
-  assert.equal(poisonSave.coins, 12);
+  assert.equal(poisonSave.coins, 12 + poisonSave.talRefund46);
   assert.equal(poisonSave.tal.atk, 2);
   assert.equal(poisonSave.extraJunk424, undefined);
   pass("存档 merge 忽略 __proto__ 并丢掉未知顶层字段");

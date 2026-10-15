@@ -28,6 +28,8 @@
     ".heroLive46.livePuppet46 .heroLiveSway46,.heroLive46.livePuppet46 .heroLiveBreath46,.heroLive46.livePuppet46 .heroLiveBlink46,.heroLive46.livePuppet46 .heroLiveBase46{animation:none!important}" +
     ".heroLive46.livePuppet46 .heroLiveSway46,.heroLive46.livePuppet46 .heroLivePhys46,.heroLive46.livePuppet46 .heroLiveBreath46,.heroLive46.livePuppet46 .heroLiveLook46{will-change:transform}" +
     ".heroLive46.livePaused46 .heroLiveSway46,.heroLive46.livePaused46 .heroLivePhys46,.heroLive46.livePaused46 .heroLiveBreath46,.heroLive46.livePaused46 .heroLiveLook46{will-change:auto}" +
+    ".heroLive46.livePaused46 .heroLiveBase46{opacity:1!important}.heroLive46.livePaused46 .heroLiveBlink46{opacity:0!important}" +
+    ".heroLive46.livePaused46 .heroLiveSway46,.heroLive46.livePaused46 .heroLivePhys46,.heroLive46.livePaused46 .heroLiveBreath46,.heroLive46.livePaused46 .heroLiveLook46{transform:none!important}" +
     ".heroHead46{position:absolute;z-index:3;left:16%;width:22%;top:8%;height:30%;pointer-events:auto;background:transparent;border:0}" +
     ".heroLive46 .heroTap46{left:12%;width:30%;top:38%;bottom:10%}" +
     ".heroLiveBreath46:after{content:\"\";position:absolute;left:28%;right:28%;bottom:7%;height:16px;border-radius:50%;background:radial-gradient(ellipse,#05020d88 0%,#05020d00 72%);pointer-events:none}" +
@@ -233,7 +235,8 @@
     if (nodes.phys) nodes.phys.style.transform = phys;
     if (nodes.breath) nodes.breath.style.transform = breath;
     if (nodes.look) nodes.look.style.transform = look;
-    if (nodes.base) nodes.base.style.opacity = pose.eye > 0.42 ? "1" : "0";
+    var hasBlink = nodes.blink && nodes.blink.getAttribute("src") && !nodes.blink.classList.contains("off");
+    if (nodes.base) nodes.base.style.opacity = !hasBlink || pose.eye > 0.42 ? "1" : "0";
     if (nodes.blink) nodes.blink.style.opacity = pose.eye < 0.72 ? String(1 - pose.eye) : "0";
     return pose;
   }
@@ -241,7 +244,7 @@
   function injectStyle() {
     if (!global.document) return;
     var style = global.document.getElementById("sakurayo-live-css");
-    if (style && style.parentNode) style.parentNode.removeChild(style);
+    if (style) return;
     style = global.document.createElement("style");
     style.id = "sakurayo-live-css";
     style.textContent = CSS;
@@ -291,7 +294,8 @@
   }
 
   function reducedMotion() {
-    return !!(global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    return !!(puppet && typeof puppet.opts.reducedMotion === "function" && puppet.opts.reducedMotion()) ||
+      !!(global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches);
   }
 
   function attach(root, opts) {
@@ -302,6 +306,7 @@
       puppet.opts = opts;
       puppet.state.test = !!opts.test;
       root.classList.add("livePuppet46");
+      puppet.refresh();
       return snapshot();
     }
     detach();
@@ -328,9 +333,11 @@
     puppet.move = move;
     function loop(now) {
       if (!puppet) return;
+      puppet.raf = 0;
       var hidden = typeof puppet.opts.hidden === "function" ? puppet.opts.hidden() : false;
       var pause = hidden || document.hidden || reducedMotion();
       root.classList.toggle("livePaused46", pause);
+      if (pause) { puppet.last = 0; return; }
       if (!pause) {
         var dt = puppet.last ? (now - puppet.last) / 1000 : 0.016;
         puppet.pose = applyPose(puppet.nodes, stepState(puppet.state, dt, Math.random));
@@ -338,7 +345,26 @@
       puppet.last = now;
       puppet.raf = global.requestAnimationFrame(loop);
     }
-    if (global.requestAnimationFrame) puppet.raf = global.requestAnimationFrame(loop);
+    puppet.refresh = function () {
+      if (!puppet) return;
+      var pause = global.document.hidden || reducedMotion() || (typeof puppet.opts.hidden === "function" && puppet.opts.hidden());
+      root.classList.toggle("livePaused46", !!pause);
+      if (pause) {
+        if (puppet.raf) global.cancelAnimationFrame(puppet.raf);
+        puppet.raf = 0; puppet.last = 0;
+      } else if (!puppet.raf && global.requestAnimationFrame) puppet.raf = global.requestAnimationFrame(loop);
+    };
+    global.document.addEventListener("visibilitychange", puppet.refresh);
+    if (global.matchMedia) {
+      puppet.media = global.matchMedia("(prefers-reduced-motion: reduce)");
+      if (puppet.media.addEventListener) puppet.media.addEventListener("change", puppet.refresh);
+      else if (puppet.media.addListener) puppet.media.addListener(puppet.refresh);
+    }
+    if (global.MutationObserver) {
+      puppet.observer = new global.MutationObserver(puppet.refresh);
+      puppet.observer.observe(global.document.body, {subtree:true,childList:true,attributes:true,attributeFilter:["class","hidden"]});
+    }
+    puppet.refresh();
     return snapshot();
   }
 
@@ -347,6 +373,12 @@
     if (puppet.move && puppet.root && puppet.root.ownerDocument) {
       puppet.root.ownerDocument.removeEventListener("pointermove", puppet.move);
     }
+    global.document.removeEventListener("visibilitychange", puppet.refresh);
+    if (puppet.media) {
+      if (puppet.media.removeEventListener) puppet.media.removeEventListener("change", puppet.refresh);
+      else if (puppet.media.removeListener) puppet.media.removeListener(puppet.refresh);
+    }
+    if (puppet.observer) puppet.observer.disconnect();
     if (puppet.raf && global.cancelAnimationFrame) global.cancelAnimationFrame(puppet.raf);
     if (puppet.root) {
       puppet.root.classList.remove("livePuppet46", "livePaused46");
@@ -398,6 +430,7 @@
     triggerState: triggerState,
     injectStyle: injectStyle,
     attach: attach,
+    refresh: function () { if (puppet) puppet.refresh(); },
     detach: detach,
     trigger: trigger,
     lookAt: lookAt,

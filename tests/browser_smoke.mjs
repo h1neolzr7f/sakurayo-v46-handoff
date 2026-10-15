@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { verifyContentReceipts } from "./content_receipts_smoke.mjs";
 import { createHash } from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
@@ -28,7 +29,7 @@ async function loadPlaywright() {
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(here, "..");
-const sourceArg = process.argv[2] || "src/index.html";
+const sourceArg = process.env.SAKURAYO_ENTRY || process.argv[2] || "src/index.html";
 const source = /^https?:\/\//i.test(sourceArg) ? sourceArg : path.resolve(projectRoot, sourceArg);
 const sourceFile = /^https?:\/\//i.test(source) ? path.resolve(projectRoot, "src/index.html") : source;
 const artifactDir = path.resolve(projectRoot, "tests/artifacts/smoke");
@@ -81,7 +82,7 @@ async function openPage(context, tracker, targetUrl = url) {
     if (message.type() !== "error") return;
     const text = `${message.text()} ${message.location()?.url || ""}`;
     if (/(?:career_|form_|fusion_)[A-Za-z]+\/anim_|fusions\/[A-Za-z]+\/splash/.test(text)) return;
-    tracker.consoleErrors.push(message.text());
+    tracker.consoleErrors.push(`${message.text()} ${(message.location()?.url || "").replace(/^.*\/game\/art\//, "art/")}`);
   });
   page.on("request", request => {
     if (/^https?:/i.test(request.url()) && new URL(request.url()).origin !== new URL(targetUrl).origin) tracker.externalRequests.push(request.url());
@@ -94,7 +95,10 @@ let mainContext;
 let legacyContext;
 let normalContext;
 try {
-  normalContext = await browser.newContext({ viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true });
+  const receiptEvidence = await verifyContentReceipts(browser, url);
+  fs.writeFileSync(path.join(artifactDir, "content-receipts.json"), JSON.stringify(receiptEvidence, null, 2));
+  pass("F22 扩展字典收据、真实购买/事件按钮、刷新后重复领取与限购拒绝");
+  normalContext = await browser.newContext({ viewport: { width: 932, height: 430 }, isMobile: true, hasTouch: true });
   const normalTracker = { pageErrors: [], consoleErrors: [], externalRequests: [] };
   const normalPage = await openPage(normalContext, normalTracker, normalUrl);
   await normalPage.locator(".bootArt35").waitFor({ state: "detached", timeout: 5000 });
@@ -106,14 +110,14 @@ try {
   assert.equal(await normalPage.locator("#betaDrawer40").count(), 0);
   assert.equal(await normalPage.evaluate(() => typeof window.render_game_to_text), "undefined");
   assert.equal(await normalPage.evaluate(() => window.__SAKURAYO_DEV__.enabled), false);
-  assert.equal(normalTracker.pageErrors.length, 0);
+  assert.equal(normalTracker.pageErrors.length, 0, [...new Set(normalTracker.pageErrors.map(String))].slice(0, 3).join("\n"));
   assert.equal(normalTracker.consoleErrors.length, 0, normalTracker.consoleErrors.join("\n"));
   assert.equal(normalTracker.externalRequests.length, 0);
   pass("普通发布模式不暴露测试 API、内测后门与快照钩子");
   await normalContext.close();
   normalContext = null;
 
-  for (const [width, height] of [[360, 800], [932, 430]]) {
+  for (const [width, height] of [[800, 360], [932, 430]]) {
     const layoutContext = await browser.newContext({ viewport: { width, height }, isMobile: true, hasTouch: true });
     const layoutTracker = { pageErrors: [], consoleErrors: [], externalRequests: [] };
     const layoutPage = await openPage(layoutContext, layoutTracker, normalUrl);
@@ -128,14 +132,15 @@ try {
     pass(`${width}×${height} 主菜单布局`);
   }
 
-  legacyContext = await browser.newContext({ viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true });
+  legacyContext = await browser.newContext({ viewport: { width: 932, height: 430 }, isMobile: true, hasTouch: true });
   await legacyContext.addInitScript(value => {
     localStorage.setItem("sakurayoV3", value);
   }, JSON.stringify({ coins: 7, tal: { atk: 1 }, settings: { glow: "soft" } }));
   const legacyTracker = { pageErrors: [], consoleErrors: [], externalRequests: [] };
   const legacyPage = await openPage(legacyContext, legacyTracker);
   const migrated = await api(legacyPage, "saveSnapshot");
-  assert.equal(migrated.coins, 7);
+  assert.ok(migrated.talRefund46 > 0 && migrated.coins === 7 + migrated.talRefund46, "frozen talents refunded once on migration");
+  assert.equal(migrated.tal.atk, 1, "legacy talent level kept");
   assert.equal(migrated.tal.atk, 1);
   assert.equal(migrated.tal.hp, 0);
   assert.equal(migrated.character, "sayo");
@@ -155,7 +160,7 @@ try {
   await legacyContext.close();
   legacyContext = null;
 
-  mainContext = await browser.newContext({ viewport: { width: 430, height: 932 }, isMobile: true, hasTouch: true });
+  mainContext = await browser.newContext({ viewport: { width: 932, height: 430 }, isMobile: true, hasTouch: true });
   await mainContext.addInitScript(() => {
     let seed = 0x5a17c9;
     Math.random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
@@ -167,7 +172,7 @@ try {
   assert.equal(await page.locator("#characterList .charCard").count(), 3);
   assert.equal(await page.locator("#start").isVisible(), true);
   assert.equal(await page.locator("#coverTitle36").isVisible(), true);
-  assert.match(await page.locator("#menu .bg").evaluate(node => node.style.backgroundImage), /lobby_wide\.webp/);
+  assert.match(await page.locator("#menu .bg").evaluate(node => node.style.backgroundImage), /ui\/tactical\/lobby-night-v5\.webp/);
   await page.waitForFunction(() => {
     const boot = new Set(window.__SAKURAYO_ART__?.boot() || []);
     return window.__SAKURAYO_ART__?.status().filter(item => boot.has(item.path)).every(item => item.ready);
@@ -176,16 +181,14 @@ try {
   assert.equal(artStatus.length, 20);
   assert.equal(artStatus.filter(item => item.ready).length, 12);
   assert.equal(artStatus.filter(item => !item.loaded).length, 8);
-  assert.equal(await page.locator("#menu .nav img").count(), 5);
+  assert.equal(await page.locator("#menu .homeNav46 .terminalIcon48 svg").count(), 7);
   assert.ok(await page.locator("#characterList .charCard img").evaluateAll(images => images.every(image => image.complete && image.naturalWidth > 0)));
   await page.waitForFunction(() => {
     const image = document.querySelector("#menu .menuBrand35");
     return image?.complete && image.naturalWidth > 0;
   });
-  if (!(await page.locator("#statsButton37").isVisible())) {
-    await page.locator("#moreButton39").click();
-  }
-  await page.locator("#modKitButton42").click();
+  await page.locator("#commandSettings47").click();
+  await page.locator("#commandModkit48").click();
   assert.equal(await page.locator("#modKitDrawer42 .modKitPack42").count(), 5);
   assert.equal(await page.locator("#modKitDrawer42 .modKitPack42.enabled").count(), 5);
   assert.match(await page.locator("#modKitDrawer42 .modKitSummary42").textContent(), /5\/5 已启用/);
@@ -265,7 +268,7 @@ try {
   assert.equal(emptyWeapon.ok, false);
   assert.equal(emptyWeapon.reason, "coins");
   await page.locator('#gachaTabs46 [data-pool="remnant"]').click();
-  assert.match(await page.locator("#gachaDrawer").textContent(), /残片进仓库/);
+  assert.match(await page.locator("#gachaDrawer").textContent(), /收藏不增加战斗属性/);
   const coinsBeforeFail = (await api(page, "lobby46")).coins;
   const broke = await api(page, "pullGacha46", 1);
   assert.equal(broke.ok, false);
@@ -285,6 +288,7 @@ try {
   assert.equal(ten.results.length, 10);
   assert.ok(ten.tenPulls >= 1);
   await shot(page, "01h-gacha-drawer.png");
+  await page.locator("#gachaReveal46 .revealTake46").click();
   await page.locator("#gachaDrawer .close").click();
   const rosterOpen = await api(page, "openDrawer", "roster");
   assert.equal(rosterOpen.visible, true);
@@ -303,7 +307,8 @@ try {
   assert.equal(await page.locator("#rosterDrawer").textContent().then((t) => t.includes("后续写入")), false);
   assert.equal(await page.locator("#rosterDrawer").textContent().then((t) => /星核机甲|血炼剑仙|瘟炼菌海/.test(t)), false);
   await page.locator('#rosterTabs46 [data-roster="fashion"]').click();
-  assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 12);
+  // 12 张寻访时装 + 24 张补给商店时装（719a6f6 引入，可在仓库装备）
+  assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 36);
   await page.locator('#rosterTabs46 [data-roster="weapon"]').click();
   assert.equal(await page.locator("#rosterWall46 .rosterSlot46").count(), 12);
   await page.locator('#rosterTabs46 [data-roster="chronicle"]').click();
@@ -382,9 +387,10 @@ try {
   assert.equal(await page.locator("#guideButton37").count(), 1);
   assert.equal(await page.locator("#statsButton37").count(), 1);
   assert.equal(await page.locator("#saveButton38").count(), 1);
-  const saveManager = await api(page, "openSaveManager");
-  assert.equal(saveManager.visible, true);
-  assert.match(saveManager.text, /"mainGod"/);
+  await page.locator("#commandSettings47").click();
+  await page.locator("#commandSave48").click();
+  assert.equal(await page.locator("#saveDrawer38").isVisible(), true);
+  assert.match(await page.locator("#saveText38").inputValue(), /"mainGod"/);
   await page.locator("#saveDrawer38 .close").click();
   await page.locator("#start").click();
   assert.equal(await page.locator("#tutorialDrawer37").isVisible(), true);
@@ -395,15 +401,13 @@ try {
   assert.equal(await page.locator("#dialogueChapter").count(), 1);
   await api(page, "dismissDialogue");
   await api(page, "backMenu");
-  if (!(await page.locator("#statsButton37").isVisible())) {
-    await page.locator("#moreButton39").click();
-  }
-  assert.equal(await page.locator("#statsButton37").isVisible(), true);
-  await page.locator("#statsButton37").click();
+  await page.locator("#commandSettings47").click();
+  assert.equal(await page.locator("#commandStats48").isVisible(), true);
+  await page.locator("#commandStats48").click();
   assert.equal(await page.locator("#analyticsDrawer37").isVisible(), true);
   assert.match(await page.locator("#analyticsText37").inputValue(), /"version": "4.6.0"/);
   await page.locator("#analyticsDrawer37 .close").click();
-  await page.locator("#settingsButton37").click();
+  await page.locator("#commandSettings47").click();
   assert.equal(await page.locator("#settingsDrawer37").isVisible(), true);
   assert.equal(await page.locator("#settingsBody37 input[type=range]").count(), 3);
   assert.equal(await page.locator("#settingsBody37 [data-toggle]").count(), 2);
@@ -632,6 +636,7 @@ try {
     await api(page, "freezeProgression");
     await api(page, "clearCombat");
     await api(page, "spawnEnemyRelative", "normal", 80, 0);
+    await page.evaluate(() => window.advanceTime(17));
     let fused = await api(page, "forceFusion41", fusion.id);
     assert.equal(fused.build.fusion, fusion.id);
     assert.equal(fused.build.fusionMechanics[fusionFlag41[fusion.id]], true);
@@ -770,8 +775,8 @@ try {
   await api(page, "freezeProgression");
   const ground1 = await api(page, "lifecycle44");
   assert.equal(ground1.ground, "torii");
-  assert.equal(ground1.label, "石板参道");
-  assert.match(ground1.hint, /鸟居/);
+  assert.equal(ground1.label, "石板御道");
+  assert.match(ground1.hint, /全息牌楼/);
   assert.ok(ground1.obstacleCount >= 3, `第一章障碍不足：${ground1.obstacleCount}`);
   await page.evaluate(() => window.advanceTime(8000));
   const early = await state(page);
@@ -779,7 +784,7 @@ try {
   assert.equal(early.stage44.earlyWindow, true);
   assert.ok(early.counts.enemies <= (await api(page, "crowdBudget")).e);
   await shot(page, "02f-ch1-ground.png");
-  pass("第一章石板参道、鸟居柱与前二十秒尸潮密度");
+  pass("第一章石板御道、牌楼柱与前二十秒尸潮密度");
 
   await api(page, "backMenu");
   await api(page, "selectStage", 2);
@@ -1113,6 +1118,7 @@ try {
   await api(page, "setBait40", 0, false);
   await api(page, "setBannedSchools40", []);
   const loneDurations = {};
+  const loneEvidence = { save: await api(page, "saveSnapshot"), runs: [] };
   for (const character of ["sayo", "aya", "rion"]) {
     await api(page, "backMenu");
     await api(page, "configureStarter40", "assault", 5, true);
@@ -1123,12 +1129,16 @@ try {
     await api(page, "dismissDialogue");
     await api(page, "protectPlayer");
     let loneState = await state(page);
+    const loneStart = loneState;
     for (let guard = 0; guard < 100 && loneState.mode !== "result"; guard++) {
       if (loneState.mode === "event") await api(page, "chooseEvent", 0);
       else if (loneState.mode === "dialogue") await api(page, "dismissDialogue");
       else if (loneState.mode === "level") throw new Error("孤证试炼不应打开局内升级选择");
       else if (loneState.mode === "play") {
-        if (loneState.player.skillCooldown <= 0) await page.locator("#skill").click();
+        if (loneState.player.skillCooldown <= 0) {
+          // 长局偶发 toast/遮罩挡住 Playwright 命中检测；DOM click 与 force 双保险
+          await page.locator("#skill").click({ force: true, timeout: 5000 }).catch(() => page.evaluate(() => document.querySelector("#skill")?.click()));
+        }
         await page.evaluate(() => window.advanceTime(5000));
       }
       loneState = await state(page);
@@ -1139,9 +1149,11 @@ try {
     assert.equal(loneState.player.upgradeChoices, 0);
     assert.equal(loneState.build.upgradeOrder.length, 0);
     loneDurations[character] = loneState.runTime;
+    loneEvidence.runs.push({character, start:loneStart, end:loneState});
     if (character === "sayo") await shot(page, "09-lone-proof-result.png");
   }
   const loneSave = await api(page, "saveSnapshot");
+  fs.writeFileSync(path.join(artifactDir, "lone-proof-evidence.json"), JSON.stringify(loneEvidence, null, 2));
   assert.equal(loneSave.ach.loneproof, true);
   assert.deepEqual(Object.keys(loneSave.hiddenStory40).sort(), ["aya", "rion", "sayo"]);
   assert.ok((await api(page, "balanceReport40")).samples >= 3);
@@ -1174,7 +1186,7 @@ try {
   const report = {
     source,
     sourceSha256: createHash("sha256").update(fs.readFileSync(sourceFile)).digest("hex"),
-    viewport: { width: 430, height: 932, isMobile: true, hasTouch: true },
+    viewport: { width: 932, height: 430, isMobile: true, hasTouch: true },
     passed,
     screenshots: screenshots.map(item => path.relative(projectRoot, item)),
     expectedErrors: tracker.pageErrors.filter(item => item.includes("SMOKE_EXPECTED")),

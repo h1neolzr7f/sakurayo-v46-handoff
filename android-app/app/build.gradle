@@ -14,8 +14,8 @@ android {
         applicationId "com.sakurayo.zombietide"
         minSdk 23
         targetSdk 36
-        versionCode 61
-        versionName "4.6.0"
+        versionCode 74
+        versionName "0.9.3-beta"
     }
 
     signingConfigs {
@@ -41,6 +41,11 @@ android {
             }
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
         }
+    }
+
+    // APK 体积：WebView 统一走 H.264（运行时 mp4 优先），webm 只留给桌面 Chromium 调试；_demo 示例与离线工作文件不进包
+    androidResources {
+        ignoreAssetsPattern = "!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~:!*.webm:!<dir>_demo:!_clips.json"
     }
 
     compileOptions {

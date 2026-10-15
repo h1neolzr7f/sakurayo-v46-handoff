@@ -16,9 +16,10 @@
     return v < a ? a : v > b ? b : v;
   }
 
-  function configure(w, h) {
+  function configure(w, h, sw, sh) {
     viewW = Math.max(1, Number(w) || 1);
     viewH = Math.max(1, Number(h) || 1);
+    // 世界 = 4×2 个视野（世界单位）。镜头按屏高固定 900 单位后，各尺寸下战场大小一致
     worldW = COLS * viewW;
     worldH = ROWS * viewH;
     return size();

@@ -1,0 +1,159 @@
+{
+  "requested_model": "gpt-image-2.5",
+  "stage_4_battle_requested_model": "gpt-image-2.5-flare",
+  "sources": 10,
+  "generation_date": "2026-10-05 Asia/Shanghai",
+  "runtime_network": false,
+  "assets": [
+    {
+      "path": "ui/lobby-command-v2.webp",
+      "bytes": 285696,
+      "size": [
+        1536,
+        1024
+      ],
+      "frames": 1,
+      "sha256": "f00dba7eb487f4738b167cab92e6ef12dee3d9e93777886681d343ec19d61f9e"
+    },
+    {
+      "path": "ui/command-seal-still.webp",
+      "bytes": 21394,
+      "size": [
+        192,
+        192
+      ],
+      "frames": 1,
+      "sha256": "f09575e57c7cc7b739619efa22cef13a3def6f9a6d8a134b6de981262c0857e2"
+    },
+    {
+      "path": "ui/command-seal-loop.webp",
+      "bytes": 170236,
+      "size": [
+        192,
+        192
+      ],
+      "frames": 8,
+      "sha256": "1c8c303b453bf487027dbbe1fc5f420496da4bccf47865cfce0148af7c8f3314"
+    },
+    {
+      "path": "stages/stage_1/battle_bg_v2.webp",
+      "bytes": 313916,
+      "size": [
+        1536,
+        1024
+      ],
+      "frames": 1,
+      "sha256": "b6a65fda2c0e0e2374db6a31527f1bc27f377324ed683db1b06f13e5d22b13b0"
+    },
+    {
+      "path": "stages/stage_1/battle_floor_v2.webp",
+      "bytes": 94824,
+      "size": [
+        768,
+        512
+      ],
+      "frames": 1,
+      "sha256": "500898f0e1029068eac7a906f7d419cd3ca22321ad376832dde6e9cf7bcda2c5"
+    },
+    {
+      "path": "stages/stage_1/chapter_keyart_v2.webp",
+      "bytes": 405584,
+      "size": [
+        1536,
+        1024
+      ],
+      "frames": 1,
+      "sha256": "db417cc36b1f38b8ceab7788c993ec394263b6d8ccb4331ce0539191a0dabb2c"
+    },
+    {
+      "path": "stages/stage_2/battle_bg_v2.webp",
+      "bytes": 350478,
+      "size": [
+        1536,
+        1024
+      ],
+      "frames": 1,
+      "sha256": "9d7ad9a86ce700d44d40ca30f188f9521cc86426f4350b5363b20c43f1d94519"
+    },
+    {
+      "path": "stages/stage_2/battle_floor_v2.webp",
+      "bytes": 70830,
+      "size": [
+        768,
+        512
+      ],
+      "frames": 1,
+      "sha256": "17ce72fc0be46d76db9566b26869bb8f8f6c3a636c08d4a5ecc33274567571b6"
+    },
+    {
+      "path": "stages/stage_2/chapter_keyart_v2.webp",
+      "bytes": 400280,
+      "size": [
+        1536,
+        1024
+      ],
+      "frames": 1,
+      "sha256": "c33200c152309f0304ecfb7a0ef8efcfd8a0cdfe4a6e776b29c7574cf576e2fa"
+    },
+    {
+      "path": "stages/stage_3/battle_bg_v2.webp",
+      "bytes": 214420,
+      "size": [
+        1536,
+        1024
+      ],
+      "frames": 1,
+      "sha256": "3d640779114ffc045a265ab81624a90c0922f8d8ead8d95e373dc7b36622fdda"
+    },
+    {
+      "path": "stages/stage_3/battle_floor_v2.webp",
+      "bytes": 52118,
+      "size": [
+        768,
+        512
+      ],
+      "frames": 1,
+      "sha256": "ebb018de951bf8d18cf8ce62516a38264c9b26b6d1a56501135a821363b1d2bf"
+    },
+    {
+      "path": "stages/stage_3/chapter_keyart_v2.webp",
+      "bytes": 309918,
+      "size": [
+        1536,
+        1024
+      ],
+      "frames": 1,
+      "sha256": "38b79e163853c62361fe7e11473a486d274f0eeadcfd6904da32b664fc23efec"
+    },
+    {
+      "path": "stages/stage_4/battle_bg_v2.webp",
+      "bytes": 179544,
+      "size": [
+        1536,
+        1024
+      ],
+      "frames": 1,
+      "sha256": "388b720ee8311578921b570a9c7ac13116f50e15c7ffdec6a5e22724fcc8ced5"
+    },
+    {
+      "path": "stages/stage_4/battle_floor_v2.webp",
+      "bytes": 30960,
+      "size": [
+        768,
+        512
+      ],
+      "frames": 1,
+      "sha256": "4a5da9eb1f5583171ed5aab2681c2376d10c37f137c7bc2724f532c92d022c20"
+    },
+    {
+      "path": "stages/stage_4/chapter_keyart_v2.webp",
+      "bytes": 338816,
+      "size": [
+        1536,
+        1024
+      ],
+      "frames": 1,
+      "sha256": "db64570674aef8b4e1d58a37cd29aa0a82f56803467860e7c2bd43b6dd1142b7"
+    }
+  ]
+}

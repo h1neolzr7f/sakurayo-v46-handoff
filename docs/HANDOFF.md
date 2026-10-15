@@ -1,6 +1,8 @@
 # 《樱夜·尸潮》V4.6.0 交接规格
 
-2026-08-14。给下一位 AI / 维护者。先读根目录 [README.md](../README.md)，再读本文和 [AGENTS.md](../AGENTS.md)。二游分期原文在 [PLAN_V46_ERYOU.md](PLAN_V46_ERYOU.md)。升版本见 [MAINTAIN.md](MAINTAIN.md)。
+> **2026-10-10 当前执行状态以 [Grok / Linux 交接](GROK_HANDOFF_2026-10-10.md) 为准。** 接手 `codex/grok-linux-handoff-20261010`，包含后续收藏政策修复；下面的完整 CI 成功属于此前 F01–F30 整合代码，不能当作当前代码全绿。试炼、表现/音乐、平衡矩阵与 Android instrumentation 仍待实现和验证。
+
+2026-10-08 更新。给下一位 AI / 维护者。先读根目录 [README.md](../README.md)，再读本文和 [AGENTS.md](../AGENTS.md)。二游分期原文在 [PLAN_V46_ERYOU.md](PLAN_V46_ERYOU.md)。升版本见 [MAINTAIN.md](MAINTAIN.md)。
 
 这不是另做一款原神。局外做成能横着玩的二次元手游大厅，局内继续是离线肉鸽射击。
 
@@ -46,7 +48,7 @@
 
 作弊只保留一种：大厅立绘 10 连点 → 9999 樱花币。不另开商店卖数值。
 
-底栏五格：寻访 / 名册 / 商店 / 关卡 / 档案。出击是大厅主按钮，不进五格。
+大厅为三项悬浮主入口和六图标底栏；邮箱、公告、活动、任务和七日登录已按用户后续要求加入。详见 VALIDATION_TACTICAL_LOBBY.md。
 
 ## 4. 分期状态
 
@@ -61,18 +63,17 @@
 | D | 寻访卡扩到 16 以内；站桩与大厅背景重出；商店/档案换皮 | **未做** |
 | E | 全量 `verify.ps1`、`release/`、APK、CHANGELOG | **未做** |
 
-### 下一步（按优先级）
+### 当前修复与交付
 
-1. I2V 绿幕重出三角色站桩（需 infsh login）。现用 `battle.webp` / `live_idle` 静帧 + JS 动。
-2. 有独特动作的融合再补 `anim_skill.webp` / `anim_dash.webp`。缺图回退，不要借错融合的图。
-3. 寻访卡扩到 16 以内；`ui/lobby_wide.webp` 去左右黑边。
-4. 全量 `powershell -File tools/verify.ps1`（`browser_smoke` 主视口仍是 430×932）。
-5. `android-app/sync-game.ps1` 后发版。模拟器上的正式包可能仍是签名对不上的 **4.2.3 / versionCode 47**；debug 不能覆盖（`INSTALL_FAILED_UPDATE_INCOMPATIBLE`）。不要擅自卸包清档。用本机 HTTP 打开 `src/index.html` 验收。
+1. 已按 [全项目审查](AUDIT_2026-10-05.md) 和 [修复计划](plans/2026-10-05-full-repair.md) 整合 F01–F30 修复，保留审查原证据；续修动态效果、绫延迟技能与跨局空间网格，见[最终验证记录](VALIDATION_REPAIR_INTEGRATION.md)。
+2. [完整 CI](https://github.com/h1neolzr7f/sakurayo-v46-handoff/actions/runs/37724631795) 已通过源码、单HTML、所有适用行为回归及 Android 编译与 lint；不替代真机验收。
+3. 真机检查横屏触控、嵌套返回、文件导出、后台恢复、覆盖安装和持续运行。不要卸载旧正式包清档。
+4. 保持开发预发布。后续 I2V 素材需明确资源缺口与质量依据，当前修复不需重复生成大厅图。
 
 ### 明确不做
 
 - 抽卡加攻击、加生命、加暴击。
-- 每日任务、邮件、赛季、通行证、广告复活。
+- 无限每日币循环、付费赛季/通行证、广告复活（现有任务、邮件和有限七日登录必须保留）。
 - 联网账号与排行榜。
 - 换引擎，引 Vue / Phaser / 原神素材。
 - 把主神空间删掉或并进寻访。
@@ -80,13 +81,7 @@
 
 ## 5. 大厅布局（必须保持）
 
-宽于 640 走左右分栏：
-
-- 左约 **64%**：当前角色全身立绘，**头要完整**。立绘 `height:100%`，不要再写成 138% 裁头。`object-position: center 10%`。标题「樱夜·尸潮」贴左上，角色名贴左下。
-- 右约 **34%**、最宽 **360**：币/更多 → 三角色横排圆钮 → 关卡胶囊 → **出击** → 五格导航。
-- 圆钮必须在操作台里，禁止漂到立绘上。
-- 出击文案固定「出击」，不要「角色名 · 进入樱夜」。
-- **不做竖版。** 不要 `#rotateHint46`、不要 `portraitFallback46` / `tallWindow46`。窄窗也走左右分栏，不叠竖屏回退。
+当前大厅采用统一冷灰、冰蓝画风，保留完整大立绘和疏朗操作区。三项主入口与六图标底栏是当前布局基线，不恢复旧右侧密集操作台。角色资料、出击整备、战绩、邮箱等使用真实存档数据。
 
 `preferLandscape46()` 在 [`src/index.html`](../src/index.html)：
 
@@ -135,7 +130,7 @@ pity, pitySR, pulls, tenPulls, owned, last, cheatUsed
 
 禁止新 top-level save key。证词进度若以后要记，加 `shop40.ops.story` 或沿用现有剧情字段。
 
-名册 8 格。未回收只用卡背，禁止灰图剧透。点开详情。重复只加计数，不进战斗。锁卡脚注「待寻访」，墙上仍可写「未回收」。
+名册包含当前三卡池的全部正式收藏。未回收只用卡背，禁止灰图剧透。点开详情。重复只加计数，不进战斗。锁卡脚注「待寻访」，墙上仍可写「未回收」。
 
 揭示层挂在 `#gachaDrawer`，不要挂在 `#gachaBody46`（刷新会抹掉翻牌）。`TEST_MODE` / `?test=1` 立即翻开。
 
@@ -218,9 +213,9 @@ pity, pitySR, pulls, tenPulls, owned, last, cheatUsed
 | `tapPortrait46(times)` | 连点立绘 |
 | `snapshot35()` | 含 `live`、`ops`、`runMode` |
 
-`startGame` 的 v37 包装：若 `!save.tutorialDone && state==="menu"`，打开教程并 **return**。隔离冒烟必须先结束教程（`#tutorialSkip37` / `#tutorialNext37`）。
+`startGame` 的教程规则：若 `!save.tutorialDone && state==="menu"`，打开教程并 **return**。隔离冒烟必须先结束教程（`#tutorialSkip37` / `#tutorialNext37`）。
 
-`#dialogue` 点击即 `nextDialogue`，没有 `#next` 按钮。
+对白点击和真实继续按钮均走 nextDialogue，键盘焦点不能落入战斗后台。
 
 ## 12. 脚本顺序与 ART_ROOT
 
@@ -254,7 +249,7 @@ ART_ROOT =
 - 新图同时考虑进 `game/art`；源 PNG 在 `assets/image2/source/`（本仓未收录）。
 - 规格见 [IMAGE2_ASSET_SPEC.md](IMAGE2_ASSET_SPEC.md)。
 - 已入库但未发版的包括：职业/融合闪图、三角色 career/form/fusion 战斗帧、`gacha/`、`ui/lobby_wide.webp`、寻访/名册/档案导航图。
-- 还缺：I2V 绿幕全身站桩、无缝大厅宽背景、部分融合的 skill/dash。
+- 已有十张统一大厅素材、四章环境动画及8帧角色技能动效；独立I2V全身站桩可另行扩展，不能把已完成大厅宽背景仍列作缺图。
 
 ## 14. 怎么跑
 
@@ -280,14 +275,7 @@ node tests/ops_smoke.mjs
 powershell -File tools/verify.ps1
 ```
 
-`verify.ps1` 目前包含：`static_check`、各 runtime 语法、`lobby_unit`、`chronicle_unit`、`live_unit`、`ops_unit`、`ops_smoke`、`framework_smoke`、`browser_smoke`。
-
-**没有**自动跑：
-
-- `tests/testimony_smoke.mjs`
-- `tests/gacha_visual.mjs`（会出 932×430 截图到 `tests/artifacts/gacha/`，该目录 gitignore）
-
-改证词或寻访视觉时请单独跑这两项。`browser_smoke.mjs` 断言版本 `"4.6.0"`，主视口 430×932；竖屏回退仍须能点 `#start` / 出击 / 五格 / 商店钱包。
+验证脚本覆盖所有 *_unit.mjs 与源码/离线浏览器回归，包含战斗、触控、经济存档、扩展、UI、证词和寻访视觉；新增修复用例需同时接入 Bash 与 PowerShell。测试 API 仍保持 4.6.0。
 
 发版（用户明确要求再做）：
 
@@ -313,3 +301,6 @@ powershell -File android-app/sync-game.ps1
 ## 16. UI 信息优先级
 
 从高到低：剧情/抉择/升级/暂停/结算 → Boss 转阶段与场地警告 → 顶部系统提示 → 底部吐槽电台。模态出现时暂停并收起其他文本；退出后按队列继续，禁止文字重叠挡住操作。
+
+
+> **2026-10-10 更新：** DP 支援部署（`sakurayo-ops.js`、`#opsDock46`、`deployOp46/grantDp46/retreatOp46`、局内干员单位）已整体删除。上文相关章节仅作历史记录。旧存档里与部署相关的字段读取时直接忽略；`save.shop40.ops` 容器仍用于补给/试炼/卡池，不受影响。「独行回收」规则改为：只用初始武器（副武器卡不出现），每击破 25 只敌人伤害 +2%（上限 +30%）。

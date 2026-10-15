@@ -135,7 +135,7 @@
 自动打回：**未过。不要进入下一类。**
 层：Playwright视口
 类：开局 toast(hint44) 与 #mission 同一句场地提示叠两层
-复现：回收演习开局数秒，toast 与 mission 都是「鸟居挡弹不挡人…」
+复现：回收演习开局数秒，toast 与 mission 都是「全息牌楼挡弹不挡人…」
 上一轮为什么没发现：全游戏扫已标重复 hint，但当时只修坞/warning/pity，没点开局 toast。
 回归：`emu_loop` 开局 toast 不得复述 mission 首行
 

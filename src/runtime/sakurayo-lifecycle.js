@@ -9,8 +9,20 @@
   var cacheKey = "";
   var cacheObs = [];
   var fillAcc = 0;
-  var echo = [0, 0, 0, 0, 0, 0];
+  var echo = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
   var echoAt = 0;
+  var echoCount = 0;
+  var echoNext = 0;
+  var echoKey = "";
+  var groundPattern = null;
+  var groundPatternImage = null;
+  var groundPatternContext = null;
+  var palettes = [
+    ["#1a1028", "#0c1424", "#ff6fb0", "torii", "石板御道"],
+    ["#0c1730", "#061018", "#5ad2ff", "neon", "雨夜沥青"],
+    ["#16141c", "#0b0a10", "#c9bdd8", "swords", "剑冢御道"],
+    ["#14102a", "#070614", "#c79bff", "mirror", "碎镜地砖"],
+  ];
 
   function clamp(v, a, b) {
     return v < a ? a : v > b ? b : v;
@@ -36,12 +48,6 @@
     var mainGod = !!(opts && opts.mainGod);
     var floor = (opts && opts.floor) || 0;
     var id = mainGod ? 0 : clamp(stageId | 0, 1, 4);
-    var palettes = [
-      ["#1a1028", "#0c1424", "#ff6fb0", "torii", "石板参道"],
-      ["#0c1730", "#061018", "#5ad2ff", "neon", "雨夜沥青"],
-      ["#16141c", "#0b0a10", "#c9bdd8", "swords", "剑冢参道"],
-      ["#14102a", "#070614", "#c79bff", "mirror", "碎镜地砖"],
-    ];
     var row = palettes[id ? id - 1 : 3];
     var hue = mainGod ? ((Math.floor(Math.max(0, floor - 1) / 3) % 4) * 18) : 0;
     return {
@@ -54,7 +60,7 @@
       bottom: row[1],
       accent: row[2],
       hue: hue,
-      waveNoun: id === 2 ? "雨街尸潮" : id === 3 ? "剑冢尸潮" : id === 4 || mainGod ? "镜核压境" : "参道尸潮",
+      waveNoun: id === 2 ? "雨街尸潮" : id === 3 ? "剑冢尸潮" : id === 4 || mainGod ? "镜核压境" : "御道尸潮",
     };
   }
 
@@ -203,6 +209,52 @@
     ctx.drawImage(img, (W - dw) / 2, (H - dh) / 2, dw, dh);
   }
 
+
+  /* ART_PASS ②：大块面、不重复的地面。把 1024² 的地面素材切成 4 块 512²，在 4×4 的大画布上随机挑块、随机 90° 旋转 / 翻转，
+     统一压低饱和度和对比度（VS 类经验：地面是“背景噪声”，必须比角色、敌人、宝石暗且平），再散布少量低透明度的中式科技装饰
+     （六角地砖缝、全息云纹圈、导流线）。结果作为 2048² 的图案平铺，肉眼几乎看不出重复。按图片缓存，只算一次。 */
+  var mosaicCache = typeof WeakMap === "function" ? new WeakMap() : null;
+  var GROUND_FILTER = "saturate(.55) contrast(.78) brightness(.82)";
+  function tokc(n, a) { return global.SakurayoTok ? global.SakurayoTok(n, a) : "transparent"; }
+  function groundMosaic(img, seed) {
+    if (!img || !img.naturalWidth || typeof document === "undefined") return img;
+    var hit = mosaicCache && mosaicCache.get(img); if (hit) return hit;
+    var B = 512, N = 4, c = document.createElement("canvas"); c.width = c.height = B * N; var g = c.getContext("2d");
+    var s = (seed || 7) >>> 0, r = function () { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
+    var half = img.naturalWidth / 2;
+    g.filter = GROUND_FILTER;
+    for (var y = 0; y < N; y++) for (var x = 0; x < N; x++) {
+      var q = Math.floor(r() * 4), rot = Math.floor(r() * 4), flip = r() < 0.5;
+      g.save(); g.translate(x * B + B / 2, y * B + B / 2); g.rotate(rot * Math.PI / 2); if (flip) g.scale(-1, 1);
+      g.drawImage(img, (q % 2) * half, Math.floor(q / 2) * half, half, half, -B / 2 - 1, -B / 2 - 1, B + 2, B + 2); g.restore();
+    }
+    g.filter = "none";
+    // 接缝柔化：沿块边画一条极淡的暗线，当作地砖缝，比硬接缝自然
+    g.strokeStyle = tokc("n0", 0.35); g.lineWidth = 3; for (var k = 1; k < N; k++) { g.beginPath(); g.moveTo(k * B, 0); g.lineTo(k * B, N * B); g.moveTo(0, k * B); g.lineTo(N * B, k * B); g.stroke(); }
+    // 散布装饰
+    for (var d = 0; d < 26; d++) {
+      var dx = r() * N * B, dy = r() * N * B, kind = Math.floor(r() * 3), sz = 40 + r() * 70;
+      g.save(); g.translate(dx, dy); g.rotate(r() * Math.PI);
+      if (kind === 0) { g.strokeStyle = tokc("primary", 0.07); g.lineWidth = 2; g.beginPath(); for (var i = 0; i < 6; i++) { var a = Math.PI / 3 * i; g[i ? "lineTo" : "moveTo"](Math.cos(a) * sz, Math.sin(a) * sz); } g.closePath(); g.stroke(); }
+      else if (kind === 1) { g.strokeStyle = tokc("primary", 0.06); g.lineWidth = 2; for (var j = 0; j < 3; j++) { g.beginPath(); g.arc(j * sz * 0.5, 0, sz * 0.35, Math.PI, Math.PI * 2); g.stroke(); } }
+      else { g.strokeStyle = tokc("n5", 0.05); g.lineWidth = 3; g.setLineDash([14, 10]); g.beginPath(); g.moveTo(-sz * 1.5, 0); g.lineTo(sz * 1.5, 0); g.stroke(); }
+      g.restore();
+    }
+    if (mosaicCache) mosaicCache.set(img, c);
+    return c;
+  }
+  /* 轮廓光精灵：给精灵加一圈 2px 令牌色描边（rim light），按 图片+颜色 缓存成离屏画布，战斗中零额外开销 */
+  var rimCache = {};
+  function rimSprite(img, tokName, alpha) {
+    if (!img || !img.naturalWidth || typeof document === "undefined") return img;
+    var key = (img.currentSrc || img.src) + "|" + tokName + "|" + alpha, hit = rimCache[key]; if (hit) return hit;
+    var w = img.naturalWidth, h = img.naturalHeight, pad = Math.max(3, Math.round(w / 90)), c = document.createElement("canvas"); c.width = w + pad * 2; c.height = h + pad * 2;
+    var g = c.getContext("2d"), m = document.createElement("canvas"); m.width = c.width; m.height = c.height; var mg = m.getContext("2d");
+    mg.drawImage(img, pad, pad); mg.globalCompositeOperation = "source-in"; mg.fillStyle = tokc(tokName, 1); mg.fillRect(0, 0, m.width, m.height);
+    g.globalAlpha = alpha == null ? 0.7 : alpha; for (var i = 0; i < 12; i++) { var a = i / 12 * TAU; g.drawImage(m, Math.cos(a) * pad, Math.sin(a) * pad); }
+    g.globalAlpha = 1; g.globalCompositeOperation = "destination-out"; g.drawImage(img, pad, pad); g.globalCompositeOperation = "source-over"; g.drawImage(img, pad, pad);
+    c.naturalWidth = c.width; c.naturalHeight = c.height; c.complete = true; c.rimPad = pad; rimCache[key] = c; return c;
+  }
   function photoReady(world) {
     var photo = world && world.battleBg;
     return !!(photo && photo.complete && photo.naturalWidth > 0);
@@ -212,29 +264,100 @@
     var W = world.worldW || world.W,
       H = world.worldH || world.H;
     if (!photoReady(world) || !W || !H) return false;
-    drawCover(ctx, world.battleBg, W, H);
+    if (world.tiledGround && typeof ctx.createPattern === "function") {
+      if (groundPatternImage !== world.battleBg || groundPatternContext !== ctx) {
+        groundPatternImage = world.battleBg;
+        groundPatternContext = ctx;
+        groundPattern = ctx.createPattern(world.groundMosaic ? groundMosaic(world.battleBg, world.stageId || 7) : world.battleBg, "repeat");
+      }
+      if (groundPattern) {
+        ctx.fillStyle = groundPattern;
+        ctx.fillRect(0, 0, W, H);
+      } else drawCover(ctx, world.battleBg, W, H);
+    } else drawCover(ctx, world.battleBg, W, H);
     ctx.fillStyle = "rgba(5,4,14,0.26)";
     ctx.fillRect(0, 0, W, H);
     return true;
   }
 
   function drawMirrorEcho(ctx, world) {
-    if (!world || world.playerX == null) return;
-    var pal = stageProfile(world.stageId, world);
-    if (pal.ground !== "mirror") return;
-    var t = world.runTime || 0;
-    if (t - echoAt > 0.08) {
-      echoAt = t;
-      echo.push(world.playerX, world.playerY);
-      if (echo.length > 12) echo.splice(0, echo.length - 12);
+    if (!world || world.playerX == null || world.playerY == null ||
+        (groundId(world) !== "mirror" && !world.mainGod)) {
+      echoKey = "";
+      return;
     }
-    ctx.fillStyle = "rgba(185,146,255,0.16)";
-    var i;
-    for (i = 0; i < echo.length; i += 2) {
+    var t = world.runTime || 0;
+    var key = obsKey(world);
+    if (key !== echoKey || t < echoAt) {
+      echoKey = key;
+      echoCount = 0;
+      echoNext = 0;
+    }
+    if (!echoCount || t - echoAt >= 0.08) {
+      echoAt = t;
+      echo[echoNext * 2] = world.playerX;
+      echo[echoNext * 2 + 1] = world.playerY;
+      echoNext = (echoNext + 1) % 6;
+      echoCount = Math.min(6, echoCount + 1);
+    }
+    var i, slot;
+    for (i = 0; i < echoCount; i++) {
+      slot = ((echoNext - echoCount + i + 6) % 6) * 2;
+      ctx.fillStyle = "rgba(185,146,255," + (0.025 + (i + 1) * 0.018) + ")";
       ctx.beginPath();
-      ctx.ellipse(echo[i], echo[i + 1] + 18, 18, 7, 0, 0, TAU);
+      ctx.ellipse(echo[slot], echo[slot + 1] + 18, 18, 7, 0, 0, TAU);
       ctx.fill();
     }
+  }
+
+  // Weather is a deterministic world grid, drawn once per viewport. No particles
+  // are added to combat arrays and the work stays bounded across long runs.
+  function drawAtmosphere(ctx, world) {
+    var id = groundId(world),
+      t = (world.runTime || 0) % 3600,
+      low = world.quality != null && world.quality < 0.8,
+      cell = 168,
+      left = Math.floor((world.camX || 0) / cell) - 1,
+      top = Math.floor((world.camY || 0) / cell) - 1,
+      right = Math.ceil(((world.camX || 0) + world.W) / cell),
+      bottom = Math.ceil(((world.camY || 0) + world.H) / cell),
+      limit = low ? 20 : 48,
+      count = 0, row, col, seed, phase, x, y;
+    ctx.save();
+    for (row = top; row <= bottom && count < limit; row++) {
+      for (col = left; col <= right && count < limit; col++) {
+        if (low && (row + col) % 2) continue;
+        count++;
+        seed = Math.abs(col * 73 + row * 137);
+        phase = (seed % 101) / 101;
+        x = col * cell + ((seed * 11 + t * (id === "neon" ? -18 : 10)) % cell + cell) % cell;
+        y = row * cell + ((seed * 7 + t * (id === "neon" ? 104 : id === "swords" ? -9 : 7)) % cell + cell) % cell;
+        if (id === "neon") {
+          ctx.strokeStyle = "rgba(149,218,255,0.16)";
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 6, y + 24); ctx.stroke();
+          if (seed % 3 === 0) {
+            ctx.strokeStyle = "rgba(102,218,255,0.10)";
+            ctx.beginPath(); ctx.ellipse(x, row * cell + 120, 4 + ((t + phase) % 1) * 12, 2 + ((t + phase) % 1) * 4, 0, 0, TAU); ctx.stroke();
+          }
+        } else if (id === "swords") {
+          ctx.fillStyle = "rgba(222,211,241," + (0.08 + Math.sin(t * 1.6 + phase * TAU) * 0.035) + ")";
+          ctx.beginPath(); ctx.arc(x, y, 1.2 + phase, 0, TAU); ctx.fill();
+          if (seed % 4 === 0) {
+            ctx.strokeStyle = "rgba(191,174,210,0.08)";
+            ctx.beginPath(); ctx.moveTo(x - 17, y + 7); ctx.lineTo(x + 12, y + 4); ctx.stroke();
+          }
+        } else if (id === "mirror" || id === "maingod") {
+          ctx.strokeStyle = "rgba(208,176,255," + (0.09 + Math.sin(t + phase * TAU) * 0.035) + ")";
+          ctx.lineWidth = 1;
+          ctx.beginPath(); ctx.moveTo(x, y - 7); ctx.lineTo(x + 4, y); ctx.lineTo(x, y + 7); ctx.lineTo(x - 4, y); ctx.closePath(); ctx.stroke();
+        } else {
+          ctx.fillStyle = "rgba(255,165,207,0.22)";
+          ctx.beginPath(); ctx.ellipse(x + Math.sin(t + phase * TAU) * 7, y, 4.5, 2, t * 0.4 + phase * TAU, 0, TAU); ctx.fill();
+        }
+      }
+    }
+    ctx.restore();
   }
 
   function drawGround(ctx, world) {
@@ -249,14 +372,98 @@
         drawGroundChunk(ctx, world, photoDone);
         ctx.restore();
       }
+      if (photoDone && world.tiledGround) drawGroundDressing18(ctx, world);
+      drawAtmosphere(ctx, world);
       drawMirrorEcho(ctx, world);
       return;
     }
-    drawGroundChunk(ctx, world, false);
+    drawGroundChunk(ctx, world, drawWorldPhoto(ctx, world));
+    drawAtmosphere(ctx, world);
     drawMirrorEcho(ctx, world);
   }
 
+
+  /* 晨修 E023：割草地面层次。照片/拼贴地面之上按世界坐标确定性地铺：深蓝黑调色、青蓝发光线路、
+     稀疏贴花与碎片、樱瓣、局部光池；各章配色/贴花不同。全部低饱和低不透明，不抢角色与弹道。 */
+  var DRESS18 = {
+    1: { tint: "6,10,26", line: "92,220,255", pool: "120,190,255", deco: "sakura", petal: "255,170,210" },
+    2: { tint: "4,12,30", line: "70,235,255", pool: "70,150,255", deco: "hazard", petal: "255,150,200" },
+    3: { tint: "12,8,26", line: "150,200,255", pool: "255,90,150", deco: "crack", petal: "255,120,170" },
+    4: { tint: "8,6,30", line: "170,140,255", pool: "150,110,255", deco: "rune", petal: "220,180,255" }
+  };
+  function tok18(n, a) { return global.SakurayoTok ? global.SakurayoTok(n, a) : "gray"; }
+  function h18(a, b, k) { var x = Math.sin(a * 127.1 + b * 311.7 + k * 74.7) * 43758.5453; return x - Math.floor(x); }
+  function drawGroundDressing18(ctx, world) {
+    if (!ctx || typeof ctx.createRadialGradient !== "function" || typeof ctx.ellipse !== "function") return; /* 单测用的极简 ctx 不支持渐变，跳过装饰 */
+    var sid = world.stageId || 1, P = DRESS18[((sid - 1) % 4 + 4) % 4 + 1], t = (world.runTime || 0) % 3600,
+      cx = world.camX || 0, cy = world.camY || 0, W = world.W, H = world.H, low = world.quality != null && world.quality < 0.8,
+      cell = 240, c0 = Math.floor(cx / cell) - 1, r0 = Math.floor(cy / cell) - 1, c1 = Math.ceil((cx + W) / cell), r1 = Math.ceil((cy + H) / cell), r, c, a, x, y, i;
+    ctx.save();
+    ctx.fillStyle = "rgba(" + P.tint + ",0.42)"; ctx.fillRect(cx - 4, cy - 4, W + 8, H + 8);
+    for (r = r0; r <= r1; r++) for (c = c0; c <= c1; c++) {
+      x = c * cell; y = r * cell; a = h18(c, r, sid);
+      if (a < 0.16) { var gp = ctx.createRadialGradient(x + 120, y + 120, 4, x + 120, y + 120, 150);
+        gp.addColorStop(0, "rgba(" + P.pool + ",0.16)"); gp.addColorStop(1, "rgba(" + P.pool + ",0)"); ctx.fillStyle = gp; ctx.fillRect(x - 30, y - 30, 300, 300); }
+    }
+    ctx.lineCap = "round";
+    for (r = r0; r <= r1; r++) for (c = c0; c <= c1; c++) {
+      x = c * cell; y = r * cell; a = h18(c, r, sid + 9);
+      if (a > 0.55) continue;
+      var mid = x + 40 + Math.floor(h18(r, c, 3) * 4) * 40, puls = 0.5 + 0.5 * Math.sin(t * 1.6 + c * 1.3 + r * 0.7);
+      ctx.strokeStyle = "rgba(" + P.line + "," + (0.10 + 0.10 * puls) + ")"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x, y + 60); ctx.lineTo(mid, y + 60); ctx.lineTo(mid + 40, y + 100); ctx.lineTo(mid + 40, y + cell); ctx.stroke();
+      ctx.fillStyle = "rgba(" + P.line + "," + (0.30 + 0.35 * puls) + ")"; ctx.fillRect(mid + 37, y + cell - 4, 6, 6);
+      if (!low) { var k = (t * 0.35 + a * 7) % 1; ctx.fillStyle = "rgba(" + P.line + ",0.55)"; ctx.beginPath(); ctx.arc(x + k * (mid - x), y + 60, 2.2, 0, Math.PI * 2); ctx.fill(); }
+    }
+    for (r = r0; r <= r1; r++) for (c = c0; c <= c1; c++) {
+      a = h18(c, r, sid + 21); if (a > 0.22) continue;
+      x = c * cell + 60 + h18(c, r, 5) * 120; y = r * cell + 60 + h18(c, r, 6) * 120;
+      ctx.save(); ctx.translate(x, y); ctx.rotate(h18(c, r, 7) * 6.28);
+      ctx.strokeStyle = "rgba(" + P.line + ",0.16)"; ctx.fillStyle = "rgba(" + P.line + ",0.07)"; ctx.lineWidth = 1.5;
+      if (P.deco === "sakura") { for (i = 0; i < 5; i++) { ctx.rotate(1.2566); ctx.beginPath(); ctx.ellipse(0, -16, 7, 15, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); } ctx.beginPath(); ctx.arc(0, 0, 30, 0, Math.PI * 2); ctx.stroke(); }
+      else if (P.deco === "hazard") { ctx.strokeRect(-34, -10, 68, 20); for (i = -3; i < 3; i++) { ctx.beginPath(); ctx.moveTo(i * 12, 10); ctx.lineTo(i * 12 + 10, -10); ctx.stroke(); } }
+      else if (P.deco === "crack") { ctx.strokeStyle = tok18("accent", 0.18); ctx.beginPath(); ctx.moveTo(-30, -4); ctx.lineTo(-8, 3); ctx.lineTo(4, -9); ctx.lineTo(30, 6); ctx.moveTo(4, -9); ctx.lineTo(10, -26); ctx.stroke(); }
+      else { ctx.beginPath(); ctx.arc(0, 0, 26, 0, Math.PI * 2); ctx.moveTo(18, 0); ctx.arc(0, 0, 18, 0, Math.PI * 2); ctx.stroke(); for (i = 0; i < 6; i++) { ctx.rotate(1.047); ctx.fillRect(20, -2, 8, 4); } }
+      ctx.restore();
+    }
+    for (r = r0; r <= r1; r++) for (c = c0; c <= c1; c++) {
+      var nd = low ? 1 : 3;
+      for (i = 0; i < nd; i++) { a = h18(c * 3 + i, r, sid + 40); if (a > 0.5) continue;
+        x = c * cell + h18(c, r, 50 + i) * cell; y = r * cell + h18(c, r, 60 + i) * cell;
+        if (i === 0) { ctx.fillStyle = tok18("n5", 0.1); ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 7, y + 2); ctx.lineTo(x + 2, y + 6); ctx.closePath(); ctx.fill(); }
+        else { var sw = Math.sin(t * 0.8 + a * 20) * 3; ctx.fillStyle = "rgba(" + P.petal + ",0.42)"; ctx.beginPath(); ctx.ellipse(x + sw, y, 4.5, 2.4, a * 6 + t * 0.2, 0, Math.PI * 2); ctx.fill(); }
+      }
+    }
+
+    // 中尺度物件（E023b）：水洼反光、裂缝、平贴路障、全息灯笼、废弃车壳、樱瓣堆。只是地面贴图，不参与碰撞，压低对比避免误认成障碍
+    var cell2 = 420, d0 = Math.floor(cx / cell2) - 1, e0 = Math.floor(cy / cell2) - 1, d1 = Math.ceil((cx + W) / cell2), e1 = Math.ceil((cy + H) / cell2), kind, ox, oy;
+    for (r = e0; r <= e1; r++) for (c = d0; c <= d1; c++) {
+      a = h18(c, r, sid + 77); kind = Math.floor(h18(r, c, sid + 78) * 6); ox = c * cell2 + 60 + h18(c, r, 79) * 300; oy = r * cell2 + 60 + h18(c, r, 80) * 300;
+      if (a > (low ? 0.45 : 0.75)) continue;
+      ctx.save(); ctx.translate(ox, oy); ctx.rotate((h18(c, r, 81) - 0.5) * 0.8);
+      if (kind === 0) { var pg = ctx.createRadialGradient(0, 0, 4, 0, 0, 70); pg.addColorStop(0, "rgba(" + P.pool + ",0.20)"); pg.addColorStop(1, "rgba(" + P.pool + ",0)"); ctx.fillStyle = pg; ctx.beginPath(); ctx.ellipse(0, 0, 70, 28, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "rgba(" + P.line + "," + (0.18 + 0.1 * Math.sin(t * 2 + a * 9)) + ")"; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(-40, -4); ctx.lineTo(30, -8); ctx.moveTo(-20, 6); ctx.lineTo(42, 3); ctx.stroke(); }
+      else if (kind === 1) { ctx.strokeStyle = tok18("n0", 0.55); ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-60, 0); ctx.lineTo(-20, 8); ctx.lineTo(0, -6); ctx.lineTo(40, 10); ctx.lineTo(70, -4); ctx.moveTo(0, -6); ctx.lineTo(10, -34); ctx.moveTo(-20, 8); ctx.lineTo(-28, 30); ctx.stroke();
+        ctx.strokeStyle = "rgba(" + P.line + ",0.14)"; ctx.lineWidth = 1; ctx.stroke(); }
+      else if (kind === 2) { ctx.fillStyle = tok18("n0", 0.4); ctx.fillRect(-56, -9, 112, 18); for (i = -4; i < 4; i++) { ctx.fillStyle = i % 2 ? tok18("warn", 0.22) : tok18("n0", 0.3); ctx.beginPath(); ctx.moveTo(i * 14, 9); ctx.lineTo(i * 14 + 7, -9); ctx.lineTo(i * 14 + 21, -9); ctx.lineTo(i * 14 + 14, 9); ctx.fill(); } }
+      else if (kind === 3) { var lp = 0.6 + 0.4 * Math.sin(t * 2.4 + a * 11), lg = ctx.createRadialGradient(0, 0, 2, 0, 0, 56); lg.addColorStop(0, "rgba(" + P.petal + "," + (0.30 * lp) + ")"); lg.addColorStop(1, "rgba(" + P.petal + ",0)"); ctx.fillStyle = lg; ctx.beginPath(); ctx.arc(0, 0, 56, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "rgba(" + P.petal + "," + (0.55 * lp) + ")"; ctx.lineWidth = 1.5; ctx.strokeRect(-7, -12, 14, 20); ctx.beginPath(); ctx.moveTo(0, -12); ctx.lineTo(0, -20); ctx.stroke(); ctx.fillStyle = "rgba(" + P.petal + "," + (0.25 * lp) + ")"; ctx.fillRect(-7, -12, 14, 20); }
+      else if (kind === 4) { ctx.fillStyle = tok18("n0", 0.42); ctx.beginPath(); ctx.moveTo(-48, -18); ctx.lineTo(30, -20); ctx.lineTo(52, -6); ctx.lineTo(50, 18); ctx.lineTo(-50, 18); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = "rgba(" + P.line + ",0.16)"; ctx.lineWidth = 1.2; ctx.stroke(); ctx.strokeRect(-30, -14, 22, 12); ctx.strokeRect(-2, -15, 22, 12); ctx.fillStyle = tok18("n0", 0.5); ctx.beginPath(); ctx.arc(-30, 18, 8, 0, Math.PI * 2); ctx.arc(30, 18, 8, 0, Math.PI * 2); ctx.fill(); }
+      else { for (i = 0; i < 9; i++) { var qx = (h18(c, i, 90) - 0.5) * 70, qy = (h18(r, i, 91) - 0.5) * 40; ctx.fillStyle = "rgba(" + P.petal + ",0.40)"; ctx.beginPath(); ctx.ellipse(qx, qy, 4.5, 2.4, i, 0, Math.PI * 2); ctx.fill(); } }
+      ctx.restore();
+    }
+    if (world.playerX != null && world.playerY != null) {
+      var px = world.playerX, py = world.playerY + 20, pp = 0.5 + 0.5 * Math.sin(t * 3);
+      var gr = ctx.createRadialGradient(px, py, 2, px, py, 46); gr.addColorStop(0, "rgba(" + P.line + ",0.22)"); gr.addColorStop(1, "rgba(" + P.line + ",0)");
+      ctx.fillStyle = gr; ctx.beginPath(); ctx.ellipse(px, py, 46, 18, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = "rgba(" + P.line + "," + (0.45 + 0.25 * pp) + ")"; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.ellipse(px, py, 26 + pp * 3, 9 + pp, 0, 0, Math.PI * 2); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
   function drawGroundChunk(ctx, world, photoDone) {
+    if (photoDone) return;
     var W = world.W,
       H = world.H,
       t = world.runTime || 0,
@@ -269,24 +476,10 @@
       pathL,
       pathR,
       photo = world.battleBg;
-    if (photoDone) return;
     if (photo && photo.complete && photo.naturalWidth > 0) {
       drawCover(ctx, photo, W, H);
       ctx.fillStyle = "rgba(5,4,14,0.26)";
       ctx.fillRect(0, 0, W, H);
-      ctx.fillStyle = pal.accent + "14";
-      var n = q < 0.8 ? 2 : 4;
-      for (i = 0; i < n; i++) {
-        var px = ((i * 211 - t * 11) % (W + 180)) - 90,
-          py = 80 + ((i * 113) % Math.max(120, H - 100));
-        ctx.save();
-        ctx.translate(px, py);
-        ctx.rotate(0.8);
-        ctx.beginPath();
-        ctx.ellipse(0, 0, 7, 3, 0, 0, TAU);
-        ctx.fill();
-        ctx.restore();
-      }
       return;
     }
     if (pal.mainGod) {
@@ -381,84 +574,98 @@
       ctx.stroke();
     }
 
-    ctx.fillStyle = pal.accent + "18";
-    var n = q < 0.8 ? 3 : 6;
-    for (i = 0; i < n; i++) {
-      var px = ((i * 211 - t * 11) % (W + 180)) - 90,
-        py = 80 + ((i * 113) % Math.max(120, H - 100));
-      ctx.save();
-      ctx.translate(px, py);
-      ctx.rotate(0.8);
-      ctx.beginPath();
-      ctx.ellipse(0, 0, 7, 3, 0, 0, TAU);
-      ctx.fill();
-      ctx.restore();
-    }
   }
 
   function drawObstacles(ctx, world) {
     if (!ctx || !world) return;
     var obs = obstacles(world),
-      i,
-      o,
-      k;
+      t = (world.runTime || 0) % 3600,
+      left = (world.camX || 0) - 84,
+      top = (world.camY || 0) - 84,
+      right = (world.camX || 0) + world.W + 84,
+      bottom = (world.camY || 0) + world.H + 84,
+      i, o, k, shimmer;
     for (i = 0; i < obs.length; i++) {
       o = obs[i];
+      if (o.x + (o.w || 0) < left || o.y + (o.h || 0) < top || o.x > right || o.y > bottom) continue;
       ctx.save();
+      ctx.fillStyle = "rgba(2,4,12,0.48)";
+      ctx.beginPath();
+      ctx.ellipse(o.x + (o.w || 0) * 0.5, o.y + (o.h || 0) + 9, o.kind === "sword" ? o.r * 0.4 : o.kind === "vehicle" ? o.w * 0.6 : 27, o.kind === "vehicle" ? 9 : 7, 0, 0, TAU);
+      ctx.fill();
       if (o.kind === "torii") {
-        ctx.fillStyle = "rgba(255,140,90,0.18)";
-        ctx.beginPath();
-        ctx.arc(o.x, o.y + 8, 22, 0, TAU);
-        ctx.fill();
-        ctx.fillStyle = "#4a1c2c";
-        ctx.fillRect(o.x - 20, o.y - 6, 8, 38);
-        ctx.fillRect(o.x + 12, o.y - 6, 8, 38);
-        ctx.fillStyle = "#d45a72";
-        ctx.fillRect(o.x - 26, o.y - 16, 52, 9);
-        ctx.fillRect(o.x - 18, o.y - 4, 36, 5);
-        ctx.fillStyle = "#ffd1a8";
-        ctx.fillRect(o.x - 3, o.y - 22, 6, 6);
-        ctx.fillStyle = "rgba(255,196,120,0.55)";
-        ctx.beginPath();
-        ctx.arc(o.x, o.y - 24, 4, 0, TAU);
-        ctx.fill();
+        /* 全息牌楼（替换和风鸟居，props/paifang.webp，黑底发光图用 lighter 叠加） */
+        var pf = propSprite("paifang"), pw = 92, ph = pf && pf.naturalWidth ? pw * pf.naturalHeight / pf.naturalWidth : 80;
+        ctx.fillStyle = "rgba(120,160,255,0.10)"; ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, TAU); ctx.fill();
+        if (pf && pf.naturalWidth) { ctx.save(); ctx.globalAlpha = 0.85 + Math.sin(t * 1.8 + i) * 0.1; ctx.drawImage(pf, o.x - pw / 2, o.y + 30 - ph, pw, ph); ctx.restore(); }
       } else if (o.kind === "vehicle") {
-        ctx.fillStyle = "#0d121c";
+        ctx.fillStyle = "#060b14";
+        ctx.fillRect(o.x + 8, o.y - 3, 9, 5);
+        ctx.fillRect(o.x + o.w - 18, o.y - 3, 9, 5);
+        ctx.fillRect(o.x + 8, o.y + o.h - 2, 9, 5);
+        ctx.fillRect(o.x + o.w - 18, o.y + o.h - 2, 9, 5);
+        ctx.fillStyle = "#203345";
         ctx.fillRect(o.x, o.y, o.w, o.h);
-        ctx.fillStyle = "rgba(92,231,255,0.35)";
-        ctx.fillRect(o.x + 6, o.y + 5, o.w * 0.4, o.h - 10);
-        ctx.fillStyle = "#ffd36b";
-        ctx.fillRect(o.x + o.w - 8, o.y + 4, 5, 6);
-        ctx.fillRect(o.x + o.w - 8, o.y + o.h - 10, 5, 6);
-        ctx.fillStyle = "#1a2430";
-        ctx.fillRect(o.x + 4, o.y + o.h - 3, 10, 4);
-        ctx.fillRect(o.x + o.w - 16, o.y + o.h - 3, 10, 4);
-        ctx.strokeStyle = "rgba(141,239,255,0.55)";
+        ctx.fillStyle = "#30495c";
+        ctx.fillRect(o.x + 4, o.y + 4, o.w - 8, o.h - 8);
+        ctx.fillStyle = "#112539";
+        ctx.fillRect(o.x + 15, o.y + 4, o.w * 0.35, o.h - 8);
+        ctx.fillStyle = "rgba(105,208,243,0.48)";
+        ctx.fillRect(o.x + 15, o.y + 5, 4, o.h - 10);
+        ctx.fillRect(o.x + o.w * 0.62, o.y + 5, 3, o.h - 10);
+        ctx.fillStyle = "#c88a74";
+        ctx.fillRect(o.x + 7, o.y + 6, 5, 3);
+        ctx.fillStyle = "rgba(255,200,112," + (0.46 + Math.sin(t * 2 + i) * 0.12) + ")";
+        ctx.fillRect(o.x + o.w - 7, o.y + 3, 4, 5);
+        ctx.fillRect(o.x + o.w - 7, o.y + o.h - 8, 4, 5);
+        ctx.strokeStyle = "rgba(168,226,247,0.72)";
+        ctx.lineWidth = 1.5;
         ctx.strokeRect(o.x, o.y, o.w, o.h);
       } else if (o.kind === "sword") {
-        ctx.strokeStyle = "rgba(239,231,255,0.22)";
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(o.x, o.y, o.r, 0, TAU);
+        // The complete boundary uses the actual slow/melee field radius.
+        ctx.fillStyle = "rgba(158,141,190,0.08)";
+        ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, TAU); ctx.fill();
+        ctx.strokeStyle = "rgba(223,203,252," + (0.29 + Math.sin(t * 1.4 + i) * 0.05) + ")";
+        ctx.lineWidth = 1.5;
         ctx.stroke();
-        ctx.strokeStyle = "#efe7ff";
-        ctx.lineWidth = 3;
+        ctx.strokeStyle = "rgba(230,216,250,0.15)";
+        ctx.beginPath(); ctx.ellipse(o.x, o.y + 3, o.r * 0.68, o.r * 0.2, 0, 0, TAU); ctx.stroke();
         for (k = -1; k <= 1; k++) {
+          ctx.strokeStyle = "#d7d2e8";
+          ctx.lineWidth = 3;
           ctx.beginPath();
-          ctx.moveTo(o.x + k * 11, o.y - o.r * 0.52);
-          ctx.lineTo(o.x + k * 7, o.y + o.r * 0.38);
+          ctx.moveTo(o.x + k * 16, o.y - o.r * 0.46);
+          ctx.lineTo(o.x + k * 11, o.y + o.r * 0.35);
+          ctx.stroke();
+          ctx.strokeStyle = "#655173";
+          ctx.lineWidth = 4;
+          ctx.beginPath();
+          ctx.moveTo(o.x + k * 16, o.y - o.r * 0.55);
+          ctx.lineTo(o.x + k * 16, o.y - o.r * 0.43);
+          ctx.stroke();
+          ctx.strokeStyle = "#ccb79c";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(o.x + k * 16 - 7, o.y - o.r * 0.44);
+          ctx.lineTo(o.x + k * 16 + 7, o.y - o.r * 0.44);
           ctx.stroke();
         }
       } else if (o.kind === "mirror") {
-        ctx.fillStyle = "rgba(212,184,255,0.22)";
+        ctx.fillStyle = "rgba(50,32,89,0.74)";
         ctx.fillRect(o.x, o.y, o.w, o.h);
-        ctx.strokeStyle = "#f4ecff";
-        ctx.lineWidth = 2;
+        ctx.fillStyle = "rgba(176,158,229,0.43)";
+        ctx.fillRect(o.x + 2, o.y + 3, o.w - 4, o.h - 6);
+        shimmer = (t * 15 + i * 21) % (o.h - 12);
+        ctx.fillStyle = "rgba(234,224,255,0.6)";
+        ctx.fillRect(o.x + 2, o.y + 3 + shimmer, o.w - 4, 7);
+        ctx.strokeStyle = "#eee2ff";
+        ctx.lineWidth = 1.5;
         ctx.strokeRect(o.x, o.y, o.w, o.h);
-        ctx.strokeStyle = "rgba(255,255,255,0.45)";
+        ctx.strokeStyle = "rgba(255,255,255,0.52)";
         ctx.beginPath();
-        ctx.moveTo(o.x + 2, o.y + 8);
-        ctx.lineTo(o.x + o.w - 2, o.y + o.h - 10);
+        ctx.moveTo(o.x + 2, o.y + 10);
+        ctx.lineTo(o.x + o.w - 2, o.y + o.h * 0.48);
+        ctx.lineTo(o.x + 2, o.y + o.h - 9);
         ctx.stroke();
       }
       ctx.restore();
@@ -589,8 +796,10 @@
     ctx.restore();
   }
 
+  var PROP_SPR = {};
+  function propSprite(n) { if (typeof Image === "undefined") return null; if (!PROP_SPR[n]) { PROP_SPR[n] = new Image(); PROP_SPR[n].src = (global.SakurayoArtBase || "art/") + "props/" + n + ".webp"; } return PROP_SPR[n]; }
   function heroVisualScale(width) {
-    return (width || 0) >= 560 ? 1.12 : 1;
+    return (width || 0) >= 560 ? 1.3 : 1.16; // ART_PASS ②：自机放大，读得清动作
   }
 
   function careerProgress(careers, fusionId, formId, fusionCatalog, schools, careerDefs) {
@@ -656,18 +865,18 @@
 
   function hint(world) {
     var id = groundId(world);
-    if (id === "neon") return "停尸车辆挡住直线弹 · 绕过去打";
+    if (id === "neon") return "停尸车辆挡住移动与直线弹 · 绕过去打";
     if (id === "swords") return "飞剑区减速 · 近战更锋利";
     if (id === "mirror") return "碎镜折射一次 · 别对镜面开枪";
     if (id === "maingod") return "回廊每三层换色温 · 别站桩";
-    return "鸟居挡弹不挡人 · 前二十秒会包抄";
+    return "全息牌楼挡弹不挡人 · 前二十秒会包抄";
   }
 
   function radio(world, character) {
     var id = groundId(world);
     var who = character || "";
     if (id === "neon") {
-      if (who === "aya") return "电台接通。雨还在洗合同。车挡只拦弹，拦不住你当年签过的字。";
+      if (who === "aya") return "电台接通。雨还在洗合同。车挡会拦住脚步与子弹。绕过去，别被当年的签名绊住。";
       if (who === "rion") return "电台接通。霓虹把招式标了价。绕开车挡，别让直线弹替你决定走位。";
       return "电台接通。霓虹还亮着，人格却被写成资产。绕开车挡再开火。";
     }
@@ -682,8 +891,8 @@
       return "电台接通。碎镜把你折成第三百一十八次。先活着，再决定哪一个你留下。";
     }
     if (id === "maingod") return "白色大厅没有外线。经验很快，死亡立刻结算。";
-    if (who === "aya") return "电台接通。旧门禁还认得你。鸟居只挡弹，不替你洗白。";
-    if (who === "rion") return "电台接通。尸潮在用师父的起手式。鸟居挡弹，不挡失礼。";
+    if (who === "aya") return "电台接通。旧门禁还认得你。全息牌楼只挡弹，不替你洗白。";
+    if (who === "rion") return "电台接通。尸潮在用师父的起手式。全息牌楼挡弹，不挡失礼。";
     return "电台接通。门还认得你的灵纹。先活过这二十秒，再谈你是谁。";
   }
 
@@ -722,6 +931,9 @@
     deflectBullet: deflectBullet,
     drawRoleSilhouette: drawRoleSilhouette,
     heroVisualScale: heroVisualScale,
+    groundMosaic: groundMosaic,
+    rimSprite: rimSprite,
+    GROUND_FILTER: GROUND_FILTER,
     careerProgress: careerProgress,
     missionLine: missionLine,
     hint: hint,

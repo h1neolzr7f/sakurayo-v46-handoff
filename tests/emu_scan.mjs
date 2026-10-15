@@ -224,11 +224,11 @@ try {
   if (bulletBlock && /for \(const e of enemies\)/.test(bulletBlock[0])) {
     findings.push({ sev: "P1", msg: "子弹循环里又扫全部 enemies" });
   }
-  if (!/for \(const e of grid\.near\(b\.x, b\.y, 50\)\)/.test(src)) {
+  if (!bulletBlock || !/for\s*\(const e of grid\.near\(b\.x,\s*b\.y,\s*[^)]+\)\)/.test(bulletBlock[0])) {
     findings.push({ sev: "P1", msg: "子弹碰撞不再走 grid.near" });
   }
 
-  await scanViewport(430, 932, "p430");
+  // 竖屏 p430 已移除：游戏锁定横屏
   await scanViewport(932, 430, "l932");
   await scanViewport(2400, 1080, "l2400");
 
