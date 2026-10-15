@@ -1434,6 +1434,8 @@
     var focusId = state.focusId || "";
     var fatePoints = state.fatePoints || 0;
     var up = featuredCard(pool, focusId);
+    /* E029：UP 立绘与 UP 卡对上——融合/职业卡用各自 splash 做主视觉卡，原角色立绘只作加载失败回退 */
+    var upArt = up && pool === "remnant" ? (up.kind === "fusion" ? "fusions/" + String(up.id).replace(/^fusion_/, "") + "/splash.webp" : up.kind === "job" || up.kind === "school" ? "careers/" + String(up.id).replace(/^(job|school)_/, "") + "/splash.webp" : "") : "";
     var coinIcon = '<img class="wishCoin46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/icon_coin.webp") + '">';
     var shardIcon = '<img class="wishCoin46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/icon_shard.webp") + '">';
     var tabHtml = "";
@@ -1446,7 +1448,12 @@
       '<div class="wishStage46 wishV2">' +
       '<img class="wishBanner46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/banner_" + pool + ".webp") + '">' +
       '<div class="wishShade46" aria-hidden="true"></div>' +
-      '<img class="wishHero46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/up_" + (pool === "fashion" ? "crown" : hero) + ".webp") + '">' +
+      (upArt ? '<img class="wishHero46 wishHeroOff46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/up_" + (pool === "fashion" ? "crown" : hero) + ".webp") + '">' +
+        '<figure class="wishUpCard46" aria-label="当前 UP"><img class="wishUpArt46" data-art alt="" src="' + artSrc(handlers, upArt) + '" onerror="var f=this.closest(\'.wishStage46\');if(f){f.classList.add(\'noUpArt46\');}">' +
+        '<figcaption><em>' + (focusId ? "定轨" : "UP") + '</em><b>' + escapeHtml(up.n) + '</b><i>' + up.r + '</i>' + (up.tag ? '<span>' + escapeHtml(up.tag) + '</span>' : '') + '<p>' + escapeHtml(up.d || "") + '</p></figcaption></figure>' +
+        '<div class="wishShards46" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>' +
+        '<aside class="wishRule46"><h4>寻访规则</h4><ul><li><b>定轨</b>点右上 UP 条选目标；出同稀有度时 50% 为定轨卡</li><li><b>命定</b>没中定轨则命定 +1，下次同稀有度必中</li><li><b>保底</b>' + RATES.pitySSR + ' 抽必出证人，' + RATES.pitySR + ' 抽必出稀有</li><li><b>碎镜</b>每抽 +' + RATES.shardPull + '，重复卡 +' + RATES.shardDupe + '，满 ' + RATES.spark + ' 可在工坊兑换</li></ul></aside>'
+      : '<img class="wishHero46" data-art alt="" src="' + artSrc(handlers, "gacha/v4/up_" + (pool === "fashion" ? "crown" : hero) + ".webp") + '">') +
       '<div class="wishPetals46">' + petalMarks() + "</div>" +
       '<nav class="wishTabs46" id="gachaTabs46" aria-label="卡池">' + tabHtml + "</nav>" +
       '<div class="wishWallet46" aria-label="货币">' +

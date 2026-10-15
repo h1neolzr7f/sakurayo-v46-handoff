@@ -3,21 +3,22 @@
 (function (global) {
   "use strict";
   var d = global.document; if (!d) return;
+  var TOK18 = function (n, a) { return global.SakurayoTok ? global.SakurayoTok(n, a) : "rgb(var(--c-" + n + "-rgb) / " + a + ")"; };
   var css = [
     "#settingsDrawer37 .dhead{position:relative}",
     "#settingsDrawer37 .dhead::before{content:none!important}",
     "#settingsDrawer37{overflow:hidden}",
     "#settingsDrawer37 #settingsBody37{display:grid!important;grid-template-columns:repeat(30,minmax(0,1fr))!important;grid-auto-rows:auto;gap:8px!important;align-content:start;padding-top:10px;padding-bottom:10px}",
-    "#settingsBody37>.settingRow37,#settingsBody37>.settingToggle37,#settingsBody37>.settingGroup39>.settingToggle37{height:48px!important;min-height:0!important;margin:0!important;order:1;box-sizing:border-box;grid-row:auto!important;align-self:stretch}",
-    "#settingsBody37>.settingRow37{grid-column:span 10!important;padding:6px 14px!important;display:flex!important;flex-direction:column;justify-content:center;gap:4px;background:#0e1a2e!important;border-color:#87b1fd33!important}",
-    "#settingsBody37>.settingRow37 span{margin:0!important;color:#f0f5f8!important;font-weight:700;font-size:14px}",
-    "#settingsBody37>.settingRow37 b{color:#ffd1e8!important}",
-    "#settingsBody37 .settingToggle37{grid-column:span 6!important;display:flex!important;align-items:center;justify-content:center;font-size:14px;font-weight:700;padding:0 6px!important;white-space:nowrap;color:#081123!important;background:linear-gradient(90deg,#7fa6ee,#9cc0ff)!important;opacity:1!important}",
+    "#settingsBody37>.settingRow37,#settingsBody37>.settingToggle37,#settingsBody37>.settingGroup39>.settingToggle37{height:clamp(48px,10.5vh,78px)!important;min-height:0!important;margin:0!important;order:1;box-sizing:border-box;grid-row:auto!important;align-self:stretch}",
+    "#settingsBody37>.settingRow37{grid-column:span 10!important;padding:6px 14px!important;display:flex!important;flex-direction:column;justify-content:center;gap:4px;background:rgb(var(--c-n1-rgb) / 1)!important;border-color:rgb(var(--c-primary-rgb) / 0.2)!important}",
+    "#settingsBody37>.settingRow37 span{margin:0!important;color:rgb(var(--c-n6-rgb) / 1)!important;font-weight:700;font-size:14px}",
+    "#settingsBody37>.settingRow37 b{color:rgb(var(--c-n6-rgb) / 1)!important}",
+    "#settingsBody37 .settingToggle37{grid-column:span 6!important;display:flex!important;align-items:center;justify-content:center;font-size:14px;font-weight:700;padding:0 6px!important;white-space:nowrap;color:rgb(var(--c-on-primary-rgb) / 1)!important;background:linear-gradient(90deg,rgb(var(--c-primary-rgb) / 1),rgb(var(--c-primary-strong-rgb) / 1))!important;opacity:1!important}",
     "#settingsBody37 .settingGroup39{display:contents!important}",
-    "#settingsBody37>.routeNote{order:2;grid-column:1/-1!important;margin:0!important;padding:8px 14px!important;font-size:14px!important;line-height:1.35;color:#d6dde8!important;background:#0e1a2e!important}",
-    "#settingsBody37>#commandUtilities48{order:3;grid-column:1/-1!important;width:auto!important;max-width:none!important;display:flex!important;align-items:center;gap:14px;padding:8px 14px!important;margin:0!important;min-height:0!important;height:auto!important;background:#0e1a2e!important}",
-    "#settingsBody37>#commandUtilities48 small{font-size:11px!important;color:#c3cede!important;white-space:nowrap}",
-    "#settingsBody37>#commandUtilities48 h3{margin:0!important;font-size:16px!important;white-space:nowrap;color:#f0f5f8!important}",
+    "#settingsBody37>.routeNote{order:2;grid-column:1/-1!important;margin:0!important;padding:8px 14px!important;font-size:14px!important;line-height:1.35;color:rgb(var(--c-n6-rgb) / 1)!important;background:rgb(var(--c-n1-rgb) / 1)!important}",
+    "#settingsBody37>#commandUtilities48{order:3;grid-column:1/-1!important;width:auto!important;max-width:none!important;display:flex!important;align-items:center;gap:14px;padding:8px 14px!important;margin:0!important;min-height:0!important;height:auto!important;background:rgb(var(--c-n1-rgb) / 1)!important}",
+    "#settingsBody37>#commandUtilities48 small{font-size:11px!important;color:rgb(var(--c-n5-rgb) / 1)!important;white-space:nowrap}",
+    "#settingsBody37>#commandUtilities48 h3{margin:0!important;font-size:16px!important;white-space:nowrap;color:rgb(var(--c-n6-rgb) / 1)!important}",
     "#settingsBody37>#commandUtilities48 .cmdActions47{margin:0 0 0 auto!important;flex-wrap:nowrap}",
     "#settingsBody37>#commandUtilities48 .cmdActions47 button{height:44px;min-height:44px;font-size:14px;padding:0 14px}"
   ].join("");
@@ -25,29 +26,29 @@
   /* E025 格斗按键：崩三式圆形发光技能键（图标 + 冷却/能量环 + 按下反馈 + 大小层级），摇杆同风格。只作用于 #duel46。 */
   var DUEL_CSS = [
     "html #duel46 .dact46{width:250px;height:190px}",
-    "html #duel46 .dact46::before{content:'';position:absolute;right:-30px;bottom:-40px;width:260px;height:260px;border-radius:50%;border:1px solid rgb(120 200 255 / .16);box-shadow:inset 0 0 40px rgb(80 160 255 / .08);pointer-events:none}",
-    "html #duel46 .dact46 .sykBtn{--ring:#7fd8ff;--core:#0b1730;border-radius:50%;clip-path:none!important;left:auto!important;top:auto!important;display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:1px;font:800 13px/1 var(--sy-font-title,sans-serif);color:#f2f8ff;transition:transform .08s ease-out,filter .08s}",
-    "html #duel46 .dact46 .sykBtn::before{inset:0!important;border-radius:50%;clip-path:none!important;background:conic-gradient(var(--ring) calc(var(--cd,1) * 360deg),rgb(255 255 255 / .12) 0)!important;-webkit-mask:radial-gradient(circle,transparent calc(50% - 4px),#000 calc(50% - 3px));mask:radial-gradient(circle,transparent calc(50% - 4px),#000 calc(50% - 3px));filter:drop-shadow(0 0 6px var(--ring))}",
-    "html #duel46 .dact46 .sykBtn::after{inset:4px!important;border-radius:50%;clip-path:none!important;background:radial-gradient(circle at 50% 35%,rgb(255 255 255 / .16),transparent 55%),radial-gradient(circle,var(--core) 58%,rgb(20 40 80 / .9))!important;box-shadow:inset 0 0 0 1px rgb(255 255 255 / .22),inset 0 -6px 14px rgb(0 0 0 / .45)}",
+    "html #duel46 .dact46::before{content:'';position:absolute;right:-30px;bottom:-40px;width:260px;height:260px;border-radius:50%;border:1px solid rgb(var(--c-primary-rgb) / 0.16);box-shadow:inset 0 0 40px rgb(var(--c-primary-rgb) / 0.08);pointer-events:none}",
+    "html #duel46 .dact46 .sykBtn{--ring:rgb(var(--c-primary-rgb) / 1);--core:rgb(var(--c-n1-rgb) / 1);border-radius:50%;clip-path:none!important;left:auto!important;top:auto!important;display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:1px;font:800 13px/1 var(--sy-font-title,sans-serif);color:rgb(var(--c-n6-rgb) / 1);transition:transform .08s ease-out,filter .08s}",
+    "html #duel46 .dact46 .sykBtn::before{inset:0!important;border-radius:50%;clip-path:none!important;background:conic-gradient(var(--ring) calc(var(--cd,1) * 360deg),rgb(var(--c-n6-rgb) / 0.12) 0)!important;-webkit-mask:radial-gradient(circle,transparent calc(50% - 4px),rgb(var(--c-n0-rgb) / 1) calc(50% - 3px));mask:radial-gradient(circle,transparent calc(50% - 4px),rgb(var(--c-n0-rgb) / 1) calc(50% - 3px));filter:drop-shadow(0 0 6px var(--ring))}",
+    "html #duel46 .dact46 .sykBtn::after{inset:4px!important;border-radius:50%;clip-path:none!important;background:radial-gradient(circle at 50% 35%,rgb(var(--c-n6-rgb) / 0.16),transparent 55%),radial-gradient(circle,var(--core) 58%,rgb(var(--c-n2-rgb) / 0.9))!important;box-shadow:inset 0 0 0 1px rgb(var(--c-n6-rgb) / 0.22),inset 0 -6px 14px rgb(var(--c-n0-rgb) / 0.45)}",
     "html #duel46 .dact46 .sykBtn svg{width:46%;height:46%;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px var(--ring))}",
     "html #duel46 .dact46 .sykBtn b18{font-size:11px;font-weight:800;letter-spacing:.06em}",
     "html #duel46 .dact46 .sykBtn small{display:none}",
     "html #duel46 .dact46 .sykBtn.pr18{transform:scale(.88);filter:brightness(1.45)}",
     "html #duel46 .dact46 .sykBtn.pr18::after{box-shadow:inset 0 0 0 2px var(--ring),0 0 18px var(--ring)}",
     "html #duel46 .dact46 .sykBtn.lock18{filter:saturate(.35) brightness(.8)}",
-    "html #duel46 .dact46 .b-H{right:8px!important;bottom:8px!important;width:92px!important;height:92px!important;--ring:#ff6fb0;--core:#2a0f2a}",
+    "html #duel46 .dact46 .b-H{right:8px!important;bottom:8px!important;width:92px!important;height:92px!important;--ring:rgb(var(--c-accent-rgb) / 1);--core:rgb(var(--c-on-accent-rgb) / 1)}",
     "html #duel46 .dact46 .b-H svg{width:44%;height:44%}",
     "html #duel46 .dact46 .b-L{right:110px!important;bottom:6px!important;width:66px!important;height:66px!important}",
-    "html #duel46 .dact46 .b-T{right:116px!important;bottom:82px!important;width:56px!important;height:56px!important;--ring:#9fb4ff}",
-    "html #duel46 .dact46 .b-BK{right:186px!important;bottom:4px!important;width:52px!important;height:52px!important;--ring:#8ef0c8;font-size:11px!important}",
-    "html #duel46 .dact46 .b-SP{right:62px!important;bottom:112px!important;width:66px!important;height:66px!important;--ring:#ffb46a;--core:#2a1808}",
-    "html #duel46 .dact46 .b-SU{right:0!important;bottom:118px!important;width:62px!important;height:62px!important;--ring:#ffe27a;--core:#2a2208}",
+    "html #duel46 .dact46 .b-T{right:116px!important;bottom:82px!important;width:56px!important;height:56px!important;--ring:rgb(var(--c-primary-rgb) / 1)}",
+    "html #duel46 .dact46 .b-BK{right:186px!important;bottom:4px!important;width:52px!important;height:52px!important;--ring:rgb(var(--c-n5-rgb) / 1);font-size:11px!important}",
+    "html #duel46 .dact46 .b-SP{right:62px!important;bottom:112px!important;width:66px!important;height:66px!important;--ring:rgb(var(--c-warn-rgb) / 1);--core:rgb(var(--c-on-accent-rgb) / 1)}",
+    "html #duel46 .dact46 .b-SU{right:0!important;bottom:118px!important;width:62px!important;height:62px!important;--ring:rgb(var(--c-rare-ssr-rgb) / 1);--core:rgb(var(--c-on-accent-rgb) / 1)}",
     "html #duel46 .dact46 .b-SU.full18::before{animation:syPulse18 1s ease-in-out infinite}",
     "@keyframes syPulse18{50%{filter:drop-shadow(0 0 12px var(--ring)) brightness(1.35)}}",
     "html #duel46 .dstk46::before,html #duel46 .dstk46::after{clip-path:none!important;border-radius:50%}",
-    "html #duel46 .dstk46::before{background:repeating-conic-gradient(rgb(127 216 255 / .55) 0 2deg,transparent 2deg 15deg)!important;-webkit-mask:radial-gradient(circle,transparent calc(50% - 7px),#000 calc(50% - 6px));mask:radial-gradient(circle,transparent calc(50% - 7px),#000 calc(50% - 6px))}",
-    "html #duel46 .dstk46::after{inset:8px!important;background:radial-gradient(circle,rgb(127 216 255 / .10),rgb(8 16 34 / .72) 70%)!important;box-shadow:inset 0 0 0 1px rgb(127 216 255 / .35),0 0 24px rgb(80 160 255 / .18)}",
-    "html #duel46 .dstk46 i{clip-path:none!important;border-radius:50%;width:56px!important;height:56px!important;margin:-28px!important;background:radial-gradient(circle at 40% 35%,#e8f6ff,#7fd8ff 45%,#2a6cc0)!important;box-shadow:0 0 16px rgb(127 216 255 / .7),inset 0 0 0 2px rgb(255 255 255 / .5)}",
+    "html #duel46 .dstk46::before{background:repeating-conic-gradient(rgb(var(--c-primary-rgb) / 0.55) 0 2deg,transparent 2deg 15deg)!important;-webkit-mask:radial-gradient(circle,transparent calc(50% - 7px),rgb(var(--c-n0-rgb) / 1) calc(50% - 6px));mask:radial-gradient(circle,transparent calc(50% - 7px),rgb(var(--c-n0-rgb) / 1) calc(50% - 6px))}",
+    "html #duel46 .dstk46::after{inset:8px!important;background:radial-gradient(circle,rgb(var(--c-primary-rgb) / 0.1),rgb(var(--c-on-primary-rgb) / 0.72) 70%)!important;box-shadow:inset 0 0 0 1px rgb(var(--c-primary-rgb) / 0.35),0 0 24px rgb(var(--c-primary-rgb) / 0.18)}",
+    "html #duel46 .dstk46 i{clip-path:none!important;border-radius:50%;width:56px!important;height:56px!important;margin:-28px!important;background:radial-gradient(circle at 40% 35%,rgb(var(--c-n6-rgb) / 1),rgb(var(--c-primary-rgb) / 1) 45%,rgb(var(--c-n4-rgb) / 1))!important;box-shadow:0 0 16px rgb(var(--c-primary-rgb) / 0.7),inset 0 0 0 2px rgb(var(--c-n6-rgb) / 0.5)}",
     "@media (min-height:600px){html #duel46 .dact46{transform:scale(1.15);transform-origin:right bottom}html #duel46 .dstk46{transform:scale(1.1);transform-origin:left bottom}}","@media (max-height:440px){html #duel46 .dact46{transform:scale(.82)}}"
   ].join("");
   var ICON = {
@@ -120,8 +121,8 @@
       if (p.k) { p.x += (-14 - 20 * p.z) * dt; p.y += (18 + 26 * p.z) * dt; p.r += dt * p.s; } else { p.y -= 8 * p.z * dt; p.x += Math.sin(now / 1500 + i) * 4 * dt; }
       if (p.y > H + 20) { p.y = -20; p.x = Math.random() * W * 1.2; } if (p.y < -20) p.y = H + 10; if (p.x < -20) p.x = W + 20;
       var ox = D.x * -10 * p.z, oy = D.y * -6 * p.z;
-      if (p.k) { g.save(); g.translate(p.x + ox, p.y + oy); g.rotate(p.r); g.fillStyle = "rgba(255,182,214," + (0.35 + 0.4 * p.z) + ")"; g.beginPath(); g.ellipse(0, 0, 5 * p.z + 2, 2.6 * p.z + 1, 0, 0, 6.283); g.fill(); g.restore(); }
-      else { g.fillStyle = "rgba(170,220,255," + (0.18 + 0.3 * p.z * (0.6 + 0.4 * Math.sin(now / 600 + i))) + ")"; g.beginPath(); g.arc(p.x + ox, p.y + oy, 1.2 + p.z * 1.4, 0, 6.283); g.fill(); } }
+      if (p.k) { g.save(); g.translate(p.x + ox, p.y + oy); g.rotate(p.r); g.fillStyle = TOK18("accent", 0.35 + 0.4 * p.z); g.beginPath(); g.ellipse(0, 0, 5 * p.z + 2, 2.6 * p.z + 1, 0, 0, 6.283); g.fill(); g.restore(); }
+      else { g.fillStyle = TOK18("primary-strong", 0.18 + 0.3 * p.z * (0.6 + 0.4 * Math.sin(now / 600 + i))); g.beginPath(); g.arc(p.x + ox, p.y + oy, 1.2 + p.z * 1.4, 0, 6.283); g.fill(); } }
     D.frames++;
   }
   function addMotionToggle() {
@@ -130,10 +131,41 @@
     b.onclick = function () { try { global.localStorage.setItem(MKEY, motionLow() ? "full" : "low"); } catch (e) {} paint(); };
     var note = body.querySelector(".routeNote"); body.insertBefore(b, note && note.parentNode === body ? note : null);
   }
+
+  /* E029 寻访页：UP 主视觉卡（与 UP 卡一致）+ 规则卡 + 视差碎镜；提示条移到顶部不压 Spark 条 */
+  var GACHA_CSS = [
+    "#gachaDrawer .wishHeroOff46{display:none!important}",
+    "#gachaDrawer .noUpArt46 .wishHeroOff46{display:block!important}#gachaDrawer .noUpArt46 .wishUpCard46{display:none}",
+    "#gachaDrawer .wishUpCard46{position:absolute;z-index:2;margin:0;left:max(160px,13vw);top:84px;bottom:150px;width:min(46vw,calc((100vh - 234px) * 1.4));clip-path:polygon(28px 0,100% 0,100% calc(100% - 28px),calc(100% - 28px) 100%,0 100%,0 28px);background:rgb(var(--c-n0-rgb) / .6);box-shadow:inset 0 0 0 1px rgb(var(--c-primary-rgb) / .5);translate:calc(var(--px18,0) * 10px) calc(var(--py18,0) * 6px)}",
+    "#gachaDrawer .wishUpArt46{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%;scale:1.06;translate:calc(var(--px18,0) * -8px) calc(var(--py18,0) * -5px)}",
+    "#gachaDrawer .wishUpCard46::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgb(var(--c-n0-rgb) / .92),rgb(var(--c-n0-rgb) / 0) 46%),repeating-linear-gradient(0deg,rgb(var(--c-n6-rgb) / .03) 0 1px,transparent 1px 3px);pointer-events:none}",
+    "#gachaDrawer .wishUpCard46 figcaption{position:absolute;z-index:1;left:22px;right:22px;bottom:14px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;color:rgb(var(--c-n6-rgb) / 1)}",
+    "#gachaDrawer .wishUpCard46 figcaption em{font:900 12px/1 var(--sy-font-title,sans-serif);font-style:normal;padding:3px 7px;background:rgb(var(--c-rare-ssr-rgb) / 1);color:rgb(var(--c-on-accent-rgb) / 1)}",
+    "#gachaDrawer .wishUpCard46 figcaption b{font:900 22px/1.1 var(--sy-font-title,sans-serif)}",
+    "#gachaDrawer .wishUpCard46 figcaption i{font:900 14px/1 var(--sy-font-title,sans-serif);font-style:normal;color:rgb(var(--c-rare-ssr-rgb) / 1)}",
+    "#gachaDrawer .wishUpCard46 figcaption span{font-size:12px;padding:2px 8px;border:1px solid rgb(var(--c-primary-rgb) / .7);color:rgb(var(--c-primary-strong-rgb) / 1)}",
+    "#gachaDrawer .wishUpCard46 figcaption p{flex-basis:100%;margin:0;font-size:14px;line-height:1.4;color:rgb(var(--c-n5-rgb) / 1)}",
+    "#gachaDrawer .wishRule46{position:absolute;z-index:3;right:22px;top:222px;width:min(377px,32vw);padding:10px 14px;background:rgb(var(--c-n0-rgb) / .78);box-shadow:inset 0 0 0 1px rgb(var(--c-primary-rgb) / .35);clip-path:polygon(14px 0,100% 0,100% 100%,0 100%,0 14px);translate:calc(var(--px18,0) * 3px) 0}",
+    "#gachaDrawer .wishRule46 h4{margin:0 0 6px;font:800 14px var(--sy-font-title,sans-serif);color:rgb(var(--c-primary-strong-rgb) / 1)}",
+    "#gachaDrawer .wishRule46 ul{margin:0;padding:0;list-style:none;display:grid;gap:5px}",
+    "#gachaDrawer .wishRule46 li{font-size:14px;line-height:1.35;color:rgb(var(--c-n6-rgb) / 1)}",
+    "#gachaDrawer .wishRule46 li b{display:inline-block;min-width:34px;margin-right:6px;color:rgb(var(--c-accent-rgb) / 1)}",
+    "#gachaDrawer .wishShards46{position:absolute;inset:0;z-index:1;pointer-events:none}",
+    "#gachaDrawer .wishShards46 i{position:absolute;width:60px;height:90px;clip-path:polygon(30% 0,100% 20%,70% 100%,0 70%);background:linear-gradient(135deg,rgb(var(--c-primary-strong-rgb) / .35),rgb(var(--c-accent-rgb) / .08));box-shadow:inset 0 0 0 1px rgb(var(--c-n6-rgb) / .3);animation:syShard29 7s ease-in-out infinite}",
+    "#gachaDrawer .wishShards46 i:nth-child(1){left:58%;top:22%;translate:calc(var(--px18,0) * 22px) calc(var(--py18,0) * 14px)}",
+    "#gachaDrawer .wishShards46 i:nth-child(2){left:64%;top:58%;width:40px;height:62px;animation-delay:-2s;translate:calc(var(--px18,0) * 30px) calc(var(--py18,0) * 18px)}",
+    "#gachaDrawer .wishShards46 i:nth-child(3){left:12%;top:70%;width:34px;height:50px;animation-delay:-4s;translate:calc(var(--px18,0) * 16px) 0}",
+    "#gachaDrawer .wishShards46 i:nth-child(4){left:52%;top:8%;width:28px;height:40px;animation-delay:-1s;translate:calc(var(--px18,0) * 26px) 0}",
+    "#gachaDrawer .wishShards46 i:nth-child(5){left:70%;top:36%;width:48px;height:70px;animation-delay:-5s;translate:calc(var(--px18,0) * 34px) calc(var(--py18,0) * 20px)}",
+    "@keyframes syShard29{50%{transform:translateY(-12px) rotate(8deg)}}",
+    "body:not(.depth18) #gachaDrawer .wishShards46 i{animation:none}",
+    "body:has(#gachaDrawer:not(.hidden)) .syHint46{top:14px!important;bottom:auto!important;max-width:44vw;left:50%!important;right:auto!important;transform:translateX(-50%)!important}",
+    "@media (max-height:500px){#gachaDrawer .wishUpCard46{top:64px;bottom:96px;left:150px;width:min(42vw,calc((100vh - 160px) * 1.5))}#gachaDrawer .wishUpCard46 figcaption b{font-size:17px}#gachaDrawer .wishUpCard46 figcaption p{display:none}#gachaDrawer .wishRule46{display:none}}"
+  ].join("");
   function add() { if (d.getElementById("syPolish18")) return; var s = d.createElement("style"); s.id = "syPolish18"; s.textContent = css; (d.head || d.documentElement).appendChild(s);
     var s2 = d.createElement("style"); s2.id = "syPolish18duel"; s2.textContent = DUEL_CSS; (d.head || d.documentElement).appendChild(s2);
     new MutationObserver(function () { var r = d.getElementById("duel46"); if (r && !r.__sk18) skinDuel(r); }).observe(d.body || d.documentElement, { childList: true, subtree: false });
-    var s3 = d.createElement("style"); s3.id = "syPolish18depth"; s3.textContent = DEPTH_CSS; (d.head || d.documentElement).appendChild(s3);
+    var s3 = d.createElement("style"); s3.id = "syPolish18depth"; s3.textContent = DEPTH_CSS + GACHA_CSS; (d.head || d.documentElement).appendChild(s3);
     var sb = null; new MutationObserver(function () { var b = d.getElementById("settingsBody37"); if (b && b !== sb) { sb = b; new MutationObserver(addMotionToggle).observe(b, { childList: true }); } addMotionToggle(); }).observe(d.body, { childList: true });
     setupDepth(); }
   if (d.readyState === "loading") d.addEventListener("DOMContentLoaded", add); else add();
