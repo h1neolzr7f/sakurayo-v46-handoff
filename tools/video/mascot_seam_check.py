@@ -33,6 +33,18 @@ for ch in sorted(os.listdir(ROOT)):
             qa, qb = psnr(a, i0), psnr(b, i0)
             if qa < TH: bad.append(f'{ch}/{n}: 首帧对 idle PSNR {qa:.1f} < {TH}')
             if qb < TH: bad.append(f'{ch}/{n}: 尾帧对 idle PSNR {qb:.1f} < {TH}')
+    # E026 透明看板娘 alpha/：左右并排（彩色|遮罩），与原片一一对应、成对、单段 ≤ 1.5 MB、idle 循环闭合
+    ad = os.path.join(d, 'alpha')
+    if os.path.isdir(ad):
+        for x in mp4:
+            p = os.path.join(ad, x)
+            if not os.path.exists(p): bad.append(f'{ch}/alpha/{x}: 缺'); continue
+            if not os.path.exists(p[:-4] + '.webm'): bad.append(f'{ch}/alpha/{x[:-4]}: 缺 webm')
+            if os.path.getsize(p) > 1.5e6: bad.append(f'{ch}/alpha/{x}: {os.path.getsize(p)/1e6:.2f}MB > 1.5MB')
+        ia = os.path.join(ad, 'idle.mp4')
+        if os.path.exists(ia):
+            q = psnr(frame(ia), frame(ia, True))
+            if q < TH: bad.append(f'{ch}/alpha/idle: 循环接缝 PSNR {q:.1f} < {TH}')
     if total > 8e6: bad.append(f'{ch}: mp4 合计 {total/1e6:.2f}MB > 8MB')
 if bad:
     print('FAIL mascot seam check:'); print('\n'.join('  - ' + b for b in bad)); sys.exit(1)

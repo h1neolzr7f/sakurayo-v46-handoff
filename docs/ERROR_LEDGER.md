@@ -162,3 +162,30 @@
 - **根因**：① 末帧停在升级选择，`runWinNode46` 要求 `state==="play"` 直接 return；② 进节点后 modal 晚一帧挂上，立刻读 state 拿不到
 - **修法**：赢节点前消掉升级弹窗；进节点后最多等 ~1.5s 直到 play 或 modal
 - **预防**：run 相关 smoke 在断言 mode/modal 前先等就绪；高负载下勿假设同步挂载
+
+### E023 · 割草地面整片灰金属板，角色与怪不显眼
+- **场景**：割草战斗（stage2 雨夜商圈等拼贴地面），1280×720 / 1024×461
+- **根因**：拼贴照片地面之上没有任何层次，明度均匀
+- **修法**：`sakurayo-lifecycle.js` drawGroundDressing18：世界坐标确定性铺设深蓝黑调色、青蓝发光线路（脉冲光点）、稀疏贴花（各章不同：樱纹/警示条/裂痕/符环）、碎片、樱瓣、局部光池；角色脚下青色光圈。纯程序化，不用中转站
+- **对比**：/workspace/sakurayo-plan/shots/morning_fix/compare/mow_d_1.jpg、/workspace/sakurayo-plan/shots/morning_fix/compare/mow_r_1.jpg
+
+### E024 · 设置页左栏发灰、「普通战斗发光」格子巨大
+- **根因**：通用 `.dhead::after`（inset:0 渐变遮罩）因 `.dhead` 未定位而盖住整个抽屉左半；最后一格独占一行被网格拉伸
+- **修法**：`#settingsDrawer37 .dhead{position:relative}`；30 列网格（滑条 3 等分、开关 5 等分）全部 48px 等高；1024×461 不滚动；文字 #f0f5f8/#081123，对比度 ≥4.5
+- **对比**：/workspace/sakurayo-plan/shots/morning_fix/compare/settings_d.jpg、/workspace/sakurayo-plan/shots/morning_fix/compare/settings_r.jpg
+
+### E025 · 格斗按键难看
+- **修法**：#duel46 局部覆写：圆形发光技能键 + SVG 图标 + 冷却/能量环（超必=气槽、重/必杀=出招恢复）+ 按下缩放发光，大小层级（重 92 > 轻/必杀 66 > 投/超必 56–62 > 防 52）；摇杆改为刻度环 + 发光球
+- **对比**：/workspace/sakurayo-plan/shots/morning_fix/compare/duel_d_1.jpg、/workspace/sakurayo-plan/shots/morning_fix/compare/duel_r_1.jpg
+
+### E026 · 大厅背景割裂（控制室 / 视频自带夜景 / 右上山景）
+- **根因**：看板娘视频自带背景，与大厅背景拼接
+- **修法**：rembg isnet-anime（CPU）逐帧抠图，遮罩环形时序平滑（循环闭合、不闪）+ 连通域清理 + 羽化；输出 alpha/ 左彩色右遮罩并排 mp4（H.264 无 alpha）+ webm，WebGL 合成到透明画布，叠在统一的 lobby-night-v5 上；未登记/无 WebGL 回退原片。管线 tools/video/mascot_alpha/，seam check 覆盖 alpha/
+- **对比**：/workspace/sakurayo-plan/shots/morning_fix/compare/lobby_d.jpg、/workspace/sakurayo-plan/shots/morning_fix/compare/lobby_r.jpg
+
+### E027 · 大厅与界面缺少纵深
+- **修法**：polish18 伪 3D：背景/粒子/角色/UI 四层视差（陀螺仪 > 鼠标 > 自动漂移），抽屉面板轻微透视倾斜，打开面板时背景景深模糊；樱瓣+光尘粒子画布（34 粒）；设置新增「动态效果：完整/减弱」（默认跟随系统减少动态）
+
+### E028 · 弹幕模式两侧与状态栏空
+- **修法**：两侧动态六角网格 + 流光 + 扫描线；左侧全息框（Boss 立绘位/NO SIGNAL）、符卡名条、Boss 血条、SECTOR 数据框；状态栏补弹幕密度条/击破/波形
+- **对比**：/workspace/sakurayo-plan/shots/morning_fix/compare/shmup_d_1.jpg、/workspace/sakurayo-plan/shots/morning_fix/compare/shmup_r_1.jpg
