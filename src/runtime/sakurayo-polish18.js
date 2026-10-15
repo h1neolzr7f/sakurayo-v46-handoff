@@ -88,7 +88,7 @@
     "body.depth18 #syDepth18{translate:calc(var(--px18,0) * -6px) calc(var(--py18,0) * -4px)}",
     "body.depth18 .depthHero18{translate:calc(var(--px18,0) * 8px) calc(var(--py18,0) * 4px)}",
     "body.depth18 #menu>.menu{translate:calc(var(--px18,0) * 4px) calc(var(--py18,0) * 3px)}",
-    "body.depth18 .drawer:not(.hidden)>.dbody{transform:perspective(1400px) rotateY(calc(var(--px18,0) * 1.4deg)) rotateX(calc(var(--py18,0) * -1deg));transform-origin:50% 50%}",
+    "/* 可点的面板不随视差移动（会让按钮“不稳定”、误触），只移动背景/装饰层 */",
     "body.depth18:has(.drawer:not(.hidden)) #menu .bg{filter:blur(3px) brightness(.8)}",
     "#syDepth18{position:absolute;inset:0;pointer-events:none;z-index:1}"
   ].join("");

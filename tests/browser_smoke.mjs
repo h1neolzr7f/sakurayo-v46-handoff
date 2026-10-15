@@ -110,7 +110,7 @@ try {
   assert.equal(await normalPage.locator("#betaDrawer40").count(), 0);
   assert.equal(await normalPage.evaluate(() => typeof window.render_game_to_text), "undefined");
   assert.equal(await normalPage.evaluate(() => window.__SAKURAYO_DEV__.enabled), false);
-  assert.equal(normalTracker.pageErrors.length, 0);
+  assert.equal(normalTracker.pageErrors.length, 0, [...new Set(normalTracker.pageErrors.map(String))].slice(0, 3).join("\n"));
   assert.equal(normalTracker.consoleErrors.length, 0, normalTracker.consoleErrors.join("\n"));
   assert.equal(normalTracker.externalRequests.length, 0);
   pass("普通发布模式不暴露测试 API、内测后门与快照钩子");

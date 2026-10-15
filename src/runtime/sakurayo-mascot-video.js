@@ -31,7 +31,7 @@
     function fit() { var r = wrap.getBoundingClientRect(), d = Math.min(1.5, global.devicePixelRatio || 1), ar = 720 / 1080, w = r.width, h = r.height;
       var cw = Math.min(w, h * ar), ch = cw / ar; cv.style.width = cw + "px"; cv.style.height = ch + "px"; cv.style.left = (w - cw) / 2 + "px"; cv.style.top = (h - ch) + "px";
       var pw = Math.round(cw * d), ph = Math.round(ch * d); if (cv.width !== pw || cv.height !== ph) { cv.width = pw; cv.height = ph; } }
-    function draw(i, o) { var e = st.v[i]; if (!e || e.readyState < 2 || o <= 0) return; gl.bindTexture(gl.TEXTURE_2D, tex[i]); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, e); gl.uniform1f(uo, o); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); }
+    function draw(i, o) { var e = st.v[i]; if (!e || e.readyState < 2 || o <= 0) return; gl.bindTexture(gl.TEXTURE_2D, tex[i]); try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, e); } catch (err) { /* file:// 等跨源环境视频会污染纹理：关掉透明版，退回带背景原片 */ global.__syNoAlpha = true; st.stop = true; cancelAnimationFrame(raf); if (st.onTaint) setTimeout(st.onTaint, 0); return; } gl.uniform1f(uo, o); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); }
     function loop() { raf = requestAnimationFrame(loop); if (st.stop) return; if (document.hidden) return; fit(); gl.viewport(0, 0, cv.width, cv.height); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
       var k = Math.min(1, (performance.now() - (st.swapAt || 0)) / 180), f = st.front; if (k < 1) draw(1 - f, 1); draw(f, k < 1 ? k : 1); R.frames++; }
     raf = requestAnimationFrame(loop); R.stop = function () { cancelAnimationFrame(raf); }; return R;
@@ -53,6 +53,7 @@
     // 浏览器省电策略可能暂停“无手势静音自动播放”的视频（切换瞬间元素还是透明的）→ 当前前台视频被意外暂停就续播
     v.forEach(function (e, i) { e.addEventListener("pause", function () { if (cur === st && st.front === i && !e.ended && !st.stop) setTimeout(function () { if (e.paused && st.front === i && !e.ended) e.play().catch(function () {}); }, 30); }); });
     var st = { id: id, wrap: wrap, v: v, front: 0, clip: "idle", plays: 0, alpha: AL };
+    st.onTaint = function () { if (cur === st) mount(box, id, artUrl, opt); };
     if (AL) { st.gl = glComp(wrap, st); if (!st.gl) { AL = false; st.alpha = false; wrap.classList.remove("heroVidA21"); } }
     function pick(src) { // 片段可写成数组 ["x.webm","x.mp4"]：按浏览器能力挑第一个能播的（Android WebView: H.264/VP9 都行；桌面 Chromium 测试环境只有 VP9）
       if (!Array.isArray(src)) return src; var t = document.createElement("video");
