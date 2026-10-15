@@ -8,7 +8,7 @@
     "#settingsDrawer37 .dhead{position:relative}",
     "#settingsDrawer37 .dhead::before{content:none!important}",
     "#settingsDrawer37{overflow:hidden}",
-    "#settingsDrawer37 #settingsBody37{display:grid!important;grid-template-columns:repeat(30,minmax(0,1fr))!important;grid-auto-rows:auto;gap:8px!important;align-content:start;padding-top:10px;padding-bottom:10px}",
+    "#settingsDrawer37 #settingsBody37{display:grid!important;grid-template-columns:repeat(30,minmax(0,1fr))!important;grid-auto-rows:auto;gap:8px!important;align-content:space-evenly;min-height:calc(100vh - 120px);box-sizing:border-box;padding-top:10px;padding-bottom:10px}",
     "#settingsBody37>.settingRow37,#settingsBody37>.settingToggle37,#settingsBody37>.settingGroup39>.settingToggle37{height:clamp(48px,10.5vh,78px)!important;min-height:0!important;margin:0!important;order:1;box-sizing:border-box;grid-row:auto!important;align-self:stretch}",
     "#settingsBody37>.settingRow37{grid-column:span 10!important;padding:6px 14px!important;display:flex!important;flex-direction:column;justify-content:center;gap:4px;background:rgb(var(--c-n1-rgb) / 1)!important;border-color:rgb(var(--c-primary-rgb) / 0.2)!important}",
     "#settingsBody37>.settingRow37 span{margin:0!important;color:rgb(var(--c-n6-rgb) / 1)!important;font-weight:700;font-size:14px}",

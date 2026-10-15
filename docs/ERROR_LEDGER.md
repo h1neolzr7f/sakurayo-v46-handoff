@@ -189,3 +189,18 @@
 ### E028 · 弹幕模式两侧与状态栏空
 - **修法**：两侧动态六角网格 + 流光 + 扫描线；左侧全息框（Boss 立绘位/NO SIGNAL）、符卡名条、Boss 血条、SECTOR 数据框；状态栏补弹幕密度条/击破/波形
 - **对比**：/workspace/sakurayo-plan/shots/morning_fix/compare/shmup_d_1.jpg、/workspace/sakurayo-plan/shots/morning_fix/compare/shmup_r_1.jpg
+
+## E028b 弹幕左侧全息框是 NO SIGNAL 空占位
+- 现象：道中阶段左框显示 NO SIGNAL，像未完成。
+- 修复：Boss 战显示 Boss 立绘/chibi；道中显示当前层场景插图 + 场上敌人精灵，叠扫描线与轻微浮动；标签改为 SECTOR SCAN / 道中·第 N 层。
+- 防回归：sweep shmup_d_1 / shmup_r_1 目视。
+
+## E023b 割草地面中尺度物件缺失
+- 修复：按 420px 网格确定性散布水洼反光、裂缝、平贴路障条纹、全息灯笼、废弃车壳、樱瓣堆；纯地面贴图、不参与碰撞，压低对比避免误认为障碍；低画质减半。
+
+## E024b 设置页下半部留白
+- 修复：按钮行高 clamp(48px,10.5vh,78px)，主体 align-content:space-evenly 填满高度；1024x461 仍不滚动。
+
+## E029 寻访页：提示条压 Spark 条、立绘脚被遮、中右留白、UP 与立绘不符
+- 根因：主视觉固定用出战角色 up_<hero>.webp（小夜巫女装），与 UP 卡（未归·星核机甲少女）无关；ux 提示固定贴底。
+- 修复：常驻池 UP 为融合/职业卡时用 fusions|careers/<id>/splash.webp 做切角主视觉卡（含名称/稀有度/标签/描述），加载失败回退原立绘；右侧加“寻访规则”卡（文案按实际抽卡逻辑：定轨 50%、命定、80/10 保底、碎镜 +1/+8/200）；5 枚视差浮动碎镜；主视觉卡与内图反向视差；寻访页提示条移到顶部居中。r 尺寸规则卡隐藏（无空间）。
