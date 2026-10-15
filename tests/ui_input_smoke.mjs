@@ -16,7 +16,7 @@ try {
  for(let i=0;i<8;i++) {await page.keyboard.press('Tab');assert.equal(await page.evaluate(()=>document.activeElement.closest('#gachaReveal46')!==null),true);}
  await page.keyboard.press('Escape');assert.equal(await page.locator('#gachaReveal46').count(),0);assert.equal(await page.evaluate(()=>window.SakurayoUI.active()?.id),'gachaDrawer');
  await page.keyboard.press('Escape');await api('selectSkin','techcoat');await api('liveTrigger46','blink');
- await page.waitForTimeout(110);assert.equal(await page.locator('.heroLiveBase46').evaluate(n=>n.style.opacity),'1');
+ await page.waitForFunction(()=>document.querySelector('.heroLiveBase46')?.style.opacity==='1',null,{timeout:1500}); /* 眨眼结束后底图回到 1；固定 110ms 在视频解码负载下不稳定 */assert.equal(await page.locator('.heroLiveBase46').evaluate(n=>n.style.opacity),'1');
  const before=await api('liveSnapshot46');await api('openDrawer','gacha');await page.waitForTimeout(120);const stopped=await api('liveSnapshot46');await page.waitForTimeout(120);assert.equal((await api('liveSnapshot46')).t,stopped.t);
  await page.keyboard.press('Escape');await page.waitForTimeout(100);assert.ok((await api('liveSnapshot46')).t>stopped.t);assert.ok(stopped.t>=before.t);
  await api('start');if(await page.locator('#tutorialDrawer37').isVisible())await page.locator('#tutorialSkip37').click();

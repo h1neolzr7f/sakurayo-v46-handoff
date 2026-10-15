@@ -216,3 +216,12 @@
 ## E030 大厅在窄屏被横向滚走 120px
 - 根因：大厅装饰 SVG 溢出右边，#menu overflow:hidden 仍可被 focus/scrollIntoView 滚动，点按钮后整页左移、按钮出屏。
 - 修复：#menu overflow:clip。command_smoke 失败信息带 box。
+
+## E031 割草/弹幕按键仍是旧菱形/六边形
+- 修复：#hud .acts .act 与 #shm46 .btns .sykBtn 统一为格斗同款圆形发光技能键（mask 图标 + 发光环 + 按压缩放），大招保留原 SVG 冷却环；transition 只留 transform/filter，避免布局变化时按钮被拉成椭圆。
+
+## E029b 寻访提示条压标题分割线
+- 修复：提示条放到 UP 主视觉卡下方、底栏上方，5 秒后自动淡出；r 尺寸单行、主视觉卡底边上移到 112px。
+
+## 测试稳定性
+- ui_input_smoke 眨眼检查从固定 110ms 改为等待底图回到 1（视频解码负载下 110ms 不稳定，二分定位到 rion idle 增强视频提交后开始失败）。
