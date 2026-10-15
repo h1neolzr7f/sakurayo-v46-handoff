@@ -1,0 +1,141 @@
+/* 晨修 E023–E028（2026-10-15）：局部视觉修复，全部按具体界面作用域，不加全局强制规则。
+   - 设置页：.dhead::after 本应只罩标题栏，却因 .dhead 未定位而盖住整个抽屉左半 → 左栏发灰（E024）；三列等高网格，1024×461 不滚动。 */
+(function (global) {
+  "use strict";
+  var d = global.document; if (!d) return;
+  var css = [
+    "#settingsDrawer37 .dhead{position:relative}",
+    "#settingsDrawer37 .dhead::before{content:none!important}",
+    "#settingsDrawer37{overflow:hidden}",
+    "#settingsDrawer37 #settingsBody37{display:grid!important;grid-template-columns:repeat(30,minmax(0,1fr))!important;grid-auto-rows:auto;gap:8px!important;align-content:start;padding-top:10px;padding-bottom:10px}",
+    "#settingsBody37>.settingRow37,#settingsBody37>.settingToggle37,#settingsBody37>.settingGroup39>.settingToggle37{height:48px!important;min-height:0!important;margin:0!important;order:1;box-sizing:border-box;grid-row:auto!important;align-self:stretch}",
+    "#settingsBody37>.settingRow37{grid-column:span 10!important;padding:6px 14px!important;display:flex!important;flex-direction:column;justify-content:center;gap:4px;background:#0e1a2e!important;border-color:#87b1fd33!important}",
+    "#settingsBody37>.settingRow37 span{margin:0!important;color:#f0f5f8!important;font-weight:700;font-size:14px}",
+    "#settingsBody37>.settingRow37 b{color:#ffd1e8!important}",
+    "#settingsBody37 .settingToggle37{grid-column:span 6!important;display:flex!important;align-items:center;justify-content:center;font-size:14px;font-weight:700;padding:0 6px!important;white-space:nowrap;color:#081123!important;background:linear-gradient(90deg,#7fa6ee,#9cc0ff)!important;opacity:1!important}",
+    "#settingsBody37 .settingGroup39{display:contents!important}",
+    "#settingsBody37>.routeNote{order:2;grid-column:1/-1!important;margin:0!important;padding:8px 14px!important;font-size:14px!important;line-height:1.35;color:#d6dde8!important;background:#0e1a2e!important}",
+    "#settingsBody37>#commandUtilities48{order:3;grid-column:1/-1!important;width:auto!important;max-width:none!important;display:flex!important;align-items:center;gap:14px;padding:8px 14px!important;margin:0!important;min-height:0!important;height:auto!important;background:#0e1a2e!important}",
+    "#settingsBody37>#commandUtilities48 small{font-size:11px!important;color:#c3cede!important;white-space:nowrap}",
+    "#settingsBody37>#commandUtilities48 h3{margin:0!important;font-size:16px!important;white-space:nowrap;color:#f0f5f8!important}",
+    "#settingsBody37>#commandUtilities48 .cmdActions47{margin:0 0 0 auto!important;flex-wrap:nowrap}",
+    "#settingsBody37>#commandUtilities48 .cmdActions47 button{height:44px;min-height:44px;font-size:14px;padding:0 14px}"
+  ].join("");
+
+  /* E025 格斗按键：崩三式圆形发光技能键（图标 + 冷却/能量环 + 按下反馈 + 大小层级），摇杆同风格。只作用于 #duel46。 */
+  var DUEL_CSS = [
+    "html #duel46 .dact46{width:250px;height:190px}",
+    "html #duel46 .dact46::before{content:'';position:absolute;right:-30px;bottom:-40px;width:260px;height:260px;border-radius:50%;border:1px solid rgb(120 200 255 / .16);box-shadow:inset 0 0 40px rgb(80 160 255 / .08);pointer-events:none}",
+    "html #duel46 .dact46 .sykBtn{--ring:#7fd8ff;--core:#0b1730;border-radius:50%;clip-path:none!important;left:auto!important;top:auto!important;display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:1px;font:800 13px/1 var(--sy-font-title,sans-serif);color:#f2f8ff;transition:transform .08s ease-out,filter .08s}",
+    "html #duel46 .dact46 .sykBtn::before{inset:0!important;border-radius:50%;clip-path:none!important;background:conic-gradient(var(--ring) calc(var(--cd,1) * 360deg),rgb(255 255 255 / .12) 0)!important;-webkit-mask:radial-gradient(circle,transparent calc(50% - 4px),#000 calc(50% - 3px));mask:radial-gradient(circle,transparent calc(50% - 4px),#000 calc(50% - 3px));filter:drop-shadow(0 0 6px var(--ring))}",
+    "html #duel46 .dact46 .sykBtn::after{inset:4px!important;border-radius:50%;clip-path:none!important;background:radial-gradient(circle at 50% 35%,rgb(255 255 255 / .16),transparent 55%),radial-gradient(circle,var(--core) 58%,rgb(20 40 80 / .9))!important;box-shadow:inset 0 0 0 1px rgb(255 255 255 / .22),inset 0 -6px 14px rgb(0 0 0 / .45)}",
+    "html #duel46 .dact46 .sykBtn svg{width:46%;height:46%;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;filter:drop-shadow(0 0 4px var(--ring))}",
+    "html #duel46 .dact46 .sykBtn b18{font-size:11px;font-weight:800;letter-spacing:.06em}",
+    "html #duel46 .dact46 .sykBtn small{display:none}",
+    "html #duel46 .dact46 .sykBtn.pr18{transform:scale(.88);filter:brightness(1.45)}",
+    "html #duel46 .dact46 .sykBtn.pr18::after{box-shadow:inset 0 0 0 2px var(--ring),0 0 18px var(--ring)}",
+    "html #duel46 .dact46 .sykBtn.lock18{filter:saturate(.35) brightness(.8)}",
+    "html #duel46 .dact46 .b-H{right:8px!important;bottom:8px!important;width:92px!important;height:92px!important;--ring:#ff6fb0;--core:#2a0f2a}",
+    "html #duel46 .dact46 .b-H svg{width:44%;height:44%}",
+    "html #duel46 .dact46 .b-L{right:110px!important;bottom:6px!important;width:66px!important;height:66px!important}",
+    "html #duel46 .dact46 .b-T{right:116px!important;bottom:82px!important;width:56px!important;height:56px!important;--ring:#9fb4ff}",
+    "html #duel46 .dact46 .b-BK{right:186px!important;bottom:4px!important;width:52px!important;height:52px!important;--ring:#8ef0c8;font-size:11px!important}",
+    "html #duel46 .dact46 .b-SP{right:62px!important;bottom:112px!important;width:66px!important;height:66px!important;--ring:#ffb46a;--core:#2a1808}",
+    "html #duel46 .dact46 .b-SU{right:0!important;bottom:118px!important;width:62px!important;height:62px!important;--ring:#ffe27a;--core:#2a2208}",
+    "html #duel46 .dact46 .b-SU.full18::before{animation:syPulse18 1s ease-in-out infinite}",
+    "@keyframes syPulse18{50%{filter:drop-shadow(0 0 12px var(--ring)) brightness(1.35)}}",
+    "html #duel46 .dstk46::before,html #duel46 .dstk46::after{clip-path:none!important;border-radius:50%}",
+    "html #duel46 .dstk46::before{background:repeating-conic-gradient(rgb(127 216 255 / .55) 0 2deg,transparent 2deg 15deg)!important;-webkit-mask:radial-gradient(circle,transparent calc(50% - 7px),#000 calc(50% - 6px));mask:radial-gradient(circle,transparent calc(50% - 7px),#000 calc(50% - 6px))}",
+    "html #duel46 .dstk46::after{inset:8px!important;background:radial-gradient(circle,rgb(127 216 255 / .10),rgb(8 16 34 / .72) 70%)!important;box-shadow:inset 0 0 0 1px rgb(127 216 255 / .35),0 0 24px rgb(80 160 255 / .18)}",
+    "html #duel46 .dstk46 i{clip-path:none!important;border-radius:50%;width:56px!important;height:56px!important;margin:-28px!important;background:radial-gradient(circle at 40% 35%,#e8f6ff,#7fd8ff 45%,#2a6cc0)!important;box-shadow:0 0 16px rgb(127 216 255 / .7),inset 0 0 0 2px rgb(255 255 255 / .5)}",
+    "@media (min-height:600px){html #duel46 .dact46{transform:scale(1.15);transform-origin:right bottom}html #duel46 .dstk46{transform:scale(1.1);transform-origin:left bottom}}","@media (max-height:440px){html #duel46 .dact46{transform:scale(.82)}}"
+  ].join("");
+  var ICON = {
+    L: '<path d="M6 18 18 6M13 6h5v5"/>',
+    H: '<path d="M5 19 16 8l3-3M14 5h5v5M8 13l3 3"/>',
+    T: '<path d="M8 12V6a1.5 1.5 0 0 1 3 0v5M11 11V5a1.5 1.5 0 0 1 3 0v6M14 11V7a1.5 1.5 0 0 1 3 0v6c0 4-2 7-6 7s-6-3-6-6l-1-3a1.5 1.5 0 0 1 3-1l1 2"/>',
+    BK: '<path d="M12 3 5 6v6c0 4 3 7 7 9 4-2 7-5 7-9V6z"/>',
+    SP: '<path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-4-1-6 1-9z"/>',
+    SU: '<path d="m12 2 2.5 6.5L21 9l-5 4.5L17.5 21 12 17l-5.5 4L8 13.5 3 9l6.5-.5z"/>'
+  };
+  var LABEL = { L: "轻", H: "重", T: "投", BK: "防", SP: "必杀", SU: "超必" };
+  function skinDuel(root) {
+    if (!root || root.__sk18) return; root.__sk18 = 1;
+    root.querySelectorAll(".dact46 .sykBtn[data-p]").forEach(function (b) {
+      var k = b.getAttribute("data-p"); if (!ICON[k]) return;
+      var keep = b.querySelector("small"); b.textContent = ""; b.insertAdjacentHTML("beforeend", '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICON[k] + "</svg><b18>" + LABEL[k] + "</b18>"); if (keep) b.appendChild(keep);
+      b.setAttribute("aria-label", LABEL[k]);
+      b.addEventListener("pointerdown", function () { b.classList.add("pr18"); clearTimeout(b.__pt); b.__pt = setTimeout(function () { b.classList.remove("pr18"); }, 160); });
+    });
+    var su = root.querySelector(".b-SU"), sp = root.querySelector(".b-SP"), hv = root.querySelector(".b-H");
+    (function tick() { if (!root.isConnected) return; requestAnimationFrame(tick);
+      var g = global.SakurayoDuel && global.SakurayoDuel.current && global.SakurayoDuel.current(), P = g && g.P; if (!P) return;
+      var m = Math.max(0, Math.min(1, P.meter || 0)), busy = !!(P.mn && P.mv);
+      if (su) { su.style.setProperty("--cd", m.toFixed(3)); su.classList.toggle("full18", m >= 1); su.classList.toggle("lock18", m < 1); }
+      var tot = busy ? (P.mv.st || 0) + (P.mv.ac || 0) + (P.mv.rc || 0) : 0, rec = tot ? Math.min(1, (P.mf || 0) / tot) : 1;
+      if (sp) sp.style.setProperty("--cd", (busy ? rec : 1).toFixed(3));
+      if (hv) hv.style.setProperty("--cd", (busy ? rec : 1).toFixed(3));
+    })();
+  }
+
+  /* E026/E027 大厅统一背景 + 透明看板娘 + 伪 3D：背景 / 粒子 / 角色 / UI 分层视差（陀螺仪 / 鼠标 / 自动漂移），
+     面板轻微透视倾斜 + 背景景深；设置页「动态效果」开关（完整 / 减弱），系统「减少动态」默认减弱。 */
+  var DEPTH_CSS = [
+    ".heroVidA21 video{opacity:0!important}",
+    ".heroVidGL21{position:absolute;pointer-events:none}",
+    "body.depth18 #menu .bg,body.depth18 #syBg{translate:calc(var(--px18,0) * -16px) calc(var(--py18,0) * -10px);scale:1.04}",
+    "body.depth18 #syDepth18{translate:calc(var(--px18,0) * -6px) calc(var(--py18,0) * -4px)}",
+    "body.depth18 .depthHero18{translate:calc(var(--px18,0) * 8px) calc(var(--py18,0) * 4px)}",
+    "body.depth18 #menu>.menu{translate:calc(var(--px18,0) * 4px) calc(var(--py18,0) * 3px)}",
+    "body.depth18 .drawer:not(.hidden)>.dbody{transform:perspective(1400px) rotateY(calc(var(--px18,0) * 1.4deg)) rotateX(calc(var(--py18,0) * -1deg));transform-origin:50% 50%}",
+    "body.depth18:has(.drawer:not(.hidden)) #menu .bg{filter:blur(3px) brightness(.8)}",
+    "#syDepth18{position:absolute;inset:0;pointer-events:none;z-index:1}"
+  ].join("");
+  var MKEY = "syMotion18";
+  function motionLow() { var v = null; try { v = global.localStorage.getItem(MKEY); } catch (e) {} if (v) return v === "low"; return !!(global.matchMedia && global.matchMedia("(prefers-reduced-motion: reduce)").matches); }
+  var D = { tx: 0, ty: 0, x: 0, y: 0, gyro: false, mouseAt: 0, cv: null, parts: [], frames: 0 };
+  function setupDepth() {
+    var body = d.body; if (!body) return;
+    var onMove = function (e) { D.mouseAt = performance.now(); D.tx = (e.clientX / global.innerWidth - 0.5) * 2; D.ty = (e.clientY / global.innerHeight - 0.5) * 2; };
+    global.addEventListener("pointermove", onMove, { passive: true });
+    global.addEventListener("deviceorientation", function (e) { if (e.gamma == null) return; D.gyro = true; D.mouseAt = performance.now();
+      var land = global.innerWidth > global.innerHeight; var a = land ? e.beta : e.gamma, b = land ? e.gamma : e.beta;
+      D.tx = Math.max(-1, Math.min(1, (a || 0) / 25)); D.ty = Math.max(-1, Math.min(1, ((b || 0) - (land ? 0 : 40)) / 25)); }, { passive: true });
+    var last = 0;
+    (function loop(now) { requestAnimationFrame(loop); var low = motionLow(); body.classList.toggle("depth18", !low); if (low) { if (D.cv) D.cv.style.display = "none"; return; }
+      var menu = d.getElementById("menu"), vis = menu && !menu.classList.contains("hidden") && menu.offsetParent !== null; var dt = Math.min(0.05, (now - (last || now)) / 1000); last = now;
+      var idle = now - D.mouseAt > 2500, ax = idle ? Math.sin(now / 3200) * 0.55 : D.tx, ay = idle ? Math.sin(now / 4100) * 0.35 : D.ty;
+      D.x += (ax - D.x) * Math.min(1, dt * 4); D.y += (ay - D.y) * Math.min(1, dt * 4);
+      body.style.setProperty("--px18", D.x.toFixed(3)); body.style.setProperty("--py18", D.y.toFixed(3));
+      var hv = d.querySelector("#menu .heroVid46"); if (hv && hv.parentElement && !hv.parentElement.classList.contains("depthHero18")) hv.parentElement.classList.add("depthHero18");
+      if (vis) drawParts(menu, dt, now); else if (D.cv) D.cv.style.display = "none"; })(performance.now());
+  }
+  function drawParts(menu, dt, now) {
+    var cv = D.cv; if (!cv || !cv.isConnected) { cv = D.cv = d.createElement("canvas"); cv.id = "syDepth18"; var bg = menu.querySelector(".bg"); if (bg && bg.parentNode) bg.parentNode.insertBefore(cv, bg.nextSibling); else menu.insertBefore(cv, menu.firstChild); D.parts = []; }
+    cv.style.display = ""; var W = global.innerWidth, H = global.innerHeight, dpr = Math.min(1.5, global.devicePixelRatio || 1);
+    if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    var g = cv.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    var P = D.parts, i, p; while (P.length < 34) P.push({ x: Math.random() * W, y: Math.random() * H, z: 0.3 + Math.random() * 0.7, k: P.length % 3 ? 0 : 1, r: Math.random() * 6.28, s: 0.5 + Math.random() });
+    for (i = 0; i < P.length; i++) { p = P[i];
+      if (p.k) { p.x += (-14 - 20 * p.z) * dt; p.y += (18 + 26 * p.z) * dt; p.r += dt * p.s; } else { p.y -= 8 * p.z * dt; p.x += Math.sin(now / 1500 + i) * 4 * dt; }
+      if (p.y > H + 20) { p.y = -20; p.x = Math.random() * W * 1.2; } if (p.y < -20) p.y = H + 10; if (p.x < -20) p.x = W + 20;
+      var ox = D.x * -10 * p.z, oy = D.y * -6 * p.z;
+      if (p.k) { g.save(); g.translate(p.x + ox, p.y + oy); g.rotate(p.r); g.fillStyle = "rgba(255,182,214," + (0.35 + 0.4 * p.z) + ")"; g.beginPath(); g.ellipse(0, 0, 5 * p.z + 2, 2.6 * p.z + 1, 0, 0, 6.283); g.fill(); g.restore(); }
+      else { g.fillStyle = "rgba(170,220,255," + (0.18 + 0.3 * p.z * (0.6 + 0.4 * Math.sin(now / 600 + i))) + ")"; g.beginPath(); g.arc(p.x + ox, p.y + oy, 1.2 + p.z * 1.4, 0, 6.283); g.fill(); } }
+    D.frames++;
+  }
+  function addMotionToggle() {
+    var body = d.getElementById("settingsBody37"); if (!body || d.getElementById("motion18")) return;
+    var b = d.createElement("button"); b.id = "motion18"; b.className = "settingToggle37"; var paint = function () { b.textContent = "动态效果：" + (motionLow() ? "减弱" : "完整"); }; paint();
+    b.onclick = function () { try { global.localStorage.setItem(MKEY, motionLow() ? "full" : "low"); } catch (e) {} paint(); };
+    var note = body.querySelector(".routeNote"); body.insertBefore(b, note && note.parentNode === body ? note : null);
+  }
+  function add() { if (d.getElementById("syPolish18")) return; var s = d.createElement("style"); s.id = "syPolish18"; s.textContent = css; (d.head || d.documentElement).appendChild(s);
+    var s2 = d.createElement("style"); s2.id = "syPolish18duel"; s2.textContent = DUEL_CSS; (d.head || d.documentElement).appendChild(s2);
+    new MutationObserver(function () { var r = d.getElementById("duel46"); if (r && !r.__sk18) skinDuel(r); }).observe(d.body || d.documentElement, { childList: true, subtree: false });
+    var s3 = d.createElement("style"); s3.id = "syPolish18depth"; s3.textContent = DEPTH_CSS; (d.head || d.documentElement).appendChild(s3);
+    var sb = null; new MutationObserver(function () { var b = d.getElementById("settingsBody37"); if (b && b !== sb) { sb = b; new MutationObserver(addMotionToggle).observe(b, { childList: true }); } addMotionToggle(); }).observe(d.body, { childList: true });
+    setupDepth(); }
+  if (d.readyState === "loading") d.addEventListener("DOMContentLoaded", add); else add();
+  global.SakurayoPolish18 = { css: function () { return css; }, motionLow: motionLow, depth: function () { return { x: D.x, y: D.y, frames: D.frames, on: d.body.classList.contains("depth18") }; } };
+})(typeof window !== "undefined" ? window : globalThis);
