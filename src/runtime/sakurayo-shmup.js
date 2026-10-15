@@ -407,30 +407,31 @@
       g.strokeStyle = TKS("primary", 0.035 + 0.05 * wv); g.beginPath();
       for (k = 0; k < 6; k++) { var a = Math.PI / 3 * k; g[k ? "lineTo" : "moveTo"](cx + Math.cos(a) * hs * 0.5, cy + Math.sin(a) * hs * 0.5); } g.closePath(); g.stroke();
     }
-    for (i = 0; i < 3; i++) { var by = ((t * (30 + i * 14) + i * H / 3) % (H + 200)) - 100, gr = g.createLinearGradient(0, by - 80, 0, by + 80); gr.addColorStop(0, "rgba(120,200,255,0)"); gr.addColorStop(0.5, "rgba(120,200,255,0.06)"); gr.addColorStop(1, "rgba(120,200,255,0)"); g.fillStyle = gr; g.fillRect(0, by - 80, W, 160); }
-    g.fillStyle = "rgba(0,0,0,0.18)"; for (i = 0; i < H; i += 3) g.fillRect(0, i, W, 1);
+    for (i = 0; i < 3; i++) { var by = ((t * (30 + i * 14) + i * H / 3) % (H + 200)) - 100, gr = g.createLinearGradient(0, by - 80, 0, by + 80); gr.addColorStop(0, TKS("primary-strong", 0)); gr.addColorStop(0.5, TKS("primary-strong", 0.06)); gr.addColorStop(1, TKS("primary-strong", 0)); g.fillStyle = gr; g.fillRect(0, by - 80, W, 160); }
+    g.fillStyle = TKS("n0", 0.3); for (i = 0; i < H; i += 3) g.fillRect(0, i, W, 1);
     g.restore();
     var lw = fx - 34; if (lw < 120) return;
     var x0 = 14, w0 = Math.min(lw, 260), y0 = fy + 24, h0 = Math.min(fh * 0.42, w0 * 1.25), c = 14;
     var holo = function (x, y, w, h) { g.beginPath(); g.moveTo(x + c, y); g.lineTo(x + w, y); g.lineTo(x + w, y + h - c); g.lineTo(x + w - c, y + h); g.lineTo(x, y + h); g.lineTo(x, y + c); g.closePath(); };
-    g.save(); holo(x0, y0, w0, h0); g.fillStyle = "rgba(10,24,48,0.55)"; g.fill(); g.save(); g.clip();
-    var bi = Bo && (img["boss_" + (Bo.cid || Bo.id)] || img.bossCut || img["cut_" + (Bo.cid || "")]);
-    if (bi && bi.width) { var s = Math.max(w0 / bi.width, h0 / bi.height); g.globalAlpha = 0.85; g.drawImage(bi, x0 + (w0 - bi.width * s) / 2, y0, bi.width * s, bi.height * s); g.globalAlpha = 1; }
-    else { g.strokeStyle = TKS("primary", 0.28); g.lineWidth = 1; for (i = 0; i < 4; i++) { g.beginPath(); g.arc(x0 + w0 / 2, y0 + h0 * 0.45, 18 + i * 16 + (t * 10 % 16), 0, Math.PI * 2); g.stroke(); }
-      g.font = "800 13px SyTitleEn, sans-serif"; g.textAlign = "center"; g.fillStyle = TKS("primary-strong", 0.85); g.fillText(Bo ? "BOSS SIGNAL" : "NO SIGNAL", x0 + w0 / 2, y0 + h0 * 0.45 + 4); }
-    var sy = (t * 60) % h0; g.fillStyle = "rgba(140,220,255,0.10)"; g.fillRect(x0, y0 + sy, w0, 2);
+    g.save(); holo(x0, y0, w0, h0); g.fillStyle = TKS("n1", 0.55); g.fill(); g.save(); g.clip();
+    var li18 = (this.layer - 1) % 3 + 1, bi = Bo ? (img["boss_" + (Bo.cid || Bo.id)] || img["chibi_" + (Bo.spr || Bo.cid || "") + "_idle0"] || img["cut_" + (Bo.cid || "")]) : null, scene = img["bg" + li18] || img["tile_" + li18];
+    if (!bi || !bi.width) { var key18 = function (e) { var k = e && e.spr; return Array.isArray(k) ? k[0] : k; }, en = (this.E || []).find(function (e) { var k = key18(e); return k && img[k] && img[k].width; }); if (Bo && Bo.spr && img[key18(Bo)]) bi = img[key18(Bo)]; else if (en) bi = img[key18(en)]; }
+    if (scene && scene.width) { var ss = Math.max(w0 / scene.width, h0 / scene.height), drift = Math.sin(t * 0.3) * 8; g.globalAlpha = 0.7; g.drawImage(scene, x0 + (w0 - scene.width * ss) / 2 + drift, y0 + (h0 - scene.height * ss) / 2, scene.width * ss, scene.height * ss); g.globalAlpha = 1; }
+    if (bi && bi.width) { var s = Math.min(w0 * 0.9 / bi.width, h0 * 0.9 / bi.height); g.globalAlpha = 0.95; g.drawImage(bi, x0 + (w0 - bi.width * s) / 2, y0 + (h0 - bi.height * s) / 2 + Math.sin(t * 2) * 3, bi.width * s, bi.height * s); g.globalAlpha = 1; }
+    g.fillStyle = TKS("n0", 0.22); for (i = 0; i < h0; i += 3) g.fillRect(x0, y0 + i, w0, 1);
+    var sy = (t * 60) % h0; g.fillStyle = TKS("primary-strong", 0.1); g.fillRect(x0, y0 + sy, w0, 2);
     g.restore(); g.strokeStyle = TKS("primary", 0.8); g.lineWidth = 1.5; holo(x0, y0, w0, h0); g.stroke();
     g.fillStyle = TKS("accent", 1); g.fillRect(x0 + c + 4, y0 - 3, 40, 3);
-    g.font = "700 12px SyTitleEn, sans-serif"; g.textAlign = "left"; g.fillStyle = TKS("primary-strong", 1); g.fillText("TARGET · " + (Bo ? Bo.name : "—"), x0 + 6, y0 + h0 + 16);
+    g.font = "700 12px SyTitleEn, sans-serif"; g.textAlign = "left"; g.fillStyle = TKS("primary-strong", 1); g.fillText((Bo ? "TARGET · " + Bo.name : "SECTOR SCAN · 道中敌群"), x0 + 6, y0 + h0 + 16);
     var card = Bo && Bo.card && !Bo.card.non ? Bo.card.n : null, ny = y0 + h0 + 30, nh = 34;
     g.beginPath(); g.moveTo(x0, ny); g.lineTo(x0 + w0, ny); g.lineTo(x0 + w0 - 12, ny + nh); g.lineTo(x0, ny + nh); g.closePath();
-    var ng = g.createLinearGradient(x0, 0, x0 + w0, 0); ng.addColorStop(0, card ? "rgba(255,90,160,0.55)" : "rgba(60,90,140,0.35)"); ng.addColorStop(1, "rgba(20,20,40,0.1)"); g.fillStyle = ng; g.fill();
-    g.font = "800 14px SyTitle, sans-serif"; g.fillStyle = "#fff"; var txt = card ? card : (Bo ? "通常弹幕" : "道中 · 待接敌"); while (g.measureText(txt).width > w0 - 24 && txt.length > 2) txt = txt.slice(0, -2) + "…"; g.fillText(txt, x0 + 10, ny + nh / 2 + 5);
+    var ng = g.createLinearGradient(x0, 0, x0 + w0, 0); ng.addColorStop(0, card ? TKS("accent", 0.55) : TKS("n3", 0.35)); ng.addColorStop(1, TKS("n0", 0.1)); g.fillStyle = ng; g.fill();
+    g.font = "800 14px SyTitle, sans-serif"; g.fillStyle = TKS("n6", 1); var txt = card ? card : (Bo ? "通常弹幕" : "道中 · 第 " + ((this.layer || 1)) + " 层"); while (g.measureText(txt).width > w0 - 24 && txt.length > 2) txt = txt.slice(0, -2) + "…"; g.fillText(txt, x0 + 10, ny + nh / 2 + 5);
     g.font = "700 11px SyTitleEn, sans-serif"; g.fillStyle = TKS("n5", 1); g.fillText("SPELL CARD", x0 + 10, ny - 4);
-    var dy = ny + nh + 28, dh = fy + fh - 24 - dy; if (dh > 60) { holo(x0, dy, w0, dh); g.fillStyle = "rgba(10,24,48,0.42)"; g.fill(); g.strokeStyle = TKS("primary", 0.5); g.lineWidth = 1; g.stroke();
+    var dy = ny + nh + 28, dh = fy + fh - 24 - dy; if (dh > 60) { holo(x0, dy, w0, dh); g.fillStyle = TKS("n1", 0.42); g.fill(); g.strokeStyle = TKS("primary", 0.5); g.lineWidth = 1; g.stroke();
       g.font = "700 12px SyTitleEn, monospace"; g.textAlign = "left"; var rows18 = ["SECTOR " + ((this.layer || 1)) + " · MIRROR SKY", "T+" + t.toFixed(1) + "s", "BULLETS " + (this.B ? this.B.length : 0), "GRAZE " + (this.P ? this.P.graze : 0), "LINK ▮▮▮▮▯", "SYNC " + (90 + Math.round(Math.sin(t) * 6)) + "%"];
       for (i = 0; i < rows18.length && 20 + i * 18 < dh - 8; i++) { g.fillStyle = TKS(i === 0 ? "primary-strong" : "n5", 0.95); g.fillText(rows18[i], x0 + 12, dy + 22 + i * 18); } }
-    if (Bo && Bo.max) { var hy = ny + nh + 12; g.fillStyle = "rgba(255,255,255,0.12)"; g.fillRect(x0, hy, w0, 5); g.fillStyle = TKS("accent", 1); g.fillRect(x0, hy, w0 * Math.max(0, Bo.hp / Bo.max), 5); }
+    if (Bo && Bo.max) { var hy = ny + nh + 12; g.fillStyle = TKS("n6", 0.12); g.fillRect(x0, hy, w0, 5); g.fillStyle = TKS("accent", 1); g.fillRect(x0, hy, w0 * Math.max(0, Bo.hp / Bo.max), 5); }
     g.restore();
   };
   // 右侧信息面板（东方式：最高分 / 分数 / 残机 / 符卡 / 火力 / 擦弹 + 当前符卡名，顶部角色立绘框）
