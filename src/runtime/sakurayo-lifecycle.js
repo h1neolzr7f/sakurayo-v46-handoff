@@ -372,6 +372,7 @@
         drawGroundChunk(ctx, world, photoDone);
         ctx.restore();
       }
+      if (photoDone && world.tiledGround) drawGroundDressing18(ctx, world);
       drawAtmosphere(ctx, world);
       drawMirrorEcho(ctx, world);
       return;
@@ -379,6 +380,65 @@
     drawGroundChunk(ctx, world, drawWorldPhoto(ctx, world));
     drawAtmosphere(ctx, world);
     drawMirrorEcho(ctx, world);
+  }
+
+
+  /* 晨修 E023：割草地面层次。照片/拼贴地面之上按世界坐标确定性地铺：深蓝黑调色、青蓝发光线路、
+     稀疏贴花与碎片、樱瓣、局部光池；各章配色/贴花不同。全部低饱和低不透明，不抢角色与弹道。 */
+  var DRESS18 = {
+    1: { tint: "6,10,26", line: "92,220,255", pool: "120,190,255", deco: "sakura", petal: "255,170,210" },
+    2: { tint: "4,12,30", line: "70,235,255", pool: "70,150,255", deco: "hazard", petal: "255,150,200" },
+    3: { tint: "12,8,26", line: "150,200,255", pool: "255,90,150", deco: "crack", petal: "255,120,170" },
+    4: { tint: "8,6,30", line: "170,140,255", pool: "150,110,255", deco: "rune", petal: "220,180,255" }
+  };
+  function h18(a, b, k) { var x = Math.sin(a * 127.1 + b * 311.7 + k * 74.7) * 43758.5453; return x - Math.floor(x); }
+  function drawGroundDressing18(ctx, world) {
+    var sid = world.stageId || 1, P = DRESS18[((sid - 1) % 4 + 4) % 4 + 1], t = (world.runTime || 0) % 3600,
+      cx = world.camX || 0, cy = world.camY || 0, W = world.W, H = world.H, low = world.quality != null && world.quality < 0.8,
+      cell = 240, c0 = Math.floor(cx / cell) - 1, r0 = Math.floor(cy / cell) - 1, c1 = Math.ceil((cx + W) / cell), r1 = Math.ceil((cy + H) / cell), r, c, a, x, y, i;
+    ctx.save();
+    ctx.fillStyle = "rgba(" + P.tint + ",0.42)"; ctx.fillRect(cx - 4, cy - 4, W + 8, H + 8);
+    for (r = r0; r <= r1; r++) for (c = c0; c <= c1; c++) {
+      x = c * cell; y = r * cell; a = h18(c, r, sid);
+      if (a < 0.16) { var gp = ctx.createRadialGradient(x + 120, y + 120, 4, x + 120, y + 120, 150);
+        gp.addColorStop(0, "rgba(" + P.pool + ",0.16)"); gp.addColorStop(1, "rgba(" + P.pool + ",0)"); ctx.fillStyle = gp; ctx.fillRect(x - 30, y - 30, 300, 300); }
+    }
+    ctx.lineCap = "round";
+    for (r = r0; r <= r1; r++) for (c = c0; c <= c1; c++) {
+      x = c * cell; y = r * cell; a = h18(c, r, sid + 9);
+      if (a > 0.55) continue;
+      var mid = x + 40 + Math.floor(h18(r, c, 3) * 4) * 40, puls = 0.5 + 0.5 * Math.sin(t * 1.6 + c * 1.3 + r * 0.7);
+      ctx.strokeStyle = "rgba(" + P.line + "," + (0.10 + 0.10 * puls) + ")"; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x, y + 60); ctx.lineTo(mid, y + 60); ctx.lineTo(mid + 40, y + 100); ctx.lineTo(mid + 40, y + cell); ctx.stroke();
+      ctx.fillStyle = "rgba(" + P.line + "," + (0.30 + 0.35 * puls) + ")"; ctx.fillRect(mid + 37, y + cell - 4, 6, 6);
+      if (!low) { var k = (t * 0.35 + a * 7) % 1; ctx.fillStyle = "rgba(" + P.line + ",0.55)"; ctx.beginPath(); ctx.arc(x + k * (mid - x), y + 60, 2.2, 0, Math.PI * 2); ctx.fill(); }
+    }
+    for (r = r0; r <= r1; r++) for (c = c0; c <= c1; c++) {
+      a = h18(c, r, sid + 21); if (a > 0.22) continue;
+      x = c * cell + 60 + h18(c, r, 5) * 120; y = r * cell + 60 + h18(c, r, 6) * 120;
+      ctx.save(); ctx.translate(x, y); ctx.rotate(h18(c, r, 7) * 6.28);
+      ctx.strokeStyle = "rgba(" + P.line + ",0.16)"; ctx.fillStyle = "rgba(" + P.line + ",0.07)"; ctx.lineWidth = 1.5;
+      if (P.deco === "sakura") { for (i = 0; i < 5; i++) { ctx.rotate(1.2566); ctx.beginPath(); ctx.ellipse(0, -16, 7, 15, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); } ctx.beginPath(); ctx.arc(0, 0, 30, 0, Math.PI * 2); ctx.stroke(); }
+      else if (P.deco === "hazard") { ctx.strokeRect(-34, -10, 68, 20); for (i = -3; i < 3; i++) { ctx.beginPath(); ctx.moveTo(i * 12, 10); ctx.lineTo(i * 12 + 10, -10); ctx.stroke(); } }
+      else if (P.deco === "crack") { ctx.strokeStyle = "rgba(255,110,160,0.18)"; ctx.beginPath(); ctx.moveTo(-30, -4); ctx.lineTo(-8, 3); ctx.lineTo(4, -9); ctx.lineTo(30, 6); ctx.moveTo(4, -9); ctx.lineTo(10, -26); ctx.stroke(); }
+      else { ctx.beginPath(); ctx.arc(0, 0, 26, 0, Math.PI * 2); ctx.moveTo(18, 0); ctx.arc(0, 0, 18, 0, Math.PI * 2); ctx.stroke(); for (i = 0; i < 6; i++) { ctx.rotate(1.047); ctx.fillRect(20, -2, 8, 4); } }
+      ctx.restore();
+    }
+    for (r = r0; r <= r1; r++) for (c = c0; c <= c1; c++) {
+      var nd = low ? 1 : 3;
+      for (i = 0; i < nd; i++) { a = h18(c * 3 + i, r, sid + 40); if (a > 0.5) continue;
+        x = c * cell + h18(c, r, 50 + i) * cell; y = r * cell + h18(c, r, 60 + i) * cell;
+        if (i === 0) { ctx.fillStyle = "rgba(170,190,215,0.10)"; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 7, y + 2); ctx.lineTo(x + 2, y + 6); ctx.closePath(); ctx.fill(); }
+        else { var sw = Math.sin(t * 0.8 + a * 20) * 3; ctx.fillStyle = "rgba(" + P.petal + ",0.42)"; ctx.beginPath(); ctx.ellipse(x + sw, y, 4.5, 2.4, a * 6 + t * 0.2, 0, Math.PI * 2); ctx.fill(); }
+      }
+    }
+    if (world.playerX != null && world.playerY != null) {
+      var px = world.playerX, py = world.playerY + 20, pp = 0.5 + 0.5 * Math.sin(t * 3);
+      var gr = ctx.createRadialGradient(px, py, 2, px, py, 46); gr.addColorStop(0, "rgba(" + P.line + ",0.22)"); gr.addColorStop(1, "rgba(" + P.line + ",0)");
+      ctx.fillStyle = gr; ctx.beginPath(); ctx.ellipse(px, py, 46, 18, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = "rgba(" + P.line + "," + (0.45 + 0.25 * pp) + ")"; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.ellipse(px, py, 26 + pp * 3, 9 + pp, 0, 0, Math.PI * 2); ctx.stroke();
+    }
+    ctx.restore();
   }
 
   function drawGroundChunk(ctx, world, photoDone) {
