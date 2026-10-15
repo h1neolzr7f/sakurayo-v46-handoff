@@ -385,6 +385,7 @@
   Game.prototype.drawFrame = function (g, W, H, fx, fy, fw, fh) {
     g.save(); g.fillStyle = TKS("n0", 0.72); g.fillRect(0, 0, W, H);
     var ga = Math.max(8, fx - 8), u = H / 24, i;
+    this.drawSideDeco18 && this.drawSideDeco18(g, W, H, fx, fy, fw, fh);
     // 左侧竖条纹样
     if (fx > 24) { var lx = fx - 14; g.strokeStyle = TKS("primary", 0.35); g.lineWidth = 1; g.beginPath(); g.moveTo(lx, 0); g.lineTo(lx, H); g.moveTo(lx - 8, 0); g.lineTo(lx - 8, H); g.stroke();
       for (i = 0; i < 24; i++) { var yy = i * u + u / 2; g.beginPath(); for (var k = 0; k < 6; k++) { var a = Math.PI / 3 * k; g[k ? "lineTo" : "moveTo"](lx - 4 + Math.cos(a) * u * 0.28, yy + Math.sin(a) * u * 0.28); } g.closePath(); g.strokeStyle = TKS(i % 4 === 0 ? "accent" : "primary", i % 4 === 0 ? 0.55 : 0.22); g.stroke(); }
@@ -394,10 +395,48 @@
     var br = Math.min(28, fw * 0.08); g.strokeStyle = TKS("accent", 1); g.lineWidth = 3; [[fx - 7, fy - 7, 1, 1], [fx + fw + 7, fy - 7, -1, 1], [fx - 7, fy + fh + 7, 1, -1], [fx + fw + 7, fy + fh + 7, -1, -1]].forEach(function (c) { g.beginPath(); g.moveTo(c[0] + c[2] * br, c[1]); g.lineTo(c[0], c[1]); g.lineTo(c[0], c[1] + c[3] * br); g.stroke(); });
     g.restore();
   };
+
+  /* 晨修 E028：两侧外框与背景层（动态六角网格 + 光带 + 扫描线）、左侧全息框（Boss 立绘位 + 符卡名条）。低不透明度，不进战场区域。 */
+  Game.prototype.drawSideDeco18 = function (g, W, H, fx, fy, fw, fh) {
+    var t = this.t || 0, i, k, img = this.__img18 || {}, Bo = this.boss, L = this.lay || {};
+    g.save(); g.beginPath(); g.rect(0, 0, fx - 10, H); var rx = (L.panX || fx + fw) + (L.panW || 0) + 6; if (rx < W) g.rect(rx, 0, W - rx, H); g.rect(fx + fw + 10, 0, Math.max(0, (L.panX || W) - fx - fw - 10), H); g.clip();
+    var hs = Math.max(22, H / 18), hh = hs * 0.866, off = (t * 12) % (hh * 2);
+    g.lineWidth = 1;
+    for (var row = -1; row * hh < H + hh; row++) for (var col = -1; col * hs * 1.5 < W + hs; col++) {
+      var cx = col * hs * 1.5, cy = row * hh * 2 + (col % 2 ? hh : 0) + off - hh, wv = 0.5 + 0.5 * Math.sin(t * 0.9 + col * 0.5 + row * 0.35);
+      g.strokeStyle = TKS("primary", 0.035 + 0.05 * wv); g.beginPath();
+      for (k = 0; k < 6; k++) { var a = Math.PI / 3 * k; g[k ? "lineTo" : "moveTo"](cx + Math.cos(a) * hs * 0.5, cy + Math.sin(a) * hs * 0.5); } g.closePath(); g.stroke();
+    }
+    for (i = 0; i < 3; i++) { var by = ((t * (30 + i * 14) + i * H / 3) % (H + 200)) - 100, gr = g.createLinearGradient(0, by - 80, 0, by + 80); gr.addColorStop(0, "rgba(120,200,255,0)"); gr.addColorStop(0.5, "rgba(120,200,255,0.06)"); gr.addColorStop(1, "rgba(120,200,255,0)"); g.fillStyle = gr; g.fillRect(0, by - 80, W, 160); }
+    g.fillStyle = "rgba(0,0,0,0.18)"; for (i = 0; i < H; i += 3) g.fillRect(0, i, W, 1);
+    g.restore();
+    var lw = fx - 34; if (lw < 120) return;
+    var x0 = 14, w0 = Math.min(lw, 260), y0 = fy + 24, h0 = Math.min(fh * 0.42, w0 * 1.25), c = 14;
+    var holo = function (x, y, w, h) { g.beginPath(); g.moveTo(x + c, y); g.lineTo(x + w, y); g.lineTo(x + w, y + h - c); g.lineTo(x + w - c, y + h); g.lineTo(x, y + h); g.lineTo(x, y + c); g.closePath(); };
+    g.save(); holo(x0, y0, w0, h0); g.fillStyle = "rgba(10,24,48,0.55)"; g.fill(); g.save(); g.clip();
+    var bi = Bo && (img["boss_" + (Bo.cid || Bo.id)] || img.bossCut || img["cut_" + (Bo.cid || "")]);
+    if (bi && bi.width) { var s = Math.max(w0 / bi.width, h0 / bi.height); g.globalAlpha = 0.85; g.drawImage(bi, x0 + (w0 - bi.width * s) / 2, y0, bi.width * s, bi.height * s); g.globalAlpha = 1; }
+    else { g.strokeStyle = TKS("primary", 0.28); g.lineWidth = 1; for (i = 0; i < 4; i++) { g.beginPath(); g.arc(x0 + w0 / 2, y0 + h0 * 0.45, 18 + i * 16 + (t * 10 % 16), 0, Math.PI * 2); g.stroke(); }
+      g.font = "800 13px SyTitleEn, sans-serif"; g.textAlign = "center"; g.fillStyle = TKS("primary-strong", 0.85); g.fillText(Bo ? "BOSS SIGNAL" : "NO SIGNAL", x0 + w0 / 2, y0 + h0 * 0.45 + 4); }
+    var sy = (t * 60) % h0; g.fillStyle = "rgba(140,220,255,0.10)"; g.fillRect(x0, y0 + sy, w0, 2);
+    g.restore(); g.strokeStyle = TKS("primary", 0.8); g.lineWidth = 1.5; holo(x0, y0, w0, h0); g.stroke();
+    g.fillStyle = TKS("accent", 1); g.fillRect(x0 + c + 4, y0 - 3, 40, 3);
+    g.font = "700 12px SyTitleEn, sans-serif"; g.textAlign = "left"; g.fillStyle = TKS("primary-strong", 1); g.fillText("TARGET · " + (Bo ? Bo.name : "—"), x0 + 6, y0 + h0 + 16);
+    var card = Bo && Bo.card && !Bo.card.non ? Bo.card.n : null, ny = y0 + h0 + 30, nh = 34;
+    g.beginPath(); g.moveTo(x0, ny); g.lineTo(x0 + w0, ny); g.lineTo(x0 + w0 - 12, ny + nh); g.lineTo(x0, ny + nh); g.closePath();
+    var ng = g.createLinearGradient(x0, 0, x0 + w0, 0); ng.addColorStop(0, card ? "rgba(255,90,160,0.55)" : "rgba(60,90,140,0.35)"); ng.addColorStop(1, "rgba(20,20,40,0.1)"); g.fillStyle = ng; g.fill();
+    g.font = "800 14px SyTitle, sans-serif"; g.fillStyle = "#fff"; var txt = card ? card : (Bo ? "通常弹幕" : "道中 · 待接敌"); while (g.measureText(txt).width > w0 - 24 && txt.length > 2) txt = txt.slice(0, -2) + "…"; g.fillText(txt, x0 + 10, ny + nh / 2 + 5);
+    g.font = "700 11px SyTitleEn, sans-serif"; g.fillStyle = TKS("n5", 1); g.fillText("SPELL CARD", x0 + 10, ny - 4);
+    var dy = ny + nh + 28, dh = fy + fh - 24 - dy; if (dh > 60) { holo(x0, dy, w0, dh); g.fillStyle = "rgba(10,24,48,0.42)"; g.fill(); g.strokeStyle = TKS("primary", 0.5); g.lineWidth = 1; g.stroke();
+      g.font = "700 12px SyTitleEn, monospace"; g.textAlign = "left"; var rows18 = ["SECTOR " + ((this.layer || 1)) + " · MIRROR SKY", "T+" + t.toFixed(1) + "s", "BULLETS " + (this.B ? this.B.length : 0), "GRAZE " + (this.P ? this.P.graze : 0), "LINK ▮▮▮▮▯", "SYNC " + (90 + Math.round(Math.sin(t) * 6)) + "%"];
+      for (i = 0; i < rows18.length && 20 + i * 18 < dh - 8; i++) { g.fillStyle = TKS(i === 0 ? "primary-strong" : "n5", 0.95); g.fillText(rows18[i], x0 + 12, dy + 22 + i * 18); } }
+    if (Bo && Bo.max) { var hy = ny + nh + 12; g.fillStyle = "rgba(255,255,255,0.12)"; g.fillRect(x0, hy, w0, 5); g.fillStyle = TKS("accent", 1); g.fillRect(x0, hy, w0 * Math.max(0, Bo.hp / Bo.max), 5); }
+    g.restore();
+  };
   // 右侧信息面板（东方式：最高分 / 分数 / 残机 / 符卡 / 火力 / 擦弹 + 当前符卡名，顶部角色立绘框）
   Game.prototype.drawPanel = function (g, img) {
     var L = this.lay, K = global.SyKit, P = this.P, x = L.panX, w = Math.min(L.panW, L.W - x - 8), H = L.H, pad = Math.max(8, w * 0.06), y = L.oy, h = FH * L.sc, f = Math.max(10, Math.min(18, w / 16)); if (w < 120) return;
-    g.save(); if (K) K.panel(g, { x: x, y: y, w: w, h: h, title: "STATUS · 镜空", cut: 16 });
+    this.__img18 = img; g.save(); if (K) K.panel(g, { x: x, y: y, w: w, h: h, title: "STATUS · 镜空", cut: 16 });
     // 立绘框
     var ci = img["cut_" + this.cid], short = h < 480 * Math.min(global.devicePixelRatio || 1, 2), ph = Math.min(h * (short ? 0.19 : 0.24), w * 0.5), py = y + f * 2.2; g.save(); g.beginPath(); g.moveTo(x + pad + 12, py); g.lineTo(x + w - pad, py); g.lineTo(x + w - pad, py + ph - 12); g.lineTo(x + w - pad - 12, py + ph); g.lineTo(x + pad, py + ph); g.lineTo(x + pad, py + 12); g.closePath();
     g.fillStyle = TKS("n2", 1); g.fill(); g.clip(); if (ci && ci.width) { var cw = w - pad * 2, chh = cw * ci.height / ci.width; g.drawImage(ci, x + pad, py - chh * 0.12, cw, chh); } g.restore();
@@ -420,6 +459,13 @@
     label("Spell Card", cy); g.font = "800 " + Math.round(f * 0.95) + "px SyTitle, sans-serif"; g.textAlign = "left"; g.fillStyle = card ? TKS("accent", 1) : TKS("n4", 1);
     var txt = card || (Bo ? Bo.name + " · 通常弹幕" : "道中"), maxW = w - pad * 2; while (g.measureText(txt).width > maxW && txt.length > 2) txt = txt.slice(0, -2) + "…"; g.fillText(txt, x + pad, cy + lh * 0.75);
     if (this.caps || this.cardsSeen) { g.font = "600 " + Math.round(f * 0.8) + "px SyTitle, sans-serif"; g.fillStyle = TKS("n5", 1); g.fillText("符卡收取 " + this.caps + " / " + (this.cardsSeen || 0), x + pad, cy + lh * 1.5); }
+    // E028 状态栏充实：弹幕密度条 + 击破数 + 动态波形，填满符卡区到触屏按键之间的空白（空间不够就逐项省略）
+    var by0 = cy + lh * ((this.caps || this.cardsSeen) ? 2.2 : 1.5), bot = y + h - rsv - f * 0.3, dens = Math.min(1, (this.B ? this.B.length : 0) / 300);
+    if (bot - by0 > f * 0.8) {
+      label("Danmaku", by0); g.font = "800 " + Math.round(f * 0.9) + "px SyTitleEn, monospace"; g.textAlign = "right"; g.fillStyle = TKS(dens > 0.6 ? "accent" : "n6", 1); g.fillText("KO " + (this.kills || 0) + " · " + Math.round(dens * 100) + "%", x + w - pad, by0);
+      if (K) K.bar(g, { x: x + pad, y: by0 + f * 0.7, w: w - pad * 2, h: Math.max(4, f * 0.26), v: dens, delay: dens, cut: 4 });
+      var wy = by0 + f * 1.5, wh = Math.min(lh * 1.4, bot - wy); if (wh > 10) { g.strokeStyle = TKS("primary", 0.55); g.lineWidth = 1.2; g.beginPath(); for (var q = 0; q <= 40; q++) { var qx = x + pad + (w - pad * 2) * q / 40, qa = Math.sin(q * 0.7 + (this.t || 0) * 5) * Math.sin(q * 0.23 + (this.t || 0)) * (0.3 + dens * 0.7); g[q ? "lineTo" : "moveTo"](qx, wy + wh / 2 + qa * wh / 2); } g.stroke(); g.strokeStyle = TKS("n3", 1); g.strokeRect(x + pad, wy, w - pad * 2, wh); }
+    }
     g.restore();
   };
   Game.prototype.snapshot = function () { var b = this.boss, P = this.P; return { t: +this.t.toFixed(2), step: this.step_, stage: (this.cur() || {}), lives: P.lives, hp: +(P.lives / this.lives0).toFixed(3), bombs: P.bombs, power: +P.power.toFixed(2), focus: P.focus, graze: P.graze, kills: this.kills, enemies: this.E.length, bullets: this.B.length, shots: this.S.length,
