@@ -394,6 +394,7 @@
   function tok18(n, a) { return global.SakurayoTok ? global.SakurayoTok(n, a) : "gray"; }
   function h18(a, b, k) { var x = Math.sin(a * 127.1 + b * 311.7 + k * 74.7) * 43758.5453; return x - Math.floor(x); }
   function drawGroundDressing18(ctx, world) {
+    if (!ctx || typeof ctx.createRadialGradient !== "function" || typeof ctx.ellipse !== "function") return; /* 单测用的极简 ctx 不支持渐变，跳过装饰 */
     var sid = world.stageId || 1, P = DRESS18[((sid - 1) % 4 + 4) % 4 + 1], t = (world.runTime || 0) % 3600,
       cx = world.camX || 0, cy = world.camY || 0, W = world.W, H = world.H, low = world.quality != null && world.quality < 0.8,
       cell = 240, c0 = Math.floor(cx / cell) - 1, r0 = Math.floor(cy / cell) - 1, c1 = Math.ceil((cx + W) / cell), r1 = Math.ceil((cy + H) / cell), r, c, a, x, y, i;
