@@ -21,8 +21,8 @@ try {
   for(const [width,height] of [[932,430],[844,390],[740,360]]){
     await page.setViewportSize({width,height});
     for(const id of ['commandCharacter47','commandSupplies47','commandPrepare47','commandHistory47']){
-      const button=page.locator('#'+id),box=await button.boundingBox();
-      assert.ok(box&&box.x>=0&&box.y>=0&&box.x+box.width<=width+1&&box.y+box.height<=height+1,id+' visible in '+width+'x'+height);
+      const button=page.locator('#'+id);let box=null;for(let k=0;k<20;k++){box=await button.boundingBox();if(box&&box.x>=0&&box.y>=0&&box.x+box.width<=width+1&&box.y+box.height<=height+1)break;await page.waitForTimeout(100);} /* 视口切换后布局有过渡，等稳定再量 */
+      assert.ok(box&&box.x>=0&&box.y>=0&&box.x+box.width<=width+1&&box.y+box.height<=height+1,id+' visible in '+width+'x'+height+' '+JSON.stringify(box));
       assert.ok(box.height>=40,id+' touch target >=40');
       await button.click({timeout:5000});
       assert.equal(await page.locator('#commandDrawer47').isVisible(),true);
