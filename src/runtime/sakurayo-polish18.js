@@ -87,7 +87,7 @@
     "body.depth18 #menu .bg,body.depth18 #syBg{translate:calc(var(--px18,0) * -16px) calc(var(--py18,0) * -10px);scale:1.04}",
     "body.depth18 #syDepth18{translate:calc(var(--px18,0) * -6px) calc(var(--py18,0) * -4px)}",
     "body.depth18 .depthHero18{translate:calc(var(--px18,0) * 8px) calc(var(--py18,0) * 4px)}",
-    "body.depth18 #menu>.menu{translate:calc(var(--px18,0) * 4px) calc(var(--py18,0) * 3px)}",
+    "",
     "#menu{overflow:clip!important} /* 装饰 SVG 溢出右边，hidden 仍会被 focus/scrollIntoView 横向滚走 120px，clip 不可滚 *//* 可点的面板不随视差移动（会让按钮“不稳定”、误触），只移动背景/装饰层 */",
     "body.depth18:has(.drawer:not(.hidden)) #menu .bg{filter:blur(3px) brightness(.8)}",
     "#syDepth18{position:absolute;inset:0;pointer-events:none;z-index:1}"

@@ -211,7 +211,7 @@
 
 ## E027b 抽屉面板随视差倾斜导致按钮“不稳定”
 - 根因：.drawer .dbody 跟随 --px18 持续 transform，Playwright 点击判定 not stable，真机也易误触。
-- 修复：可交互面板不再随视差移动，只移动背景与装饰层。
+- 修复：可交互面板（抽屉 .dbody、大厅 #menu>.menu）不再随视差移动，只移动背景、粒子与看板娘层。
 
 ## E030 大厅在窄屏被横向滚走 120px
 - 根因：大厅装饰 SVG 溢出右边，#menu overflow:hidden 仍可被 focus/scrollIntoView 滚动，点按钮后整页左移、按钮出屏。
