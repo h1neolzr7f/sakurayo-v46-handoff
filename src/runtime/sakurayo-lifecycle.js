@@ -391,6 +391,7 @@
     3: { tint: "12,8,26", line: "150,200,255", pool: "255,90,150", deco: "crack", petal: "255,120,170" },
     4: { tint: "8,6,30", line: "170,140,255", pool: "150,110,255", deco: "rune", petal: "220,180,255" }
   };
+  function tok18(n, a) { return global.SakurayoTok ? global.SakurayoTok(n, a) : "gray"; }
   function h18(a, b, k) { var x = Math.sin(a * 127.1 + b * 311.7 + k * 74.7) * 43758.5453; return x - Math.floor(x); }
   function drawGroundDressing18(ctx, world) {
     var sid = world.stageId || 1, P = DRESS18[((sid - 1) % 4 + 4) % 4 + 1], t = (world.runTime || 0) % 3600,
@@ -420,7 +421,7 @@
       ctx.strokeStyle = "rgba(" + P.line + ",0.16)"; ctx.fillStyle = "rgba(" + P.line + ",0.07)"; ctx.lineWidth = 1.5;
       if (P.deco === "sakura") { for (i = 0; i < 5; i++) { ctx.rotate(1.2566); ctx.beginPath(); ctx.ellipse(0, -16, 7, 15, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); } ctx.beginPath(); ctx.arc(0, 0, 30, 0, Math.PI * 2); ctx.stroke(); }
       else if (P.deco === "hazard") { ctx.strokeRect(-34, -10, 68, 20); for (i = -3; i < 3; i++) { ctx.beginPath(); ctx.moveTo(i * 12, 10); ctx.lineTo(i * 12 + 10, -10); ctx.stroke(); } }
-      else if (P.deco === "crack") { ctx.strokeStyle = "rgba(255,110,160,0.18)"; ctx.beginPath(); ctx.moveTo(-30, -4); ctx.lineTo(-8, 3); ctx.lineTo(4, -9); ctx.lineTo(30, 6); ctx.moveTo(4, -9); ctx.lineTo(10, -26); ctx.stroke(); }
+      else if (P.deco === "crack") { ctx.strokeStyle = tok18("accent", 0.18); ctx.beginPath(); ctx.moveTo(-30, -4); ctx.lineTo(-8, 3); ctx.lineTo(4, -9); ctx.lineTo(30, 6); ctx.moveTo(4, -9); ctx.lineTo(10, -26); ctx.stroke(); }
       else { ctx.beginPath(); ctx.arc(0, 0, 26, 0, Math.PI * 2); ctx.moveTo(18, 0); ctx.arc(0, 0, 18, 0, Math.PI * 2); ctx.stroke(); for (i = 0; i < 6; i++) { ctx.rotate(1.047); ctx.fillRect(20, -2, 8, 4); } }
       ctx.restore();
     }
@@ -428,9 +429,28 @@
       var nd = low ? 1 : 3;
       for (i = 0; i < nd; i++) { a = h18(c * 3 + i, r, sid + 40); if (a > 0.5) continue;
         x = c * cell + h18(c, r, 50 + i) * cell; y = r * cell + h18(c, r, 60 + i) * cell;
-        if (i === 0) { ctx.fillStyle = "rgba(170,190,215,0.10)"; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 7, y + 2); ctx.lineTo(x + 2, y + 6); ctx.closePath(); ctx.fill(); }
+        if (i === 0) { ctx.fillStyle = tok18("n5", 0.1); ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + 7, y + 2); ctx.lineTo(x + 2, y + 6); ctx.closePath(); ctx.fill(); }
         else { var sw = Math.sin(t * 0.8 + a * 20) * 3; ctx.fillStyle = "rgba(" + P.petal + ",0.42)"; ctx.beginPath(); ctx.ellipse(x + sw, y, 4.5, 2.4, a * 6 + t * 0.2, 0, Math.PI * 2); ctx.fill(); }
       }
+    }
+
+    // 中尺度物件（E023b）：水洼反光、裂缝、平贴路障、全息灯笼、废弃车壳、樱瓣堆。只是地面贴图，不参与碰撞，压低对比避免误认成障碍
+    var cell2 = 420, d0 = Math.floor(cx / cell2) - 1, e0 = Math.floor(cy / cell2) - 1, d1 = Math.ceil((cx + W) / cell2), e1 = Math.ceil((cy + H) / cell2), kind, ox, oy;
+    for (r = e0; r <= e1; r++) for (c = d0; c <= d1; c++) {
+      a = h18(c, r, sid + 77); kind = Math.floor(h18(r, c, sid + 78) * 6); ox = c * cell2 + 60 + h18(c, r, 79) * 300; oy = r * cell2 + 60 + h18(c, r, 80) * 300;
+      if (a > (low ? 0.45 : 0.75)) continue;
+      ctx.save(); ctx.translate(ox, oy); ctx.rotate((h18(c, r, 81) - 0.5) * 0.8);
+      if (kind === 0) { var pg = ctx.createRadialGradient(0, 0, 4, 0, 0, 70); pg.addColorStop(0, "rgba(" + P.pool + ",0.20)"); pg.addColorStop(1, "rgba(" + P.pool + ",0)"); ctx.fillStyle = pg; ctx.beginPath(); ctx.ellipse(0, 0, 70, 28, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "rgba(" + P.line + "," + (0.18 + 0.1 * Math.sin(t * 2 + a * 9)) + ")"; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(-40, -4); ctx.lineTo(30, -8); ctx.moveTo(-20, 6); ctx.lineTo(42, 3); ctx.stroke(); }
+      else if (kind === 1) { ctx.strokeStyle = tok18("n0", 0.55); ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(-60, 0); ctx.lineTo(-20, 8); ctx.lineTo(0, -6); ctx.lineTo(40, 10); ctx.lineTo(70, -4); ctx.moveTo(0, -6); ctx.lineTo(10, -34); ctx.moveTo(-20, 8); ctx.lineTo(-28, 30); ctx.stroke();
+        ctx.strokeStyle = "rgba(" + P.line + ",0.14)"; ctx.lineWidth = 1; ctx.stroke(); }
+      else if (kind === 2) { ctx.fillStyle = tok18("n0", 0.4); ctx.fillRect(-56, -9, 112, 18); for (i = -4; i < 4; i++) { ctx.fillStyle = i % 2 ? tok18("warn", 0.22) : tok18("n0", 0.3); ctx.beginPath(); ctx.moveTo(i * 14, 9); ctx.lineTo(i * 14 + 7, -9); ctx.lineTo(i * 14 + 21, -9); ctx.lineTo(i * 14 + 14, 9); ctx.fill(); } }
+      else if (kind === 3) { var lp = 0.6 + 0.4 * Math.sin(t * 2.4 + a * 11), lg = ctx.createRadialGradient(0, 0, 2, 0, 0, 56); lg.addColorStop(0, "rgba(" + P.petal + "," + (0.30 * lp) + ")"); lg.addColorStop(1, "rgba(" + P.petal + ",0)"); ctx.fillStyle = lg; ctx.beginPath(); ctx.arc(0, 0, 56, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = "rgba(" + P.petal + "," + (0.55 * lp) + ")"; ctx.lineWidth = 1.5; ctx.strokeRect(-7, -12, 14, 20); ctx.beginPath(); ctx.moveTo(0, -12); ctx.lineTo(0, -20); ctx.stroke(); ctx.fillStyle = "rgba(" + P.petal + "," + (0.25 * lp) + ")"; ctx.fillRect(-7, -12, 14, 20); }
+      else if (kind === 4) { ctx.fillStyle = tok18("n0", 0.42); ctx.beginPath(); ctx.moveTo(-48, -18); ctx.lineTo(30, -20); ctx.lineTo(52, -6); ctx.lineTo(50, 18); ctx.lineTo(-50, 18); ctx.closePath(); ctx.fill();
+        ctx.strokeStyle = "rgba(" + P.line + ",0.16)"; ctx.lineWidth = 1.2; ctx.stroke(); ctx.strokeRect(-30, -14, 22, 12); ctx.strokeRect(-2, -15, 22, 12); ctx.fillStyle = tok18("n0", 0.5); ctx.beginPath(); ctx.arc(-30, 18, 8, 0, Math.PI * 2); ctx.arc(30, 18, 8, 0, Math.PI * 2); ctx.fill(); }
+      else { for (i = 0; i < 9; i++) { var qx = (h18(c, i, 90) - 0.5) * 70, qy = (h18(r, i, 91) - 0.5) * 40; ctx.fillStyle = "rgba(" + P.petal + ",0.40)"; ctx.beginPath(); ctx.ellipse(qx, qy, 4.5, 2.4, i, 0, Math.PI * 2); ctx.fill(); } }
+      ctx.restore();
     }
     if (world.playerX != null && world.playerY != null) {
       var px = world.playerX, py = world.playerY + 20, pp = 0.5 + 0.5 * Math.sin(t * 3);
